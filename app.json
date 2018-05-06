@@ -6,14 +6,8 @@
   "keywords": ["api", "management", "orchestrator", "rest", "manager"],
   "website": "https://getheimdall.io/",
   "success_url": "/",
-  "env": {
-    "HEROKU_APP_NAME": {
-      "description": "Please re-enter your App Name from the top.",
-      "required": true
-    }
-  },
   "addons": [
-    "mongolab",
+    "mongolab:sandbox",
     "heroku-postgresql:hobby-dev",
     "heroku-redis:hobby-dev",
     "rabbitmq-bigwig:pipkin"
