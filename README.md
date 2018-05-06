@@ -1,10 +1,15 @@
 # Heimdall
-[![forthebadge](https://forthebadge.com/images/badges/made-with-java.svg)](https://forthebadge.com) [![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
 
-**An easy way to orchestrate your Api's**
+<p align="center"> 
+  <img src="https://raw.githubusercontent.com/getheimdall/heimdall/master/.github/heimdall-logo.png">
+</p>
+<p align="center">
+  An easy way to orchestrate your Api's
+</p>
 
-### What's Heimdall
--------------------
+
+## What's Heimdall
+
 This project is an easy way to use an API Orchestrator to your project. A simple way to manipulate request/response and uncouple your business domain, providing more flexibilities and personalize your API.
 
 ### Features
@@ -26,11 +31,41 @@ In this project we built our algorithm over the [Netflix Zuul](https://github.co
 ### Api
 To provide a easy way to manage the gateway we put an Api to make more easy add new routes, interceptors, rate limit and others things to manipulate the gateway at runtime.
 
-## Usage 
+## Usage
+Keep in mind, that you are going to start 3 Spring Boot applications, 1 Database instance and RabbitMq. Make sure you have `4 Gb` RAM available on your machine.\
+
+### Requirements
+- Docker
+- Docker Compose
+- Nodejs
+- Maven
+- Java 8
+
+### First clone the project
+
+```sh 
+$ git clone --depth=1 https://github.com/getheimdall/heimdall.git heimdall
+$ cd heimdall
+```
+
+### Docker mode
+...
+
+If you'd like to build images yourself (with some changes in the code, for example), you have to clone all repository and build artifacts with maven. Then, run: 
+
+```sh
+$ docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+```
+
+`docker-compose.dev.yml` inherits `docker-compose.yml` with additional possibility to build images locally and expose all containers ports for convenient development.
+
+Access Heimdal on: [http://localhost:3000](http://localhost:3000)
 
 ### Deploy on Heroku
 
-Heimdall app can easily be deployed to Heroku clicking on button  [![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+Heimdall app can easily be deployed to Heroku clicking on button: 
+
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
 or executing the commands:
 
@@ -41,64 +76,54 @@ $ git push heroku master
 $ heroku open
 ```
 
-### How to run all the things?
-Keep in mind, that you are going to start 3 Spring Boot applications, 1 Database instance and RabbitMq. Make sure you have `4 Gb` RAM available on your machine.\
-
-#### Requirements
-- Docker
-- Docker Compose
-- Nodejs
-- Maven
-- Java 8
-
-```sh 
-$ git clone --depth=1 https://github.com/getheimdall/heimdall.git heimdall
-```
-
-#### Docker mode
-...
-
-If you'd like to build images yourself (with some changes in the code, for example), you have to clone all repository and build artifacts with maven. Then, run `docker-compose -f docker-compose.yml -f docker-compose.dev.yml up`
-
-`docker-compose.dev.yml` inherits `docker-compose.yml` with additional possibility to build images locally and expose all containers ports for convenient development.
-
-#### Developer mode
+### Running locally
 
 Open your favorite Terminal and run these commands.
 
 First tab to start config:
 
 ```sh
-$ cd /heimdall-config && mvn spring-boot:run
+$ cd /heimdall-config
+$ mvn spring-boot:run
 ```
 
 Second tab to start gateway (require **CONFIG** alredy started): 
 
 ```sh
-$ cd /heimdall-gateway && mvn spring-boot:run
+$ cd /heimdall-gateway
+$ mvn spring-boot:run
 ```
 
 Third tab to start api (require **CONFIG** alredy started):
 
 ```sh
-$ cd /heimdall-api && mvn spring-boot:run
+$ cd /heimdall-api
+$ mvn spring-boot:run
 ```
 
 (optional) Fourth tab to start front-end (require **API** alredy started)
 
+With Yarn
 ```sh
 $ cd /heimdall-frontend
-$ yarn` or `npm install
-$ yarn run` or `npm run start
+$ yarn
+$ yarn run
 ```
 
-#### Important endpoints
+Withou Yarn
+```sh
+$ cd /heimdall-frontend
+$ npm install
+$ npm run start
+```
+
+### Important endpoints
 - http://localhost:8080 - Gateway
 - http://localhost:8888 - Config
 - http://localhost:9090 - Api
 - http://localhost:3000 - frontend
 
-#### Notes
+### Notes
 All Spring Boot applications require already running [Config Server](https://github.com/sqshq/PiggyMetrics#config-service) for startup. But we can start all containers simultaneously because of `depends_on` docker-compose option.
 
 ## Feedback welcome
