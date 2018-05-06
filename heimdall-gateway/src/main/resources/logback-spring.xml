@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+	<springProperty scope="context" name="app_name" source="info.app.name" />	
+	<springProperty scope="context" name="app_version" source="info.app.version"/>
+	<springProperty scope="context" name="app_profile" source="info.app.profile"/>
+
+	<logger name="org.apache.catalina.startup.DigesterFactory" level="ERROR"/>
+	<logger name="org.apache.catalina.util.LifecycleBase" level="ERROR"/>
+	<logger name="org.apache.coyote.http11.Http11NioProtocol" level="WARN"/>
+	<logger name="org.apache.sshd.common.util.SecurityUtils" level="WARN"/>
+	<logger name="org.apache.tomcat.util.net.NioSelectorPool" level="WARN"/>
+	<logger name="org.crsh.plugin" level="WARN"/>
+	<logger name="org.crsh.ssh" level="WARN"/>
+	<logger name="org.eclipse.jetty.util.component.AbstractLifeCycle" level="ERROR"/>
+	<logger name="org.hibernate.validator.internal.util.Version" level="WARN"/>
+	<logger name="org.springframework.boot.actuate.autoconfigure.CrshAutoConfiguration" level="WARN"/>
+	<logger name="org.springframework.boot.actuate.endpoint.jmx" additivity="false">
+		<appender-ref ref="DEBUG_LEVEL_REMAPPER"/>
+	</logger>
+	<logger name="com.netflix.zuul" level="INFO"/>
+	<logger name="org.springframework.cloud.netflix.zuul" level="INFO"/>
+	<logger name="io.sentry" level="OFF" />
+
+	<appender name="APPENDER_SENTRY_LOGS" class="io.sentry.logback.SentryAppender">
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>ERROR</level>
+		</filter>
+	</appender>
+    
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="APPENDER_SENTRY_LOGS"/> 
+    </root>	
+
+</configuration>

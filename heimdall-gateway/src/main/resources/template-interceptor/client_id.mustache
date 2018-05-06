@@ -1,0 +1,126 @@
+
+import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
+
+import java.util.*;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.util.DigestUtils;
+
+import com.google.common.collect.Sets;
+import com.netflix.zuul.context.RequestContext;
+
+import br.com.conductor.heimdall.gateway.filter.helper.*;
+import br.com.conductor.heimdall.core.entity.App;
+import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
+import br.com.conductor.heimdall.core.enums.Location;
+import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
+import br.com.conductor.heimdall.core.repository.AppRepository;
+import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import br.com.conductor.heimdall.core.util.BeanManager;
+import br.com.conductor.heimdall.core.util.ConstantsInterceptors;
+import br.com.conductor.heimdall.core.util.DigestUtils;
+import br.com.conductor.heimdall.middleware.spec.*;
+import br.com.twsoftware.alfred.object.Objeto;
+
+public class ClientIdInterceptor extends HeimdallFilter {
+
+     private static Set<String> pathsAllowed;
+
+     private static Set<String> pathsNotAllowed;
+
+     private AppRepository appRepository;
+
+     private static String inboundURL;
+
+     private static String method;
+
+     private Helper helper;
+
+     public ClientIdInterceptor() {
+
+          method = "{{method}}";
+
+          pathsAllowed = Sets.newHashSet();
+     {{#pathsAllowed}}
+          pathsAllowed.add("{{.}}");
+     {{/pathsAllowed}}      
+
+          pathsNotAllowed = Sets.newHashSet();
+     {{#pathsNotAllowed}}
+          pathsNotAllowed.add("{{.}}");
+     {{/pathsNotAllowed}}           
+
+          inboundURL = "{{inboundURL}}";
+
+          this.helper = new HelperImpl();
+
+     }
+
+     @Override
+     public int filterOrder() {
+
+          return {{order}};
+     }
+
+     @Override
+     public String filterType() {
+
+          return "{{executionPoint}}";
+     }
+
+     @Override
+     public boolean should() {
+
+          return InterceptorLifeCycle.{{lifeCycle}}.filter(pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest());
+     }
+     
+     @Override
+     public String getName() {
+     	return "{{name}}"
+     }
+
+     @Override
+     public void execute() throws Throwable {
+
+          appRepository = (AppRepository) BeanManager.getBean(AppRepository.class);
+          RequestContext ctx = RequestContext.getCurrentContext();
+          HttpServletRequest request = ctx.getRequest();
+          
+          String clientId = null;
+          Location location = Location.valueOf("{{location}}");
+          String name = "{{name}}";
+          if (Location.HEADER.equals(location)) {
+               
+               clientId = helper.call().request().header().get(name);
+          }else {
+
+               clientId = request.getParameter(name);               
+          }
+          
+          if (Objeto.notBlank(clientId)) {
+               
+               TraceContextHolder.getInstance().getActualTrace().setClientId(DigestUtils.digestMD5(clientId));
+               App app = appRepository.findByClientId(clientId);
+               
+               if (Objeto.isBlank(app)) {
+
+                    ctx.setSendZuulResponse(false);
+                    ctx.put(INTERRUPT, true);
+                    ctx.setResponseBody(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, "Client Id"));
+                    ctx.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());               
+               } else {
+                    
+                    TraceContextHolder.getInstance().getActualTrace().setAppDeveloper(app.getDeveloper().getEmail());
+               }
+          } else {
+
+               ctx.setSendZuulResponse(false);
+               ctx.put(INTERRUPT, true);
+               ctx.setResponseBody(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, "Client Id"));
+               ctx.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
+          }
+     }
+     
+}

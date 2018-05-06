@@ -1,0 +1,72 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>br.com.conductor.heimdall</groupId>
+		<artifactId>heimdall</artifactId>
+		<version>1.1.47-SNAPSHOT</version>
+	</parent>
+	<artifactId>heimdall-config</artifactId>
+	<name>heimdall-config</name>
+	<packaging>jar</packaging>
+
+	<properties>
+		<docker.imageName>getheimdall/heimdall-config</docker.imageName>
+		<docker.serverId>docker-hub</docker.serverId>
+		<docker.registryUrl>https://hub.docker.com/</docker.registryUrl>
+	</properties>
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-config-server</artifactId>
+		</dependency>
+	</dependencies>
+	
+	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+				<includes>
+					<include>**/*</include>
+				</includes>
+			</resource>
+		</resources>
+	
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>				
+			</plugin>
+
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>docker-maven-plugin</artifactId>
+				<version>0.4.1</version>
+				<configuration>
+					<baseImage>java:openjdk-8-jdk-alpine</baseImage>
+					<imageName>${docker.imageName}</imageName>
+					<entryPoint>["java", "-Xmx600m", "-Xms200m", "-jar", "/${project.build.finalName}.jar"]</entryPoint>
+					<forceTags>true</forceTags>
+					<serverId>${docker.serverId}</serverId>
+					<registryUrl>${docker.registryUrl}</registryUrl>
+					<imageTags>
+						<imageTag>${project.version}</imageTag>
+						<imageTag>latest</imageTag>
+					</imageTags>
+					<resources>
+						<resource>
+							<targetPath>/</targetPath>
+							<directory>${project.build.directory}</directory>
+							<include>${project.build.finalName}.jar</include>
+						</resource>
+					</resources>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>	
+	<description>Spring Cloud Config is horizontally scalable centralized configuration service for distributed systems. It uses a pluggable repository layer that currently supports local storage, Git, and Subversion.
+
+In this project, We use native profile, which simply loads config files from the local classpath. You can see shared directory in Config service resources. Now, when Heimdall-api requests it's configuration, Config service responses with shared/application-api.yml.</description>
+</project>

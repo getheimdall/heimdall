@@ -1,0 +1,73 @@
+
+package br.com.conductor.heimdall.middleware.spec;
+
+/*-
+ * =========================LICENSE_START==================================
+ * heimdall-middleware-spec
+ * ========================================================================
+ * Copyright (C) 2018 Conductor Tecnologia SA
+ * ========================================================================
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ==========================LICENSE_END===================================
+ */
+
+/**
+ * <h1>Helper</h1><br/>
+ * 
+ * This interface provides methods that return a {@link ApiResponse},
+ * a {@link Call}, a {@link DB}, a {@link Http} and a {@link Json}.
+ *
+ * @author Filipe Germano
+ *
+ */
+public interface Helper {
+
+	 /**
+	  * Gets a ApiResponse.
+	  * 
+	  * @return	The ApiResponse
+	  */
+     public ApiResponse apiResponse();
+
+     /**
+      * Gets a Call.
+      * 
+      * @return	The Call
+      */
+     public Call call();
+
+     /**
+      * Gets a DB.
+      * 
+      * @param databaseName		The database name
+      * @return					The DB
+      */
+     public DB db(String databaseName);
+
+     /**
+      * Gets a Http.
+      * 
+      * @return	The Http
+      */
+     public Http http();
+
+     /**
+      * Gets a Json.
+      * 
+      * @return The Json
+      */
+     public Json json();
+     
+     public Xml xml();
+
+}

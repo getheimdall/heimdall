@@ -1,0 +1,56 @@
+version: '2'
+services:
+  mongo:
+    image: mongo:3.6
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+  redis:
+    image: redis:alpine
+  rabbitmq:
+    image: rabbitmq:alpine
+  postgres-data:
+    image: busybox
+    volumes:
+    - /var/lib/postgresql/data/pgdata        
+  postgres:
+    image: postgres:alpine
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_DB: heimdall
+      POSTGRES_PASSWORD: '123456'
+      POSTGRES_USER: postgres
+    volumes_from:
+    - postgres-data
+    ports:
+    - 5433:5432/tcp        
+  heimdall-config:
+    image: getheimdall/heimdall-config:latest
+  heimdall-api:
+    image: getheimdall/heimdall-api:latest
+    environment:
+    - SPRING_PROFILES_ACTIVE=docker
+    links:
+    - postgres:postgres
+    - heimdall-config:heimdall-config
+    - redis:redis
+    - mongo:mongo
+    - rabbitmq:rabbitmq
+    ports:
+    - 9090:9090/tcp        
+  heimdall-gateway:
+    image: getheimdall/heimdall-gateway:latest
+    environment:
+    - SPRING_PROFILES_ACTIVE=docker
+    links:
+    - postgres:postgres
+    - heimdall-config:heimdall-config
+    - redis:redis
+    - mongo:mongo
+    - rabbitmq:rabbitmq
+    ports:
+    - 8080:8080/tcp        
+  heimdall-frontend:
+    image: getheimdall/heimdall-frontend:latest   
+    ports:
+    - 80:5000/tcp        

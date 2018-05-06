@@ -1,0 +1,18 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="conductor\marcos.filho" id="1">
+		<preConditions>
+			<tableExists tableName="USERS_ROLES" />
+			<sqlCheck expectedResult="0">
+				select count(1) from USERS_ROLES
+			</sqlCheck>
+		</preConditions>
+		<sql>
+			INSERT INTO USERS_ROLES (USER_ID, ROLE_ID) SELECT USERS.ID AS USERID, ROLES.ID AS ROLEID FROM USERS USERS, ROLES ROLES WHERE USERS.USERNAME = 'admin' AND ROLES.NAME = 'ADMIN';
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>

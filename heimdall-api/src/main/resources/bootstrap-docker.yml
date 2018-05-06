@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: api
+  cloud:
+    config:
+      uri: http://heimdall-config:8888
+      fail-fast: true
