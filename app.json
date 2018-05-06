@@ -15,7 +15,7 @@
   "addons": [
     "mongolab",
     "heroku-postgresql:hobby-dev",
-    "heroku-redis:premium-0",
+    "heroku-redis:hobby-dev",
     "rabbitmq-bigwig:pipkin"
   ]
 }
