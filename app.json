@@ -1,0 +1,21 @@
+{
+  "name": "Heimdall API Orchestrator",
+  "description": "An easy way to orchestrate your Api's",
+  "repository": "https://github.com/getheimdall/heimdall",
+  "logo": "https://raw.githubusercontent.com/getheimdall/heimdall/master/.github/heimdall-logo.png",
+  "keywords": ["api", "management", "orchestrator", "rest", "manager"],
+  "website": "https://getheimdall.io/",
+  "success_url": "/",
+  "env": {
+    "HEROKU_APP_NAME": {
+      "description": "Please re-enter your App Name from the top.",
+      "required": true
+    }
+  },
+  "addons": [
+    "mongolab",
+    "heroku-postgresql:hobby-dev",
+    "heroku-redis:premium-0",
+    "rabbitmq-bigwig:pipkin"
+  ]
+}
