@@ -27,13 +27,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 /**
- * <h1>Page</h1><br/>
- * 
  * This class provides a paging system for a response from a database.
  *
  * @author Filipe Germano
  *
- * @param <T>
  */
 public class Page<T> {
      

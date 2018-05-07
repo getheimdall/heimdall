@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.middleware.spec;
  */
 
 /**
- * <h1>Helper</h1><br/>
- * 
  * This interface provides methods that return a {@link ApiResponse},
  * a {@link Call}, a {@link DB}, a {@link Http} and a {@link Json}.
  *

@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.middleware.exception;
  */
 
 /**
- * <h1>NotFoundException</h1><br/>
- * 
  * This class represents the exceptions related to not found requests.
  *
  * @author Filipe Germano

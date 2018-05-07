@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.middleware.spec;
  */
 
 /**
- * <h1>Call</h1><br/>
- * 
  * This interface represents a call made to the api.
  *
  * @author Filipe Germano

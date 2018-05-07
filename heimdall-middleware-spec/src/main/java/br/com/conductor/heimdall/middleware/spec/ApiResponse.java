@@ -25,8 +25,6 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
- * <h1>ApiResponse</h1><br/>
- * 
  * This interface represents a response to the Api.
  *
  * @author Filipe Germano

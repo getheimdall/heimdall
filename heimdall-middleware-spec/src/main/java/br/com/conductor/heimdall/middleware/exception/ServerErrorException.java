@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.middleware.exception;
  */
 
 /**
- * <h1>ServerErrorException</h1><br/>
- * 
  * This class represents the exceptions where the server generated some error. 
  *
  * @author Filipe Germano

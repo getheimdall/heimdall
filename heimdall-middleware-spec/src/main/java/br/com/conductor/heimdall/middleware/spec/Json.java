@@ -24,8 +24,6 @@ package br.com.conductor.heimdall.middleware.spec;
 import java.util.Map;
 
 /**
- * <h1>Json</h1><br/>
- * 
  * This interface provides methods to parse Json Strings to a java object and reverse.
  *
  * @author Filipe Germano
@@ -36,7 +34,7 @@ public interface Json {
 	 /**
 	  * Converts a Map of objects to a json string.
 	  * 
-	  * @param body		- The Map of objects to be converted
+	  * @param body		The Map of objects to be converted
 	  * @return			The json string created
 	  */
      public String parse(Map<String, Object> body);
@@ -44,7 +42,7 @@ public interface Json {
      /**
       * Parses a string to a json string.
       * 
-      * @param string	- The string to be parsed
+      * @param string	The string to be parsed
       * @return			The parsed json string
       */
      public String parse(String string);
@@ -52,7 +50,7 @@ public interface Json {
      /**
       * Parses a Object to a json string.
       * 
-      * @param object	- The object to be parsed
+      * @param object	The object to be parsed
       * @return			The parsed json string
       */
      public <T> String parse(T object);
@@ -68,7 +66,7 @@ public interface Json {
      /**
       * Parses a object to a Map<String, Object>.
       * 
-      * @param object	- The object to be parsed
+      * @param object	The object to be parsed
       * @return			The Map representation of the object
       */
      public <T> Map<String, Object> parseToMap(T object);
