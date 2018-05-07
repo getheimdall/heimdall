@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.core.util;
  */
 
 /**
- * <h1>ConstantsInterceptors</h1><br/>
- * 
  * This class holds the global interceptor constants.
  *
  * @author Filipe Germano

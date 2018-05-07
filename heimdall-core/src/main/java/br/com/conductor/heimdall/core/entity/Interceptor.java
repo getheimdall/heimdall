@@ -56,8 +56,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * <h1>Interceptor</h1>
- * 
  * This class represents a Interceptor registered to the system.
  * 
  * @author Filipe Germano

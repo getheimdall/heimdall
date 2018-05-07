@@ -22,9 +22,7 @@ package br.com.conductor.heimdall.core.exception;
  */
 
 /**
- * <h1>NotFoundException</h1><br/>
- * 
- * This calss represents the exceptions where the request was not found.
+ * This class represents the exceptions where the request was not found.
  * 
  * @author Filipe Germano
  * @see HeimdallException

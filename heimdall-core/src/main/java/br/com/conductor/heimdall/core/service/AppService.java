@@ -58,8 +58,6 @@ import br.com.twsoftware.alfred.object.Objeto;
 import net.bytebuddy.utility.RandomString;
 
 /**
- * <h1>App Service</h1>
- * 
  * This class provides methods to create, read, update and delete the {@link App} resource.
  * 
  * @author Filipe Germano
@@ -83,7 +81,7 @@ public class AppService {
      /**
       * Finds a {@link App} by its ID.
       * 
-      * @param 	id						- The id of the {@link App}
+      * @param 	id						The id of the {@link App}
       * @return							The {@link App} that was found
       * @throws NotFoundException		Resource not found
       */
@@ -100,8 +98,8 @@ public class AppService {
      /**
       * Generates a paged list of App.
       * 
-      * @param 	appDTO					- The {@link AppDTO}
-      * @param 	pageableDTO				- The {@link PageableDTO}
+      * @param 	appDTO					The {@link AppDTO}
+      * @param 	pageableDTO				The {@link PageableDTO}
       * @return							The paged {@link App} list as a {@link AppPage} object
       */
      @Transactional(readOnly = true)
@@ -122,7 +120,7 @@ public class AppService {
      /**
       * Generates a list of {@link App}.
       * 
-      * @param 	appDTO					- The {@link AppDTO}
+      * @param 	appDTO					The {@link AppDTO}
       * @return							The list of {@link App}'s
       */
      @Transactional(readOnly = true)
@@ -140,7 +138,7 @@ public class AppService {
      /**
       * Saves a {@link App} to the repository.
       * 
-      * @param 	appDTO					- The {@link AppDTO}
+      * @param 	appDTO					The {@link AppDTO}
       * @return							The saved {@link App}
       * @throws HeimdallException		Developer not exist
       */
@@ -167,8 +165,8 @@ public class AppService {
      /**
       * Updates a {@link App} by its ID.
       * 
-      * @param 	id						- The ID of the {@link App}
-      * @param 	appDTO					- {@link AppDTO}
+      * @param 	id						The ID of the {@link App}
+      * @param 	appDTO					{@link AppDTO}
       * @return							The updated {@link App}
       * @throws HeimdallException		Resource not found
       */
@@ -187,7 +185,7 @@ public class AppService {
      /**
       * Deletes a {@link App} by its ID.
       * 
-      * @param  id						- The ID of the {@link App}
+      * @param  id						The ID of the {@link App}
       * @throws HeimdallException		Resource not found
       */
      public void delete(Long id) {
@@ -201,7 +199,7 @@ public class AppService {
      /**
       * Saves a {@link App}.
       * 
-      * @param  reqBody					- {@link AppCallbackDTO}
+      * @param  reqBody					{@link AppCallbackDTO}
       * @return							The {@link App} saved
       * @throws HeimdallException		Developer not exist
       */

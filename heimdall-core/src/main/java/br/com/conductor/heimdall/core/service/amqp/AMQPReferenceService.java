@@ -28,8 +28,6 @@ import org.springframework.stereotype.Service;
 import br.com.conductor.heimdall.core.util.RabbitConstants;
 
 /**
- * <h1>AMQPReferenceService.java</h1><br/>
- * 
  * This class controls a reference cache service.
  *
  * @author Marcos Filho

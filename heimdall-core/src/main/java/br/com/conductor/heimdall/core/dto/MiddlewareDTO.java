@@ -30,8 +30,6 @@ import br.com.conductor.heimdall.core.enums.Status;
 import lombok.Data;
 
 /**
- * <h1>MiddlewareDTO</h1><br/>
- *
  * Class is a Data Transfer Object for the {@link Middleware}.
  * 
  * @author Filipe Germano

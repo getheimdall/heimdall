@@ -47,8 +47,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * <h1>Plan</h1>
- * 
  * This class represents a Plan registered to the system.
  * 
  * @author Filipe Germano

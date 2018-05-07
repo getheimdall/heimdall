@@ -36,8 +36,6 @@ import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.util.ConstantsCache;
 
 /**
- * <h1>AppRepository</h1><br/>
- * 
  * Provides methods to access a {@link App}.
  *
  * @author Filipe Germano
@@ -48,7 +46,7 @@ public interface AppRepository extends JpaRepository<App, Long> {
      /**
 	 * Finds a active App by its client Id.
 	 * 
-	 * @param  clientId		- The client id
+	 * @param  clientId		The client id
 	 * @return				The App found
 	 */
      @Lock(LockModeType.NONE)
@@ -59,7 +57,7 @@ public interface AppRepository extends JpaRepository<App, Long> {
      /**
 	 * Finds a App by its client Id.
 	 * 
-	 * @param  clientId		- The client id
+	 * @param  clientId		The client id
 	 * @return				The App found
 	 */
      @Lock(LockModeType.NONE)
@@ -69,7 +67,7 @@ public interface AppRepository extends JpaRepository<App, Long> {
 	/**
 	 * Finds a App by its name.
 	 * 
-	 * @param  name			- The App name
+	 * @param  name			The App name
 	 * @return				The App found
 	 */
      @Lock(LockModeType.NONE)
@@ -78,7 +76,7 @@ public interface AppRepository extends JpaRepository<App, Long> {
 	/**
 	 * Finds a List of {@link Plan} associated with a App.
 	 * 
-	 * @param  appId		- The App Id
+	 * @param  appId		The App Id
 	 * @return				The list of Plan
 	 */
      @Lock(LockModeType.NONE)

@@ -24,8 +24,6 @@ package br.com.conductor.heimdall.core.util;
 import br.com.twsoftware.alfred.object.Objeto;
 
 /**
- * <h1>DigestUtils</h1><br/>
- * 
  * DigestMD5 wrapper class
  * 
  * @author Marcos Filho
@@ -36,7 +34,7 @@ public abstract class DigestUtils {
 	 /**
 	  * Return a hexadecimal string representation of the MD5 digest of the given bytes.
 	  * 
-	  * @param  value		- The value to be converted
+	  * @param  value		The value to be converted
 	  * @return				The converted value. Returns the input value if its blank.
 	  */
      public static String digestMD5(String value) {

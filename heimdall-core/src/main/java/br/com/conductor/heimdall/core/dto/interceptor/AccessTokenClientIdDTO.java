@@ -26,8 +26,6 @@ import java.io.Serializable;
 import lombok.Data;
 
 /**
- * <h1>AccessTokenClientIdDTO</h1><br/>
- * 
  * Class is a Data Transfer Object for the AccessTokenClientId.
  *
  * @author Filipe Germano

@@ -31,8 +31,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>Bean Manager</h1>
- * 
  * This class is used to manage the Beans from the system.
  * 
  * @author Thiago Sampaio
@@ -57,7 +55,7 @@ public class BeanManager implements ApplicationContextAware {
      /**
       * Initializes factory with {@link ApplicationContext}.
       * 
-      * @param 	applicationContext		- The {@link ApplicationContext} that will be used to initialize the factory
+      * @param 	applicationContext		The {@link ApplicationContext} that will be used to initialize the factory
       */
      private static void init(ApplicationContext applicationContext) {
 

@@ -31,8 +31,6 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
 /**
- * <h1>LocalDateTimeSerializer</h1><br/>
- * 
  * This class provides a method to serialize the data and time to a <i>json</i> format file.
  * 
  * @author Marcos Filho

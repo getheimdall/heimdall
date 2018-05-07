@@ -34,8 +34,6 @@ import br.com.conductor.heimdall.core.enums.Status;
 import lombok.Data;
 
 /**
- * <h1>AccessTokenPersist</h1><br/>
- * 
  * Class that represents the persist for a {@link AccessToken}.
  *
  * @author Filipe Germano

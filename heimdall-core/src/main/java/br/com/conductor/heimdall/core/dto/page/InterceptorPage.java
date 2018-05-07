@@ -30,8 +30,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <h1>InterceptorPage</h1><br/>
- * 
  * Class that represents a paged {@link Interceptor} list.
  *
  * @author Filipe Germano

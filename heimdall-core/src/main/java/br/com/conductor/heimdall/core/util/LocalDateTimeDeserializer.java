@@ -32,8 +32,6 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 
 /**
- * <h1>LocalDateTimeDeserializer</h1><br/>
- * 
  * This class provides a method to deserialize a <i>json</i> to a data and time format.
  * 
  * @author Marcos Filho

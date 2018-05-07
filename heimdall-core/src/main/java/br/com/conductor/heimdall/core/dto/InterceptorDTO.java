@@ -34,8 +34,6 @@ import br.com.conductor.heimdall.core.enums.TypeInterceptor;
 import lombok.Data;
 
 /**
- * <h1>InterceptorDTO</h1><br/>
- * 
  * Class is a Data Transfer Object for the {@link Interceptor}.
  *
  * @author Filipe Germano

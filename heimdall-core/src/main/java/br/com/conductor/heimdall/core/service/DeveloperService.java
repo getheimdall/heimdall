@@ -45,8 +45,6 @@ import br.com.conductor.heimdall.core.repository.DeveloperRepository;
 import br.com.conductor.heimdall.core.util.Pageable;
 
 /**
- * <h1>Developer Service</h1>
- * 
  * This class provides methods to create, read, update and delete the {@link Developer} resource.
  * 
  * @author Filipe Germano
@@ -61,7 +59,7 @@ public class DeveloperService {
      /**
       * Finds a {@link Developer} by its ID.
       * 
-      * @param  id 						- The ID of the {@link Developer} 
+      * @param  id 						The ID of the {@link Developer} 
       * @return 						The {@link Developer} found
       * @throws NotFoundException		Resource not found
       */
@@ -76,8 +74,8 @@ public class DeveloperService {
      /**
       * Generates a paged list of {@link Developer}s from a request.
       * 
-      * @param  developerDTO 			- The {@link DeveloperDTO}
-      * @param  pageableDTO 			- The {@link PageableDTO}
+      * @param  developerDTO 			The {@link DeveloperDTO}
+      * @param  pageableDTO 			The {@link PageableDTO}
       * @return							The paged {@link Developer} list as a {@link DeveloperPage} object
       */
      public DeveloperPage list(DeveloperDTO developerDTO, PageableDTO pageableDTO) {
@@ -97,7 +95,7 @@ public class DeveloperService {
      /**
       * Generates a list of {@link Developer} from a request.
       * 
-      * @param  developerDTO 			- The {@link DeveloperDTO}
+      * @param  developerDTO 			The {@link DeveloperDTO}
       * @return							The list of {@link Developer}
       */
      public List<Developer> list(DeveloperDTO developerDTO) {
@@ -114,7 +112,7 @@ public class DeveloperService {
      /**
       * Saves a {@link Developer}.
       * 
-      * @param  developerDTO 			- The {@link DeveloperDTO}
+      * @param  developerDTO 			The {@link DeveloperDTO}
       * @return							The {@link Developer} saved
       */
      @Transactional
@@ -129,8 +127,8 @@ public class DeveloperService {
      /**
       * Updates a {@link Developer} by its ID.
       * 
-      * @param  id						- The ID of the {@link Developer} to be updated
-      * @param  developerDTO 			- The {@link DeveloperDTO}
+      * @param  id						The ID of the {@link Developer} to be updated
+      * @param  developerDTO 			The {@link DeveloperDTO}
       * @return							The updated {@link Developer}
       * @throws NotFoundException		Resource not found
       */
@@ -148,7 +146,7 @@ public class DeveloperService {
      
      /**
       * Deletes a {@link Developer} by its ID.
-      * @param  id						- The ID of the {@link Developer} to be deleted
+      * @param  id						The ID of the {@link Developer} to be deleted
       * @throws NotFoundException		Resource not found
       */
      @Transactional

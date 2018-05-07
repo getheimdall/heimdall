@@ -28,8 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import br.com.conductor.heimdall.core.entity.Interceptor;
 
 /**
- * <h1>Should</h1><br/>
- * 
  * Provides method to validate the path of a {@link Interceptor}.
  *
  * @author Filipe Germano
@@ -40,11 +38,11 @@ public interface Should {
 	/**
 	 * Validates if a inbound {@link Interceptor} URL is valid.
 	 * 
-	 * @param path				- The Set that represents the path
-	 * @param pathsAllowed		- The Set of allowed paths
-	 * @param inboundURL		- The inbound URL
-	 * @param method			- The HTTP method
-	 * @param req				- The {@link HttpServletRequest}
+	 * @param path				The Set that represents the path
+	 * @param pathsAllowed		The Set of allowed paths
+	 * @param inboundURL		The inbound URL
+	 * @param method			The HTTP method
+	 * @param req				The {@link HttpServletRequest}
 	 * @return					True if the inbound URL is valid, false otherwise
 	 */
      public boolean filter(Set<String> path, Set<String> pathsAllowed, String inboundURL, String method, HttpServletRequest req);

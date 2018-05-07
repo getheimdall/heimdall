@@ -30,8 +30,6 @@ import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 
 /**
- * <h1>GenerateMustache</h1><br/>
- * 
  * Class creates a Mustache file.
  * 
  * @author Filipe Germano
@@ -42,8 +40,8 @@ public abstract class GenerateMustache {
 	 /**
 	  * Generates a Mustache file.
 	  * 
-	  * @param template		- The template for generation
-	  * @param parameters	- The Map<String, Object> with the parameters for creation
+	  * @param template		The template for generation
+	  * @param parameters	The Map<String, Object> with the parameters for creation
 	  * @return				The content of the file created
 	  */
      public static String generateTemplate(String template, Map<String, Object> parameters) {

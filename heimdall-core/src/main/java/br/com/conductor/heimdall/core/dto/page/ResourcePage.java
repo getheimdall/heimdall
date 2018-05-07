@@ -29,8 +29,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <h1>ResourcePage</h1><br/>
- * 
  * Class that represents a paged {@link Resource} list.
  *
  * @author Filipe Germano

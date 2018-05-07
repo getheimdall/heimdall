@@ -49,8 +49,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * <h1>Developer</h1>
- * 
  * This class represents a Developer registered to the system.
  * 
  * @author Filipe Germano

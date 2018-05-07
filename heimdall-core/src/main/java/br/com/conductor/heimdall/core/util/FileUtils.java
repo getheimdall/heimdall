@@ -30,8 +30,6 @@ import com.google.common.io.Files;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>FileUtils</h1><br/>
- * 
  * This class provides a method to write files on disk.
  * 
  * @author Filipe Germano
@@ -43,8 +41,8 @@ public class FileUtils {
 	 /**
 	  * Saves a file to disk with UTF-8 formating.
 	  * 
-	  * @param  content		- The String content of the file
-	  * @param  file		- The {@link File} object to be saved
+	  * @param  content		The String content of the file
+	  * @param  file		The {@link File} object to be saved
 	  */
      public static void write(String content, File file) {
           try {

@@ -24,8 +24,6 @@ package br.com.conductor.heimdall.core.enums;
 import br.com.conductor.heimdall.core.entity.Interceptor;
 
 /**
- * <h1>TypeInterceptor</h1><br/>
- * 
  * Enum that hold the types of {@link Interceptor}.
  *
  * @author Filipe Germano

@@ -24,8 +24,6 @@ package br.com.conductor.heimdall.core.repository;
 import br.com.conductor.heimdall.core.entity.RateLimit;
 
 /**
- * <h1>RateLimitRepository</h1><br/>
- * 
  * Provides methods to save, find and delete a {@link RateLimit}.
  *
  * @author Marcos Filho
@@ -36,7 +34,7 @@ public interface RateLimitRepository {
 	 /**
 	  * Saves a {@link RateLimit} to the repository and returns the RateLimit saved.
 	  * 
-	  * @param rate			- The RateLimit to be saved
+	  * @param rate			The RateLimit to be saved
 	  * @return				The saved RateLimit
 	  */
      RateLimit save(RateLimit rate);
@@ -44,7 +42,7 @@ public interface RateLimitRepository {
      /**
       * Finds a RateLimit on the repository.
       * 
-      * @param path			- The path to the RateLimit
+      * @param path			The path to the RateLimit
       * @return				The RateLimit found
       */
      RateLimit find(String path);
@@ -52,7 +50,7 @@ public interface RateLimitRepository {
      /**
       * Deletes a RateLimit from the repository.
       * 
-      * @param path			- The path to the RateLimit
+      * @param path			The path to the RateLimit
       */
      void delete(String path);
 

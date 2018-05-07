@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.core.util;
  */
 
 /**
- * <h1>ConstantsTag</h1><br/>
- *
  * This class holds the constant tags
  * 
  * @author Filipe Germano

@@ -25,8 +25,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 /**
- * <h1>Constants</h1><br/>
- * 
  * This class holds miscellaneous constants.
  *
  * @author Filipe Germano

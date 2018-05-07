@@ -29,8 +29,6 @@ import br.com.conductor.heimdall.core.entity.Middleware;
 import br.com.conductor.heimdall.core.enums.Status;
 
 /**
- * <h1>MiddlewareRepository</h1><br/>
- * 
  * Provides methods to access a {@link Middleware}.
  *
  * @author Filipe Germano
@@ -41,8 +39,8 @@ public interface MiddlewareRepository extends JpaRepository<Middleware, Long> {
 	 /**
 	  * Finds a Middleware by its Id and Status.
 	  * 
-	  * @param  id			- The Middleware Id
-	  * @param  status		- The Middleware Status
+	  * @param  id			The Middleware Id
+	  * @param  status		The Middleware Status
 	  * @return				The Middleware found
 	  */
      Middleware findByIdAndStatus(Long id, Status status);
@@ -66,8 +64,8 @@ public interface MiddlewareRepository extends JpaRepository<Middleware, Long> {
      /**
       * Finds a List of Middleware by Status and Api Id.
       * 
-      * @param  status		- The Middleware Staus
-      * @param  apiId		- The Api Id
+      * @param  status		The Middleware Staus
+      * @param  apiId		The Api Id
       * @return				The List of Middleware found
 	  */
      List<Middleware> findByStatusAndApiId(Status status, Long apiId);
@@ -75,8 +73,8 @@ public interface MiddlewareRepository extends JpaRepository<Middleware, Long> {
      /**
       * Finds a Middleware by its Id and Api Id.
       * 
-      * @param  apiId		- The Api Id
-      * @param  id			- The Middleware Id
+      * @param  apiId		The Api Id
+      * @param  id			The Middleware Id
       * @return				The Middleware found
 	  */
      Middleware findByApiIdAndId(Long apiId, Long id);
@@ -84,8 +82,8 @@ public interface MiddlewareRepository extends JpaRepository<Middleware, Long> {
      /**
       * Finds a Middleware by Api Id and Version.
       * 
-      * @param  apiId		- The Api Id
-      * @param  name		- The Middleware Version
+      * @param  apiId		The Api Id
+      * @param  name		The Middleware Version
       * @return				The Middleware found
 	  */
      Middleware findByApiIdAndVersion(Long apiId, String name);
@@ -93,7 +91,7 @@ public interface MiddlewareRepository extends JpaRepository<Middleware, Long> {
      /**
       * Finds a the first Middleware by Api Id.
       * 
-      * @param  apiId		- The Api Id
+      * @param  apiId		The Api Id
       * @return				The Middleware found
 	  */
      Middleware findTop1ByApiIdOrderByVersionDesc(Long apiId);

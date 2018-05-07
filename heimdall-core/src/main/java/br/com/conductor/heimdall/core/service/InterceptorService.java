@@ -77,8 +77,6 @@ import br.com.twsoftware.alfred.object.Objeto;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>Interceptor Service</h1>
- * 
  * This class provides methos to create, read, update and delete a {@link Interceptor} resource.<br/>
  * This class also performs a validation  before it saves or deletes a {@link Interceptor}.
  * 
@@ -117,7 +115,7 @@ public class InterceptorService {
      /**
       * Finds a {@link Interceptor} by its ID.
       * 
-      * @param  id					- The Id of the {@link Interceptor}
+      * @param  id					The Id of the {@link Interceptor}
       * @return						The {@link Interceptor} found
       * @throws NotFoundException	Resource not found
       */
@@ -133,8 +131,8 @@ public class InterceptorService {
      /**
       * Generates a paged list of {@link Interceptor} from a request.
       * 
-      * @param 	interceptorDTO					- The {@link InterceptorDTO}
-      * @param 	pageableDTO						- The {@link PageableDTO}
+      * @param 	interceptorDTO					The {@link InterceptorDTO}
+      * @param 	pageableDTO						The {@link PageableDTO}
       * @return									The paged {@link Interceptor} list as a {@link InterceptorPage} object
       */
      @Transactional(readOnly = true)
@@ -155,7 +153,7 @@ public class InterceptorService {
      /**
       * Generates a list of {@link Interceptor} from a request.
       * 
-      * @param 	interceptorDTO					- The {@link InterceptorDTO}
+      * @param 	interceptorDTO					The {@link InterceptorDTO}
       * @return									The List<{@link Interceptor}> list
       */
      @Transactional(readOnly = true)
@@ -173,7 +171,7 @@ public class InterceptorService {
      /**
       * Saves a {@link Interceptor} to the repository.
       * 
-      * @param 	interceptorDTO					- The {@link InterceptorDTO}
+      * @param 	interceptorDTO					The {@link InterceptorDTO}
       * @return									The {@link Interceptor} saved
       * @throws BadRequestException				Reference operations invalid
       */
@@ -228,8 +226,8 @@ public class InterceptorService {
      /**
       * Updates a {@link Interceptor} by its ID.
       * 
-      * @param 	id							- The ID of the {@link Interceptor} to be updated
-      * @param 	interceptorDTO				- The {@link InterceptorDTO}
+      * @param 	id							The ID of the {@link Interceptor} to be updated
+      * @param 	interceptorDTO				The {@link InterceptorDTO}
       * @return								The updated {@link Interceptor}
       * @throws NotFoundException			Resource not found
       */
@@ -254,7 +252,7 @@ public class InterceptorService {
      /**
       * Deletes a{@link Interceptor} by its ID.
       * 
-      * @param 	id						- The Id of the {@link Interceptor} to be deleted
+      * @param 	id						The Id of the {@link Interceptor} to be deleted
       * @throws NotFoundException		Resource not found
       */
      @Transactional
@@ -324,7 +322,7 @@ public class InterceptorService {
       * Private method to validate the lifecycle of a {@link Interceptor}.<br/>
       * Life cycle can be a PLAN, a RESOURCE or a OPERATION. 
       *
-      * @param 	interceptor					- The {@link Interceptor} to be validated
+      * @param 	interceptor					The {@link Interceptor} to be validated
       * @return								The validated {@link Interceptor}
       */
      private Interceptor validateLifeCycle(Interceptor interceptor) {

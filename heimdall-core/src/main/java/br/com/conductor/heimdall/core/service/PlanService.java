@@ -45,8 +45,6 @@ import br.com.conductor.heimdall.core.repository.PlanRepository;
 import br.com.conductor.heimdall.core.util.Pageable;
 
 /**
- * <h1>Plan Service</h1>
- * 
  * This class provides methos to create, read, update and delete a {@link Plan} resource.
  * 
  * @author Filipe Germano
@@ -70,8 +68,8 @@ public class PlanService {
      /**
       * Generates a paged list of {@link Plan} from a request.
       * 
-      * @param  planDTO						- The {@link PlanDTO}
-      * @param  pageableDTO					- The {@link PageableDTO}
+      * @param  planDTO						The {@link PlanDTO}
+      * @param  pageableDTO					The {@link PageableDTO}
       * @return								The paged {@link Plan} list as a {@link PlanPage} object
       */
      @Transactional(readOnly = true)
@@ -92,7 +90,7 @@ public class PlanService {
      /**
       * Generates a list of {@link Plan} from a request.
       * 
-      * @param  planDTO						- The {@link PlanDTO}
+      * @param  planDTO						The {@link PlanDTO}
       * @return								The List of {@link Plan}
       */
      @Transactional(readOnly = true)
@@ -110,7 +108,7 @@ public class PlanService {
      /**
       * Saves a {@link Plan} to the repository.
       * 
-      * @param  planDTO						- The {@link PlanDTO}
+      * @param  planDTO						The {@link PlanDTO}
       * @return								The saved {@link Plan}
       */
      public Plan save(PlanDTO planDTO) {
@@ -124,8 +122,8 @@ public class PlanService {
      /**
       * Updates a {@link Plan} by its Id.
       * 
-      * @param 	id							- The {@link Plan} Id
-      * @param 	planDTO						- The {@link PlanDTO}
+      * @param 	id							The {@link Plan} Id
+      * @param 	planDTO						The {@link PlanDTO}
       * @return								The updated {@link Plan}
       * @throws NotFoundException			Resource not found
       */
@@ -143,7 +141,7 @@ public class PlanService {
      /**
       * Deletes a {@link Plan} by its Id.
       * 
-      * @param 	id						- The {@link Plan} Id
+      * @param 	id						The {@link Plan} Id
       * @throws NotFoundException		Resource not found
       */
      public void delete(Long id) {

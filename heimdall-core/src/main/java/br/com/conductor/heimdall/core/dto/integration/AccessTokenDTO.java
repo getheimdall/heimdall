@@ -30,8 +30,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * <h1>AccessTokenDTO</h1><br/>
- * 
  * Class is a Data Transfer Object for the AccessToken.
  *
  * @author Marcos Filho

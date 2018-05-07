@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.core.util;
  */
 
 /**
- * <h1>ConstantsPath</h1><br/>
- * 
  * This class holds the path constants.
  *
  * @author Filipe Germano

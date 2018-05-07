@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.core.enums;
  */
 
 /**
- * <h1>Status</h1><br/>
- * 
  * Enum that represents the status allowed.
  *
  * @author Filipe Germano

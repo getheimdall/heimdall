@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.core.exception;
  */
 
 /**
- * <h1>ServerErrorException</h1><br/>
- * 
  * This class represents the exceptions related to server errors.
  * 
  * @author Filipe Germano

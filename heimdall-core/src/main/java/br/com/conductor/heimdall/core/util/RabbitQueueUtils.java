@@ -27,8 +27,6 @@ import java.net.UnknownHostException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>RabbitQueueUtils</h1><br/>
- * 
  * This class creates the required system properties that will be needed for the Rabbit Queue.
  * 
  * @author Filipe Germano

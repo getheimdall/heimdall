@@ -41,8 +41,6 @@ import org.springframework.messaging.handler.annotation.support.DefaultMessageHa
 import br.com.conductor.heimdall.core.util.RabbitConstants;
 
 /**
- * <h1>RabbitConfiguration</h1><br/>
- * 
  * Class provides the configuration for a RabbitMQ.
  *
  * @author Filipe Germano
