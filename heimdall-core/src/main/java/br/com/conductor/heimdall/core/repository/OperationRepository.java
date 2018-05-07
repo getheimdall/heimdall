@@ -51,7 +51,7 @@ public interface OperationRepository extends JpaRepository<Operation, Long> {
 	  * @return					The List of Operation's associated with the endpoint
 	  */
      @Cacheable(ConstantsCache.OPERATION_ACTIVE_FROM_ENDPOINT)
-     @Query("select op from Operation op join fetch op.resource r join fetch r.api a join fetch a.environments e where (a.basePath + op.path) = :endPoint")
+     @Query("select op from Operation op join fetch op.resource r join fetch r.api a join fetch a.environments e where CONCAT(a.basePath, op.path) = :endPoint")
      List<Operation> findByEndPoint(@Param("endPoint") String endPoint);
      
      /**
