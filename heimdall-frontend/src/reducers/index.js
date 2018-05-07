@@ -13,6 +13,7 @@ import interceptors from './interceptors'
 import queue from './Queue'
 import users from './Users'
 import roles from './Roles'
+import caches from './Caches'
 
 export default combineReducers({
     apis,
@@ -27,5 +28,6 @@ export default combineReducers({
     interceptors,
     queue,
     users,
-    roles
+    roles,
+    caches
 })

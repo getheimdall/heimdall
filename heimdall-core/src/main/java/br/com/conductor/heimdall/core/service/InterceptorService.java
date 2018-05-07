@@ -48,6 +48,8 @@ import br.com.conductor.heimdall.core.dto.InterceptorFileDTO;
 import br.com.conductor.heimdall.core.dto.PageDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
+import br.com.conductor.heimdall.core.dto.interceptor.AccessTokenClientIdDTO;
+import br.com.conductor.heimdall.core.dto.interceptor.MockDTO;
 import br.com.conductor.heimdall.core.dto.interceptor.RattingDTO;
 import br.com.conductor.heimdall.core.dto.page.InterceptorPage;
 import br.com.conductor.heimdall.core.entity.Api;
@@ -184,6 +186,8 @@ public class InterceptorService {
 
           interceptor = validateLifeCycle(interceptor);
           
+          validateTemplate(interceptor.getType(), interceptor.getContent());
+          
           List<Long> ignoredResources = ignoredValidate(interceptorDTO.getIgnoredResources(), resourceRepository);
           HeimdallException.checkThrow(Objeto.notBlank(ignoredResources), INTERCEPTOR_IGNORED_INVALID, ignoredResources.toString());
 
@@ -223,6 +227,98 @@ public class InterceptorService {
           amqpInterceptorService.dispatchInterceptor(interceptor.getId());
 
           return interceptor;
+     }
+     
+     private Object validateTemplate(TypeInterceptor type, String content) {
+
+          boolean valid = false;
+          switch (type) {
+               case ACCESS_TOKEN:
+                    try {
+
+                         AccessTokenClientIdDTO accessTokenDTO = JsonUtils.convertJsonToObject(content, AccessTokenClientIdDTO.class);
+                         if (Objeto.notBlank(accessTokenDTO)) {
+                              
+                              valid = true;
+                         }
+                    } catch (Exception e) {
+
+                         log.error(e.getMessage(), e);
+                         ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(type.name(), TemplateUtils.TEMPLATE_ACCESS_TOKEN);
+                    }
+                    break;
+               case CLIENT_ID:
+                    try {
+
+                         AccessTokenClientIdDTO clientIdDTO = JsonUtils.convertJsonToObject(content, AccessTokenClientIdDTO.class);
+                         if (Objeto.notBlank(clientIdDTO)) {
+                              
+                              valid = true;
+                         }
+                    } catch (Exception e) {
+
+                         log.error(e.getMessage(), e);
+                         ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(type.name(), TemplateUtils.TEMPLATE_ACCESS_TOKEN);
+                    }
+                    break;
+               case MOCK:
+                    try {
+
+                         MockDTO mockDTO = JsonUtils.convertJsonToObject(content, MockDTO.class);
+                         if (Objeto.notBlank(mockDTO)) {
+                              
+                              valid = true;
+                         }
+                    } catch (Exception e) {
+
+                         log.error(e.getMessage(), e);
+                         ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(type.name(), TemplateUtils.TEMPLATE_MOCK);
+                    }
+                    break;
+               case RATTING:
+                    try {
+
+                         RattingDTO rattingDTO = JsonUtils.convertJsonToObject(content, RattingDTO.class);
+                         if (Objeto.notBlank(rattingDTO)) {
+                              
+                              valid = true;
+                         }
+                    } catch (Exception e) {
+
+                         log.error(e.getMessage(), e);
+                         ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(type.name(), TemplateUtils.TEMPLATE_RATTING);
+                    }
+                    break;
+               case CUSTOM:
+                    try {
+
+                         if (Objeto.notBlank(content)) {
+                              
+                              valid = true;
+                         }
+                    } catch (Exception e) {
+
+                         log.error(e.getMessage(), e);
+                    }
+                    break;
+               case MIDDLEWARE:
+                    try {
+                         
+                         if (Objeto.notBlank(content)) {
+                              
+                              valid = true;
+                         }
+                    } catch (Exception e) {
+                         
+                         log.error(e.getMessage(), e);
+                    }
+                    break;
+
+               default:
+                    break;
+          }
+
+          return valid;
      }
      
      /**

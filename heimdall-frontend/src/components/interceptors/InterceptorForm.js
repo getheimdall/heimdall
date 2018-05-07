@@ -20,9 +20,12 @@ class InterceptorForm extends Component {
     onSubmitForm = () => {
         this.props.form.validateFieldsAndScroll((err, payload) => {
             if (!err) {
-                if (payload.plans) {
-                    const plans = payload.plans;
-                    payload.plans = plans.map((planId) => ({ id: planId }))
+                // if (payload.plans) {
+                //     const plans = payload.plans;
+                //     payload.plans = plans.map((planId) => ({ id: planId }))
+                // }
+                if (payload.environment) {
+                    payload.environment = { id: payload.environment }
                 }
                 this.props.handleForm(payload)
                 this.props.closeModal()
@@ -58,7 +61,8 @@ class InterceptorForm extends Component {
             resourceId,
             operationId,
             executionPoint,
-            type
+            type,
+            environmentId
         } = this.props
 
 
@@ -86,6 +90,7 @@ class InterceptorForm extends Component {
                 <Form>
                     {interceptor && getFieldDecorator('id', { initialValue: interceptor.id })(<Input type='hidden' />)}
                     {getFieldDecorator('referenceId', { initialValue: interceptor ? interceptor.referenceId : referenceId })(<Input type='hidden' />)}
+                    {environmentId && getFieldDecorator('environment', { initialValue: environmentId })(<Input type='hidden' />)}
 
                     <Row gutter={24}>
                         <Col sm={24} md={12} >

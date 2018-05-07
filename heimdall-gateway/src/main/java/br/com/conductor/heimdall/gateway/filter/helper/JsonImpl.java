@@ -23,6 +23,7 @@ package br.com.conductor.heimdall.gateway.filter.helper;
 
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -33,6 +34,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import br.com.conductor.heimdall.middleware.spec.Json;
+import br.com.twsoftware.alfred.object.Objeto;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -59,20 +61,26 @@ public class JsonImpl implements Json {
           }
      }
 
-     public String parse(String string) {
-
+     public String parse(String string) {          
+          
           try {
-
+               
                JSONObject jsonObject = new JSONObject(string);
-
+               
                return jsonObject.toString();
           } catch (JSONException e) {
 
-               log.error(e.getMessage(), e);
-               return null;
+               if (Objeto.notBlank(string)) {
+                    
+                    return string;
+               } else {
+                    
+                    log.error(e.getMessage(), e);
+                    return null;
+               }
           }
      }
-
+     
      public <T> String parse(T object) {
 
           try {
@@ -118,6 +126,25 @@ public class JsonImpl implements Json {
           } 
      }
      
+     public boolean isJson(String string) {          
+          
+          boolean valid = false;
+          try {
+               
+               JSONObject jsonObject = new JSONObject(string);
+               if (Objeto.notBlank(jsonObject)) {
+                    
+                    valid = true;
+               }
+          } catch (JSONException e) {
+
+               valid = false;
+          }
+          
+          return valid;
+     }
+
+
      private ObjectMapper mapper() {
           
           ObjectMapper mapper = new ObjectMapper();
@@ -126,5 +153,6 @@ public class JsonImpl implements Json {
           
           return mapper;
      }    
-
+     
+     
 }

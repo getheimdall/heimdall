@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
-import { Row, Form, Input, Col, Switch, Tooltip, Button, Modal, AutoComplete, Spin } from 'antd'
+import { Row, Form, Input, Col, Switch, Tooltip, Button, Modal, AutoComplete, Spin, Checkbox } from 'antd'
+import Loading from '../ui/Loading';
 
 const FormItem = Form.Item
 const confirm = Modal.confirm
@@ -14,6 +15,11 @@ class AppForm extends Component {
             if (!err) {
                 payload.status = payload.status ? 'ACTIVE' : 'INACTIVE'
                 payload.developer.id = Number(payload.developer.id)
+                if (payload.plans) {
+                    const plans = payload.plans;
+                    payload.plans = plans.map((planId) => ({ id: planId }))
+                }
+
                 this.props.handleSubmit(payload)
             }
         });
@@ -102,7 +108,7 @@ class AppForm extends Component {
                                 }
                             </FormItem>
                         </Col>
-                        <Col sm={24} md={5}>
+                        <Col sm={24} md={12}>
                             <FormItem label="Status">
                                 {
                                     getFieldDecorator('status', {
@@ -111,6 +117,20 @@ class AppForm extends Component {
                                     })(<Switch required />)
                                 }
                             </FormItem>
+                        </Col>
+                        <Col sm={24} md={12}>
+                            { this.props.plans && this.props.plans.content.length === 0 ? <Loading /> :
+                                <FormItem label="Plans">
+                                    {
+                                        getFieldDecorator('plans', {
+                                            initialValue: app && app.plans.map(plan => plan.id)
+                                        })(<Checkbox.Group className='checkbox-conductor'>
+                                            {this.props.plans && this.props.plans.content.map((plan, index) => {
+                                                return <Checkbox key={index} value={plan.id}>{plan.name}</Checkbox>
+                                            })}
+                                        </Checkbox.Group>)
+                                    }
+                                </FormItem>}
                         </Col>
                     </Row>
                 </Form>
@@ -131,13 +151,17 @@ class AppForm extends Component {
 AppForm.propTypes = {
     fetching: PropTypes.bool,
     loading: PropTypes.bool,
-    developerSource: PropTypes.array.isRequired
+    developerSource: PropTypes.array.isRequired,
+    plans: PropTypes.object.isRequired
 }
 
 AppForm.defaultProps = {
     fetching: false,
     loading: false,
-    developerSource: []
+    developerSource: [],
+    plans: {
+        content: []
+    }
 }
 
 export default Form.create({})(AppForm)

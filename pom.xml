@@ -22,13 +22,6 @@
 		<name>Conductor Tecnologia SA</name>
 		<url>http://www.conductor.com.br/</url>
 	</organization>
-
-	<repositories>
-		<repository>
-		    <id>jitpack.io</id>
-		    <url>https://jitpack.io</url>
-		</repository>
-	</repositories>	
 	
 	<developers>
 		<developer>
@@ -187,6 +180,11 @@
 			<groupId>com.github.spullara.mustache.java</groupId>
 			<artifactId>compiler</artifactId>
 			<version>0.9.5</version>
+		</dependency>
+		<dependency>
+			<groupId>splunk-sdk-java</groupId>
+			<artifactId>splunk-sdk-java</artifactId>
+			<version>1.5.0</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>
