@@ -46,9 +46,12 @@ import javax.persistence.Transient;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.google.common.collect.Lists;
@@ -111,11 +114,12 @@ public class App implements Serializable {
      @JsonBackReference
      private List<AccessToken> accessTokens;
 
-     @JsonIgnore
      @ManyToMany
+     @LazyCollection(LazyCollectionOption.FALSE)
      @JoinTable(name = "APPS_PLANS", 
           joinColumns = @JoinColumn(name = "APP_ID", referencedColumnName = "ID"), 
           inverseJoinColumns = @JoinColumn(name = "PLAN_ID", referencedColumnName = "ID"))
+     @JsonIgnoreProperties({ "api" })
      private List<Plan> plans;
      
      @JsonIgnore

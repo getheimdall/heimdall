@@ -21,17 +21,23 @@ class Login extends Component {
         return (
             <Row type="flex" justify="center" className="login-row">
 
-                <Row type="flex" justify="center" style={{ position: 'absolute', zIndex: 99, width: '100%', top: 0, left: 0, marginTop: -25 }}>
-                    <img src={logo} alt="" style={{ marginBottom: 30, height: 160 }} />
+                <Row type="flex" justify="center" className="heimdall-logo-form">
+                    <img src={logo} alt="" className="heimdall-logo" />
                 </Row>
                 <Card className="login-cardbox">
                     <Row type="flex" justify="center">
                         <img src={formLogo} alt="" style={{ marginBottom: 30, width: 250, height: 56 }} />
                     </Row>
-                    <LoginForm submit={this.props.login} />
+                    <LoginForm submit={this.props.login} loading={this.props.loading} />
                 </Card>
             </Row>
         )
+    }
+}
+
+const mapStateToProps = state => {
+    return {
+        loading: state.auth.loading
     }
 }
 
@@ -42,4 +48,4 @@ const mapDispatchToProps = (dispatch) => {
     }
 }
 
-export default connect(null, mapDispatchToProps)(Login)
+export default connect(mapStateToProps, mapDispatchToProps)(Login)

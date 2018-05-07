@@ -23,7 +23,6 @@ class Operations extends Component {
     }
 
     showOperationModal = (operationId) => (e) => {
-        console.log(operationId)
         if (operationId) {
             this.setState({ ...this.state, operationSelected: operationId });
         }
@@ -39,12 +38,11 @@ class Operations extends Component {
         this.setState({ ...this.state, operations: null });
         operationService.getOperationsByResource(this.props.idApi, this.props.idResource)
             .then(data => {
-                console.log(data)
                 this.setState({ ...this.state, operations: data });
             })
-            .catch(error => {
-                console.log(error)
-            })
+            // .catch(error => {
+            //     console.log(error)
+            // })
     }
 
     saveOperation = (idApi, idResource, operation) => {
@@ -52,9 +50,9 @@ class Operations extends Component {
         .then(data => {
             this.reloadOperations()
         })
-        .catch(error => {
-            console.log(error)
-        })
+        // .catch(error => {
+        //     console.log(error)
+        // })
     }
 
     updateOperation = (idApi, idResource, operation) => {
@@ -62,9 +60,9 @@ class Operations extends Component {
         .then(data => {
             this.reloadOperations()
         })
-        .catch(error => {
-            console.log(error)
-        })
+        // .catch(error => {
+        //     console.log(error)
+        // })
     }
 
     removeOperation = (idApi, idResource, operation) => {
@@ -72,9 +70,9 @@ class Operations extends Component {
             .then(data => {
                 this.reloadOperations()
             })
-            .catch(error => {
-                console.log(error)
-            })
+            // .catch(error => {
+            //     console.log(error)
+            // })
     }
 
     handleSave = (e) => {

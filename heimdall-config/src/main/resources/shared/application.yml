@@ -19,7 +19,7 @@ heimdall:
     rewrite:
         enable: false
         prefix: heimdall
-    datasource: 
+    datasource:
         initializationFailTimeout: -1
         dataBaseType: POSTGRESQL
         socketTimeout: 10000

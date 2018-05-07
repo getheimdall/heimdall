@@ -221,8 +221,8 @@ class Interceptors extends Component {
             let interceptorsPostOrdered = this.orderInterceptor(interceptorsSecond)
 
             if (this.state.environmentId !== 0) {
-                const environmentsPreFiltered = interceptorsPreOrdered.filter(item => item.environment === this.state.environmentId || item.environment === null)
-                const environmentsPostFiltered = interceptorsPostOrdered.filter(item => item.environment === this.state.environmentId || item.environment === null)
+                const environmentsPreFiltered = interceptorsPreOrdered.filter(item => (item.environment && item.environment.id === this.state.environmentId) || item.environment === null)
+                const environmentsPostFiltered = interceptorsPostOrdered.filter(item => (item.environment && item.environment.id === this.state.environmentId) || item.environment === null)
 
                 interceptorsPreOrdered = environmentsPreFiltered
                 interceptorsPostOrdered = environmentsPostFiltered
@@ -336,6 +336,7 @@ class Interceptors extends Component {
                                     icon='code-o'
                                     canAddInterceptor={canAddInterceptor}
                                     color={canAddInterceptor && '#989898'}
+                                    environmentId={this.state.environmentId !== 0 && this.state.environmentId}
                                     planId={this.state.planId !== 0 && this.state.planId}
                                     resourceId={this.state.resourceId !== 0 && this.state.resourceId}
                                     operationId={this.state.operationId !== 0 && this.state.operationId}
