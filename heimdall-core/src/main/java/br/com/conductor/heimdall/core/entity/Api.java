@@ -65,8 +65,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <h1>Api</h1>
- * 
  * This class represents a Api registered to the system.<br/>
  * 
  * @author Filipe Germano

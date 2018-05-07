@@ -33,8 +33,6 @@ import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.twsoftware.alfred.object.Objeto;
 
 /**
- * <h1>Interceptor Life Cycle</h1><br/>
- * 
  * This enum lists the stages of a {@link Interceptor} life cycle.<br/>
  * It provides a validation for each of the stages.
  * 

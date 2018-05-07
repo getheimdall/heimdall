@@ -43,8 +43,6 @@ import br.com.conductor.heimdall.api.repository.RoleRepository;
 import br.com.conductor.heimdall.api.repository.UserRepository;
 
 /**
- * <h1>HeimdallLdapAuthoritiesPopulator</h1><br/>
- * 
  * Implements the {@link LdapAuthoritiesPopulator}. Provides a method to get the granted authorities.
  *
  * @author Marcos Filho

@@ -29,8 +29,6 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.core.io.ClassPathResource;
 
 /**
- * <h1>ResourceUtils</h1><br/>
- * 
  * This class provides methods to recover resource files.
  * 
  * @author Filipe Germano
@@ -41,7 +39,7 @@ public class ResourceUtils {
 	 /**
 	  * Return a File from a resource path.
 	  * 
-	  * @param  name			- The path to the resource
+	  * @param  name			The path to the resource
 	  * @return					The File from the resource
 	  * @throws IOException
 	  */
@@ -58,7 +56,7 @@ public class ResourceUtils {
      /**
       * Opens a InputStream.
       * 
-      * @param 	name				- The path to open the InputStream
+      * @param 	name				The path to open the InputStream
       * @return						The opened InputStream
       * @throws IOException
       */

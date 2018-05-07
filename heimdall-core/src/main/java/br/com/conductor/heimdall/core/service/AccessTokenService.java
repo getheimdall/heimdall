@@ -59,8 +59,6 @@ import br.com.twsoftware.alfred.object.Objeto;
 import net.bytebuddy.utility.RandomString;
 
 /**
- * <h1>Access Token Service</h1>
- * 
  * This class provides methods to create, read, update and delete the {@link AccessToken} resource.
  * 
  * @author Filipe Germano
@@ -84,7 +82,7 @@ public class AccessTokenService {
      /**
       * Looks for a {@link AccessToken} based on it's.
       * 
-      * @param 	id 						- The id of the {@link AccessToken}
+      * @param 	id 						The id of the {@link AccessToken}
       * @return  						The {@link AccessToken} found
       * @throws NotFoundException 		Resource not found
       */
@@ -100,8 +98,8 @@ public class AccessTokenService {
      /**
       * Returns a paged list of all {@link AccessToken} from a request.
       * 
-      * @param 	accessTokenRequest 		- {@link AccessTokenRequest} The request for {@link AccessToken}
-      * @param 	pageableDTO 			- {@link PageableDTO} The pageable DTO
+      * @param 	accessTokenRequest 		{@link AccessTokenRequest} The request for {@link AccessToken}
+      * @param 	pageableDTO 			{@link PageableDTO} The pageable DTO
       * @return 						The paged {@link AccessToken} list as a {@link AccessTokenPage} object
       */
      @Transactional(readOnly = true)
@@ -122,7 +120,7 @@ public class AccessTokenService {
      /**
       * Returns a list of all {@link AccessToken} from a request
       * 
-      * @param 	accessTokenRequest 		- {@link AccessTokenRequest} The request for {@link AccessToken}
+      * @param 	accessTokenRequest 		{@link AccessTokenRequest} The request for {@link AccessToken}
       * @return 						The list of {@link AccessToken}
       */
      @Transactional(readOnly = true)
@@ -141,7 +139,7 @@ public class AccessTokenService {
       * Saves a new {@link AccessToken} for a {@link App}. If the {@link AccessToken} does not
       * have a token it generates a new token for it.
       *  
-      * @param 	accessTokenPersist 		- {@link AccessTokenPersist}
+      * @param 	accessTokenPersist 		{@link AccessTokenPersist}
       * @return 						The {@link AccessToken} that was saved to the repository
       * @throws BadRequestException		App not exist.
       * @throws BadRequestException		Token already exists.
@@ -179,8 +177,8 @@ public class AccessTokenService {
      /**
       * Updates a {@link AccessToken} by its ID.
       * 
-      * @param 	id 						- The ID of the {@link AccessToken} to be updated
-      * @param 	accessTokenRequest 		- {@link AccessTokenRequest} The request for {@link AccessToken}
+      * @param 	id 						The ID of the {@link AccessToken} to be updated
+      * @param 	accessTokenRequest 		{@link AccessTokenRequest} The request for {@link AccessToken}
       * @return 						The {@link AccessToken} updated
       * @throws NotFoundException 		Resource not found
       * @throws BadRequestException		App not exist
@@ -203,7 +201,7 @@ public class AccessTokenService {
      /**
       * Deletes a {@link AccessToken} by its ID.
       * 
-      * @param 	id 						- The ID of the {@link AccessToken} to be deleted
+      * @param 	id 						The ID of the {@link AccessToken} to be deleted
       * @throws NotFoundException 		Resource not found
       */
      @Transactional
@@ -218,7 +216,7 @@ public class AccessTokenService {
      /**
       * Saves a new {@link AccessToken} for a {@link App}.
       * 
-      * @param reqBody					- The {@link AccessTokenDTO}
+      * @param reqBody					The {@link AccessTokenDTO}
       * @return							The {@link AccessToken} saved
       * @throws BadRequestException		Access token not defined
       * @throws BadRequestException		Token already exists

@@ -35,8 +35,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * <h1>RateLimit</h1>
- * 
  * Represents a view of rate limit that client will define how many requests can be executed by the user. 
  * 
  * @author Marcos Filho

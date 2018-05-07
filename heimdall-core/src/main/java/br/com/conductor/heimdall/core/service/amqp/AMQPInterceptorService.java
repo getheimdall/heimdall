@@ -31,8 +31,6 @@ import br.com.conductor.heimdall.core.util.RabbitConstants;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>AMQPInterceptorService</h1><br/>
- * 
  * This class controls a {@link Interceptor} cache service.
  *
  * @author Filipe Germano
@@ -69,7 +67,7 @@ public class AMQPInterceptorService {
      /**
       * Dispatch a message to remove a {@link Interceptor}
       * 
-      * @param interceptor			- The {@link InterceptorFileDTO}
+      * @param interceptor			The {@link InterceptorFileDTO}
       */
      public void dispatchRemoveInterceptors(InterceptorFileDTO interceptor) {
           rabbitTemplate.convertAndSend(RabbitConstants.EXCHANGE_FANOUT_HEIMDALL_REMOVE_INTERCEPTORS, "", interceptor);

@@ -33,8 +33,6 @@ import br.com.conductor.heimdall.core.enums.Status;
 import lombok.Data;
 
 /**
- * <h1>AccessTokenRequest</h1><br/>
- * 
  * Class that represents a request for a {@link AccessToken}.
  *
  * @author Filipe Germano

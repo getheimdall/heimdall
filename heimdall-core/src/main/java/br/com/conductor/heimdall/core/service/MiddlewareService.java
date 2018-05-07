@@ -62,7 +62,6 @@ import br.com.twsoftware.alfred.object.Objeto;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>Middleware Service class</h1>
  * This class provides methods to create, read, update and delete the {@link Middleware} resource.
  * 
  * @author Filipe Germano
@@ -90,8 +89,8 @@ public class MiddlewareService {
      /**
       * Finds a {@link Middleware} by its Id and {@link Api} Id.
       * 
-      * @param 	apiId 					- The {@link Api} Id
-      * @param 	middlewareId 			- The {@link Middleware} Id
+      * @param 	apiId 					The {@link Api} Id
+      * @param 	middlewareId 			The {@link Middleware} Id
       * @return  						The {@link Middleware} associated with the {@link Api}
       * @throws NotFoundException 		Resource not found
       */
@@ -107,9 +106,9 @@ public class MiddlewareService {
      /**
       * Generates a paged list of the {@link Middleware} associated with a {@link Api}.
       * 
-      * @param 	apiId 					- The ID of the {@link Api} 
-      * @param 	middlewareDTO 			- The {@link MiddlewareDTO}
-      * @param	pageableDTO 			- The {@link PageableDTO}
+      * @param 	apiId 					The ID of the {@link Api} 
+      * @param 	middlewareDTO 			The {@link MiddlewareDTO}
+      * @param	pageableDTO 			The {@link PageableDTO}
       * @return  						A paged {@link Middleware} list as a {@link MiddlewarePage} object
       * @throws NotFoundException 		Resource not found 
       */
@@ -135,8 +134,8 @@ public class MiddlewareService {
      /**
       * Generates a list of the {@link Middleware} associated with a {@link Api}.
       * 
-      * @param 	apiId 						- The ID of the API 
-      * @param 	middlewareDTO 				- The middleware DTO
+      * @param 	apiId 						The ID of the API 
+      * @param 	middlewareDTO 				The middleware DTO
       * @return 						 	The list of {@link Middleware}
       * @throws NotFoundException 			Resource not found
       */
@@ -161,9 +160,9 @@ public class MiddlewareService {
      /**
       * Save a new {@link Middleware} for a {@link Api}.
       * 
-      * @param 	apiId 					- The {@link Api} Id
-      * @param 	middlewareDTO 			- The {@link MiddlewareDTO}
-      * @param 	file 					- The packaged {@link Middleware} file
+      * @param 	apiId 					The {@link Api} Id
+      * @param 	middlewareDTO 			The {@link MiddlewareDTO}
+      * @param 	file 					The packaged {@link Middleware} file
       * @return 						The new {@link Middleware} created
       * @throws NotFoundException 		Resource not found
       * @throws BadRequestException		Only one middleware per version and api
@@ -213,9 +212,9 @@ public class MiddlewareService {
      /**
       * Updates a middleware by Middleware ID and API ID.
       * 
-      * @param 	apiId 					- The ID of the API 
-      * @param 	middlewareId 			- The middleware ID
-      * @param	middlewareDTO 			- The middleware DTO
+      * @param 	apiId 					The ID of the API 
+      * @param 	middlewareId 			The middleware ID
+      * @param	middlewareDTO 			The middleware DTO
       * @return 						The middleware that was updated
       * @throws NotFoundException		Resource not found
       * @throws BadRequestException		Only one middleware per version and api
@@ -241,8 +240,8 @@ public class MiddlewareService {
      /**
       * Deletes a middleware by API ID and middleware ID
       * 
-      * @param 	apiId					- The ID of the API 
-      * @param 	middlewareId			- The middleware ID
+      * @param 	apiId					The ID of the API 
+      * @param 	middlewareId			The middleware ID
       * @throws NotFoundException		Resource not found
       * @throws BadRequestException		Middleware still contains interceptors associated
       */

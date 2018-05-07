@@ -26,8 +26,6 @@ import org.springframework.data.domain.PageRequest;
 import br.com.twsoftware.alfred.object.Objeto;
 
 /**
- * <h1>Pageable</h1><br/>
- * 
  * Class responsible for validating query paging limits.
  * 
  * @author Filipe Germano
@@ -44,9 +42,9 @@ public class Pageable extends PageRequest {
      /**
       * Method responsible for setting the necessary parameters for requesting a pagination.
       * 
-      * @param offset			- Indicates which page should be returned.
+      * @param offset			Indicates which page should be returned.
       * 						  If no value is entered for this parameter, it will default to 0. 
-      * @param limit 			- Indicates the limit of records to be displayed per page.
+      * @param limit 			Indicates the limit of records to be displayed per page.
       * 						  If no value is entered for this parameter or the value
       * 						  entered is greater than 100, it will default to 100.
       * 

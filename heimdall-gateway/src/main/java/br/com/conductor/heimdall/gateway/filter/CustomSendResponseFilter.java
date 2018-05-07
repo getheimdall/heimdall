@@ -29,8 +29,8 @@ import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>CustomSendResponseFilter</h1><br/>
- *
+ * Extends the {@link SendResponseFilter} to add a timelimit to the response filter.
+ * 
  * @author Marcos Filho
  *
  */

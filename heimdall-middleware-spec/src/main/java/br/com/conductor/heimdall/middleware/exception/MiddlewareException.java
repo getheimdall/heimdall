@@ -24,8 +24,6 @@ package br.com.conductor.heimdall.middleware.exception;
 import lombok.Getter;
 
 /**
- * <h1>MiddlewareException</h1><br/>
- * 
  * Class thar represets the personalized exception of a Heimdall Middleware.
  *
  * @author Filipe Germano
@@ -41,7 +39,7 @@ public class MiddlewareException extends RuntimeException {
      /**
       * Constructor of a MiddlewareException.
       * 
-      * @param exceptionMessage		- The {@link ExceptionMessage} that should be used to create the exception
+      * @param exceptionMessage		The {@link ExceptionMessage} that should be used to create the exception
       */
      public MiddlewareException(ExceptionMessage exceptionMessage) {
 
@@ -53,8 +51,8 @@ public class MiddlewareException extends RuntimeException {
      /**
       * Static method that check if a new MiddlewareException should be thrown.
       * 
-      * @param expression				- The expression that is checked
-      * @param exceptionMessage			- The {@link ExceptionMessage} that should be thrown
+      * @param expression				The expression that is checked
+      * @param exceptionMessage			The {@link ExceptionMessage} that should be thrown
       * @throws MiddlewareException		If the expression is true, throw a MiddlewareExcpetion
       */
      public static void checkThrow(boolean expression, ExceptionMessage exceptionMessage) throws MiddlewareException {
@@ -67,9 +65,9 @@ public class MiddlewareException extends RuntimeException {
      /**
       * Static method that check if a new MiddlewareException should be thrown with a custom message.
       * 
-      * @param expression				- The expression that is checked
-      * @param exceptionMessage			- The {@link ExceptionMessage} that should be thrown
-      * @param dynamicText				- The custom text that will be placed in the exception message
+      * @param expression				The expression that is checked
+      * @param exceptionMessage			The {@link ExceptionMessage} that should be thrown
+      * @param dynamicText				The custom text that will be placed in the exception message
       * @throws MiddlewareException		If the expression is true, throw a MiddlewareExcpetion
       */
      public static void checkThrow(boolean expression, ExceptionMessage exceptionMessage, String... dynamicText) throws MiddlewareException {

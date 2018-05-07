@@ -33,8 +33,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * <h1>PageDTO</h1><br/>
- * 
  * Class is a Data Transfer Object for the {@link Page}
  *
  * @author Filipe Germano

@@ -28,8 +28,6 @@ import org.springframework.stereotype.Service;
 import br.com.conductor.heimdall.core.util.RabbitConstants;
 
 /**
- * <h1>AMQPRouteService</h1><br/>
- * 
  * This class controls a route cache service.
  *
  * @author Marcos Filho

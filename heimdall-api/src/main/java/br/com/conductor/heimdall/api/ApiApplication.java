@@ -36,8 +36,6 @@ import br.com.conductor.heimdall.core.environment.Property;
 import br.com.conductor.heimdall.core.util.RabbitQueueUtils;
 
 /**
- * <h1>ApiApplication</h1><br/>
- * 
  * Since Heimdall is a SpringBoot application, this is a {@link SpringBootServletInitializer}.
  *
  * @author Marcos Filho

@@ -26,8 +26,6 @@ import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.twsoftware.alfred.object.Objeto;
 
 /**
- * <h1>StringUtils</h1><br/>
- * 
  * This class provides a methods to format {@link String}s to be used by Heimdall. 
  * 
  * @author Filipe Germano
@@ -38,8 +36,8 @@ public abstract class StringUtils {
 	/**
 	 * Creates a String that represents a order. It adds leading zeros ("0").
 	 * 
-	 * @param  prefix					- The number to be prefixed
-	 * @param  order					- The order
+	 * @param  prefix					The number to be prefixed
+	 * @param  order					The order
 	 * @return							The prefixed order created
 	 * @throws BadRequestException
 	 */
@@ -54,7 +52,7 @@ public abstract class StringUtils {
      /**
       * Converts multiple parameters of type String from UPPER_SPLIT case to camelCase and concatenate them.
       * 
-      * @param  strings				- Multiple String parameters
+      * @param  strings				Multiple String parameters
       * @return						The concatenated String
       */
      public static String concatCamelCase(String... strings) {
@@ -78,7 +76,7 @@ public abstract class StringUtils {
      /**
       * Concatenates multiple strings.
       * 
-      * @param  strings				- Multiple String parameters 
+      * @param  strings				Multiple String parameters 
       * @return						The concatenated String
       */
      public static String join(String... strings) {
@@ -90,8 +88,8 @@ public abstract class StringUtils {
      /**
       * Concatenates multiple strings with a specific separator.
       * 
-      * @param 	separator			- The separator to be used.
-      * @param  strings				- Multiple String parameters 
+      * @param 	separator			The separator to be used.
+      * @param  strings				Multiple String parameters 
       * @return						The concatenated String
       */
      public static String join(String separator, String... strings) {

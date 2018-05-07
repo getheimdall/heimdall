@@ -41,8 +41,6 @@ import br.com.conductor.heimdall.core.util.ConstantsTag;
 import io.swagger.annotations.ApiOperation;
 
 /**
- * <h1>CacheResource</h1><br/>
- * 
  * Uses a {@link CacheService} to provide methods to read and remove the cache.
  *
  * @author Filipe Germano
@@ -76,7 +74,7 @@ public class CacheResource {
      /**
       * Deletes a cache by its key.
       * 
-      * @param cacheKey				- The cache key
+      * @param cacheKey				The cache key
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -93,8 +91,8 @@ public class CacheResource {
      /**
       * Deletes a cache by its key and Id.
       * 
-      * @param cacheKey				- The cache key
-      * @param cacheId				- The cache Id
+      * @param cacheKey				The cache key
+      * @param cacheId				The cache Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody

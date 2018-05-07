@@ -25,8 +25,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * <h1>TypeExecutionPoint</h1><br/>
- * 
  * Enum that hold the types of ExecutionPoint.
  *
  * @author Filipe Germano

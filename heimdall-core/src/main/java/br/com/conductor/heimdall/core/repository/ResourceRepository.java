@@ -29,8 +29,6 @@ import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Resource;
 
 /**
- * <h1>ResourceRepository</h1><br/>
- * 
  * Provide methods to find a specific {@link Resource} or a List of them.
  *
  * @author Filipe Germano
@@ -41,8 +39,8 @@ public interface ResourceRepository extends JpaRepository<Resource, Long> {
 	 /**
 	  * Finds a Resource by its Id and {@link Api} Id.
 	  *  
-	  * @param apiId		- The Api Id
-	  * @param id			- The Resource Id
+	  * @param apiId		The Api Id
+	  * @param id			The Resource Id
 	  * @return				The Resource found
 	  */
      Resource findByApiIdAndId(Long apiId, Long id);
@@ -50,7 +48,7 @@ public interface ResourceRepository extends JpaRepository<Resource, Long> {
      /**
       * Finds a list of Resource's for a {@link Api} by the Api's Id.
       * 
-	  * @param apiId		- The Api Id
+	  * @param apiId		The Api Id
       * @return				The List of Resource's found
       */
      List<Resource> findByApiId(Long apiId);
@@ -58,8 +56,8 @@ public interface ResourceRepository extends JpaRepository<Resource, Long> {
      /**
       * Finds a Resource by its name and {@link Api} Id.
       * 
-	  * @param apiId		- The Api Id
-      * @param name			- The Resource name
+	  * @param apiId		The Api Id
+      * @param name			The Resource name
 	  * @return				The Resource found
       */
      Resource findByApiIdAndName(Long apiId, String name);

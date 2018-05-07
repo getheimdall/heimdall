@@ -38,8 +38,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 /**
- * <h1>CORSFilter</h1><br/>
- * 
  * Implements the {@link Filter} interface.
  *
 * @author Filipe Germano

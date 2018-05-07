@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.api.security;
  */
 
 /**
- * <h1>CredentialSecurity</h1><br/>
- * 
  * Provides methods to retrive the username and password of a Credential.
  *
  * @author Marcos Filho
@@ -34,14 +32,14 @@ public interface CredentialSecurity {
 	 /**
 	  * Returns the username.
 	  * 
-	  * @return String - username
+	  * @return String username
 	  */
      String getUserName();
      
      /**
 	  * Returns the password.
 	  * 
-	  * @return String - password
+	  * @return String password
 	  */
      String getPassword();
 }

@@ -50,8 +50,6 @@ import br.com.conductor.heimdall.core.util.Pageable;
 import br.com.twsoftware.alfred.object.Objeto;
 
 /**
- * <h1>RoleService</h1><br/>
- * 
  * Provides methods to create, read, update and delete a {@link Role}.
  *
  * @author Marcos Filho
@@ -69,7 +67,7 @@ public class RoleService {
      /**
       * Saves a {@link Role}.
       *      
-      * @param roleDTO		- {@link RoleDTO}
+      * @param roleDTO		{@link RoleDTO}
       * @return				{@link Role} saved
       * @throws				BadRequestException
       */
@@ -96,7 +94,7 @@ public class RoleService {
      /**
       * Finds a {@link Role} by its Id.
       * 
-      * @param roleId		- The Role Id
+      * @param roleId		The Role Id
       * @return				{@link Role}
       * @throws				NotFoundException
       */
@@ -111,8 +109,8 @@ public class RoleService {
      /**
       * Creates a paged list of {@link Role} from a request.
       * 
-      * @param roleDTO		- {@link RoleDTO}
-      * @param pageableDTO	- {@link PageableDTO}
+      * @param roleDTO		{@link RoleDTO}
+      * @param pageableDTO	{@link PageableDTO}
       * @return				{@link RolePage}
       */
      @Transactional(readOnly = false)
@@ -133,7 +131,7 @@ public class RoleService {
      /**
       * Creates a list of {@link Role} from a request.
       * 
-      * @param roleDTO		- {@link RoleDTO}
+      * @param roleDTO		{@link RoleDTO}
       * @return				{@link List} of {@link Role}
       */
      @Transactional(readOnly = false)
@@ -151,7 +149,7 @@ public class RoleService {
      /**
       * Deletes a {@link Role}.
       * 
-      * @param roleId		- The Role Id
+      * @param roleId		The Role Id
       * @throws				NotFoundException
       */
      @Transactional
@@ -166,8 +164,8 @@ public class RoleService {
      /**
       * Updates a {@link Role}.
       * 
-      * @param roleId		- The Role Id
-      * @param roleDTO		- {@link RoleDTO}
+      * @param roleId		The Role Id
+      * @param roleDTO		{@link RoleDTO}
       * @return				{@link Role}
       * @throws				NotFoundException
       */

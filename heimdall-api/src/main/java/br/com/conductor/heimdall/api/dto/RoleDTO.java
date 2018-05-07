@@ -30,8 +30,6 @@ import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
 import lombok.Data;
 
 /**
- * <h1>RoleDTO</h1><br/>
- * 
  * Data transference object class that represents a Heimdall role.
  *
  * @author Marcos Filho

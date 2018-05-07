@@ -27,8 +27,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * <h1>StackTraceImpl</h1><br/>
- * 
  * Data class that represents a custom Stack Trace.
  * Implements the {@link StackTrace} interface.
  *

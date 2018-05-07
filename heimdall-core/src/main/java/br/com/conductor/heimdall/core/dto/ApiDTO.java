@@ -32,8 +32,6 @@ import br.com.conductor.heimdall.core.enums.Status;
 import lombok.Data;
 
 /**
- * <h1>ApiDTO</h1><br/>
- * 
  * Class is a Data Transfer Object for the {@link Api}.
  *
  * @author Filipe Germano

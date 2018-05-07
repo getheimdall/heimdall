@@ -48,8 +48,6 @@ import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.util.Pageable;
 
 /**
- * <h1>UserService</h1><br/>
- * 
  * Provides methods to create, read, update and delete a {@link User}.
  *
  * @author Marcos Filho
@@ -70,7 +68,7 @@ public class UserService {
      /**
       * Saves a {@link User}.
       * 
-      * @param userDTO		- {@link UserDTO}
+      * @param userDTO		{@link UserDTO}
       * @return				{@link User}
       */
      @Transactional
@@ -87,7 +85,7 @@ public class UserService {
      /**
       * Finds a {@link User} by its Id.
       * 
-      * @param id		- The User Id
+      * @param id		The User Id
       * @return			{@link User}
       * @throws NotFoundException
       */
@@ -104,8 +102,8 @@ public class UserService {
      /**
       * Creates a paged list of {@link User} from a request.
       * 
-      * @param userDTO		- {@link UserDTO}
-      * @param pageableDTO	- {@link PageableDTO}
+      * @param userDTO		{@link UserDTO}
+      * @param pageableDTO	{@link PageableDTO}
       * @return				{@link UserPage}
       */
      @Transactional(readOnly = false)
@@ -126,7 +124,7 @@ public class UserService {
      /**
       * Creates a list of {@link User} from a request.
       * 
-      * @param userDTO		- {@link UserDTO}
+      * @param userDTO		{@link UserDTO}
       * @return				{@link List} of {@link User}
       */
      @Transactional(readOnly = false)
@@ -144,7 +142,7 @@ public class UserService {
      /**
       * Deletes a {@link User}.
       * 
-      * @param userId		- The User Id
+      * @param userId		The User Id
       * @throws NotFoundException
       */
      @Transactional
@@ -159,8 +157,8 @@ public class UserService {
      /**
       * Updates a {@link User}.
       * 
-      * @param userId		- The User Id
-      * @param userDTO		- {@link UserDTO}
+      * @param userId		The User Id
+      * @param userDTO		{@link UserDTO}
       * @return				{@link User}
       * @throws NotFoundException
       */

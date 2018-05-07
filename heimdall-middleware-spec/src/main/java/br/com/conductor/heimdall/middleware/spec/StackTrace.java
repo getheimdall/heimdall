@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.middleware.spec;
  */
 
 /**
- * <h1>StackTrace</h1><br/>
- * 
  * This interface provides methods to control a StackTrace.
  *
  * @author Filipe Germano
@@ -41,7 +39,7 @@ public interface StackTrace {
      /**
       * Sets the class from which the stack should tracking.
       * 
-      * @param clazz	- The name of the class
+      * @param clazz	The name of the class
       */
      public void setClazz(String clazz);
 
@@ -55,7 +53,7 @@ public interface StackTrace {
      /**
       * Sets a message to the StackTrace.
       * 
-      * @param message	- The message
+      * @param message	The message
       */
      public void setMessage(String message);
 
@@ -69,7 +67,7 @@ public interface StackTrace {
      /**
       * Sets the current stack.
       * 
-      * @param stack	- The new stack
+      * @param stack	The new stack
       */
      public void setStack(String stack);
 }

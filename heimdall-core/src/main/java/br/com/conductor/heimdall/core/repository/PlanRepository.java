@@ -26,8 +26,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import br.com.conductor.heimdall.core.entity.Plan;
 
 /**
- * <h1>PlanRepository.java</h1><br/>
- *
+ * Plan Repository.
+ * 
  * @author Filipe Germano
  *
  */

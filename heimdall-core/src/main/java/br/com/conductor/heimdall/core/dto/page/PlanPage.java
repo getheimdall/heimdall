@@ -30,8 +30,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <h1>PlanPage</h1><br/>
- * 
  * Class that represents a paged {@link Plan} list.
  *
  * @author Filipe Germano

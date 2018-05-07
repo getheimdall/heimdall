@@ -57,8 +57,6 @@ import br.com.twsoftware.alfred.object.Objeto;
 import io.swagger.annotations.ApiOperation;
 
 /**
- * <h1>MiddlewareResource.java</h1><br/>
- * 
  * Uses a {@link MiddlewareService} to provide methods to create, read, update and delete a {@link Middleware}.
  *
  * @author Filipe Germano
@@ -75,8 +73,8 @@ public class MiddlewareResource {
      /**
       * Finds a {@link Middleware} by its Id and {@link Api} Id.
       * 
-      * @param apiId				- The Api Id
-      * @param middlewareId			- The Middleware Id
+      * @param apiId				The Api Id
+      * @param middlewareId			The Middleware Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -93,9 +91,9 @@ public class MiddlewareResource {
      /**
       * Finds all {@link Middleware} from a request.
       * 
-      * @param apiId				- The Api Id
-      * @param middlewareDTO		- {@link MiddlewareDTO}
-      * @param pageableDTO			- {@link PageableDTO}
+      * @param apiId				The Api Id
+      * @param middlewareDTO		{@link MiddlewareDTO}
+      * @param pageableDTO			{@link PageableDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -119,9 +117,9 @@ public class MiddlewareResource {
      /**
       * Saves a {@link Middleware}.
       * 
-      * @param apiId				- The Api Id
-      * @param file					- {@link MultipartFile} of the Api
-      * @param middlewareDTO		- {@link MiddlewareDTO}
+      * @param apiId				The Api Id
+      * @param file					{@link MultipartFile} of the Api
+      * @param middlewareDTO		{@link MiddlewareDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -141,9 +139,9 @@ public class MiddlewareResource {
      /**
       * Updates a {@link Middleware}.
       * 
-      * @param apiId				- The Api Id
-      * @param middlewareId			- The Middleware Id
-      * @param middlewareDTO		- {@link MiddlewareDTO}
+      * @param apiId				The Api Id
+      * @param middlewareId			The Middleware Id
+      * @param middlewareDTO		{@link MiddlewareDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -160,8 +158,8 @@ public class MiddlewareResource {
      /**
       * Deletes a {@link Middleware}.
       * 
-      * @param apiId				- The Api Id
-      * @param middlewareId			- The Middleware Id
+      * @param apiId				The Api Id
+      * @param middlewareId			The Middleware Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody

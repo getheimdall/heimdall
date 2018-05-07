@@ -33,8 +33,6 @@ import br.com.conductor.heimdall.core.entity.Resource;
 import br.com.conductor.heimdall.core.enums.TypeInterceptor;
 
 /**
- * <h1>InterceptorRepository.java</h1><br/>
- * 
  * Provides methods to access a {@link Interceptor}
  *
  * @author Filipe Germano
@@ -45,8 +43,8 @@ public interface InterceptorRepository extends JpaRepository<Interceptor, Long> 
 	 /**
 	  * Finds a List of Interceptors by Interceptor type and {@link Plan} Id.
 	  * 
-	  * @param  type			- The type of Interceptor
-	  * @param  planId			- The Plan Id.
+	  * @param  type			The type of Interceptor
+	  * @param  planId			The Plan Id.
 	  * @return					The List of Interceptor associated
 	  */
      List<Interceptor> findByTypeAndPlanId(TypeInterceptor type, Long planId);
@@ -54,8 +52,8 @@ public interface InterceptorRepository extends JpaRepository<Interceptor, Long> 
      /**
       * Finds a List of Interceptors by Interceptor type and {@link Resource} Id.
       * 
-      * @param  type			- The type of Interceptor
-	  * @param  resourceId		- The Resource Id
+      * @param  type			The type of Interceptor
+	  * @param  resourceId		The Resource Id
       * @return					The List of Interceptor associated
 	  */
      List<Interceptor> findByTypeAndResourceId(TypeInterceptor type, Long resourceId);
@@ -63,8 +61,8 @@ public interface InterceptorRepository extends JpaRepository<Interceptor, Long> 
      /**
       * Finds a List of Interceptors by Interceptor type and {@link Operation} Id.
       * 
-      * @param  type			- The type of Interceptor
-	  * @param  operationId		- The Operation Id
+      * @param  type			The type of Interceptor
+	  * @param  operationId		The Operation Id
       * @return					The List of Interceptor associated
 	  */
      List<Interceptor> findByTypeAndOperationId(TypeInterceptor type, Long operationId);
@@ -72,8 +70,8 @@ public interface InterceptorRepository extends JpaRepository<Interceptor, Long> 
      /**
       * Finds a List of Interceptors by Interceptor type and {@link Api} Id.
       * 
-      * @param  type			- The type of Interceptor
-	  * @param  apiId			- The Api Id
+      * @param  type			The type of Interceptor
+	  * @param  apiId			The Api Id
       * @return					The List of Interceptor associated
 	  */
      List<Interceptor> findByTypeAndOperationResourceApiId(TypeInterceptor type, Long apiId);

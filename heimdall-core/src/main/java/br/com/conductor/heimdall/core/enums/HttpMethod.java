@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.core.enums;
  */
 
 /**
- * <h1>Http Method</h1><br/>
- * 
  * This enum lists the HTTP methods that can be used.
  * 
  * @author Filipe Germano

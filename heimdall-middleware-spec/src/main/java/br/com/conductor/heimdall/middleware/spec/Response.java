@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.middleware.spec;
  */
 
 /**
- * <h1>Response</h1><br/>
- * 
  * This interface provides methods to control a response.
  *
  * @author Filipe Germano
@@ -47,7 +45,7 @@ public interface Response {
      
      /**
       * Sets the status code of a response.
-      * @param status	- The the status code of a response
+      * @param status	The the status code of a response
       */
      public void setStatus(Integer status);
      
@@ -61,14 +59,14 @@ public interface Response {
      /**
       * Sets the body of a response.
       * 
-      * @param body		- The String representation of body of a response
+      * @param body		The String representation of body of a response
       */
      public void setBody(String body);
      
      /**
       * Sets the body of a response.
       * 
-      * @param body		- The byte array representation of body of a response
+      * @param body		The byte array representation of body of a response
       */
      public void setBody(byte[] body);
 }

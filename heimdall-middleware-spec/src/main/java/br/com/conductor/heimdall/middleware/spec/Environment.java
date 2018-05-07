@@ -24,8 +24,6 @@ package br.com.conductor.heimdall.middleware.spec;
 import java.util.Map;
 
 /**
- * <h1>Environment</h1><br/>
- * 
  * This interface provides methods for accessing a Environment
  *
  * @author Filipe Germano
@@ -43,7 +41,7 @@ public interface Environment {
      /**
       * Gets a specific variable from a environment.
       * 
-      * @param key	- The key of the variable
+      * @param key	The key of the variable
       * @return		The variable found
       */
      public String getVariable(String key);

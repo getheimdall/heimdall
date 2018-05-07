@@ -56,8 +56,6 @@ import br.com.twsoftware.alfred.object.Objeto;
 import io.swagger.annotations.ApiOperation;
 
 /**
- * <h1>ApiResource</h1><br/>
- * 
  * Uses a {@link ApiService} to provide methods to create, read, update and delete a {@link Api}.
  *
  * @author Filipe Germano
@@ -75,7 +73,7 @@ public class ApiResource {
      /**
       * Finds a {@link Api} by its Id.
       * 
-      * @param id					- The Api Id
+      * @param id					The Api Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -92,8 +90,8 @@ public class ApiResource {
      /**
       * Fids all {@link Api} from a request.
       * 
-      * @param apiDTO				- {@link ApiDTO}
-      * @param pageableDTO			- {@link PageableDTO}
+      * @param apiDTO				{@link ApiDTO}
+      * @param pageableDTO			{@link PageableDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -117,7 +115,7 @@ public class ApiResource {
      /**
       * Saves a {@link Api}.
       * 
-      * @param apiDTO				- {@link ApiDTO}
+      * @param apiDTO				{@link ApiDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -134,8 +132,8 @@ public class ApiResource {
      /**
       * Updates a {@link Api}.
       * 
-      * @param id					- The Api Id
-      * @param apiDTO				- {@link ApiDTO}
+      * @param id					The Api Id
+      * @param apiDTO				{@link ApiDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -152,7 +150,7 @@ public class ApiResource {
      /**
       * Deletes a {@link Api}.
       * 
-      * @param id					- The Api Id
+      * @param id					The Api Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -169,8 +167,8 @@ public class ApiResource {
      /**
       * Uploads the {@link Api} file.
       * 
-      * @param id					- The Api Id
-      * @param file					- {@link MultipartFile} of the Api
+      * @param id					The Api Id
+      * @param file					{@link MultipartFile} of the Api
       * @return						{@link ResponseEntity}
       */
      @ResponseBody

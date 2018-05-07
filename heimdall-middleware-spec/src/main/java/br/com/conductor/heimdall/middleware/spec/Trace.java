@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.middleware.spec;
  */
 
 /**
- * <h1>Trace</h1><br/>
- * 
  * This interface provides methods to control a Trace.
  *
  * @author Filipe Germano
@@ -34,9 +32,9 @@ public interface Trace {
 	 /**
 	  * Adds a Trace to the stack.
 	  * 
-	  * @param clazz		- Class that generated the trace
-	  * @param message		- Message generated
-	  * @param stack		- Stack that will receive the trace
+	  * @param clazz		Class that generated the trace
+	  * @param message		Message generated
+	  * @param stack		Stack that will receive the trace
 	  */
      public void addStackTrace(String clazz, String message, String stack);
      
@@ -50,15 +48,15 @@ public interface Trace {
      /**
       * Adds a Trace.
       * 
-      * @param trace		- The Trace to be added
+      * @param trace		The Trace to be added
       */
      public void addTrace(String trace);
 
      /**
       * Adds a Trace for a object.
       * 
-      * @param trace		- The Trace to be aded
-      * @param object		- The object that should br traced
+      * @param trace		The Trace to be added
+      * @param object		The object that should be traced
       */
      public void addTrace(String trace, Object object);
      

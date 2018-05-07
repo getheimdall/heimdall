@@ -24,8 +24,6 @@ package br.com.conductor.heimdall.core.exception;
 import lombok.Getter;
 
 /**
- * <h1>HeimdallException</h1><br/>
- * 
  * This class represents all the Heimdall personalized exceptions.
  * 
  * @author Filipe Germano
@@ -39,6 +37,11 @@ public class HeimdallException extends RuntimeException {
      @Getter
      private ExceptionMessage msgEnum;
 
+     /**
+      * Creates a new Heimdall Exception.
+      * 
+      * @param exceptionMessage  {@link ExceptionMessage}
+      */
      public HeimdallException(ExceptionMessage exceptionMessage) {
 
           super(exceptionMessage.getMessage());
@@ -46,6 +49,13 @@ public class HeimdallException extends RuntimeException {
 
      }
 
+     /**
+      * Throws a new exception with a {@link ExceptionMessage} if the expression is true.
+      * 
+      * @param expression	if true, throws expection
+      * @param exceptionMessage	{@link ExceptionMessage}
+      * @throws HeimdallException {@link HeimdallException}
+      */
      public static void checkThrow(boolean expression, ExceptionMessage exceptionMessage) throws HeimdallException {
 
           if (expression) {
@@ -53,6 +63,14 @@ public class HeimdallException extends RuntimeException {
           }
      }
 
+     /**
+      * Throws a new custom exception with a {@link ExceptionMessage} with the dynamicText injected.
+      * 
+      * @param expression	if true, throws expection
+      * @param exceptionMessage	{@link ExceptionMessage}
+      * @param dynamicText	text to be injected to the message
+      * @throws HeimdallException {@link HeimdallException}
+      */
      public static void checkThrow(boolean expression, ExceptionMessage exceptionMessage, String... dynamicText) throws HeimdallException {
 
           if (expression) {

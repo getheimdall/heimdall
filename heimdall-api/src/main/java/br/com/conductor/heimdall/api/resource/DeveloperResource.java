@@ -54,8 +54,6 @@ import br.com.twsoftware.alfred.object.Objeto;
 import io.swagger.annotations.ApiOperation;
 
 /**
- * <h1>DeveloperResource</h1><br/>
- * 
  * Uses a {@link DeveloperService} to provide methods to create, read, update and delete a {@link Developer}.
  *
  * @author Filipe Germano
@@ -72,7 +70,7 @@ public class DeveloperResource {
      /**
       * Finds a {@link Developer} by its Id.
       * 
-      * @param id					- The Developer Id
+      * @param id					The Developer Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -89,8 +87,8 @@ public class DeveloperResource {
      /**
       * Finds all {@link Developer} from a request.
       * 
-      * @param developerDTO			- {@link DeveloperDTO}
-      * @param pageableDTO			- {@link PageableDTO}
+      * @param developerDTO			{@link DeveloperDTO}
+      * @param pageableDTO			{@link PageableDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -113,7 +111,7 @@ public class DeveloperResource {
      /**
       * Saves a {@link Developer}.
       * 
-      * @param developerDTO			- {@link DeveloperDTO}
+      * @param developerDTO			{@link DeveloperDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -130,8 +128,8 @@ public class DeveloperResource {
      /**
       * Updates a {@link Developer}.
       * 
-      * @param id					- The Developer Id
-      * @param developerDTO			- {@link DeveloperDTO}
+      * @param id					The Developer Id
+      * @param developerDTO			{@link DeveloperDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -148,7 +146,7 @@ public class DeveloperResource {
      /**
       * Deletes a {@link Developer}.
       * 
-      * @param id					- The Developer Id
+      * @param id					The Developer Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody

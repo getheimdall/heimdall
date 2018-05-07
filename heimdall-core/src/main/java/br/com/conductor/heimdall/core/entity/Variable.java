@@ -39,8 +39,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * <h1>Variable</h1>
- * 
  * This class represents a Variable registered to the system.
  * 
  * @author Filipe Germano

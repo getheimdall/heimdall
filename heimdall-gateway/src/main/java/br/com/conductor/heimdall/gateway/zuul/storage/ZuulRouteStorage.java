@@ -27,8 +27,6 @@ import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties.ZuulRoute;
 
 /**
- * <h1>ZuulRouteStorage</h1><br/>
- * 
  * Interface that provides method to find a list of all {@link ZuulRoute}.
  *
  * @author Marcos Filho

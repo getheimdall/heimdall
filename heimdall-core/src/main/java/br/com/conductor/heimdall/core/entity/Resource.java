@@ -54,8 +54,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <h1>Resource</h1>
- * 
  * This class represents a Resource registered to the system.
  * 
  * @author Filipe Germano

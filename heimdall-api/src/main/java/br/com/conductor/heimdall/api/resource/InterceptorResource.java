@@ -59,8 +59,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * <h1>InterceptorResource</h1><br/>
- * 
  * Uses a {@link InterceptorService} to provide methods to create, read, update and delete a {@link Interceptor}.
  *
  * @author Filipe Germano
@@ -81,7 +79,7 @@ public class InterceptorResource {
      /**
       * Finds a {@link Interceptor} by its Id.
       * 
-      * @param id					- The Interceptor Id
+      * @param id					The Interceptor Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -98,8 +96,8 @@ public class InterceptorResource {
      /**
       * Finds all {@link Interceptor} from a request.
       * 
-      * @param interceptorDTO		- {@link InterceptorDTO}
-      * @param pageableDTO			- {@link PageableDTO}
+      * @param interceptorDTO		{@link InterceptorDTO}
+      * @param pageableDTO			{@link PageableDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -142,7 +140,7 @@ public class InterceptorResource {
      /**
       * Saves a {@link Interceptor}.
       * 
-      * @param interceptorDTO		- {@link InterceptorDTO}
+      * @param interceptorDTO		{@link InterceptorDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -159,8 +157,8 @@ public class InterceptorResource {
      /**
       * Updates a {@link Interceptor}.
       * 
-      * @param id					- The Interceptor Id
-      * @param interceptorDTO		- {@link InterceptorDTO}
+      * @param id					The Interceptor Id
+      * @param interceptorDTO		{@link InterceptorDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -177,7 +175,7 @@ public class InterceptorResource {
      /**
       * Delets a {@link Interceptor}
       * 
-      * @param id					- The Interceptor Id
+      * @param id					The Interceptor Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody

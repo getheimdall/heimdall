@@ -30,8 +30,6 @@ import br.com.conductor.heimdall.middleware.spec.Json;
 import br.com.conductor.heimdall.middleware.spec.Xml;
 
 /**
- * <h1>HelperImpl</h1><br/>
- * 
  * Implementation of the {@link Helper} interface.
  *
  * @author Filipe Germano

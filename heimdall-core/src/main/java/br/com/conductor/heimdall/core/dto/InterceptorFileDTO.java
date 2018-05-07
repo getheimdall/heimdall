@@ -26,8 +26,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * <h1>InterceptorFileDTO</h1><br/>
- * 
  * Class is a Data Transfer Object for the InterceptorFile.
  *
  * @author Filipe Germano

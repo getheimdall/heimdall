@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.middleware.exception;
  */
 
 /**
- * <h1>UnauthorizedException</h1><br/>
- * 
  * This class represents the exceptions related to resource requests that were rejected by the bussiness logic.
  *
  * @author Filipe Germano

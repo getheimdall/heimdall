@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.api.security;
  */
 
 /**
- * <h1>CredentialAuthority</h1><br/>
- * 
  * Provides a method to retrive the name of the Credential.
  *
  * @author Marcos Filho
@@ -33,7 +31,7 @@ public interface CredentialAuthority {
 	 /**
 	  * Returns the name of a Credential.
 	  * 
-	  * @return String - name
+	  * @return String name
 	  */
      String getName();
 }

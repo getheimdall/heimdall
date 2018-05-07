@@ -53,8 +53,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * <h1>Middleware</h1>
- * 
  * This class represents a Middleware registered to the system.
  * 
  * @author Filipe Germano

@@ -48,8 +48,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>Trace</h1><br/>
- * 
  * Represents the trace message.
  *
  * @author Thiago Sampaio
@@ -113,9 +111,9 @@ public class Trace {
      /**
       * Creates a Trace.
       * 
-      * @param printAllTrace	- boolean, should print all trace
-      * @param profile			- String, profile
-      * @param servletRequest	- {@link ServletRequest}
+      * @param printAllTrace	boolean, should print all trace
+      * @param profile			String, profile
+      * @param servletRequest	{@link ServletRequest}
       */
      public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest){
 
@@ -146,7 +144,7 @@ public class Trace {
      /**
       * Adds a {@link FilterDetail} to the List.
       * 
-      * @param detail - {@link FilterDetail}
+      * @param detail {@link FilterDetail}
       */
      public void addFilter(FilterDetail detail) {
           filters.add(detail);
@@ -155,7 +153,7 @@ public class Trace {
      /**
       * Creates and adds a new trace to the traces List.
       * 
-      * @param msg	- Message to be added to the trace
+      * @param msg	Message to be added to the trace
       * @return		{@link Trace} created
       */
      public Trace trace(String msg) {
@@ -169,8 +167,8 @@ public class Trace {
      /**
       * Creates and adds a new trace from message and Object.
       * 
-      * @param msg		- The message for the trace
-      * @param object	- The Object to be added to the trace
+      * @param msg		The message for the trace
+      * @param object	The Object to be added to the trace
       * @return			{@link Trace} created
       */
      public Trace trace(String msg, Object object) {

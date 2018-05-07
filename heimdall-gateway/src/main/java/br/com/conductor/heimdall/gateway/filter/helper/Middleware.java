@@ -31,8 +31,6 @@ import com.google.common.collect.Lists;
 import groovy.lang.GroovyClassLoader;
 
 /**
- * <h1>Middleware</h1><br/>
- * 
  * Middleware representation.
  *
  * @author Filipe Germano

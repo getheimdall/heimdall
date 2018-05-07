@@ -33,8 +33,6 @@ import br.com.twsoftware.alfred.object.Objeto;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>AMQPCacheService</h1><br/>
- * 
  * This class controls a Advanced Message Queuing Protocol (AMQP) cache service.
  *
  * @author Filipe Germano
@@ -85,7 +83,7 @@ public class AMQPCacheService {
      /**
       * Dispatch a message to clean cache by key
       * 
-      * @param key		- The cache key
+      * @param key		The cache key
       */
      public void dispatchClean(String key) {
           
@@ -95,8 +93,8 @@ public class AMQPCacheService {
      /**
       * Dispatch a message to clean cache by key and id
       * 
-      * @param key		- The cache key
-      * @param id		- The cache id
+      * @param key		The cache key
+      * @param id		The cache id
       */
      public void dispatchClean(String key, String id) {
           

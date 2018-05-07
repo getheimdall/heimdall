@@ -27,8 +27,6 @@ import groovy.lang.GroovyClassLoader;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>GroovyUtils</h1><br/>
- * 
  * This class provides a method to compile Groovy resources.
  * 
  * @author Filipe Germano
@@ -40,8 +38,8 @@ public abstract class GroovyUtils {
 	 /**
 	  * Maps a groovy object to a java Object.
 	  *  
-	  * @param  groovy			- The groovy object to be converted
-	  * @param  clazz			- The java class representation of the groovy
+	  * @param  groovy			The groovy object to be converted
+	  * @param  clazz			The java class representation of the groovy
 	  * @return					The java object created, returns null if operation failed
 	  */
      @SuppressWarnings({ "resource", "unchecked" })

@@ -30,8 +30,6 @@ import br.com.twsoftware.alfred.object.Objeto;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>UrlUtil</h1><br/>
- * 
  * This class provides methods to handle {@link URL}s.
  * 
  * @author Thiago Sampaio
@@ -43,7 +41,7 @@ public class UrlUtil {
 	 /**
 	  * Returns the current URL from a {@link HttpServletRequest}.
 	  * 
-	  * @param 	request			- The {@link HttpServletRequest}
+	  * @param 	request			The {@link HttpServletRequest}
 	  * @return					The current URL as a {@link String}
 	  */
      public static String getCurrentUrl(HttpServletRequest request) {
@@ -71,7 +69,7 @@ public class UrlUtil {
      /**
       * Transforms a {@link String} to a {@link URL}.
       * 
-      * @param 	target				- The String to be converted
+      * @param 	target				The String to be converted
       * @return						The formed URL
       * @throws	IllegalStateException
       */

@@ -26,8 +26,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import br.com.conductor.heimdall.core.entity.Developer;
 
 /**
- * <h1>DeveloperRepository</h1><br/>
- * 
  * Provides methods to access a {@link Developer}.
  *
  * @author Filipe Germano
@@ -38,7 +36,7 @@ public interface DeveloperRepository extends JpaRepository<Developer, Long> {
 	 /**
 	  * Finds a Developer by its email.
 	  * 
-	  * @param  email		- The Developer email
+	  * @param  email		The Developer email
 	  * @return				The Developer found
 	  */
      Developer findByEmail(String email);

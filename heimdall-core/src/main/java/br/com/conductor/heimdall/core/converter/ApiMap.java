@@ -32,8 +32,6 @@ import br.com.conductor.heimdall.core.entity.Api;
 import br.com.twsoftware.alfred.object.Objeto;
 
 /**
- * <h1>ApiMap</h1><br/>
- * 
  * Maps a {@link ApiDTO} to a {@link Api} object.
  *
  * @author Filipe Germano

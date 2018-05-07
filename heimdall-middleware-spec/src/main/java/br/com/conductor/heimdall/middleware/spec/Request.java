@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.middleware.spec;
  */
 
 /**
- * <h1>Request</h1><br/>
- * 
  * This interface provides methods to control a request.
  *
  * @author Filipe Germano
@@ -55,21 +53,21 @@ public interface Request {
      /**
       * Sets the body of a request.
       * 
-      * @param body		- The body of the request to be set
+      * @param body		The body of the request to be set
       */
      public void setBody(String body);
      
      /**
       * Sets a url to the request.
       * 
-      * @param routeUrl	- The url to the request
+      * @param routeUrl	The url to the request
       */
      public void setUrl(String routeUrl);
      
      /**
       * Gets the path of a parameter by its name.
       * 
-      * @param name 	- The name of the path
+      * @param name 	The name of the path
       * @return			The path to the parameter
       */
      public String pathParam(String name);

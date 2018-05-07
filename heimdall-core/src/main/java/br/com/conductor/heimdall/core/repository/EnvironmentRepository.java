@@ -26,8 +26,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import br.com.conductor.heimdall.core.entity.Environment;
 
 /**
- * <h1>EnvironmentRepository</h1><br/>
- * 
  * Provides methods to access a {@link Environment}.
  *
  * @author Filipe Germano
@@ -38,7 +36,7 @@ public interface EnvironmentRepository extends JpaRepository<Environment, Long> 
 	 /**
 	  * Finds a Environment by its inbound URL.
 	  * 
-	  * @param  inboundURL		- The inbound URL
+	  * @param  inboundURL		The inbound URL
 	  * @return					The Environment found
 	  */
      Environment findByInboundURL(String inboundURL);

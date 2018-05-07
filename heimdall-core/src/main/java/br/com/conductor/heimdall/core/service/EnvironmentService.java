@@ -45,9 +45,8 @@ import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.EnvironmentRepository;
 import br.com.conductor.heimdall.core.util.Pageable;
+
 /**
- * <h1>Environment Service</h1>
- * 
  * This class provides methods to create, read, update and delete the {@link Environment} resource.
  * 
  * @author Filipe Germano
@@ -62,7 +61,7 @@ public class EnvironmentService {
      /**
       * Finds a {@link Environment} by its ID.
       * 
-      * @param 	id 						- The id of the {@link Environment} 
+      * @param 	id 						The id of the {@link Environment} 
       * @return 						The {@link Environment} that was found
       * @throws NotFoundException 		Resource not found
       */
@@ -77,8 +76,8 @@ public class EnvironmentService {
      /**
       * Generates a paged list of {@link Environment} from a request.
       * 
-      * @param environmentDTO			- The {@link EnvironmentDTO}
-      * @param pageableDTO				- The {@link PageableDTO}
+      * @param environmentDTO			The {@link EnvironmentDTO}
+      * @param pageableDTO				The {@link PageableDTO}
       * @return							The paged {@link Environment} list as a {@link EnvironmentPage} object
       */
      public EnvironmentPage list(EnvironmentDTO environmentDTO, PageableDTO pageableDTO) {
@@ -98,7 +97,7 @@ public class EnvironmentService {
      /**
       * Generates a list of {@link Environment} from a request.
       * 
-      * @param environmentDTO			- The {@link EnvironmentDTO}
+      * @param environmentDTO			The {@link EnvironmentDTO}
       * @return							The List<{@link Environment}>
       */
      public List<Environment> list(EnvironmentDTO environmentDTO) {
@@ -115,7 +114,7 @@ public class EnvironmentService {
      /**
       * Saves a {@link Environment} in the repository.
       * 
-      * @param environmentDTO			- The {@link EnvironmentDTO}
+      * @param environmentDTO			The {@link EnvironmentDTO}
       * @return							The saved {@link Environment}
       * @throws BadRequestException		Inbound URL already exists
       */
@@ -134,8 +133,8 @@ public class EnvironmentService {
      /**
       * Updates a {@link Environment} by its ID.
       * 
-      * @param 	id 						- The id of the {@link Environment} 
-      * @param environmentDTO			- The {@link EnvironmentDTO}
+      * @param 	id 						The id of the {@link Environment} 
+      * @param environmentDTO			The {@link EnvironmentDTO}
       * @return							The updated {@link Environment}
       * @throws NotFoundException		Resource not found
       * @throws BadRequestException		Inbound URL already exists
@@ -158,7 +157,7 @@ public class EnvironmentService {
      /**
       * Deletes a {@link Environment} by its ID.
       * 
-      * @param 	id 						- The id of the {@link Environment}
+      * @param 	id 						The id of the {@link Environment}
       * @throws NotFoundException		Resource not found
       */
      @Transactional

@@ -24,8 +24,6 @@ package br.com.conductor.heimdall.middleware.spec;
 import java.util.Map;
 
 /**
- * <h1>Header</h1><br/>
- * 
  * This interface provides methods to create, read, update and delete a header.
  *
  * @author Filipe Germano
@@ -43,7 +41,7 @@ public interface Header {
      /**
       * Gets a header from name.
       * 
-      * @param name		- The name of the header
+      * @param name		The name of the header
       * @return			The header found
       */
      public String get(String name);
@@ -51,23 +49,23 @@ public interface Header {
      /**
       * Sets a header.
       * 
-      * @param name		- The name of the header
-      * @param value	- The value of the header
+      * @param name		The name of the header
+      * @param value	The value of the header
       */
      public void set(String name, String value);
      
      /**
       * Adds a header.
       * 
-      * @param name		- The name of the header
-      * @param value	- The value of the header
+      * @param name		The name of the header
+      * @param value	The value of the header
       */
      public void add(String name, String value);
      
      /**
       * Removes a header.
       * 
-      * @param name		- The name of the header
+      * @param name		The name of the header
       */
      public void remove(String name);
      

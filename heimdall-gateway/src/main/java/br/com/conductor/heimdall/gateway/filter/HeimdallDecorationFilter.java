@@ -76,8 +76,6 @@ import br.com.twsoftware.alfred.object.Objeto;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>HeimdallDecorationFilter</h1><br/>
- * 
  * Extends the {@link PreDecorationFilter}.
  *
  * @author Marcos Filho

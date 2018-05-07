@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.core.exception;
  */
 
 /**
- * <h1>BadRequestException</h1><br/>
- * 
  * This class represents the exception related to non permited requests.
  * 
  * @author Filipe Germano

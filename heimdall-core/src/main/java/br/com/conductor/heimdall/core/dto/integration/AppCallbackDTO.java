@@ -29,8 +29,6 @@ import javax.validation.constraints.Size;
 import lombok.Data;
 
 /**
- * <h1>AppCallbackDTO</h1><br/>
- * 
  * Class is a Data Transfer Object for the AppCallback
  *
  * @author Marcos Filho

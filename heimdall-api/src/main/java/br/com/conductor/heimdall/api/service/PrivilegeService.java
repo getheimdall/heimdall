@@ -44,8 +44,6 @@ import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.util.Pageable;
 
 /**
- * <h1>PrivilegeService</h1><br/>
- * 
  * Provides methods to find one or mode {@link Privilege}.
  *
  * @author Marcos Filho
@@ -60,7 +58,7 @@ public class PrivilegeService {
      /**
       * Finds a {@link Privilege} by its Id.
       * 
-      * @param id		- The Privilege Id
+      * @param id		The Privilege Id
       * @return			{@link Privilege}
       * @throws			NotFoundException
       */	
@@ -75,8 +73,8 @@ public class PrivilegeService {
      /**
       * Finds all {@link Privilege} from a paged request.
       * 
-      * @param privilegeDTO		- {@link PrivilegeDTO}
-      * @param pageableDTO		- {@link PageableDTO}
+      * @param privilegeDTO		{@link PrivilegeDTO}
+      * @param pageableDTO		{@link PageableDTO}
       * @return					{@link PrivilegePage}
       */
      public PrivilegePage list(PrivilegeDTO privilegeDTO, PageableDTO pageableDTO) {
@@ -96,7 +94,7 @@ public class PrivilegeService {
      /**
       * Finds a {@link List} of {@link Privilege} associated with one Privilege provided.
       * 
-      * @param privilegeDTO		- {@link PrivilegeDTO}
+      * @param privilegeDTO		{@link PrivilegeDTO}
       * @return					{@link List} of {@link Privilege}
       */
      public List<Privilege> list(PrivilegeDTO privilegeDTO) {

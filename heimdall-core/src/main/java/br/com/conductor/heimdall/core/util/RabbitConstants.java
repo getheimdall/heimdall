@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.core.util;
  */
 
 /**
- * <h1>RabbitConstants</h1><br/>
- * 
  * This class holds the Rabbit Constants. 
  * 
  * @author Filipe Germano

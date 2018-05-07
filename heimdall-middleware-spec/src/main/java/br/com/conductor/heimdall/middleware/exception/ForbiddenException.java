@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.middleware.exception;
  */
 
 /**
- * <h1>ForbiddenException</h1><br/>
- * 
  * Class that represents the exceptions related to requests where the callers has no access.
  *
  * @author Filipe Germano
