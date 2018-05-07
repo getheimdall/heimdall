@@ -20,6 +20,9 @@ package br.com.conductor.heimdall.gateway.util;
  * ==========================LICENSE_END===================================
  */
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 import java.util.Comparator;
 
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties.ZuulRoute;
@@ -35,17 +38,12 @@ public class RouteSort implements Comparator<ZuulRoute> {
 
      @Override
      public int compare(ZuulRoute r1, ZuulRoute r2) {
-          String pattern1 = r1.getPath();
-          String pattern2 = r2.getPath();
           
-          String[] split = pattern1.split("/");
-          String[] split2 = pattern2.split("/");
-                
-          if (split[0].equals("**") && split2[0].equals("**")) return 0;
-          if (split[0].equals("**") && !split2[0].equals("**")) return -1;
-          if (!split[0].equals("**") && split2[0].equals("**")) return 1;
-
-          return pattern1.compareTo(pattern2);
+          Path path1 = Paths.get(r1.getPath());
+          Path path2 = Paths.get(r2.getPath());
+          
+          return path1.compareTo(path2);
+          
      }
 
 }
