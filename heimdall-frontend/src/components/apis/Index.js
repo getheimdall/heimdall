@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import PageHeader from '../ui/PageHeader'
 import ListApis from './ListApis'
 // import FloatButton from '../ui/FloatButton'
-import { Row, Col, Form, Input, Button, Tooltip } from 'antd'
+import { Row, Col, Form, Input, Button, Tooltip, notification } from 'antd'
 import { getAllApis } from '../../actions/apis'
 import Loading from '../ui/Loading';
 
@@ -14,6 +14,13 @@ class Index extends Component {
         super(props)
         this.state = { searchBy: '' }
         this.searchApi = this.searchApi.bind(this)
+    }
+
+    componentWillReceiveProps(newProps) {
+        if (newProps.notification && newProps.notification !== this.props.notification) {
+            const { type, message, description } = newProps.notification
+            notification[type]({ message, description })
+        }
     }
 
     componentDidMount() {
@@ -65,7 +72,8 @@ class Index extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        apis: state.apis.allApis
+        apis: state.apis.allApis,
+        notification: state.apis.notification,
     }
 }
 
