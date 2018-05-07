@@ -3,7 +3,6 @@ import { Layout, Row, Col } from 'antd'
 
 import NavBar from '../ui/NavBar'
 import SideBar from '../ui/SideBar'
-import Joyride from 'react-joyride'
 
 class MainLayout extends Component {
 
@@ -27,6 +26,10 @@ class MainLayout extends Component {
 		});
 	}
 
+	clearSteps = () => {
+		this.setState({...this.state, steps: []})
+	}
+
 	handleTour = (check) => {
 		this.setState({...this.state, keepTour: check})
 	}
@@ -37,22 +40,15 @@ class MainLayout extends Component {
 
 		return (
 			<Layout className="App">
-				<Joyride
-					ref={c => (this.joyride = c)}
-					steps={this.state.steps}
-					type="continuous"
-					showSkipButton={true}
-					run={this.state.keepTour}
-				/>
-				<SideBar addSteps={this.addSteps} history={history} collapse={true} />
+				<SideBar history={history} collapse={true} />
 				<Layout>
 					<Header className="h-header">
-						<NavBar joyride={this.joyride} handleTour={this.handleTour} history={history} />
+						<NavBar history={history} />
 					</Header>
 					<Content>
 						<Row>
 							<Col sm={24}>
-								{React.cloneElement(this.props.children, { addSteps: this.addSteps })}
+								{React.cloneElement(this.props.children)}
 							</Col>
 						</Row>
 					</Content>

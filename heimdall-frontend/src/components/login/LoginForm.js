@@ -50,9 +50,9 @@ class LoginForm extends Component {
                     </Col>
                 </Row> */}
                 <Col>
-                    <Button style={{ width: '100%' }} type="primary" htmlType="submit" className="login-form-button">
+                    <Button style={{ width: '100%' }} type="primary" htmlType="submit" className="login-form-button" loading={this.props.loading}>
                         Log in
-                        </Button>
+                    </Button>
                 </Col>
             </Form>
         );

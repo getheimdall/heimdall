@@ -166,13 +166,6 @@ body {
     min-height: 120px;
 }
 
-@media screen and (max-width: 400px) {
-    .no-mobile-padding {
-        padding-left: 0;
-        padding-right: 0;
-    }
-}
-
 .footer-bottom {
     position:fixed;
     left:0px;
@@ -182,43 +175,7 @@ body {
  }
 
  .login-gradient {
-    // style={{ minHeight: 300 }}
-    // min-height: 300px;
     background-color: #0a183f;
-    // background: rgb(0,21,41); /* Old browsers */
-    // background: -moz-linear-gradient(top, rgba(0,21,41,1) 0%, rgba(0,66,58,1) 85%, rgba(0,66,58,1) 100%); /* FF3.6-15 */
-    // background: -webkit-linear-gradient(top, rgba(0,21,41,1) 0%,rgba(0,66,58,1) 85%,rgba(0,66,58,1) 100%); /* Chrome10-25,Safari5.1-6 */
-    // background: linear-gradient(to bottom, rgba(0,21,41,1) 0%,rgba(0,66,58,1) 85%,rgba(0,66,58,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-    // filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#001529', endColorstr='#00423a',GradientType=0 ); /* IE6-9 */
-}
-
-@media screen and (max-width: 400px) {
-    .footer-bottom {
-        position: relative;
-        left:0px;
-        bottom:0px;
-        // height:30px;
-        width:100%;
-     }
-
-    //  .login-gradient {
-    //     min-height: 50px;
-    //  }
-}
-
-@media (min-width: 641px) { 
-    .login-cardbox {
-        width: 400px;
-        border-radius: 6px;
-    }
-
-    .login-gradient {
-        min-height: 300px;
-    }
-
-    .login-row {
-        margin-top: 120px;
-    }
 }
 
 .checkbox-conductor {
@@ -405,4 +362,56 @@ body {
     top: 0;
     left: 0;
     width: 100%;
+}
+
+.heimdall-logo-form {
+    position: absolute; 
+    z-index: 99;
+    width: 100%;
+    top: 0px;
+    left: 0px;
+    margin-top: -25px;
+}
+
+.heimdall-logo {
+    // margin-bottom: 30px;
+    height: 160px;
+}
+
+@media screen and (max-width: 400px) {
+    .no-mobile-padding {
+        padding-left: 0;
+        padding-right: 0;
+    }
+    
+    .footer-bottom {
+        position: relative;
+        left:0px;
+        bottom:0px;
+        // height:30px;
+        width:100%;
+     }
+
+     .heimdall-logo-form {
+        margin-top: -120px;
+     }
+
+     .heimdall-logo {
+        height: 130px;
+     }
+}
+
+@media (min-width: 641px) { 
+    .login-cardbox {
+        width: 400px;
+        border-radius: 6px;
+    }
+
+    .login-gradient {
+        min-height: 300px;
+    }
+
+    .login-row {
+        margin-top: 120px;
+    }
 }

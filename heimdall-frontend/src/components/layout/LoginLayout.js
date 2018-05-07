@@ -6,7 +6,7 @@ import particlesParams from '../../utils/particles'
 
 class LoginLayout extends Component {
     render() {
-        const { Content, Footer } = Layout
+        const { Content } = Layout
 
         return (
             <Layout className="layout login-layout">
@@ -21,9 +21,6 @@ class LoginLayout extends Component {
                     <Content className="login-content">
                         {this.props.children}
                     </Content>
-                    <Footer className="footer-bottom">
-                        <a href="http://conductor.com.br">Conductor Tecnologia</a>
-                    </Footer>
                 </Layout>
             </Layout>
         )

@@ -1,22 +1,15 @@
-[![Build Status](https://travis-ci.org/getheimdall/heimdall.svg?branch=master)](https://travis-ci.org/getheimdall/heimdall)
-[![Github All Releases](https://img.shields.io/github/downloads/getheimdall/heimdall/total.svg)](https://github.com/getheimdall/heimdall)
+# Heimdall
+[![forthebadge](https://forthebadge.com/images/badges/made-with-java.svg)](https://forthebadge.com) [![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
 
-<p align="center"> 
-  <img src="https://raw.githubusercontent.com/getheimdall/heimdall/master/.github/heimdall-logo.png">
-</p>
-<p align="center">
-  An easy way to orchestrate your Api's
-</p>
-
-
-## What's Heimdall
+**An easy way to orchestrate your Api's**
 
 This project is an easy way to use an API Orchestrator to your project. A simple way to manipulate request/response and uncouple your business domain, providing more flexibilities and personalize your API.
 
-### Features
-- imagem 1
-- imagem 2
-- imagem 3 completa.
+## Features
+
+imagem 1
+imagem 2
+imagem 3 completa.
 
 ## Infrastructure
 Heimdall was decomposed into six modules where three of they are principal (**Config, Api, Gateway**), built in around certain business domains.
@@ -32,105 +25,51 @@ In this project we built our algorithm over the [Netflix Zuul](https://github.co
 ### Api
 To provide a easy way to manage the gateway we put an Api to make more easy add new routes, interceptors, rate limit and others things to manipulate the gateway at runtime.
 
-## Usage
+## How to run all the things?
 Keep in mind, that you are going to start 3 Spring Boot applications, 1 Database instance and RabbitMq. Make sure you have `4 Gb` RAM available on your machine.\
 
-### First clone the project
-
-```sh 
-$ git clone --depth=1 https://github.com/getheimdall/heimdall.git heimdall
-$ cd heimdall
-```
-
-### Docker mode
-
 #### Requirements
-- Docker https://www.docker.com/
-- Docker Compose https://docs.docker.com/compose/
+- Docker
+- Docker Compose
+- Nodejs
+- Maven
+- Java 8
 
-If you'd like to build images yourself (with some changes in the code, for example), you have to clone all repository and build artifacts with maven. Then, run: 
+`git clone --depth=1 https://github.com/getheimdall/heimdall.git heimdall`
 
-```sh
-$ docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
-```
+#### Docker mode
+...
+
+If you'd like to build images yourself (with some changes in the code, for example), you have to clone all repository and build artifacts with maven. Then, run `docker-compose -f docker-compose.yml -f docker-compose.dev.yml up`
 
 `docker-compose.dev.yml` inherits `docker-compose.yml` with additional possibility to build images locally and expose all containers ports for convenient development.
 
-Access Heimdal on: [http://localhost:3000](http://localhost:3000)
-
-### Developer mode
-
-### Requirements
-- Nodejs https://nodejs.org/
-- Maven https://maven.apache.org/
-- Java 8 http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
-- PostgresSQL https://www.postgresql.org/
-- Erlang http://www.erlang.org/downloads
-- RabbitMQ https://www.rabbitmq.com/download.html
-- Redis https://redis.io/download or https://github.com/MicrosoftArchive/redis/releases
+#### Developer mode
 
 Open your favorite Terminal and run these commands.
 
 First tab to start config:
-
-```sh
-$ cd /heimdall-config
-$ mvn spring-boot:run
-```
+`cd /heimdall-config && mvn spring-boot:run`
 
 Second tab to start gateway (require **CONFIG** alredy started): 
-
-```sh
-$ cd /heimdall-gateway
-$ mvn spring-boot:run
-```
+`cd /heimdall-gateway && mvn spring-boot:run`
 
 Third tab to start api (require **CONFIG** alredy started):
-
-```sh
-$ cd /heimdall-api
-$ mvn spring-boot:run
-```
+`cd /heimdall-api && mvn spring-boot:run`
 
 (optional) Fourth tab to start front-end (require **API** alredy started)
+`cd /heimdall-frontend`
+`yarn` or `npm install`
+`yarn run` or `npm run start`
 
-With Yarn
-```sh
-$ cd /heimdall-frontend
-$ yarn
-$ yarn run
-```
-
-Withou Yarn
-```sh
-$ cd /heimdall-frontend
-$ npm install
-$ npm run start
-```
-
-### Important endpoints
+#### Important endpoints
 - http://localhost:8080 - Gateway
 - http://localhost:8888 - Config
 - http://localhost:9090 - Api
 - http://localhost:3000 - frontend
 
-### Notes
+#### Notes
 All Spring Boot applications require already running [Config Server](https://github.com/sqshq/PiggyMetrics#config-service) for startup. But we can start all containers simultaneously because of `depends_on` docker-compose option.
-
-### Deploy on Heroku
-
-Heimdall app can easily be deployed to Heroku clicking on button: 
-
-[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
-
-or executing the commands:
-
-```sh
-$ heroku login
-$ heroku create
-$ git push heroku master
-$ heroku open
-```
 
 ## Feedback welcome
 Heimdall is open source, and we appreciate your help. Feel free to contribute.

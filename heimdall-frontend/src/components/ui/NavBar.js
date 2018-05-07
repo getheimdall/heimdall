@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
-import { Menu, Icon, Row, Col, Checkbox } from 'antd'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
+
+import { Menu, Icon, Row, Col, notification } from 'antd'
 import { logout, getUser } from '../../actions/auth'
+import { clearCaches, initLoading } from '../../actions/cache'
 
 const SubMenu = Menu.SubMenu
 const MenuItemGroup = Menu.ItemGroup
@@ -13,13 +15,21 @@ class NavBar extends Component {
         this.props.getUser()
     }
 
+    componentWillReceiveProps(newProps) {
+        if (newProps.notification && newProps.notification !== this.props.notification) {
+            const { type, message, description } = newProps.notification
+            notification[type]({ message, description })
+        }
+    }
+
     handleClick = (e) => {
         switch (e.key) {
             case 'logout':
                 this.props.logout()
                 break;
-            case 'heimdall:1':
-                this.props.joyride.reset(true)
+            case 'heimdall:2':
+                this.props.initLoading()
+                this.props.clearCaches()
                 break;
             default:
                 break;
@@ -33,14 +43,11 @@ class NavBar extends Component {
     render() {
         return (
             <Row type="flex" justify="start">
-                <Col sm={2} md={2}>
-                    <Checkbox defaultChecked onChange={this.handleTour}>Keep Tour</Checkbox>
-                </Col>
-                <Col sm={22} md={22}>
+                <Col sm={24} md={24}>
                     <Menu id="top-bar-menu" mode="horizontal" theme="light" style={{ lineHeight: '62px' }} onClick={this.handleClick}>
                         <SubMenu title={<span><Icon type="info-circle-o" /></span>}>
                             <MenuItemGroup title="Heimdall Project">
-                                <Menu.Item key="heimdall:1">Reset Tour</Menu.Item>
+                                <Menu.Item key="heimdall:2">Clear Cache</Menu.Item>
                                 {/* <Menu.Item key="heimdall:2">About</Menu.Item> */}
                                 <Menu.Item key="heimdall:4">License</Menu.Item>
                             </MenuItemGroup>
@@ -63,14 +70,17 @@ class NavBar extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        user: state.auth.user
+        user: state.auth.user,
+        notification: state.caches.notification
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
         logout: bindActionCreators(logout, dispatch),
-        getUser: bindActionCreators(getUser, dispatch)
+        getUser: bindActionCreators(getUser, dispatch),
+        clearCaches: bindActionCreators(clearCaches, dispatch),
+        initLoading: bindActionCreators(initLoading, dispatch)
     }
 }
 

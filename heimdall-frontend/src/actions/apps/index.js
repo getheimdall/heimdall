@@ -43,7 +43,6 @@ export const save = app => dispatch => {
             dispatch(finishLoading())
         })
         .catch(error => {
-            console.log(error)
             if (error.response && error.response.status === 400) {
                 notification['error']({ message: 'Error', description: error.response.data.message })
             }
@@ -59,7 +58,6 @@ export const update = app => dispatch => {
             dispatch(finishLoading())
         })
         .catch(error => {
-            console.log(error)
             if (error.response && error.response.status === 400) {
                 notification['error']({ message: 'Error', description: error.response.data.message })
             }
