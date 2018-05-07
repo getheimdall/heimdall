@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import PageHeader from '../ui/PageHeader'
-import { Row, Button, Card } from 'antd'
+import { Row, Button, Card, notification } from 'antd'
 
 import { getAllEnvironments, clearEnvironments } from '../../actions/environments'
 import { saveApi, getNewApi } from '../../actions/apis'
@@ -20,6 +20,13 @@ class NewApi extends Component {
 
         this.next = this.next.bind(this)
         this.prev = this.prev.bind(this)
+    }
+
+    componentWillReceiveProps(newProps) {
+        if (newProps.notification && newProps.notification !== this.props.notification) {
+            const { type, message, description } = newProps.notification
+            notification[type]({ message, description })
+        }
     }
 
     componentDidMount() {
@@ -102,6 +109,7 @@ const mapStateToProps = (state) => {
 
     return {
         newApi: state.apis.api,
+        notification: state.apis.notification,
         environments: optionsEnvs
     }
 }
