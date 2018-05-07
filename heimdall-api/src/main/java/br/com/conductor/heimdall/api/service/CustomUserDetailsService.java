@@ -41,8 +41,6 @@ import br.com.conductor.heimdall.api.repository.UserRepository;
 import br.com.conductor.heimdall.api.security.CredentialSecurity;
 
 /**
- * <h1>CustomUserDetailsService</h1><br/>
- * 
  * Implements the {@link UserDetailsService} interface.
  * Loads a specific User data, with its user name, password
  * and Collection of GrantedAuthority.

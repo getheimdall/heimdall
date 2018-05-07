@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.core.enums;
  */
 
 /**
- * <h1>Interval</h1><br/>
- * 
  * Enum that represents the time intervals that can be used.
  *
  * @author Filipe Germano

@@ -35,8 +35,6 @@ import br.com.conductor.heimdall.core.enums.HttpMethod;
 import br.com.conductor.heimdall.core.util.ConstantsCache;
 
 /**
- * <h1>OperationRepository</h1><br/>
- * 
  * Provides methods to access a {@link Operation}.
  *
  * @author Filipe Germano
@@ -47,7 +45,7 @@ public interface OperationRepository extends JpaRepository<Operation, Long> {
 	 /**
 	  * Returns a List of Operation from a endpoint.
 	  *  
-	  * @param endPoint			- The endpoint that will be searched
+	  * @param endPoint			The endpoint that will be searched
 	  * @return					The List of Operation's associated with the endpoint
 	  */
      @Cacheable(ConstantsCache.OPERATION_ACTIVE_FROM_ENDPOINT)
@@ -57,7 +55,7 @@ public interface OperationRepository extends JpaRepository<Operation, Long> {
      /**
       * Returns a List of Operation associated with a {@link Resource}.
       * 
-      * @param idResource		- The Resource Id
+      * @param idResource		The Resource Id
       * @return					The List of Operation
       */
      List<Operation> findByResourceId(Long idResource);
@@ -65,9 +63,9 @@ public interface OperationRepository extends JpaRepository<Operation, Long> {
      /**
       * Finds a Operation by its Id, {@link Api} Id and {@link Resource} Id.
       * 
-      * @param apiId			- The Api Id
-      * @param resourceId		- The Resource Id
-      * @param id				- The Operation Id
+      * @param apiId			The Api Id
+      * @param resourceId		The Resource Id
+      * @param id				The Operation Id
       * @return					The Operation found
       */
      Operation findByResourceApiIdAndResourceIdAndId(Long apiId, Long resourceId, Long id);
@@ -75,8 +73,8 @@ public interface OperationRepository extends JpaRepository<Operation, Long> {
      /**
       * Returns a List of Operation from a {@link Api} Id and {@link Resource} Id.
       * 
-      * @param apiId			- The Api Id
-      * @param resourceId		- The Resource Id
+      * @param apiId			The Api Id
+      * @param resourceId		The Resource Id
       * @return					The List of Operation
       */
      List<Operation> findByResourceApiIdAndResourceId(Long apiId, Long resourceId);
@@ -84,7 +82,7 @@ public interface OperationRepository extends JpaRepository<Operation, Long> {
      /**
       * Returns a List of Operation from a {@link Api} Id.
       * 
-      * @param apiId			- The Api Id
+      * @param apiId			The Api Id
       * @return					The List of Operation
       */
      List<Operation> findByResourceApiId(Long apiId);
@@ -92,9 +90,9 @@ public interface OperationRepository extends JpaRepository<Operation, Long> {
      /**
       * Finds a Operation by its path, {@link Resource} Id and HTTP method. 
       * 
-      * @param resourceId		- The Resource Id
-      * @param method			- The HTTP method
-      * @param path				- The path to the Operation
+      * @param resourceId		The Resource Id
+      * @param method			The HTTP method
+      * @param path				The path to the Operation
       * @return					The Operation found
       */
      Operation findByResourceIdAndMethodAndPath(Long resourceId, HttpMethod method, String path);
@@ -102,8 +100,8 @@ public interface OperationRepository extends JpaRepository<Operation, Long> {
      /**
       * Finds a Operation by its path and HTTP method.
       * 
-      * @param method			- The HTTP method
-      * @param path				- The path to the Operation
+      * @param method			The HTTP method
+      * @param path				The path to the Operation
       * @return					The Operation found
       */
      Operation findByMethodAndPath(HttpMethod method, String path);

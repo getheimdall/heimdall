@@ -55,8 +55,6 @@ import br.com.twsoftware.alfred.object.Objeto;
 import io.swagger.annotations.ApiOperation;
 
 /**
- * <h1>OperationResource</h1><br/>
- * 
  * Uses a {@link OperationService} to provide methods to create, read, update and delete a {@link Operation}.
  *
  * @author Filipe Germano
@@ -76,9 +74,9 @@ public class OperationResource {
      /**
       * Finds a {@link Operation} by its Id.
       * 
-      * @param apiId				- The Api Id
-      * @param resourceId			- The Resource Id
-      * @param operationId			- The Operation Id
+      * @param apiId				The Api Id
+      * @param resourceId			The Resource Id
+      * @param operationId			The Operation Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -95,10 +93,10 @@ public class OperationResource {
      /**
       * Finds all {@link Operation} from a request.
       * 
-      * @param apiId				- The Api Id
-      * @param resourceId			- The Resource Id
-      * @param operationDTO			- {@link OperationDTO}
-      * @param pageableDTO			- {@link PageableDTO}
+      * @param apiId				The Api Id
+      * @param resourceId			The Resource Id
+      * @param operationDTO			{@link OperationDTO}
+      * @param pageableDTO			{@link PageableDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -121,9 +119,9 @@ public class OperationResource {
      /**
       * Saves a {@link Operation}.
       * 
-      * @param apiId				- The Api Id
-      * @param resourceId			- The Resource Id
-      * @param operationDTO			- {@link OperationDTO}
+      * @param apiId				The Api Id
+      * @param resourceId			The Resource Id
+      * @param operationDTO			{@link OperationDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -140,10 +138,10 @@ public class OperationResource {
      /**
       * Updates a {@link Operation}.
       * 
-      * @param apiId				- The Api Id
-      * @param resourceId			- The Resource Id
-      * @param operationId			- The Operation Id
-      * @param operationDTO			- {@link OperationDTO}
+      * @param apiId				The Api Id
+      * @param resourceId			The Resource Id
+      * @param operationId			The Operation Id
+      * @param operationDTO			{@link OperationDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -160,9 +158,9 @@ public class OperationResource {
      /**
       * Deletes a {@link Operation}.
       * 
-      * @param apiId				- The Api Id
-      * @param resourceId			- The Resource Id
-      * @param operationId			- The Operation Id
+      * @param apiId				The Api Id
+      * @param resourceId			The Resource Id
+      * @param operationId			The Operation Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -179,8 +177,8 @@ public class OperationResource {
      /**
       * Refreshes all {@link Operation}.
       * 
-      * @param apiId				- The Api Id
-      * @param resourceId			- The Resource Id
+      * @param apiId				The Api Id
+      * @param resourceId			The Resource Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody

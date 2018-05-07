@@ -178,7 +178,7 @@ public class StartServer implements ServletContextListener {
      /**
       * Creates the {@link Interceptor} from the {@link Middleware} by the {@link Middleware} Id.
       * 
-      * @param middlewareId		- The {@link Middleware} Id
+      * @param middlewareId		The {@link Middleware} Id
       */
      public void createMiddlewaresInterceptor(Long middlewareId) {
           
@@ -197,7 +197,7 @@ public class StartServer implements ServletContextListener {
      /**
       * Cleans all the files from a specific folder.
       * 
-      * @param root		- The folder root
+      * @param root		The folder root
       */
      public void cleanFilesFolder(String root) {
           
@@ -287,7 +287,7 @@ public class StartServer implements ServletContextListener {
      /**
       * Loads the {@link Middleware} files.
       * 
-      * @param middlewareId		- The {@link Middleware} Id
+      * @param middlewareId		The {@link Middleware} Id
       */
      public void loadMiddlewareFiles(Long middlewareId) {
           
@@ -312,7 +312,7 @@ public class StartServer implements ServletContextListener {
      /**
       * Remove the {@link Middleware} files.
       * 
-      * @param path			- The path to the {@link Middleware} files
+      * @param path			The path to the {@link Middleware} files
       */
      public void removeMiddlewareFiles(String path) {
           

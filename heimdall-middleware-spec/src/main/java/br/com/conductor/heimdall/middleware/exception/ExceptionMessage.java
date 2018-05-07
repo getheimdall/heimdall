@@ -29,8 +29,6 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>ExceptionMessage.java</h1><br/>
- * 
  * Enum that concentrates the messages and validations of the exceptions.
  *
  * @author Filipe Germano

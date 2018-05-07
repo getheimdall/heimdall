@@ -24,8 +24,6 @@ package br.com.conductor.heimdall.core.util;
 import org.junit.Ignore;
 
 /**
- * <h1>ConstantsCache</h1><br/>
- * 
  * This class holds the cache constants.
  *
  * @author Thiago Sampaio

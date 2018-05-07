@@ -54,8 +54,6 @@ import br.com.twsoftware.alfred.object.Objeto;
 import io.swagger.annotations.ApiOperation;
 
 /**
- * <h1>PlanResource</h1><br/>
- * 
  * Uses a {@link PlanService} to provide methods to create, read, update and delete a {@link Plan}.
  *
  * @author Filipe Germano
@@ -72,7 +70,7 @@ public class PlanResource {
      /**
       * Finds a {@link Plan} by its Id.
       * 
-      * @param id					- The Plan Id
+      * @param id					The Plan Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -89,8 +87,8 @@ public class PlanResource {
      /**
       * Finds all {@link Plan} from a request.
       * 
-      * @param planDTO				- {@link PlanDTO}
-      * @param pageableDTO			- {@link PageableDTO}
+      * @param planDTO				{@link PlanDTO}
+      * @param pageableDTO			{@link PageableDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -113,7 +111,7 @@ public class PlanResource {
      /**
       * Saves a {@link Plan}.
       * 
-      * @param planDTO				- {@link PlanDTO}
+      * @param planDTO				{@link PlanDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -130,8 +128,8 @@ public class PlanResource {
      /**
       * Updates a {@link Plan}.
       * 
-      * @param id					- The Plan Id
-      * @param planDTO				- {@link PlanDTO}
+      * @param id					The Plan Id
+      * @param planDTO				{@link PlanDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -148,7 +146,7 @@ public class PlanResource {
      /**
       * Deletes a {@link Plan}.
       * 
-      * @param id					- The Plan Id
+      * @param id					The Plan Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody

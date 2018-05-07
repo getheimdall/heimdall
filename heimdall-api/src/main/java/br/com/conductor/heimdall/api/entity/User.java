@@ -51,8 +51,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <h1>User</h1><br/>
- * 
  * Data class that represents the User.
  *
  * @author Marcos Filho

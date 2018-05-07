@@ -30,8 +30,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <h1>RolePage</h1><br/>
- * 
  * Represents a {@link Role} page.
  *
  * @author Marcos Filho

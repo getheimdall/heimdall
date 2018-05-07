@@ -30,8 +30,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <h1>OperationPage</h1><br/>
- * 
  * Class that represents a paged {@link Operation} list.
  *
  * @author Filipe Germano

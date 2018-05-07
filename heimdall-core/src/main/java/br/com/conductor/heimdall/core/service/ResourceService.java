@@ -51,8 +51,6 @@ import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
 import br.com.conductor.heimdall.core.util.Pageable;
 
 /**
- * <h1>Resource Service</h1>
- * 
  * This class provides methos to create, read, update and delete a {@link Resource} resource.
  * 
  * @author Filipe Germano
@@ -74,8 +72,8 @@ public class ResourceService {
      /**
       * Finds a {@link Resource} by its Id and {@link Api} Id.
       * 
-      * @param 	apiId						- The {@link Api} Id
-      * @param 	resourceId					- The {@link Resource} Id
+      * @param 	apiId						The {@link Api} Id
+      * @param 	resourceId					The {@link Resource} Id
       * @return								The {@link Resource} found
       * @throws NotFoundException			Resource not found
       */
@@ -91,9 +89,9 @@ public class ResourceService {
      /**
       * Generates a paged list of {@link Resource} from a request.
       * 
-      * @param 	apiId						- The {@link Api} Id
-      * @param 	resourceDTO					- The {@link ResourceDTO}
-      * @param 	pageableDTO					- The {@link PageableDTO}
+      * @param 	apiId						The {@link Api} Id
+      * @param 	resourceDTO					The {@link ResourceDTO}
+      * @param 	pageableDTO					The {@link PageableDTO}
       * @return								The paged {@link Resource} list as a {@link ResourcePage} object
       * @throws NotFoundException			Resource not found
       */
@@ -118,8 +116,8 @@ public class ResourceService {
      /**
       * Generates a list of {@link Resource} from a request.
       * 
-      * @param 	apiId						- The {@link Api} Id
-      * @param 	resourceDTO					- The {@link ResourceDTO}
+      * @param 	apiId						The {@link Api} Id
+      * @param 	resourceDTO					The {@link ResourceDTO}
       * @return								The List of {@link Resource}
       * @throws NotFoundException			Resource not found
       */
@@ -141,8 +139,8 @@ public class ResourceService {
      /**
       * Saves a {@link Resource} to the repository.
       * 
-      * @param 	apiId						- The {@link Api} Id
-      * @param 	resourceDTO					- The {@link ResourceDTO}
+      * @param 	apiId						The {@link Api} Id
+      * @param 	resourceDTO					The {@link ResourceDTO}
       * @return								The saved {@link Resource}
       * @throws NotFoundException			Resource not found
       * @throws BadRequestException			Only one resource per api
@@ -168,9 +166,9 @@ public class ResourceService {
      /**
       * Updates a {@link Resource} by its Id and {@link Api} Id
       * 
-      * @param 	apiId						- The {@link Api} Id
-      * @param 	resourceId					- The {@link Resource} Id
-      * @param 	resourceDTO					- The {@link ResourceDTO}
+      * @param 	apiId						The {@link Api} Id
+      * @param 	resourceId					The {@link Resource} Id
+      * @param 	resourceDTO					The {@link ResourceDTO}
       * @return								The updated {@link Resource}
       * @throws NotFoundException			Resource not found
       * @throws BadRequestException			Only one resource per api
@@ -195,8 +193,8 @@ public class ResourceService {
      /**
       * Deletes a {@link Resource} by its Id.
       * 
-      * @param 	apiId						- The {@link Api} Id
-      * @param 	resourceId					- The {@link Resource} Id
+      * @param 	apiId						The {@link Api} Id
+      * @param 	resourceId					The {@link Resource} Id
       * @throws NotFoundException			Resource not found
       */
      public void delete(Long apiId, Long resourceId) {

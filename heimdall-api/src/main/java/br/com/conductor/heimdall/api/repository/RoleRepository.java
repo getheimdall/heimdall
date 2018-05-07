@@ -30,8 +30,6 @@ import org.springframework.data.repository.query.Param;
 import br.com.conductor.heimdall.api.entity.Role;
 
 /**
- * <h1>RoleRepository</h1><br/>
- * 
  * Extends {@link JpaRepository}. Provides method to find a {@link Set} of {@link Role}.
  *
  * @author Marcos Filho
@@ -42,7 +40,7 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
 	 /**
 	  * Finds a {@link Set} of {@link Role} by its name.
 	  * 
-	  * @param name		- The Role name
+	  * @param name		The Role name
 	  * @return			{@link Set} of {@link Role}
 	  */
      Set<Role> findByName(String name);

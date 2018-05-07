@@ -29,8 +29,6 @@ import org.modelmapper.PropertyMap;
 import org.modelmapper.convention.MatchingStrategies;
 
 /**
- * <h1>GenericConverter</h1><br/>
- * 
  * This class provides generic methods to convert between types.
  *
  * @author Filipe Germano
@@ -41,8 +39,8 @@ public abstract class GenericConverter {
 	 /**
 	  * Converts a source to a type destination.
 	  * 
-	  * @param source					- The source object
-	  * @param typeDestination			- The type destination
+	  * @param source					The source object
+	  * @param typeDestination			The type destination
 	  * @return							The object created
 	  */
      public static <T, E> E mapper(T source, Class<E> typeDestination) {
@@ -56,8 +54,8 @@ public abstract class GenericConverter {
      /**
       * Converts a source to a type destination.
       * 
-      * @param source				- The source object
-      * @param destination			- The destination object
+      * @param source				The source object
+      * @param destination			The destination object
       * @return						The object created
       */
      public static <T, E> E mapper(T source, E destination) {
@@ -72,9 +70,9 @@ public abstract class GenericConverter {
      /**
       * Converts a source to a type destination.
       * 
-      * @param source				- The souce object
-      * @param typeDestination		- The type destination 
-      * @param mapping				- The properties for the mapping process
+      * @param source				The souce object
+      * @param typeDestination		The type destination 
+      * @param mapping				The properties for the mapping process
       * @return						The object created
       */
      public static <T, E> E mapperWithMapping(T source, Class<E> typeDestination, PropertyMap<T, E> mapping) {
@@ -89,9 +87,9 @@ public abstract class GenericConverter {
      /**
       * Converts a source to a type destination.
       * 
-      * @param source				- The souce object
-      * @param destination			- The destination object
-      * @param mapping				- The properties for the mapping process
+      * @param source				The souce object
+      * @param destination			The destination object
+      * @param mapping				The properties for the mapping process
       * @return						The object created
       */
      public static <T, E> E mapperWithMapping(T source, E destination, PropertyMap<T, E> mapping) {
@@ -107,8 +105,8 @@ public abstract class GenericConverter {
      /**
       * Converts a source to a type destination.
       * 
-      * @param source				- The souce object
-      * @param typeDestination		- The type destination 
+      * @param source				The souce object
+      * @param typeDestination		The type destination 
       * @return						The object created
       */
      public static <E, T> List<E> mapper(List<T> source, Type destinationType) {

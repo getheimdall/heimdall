@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.middleware.spec;
  */
 
 /**
- * <h1>Middleware</h1><br/>
- * 
  * This is the main Middleware interface. It provides the method used to execute the Middleware.
  *
  * @author Filipe Germano
@@ -33,7 +31,7 @@ public interface Middleware {
      
 	 /**
 	  * Executes the Middleware using the {@link Helper} class defined.
-	  * @param helper	- The Helper class
+	  * @param helper	The Helper class
 	  */
      public void run(Helper helper);
 

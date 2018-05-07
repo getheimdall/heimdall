@@ -46,8 +46,6 @@ import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>DataBaseConfiguration</h1><br/>
- * 
  * This class is responsible for managing the database connection.
  *
  * @author Filipe Germano
@@ -134,7 +132,7 @@ public class DataBaseConfiguration implements EnvironmentAware {
      /**
       * Creates a {@link SpringLiquibase} from a {@link DataSource}.
       * 
-      * @param dataSource		- The {@link DataSource} that will be used to create the {@link SpringLiquibase} instance
+      * @param dataSource		The {@link DataSource} that will be used to create the {@link SpringLiquibase} instance
       * @return					The {@link SpringLiquibase} instance created
       */
      @Bean

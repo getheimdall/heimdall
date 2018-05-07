@@ -48,8 +48,6 @@ import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
 import br.com.conductor.heimdall.core.util.Pageable;
 
 /**
- * <h1>API Service</h1>
- * 
  * This class provides methods to create, read, update and delete the {@link Api} resource.
  * 
  * @author Filipe Germano
@@ -67,7 +65,7 @@ public class ApiService {
      /**
       * Finds a {@link Api} by its ID.
       * 
-      * @param 	id						- The ID of the {@link Api}
+      * @param 	id						The ID of the {@link Api}
       * @return							The {@link Api}
       * @throws	NotFoundException		Resource not found
       */
@@ -82,9 +80,9 @@ public class ApiService {
      /**
       * Generates a paged list of the {@link Api}'s
       * 
-      * @param 	apiDTO					- {@link ApiDTO}
-      * @param 	pageableDTO				- {@link PageableDTO}
-      * @return 						- The paged {@link Api} list as a {@link ApiPage} object
+      * @param 	apiDTO					{@link ApiDTO}
+      * @param 	pageableDTO				{@link PageableDTO}
+      * @return 						The paged {@link Api} list as a {@link ApiPage} object
       */
      public ApiPage list(ApiDTO apiDTO, PageableDTO pageableDTO) {
 
@@ -103,8 +101,8 @@ public class ApiService {
      /**
       * Generates a list of the {@link Api}'s
       * 
-      * @param 	apiDTO					- {@link ApiDTO}
-      * @param 	pageableDTO				- The pageable DTO
+      * @param 	apiDTO					{@link ApiDTO}
+      * @param 	pageableDTO				The pageable DTO
       * @return 						The list of {@link Api}'s
       */
      public List<Api> list(ApiDTO apiDTO) {
@@ -121,7 +119,7 @@ public class ApiService {
      /**
       * Saves a {@link Api}.
       * 
-      * @param 	apiDTO					- {@link ApiDTO}
+      * @param 	apiDTO					{@link ApiDTO}
       * @return							The saved {@link Api}
       * @throws	BadRequestException		The basepath defined exist
       */
@@ -141,8 +139,8 @@ public class ApiService {
      /**
       * Updates a {@link Api} by its ID.
       *  
-      * @param 	id						- The ID of the {@link Api}
-      * @param 	apiDTO					- {@link ApiDTO}
+      * @param 	id						The ID of the {@link Api}
+      * @param 	apiDTO					{@link ApiDTO}
       * @return							The updated {@link Api}
       * @throws	NotFoundException		Resource not found
       * @throws	BadRequestException		The basepath defined exist
@@ -166,7 +164,7 @@ public class ApiService {
      /**
       * Deletes a {@link Api} by its ID.
       * 
-      * @param 	id						- The ID of the {@link Api}
+      * @param 	id						The ID of the {@link Api}
       * @throws	NotFoundException		Resource not found
       */
      public void delete(Long id) {

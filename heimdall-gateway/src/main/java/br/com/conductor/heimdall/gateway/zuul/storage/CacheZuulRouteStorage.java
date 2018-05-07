@@ -42,8 +42,6 @@ import br.com.twsoftware.alfred.object.Objeto;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>CacheZuulRouteStorage</h1><br/>
- *
  * Represents the place that will fill the ZuulRoutes
  * 
  * @author Marcos Filho

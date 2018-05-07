@@ -26,8 +26,6 @@ import java.util.Comparator;
 import br.com.conductor.heimdall.core.entity.Operation;
 
 /**
- * <h1>OperationSort</h1><br/>
- * 
  * This class provides a comparator for the {@link Operation} resource.
  * 
  * @author Marcos Filho

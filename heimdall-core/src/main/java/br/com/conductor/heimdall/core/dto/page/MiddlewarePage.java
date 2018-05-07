@@ -29,8 +29,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <h1>MiddlewarePage</h1><br/>
- * 
  * Class that represents a paged {@link Middleware} list.
  *
  * @author Filipe Germano

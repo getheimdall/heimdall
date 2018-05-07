@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.api.enums;
  */
 
 /**
- * <h1>TypeUser</h1><br/>
- * 
  * Enum represents the user types.
  *
  * @author Marcos Filho

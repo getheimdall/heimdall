@@ -25,8 +25,6 @@ import br.com.conductor.heimdall.core.enums.Interval;
 import lombok.Data;
 
 /**
- * <h1>RattingDTO</h1><br/>
- * 
  * Class is a Data Transfer Object for the Ratting.
  *
  * @author Marcos Filho

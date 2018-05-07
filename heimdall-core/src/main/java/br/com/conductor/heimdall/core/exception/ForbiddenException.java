@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.core.exception;
  */
 
 /**
- * <h1>ForbiddenException</h1><br/>
- * 
  * This class represents the exception where there is a authorization conflict. 
  * 
  * @author Filipe Germano

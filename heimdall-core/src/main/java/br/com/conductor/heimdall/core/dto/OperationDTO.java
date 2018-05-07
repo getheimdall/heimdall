@@ -31,8 +31,6 @@ import br.com.conductor.heimdall.core.enums.HttpMethod;
 import lombok.Data;
 
 /**
- * <h1>OperationDTO</h1><br/>
- * 
  * Class is a Data Transfer Object for the {@link Operation}.
  *
  * @author Filipe Germano

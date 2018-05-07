@@ -29,8 +29,6 @@ import javax.servlet.ServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>TraceContextHolder</h1><br/>
- * 
  * Provides thread safe methods to manage the Trace.
  *
  * @author Thiago Sampaio
@@ -66,9 +64,9 @@ public class TraceContextHolder {
      /**
       * Initializes a {@link Trace}
       * 
-      * @param printAllTrace	- boolean
-      * @param profile			- Profile
-      * @param request			- {@link ServletRequest}
+      * @param printAllTrace	boolean
+      * @param profile			Profile
+      * @param request			{@link ServletRequest}
       * @return					{@link Trace}
       */
      public Trace init(boolean printAllTrace, String profile, ServletRequest request) {

@@ -32,8 +32,6 @@ import br.com.conductor.heimdall.core.entity.RateLimit;
 import br.com.conductor.heimdall.core.repository.RateLimitRepository;
 
 /**
- * <h1>RateLimitRepositoryImpl</h1><br/>
- * 
  * This class provides methods to save, find and delete a {@link RateLimit}.
  *
  * @author Marcos Filho

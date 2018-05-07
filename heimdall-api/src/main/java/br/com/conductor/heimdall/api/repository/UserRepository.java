@@ -30,8 +30,6 @@ import br.com.conductor.heimdall.api.enums.TypeUser;
 import br.com.conductor.heimdall.api.security.CredentialSecurity;
 
 /**
- * <h1>UserRepository</h1><br/>
- * 
  * Extends {@link JpaRepository}. Provides methods to find a {@link User} and the {@link CredentialSecurity}.
  *
  * @author Marcos Filho
@@ -42,7 +40,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 	 /**
 	  * Finds a {@link User} by its username.
 	  * 
-	  * @param username		- The User username.
+	  * @param username		The User username.
 	  * @return				{@link User}
 	  */
      User findByUserName(String username);
@@ -50,8 +48,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
      /**
       * Finds a {@link User} by its username and {@link TypeUser}.
       * 
-	  * @param username		- The User username.
-      * @param type			- {@link TypeUser}
+	  * @param username		The User username.
+      * @param type			{@link TypeUser}
 	  * @return				{@link User}
       */
      User findByUserNameAndType(@Param("username") String username, @Param("type") TypeUser type);
@@ -59,8 +57,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
      /**
       * Finds a {@link CredentialSecurity} by {@link User} username and {@link TypeUser}.
       * 
-	  * @param username		- The User username.
-      * @param type			- {@link TypeUser}
+	  * @param username		The User username.
+      * @param type			{@link TypeUser}
       * @return				{@link CredentialSecurity}
       */
      @Query(value = "SELECT userName as userName, password as password FROM User WHERE userName = ?1 and type = ?2")

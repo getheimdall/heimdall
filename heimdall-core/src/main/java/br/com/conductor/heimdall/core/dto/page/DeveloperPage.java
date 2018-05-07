@@ -30,8 +30,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <h1>DeveloperPage</h1><br/>
- * 
  * Class that represents a paged {@link Developer} list.
  *
  * @author Filipe Germano

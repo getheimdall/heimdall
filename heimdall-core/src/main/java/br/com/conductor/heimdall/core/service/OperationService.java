@@ -52,8 +52,6 @@ import br.com.conductor.heimdall.core.util.ConstantsCache;
 import br.com.conductor.heimdall.core.util.Pageable;
 
 /**
- * <h1>Operation Service</h1>
- * 
  * This class provides methods to create, read, updade and delete a {@link Operation} resource.
  * 
  * @author Filipe Germano
@@ -77,9 +75,9 @@ public class OperationService {
      /**
       * Finds a {@link Operation} by its Id, {@link Resource} Id and {@link Api} Id.
       * 
-      * @param  apiId						- The {@link Api} Id
-      * @param 	resourceId					- The {@link Resource} Id
-      * @param 	operationId					- The {@link Operation} Id
+      * @param  apiId						The {@link Api} Id
+      * @param 	resourceId					The {@link Resource} Id
+      * @param 	operationId					The {@link Operation} Id
       * @return								The {@link Operation} found
       * @throws NotFoundException			Resource not found
       */
@@ -95,10 +93,10 @@ public class OperationService {
      /**
       * Generates a paged list of {@link Operation} from a request.
       * 
-      * @param  apiId						- The {@link Api} Id
-      * @param 	resourceId					- The {@link Resource} Id
-      * @param 	operationDTO				- The {@link OperationDTO}
-      * @param 	pageableDTO					- The {@link PageableDTO}
+      * @param  apiId						The {@link Api} Id
+      * @param 	resourceId					The {@link Resource} Id
+      * @param 	operationDTO				The {@link OperationDTO}
+      * @param 	pageableDTO					The {@link PageableDTO}
       * @return								The paged {@link Operation} list as a {@link OperationPage} object
       * @throws NotFoundException			Resource not found
       */
@@ -124,9 +122,9 @@ public class OperationService {
      /**
       * Generates a list of {@link Operation} from a request.
       * 
-      * @param  apiId						- The {@link Api} Id
-      * @param 	resourceId					- The {@link Resource} Id
-      * @param 	operationDTO				- The {@link OperationDTO}
+      * @param  apiId						The {@link Api} Id
+      * @param 	resourceId					The {@link Resource} Id
+      * @param 	operationDTO				The {@link OperationDTO}
       * @return								The list of {@link Operation}
       * @throws NotFoundException			Resource not found
       */
@@ -149,9 +147,9 @@ public class OperationService {
      /**
       * Saves a {@link Operation} to the repository.
       * 
-      * @param  apiId						- The {@link Api} Id
-      * @param 	resourceId					- The {@link Resource} Id
-      * @param 	operationDTO				- The {@link OperationDTO}
+      * @param  apiId						The {@link Api} Id
+      * @param 	resourceId					The {@link Resource} Id
+      * @param 	operationDTO				The {@link OperationDTO}
       * @return								The saved {@link Operation}
       * @throws NotFoundException			Resource not found
       * @throws	BadRequestException			Only one operation per resource
@@ -178,10 +176,10 @@ public class OperationService {
      /**
       * Updates a {@link Operation} by its Id, {@link Api} Id, {@link Resource} Id and {@link OperationDTO}.
       * 
-      * @param  apiId						- The {@link Api} Id
-      * @param 	resourceId					- The {@link Resource} Id
-      * @param 	operationId					- The {@link Operation} Id
-      * @param 	operationDTO				- The {@link OperationDTO}
+      * @param  apiId						The {@link Api} Id
+      * @param 	resourceId					The {@link Resource} Id
+      * @param 	operationId					The {@link Operation} Id
+      * @param 	operationDTO				The {@link OperationDTO}
       * @return								The updated {@link Operation}
       * @throws NotFoundException			Resource not found
       * @throws BadRequestException			Only one operation per resource
@@ -209,9 +207,9 @@ public class OperationService {
      /**
       * Deletes a {@link Operation} by its Id, {@link Resource} Id and {@link Api} Id.
       * 
-      * @param  apiId						- The {@link Api} Id
-      * @param 	resourceId					- The {@link Resource} Id
-      * @param 	operationId					- The {@link Operation} Id
+      * @param  apiId						The {@link Api} Id
+      * @param 	resourceId					The {@link Resource} Id
+      * @param 	operationId					The {@link Operation} Id
       * @throws NotFoundException			Resource not found
       */
      @Transactional

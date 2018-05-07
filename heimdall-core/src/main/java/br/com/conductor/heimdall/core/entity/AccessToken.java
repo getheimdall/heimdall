@@ -51,8 +51,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * <h1>Access Token</h1>
- * 
  *  The Access Token is required for a safe connection to be established.
  * 
  * @author Filipe Germano

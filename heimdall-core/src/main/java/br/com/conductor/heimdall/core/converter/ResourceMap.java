@@ -32,8 +32,6 @@ import br.com.conductor.heimdall.core.entity.Resource;
 import br.com.twsoftware.alfred.object.Objeto;
 
 /**
- * <h1>ResourceMap</h1><br/>
- * 
  * Maps a {@link ResourceDTO} to a {@link Resource} object.
  *
  * @author  * @author Filipe Germano

@@ -28,8 +28,6 @@ import org.springframework.cloud.netflix.zuul.web.ZuulController;
 import org.springframework.cloud.netflix.zuul.web.ZuulHandlerMapping;
 
 /**
- * <h1>HeimdallHandlerMapping</h1><br/>
- * 
  * Extends {@link ZuulHandlerMapping} to add a dirty checking.
  *
  * @author Marcos Filho

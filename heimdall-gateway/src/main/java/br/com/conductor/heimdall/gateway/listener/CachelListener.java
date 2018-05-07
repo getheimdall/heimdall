@@ -33,8 +33,6 @@ import br.com.twsoftware.alfred.object.Objeto;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>CachelListener</h1><br/>
- * 
  * Keeps track of the Rabbit Cache to clean it when necessary.
  *
  * @author Filipe Germano

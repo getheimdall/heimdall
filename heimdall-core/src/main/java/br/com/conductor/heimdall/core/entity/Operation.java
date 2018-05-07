@@ -52,8 +52,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <h1>Operation</h1>
- * 
  * This class represents a Operation registered to the system.
  * 
  * @author Filipe Germano

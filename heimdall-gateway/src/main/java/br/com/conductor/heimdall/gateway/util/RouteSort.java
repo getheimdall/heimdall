@@ -25,11 +25,10 @@ import java.util.Comparator;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties.ZuulRoute;
 
 /**
- * <h1>RouteSort</h1><br/>
- *
  * Represents the algorithm to sort {@link ZuulRoute} correctly.
  * 
  * @author Marcos Filho
+ * @author Marcelo Rodrigues
  *
  */
 public class RouteSort implements Comparator<ZuulRoute> {

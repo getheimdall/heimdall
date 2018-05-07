@@ -64,8 +64,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <h1>App</h1>
- * 
  * This class represents a App registered to the system.
  * 
  * @author Filipe Germano

@@ -55,8 +55,6 @@ import br.com.twsoftware.alfred.object.Objeto;
 import io.swagger.annotations.ApiOperation;
 
 /**
- * <h1>ResourceResource</h1><br/>
- * 
  * Uses a {@link ResourceService} to provide methods to create, read, update and delete a {@link Resource}.
  *
  * @author Filipe Germano
@@ -77,8 +75,8 @@ public class ResourceResource{
      /**
       * Finds a {@link Resource} by its Id.
       * 
-      * @param apiId				- The Api Id
-      * @param resourceId			- The Resource Id
+      * @param apiId				The Api Id
+      * @param resourceId			The Resource Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -95,9 +93,9 @@ public class ResourceResource{
      /**
       * Finds all {@link Resource} from a request.
       * 
-      * @param apiId				- The Api Id
-      * @param resourceDTO			- {@link ResourceDTO}
-      * @param pageableDTO			- {@link PageableDTO}
+      * @param apiId				The Api Id
+      * @param resourceDTO			{@link ResourceDTO}
+      * @param pageableDTO			{@link PageableDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -120,8 +118,8 @@ public class ResourceResource{
      /**
       * Saves a {@link Resource}.
       * 
-      * @param apiId				- The Api Id
-      * @param resourceDTO			- {@link ResourceDTO}
+      * @param apiId				The Api Id
+      * @param resourceDTO			{@link ResourceDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -138,9 +136,9 @@ public class ResourceResource{
      /**
       * Updates a {@link Resource}.
       * 
-      * @param apiId				- The Api Id
-      * @param resourceId			- The Resource Id
-      * @param resourceDTO			- {@link ResourceDTO}
+      * @param apiId				The Api Id
+      * @param resourceId			The Resource Id
+      * @param resourceDTO			{@link ResourceDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -157,8 +155,8 @@ public class ResourceResource{
      /**
       * Deletes a {@link Resource}.
       * 
-      * @param apiId				- The Api Id
-      * @param resourceId			- The Resource Id
+      * @param apiId				The Api Id
+      * @param resourceId			The Resource Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -175,7 +173,7 @@ public class ResourceResource{
      /**
       * Refreshes all {@link Resource}.
       * 
-      * @param apiId				- The Api Id
+      * @param apiId				The Api Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody

@@ -28,8 +28,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * <h1>ReferenceIdDTO</h1><br/>
- * 
  * Class is a Data Transfer Object for the ReferenceId.
  *
  * @author Filipe Germano

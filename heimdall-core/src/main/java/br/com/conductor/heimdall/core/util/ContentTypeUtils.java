@@ -27,8 +27,6 @@ import org.apache.commons.lang.ArrayUtils;
 import org.springframework.http.MediaType;
 
 /**
- * <h1>ContentTypeUtils</h1><br/>
- *
  * This class provides a method to verify if any content is part of the blacklisted types.
  *
  * @author Marcos Filho
@@ -48,7 +46,7 @@ public class ContentTypeUtils {
      /**
       * Checks if any of a list of files is part of the blacklisted types.
       * 
-      * @param  content			- The strings to be tested.
+      * @param  content			The strings to be tested.
       * @return					boolean value if any of the types is blacklisted
       */
      public static boolean belongsToBlackList(String... content) {

@@ -27,8 +27,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * <h1>JsonUtils</h1><br/>
- * 
  * This class provides methods to create and retrieve information from a <i>json</i> type String.<br/> 
  * 
  * @author Filipe Germano
@@ -39,7 +37,7 @@ public abstract class JsonUtils {
 	 /**
 	  * Converts a java Object to a <i>json</i> String representation.
 	  * 
-	  * @param  object						- The object to be converter
+	  * @param  object						The object to be converter
 	  * @return								The json String representation of the object
 	  * @throws JsonProcessingException
 	  */
@@ -54,8 +52,8 @@ public abstract class JsonUtils {
      /**
       * Maps a json String to a class structure.
       * 
-      * @param  json						- The json to be mapped
-      * @param  clazz						- The class structure that represents the json
+      * @param  json						The json to be mapped
+      * @param  clazz						The class structure that represents the json
       * @return								The object created from the json
       * @throws IOException
       */

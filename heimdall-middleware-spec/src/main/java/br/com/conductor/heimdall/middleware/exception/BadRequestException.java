@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.middleware.exception;
  */
 
 /**
- * <h1>BadRequestException</h1><br/>
- * 
  * This class represents the exceptions related to malformed requests.
  *
  * @author Filipe Germano

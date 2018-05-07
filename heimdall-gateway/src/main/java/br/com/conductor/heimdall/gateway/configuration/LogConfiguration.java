@@ -36,8 +36,6 @@ import net.logstash.logback.appender.LogstashTcpSocketAppender;
 import net.logstash.logback.encoder.LogstashEncoder;
 
 /**
- * <h1>LogConfiguration</h1><br/>
- * 
  * Class responsible to configure the logging.
  *
  * @author Thiago Sampaio

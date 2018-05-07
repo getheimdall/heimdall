@@ -33,8 +33,6 @@ import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
 import lombok.Data;
 
 /**
- * <h1>UserDTO</h1><br/>
- * 
  * Data transference object class that represents a Heimdall user.
  *
  * @author Marcos Filho

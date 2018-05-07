@@ -32,8 +32,6 @@ import br.com.conductor.heimdall.core.entity.AccessToken;
 import br.com.conductor.heimdall.core.util.ConstantsCache;
 
 /**
- * <h1>AccessTokenRepository</h1><br/>
- * 
  * Provides methods to access a {@link AccessToken}.
  *
  * @author Filipe Germano
@@ -44,7 +42,7 @@ public interface AccessTokenRepository extends JpaRepository<AccessToken, Long> 
 	/**
 	 * Finds a active {@link AccessToken} by its code.
 	 * 
-	 * @param  code			- The AccessToken code
+	 * @param  code			The AccessToken code
 	 * @return				The AccessToken
 	 */
      @Cacheable(ConstantsCache.ACCESS_TOKENS_ACTIVE_CACHE)
@@ -54,7 +52,7 @@ public interface AccessTokenRepository extends JpaRepository<AccessToken, Long> 
      /**
       * Finds a {@link AccessToken} by its code.
       * 
-      * @param  code		- The AccessToken code
+      * @param  code		The AccessToken code
       * @return				The AccessToken
       */
      AccessToken findByCode(String code);
@@ -62,7 +60,7 @@ public interface AccessTokenRepository extends JpaRepository<AccessToken, Long> 
      /**
       * Finds a {@link AccessToken} by its Id.
       * 
-      * @param  id			- The AccessToken id
+      * @param  id			The AccessToken id
       * @return				The AccessToken
       */
      List<AccessToken> findByAppId(Long id);

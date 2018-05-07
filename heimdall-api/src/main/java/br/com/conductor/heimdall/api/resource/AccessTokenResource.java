@@ -55,8 +55,6 @@ import br.com.twsoftware.alfred.object.Objeto;
 import io.swagger.annotations.ApiOperation;
 
 /**
- * <h1>AccessTokenResource</h1><br/>
- * 
  * Uses a {@link AccessTokenService} to provide methods to create, read, update and delete a {@link AccessToken}.
  *
  * @author Filipe Germano
@@ -73,7 +71,7 @@ public class AccessTokenResource {
      /**
       * Finds a {@link AccessToken} by its Id.
       * 
-      * @param id					- The AccessToken Id
+      * @param id					The AccessToken Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -90,8 +88,8 @@ public class AccessTokenResource {
      /**
       * Finds all {@link AccessToken}
       * 
-      * @param accessTokenRequest	- {@link AccessTokenRequest}
-      * @param pageableDTO			- {@link PageableDTO}
+      * @param accessTokenRequest	{@link AccessTokenRequest}
+      * @param pageableDTO			{@link PageableDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -114,7 +112,7 @@ public class AccessTokenResource {
      /**
       * Saves a {@link AccessToken}.
       * 
-      * @param accessTokenPersist	- {@link AccessTokenPersist}
+      * @param accessTokenPersist	{@link AccessTokenPersist}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -131,8 +129,8 @@ public class AccessTokenResource {
      /**
       * Updates a {@link AccessToken}.
       * 
-      * @param id					- The AccessToken Id
-      * @param accessTokenRequest	- {@link AccessTokenRequest}
+      * @param id					The AccessToken Id
+      * @param accessTokenRequest	{@link AccessTokenRequest}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -149,7 +147,7 @@ public class AccessTokenResource {
      /**
       * Deletes a {@link AccessToken}.
       * 
-      * @param id					- The AccessToken Id
+      * @param id					The AccessToken Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody

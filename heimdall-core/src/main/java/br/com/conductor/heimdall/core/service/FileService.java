@@ -32,8 +32,6 @@ import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>File Service</h1>
- * 
  * This class provides a simple way to save a {@link MultipartFile} to the file system.
  * 
  * @author Filipe Germano
@@ -47,8 +45,8 @@ public class FileService {
 	 /**
 	  * Saves a {@link MultipartFile} to the file system.
 	  * 
-	  * @param file				- The {@link MultipartFile} file to be saved
-	  * @param pathname			- The path to save
+	  * @param file				The {@link MultipartFile} file to be saved
+	  * @param pathname			The path to save
 	  */
      public void save(MultipartFile file, String pathname) {
 
@@ -68,8 +66,8 @@ public class FileService {
      /**
       * Saves a byte array to the file system.
       * 
-      * @param file				- The byte array to be saved
-      * @param pathname			- The path to save
+      * @param file				The byte array to be saved
+      * @param pathname			The path to save
       */
      public void save(byte[] file, String pathname) {
           

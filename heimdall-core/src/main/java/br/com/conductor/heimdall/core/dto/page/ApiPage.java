@@ -30,8 +30,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <h1>ApiPage</h1><br/>
- * 
  * Class that represents a paged {@link Api} list.
  *
  * @author Filipe Germano

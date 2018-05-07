@@ -31,8 +31,6 @@ import br.com.conductor.heimdall.core.enums.Status;
 import lombok.Data;
 
 /**
- * <h1>PlanDTO</h1><br/>
- * 
  * Class is a Data Transfer Object for the {@link Plan}.
  *
  * @author Filipe Germano

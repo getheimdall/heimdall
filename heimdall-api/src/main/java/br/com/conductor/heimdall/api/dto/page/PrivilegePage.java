@@ -30,8 +30,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <h1>PrivilegePage</h1><br/>
- * 
  * Represents a {@link Privilege} page.
  *
  * @author Marcos Filho

@@ -1,6 +1,26 @@
 
 package br.com.conductor.heimdall.gateway.filter.helper;
 
+/*-
+ * =========================LICENSE_START==================================
+ * heimdall-gateway
+ * ========================================================================
+ * Copyright (C) 2018 Conductor Tecnologia SA
+ * ========================================================================
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ==========================LICENSE_END===================================
+ */
+
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -10,9 +30,7 @@ import java.util.List;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.mongodb.morphia.Datastore;
-import org.mongodb.morphia.Key;
 import org.mongodb.morphia.Morphia;
-import org.mongodb.morphia.mapping.DefaultCreator;
 import org.mongodb.morphia.query.FindOptions;
 import org.mongodb.morphia.query.Query;
 
@@ -33,9 +51,16 @@ import br.com.conductor.heimdall.middleware.spec.Helper;
 import br.com.conductor.heimdall.middleware.spec.Json;
 import br.com.conductor.heimdall.middleware.util.Page;
 import br.com.twsoftware.alfred.object.Objeto;
-import groovy.lang.GroovyClassLoader;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Implements the {@link DB} interface.
+ * 
+ * @author Filipe Germano
+ * @author Magdiel Matias
+ * @author Daniel Vilar
+ *
+ */
 @Slf4j
 public class DBImpl implements DB {
 
@@ -51,6 +76,11 @@ public class DBImpl implements DB {
 
      private Helper helper = new HelperImpl();
 
+     /**
+      * Initializes the database connection by name.
+      * 
+      * @param databaseName		Database names
+      */
      public DBImpl(String databaseName) {
 
           this.databaseName = databaseName;
@@ -86,6 +116,7 @@ public class DBImpl implements DB {
           return database;
      }
 
+     @Override
      public MongoCollection<Document> collection(String name) {
 
           MongoCollection<Document> collection = database().getCollection(name);
@@ -101,6 +132,7 @@ public class DBImpl implements DB {
           return collection;
      }
 
+     @Override
      public <T> Page<T> find(Object criteria, Integer page, Integer limit) {
 
           Query<T> query = this.prepareQuery(criteria, this.datastore());
@@ -129,6 +161,7 @@ public class DBImpl implements DB {
           return (Page<T>) buildPage(list, page, limit, totalElements);
      }
 
+     @Override
      public <T> Query<T> getQueryProvider(Class<T> classType) {
 
           Query<T> query = (Query<T>) this.prepareQuery(classType, this.datastore());
@@ -157,6 +190,7 @@ public class DBImpl implements DB {
           return query;
      }
 
+     @Override
      public <T> T save(T object) {
 
           try {
@@ -169,6 +203,7 @@ public class DBImpl implements DB {
           }
      }
 
+     @Override
      public void delete(Object object) {
 
           this.datastore().delete(object);
@@ -243,6 +278,7 @@ public class DBImpl implements DB {
           return buildPage(list, page, limit, totalElements);
      }
 
+     @Override
      public <T> Page<T> buildPage(List<T> list, Integer page, Integer limit, Long totalElements) {
 
           Page<T> pageResponse = new Page<>();
@@ -263,6 +299,7 @@ public class DBImpl implements DB {
           return pageResponse;
      }
 
+     @Override
      public <T> void insertOne(MongoCollection<Document> collection, T object) {
 
           try {
@@ -278,6 +315,7 @@ public class DBImpl implements DB {
           }
      }
 
+     @Override
      public <T> void insertMany(MongoCollection<Document> collection, List<T> objects) {
 
           try {
@@ -297,10 +335,4 @@ public class DBImpl implements DB {
           }
      }
      
-     public static <T> void main(String[] args) {
-
-          List<T> list = Lists.newArrayList();
-          System.out.println(Objeto.isBlank(list));
-     }
-
 }

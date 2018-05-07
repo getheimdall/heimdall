@@ -26,8 +26,6 @@ import java.util.Map;
 import lombok.Data;
 
 /**
- * <h1>RequestResponseParser</h1><br/>
- * 
  * Data class a that represents a Request Response parser.
  *
  * @author Thiago Sampaio

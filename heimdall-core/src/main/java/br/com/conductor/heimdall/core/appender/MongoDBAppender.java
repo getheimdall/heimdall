@@ -42,8 +42,6 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>MongoDB Appender</h1><br/>
- * 
  * This class provides a appender service to a MongoDB database.
  * 
  * @author Marcos Filho

@@ -44,8 +44,6 @@ import br.com.conductor.heimdall.core.environment.Property;
 import redis.clients.jedis.JedisPoolConfig;
 
 /**
- * <h1>RedisTestConfiguration</h1><br/>
- * 
  * Class responsible for the Redis configuration.
  *
  * @author Marcos Filho

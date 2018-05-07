@@ -42,8 +42,6 @@ import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 
 /**
- * <h1>HeimdallErrorController</h1><br/>
- * 
  * Controller class for the custom Heimdall errors.
  *
  * @author Marcos Filho
@@ -63,7 +61,7 @@ public class HeimdallErrorController implements ErrorController {
      /**
       * Creates a custom error.
       * 
-      * @param request		- The {@link HttpServletRequest}
+      * @param request		The {@link HttpServletRequest}
       * @return				{@link ResponseEntity}
       */
      @RequestMapping(value = "${error.path:/error}", produces = MediaType.APPLICATION_JSON_VALUE)

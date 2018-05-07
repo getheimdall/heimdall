@@ -2,122 +2,135 @@
 layout: default
 ---
 
-Text can be **bold**, _italic_, or ~~strikethrough~~.
+## What's Heimdall
 
-[Link to another page](./another-page.html).
+This project is an easy way to use an API Orchestrator to your project. A simple way to manipulate request/response and uncouple your business domain, providing more flexibility and personalization to your API.
 
-There should be whitespace between paragraphs.
+## Infrastructure
+Heimdall was decomposed into six modules where three of they are principal (**Config, Api, Gateway**), built around certain business domains.
 
-There should be whitespace between paragraphs. We recommend including a README, or a file with information about your project.
+### Config
+[Spring Cloud Config](http://cloud.spring.io/spring-cloud-config/spring-cloud-config.html) is a horizontally scalable centralized configuration service for distributed systems. It uses a pluggable repository layer that currently supports local storage, Git, and Subversion. 
 
-# Header 1
+In this project we use `native profile` which simply loads config files from the local classpath. You can look into `shared` directory in [Config service resources](https://ourGitHub...). Now, when Heimdall-api requests it's configuration, Config service responds with `shared/application-api.yml`.
 
-This is a normal paragraph following a header. GitHub is a code hosting platform for version control and collaboration. It lets you and others work together on projects from anywhere.
+### Gateway
+In this project we built our algorithm over the [Netflix Zuul](https://github.com/Netflix/zuul). We put some steroids on the Zuul Filters, added some criterias to make the routes matching more rigid (like the **HTTP Verb** on the match). And to manage the request/response and Zuul Filters flow we put a message broker ([RabbitMQ](https://www.rabbitmq.com/)) to communicate with the API.
 
-## Header 2
+### Api
+To provide a easy way to manage the gateway we put an Api to make it easier to add new routes, interceptors, rate limit and others things to manipulate the gateway at runtime.
 
-> This is a blockquote following a header.
->
-> When something is important enough, you do it even if the odds are not in your favor.
+## Usage
+Keep in mind that you are going to start 3 Spring Boot applications, 1 Database instance and RabbitMq. Make sure you have `4 Gb` RAM available on your machine.
 
-### Header 3
+### First clone the project
 
-```js
-// Javascript code with syntax highlighting.
-var fun = function lang(l) {
-  dateformat.i18n = require('./lang/' + l)
-  return true;
-}
+```sh 
+$ git clone --depth=1 https://github.com/getheimdall/heimdall.git heimdall
+$ cd heimdall
 ```
 
-```ruby
-# Ruby code with syntax highlighting
-GitHubPages::Dependencies.gems.each do |gem, version|
-  s.add_dependency(gem, "= #{version}")
-end
+### Docker mode
+
+#### Requirements
+- Docker https://www.docker.com/
+- Docker Compose https://docs.docker.com/compose/
+
+If you'd like to build images yourself (with some changes in the code, for example), you have to clone all repository and build artifacts with maven. Then, run: 
+
+```sh
+$ docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 ```
 
-#### Header 4
+`docker-compose.dev.yml` inherits `docker-compose.yml` with additional possibility to build images locally and expose all containers ports for convenient development.
 
-*   This is an unordered list following a header.
-*   This is an unordered list following a header.
-*   This is an unordered list following a header.
+Access Heimdal on: [http://localhost:3000](http://localhost:3000)
 
-##### Header 5
+### Developer mode
 
-1.  This is an ordered list following a header.
-2.  This is an ordered list following a header.
-3.  This is an ordered list following a header.
+### Requirements
+- Nodejs https://nodejs.org/
+- Maven https://maven.apache.org/
+- Java 8 http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+- PostgresSQL https://www.postgresql.org/
+- Erlang http://www.erlang.org/downloads
+- RabbitMQ https://www.rabbitmq.com/download.html
+- Redis https://redis.io/download or https://github.com/MicrosoftArchive/redis/releases
 
-###### Header 6
+Open your favorite Terminal and run these commands.
 
-| head1        | head two          | three |
-|:-------------|:------------------|:------|
-| ok           | good swedish fish | nice  |
-| out of stock | good and plenty   | nice  |
-| ok           | good `oreos`      | hmm   |
-| ok           | good `zoute` drop | yumm  |
+First tab to start config:
 
-### There's a horizontal rule below this.
-
-* * *
-
-### Here is an unordered list:
-
-*   Item foo
-*   Item bar
-*   Item baz
-*   Item zip
-
-### And an ordered list:
-
-1.  Item one
-1.  Item two
-1.  Item three
-1.  Item four
-
-### And a nested list:
-
-- level 1 item
-  - level 2 item
-  - level 2 item
-    - level 3 item
-    - level 3 item
-- level 1 item
-  - level 2 item
-  - level 2 item
-  - level 2 item
-- level 1 item
-  - level 2 item
-  - level 2 item
-- level 1 item
-
-### Small image
-
-![Octocat](https://assets-cdn.github.com/images/icons/emoji/octocat.png)
-
-### Large image
-
-![Branching](https://guides.github.com/activities/hello-world/branching.png)
-
-
-### Definition lists can be used with HTML syntax.
-
-<dl>
-<dt>Name</dt>
-<dd>Godzilla</dd>
-<dt>Born</dt>
-<dd>1952</dd>
-<dt>Birthplace</dt>
-<dd>Japan</dd>
-<dt>Color</dt>
-<dd>Green</dd>
-</dl>
-
-```
-Long, single-line code blocks should not wrap. They should horizontally scroll if they are too long. This line should be long enough to demonstrate this.
+```sh
+$ cd /heimdall-config
+$ mvn spring-boot:run
 ```
 
+Second tab to start gateway (require **CONFIG** already started): 
+
+```sh
+$ cd /heimdall-gateway
+$ mvn spring-boot:run
 ```
-The final element.
+
+Third tab to start api (require **CONFIG** already started):
+
+```sh
+$ cd /heimdall-api
+$ mvn spring-boot:run
 ```
+
+(optional) Fourth tab to start front-end (require **API** already started)
+
+With Yarn
+```sh
+$ cd /heimdall-frontend
+$ yarn
+$ yarn run
+```
+
+Withou Yarn
+```sh
+$ cd /heimdall-frontend
+$ npm install
+$ npm run start
+```
+
+### Important endpoints
+- http://localhost:8080 - Gateway
+- http://localhost:8888 - Config
+- http://localhost:9090 - Api
+- http://localhost:3000 - frontend
+
+### Notes
+All Spring Boot applications require already running [Config Server](https://github.com/sqshq/PiggyMetrics#config-service) for startup. But we can start all containers simultaneously because of `depends_on` docker-compose option.
+
+### Deploy on Heroku
+
+Heimdall app can easily be deployed to Heroku clicking on button: 
+
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+
+or executing the commands:
+
+```sh
+$ heroku login
+$ heroku create
+$ git push heroku master
+$ heroku open
+```
+
+## Feedback welcome
+Heimdall is open source, and we appreciate your help. Feel free to contribute.
+
+## Roadmap
+
+**Only Heimdall subteam members should create new issues in this repo**. If you believe a project should be added within the tracker, please leave a comment on the appropriate "parent" issue, i.e. one of the issues linked below. And in general, feel free to use comments to ask questions, pitch ideas, or mention updates that need to be made!
+
+There are issues for each of the vision statements:
+
+* [Heimdall should have Metrics](https://github.com/getheimdall/issue/...)
+* [Heimdall should have Dashboard](https://github.com/getheimdall/issue/...)
+* [Heimdall should provide a easy way to track the request/response](https://github.com/getheimdall/issue/...)
+* [Heimdall should have a editor to interceptors](https://github.com/getheimdall/issue/...)
+* [Heimdall should provide a solid way to test middlewares](https://github.com/getheimdall/issue/...)

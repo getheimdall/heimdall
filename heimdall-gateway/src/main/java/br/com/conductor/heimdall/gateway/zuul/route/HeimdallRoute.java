@@ -28,8 +28,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * <h1>HeimdallRoute</h1><br/>
- * 
  * Data class that represents a route inside Heimdall.
  *
  * @author Marcos Filho

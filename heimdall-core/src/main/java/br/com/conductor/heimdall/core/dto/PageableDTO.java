@@ -30,8 +30,6 @@ import br.com.conductor.heimdall.core.util.Pageable;
 import lombok.Data;
 
 /**
- * <h1>PageableDTO</h1><br/>
- * 
  * Class is a Data Transfer Object for the {@link Pageable}.
  *
  * @author Filipe Germano

@@ -56,8 +56,6 @@ import br.com.twsoftware.alfred.object.Objeto;
 import io.swagger.annotations.ApiOperation;
 
 /**
- * <h1>AppResource.java</h1><br/>
- * 
  * Uses the {@link AppService} to provide methods to create, read, update and delete a {@link App}.
  *
  * @author Filipe Germano
@@ -74,7 +72,7 @@ public class AppResource {
      /**
       * Finds a {@link App} by its Id.
       * 
-      * @param id					- The App Id
+      * @param id					The App Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -91,8 +89,8 @@ public class AppResource {
      /**
       * Finds all {@link App} from a request.
       * 
-      * @param appDTO				- {@link AppDTO}
-      * @param pageableDTO			- {@link PageableDTO}
+      * @param appDTO				{@link AppDTO}
+      * @param pageableDTO			{@link PageableDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -125,7 +123,7 @@ public class AppResource {
      /**
       * Saves a {@link App}.
       * 
-      * @param appDTO				- {@link AppDTO}
+      * @param appDTO				{@link AppDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -142,8 +140,8 @@ public class AppResource {
      /**
       * Updates a {@link App}.
       * 
-      * @param id					- The App Id
-      * @param appDTO				- {@link AppDTO}
+      * @param id					The App Id
+      * @param appDTO				{@link AppDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -160,7 +158,7 @@ public class AppResource {
      /**
       * Deletes a {@link App}.
       * 
-      * @param id					- The App Id
+      * @param id					The App Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody

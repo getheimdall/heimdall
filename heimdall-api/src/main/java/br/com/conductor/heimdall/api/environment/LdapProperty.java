@@ -26,8 +26,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import lombok.Data;
 
 /**
- * <h1>LdapProperty</h1><br/>
- * 
  * Data class that holds tha Ldap properties.
  *
  * @author Marcos Filho

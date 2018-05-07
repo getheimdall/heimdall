@@ -68,8 +68,6 @@ import br.com.twsoftware.alfred.object.Objeto;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>InterceptorFileService</h1><br/>
- * 
  * Provides methods to create and remove the {@link Interceptor} files.
  *
  * @author Filipe Germano
@@ -92,7 +90,7 @@ public class InterceptorFileService {
      /**
       * Creates a {@link Interceptor} from its Id.
       * 
-      * @param id	- The {@link Interceptor} Id
+      * @param id	The {@link Interceptor} Id
       * @throws BadRequestException
       */
      @Transactional(readOnly = true)
@@ -156,7 +154,7 @@ public class InterceptorFileService {
      /**
       * Removes a {@link Interceptor} file.
       * 
-      * @param interceptor		- {@link InterceptorFileDTO}
+      * @param interceptor		{@link InterceptorFileDTO}
       */
      public void removeFileInterceptor(InterceptorFileDTO interceptor) {
 

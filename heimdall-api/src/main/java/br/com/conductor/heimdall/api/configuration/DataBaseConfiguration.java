@@ -47,8 +47,6 @@ import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>DataBaseConfiguration.java</h1><br/>
- * 
  * Implements the {@link EnvironmentAware} interface.
  *
  * @author Filipe Germano
@@ -135,7 +133,7 @@ public class DataBaseConfiguration implements EnvironmentAware {
      /**
       * Configures a {@link SpringLiquibase} based on a {@link DataSource}.
       * 
-      * @param dataSource		- {@link DataSource}
+      * @param dataSource		{@link DataSource}
       * @return					{@link SpringLiquibase}
       */
      @Bean
@@ -158,7 +156,7 @@ public class DataBaseConfiguration implements EnvironmentAware {
      /**
       * Release all Liquibase locks from a {@link DataSource}.
       * 
-      * @param ds			- {@link DataSource}
+      * @param ds			{@link DataSource}
       */
      public void releaseLiquibaseLocks(DataSource ds) {
 
@@ -183,7 +181,7 @@ public class DataBaseConfiguration implements EnvironmentAware {
      /**
       * Clears all Liquibase checksums from a {@link DataSource}.
       * 
-      * @param ds			- {@link DataSource}
+      * @param ds			{@link DataSource}
       */
      public void clearLiquibaseCheckSums(DataSource ds) {
 

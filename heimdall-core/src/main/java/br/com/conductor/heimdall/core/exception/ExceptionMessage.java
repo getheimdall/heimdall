@@ -34,8 +34,6 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>ExceptionMessage</h1><br/>
- * 
  * Enum that concentrates the messages and validations of the exceptions <br/>
  * 
  * @author Filipe Germano
@@ -159,7 +157,7 @@ public enum ExceptionMessage {
      /**
       * Method responsible for exception triggering with partial or total custom message inclusion.
       * 
-      * @param dynamicText				- This parameter will replace the symbols: {},
+      * @param dynamicText				This parameter will replace the symbols: {},
       * 								included in the message respectively. If more
       * 								than one symbol is given: {}, and only one parameter
       * 								pass, it will replace all the keys for the parameter entered.

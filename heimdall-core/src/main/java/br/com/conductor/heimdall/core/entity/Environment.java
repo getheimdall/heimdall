@@ -49,8 +49,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
- * <h1>Environment</h1>
- * 
  * This class represents a Environment registered to the system.
  * 
  * @author Filipe Germano

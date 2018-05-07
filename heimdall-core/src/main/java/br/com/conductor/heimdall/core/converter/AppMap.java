@@ -32,8 +32,6 @@ import br.com.conductor.heimdall.core.entity.App;
 import br.com.twsoftware.alfred.object.Objeto;
 
 /**
- * <h1>AppMap</h1><br/>
- * 
  * Maps a {@link AppDTO} to a {@link App} object.
  *
  * @author Filipe Germano

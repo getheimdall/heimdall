@@ -33,8 +33,6 @@ import br.com.conductor.heimdall.core.enums.Status;
 import br.com.conductor.heimdall.core.util.ConstantsCache;
 
 /**
- * <h1>ApiRepository.java</h1><br/>
- * 
  * Provides methods to access a {@link Api}.
  *
  * @author Filipe Germano
@@ -45,7 +43,7 @@ public interface ApiRepository extends JpaRepository<Api, Long> {
 	/**
 	 * Finds a Api by its Status
 	 * 
-	 * @param status		- The Api {@link Status}
+	 * @param status		The Api {@link Status}
 	 * @return				A List of Api
 	 */
      List<Api> findByStatus(Status status);
@@ -53,7 +51,7 @@ public interface ApiRepository extends JpaRepository<Api, Long> {
      /**
       * Finds a Api by its endpoint.
       * 
-      * @param  endPoint	- The endpoint of the Api
+      * @param  endPoint	The endpoint of the Api
       * @return				The Api found
       */
      @Cacheable(ConstantsCache.API_ACTIVE_FROM_ACCESS_TOKEN)
@@ -63,7 +61,7 @@ public interface ApiRepository extends JpaRepository<Api, Long> {
      /**
       * Finds a Api by its basepath.
       * 
-      * @param  basePath	- The basepath of the Api
+      * @param  basePath	The basepath of the Api
       * @return				The Api found
       */
      Api findByBasePath(String basePath);

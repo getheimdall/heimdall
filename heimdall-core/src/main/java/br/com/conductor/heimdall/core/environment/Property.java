@@ -28,8 +28,6 @@ import java.util.List;
 import lombok.Data;
 
 /**
- * <h1>Property</h1><br/>
- * 
  * This class represents the environment.
  * 
  * @author Filipe Germano

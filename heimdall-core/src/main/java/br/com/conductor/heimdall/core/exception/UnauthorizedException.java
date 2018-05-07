@@ -1,3 +1,4 @@
+
 package br.com.conductor.heimdall.core.exception;
 
 /*-
@@ -21,8 +22,6 @@ package br.com.conductor.heimdall.core.exception;
  */
 
 /**
- * <h1>UnauthorizedException</h1><br/>
- * 
  * This class represents the exceptions related with a resource request
  * that was invalidated due to business logic.
  * 

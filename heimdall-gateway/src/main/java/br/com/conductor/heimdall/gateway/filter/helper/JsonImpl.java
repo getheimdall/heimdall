@@ -38,8 +38,6 @@ import br.com.twsoftware.alfred.object.Objeto;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>JsonImpl</h1><br/>
- *
  * Implementation of the {@link Json} interface.
  *
  * @author Filipe Germano

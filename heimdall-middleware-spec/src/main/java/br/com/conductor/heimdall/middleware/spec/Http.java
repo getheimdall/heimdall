@@ -24,8 +24,6 @@ package br.com.conductor.heimdall.middleware.spec;
 import java.util.Map;
 
 /**
- * <h1>Http</h1><br/>
- * 
  * This interface provides methods to handle a {@link Http} and a {@link ApiResponse}.
  *
  * @author Filipe Germano
@@ -36,8 +34,8 @@ public interface Http {
 	 /**
 	  * Sets a header to a Http.
 	  * 
-	  * @param name		- The name of the header
-	  * @param value	- The value of the header
+	  * @param name		The name of the header
+	  * @param value	The value of the header
 	  * @return			The Http with the new header added
 	  */
      public Http header(String name, String value);
@@ -45,7 +43,7 @@ public interface Http {
      /**
       * Sets a header to a Http.
 	  * 
-      * @param params	- The Map with name and value of the headers
+      * @param params	The Map with name and value of the headers
       * @return			The Http with the new headers added 
       */
      public Http header(Map<String, String> params);
@@ -53,7 +51,7 @@ public interface Http {
      /**
       * Sets a url to a Http.
       * 
-      * @param url		- The url
+      * @param url		The url
       * @return			The Http with the url added
       */
      public Http url(String url);
@@ -61,8 +59,8 @@ public interface Http {
      /**
       * Sets query parameters to the Http.
       * 
-      * @param name		- The name of the query
-      * @param value	- The value of the query
+      * @param name		The name of the query
+      * @param value	The value of the query
       * @return			The Http with the query added
       */
      public Http queryParam(String name, String value);
@@ -70,7 +68,7 @@ public interface Http {
      /**
       * Sets a body to the Http.
       * 
-      * @param params	- The Map representation of the body
+      * @param params	The Map representation of the body
       * @return			The updated Http
       */
      public Http body(Map<String, Object> params);

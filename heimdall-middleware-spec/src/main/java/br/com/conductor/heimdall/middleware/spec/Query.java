@@ -24,8 +24,6 @@ package br.com.conductor.heimdall.middleware.spec;
 import java.util.Map;
 
 /**
- * <h1>Query</h1><br/>
- * 
  * This interface provides methods to create, read, update and delete a Query.
  *
  * @author Filipe Germano
@@ -43,7 +41,7 @@ public interface Query {
      /**
       * Gets a specific query.
       * 
-      * @param name		- The name of the query
+      * @param name		The name of the query
       * @return			The query found
       */
      public String get(String name);
@@ -51,23 +49,23 @@ public interface Query {
      /**
       * Sets a query.
       * 
-      * @param name		- The name of the query to be set
-      * @param value	- The value of the query to be set
+      * @param name		The name of the query to be set
+      * @param value	The value of the query to be set
       */
      public void set(String name, String value);
      
      /**
       * Adds a query.
       * 
-      * @param name		- The name of the query to be set
-      * @param value	- The value of the query to be set
+      * @param name		The name of the query to be set
+      * @param value	The value of the query to be set
       */
      public void add(String name, String value);
      
      /**
       * Removes a query.
       *  
-      * @param name		- The name of the query to be set
+      * @param name		The name of the query to be set
       */
      public void remove(String name);
 

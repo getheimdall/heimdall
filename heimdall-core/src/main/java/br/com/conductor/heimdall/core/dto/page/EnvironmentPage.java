@@ -30,8 +30,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <h1>EnvironmentPage</h1><br/>
- * 
  * Class that represents a paged {@link Environment} list.
  *
  * @author Filipe Germano

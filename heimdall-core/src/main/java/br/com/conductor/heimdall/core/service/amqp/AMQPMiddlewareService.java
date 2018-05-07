@@ -29,8 +29,6 @@ import br.com.conductor.heimdall.core.entity.Middleware;
 import br.com.conductor.heimdall.core.util.RabbitConstants;
 
 /**
- * <h1>AMQPMiddlewareService</h1><br/>
- * 
  * This class controls a {@link Middleware} cache service.
  *
  * @author Filipe Germano
@@ -45,7 +43,7 @@ public class AMQPMiddlewareService {
      /**
       * Dispatch a message to refresh middlewares by id.
       * 
-      * @param idMiddleware		- The {@link Middleware} Id
+      * @param idMiddleware		The {@link Middleware} Id
       */
      public void dispatchCreateMiddlewares(Long idMiddleware) {
 
@@ -55,7 +53,7 @@ public class AMQPMiddlewareService {
      /**
       * Dispatch a message to remove middlewares
       * 
-      * @param path				- The path to the Middleware
+      * @param path				The path to the Middleware
       */
      public void dispatchRemoveMiddlewares(String path) {
           

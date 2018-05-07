@@ -31,8 +31,6 @@ import br.com.conductor.heimdall.core.entity.Resource;
 import lombok.Data;
 
 /**
- * <h1>ResourceDTO</h1><br/>
- * 
  * Class is a Data Transfer Object for the {@link Resource}.
  *
  * @author Filipe Germano

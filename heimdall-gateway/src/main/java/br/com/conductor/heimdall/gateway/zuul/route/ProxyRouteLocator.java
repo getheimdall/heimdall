@@ -38,8 +38,6 @@ import br.com.conductor.heimdall.gateway.zuul.storage.ZuulRouteStorage;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>ProxyRouteLocator</h1><br/>
- *
  * Represents the Heimdall's route manager.
  * 
  * @author Marcos Filho
@@ -163,6 +161,7 @@ public class ProxyRouteLocator extends DiscoveryClientRouteLocator {
 
      /**
       * Returns the routes
+      * 
       * @return	{@link AtomicReference} of String, {@link ZuulRoute}
       */
      public AtomicReference<Map<String, ZuulRoute>> getAtomicRoutes() {

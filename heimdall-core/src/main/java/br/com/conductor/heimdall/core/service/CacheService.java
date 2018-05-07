@@ -29,8 +29,6 @@ import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
 /**
- * <h1>Cache Service</h1>
- * 
  * This class provides a method for manipulate the cache.
  * 
  * @author Filipe Germano
@@ -58,8 +56,8 @@ public class CacheService {
      /**
       * Cleans a specific entry of a cache by key and id.
       * 
-      * @param key - The name of the cache
-      * @param id - The id to remove
+      * @param key The name of the cache
+      * @param id The id to remove
       */
      public void clean(String key, String id) {
           
@@ -81,7 +79,7 @@ public class CacheService {
      /**
       * Cleans all references of a cache entry.
       * 
-      * @param key - The name of the cache
+      * @param key The name of the cache
       */
      public void clean(String key) {
           

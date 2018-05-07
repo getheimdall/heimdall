@@ -30,8 +30,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <h1>AccessTokenPage</h1><br/>
- * 
  * Class that represents a paged {@link AccessToken} list.
  *
  * @author Filipe Germano

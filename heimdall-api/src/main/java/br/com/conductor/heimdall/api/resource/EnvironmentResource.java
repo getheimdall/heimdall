@@ -54,8 +54,6 @@ import br.com.twsoftware.alfred.object.Objeto;
 import io.swagger.annotations.ApiOperation;
 
 /**
- * <h1>EnvironmentResource</h1><br/>
- * 
  * Uses a {@link EnvironmentService} to provide methods to create, read, update and delete a {@link Environment}.
  *
  * @author Filipe Germano
@@ -72,7 +70,7 @@ public class EnvironmentResource {
      /**
       * Finds a {@link Environment} by its Id.
       * 
-      * @param id					- The Environment Id
+      * @param id					The Environment Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -89,8 +87,8 @@ public class EnvironmentResource {
      /**
       * Finds all {@link Environment} from a request.
       * 
-      * @param environmentDTO		- {@link EnvironmentDTO}
-      * @param pageableDTO			- {@link PageableDTO}
+      * @param environmentDTO		{@link EnvironmentDTO}
+      * @param pageableDTO			{@link PageableDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -113,7 +111,7 @@ public class EnvironmentResource {
      /**
       * Saves a {@link Environment}.
       * 
-      * @param environmentDTO		- {@link EnvironmentDTO}
+      * @param environmentDTO		{@link EnvironmentDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -130,8 +128,8 @@ public class EnvironmentResource {
      /**
       * Updates a {@link Environment}.
       * 
-      * @param id					- The Environment Id
-      * @param environmentDTO		- {@link EnvironmentDTO}
+      * @param id					The Environment Id
+      * @param environmentDTO		{@link EnvironmentDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -148,7 +146,7 @@ public class EnvironmentResource {
      /**
       * Deletes a {@link Environment}.
       * 
-      * @param id					- The Environment Id
+      * @param id					The Environment Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody

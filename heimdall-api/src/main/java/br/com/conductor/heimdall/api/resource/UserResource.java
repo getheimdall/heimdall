@@ -55,8 +55,6 @@ import br.com.twsoftware.alfred.object.Objeto;
 import io.swagger.annotations.ApiOperation;
 
 /**
- * <h1>UserResource.java</h1><br/>
- * 
  * Uses a {@link UserService} to provide methods to create, read, update and delete a {@link User}.
  *
  * @author Marcos Filho
@@ -73,7 +71,7 @@ public class UserResource {
      /**
       * Saves a {@link User}.
       * 
-      * @param userDTO				- {@link UserDTO}
+      * @param userDTO				{@link UserDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -90,7 +88,7 @@ public class UserResource {
      /**
       * Finds a {@link User} by its Id.
       * 
-      * @param userId				- The User Id
+      * @param userId				The User Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -107,8 +105,8 @@ public class UserResource {
      /**
       * Finds all {@link User} from a request.
       * 
-      * @param userDTO				- {@link UserDTO}
-      * @param pageableDTO			- {@link PageableDTO}
+      * @param userDTO				{@link UserDTO}
+      * @param pageableDTO			{@link PageableDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -139,8 +137,8 @@ public class UserResource {
      /**
       * Updates a {@link User}.
       * 
-      * @param userId				- The User Id
-      * @param userDTO				- {@link UserDTO}
+      * @param userId				The User Id
+      * @param userDTO				{@link UserDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -157,7 +155,7 @@ public class UserResource {
      /**
       * Deletes a {@link User}.
       * 
-      * @param userId				- The User Id
+      * @param userId				The User Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody

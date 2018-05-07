@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.core.enums;
  */
 
 /**
- * <h1>Location</h1><br/>
- * 
  * Enum that represents the location where the parameters should be.
  *
  * @author Filipe Germano

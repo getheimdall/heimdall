@@ -40,8 +40,6 @@ import br.com.conductor.heimdall.core.service.DeveloperService;
 import br.com.conductor.heimdall.core.util.ConstantsPath;
 
 /**
- * <h1>IntegrationResource</h1><br/>
- * 
  * Uses a {@link AccessTokenService}, {@link DeveloperService} and {@link AppService} to provide the callback requests
  *
  * @author Marcos Filho
@@ -63,7 +61,7 @@ public class IntegrationResource {
      /**
       * AccessToken callback.
       * 
-      * @param reqBody	- {@link AccessTokenDTO}
+      * @param reqBody	{@link AccessTokenDTO}
       * @return			{@link ResponseEntity}
       */
      @PostMapping(value = "/access-token/callback", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -76,7 +74,7 @@ public class IntegrationResource {
      /**
       * Developer callback.
       * 
-      * @param reqBody- {@link DeveloperDTO}
+      * @param reqBody {@link DeveloperDTO}
       * @return			{@link ResponseEntity}
       */
      @PostMapping(value = "/developer/callback", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -89,7 +87,7 @@ public class IntegrationResource {
      /**
       * App callback. 
       *
-      * @param reqBody	- {@link AppCallbackDTO}
+      * @param reqBody	{@link AppCallbackDTO}
       * @return			{@link ResponseEntity}
       */
      @PostMapping(value = "/app/callback", produces = MediaType.APPLICATION_JSON_VALUE)

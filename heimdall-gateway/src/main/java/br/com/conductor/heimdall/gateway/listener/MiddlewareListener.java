@@ -34,8 +34,6 @@ import br.com.twsoftware.alfred.object.Objeto;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>MiddlewareListener</h1><br/>
- * 
  * Listener that controls the {@link Middleware} repository.
  *
  * @author Filipe Germano
@@ -82,7 +80,7 @@ public class MiddlewareListener {
      }
 
      /**
-      * Removesa {@link Middleware} from repository.
+      * Removes a {@link Middleware} from repository.
       * 
       * @param message {@link Message}
       */

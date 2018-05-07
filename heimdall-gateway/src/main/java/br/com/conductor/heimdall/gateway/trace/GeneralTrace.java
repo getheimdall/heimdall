@@ -26,8 +26,6 @@ import java.util.Date;
 import lombok.Data;
 
 /**
- * <h1>GeneralTrace</h1><br/>
- * 
  * Data class that represents a General Trace
  *
  * @author Thiago Sampaio
@@ -45,7 +43,7 @@ public class GeneralTrace {
      /**
       * Adds a description to the trace.
       * 
-      * @param description	- Trace message
+      * @param description	Trace message
       */
      public GeneralTrace(String description){
 
@@ -56,8 +54,8 @@ public class GeneralTrace {
      /**
       * Adds a description and Object to the trace.
       * 
-      * @param description	- Trace message
-      * @param content		- Object with content
+      * @param description	Trace message
+      * @param content		Object with content
       */
      public GeneralTrace(String description, Object content){
 
