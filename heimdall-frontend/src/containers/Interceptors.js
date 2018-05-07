@@ -76,8 +76,8 @@ class Interceptors extends Component {
         }
 
         if (newProps.queueCount === 0 && showProgress) {
-            notification.success({
-                message: 'Interceptors saved'
+            notification.info({
+                message: 'Interceptors processed'
             })
             this.setState({ showProgress: false, progress: 0 })
         }
