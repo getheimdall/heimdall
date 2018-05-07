@@ -1,4 +1,7 @@
-# Heimdall
+<p align="center"> 
+	[![Build Status](https://travis-ci.org/getheimdall/heimdall.svg?branch=master)](https://travis-ci.org/getheimdall/heimdall)
+	[![Github All Releases](https://img.shields.io/github/downloads/getheimdall/heimdall/total.svg)](https://github.com/getheimdall/heimdall)
+</p>
 
 <p align="center"> 
   <img src="https://raw.githubusercontent.com/getheimdall/heimdall/master/.github/heimdall-logo.png">
