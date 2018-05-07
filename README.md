@@ -34,13 +34,6 @@ To provide a easy way to manage the gateway we put an Api to make more easy add 
 ## Usage
 Keep in mind, that you are going to start 3 Spring Boot applications, 1 Database instance and RabbitMq. Make sure you have `4 Gb` RAM available on your machine.\
 
-### Requirements
-- Docker
-- Docker Compose
-- Nodejs
-- Maven
-- Java 8
-
 ### First clone the project
 
 ```sh 
@@ -49,7 +42,10 @@ $ cd heimdall
 ```
 
 ### Docker mode
-...
+
+#### Requirements
+- Docker https://www.docker.com/
+- Docker Compose https://docs.docker.com/compose/
 
 If you'd like to build images yourself (with some changes in the code, for example), you have to clone all repository and build artifacts with maven. Then, run: 
 
@@ -61,22 +57,16 @@ $ docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 
 Access Heimdal on: [http://localhost:3000](http://localhost:3000)
 
-### Deploy on Heroku
+### Developer mode
 
-Heimdall app can easily be deployed to Heroku clicking on button: 
-
-[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
-
-or executing the commands:
-
-```sh
-$ heroku login
-$ heroku create
-$ git push heroku master
-$ heroku open
-```
-
-### Running locally
+### Requirements
+- Nodejs https://nodejs.org/
+- Maven https://maven.apache.org/
+- Java 8 http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
+- PostgresSQL https://www.postgresql.org/
+- Erlang http://www.erlang.org/downloads
+- RabbitMQ https://www.rabbitmq.com/download.html
+- Redis https://redis.io/download or https://github.com/MicrosoftArchive/redis/releases
 
 Open your favorite Terminal and run these commands.
 
@@ -125,6 +115,21 @@ $ npm run start
 
 ### Notes
 All Spring Boot applications require already running [Config Server](https://github.com/sqshq/PiggyMetrics#config-service) for startup. But we can start all containers simultaneously because of `depends_on` docker-compose option.
+
+### Deploy on Heroku
+
+Heimdall app can easily be deployed to Heroku clicking on button: 
+
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+
+or executing the commands:
+
+```sh
+$ heroku login
+$ heroku create
+$ git push heroku master
+$ heroku open
+```
 
 ## Feedback welcome
 Heimdall is open source, and we appreciate your help. Feel free to contribute.
