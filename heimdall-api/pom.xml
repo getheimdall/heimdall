@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
@@ -73,8 +74,20 @@
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
+			<scope>test</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>com.github.kstyrc</groupId>
+			<artifactId>embedded-redis</artifactId>
+			<version>0.6</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-api-mockito</artifactId>
+			<version>1.7.1</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -101,7 +114,8 @@
 				<configuration>
 					<baseImage>java:openjdk-8-jdk-alpine</baseImage>
 					<imageName>${docker.imageName}</imageName>
-					<entryPoint>["java", "-Xmx1024m", "-Xms500m",  "-jar", "/${project.build.finalName}.jar"]</entryPoint>
+					<entryPoint>["java", "-Xmx1024m", "-Xms500m", "-jar",
+						"/${project.build.finalName}.jar"]</entryPoint>
 					<forceTags>true</forceTags>
 					<serverId>${docker.serverId}</serverId>
 					<registryUrl>${docker.registryUrl}</registryUrl>
@@ -125,9 +139,9 @@
 		<profile>
 			<id>dev</id>
 			<activation>
-            	<activeByDefault>true</activeByDefault>
-        	</activation>
-			<build>				
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
 				<plugins>
 					<plugin>
 						<groupId>org.springframework.boot</groupId>
@@ -140,7 +154,7 @@
 					</plugin>
 				</plugins>
 			</build>
-		</profile>		
+		</profile>
 	</profiles>
 	<description>To provide a easy way to manage the gateway we put an Api to make more easy to add new routes, interceptors, rate limit and others things to manipulate the gateway at runtime.</description>
 </project>
