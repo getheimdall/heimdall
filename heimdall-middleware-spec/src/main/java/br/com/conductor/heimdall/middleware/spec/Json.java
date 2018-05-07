@@ -71,4 +71,12 @@ public interface Json {
       */
      public <T> Map<String, Object> parseToMap(T object);
      
+     /**
+      * Validate this is Json valid.
+      * 
+      * @param string    - The string to be validate
+      * @return               boolean
+      */
+     public boolean isJson(String string);
+     
 }

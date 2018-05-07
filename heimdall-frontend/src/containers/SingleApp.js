@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 // actions
 import { getApp, initLoading, clearApp, clearApps, update, save, remove } from '../actions/apps';
 import { developerSource, getDeveloperSourceByEmail, clearDeveloperSource, fetchingDeveloper } from '../actions/developers';
+import { getAllPlans, clearPlans } from '../actions/plans'
 
 //components
 import { Card, Row } from 'antd'
@@ -25,6 +26,7 @@ class SingleApp extends Component {
             this.props.dispatch(getApp(idApp))
             this.setState({ ...this.state, loadEntity: true })
         }
+        this.props.dispatch(getAllPlans({offset: 0, limit: 50}))
     }
 
     componentWillReceiveProps(newProps) {
@@ -36,6 +38,7 @@ class SingleApp extends Component {
     componentWillUnmount() {
         this.props.dispatch(clearApp())
         this.props.dispatch(clearDeveloperSource())
+        this.props.dispatch(clearPlans())
     }
 
     handleSearch = (searchObject) => {
@@ -80,6 +83,7 @@ class SingleApp extends Component {
                 <Row className="h-row bg-white">
                     <Card style={{ width: '100%' }} title={title + ' App'}>
                         <AppForm app={app}
+                            plans={this.props.plans}
                             handleDelete={this.handleDelete}
                             handleSubmit={this.handleSubmit}
                             handleSearch={this.handleSearch}
@@ -98,7 +102,8 @@ const mapStateToProps = state => {
         app: state.apps.app,
         loading: state.apps.loading,
         developerSource: state.developers.developerSource,
-        fetching: state.developers.fetching
+        fetching: state.developers.fetching,
+        plans: state.plans.plans
     }
 }
 

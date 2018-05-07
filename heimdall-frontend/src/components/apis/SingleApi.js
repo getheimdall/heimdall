@@ -49,18 +49,18 @@ class SingleApi extends Component {
         const { api } = this.props
 
         return (
-            <div>
+            <div className="joy">
                 <PageHeader title="APIs" icon="api" />
                 <Row>
                     <Card style={{ width: '100%' }} title={api.name}>
-                        <Tabs defaultActiveKey="1">
+                        <Tabs defaultActiveKey="1" className="resource-tour">
                             <TabPane tab="Definitions" key="1">
                                 <ApiDefinition api={api} environments={this.props.environments} history={this.props.history} submit={this.props.updateApi} deleteApi={this.props.deleteApi} />
                             </TabPane>
-                            <TabPane tab="Resources" key="2">
+                            <TabPane tab={<div role="tab" className="ant-tabs-tab resource">Resources</div>} key="2" >
                                 <Resources api={api} />
                             </TabPane>
-                            <TabPane tab="Interceptors" key="3">
+                            <TabPane tab={<div role="tab" className="ant-tabs-tab interceptors">Interceptors</div>} key="3">
                                 <Interceptors api={api} />
                             </TabPane>
                         </Tabs>

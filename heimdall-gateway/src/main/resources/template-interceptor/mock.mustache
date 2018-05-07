@@ -73,9 +73,21 @@ public class MockInterceptor extends HeimdallFilter {
           RequestContext ctx = RequestContext.getCurrentContext();
 
           String status = "{{status}}";     
-          String body = helper.json().parse("{{{body}}}");
 
-          helper.call().response().header().add("Content-Type", "application/json");
+          boolean jsonValid = helper.json().isJson("{{{body}}}");          
+
+          String body = "";
+          if (jsonValid) {
+               body = helper.json().parse("{{{body}}}");
+
+               helper.call().response().header().add("Content-Type", "application/json");
+          } else {
+
+               body = "{{{body}}}";
+
+               helper.call().response().header().add("Content-Type", "text/plain");
+          }
+          
           helper.call().response().setBody(body);
                
           ctx.setSendZuulResponse(false);

@@ -56,4 +56,5 @@ public class AppDTO implements Serializable {
      
      private Status status;
      
+     private List<ReferenceIdDTO> plans;
 }

@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -49,6 +50,7 @@ import redis.clients.jedis.JedisPoolConfig;
  * @see <a href="https://redis.io/">https://redis.io/</a>
  */
 @Configuration
+@Profile("!test")
 public class RedisConfiguration {
      
      @Autowired

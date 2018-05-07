@@ -39,32 +39,46 @@ import br.com.conductor.heimdall.core.repository.RateLimitRepository;
  */
 @Repository
 public class RateLimitRepositoryImpl implements RateLimitRepository {
-     
+
      private RMap<String, RateLimit> map;
-     
+
      @Autowired
      private RedissonClient redisson;
 
      @PostConstruct
      private void init() {
-          map = redisson.getMap(RateLimit.KEY);
+
+          if (redisson != null) {
+               map = redisson.getMap(RateLimit.KEY);
+          }
+
      }
 
      @Override
      public RateLimit save(RateLimit rate) {
-          map.put(rate.getPath(), rate);
-          
+
+          if (map != null) {
+               map.put(rate.getPath(), rate);
+          }
           return find(rate.getPath());
      }
 
      @Override
      public RateLimit find(String path) {
-          return map.get(path);
+
+          RateLimit rateLimit = null;
+          if (map != null) {
+               rateLimit = map.get(path);
+          }
+          return rateLimit;
      }
 
      @Override
      public void delete(String path) {
-          map.remove(path);
+
+          if (map != null) {
+               map.remove(path);
+          }
      }
 
 }

@@ -145,20 +145,20 @@ public class AppService {
      public App save(AppDTO appDTO) {
 
           App app = GenericConverter.mapperWithMapping(appDTO, App.class, new AppMap());
-          
+
           Developer dev = devRepository.findOne(app.getDeveloper().getId());
           HeimdallException.checkThrow(isBlank(dev), DEVELOPER_NOT_EXIST);
-          
+
           RandomString randomString = new RandomString(12);
           String token = randomString.nextString();
-          
+
           while (appRepository.findByClientId(token) != null) {
-        	  token = randomString.nextString();
+               token = randomString.nextString();
           }
-                         
-		  app.setClientId(token);
-		  app = appRepository.save(app);
-		  
+
+          app.setClientId(token);
+          app = appRepository.save(app);
+
           return app;
      }
 
