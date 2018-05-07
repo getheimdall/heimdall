@@ -21,7 +21,7 @@ heimdall:
         prefix: heimdall
     datasource:
         initializationFailTimeout: -1
-        dataBaseType: POSTGRESQL
+        dataBaseType: H2
         socketTimeout: 10000
         loginTimeout: 10000
         minimumIdle: 0
@@ -103,6 +103,8 @@ spring:
         requested-heartbeat: 10
     cache:
         type: redis
+    profiles: 
+        active: test
 
 springfox:
     documentation:

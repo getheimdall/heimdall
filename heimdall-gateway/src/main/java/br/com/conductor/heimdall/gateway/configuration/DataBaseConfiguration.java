@@ -33,6 +33,7 @@ import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 
 import com.zaxxer.hikari.HikariConfig;
@@ -80,6 +81,7 @@ public class DataBaseConfiguration implements EnvironmentAware {
       * @return			The new {@link DataSource} created
       */
      @Bean
+     @Profile("!test")
      public DataSource dataSource() {
 
           DataSource dataSource;
