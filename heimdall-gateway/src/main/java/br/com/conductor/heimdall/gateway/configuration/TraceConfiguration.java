@@ -45,8 +45,6 @@ import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>TraceConfiguration</h1><br/>
- * 
  * Class responsible for configuring the Trace.
  *
  * @author Filipe Germano
@@ -123,7 +121,7 @@ public class TraceConfiguration{
      /**
       * Checks if it should disable the Trace from a c.
       * 
-      * @param request		- {@link ServletRequest}
+      * @param request		{@link ServletRequest}
       * @return				True if trace should be disable, false otherwise
       */
      public boolean shouldDisableTrace(ServletRequest request) {

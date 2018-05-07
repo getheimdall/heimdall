@@ -33,8 +33,6 @@ import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 
 /**
- * <h1>HeimdallFilter</h1><br/>
- * 
  * HeimdallFilter is a extension of a {@link ZuulFilter}.
  *
  * @author Filipe Germano

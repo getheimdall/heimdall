@@ -36,8 +36,6 @@ import br.com.conductor.heimdall.middleware.spec.Json;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>JsonImpl</h1><br/>
- *
  * Implementation of the {@link Json} interface.
  *
  * @author Filipe Germano

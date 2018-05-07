@@ -36,8 +36,6 @@ import br.com.twsoftware.alfred.object.Objeto;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>InterceptorListener</h1><br/>
- * 
  * Listener that controls the {@link Interceptor} repository.
  *
  * @author Filipe Germano
@@ -61,6 +59,7 @@ public class InterceptorListener {
 
      /**
       * Updates the {@link Interceptor} repository.
+      * 
       * @param message {@link Message}
       */
      @RabbitListener(queues = RabbitConstants.LISTENER_HEIMDALL_INTERCEPTORS)

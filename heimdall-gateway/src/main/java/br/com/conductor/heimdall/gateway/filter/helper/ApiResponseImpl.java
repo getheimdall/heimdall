@@ -27,8 +27,6 @@ import br.com.conductor.heimdall.middleware.spec.ApiResponse;
 import lombok.Data;
 
 /**
- * <h1>ApiResponseImpl</h1><br/>
- * 
  * Data class that represents a ApiResponse.
  *
  * @author Filipe Germano

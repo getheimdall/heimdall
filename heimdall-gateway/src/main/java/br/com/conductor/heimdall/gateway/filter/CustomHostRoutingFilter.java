@@ -38,8 +38,6 @@ import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>CustomHostRoutingFilter</h1><br/>
- * 
  * Creates a custom routing filter.
  *
  * @author Marcos Filho

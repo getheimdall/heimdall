@@ -27,8 +27,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * <h1>FilterDetail</h1><br/>
- * 
  * Data class that represents the Filter detais.
  *
  * @author Thiago Sampaio

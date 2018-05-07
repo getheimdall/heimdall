@@ -33,8 +33,6 @@ import br.com.conductor.heimdall.gateway.configuration.HeimdallHandlerMapping;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * <h1>RouteListener</h1><br/>
- * 
  * Listener that controls the Routes.
  *
  * @author Marcos Filho

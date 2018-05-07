@@ -43,8 +43,6 @@ import br.com.conductor.heimdall.middleware.spec.Json;
 import br.com.twsoftware.alfred.object.Objeto;
 
 /**
- * <h1>HttpImpl</h1><br/>
- * 
  * Implementation of the {@link Http} interface.
  *
  * @author Filipe Germano
