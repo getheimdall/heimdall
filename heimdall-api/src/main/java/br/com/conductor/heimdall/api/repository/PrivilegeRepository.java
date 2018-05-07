@@ -32,8 +32,6 @@ import br.com.conductor.heimdall.api.entity.User;
 import br.com.conductor.heimdall.api.enums.TypeUser;
 
 /**
- * <h1>PrivilegeRepository</h1><br/>
- * 
  * Extends {@link JpaRepository}. Provides method to find a {@link Set} of {@link Privilege}.
  *
  * @author Marcos Filho
@@ -44,8 +42,8 @@ public interface PrivilegeRepository extends JpaRepository<Privilege, Long> {
 	 /**
 	  * Finds a {@link Set} of {@link Privilege} by {@link User} username and {@link TypeUser}.
 	  * 
-	  * @param username		- The User username
-	  * @param type			- {@link TypeUser}
+	  * @param username		The User username
+	  * @param type			{@link TypeUser}
 	  * @return				{@link Set} of {@link Privilege}
 	  */
      @Query(value = "select p from Privilege p join fetch p.roles r join fetch r.users u where u.userName = :username and u.type = :type")

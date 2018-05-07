@@ -46,8 +46,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <h1>Role</h1><br/>
- * 
  * Data class that represents the Role.
  *
  * @author Marcos Filho

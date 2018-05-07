@@ -33,8 +33,6 @@ import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 /**
- * <h1>SwaggerConfiguration.java</h1><br/>
- * 
  * Configures the Swagger.
  *
  * @author Filipe Germano

@@ -27,8 +27,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
- * <h1>CryptoConfiguration</h1><br/>
- * 
  * Provides method to create a encoder.
  *
  * @author Marcos Filho

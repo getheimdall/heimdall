@@ -26,8 +26,6 @@ import javax.validation.constraints.Size;
 import lombok.Data;
 
 /**
- * <h1>PrivilegeDTO</h1><br/>
- * 
  * Data transference object class that represents a Heimdall Privilege.
  *
  * @author Marcos Filho

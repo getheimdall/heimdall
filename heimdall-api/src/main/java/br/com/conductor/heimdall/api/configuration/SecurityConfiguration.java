@@ -43,8 +43,6 @@ import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import br.com.conductor.heimdall.api.environment.LdapProperty;
 
 /**
- * <h1>SecurityConfiguration</h1><br/>
- * 
  * Extends the {@link WebSecurityConfigurerAdapter} class.
  *
  * @author Marcos Filho

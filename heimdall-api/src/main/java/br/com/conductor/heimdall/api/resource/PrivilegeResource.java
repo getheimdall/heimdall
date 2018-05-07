@@ -47,8 +47,6 @@ import br.com.twsoftware.alfred.object.Objeto;
 import io.swagger.annotations.ApiOperation;
 
 /**
- * <h1>PrivilegeResource</h1><br/>
- * 
  * Uses a {@link PrivilegeService} to provide methods to find one or more {@link Privilege}.
  *
  * @author Marcos Filho
@@ -65,7 +63,7 @@ public class PrivilegeResource {
      /**
       * Finds a {@link Privilege} by its Id.
       * 
-      * @param id					- The Privilege Id
+      * @param id					The Privilege Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -82,8 +80,8 @@ public class PrivilegeResource {
      /**
       * Finds all {@link Privilege} from a request.
       * 
-      * @param privilegeDTO			- {@link PrivilegeDTO}
-      * @param pageableDTO			- {@link PageableDTO}
+      * @param privilegeDTO			{@link PrivilegeDTO}
+      * @param pageableDTO			{@link PageableDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody

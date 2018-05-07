@@ -54,8 +54,6 @@ import br.com.twsoftware.alfred.object.Objeto;
 import io.swagger.annotations.ApiOperation;
 
 /**
- * <h1>RoleResource</h1><br/>
- * 
  * Uses a {@link RoleService} to provide methods to create, read, update and delete a {@link Role}.
  *
  * @author Marcos Filho
@@ -72,7 +70,7 @@ public class RoleResource {
      /**
       * Saves a {@link Role}.
       * 
-      * @param roleDTO				- {@link RoleDTO}
+      * @param roleDTO				{@link RoleDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -89,7 +87,7 @@ public class RoleResource {
      /**
       * Finds a {@link Role} by its Id.
       * 
-      * @param roleId				- The Role Id
+      * @param roleId				The Role Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -106,8 +104,8 @@ public class RoleResource {
      /**
       * Finds all {@link Role} from a request.
       * 
-      * @param roleDTO				- {@link RoleDTO}
-      * @param pageableDTO			- {@link PageableDTO}
+      * @param roleDTO				{@link RoleDTO}
+      * @param pageableDTO			{@link PageableDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -130,8 +128,8 @@ public class RoleResource {
      /**
       * Updates a {@link Role}.
       * 
-      * @param roleId				- The Role Id
-      * @param roleDTO				- {@link RoleDTO}
+      * @param roleId				The Role Id
+      * @param roleDTO				{@link RoleDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
@@ -148,7 +146,7 @@ public class RoleResource {
      /**
       * Deletes a {@link Role}.
       * 
-      * @param roleId				- The Role Id
+      * @param roleId				The Role Id
       * @return						{@link ResponseEntity}
       */
      @ResponseBody

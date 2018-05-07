@@ -43,8 +43,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * <h1>Privilege</h1><br/>
- * 
  * Data class that represents the Privilege.
  *
  * @author Marcos Filho
