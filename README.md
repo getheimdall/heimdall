@@ -8,7 +8,7 @@
   An easy way to orchestrate your Api's
 </p>
 <p align="center">
-  Desafio QConSP 2018: <a href="https://github.com/getheimdall/heimdall/wiki/Desafio-QCon-S%C3%A3o-Paulo-2018">complete o desafio e ganhe prêmios</a>
+  Desafio QConSP 2018: <a href="https://github.com/getheimdall/heimdall/wiki/Desafio-QCon-S%C3%A3o-Paulo-2018#6-tldr">complete o desafio e ganhe prêmios</a>
 </p>
 
 
