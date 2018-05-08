@@ -94,7 +94,11 @@ public enum ExceptionMessage {
      
      PRIVILEGES_NOT_EXIST(BAD_REQUEST.value(), "Privileges {} defined to attach in role not exist ", BadRequestException.class),
      
-     ACCESS_DENIED(UNAUTHORIZED.value(), "Access Denied", UnauthorizedException.class);
+     ACCESS_DENIED(UNAUTHORIZED.value(), "Access Denied", UnauthorizedException.class),
+     
+     ENVIRONMENT_ATTACHED_TO_API(BAD_REQUEST.value(), "Environment attached to Api", BadRequestException.class),
+     
+     OPERATION_ATTACHED_TO_INTERCEPTOR(BAD_REQUEST.value(), "Operation attached to Interceptor", BadRequestException.class);
      
      
      @Getter

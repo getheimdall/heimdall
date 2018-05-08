@@ -22,6 +22,7 @@ package br.com.conductor.heimdall.core.service;
  */
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ENVIRONMENT_ATTACHED_TO_API;
 import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 import static br.com.twsoftware.alfred.object.Objeto.notBlank;
 
@@ -165,6 +166,10 @@ public class EnvironmentService {
 
           Environment environment = environmentRepository.findOne(id);
           HeimdallException.checkThrow(isBlank(environment), GLOBAL_RESOURCE_NOT_FOUND);
+          
+          Integer totalEnvironmentsAttached = environmentRepository.findApisWithEnvironment(id);
+          HeimdallException.checkThrow(totalEnvironmentsAttached == 1, ENVIRONMENT_ATTACHED_TO_API);
+          
           
           environmentRepository.delete(environment);
      }
