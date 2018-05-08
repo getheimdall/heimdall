@@ -1,5 +1,4 @@
 import { ApiConstants } from '../../constants/actions-types'
-import { notification } from 'antd'
 
 import { apiService } from '../../services'
 import { push } from 'connected-react-router';
@@ -14,7 +13,15 @@ const receiveApis = apis => ({
 export const getAllApis = () => dispatch => {
     apiService.getApis()
         .then(data => dispatch(receiveApis(data)))
-        .catch(error => console.log('Error: ', error))
+        .catch(error => {
+            if (error.response && error.response.status === 400) {
+                dispatch(sendNotification({ type: 'error', message: 'error', description: error.response.data.message }))
+            }
+        })
+}
+
+export const sendNotification = notification => dispatch => {
+    dispatch({ type: ApiConstants.API_NOTIFICATION, notification })
 }
 
 const receiveApi = api => ({ type: ApiConstants.RECEIVE_API, api })
@@ -23,8 +30,9 @@ export const getApiById = (id) => dispatch => {
     apiService.getApiById(id)
         .then(data => dispatch(receiveApi(data)))
         .catch(error => {
-            notification['error']({ message: error.message })
-            console.log(error.message)
+            if (error.response && error.response.status === 400) {
+                dispatch(sendNotification({ type: 'error', message: 'error', description: error.response.data.message }))
+            }
             dispatch(push('/apis'))
         })
 }
@@ -36,11 +44,15 @@ export const updateApi = (api) => dispatch => {
     dispatch(resetApiAction())
     apiService.updateApi(api)
         .then(data => {
-            notification['success']({ message: 'Update Successful' })
+            dispatch(sendNotification({ type: 'success', message: 'Api updated' }))
             dispatch(updateApiAction(data))
             // dispatch(push('/apis/' + api.id))
         })
-        .catch(error => console.log(error))
+        .catch(error => {
+            if (error.response && error.response.status === 400) {
+                dispatch(sendNotification({ type: 'error', message: 'error', description: error.response.data.message }))
+            }
+        })
 }
 
 export const getNewApi = () => dispatch => {
@@ -52,11 +64,15 @@ const saveApiAction = api => ({ type: ApiConstants.SAVE_API, api })
 export const saveApi = api => dispatch => {
     apiService.saveApi(api)
         .then(data => {
-            notification['success']({ message: 'Save Successful' })
+            dispatch(sendNotification({ type: 'success', message: 'Api saved' }))
             dispatch(saveApiAction(data))
             dispatch(push('/apis'))
         })
-        .catch(error => console.log(error))
+        .catch(error => {
+            if (error.response && error.response.status === 400) {
+                dispatch(sendNotification({ type: 'error', message: 'error', description: error.response.data.message }))
+            }
+        })
 }
 
 const deleteApiAction = id => ({
@@ -66,11 +82,15 @@ const deleteApiAction = id => ({
 export const deleteApi = id => dispatch => {
     apiService.deleteApi(id)
         .then(data => {
-            notification['success']({ message: 'Api Deleted' })
+            dispatch(sendNotification({ type: 'success', message: 'Api removed' }))
             dispatch(deleteApiAction(data))
             dispatch(push('/apis'))
         })
-        .catch(error => console.log(error))
+        .catch(error => {
+            if (error.response && error.response.status === 400) {
+                dispatch(sendNotification({ type: 'error', message: 'error', description: error.response.data.message }))
+            }
+        })
 }
 
 export const apiSource = apiSource => dispatch => {

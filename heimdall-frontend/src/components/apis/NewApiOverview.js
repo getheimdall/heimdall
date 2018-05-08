@@ -23,8 +23,6 @@ class NewApiOverview extends Component {
                 }
                 payload.status = payload.status ? 'ACTIVE' : 'INACTIVE'
 
-                console.log(JSON.stringify(payload))
-
                 this.props.submit(payload)
             }
         });

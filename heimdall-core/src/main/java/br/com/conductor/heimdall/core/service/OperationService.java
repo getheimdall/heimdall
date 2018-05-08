@@ -23,6 +23,7 @@ package br.com.conductor.heimdall.core.service;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ONLY_ONE_OPERATION_PER_RESOURCE;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.OPERATION_ATTACHED_TO_INTERCEPTOR;
 import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 import static br.com.twsoftware.alfred.object.Objeto.notBlank;
 
@@ -218,8 +219,12 @@ public class OperationService {
           Operation operation = operationRepository.findByResourceApiIdAndResourceIdAndId(apiId, resourceId, operationId);
           HeimdallException.checkThrow(isBlank(operation), GLOBAL_RESOURCE_NOT_FOUND);
           
+          Integer totalOperationsAttached = operationRepository.findInterceptorWithOperation(operationId);
+          HeimdallException.checkThrow(totalOperationsAttached == 1, OPERATION_ATTACHED_TO_INTERCEPTOR);
+          
           operationRepository.delete(operation.getId());
           amqpCacheService.dispatchClean(ConstantsCache.OPERATION_ACTIVE_FROM_ENDPOINT, operation.getResource().getApi().getBasePath() + operation.getPath());
+          
           
           amqpRoute.dispatchRoutes();
      }

@@ -16,6 +16,8 @@ export default (state = {}, action) => {
             return { ...state, loading: true }
         case EnvironmentConstants.ENVIRONMENT_LOADING_FINISH:
             return { ...state, loading: false }
+        case EnvironmentConstants.ENVIRONMENT_NOTIFICATION:
+            return { ...state, notification: action.notification }
         default:
             return state
     }

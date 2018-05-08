@@ -24,11 +24,14 @@ class ListApis extends Component {
                             <Col sm={24} md={8} lg={6} style={{ marginBottom: 20 }} key={api.id}>
                                 <Card
                                     className="heimdall-card"
-                                    title={<span>{api.name}</span>}
+                                    title={
+                                        <div style={{paddingLeft: 24, paddingRight: 24, paddingTop: 16, paddingBottom: 16, cursor: 'pointer'}} onClick={this.redirect('/apis/' + api.id)}>
+                                            <span>{api.name}</span>
+                                        </div>
+                                    }
                                     actions={[
                                         <Tooltip title="View" onClick={this.redirect('/apis/' + api.id)}><Icon type="search" /></Tooltip>
                                     ]}
-                                    hoverable
                                 >
                                     <div className="heimdall-card-body" onClick={this.redirect('/apis/' + api.id)}>
                                         <span className="api_description">{api.description}</span>

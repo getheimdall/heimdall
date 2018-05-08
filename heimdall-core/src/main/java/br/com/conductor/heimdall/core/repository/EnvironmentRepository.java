@@ -22,6 +22,8 @@ package br.com.conductor.heimdall.core.repository;
  */
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import br.com.conductor.heimdall.core.entity.Environment;
 
@@ -40,5 +42,14 @@ public interface EnvironmentRepository extends JpaRepository<Environment, Long> 
 	  * @return					The Environment found
 	  */
      Environment findByInboundURL(String inboundURL);
+     
+     /**
+      * Check if an environment has apis attached
+      * 
+      * @param id
+      * @return
+      */
+     @Query(value = "select count(0) from apis_environments where environment_id = :id", nativeQuery = true)
+     Integer findApisWithEnvironment(@Param("id") Long id);
 
 }

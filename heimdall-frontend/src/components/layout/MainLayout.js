@@ -53,7 +53,7 @@ class MainLayout extends Component {
 						</Row>
 					</Content>
 					<Footer>
-						<a href="http://conductor.com.br">Conductor Tecnologia</a>
+						<a href="http://www.conductor.com.br">Conductor Tecnologia</a>
 					</Footer>
 				</Layout>
 			</Layout>

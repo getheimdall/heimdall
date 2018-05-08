@@ -24,6 +24,8 @@ export default (state = {}, action) => {
             return { ...state, fetching: true }
         case ApiConstants.FINISH_FETCHING_API_SOURCE:
             return { ...state, fetching: false }
+        case ApiConstants.API_NOTIFICATION:
+            return { ...state, notification: action.notification }
         default:
             return state
     }
