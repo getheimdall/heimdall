@@ -105,5 +105,14 @@ public interface OperationRepository extends JpaRepository<Operation, Long> {
       * @return					The Operation found
       */
      Operation findByMethodAndPath(HttpMethod method, String path);
+     
+     /**
+      * Check if an operation has interceptors attached 
+      * 
+      * @param id
+      * @return
+      */
+     @Query(value = "select count(0) from interceptors where life_cycle = 'OPERATION' and operation_id = :id", nativeQuery = true)
+     Integer findInterceptorWithOperation(@Param("id") Long id);
 
 }

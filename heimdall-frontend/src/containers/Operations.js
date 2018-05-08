@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import { operationService } from '../services'
 import { toggleModal } from '../actions/operations'
 
-import { List, Avatar, Button, Row, Col, Tooltip, Modal } from 'antd';
+import { List, Avatar, Button, Row, Col, Tooltip, Modal, notification } from 'antd';
 import Loading from '../components/ui/Loading'
 import OperationForm from '../components/operations/OperationForm';
 
@@ -20,6 +20,13 @@ class Operations extends Component {
 
     componentDidMount() {
         this.reloadOperations()
+    }
+
+    componentWillReceiveProps(newProps) {
+        if (newProps.notification && newProps.notification !== this.props.notification) {
+            const { type, message, description } = newProps.notification
+            notification[type]({ message, description })
+        }
     }
 
     showOperationModal = (operationId) => (e) => {
@@ -40,29 +47,22 @@ class Operations extends Component {
             .then(data => {
                 this.setState({ ...this.state, operations: data });
             })
-            // .catch(error => {
-            //     console.log(error)
-            // })
+
     }
 
     saveOperation = (idApi, idResource, operation) => {
         operationService.save(idApi, idResource, operation)
-        .then(data => {
-            this.reloadOperations()
-        })
-        // .catch(error => {
-        //     console.log(error)
-        // })
+            .then(data => {
+                this.reloadOperations()
+            })
+
     }
 
     updateOperation = (idApi, idResource, operation) => {
         operationService.update(idApi, idResource, operation)
-        .then(data => {
-            this.reloadOperations()
-        })
-        // .catch(error => {
-        //     console.log(error)
-        // })
+            .then(data => {
+                this.reloadOperations()
+            })
     }
 
     removeOperation = (idApi, idResource, operation) => {
@@ -70,9 +70,12 @@ class Operations extends Component {
             .then(data => {
                 this.reloadOperations()
             })
-            // .catch(error => {
-            //     console.log(error)
-            // })
+            .catch(error => {
+                if (error.response && error.response.status === 400) {
+                    notification['error']({ message: 'Error', description: error.response.data.message })
+                }
+                this.reloadOperations()
+            })
     }
 
     handleSave = (e) => {
