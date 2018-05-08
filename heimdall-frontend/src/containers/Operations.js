@@ -85,7 +85,6 @@ class Operations extends Component {
     }
 
     submitPayload = (payload) => {
-        console.log(payload)
         if (!payload.id) {
             this.saveOperation(this.props.idApi, this.props.idResource, payload)
         } else {
@@ -94,10 +93,8 @@ class Operations extends Component {
     }
 
     remove = (operationId) => (e) => {
-        console.log(this.props.idApi, this.props.idResource, operationId)
         this.setState({ ...this.state, operationSelected: 0, operations: null });
         this.removeOperation(this.props.idApi, this.props.idResource, operationId)
-        // this.reloadOperations()
     }
 
     render() {
