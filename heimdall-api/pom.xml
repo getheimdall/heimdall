@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>br.com.conductor.heimdall</groupId>
 		<artifactId>heimdall</artifactId>
-		<version>1.1.47-SNAPSHOT</version>
+		<version>1.1.49-SNAPSHOT</version>
 	</parent>
 	<artifactId>heimdall-api</artifactId>
 	<packaging>jar</packaging>
@@ -114,7 +114,7 @@
 				<configuration>
 					<baseImage>java:openjdk-8-jdk-alpine</baseImage>
 					<imageName>${docker.imageName}</imageName>
-					<entryPoint>["java", "-Xmx1024m", "-Xms500m",  "-jar", "/${project.build.finalName}.jar"]</entryPoint>
+					<entryPoint>["java", "-Xmx1024m", "-Xms500m", "-jar", "/${project.build.finalName}.jar"]</entryPoint>
 					<forceTags>true</forceTags>
 					<serverId>${docker.serverId}</serverId>
 					<registryUrl>${docker.registryUrl}</registryUrl>

@@ -21,9 +21,6 @@ package br.com.conductor.heimdall.core.util;
  * ==========================LICENSE_END===================================
  */
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import java.util.Comparator;
 
 import br.com.conductor.heimdall.core.entity.Operation;
@@ -37,12 +34,25 @@ import br.com.conductor.heimdall.core.entity.Operation;
  */
 public class OperationSort implements Comparator<Operation> {
 
-     @Override
-     public int compare(Operation r1, Operation r2) {
+	@Override
+    public int compare(Operation r1, Operation r2) {
+         String pattern1 = r1.getPath();
+         String pattern2 = r2.getPath();
          
-          Path path1 = Paths.get(r1.getPath());
-          Path path2 = Paths.get(r2.getPath());
-          
-          return path1.compareTo(path2);
-     }
+         String[] split = pattern1.split("/");
+         String[] split2 = pattern2.split("/");
+         
+         for (String firstSplit : split) {
+              for (String secondSplit : split2) {
+                   if (firstSplit.equals("**") && secondSplit.equals("**")) return 0;
+                   if (firstSplit.equals("**") && !secondSplit.equals("**")) return -1;
+                   if (!firstSplit.equals("**") && secondSplit.equals("**")) return 1;
+                   return pattern1.compareTo(pattern2);
+              }
+              
+         }
+
+         return pattern1.compareTo(pattern2);
+    }
+
 }
