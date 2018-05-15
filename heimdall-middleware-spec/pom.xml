@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>br.com.conductor.heimdall</groupId>
 		<artifactId>heimdall</artifactId>
-		<version>1.1.49-RELEASE</version>
+		<version>1.1.50-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>heimdall-middleware-spec</artifactId>
