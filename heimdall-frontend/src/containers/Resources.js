@@ -10,7 +10,6 @@ import Loading from '../components/ui/Loading'
 import Operations from './Operations'
 import ResourceForm from '../components/resources/ResourceForm'
 import HeimdallCollapse from '../components/collapse'
-import Joyride from 'react-joyride'
 
 const HeimdallPanel = HeimdallCollapse.Panel;
 const ButtonGroup = Button.Group;
@@ -21,21 +20,7 @@ class Resources extends Component {
         super(props)
         this.state = {
             loadedKeys: [],
-            resourceSelected: 0,
-            steps: [{
-                title: 'Action',
-                text: `teste`,
-                selector: '.add-tour',
-                position: 'right',
-                type: 'hover',
-            },
-            {
-                title: 'Action',
-                text: `teste`,
-                selector: '.header-tour',
-                position: 'top',
-                type: 'hover',
-            }]
+            resourceSelected: 0
         }
 
         this.callback = this.callback.bind(this)
@@ -127,13 +112,6 @@ class Resources extends Component {
 
         return (
             <Row>
-                <Joyride
-                    ref={c => (this.joyride = c)}
-                    steps={this.state.steps}
-                    type="continuous"
-                    showSkipButton={true}
-                    run={true}
-                />
                 <HeimdallCollapse onChange={this.callback}>
                     {resources.map((resource, index) => {
                         return (
