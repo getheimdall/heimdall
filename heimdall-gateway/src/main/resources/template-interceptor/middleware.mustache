@@ -74,7 +74,10 @@ public class MiddlewareInterceptor extends HeimdallFilter {
 
      @Override
      public void execute() throws Throwable {
-                    
+          
+          RequestContext ctx = RequestContext.getCurrentContext();
+          ctx.setSendZuulResponse(false);
+          
           def middleware = m.instance("{{{content}}}");
           middleware.run(helper);
           

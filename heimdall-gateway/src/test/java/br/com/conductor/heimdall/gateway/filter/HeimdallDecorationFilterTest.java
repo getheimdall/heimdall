@@ -126,7 +126,6 @@ public class HeimdallDecorationFilterTest {
     	 this.request.addHeader("host", "some-path.com");
     	 
     	 Map<String, ZuulRoute> routes = new LinkedHashMap<>();
-//    	 ZuulRoute route = new ZuulRoute("/path/api/foo", "");
     	 ZuulRoute route = new ZuulRoute("idFoo", "/path/api/foo", null, "my.dns.com.br", true, null, Sets.newConcurrentHashSet());
     	 routes.put("/path/api/foo", route);
     	 
