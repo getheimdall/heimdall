@@ -120,6 +120,52 @@ public class HeimdallDecorationFilterTest {
      }
      
      @Test
+     public void matchRouteWithMultiEnvironments() {
+    	 this.request.setRequestURI("/path/api/foo");
+    	 this.request.setMethod(HttpMethod.GET.name());
+    	 this.request.addHeader("host", "some-path.com");
+    	 
+    	 Map<String, ZuulRoute> routes = new LinkedHashMap<>();
+    	 ZuulRoute route = new ZuulRoute("idFoo", "/path/api/foo", null, "my.dns.com.br", true, null, Sets.newConcurrentHashSet());
+    	 routes.put("/path/api/foo", route);
+    	 
+    	 Api api = new Api();
+         api.setId(10L);
+         api.setBasePath("/path");
+         
+         Resource res = new Resource();
+         res.setId(88L);
+         res.setApi(api);
+         
+         Environment env1 = new Environment();
+         env1.setInboundURL("https://some-path.com");
+         env1.setOutboundURL("https://some-path.com");
+         env1.setVariables(new HashMap<>());
+         
+         Environment env2 = new Environment();
+         env2.setInboundURL("https://other-path.com");
+         env2.setOutboundURL("https://other-path.com");
+         env2.setVariables(new HashMap<>());
+         
+         List<Environment> environments = Lists.newArrayList(); 
+         environments.add(env1);
+         environments.add(env2);
+         
+         api.setEnvironments(environments);
+                   
+         Operation opGet = new Operation(10L, HttpMethod.GET, "/api/foo", "GET description", res);
+         Operation opDelete = new Operation(10L, HttpMethod.DELETE, "/api/foo", "DELETE description", res);
+         
+         Mockito.when(routeLocator.getAtomicRoutes()).thenReturn(new AtomicReference<>(routes));
+         Mockito.when(operationRepository.findByEndPoint("/path/api/foo")).thenReturn(Lists.newArrayList(opGet, opDelete));
+         
+         this.filter.run();
+         
+         assertEquals("/api/foo", this.ctx.get(REQUEST_URI_KEY));
+         assertEquals(true, this.ctx.sendZuulResponse());
+     }
+     
+     @Test
      public void throwNotAllowedRoute() {
           Api api = new Api();
           api.setId(10L);
