@@ -73,5 +73,7 @@ public interface Request {
      public String pathParam(String name);
      
      public String getAppName();
+     
+     public void setSendResponse(boolean value);     
 
 }
