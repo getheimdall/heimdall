@@ -49,6 +49,7 @@ import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.page.EnvironmentPage;
 import br.com.conductor.heimdall.core.entity.Environment;
 import br.com.conductor.heimdall.core.service.EnvironmentService;
+import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
 import br.com.twsoftware.alfred.object.Objeto;
 import io.swagger.annotations.ApiOperation;
@@ -64,6 +65,9 @@ import io.swagger.annotations.ApiOperation;
 @RequestMapping(value = PATH_ENVIRONMENTS)
 public class EnvironmentResource {
 
+     @Autowired
+     private AMQPCacheService amqpCacheService;
+	
      @Autowired
      private EnvironmentService environmentService;
 
@@ -121,6 +125,7 @@ public class EnvironmentResource {
      public ResponseEntity<?> save(@RequestBody @Valid EnvironmentDTO environmentDTO) {
 
           Environment environment = environmentService.save(environmentDTO);
+          amqpCacheService.dispatchClean();
           
           return ResponseEntity.created(URI.create(String.format("/%s/%s", "environments", environment.getId().toString()))).build();
      }
@@ -139,6 +144,7 @@ public class EnvironmentResource {
      public ResponseEntity<?> update(@PathVariable("environmentId") Long id, @RequestBody EnvironmentDTO environmentDTO) {
 
           Environment environment = environmentService.update(id, environmentDTO);
+          amqpCacheService.dispatchClean();
           
           return ResponseEntity.ok(environment);
      }
@@ -156,6 +162,7 @@ public class EnvironmentResource {
      public ResponseEntity<?> delete(@PathVariable("environmentId") Long id) {
 
           environmentService.delete(id);
+          amqpCacheService.dispatchClean();
           
           return ResponseEntity.noContent().build();
      }
