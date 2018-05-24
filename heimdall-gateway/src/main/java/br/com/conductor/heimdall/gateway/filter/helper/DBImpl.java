@@ -162,9 +162,9 @@ public class DBImpl implements DB {
      }
 
      @Override
-     public <T> Query<T> getQueryProvider(Class<T> classType) {
+     public <T> Query<T> getQueryProvider(Object criteria) {
 
-          Query<T> query = (Query<T>) this.prepareQuery(classType, this.datastore());
+          Query<T> query = (Query<T>) this.prepareQuery(criteria, this.datastore());
 
           return query;
      }
