@@ -7,9 +7,6 @@
 <p align="center">
   An easy way to orchestrate your APIs
 </p>
-<p align="center">
-  QConSP 2018 Challenge: <a href="https://github.com/getheimdall/heimdall/wiki/QConSP-2018-Challenge#6-tldr">complete the challenge and win prizes</a>
-</p>
 
 
 ## What is Heimdall

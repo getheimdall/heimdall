@@ -43,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.common.collect.Lists;
 
 import br.com.conductor.heimdall.core.converter.GenericConverter;
+import br.com.conductor.heimdall.core.converter.InterceptorMap;
 import br.com.conductor.heimdall.core.dto.InterceptorDTO;
 import br.com.conductor.heimdall.core.dto.InterceptorFileDTO;
 import br.com.conductor.heimdall.core.dto.PageDTO;
@@ -331,7 +332,7 @@ public class InterceptorService {
 
           Interceptor interceptor = interceptorRepository.findOne(id);          
           HeimdallException.checkThrow(isBlank(interceptor), GLOBAL_RESOURCE_NOT_FOUND);
-          interceptor = GenericConverter.mapper(interceptorDTO, interceptor);
+          interceptor = GenericConverter.mapperWithMapping(interceptorDTO, interceptor, new InterceptorMap());
           
           interceptor = validateLifeCycle(interceptor);
           

@@ -329,6 +329,12 @@ public class CallImpl implements Call {
                
                return TraceContextHolder.getInstance().getActualTrace().getApp();
           }
+
+          @Override
+          public void setSendResponse(boolean value) {
+
+               context.setSendZuulResponse(value);
+          }
           
      }
 

@@ -95,10 +95,10 @@ public interface DB {
      /**
       * Returns the {@link Query} provider.
       * 
-      * @param classType	Class type
+      * @param object
       * @return				The Query provider
       */
-     public <T> Query<T> getQueryProvider(Class<T> classType);
+     public <T> Query<T> getQueryProvider(Object criteria);
      
      /**
       * Find a documents
