@@ -1,4 +1,5 @@
-package br.com.conductor.heimdall.gateway.util;
+
+package br.com.conductor.heimdall.core.util;
 
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -10,28 +11,33 @@ import java.util.List;
 import org.hamcrest.collection.IsCollectionWithSize;
 import org.junit.After;
 import org.junit.Test;
-import org.springframework.cloud.netflix.zuul.filters.ZuulProperties.ZuulRoute;
 
-public class RouteSortTest {
+import br.com.conductor.heimdall.core.entity.Operation;
 
-	
-     List<ZuulRoute> expected = new LinkedList<>();
-     List<ZuulRoute> actual = new LinkedList<>();
-     
+public class OperationSortTest {
+     List<Operation> expected = new LinkedList<>();
+     List<Operation> actual = new LinkedList<>();
+
      @After
      public void afterTestMethod() {
          expected.clear();
          actual.clear();
      }
-
+     
      @Test
      public void routeWithWildCardNeedBeTheLast() {
-
-          ZuulRoute r1 = new ZuulRoute("/cartoes", "");
-          ZuulRoute r2 = new ZuulRoute("/cartoes/*", "");
-          ZuulRoute r3 = new ZuulRoute("/foo", "");
-          ZuulRoute r4 = new ZuulRoute("/foo/*", "");
-          ZuulRoute r5 = new ZuulRoute("/*", "");
+          
+          Operation r1 = new Operation();
+          Operation r2 = new Operation();
+          Operation r3 = new Operation();
+          Operation r4 = new Operation();
+          Operation r5 = new Operation();
+          
+          r1.setPath("/cartoes");
+          r2.setPath("/cartoes/*");
+          r3.setPath("/foo");
+          r4.setPath("/foo/*");
+          r5.setPath("/*");
           
           actual.add(r5);
           actual.add(r3);
@@ -45,7 +51,7 @@ public class RouteSortTest {
           expected.add(r4);
           expected.add(r5);
 
-          actual.sort(new RouteSort());
+          actual.sort(new OperationSort());
 
           assertThat(actual, IsCollectionWithSize.hasSize(5));
           assertTrue(actual.get(actual.size() - 1).getPath().startsWith("/*"));
@@ -55,16 +61,19 @@ public class RouteSortTest {
      @Test
      public void routeWithSamePrefix() {
 
-          ZuulRoute r1 = new ZuulRoute("/foo/bar", "");
-          ZuulRoute r2 = new ZuulRoute("/foo/bar/alpha/beta", "");
+          Operation r1 = new Operation();
+          Operation r2 = new Operation();
           
+          r1.setPath("/foo/bar");
+          r2.setPath("/foo/bar/alpha/beta");
+
           actual.add(r2);
           actual.add(r1);
 
           expected.add(r1);
           expected.add(r2);
 
-          actual.sort(new RouteSort());
+          actual.sort(new OperationSort());
 
           assertThat(actual, is(expected));
      }
@@ -72,16 +81,19 @@ public class RouteSortTest {
      @Test
      public void routeWithSamePrefixAndSingleWildCard() {
         
-          ZuulRoute r1 = new ZuulRoute("/foo/bar", "");
-          ZuulRoute r2 = new ZuulRoute("/foo/bar/*", "");
+          Operation r1 = new Operation();
+          Operation r2 = new Operation();
           
+          r1.setPath("/foo/bar");
+          r2.setPath("/foo/bar/*");
+
           actual.add(r2);
           actual.add(r1);
 
           expected.add(r1);
           expected.add(r2);
 
-          actual.sort(new RouteSort());
+          actual.sort(new OperationSort());
 
           assertThat(actual, is(expected));
      }
@@ -89,16 +101,19 @@ public class RouteSortTest {
      @Test
      public void routeWithSamePrefixAndDoubleWildCard() {
 
-          ZuulRoute r1 = new ZuulRoute("/foo/bar", "");
-          ZuulRoute r2 = new ZuulRoute("/foo/bar/**", "");
+          Operation r1 = new Operation();
+          Operation r2 = new Operation();
           
+          r1.setPath("/foo/bar");
+          r2.setPath("/foo/bar/**");
+
           actual.add(r2);
           actual.add(r1);
 
           expected.add(r1);
           expected.add(r2);
 
-          actual.sort(new RouteSort());
+          actual.sort(new OperationSort());
 
           assertThat(actual, is(expected));
      }
@@ -106,10 +121,14 @@ public class RouteSortTest {
      @Test
      public void routeWithSamePrefixAndDoubleWildCardAndSingleWildCard() {
           
-          ZuulRoute r1 = new ZuulRoute("/foo/bar", "");
-          ZuulRoute r2 = new ZuulRoute("/foo/bar/*", "");
-          ZuulRoute r3 = new ZuulRoute("/foo/bar/**", "");
-          
+          Operation r1 = new Operation();
+          Operation r2 = new Operation();
+          Operation r3 = new Operation();
+
+          r1.setPath("/foo/bar");
+          r2.setPath("/foo/bar/*");
+          r3.setPath("/foo/bar/**");
+
           actual.add(r3);
           actual.add(r2);
           actual.add(r1);
@@ -118,7 +137,7 @@ public class RouteSortTest {
           expected.add(r2);
           expected.add(r3);
 
-          actual.sort(new RouteSort());
+          actual.sort(new OperationSort());
 
           assertThat(actual, is(expected));
      }
@@ -126,10 +145,15 @@ public class RouteSortTest {
      @Test
      public void routeWithSamePrefixValidPathAndWildCard() {
           
-          ZuulRoute r1 = new ZuulRoute("/foo/bar", "");
-          ZuulRoute r2 = new ZuulRoute("/foo/bar/alpha", "");
-          ZuulRoute r3 = new ZuulRoute("/foo/bar/*", "");
-          ZuulRoute r4 = new ZuulRoute("/*", "");
+          Operation r1 = new Operation();
+          Operation r2 = new Operation();
+          Operation r3 = new Operation();
+          Operation r4 = new Operation();
+          
+          r1.setPath("/foo/bar");
+          r2.setPath("/foo/bar/alpha");
+          r3.setPath("/foo/bar/*");
+          r4.setPath("/*");
           
           actual.add(r4);
           actual.add(r3);
@@ -141,8 +165,9 @@ public class RouteSortTest {
           expected.add(r3);
           expected.add(r4);
 
-          actual.sort(new RouteSort());
+          actual.sort(new OperationSort());
 
           assertThat(actual, is(expected));
      }
+
 }
