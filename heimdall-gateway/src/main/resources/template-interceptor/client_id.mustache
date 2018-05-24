@@ -81,6 +81,10 @@ public class ClientIdInterceptor extends HeimdallFilter {
      	return "{{name}}"
      }
 
+     public Long getApiId() {
+          return {{apiId}};
+     }
+
      @Override
      public void execute() throws Throwable {
 
@@ -104,7 +108,14 @@ public class ClientIdInterceptor extends HeimdallFilter {
                TraceContextHolder.getInstance().getActualTrace().setClientId(DigestUtils.digestMD5(clientId));
                App app = appRepository.findByClientId(clientId);
                
-               if (Objeto.isBlank(app)) {
+               if (!getApiId.equals(helper.call().info().apiId())) {
+
+                    ctx.setSendZuulResponse(false);
+                    ctx.put(INTERRUPT, true);
+                    ctx.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
+                    ctx.setResponseBody(String.format(ConstantsInterceptors.GLOBAL_ACCESS_NOT_ALLOWED_API));
+                    
+               } else if (Objeto.isBlank(app)) {
 
                     ctx.setSendZuulResponse(false);
                     ctx.put(INTERRUPT, true);

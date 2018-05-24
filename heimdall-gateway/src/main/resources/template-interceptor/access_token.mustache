@@ -81,12 +81,16 @@ public class AccessTokenInterceptor extends HeimdallFilter {
      	return "{{name}}"
      }
 
+     public Long getApiId() {
+          return {{apiId}};
+     }
+
      @Override
      public void execute() throws Throwable {
 
           accessTokenRepository = (AccessTokenRepository) BeanManager.getBean(AccessTokenRepository.class);
           RequestContext ctx = RequestContext.getCurrentContext();
-          HttpServletRequest request = ctx.getRequest();
+          HttpServletRequest request = ctx.getRequest();          
 
           String accessToken = null;
           String clientId = null;
@@ -107,8 +111,14 @@ public class AccessTokenInterceptor extends HeimdallFilter {
 
           boolean error = true;
 
+          if (!getApiId.equals(helper.call().info().apiId())) {
+
+               ctx.setSendZuulResponse(false);
+               ctx.put(INTERRUPT, true);
+               ctx.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
+               ctx.setResponseBody(String.format(ConstantsInterceptors.GLOBAL_ACCESS_NOT_ALLOWED_API));
                
-          if (Objeto.notBlank(accessToken) && Objeto.notBlank(clientId)) {
+          } else if (Objeto.notBlank(accessToken) && Objeto.notBlank(clientId)) {
                     
                AccessToken token = accessTokenRepository.findAccessTokenActive(accessToken);
                
@@ -121,16 +131,15 @@ public class AccessTokenInterceptor extends HeimdallFilter {
 	                    TraceContextHolder.getInstance().getActualTrace().setApp(token.getApp().getName());
 	               }
                } 
-          }
 
+               if (error) {
 
-          if (error) {
-
-               ctx.setSendZuulResponse(false);
-               ctx.put(INTERRUPT, true);
-               ctx.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
-               ctx.setResponseBody(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, "Access Token"));
-          }
+                    ctx.setSendZuulResponse(false);
+                    ctx.put(INTERRUPT, true);
+                    ctx.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
+                    ctx.setResponseBody(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, "Access Token"));
+               }
+          }          
 
      }     
 
