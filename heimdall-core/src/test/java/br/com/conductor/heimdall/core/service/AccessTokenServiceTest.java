@@ -13,7 +13,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
 import br.com.conductor.heimdall.core.dto.persist.AccessTokenPersist;
-import br.com.conductor.heimdall.core.dto.request.AccessTokenRequest;
 import br.com.conductor.heimdall.core.entity.AccessToken;
 import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.exception.BadRequestException;
@@ -138,11 +137,11 @@ public class AccessTokenServiceTest {
           thrown.expect(NotFoundException.class);
           thrown.expectMessage("Resource not found");
           
-          AccessTokenRequest accessTokenRequest = new AccessTokenRequest();
+          AccessTokenPersist accessTokenPersist = new AccessTokenPersist();
           
           Mockito.when(accessTokenRepository.findOne(Mockito.anyLong())).thenReturn(null);
           
-          service.update(10L, accessTokenRequest);
+          service.update(10L, accessTokenPersist);
      }
      
      @Test
@@ -150,8 +149,8 @@ public class AccessTokenServiceTest {
           thrown.expect(BadRequestException.class);
           thrown.expectMessage("App not exist");
           
-          AccessTokenRequest accessTokenRequest = new AccessTokenRequest();
-          accessTokenRequest.setApp(new ReferenceIdDTO(10L));
+          AccessTokenPersist accessTokenPersist = new AccessTokenPersist();
+          accessTokenPersist.setApp(new ReferenceIdDTO(10L));
           
           AccessToken recoverAt = new AccessToken();
           recoverAt.setCode("123456");
@@ -159,13 +158,13 @@ public class AccessTokenServiceTest {
           Mockito.when(accessTokenRepository.findOne(Mockito.anyLong())).thenReturn(recoverAt);
           Mockito.when(appRespository.findOne(Mockito.anyLong())).thenReturn(null);
           
-          service.update(10L, accessTokenRequest);
+          service.update(10L, accessTokenPersist);
      }
      
      @Test
      public void updatingAnAccessTokenWithExistentApp() {         
-          AccessTokenRequest accessTokenRequest = new AccessTokenRequest();
-          accessTokenRequest.setApp(new ReferenceIdDTO(10L));
+          AccessTokenPersist accessTokenPersist = new AccessTokenPersist();
+          accessTokenPersist.setApp(new ReferenceIdDTO(10L));
           
           AccessToken recoverAt = new AccessToken();
           recoverAt.setCode("123456");
@@ -176,7 +175,7 @@ public class AccessTokenServiceTest {
           Mockito.when(accessTokenRepository.findOne(Mockito.anyLong())).thenReturn(recoverAt);
           Mockito.when(appRespository.findOne(Mockito.anyLong())).thenReturn(appRecovered);
           
-          service.update(10L, accessTokenRequest);
+          service.update(10L, accessTokenPersist);
           
           Mockito.verify(accessTokenRepository, Mockito.times(1)).save(Mockito.any(AccessToken.class));
      }
