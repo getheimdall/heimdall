@@ -288,11 +288,11 @@ public class DBImpl implements DB {
           pageResponse.numberOfElements = limit;
           pageResponse.totalElements = totalElements;
           pageResponse.hasPreviousPage = page > 0;
-          pageResponse.hasNextPage = page < pageResponse.totalPages;
+          pageResponse.hasNextPage = page < (pageResponse.totalPages - 1);
           pageResponse.hasContent = Objeto.notBlank(list);
           pageResponse.first = page == 0;
-          pageResponse.last = page == pageResponse.totalPages;
-          pageResponse.nextPage = page == pageResponse.totalPages ? pageResponse.totalPages : page + 1;
+          pageResponse.last = page == (pageResponse.totalPages - 1);
+          pageResponse.nextPage = page == (pageResponse.totalPages - 1) ? page : page + 1;
           pageResponse.previousPage = page == 0 ? 0 : page - 1;
           pageResponse.content = list;
 
