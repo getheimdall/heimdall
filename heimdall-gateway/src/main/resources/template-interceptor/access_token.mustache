@@ -16,7 +16,7 @@ import br.com.conductor.heimdall.core.entity.AccessToken;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.enums.Location;
 import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
-import br.com.conductor.heimdall.core.repository.AccessTokenRepository;
+import br.com.conductor.heimdall.gateway.service.SecurityService;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.core.util.BeanManager;
 import br.com.conductor.heimdall.core.util.ConstantsInterceptors;
@@ -34,7 +34,7 @@ public class AccessTokenInterceptor extends HeimdallFilter {
 
      private static String method;
 
-     private AccessTokenRepository accessTokenRepository;
+     private SecurityService securityService;
 
      private Helper helper;
 
@@ -81,12 +81,16 @@ public class AccessTokenInterceptor extends HeimdallFilter {
      	return "{{name}}"
      }
 
+     public Long getApiId() {
+          return {{apiId}};
+     }
+
      @Override
      public void execute() throws Throwable {
 
-          accessTokenRepository = (AccessTokenRepository) BeanManager.getBean(AccessTokenRepository.class);
+          securityService = (SecurityService) BeanManager.getBean(SecurityService.class);
           RequestContext ctx = RequestContext.getCurrentContext();
-          HttpServletRequest request = ctx.getRequest();
+          HttpServletRequest request = ctx.getRequest();          
 
           String accessToken = null;
           String clientId = null;
@@ -103,34 +107,7 @@ public class AccessTokenInterceptor extends HeimdallFilter {
                clientId = request.getParameter(nameClientId);       
           }
 
-          TraceContextHolder.getInstance().getActualTrace().setAccessToken(DigestUtils.digestMD5(accessToken));
-
-          boolean error = true;
-
-               
-          if (Objeto.notBlank(accessToken) && Objeto.notBlank(clientId)) {
-                    
-               AccessToken token = accessTokenRepository.findAccessTokenActive(accessToken);
-               
-               if (Objeto.notBlank(token)) {
-               	   String cId = token.getApp().getClientId();
-                    
-	               if (Objeto.notBlank(cId) && clientId.equals(cId)) {
-	                         
-	                    error = false;
-	                    TraceContextHolder.getInstance().getActualTrace().setApp(token.getApp().getName());
-	               }
-               } 
-          }
-
-
-          if (error) {
-
-               ctx.setSendZuulResponse(false);
-               ctx.put(INTERRUPT, true);
-               ctx.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
-               ctx.setResponseBody(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, "Access Token"));
-          }
+          securityService.validadeAccessToken(ctx, helper, getApiId(), clientId, accessToken);       
 
      }     
 
