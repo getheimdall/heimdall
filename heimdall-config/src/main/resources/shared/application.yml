@@ -43,20 +43,20 @@ heimdall:
         sendStringParametersAsUnicode: false
     mongo:
         enabled: false
-        #serverName: 
+        serverName: localhost
         #url: 
-        #port: 27017
-        #dataBase: logging
-        #collection: logs
-        #username: admin
-        #password: admin
+        port: 27017
+        dataBase: logging
+        collection: logs
+        username: admin
+        password: admin
     trace:
         printAllTrace: true
         sanitizes:
             - access_token
             - client_id
     redis:
-        host: 127.0.0.1
+        host: 192.168.10.200
         port: 6379
         maxTotal: 128
         maxIdle: 128
