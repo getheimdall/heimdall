@@ -48,6 +48,7 @@ import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.middleware.spec.Call;
 import br.com.conductor.heimdall.middleware.spec.Environment;
 import br.com.conductor.heimdall.middleware.spec.Header;
+import br.com.conductor.heimdall.middleware.spec.Info;
 import br.com.conductor.heimdall.middleware.spec.Query;
 import br.com.conductor.heimdall.middleware.spec.Request;
 import br.com.conductor.heimdall.middleware.spec.Response;
@@ -328,6 +329,12 @@ public class CallImpl implements Call {
                
                return TraceContextHolder.getInstance().getActualTrace().getApp();
           }
+
+          @Override
+          public void setSendResponse(boolean value) {
+
+               context.setSendZuulResponse(value);
+          }
           
      }
 
@@ -537,6 +544,82 @@ public class CallImpl implements Call {
                return value;
           }
 
+     }
+     
+     @Override
+     public Info info() {
+          
+          Info info = new InfoImpl();
+          return info;
+     }
+     
+     public class InfoImpl implements Info {
+          
+          public String appName() {
+               
+               return TraceContextHolder.getInstance().getActualTrace().getApp();
+          }
+
+          public String apiName() {
+               
+               return TraceContextHolder.getInstance().getActualTrace().getApiName();
+          }
+
+          public Long apiId() {
+               
+               return TraceContextHolder.getInstance().getActualTrace().getApiId();
+          }
+          
+          public String developer() {
+               
+               return TraceContextHolder.getInstance().getActualTrace().getAppDeveloper();
+          }
+          
+          public String method() {
+               
+               return TraceContextHolder.getInstance().getActualTrace().getMethod();
+          }
+
+          public String clientId() {
+               
+               return TraceContextHolder.getInstance().getActualTrace().getClientId();
+          }
+
+          public String accessToken() {
+               
+               return TraceContextHolder.getInstance().getActualTrace().getAccessToken();
+          }
+
+          public String pattern() {
+               
+               return TraceContextHolder.getInstance().getActualTrace().getPattern();
+          }
+
+          public Long operationId() {
+               
+               return TraceContextHolder.getInstance().getActualTrace().getOperationId();
+          }
+
+          public String profile() {
+               
+               return TraceContextHolder.getInstance().getActualTrace().getProfile();
+          }
+          
+          public Long resourceId() {
+               
+               return TraceContextHolder.getInstance().getActualTrace().getResourceId();
+          }
+
+          public String url() {
+               
+               return TraceContextHolder.getInstance().getActualTrace().getUrl();
+          }
+
+          public String requestURI() {
+               
+               return context.getRequest().getRequestURI();
+          }
+          
      }
      
      //

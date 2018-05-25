@@ -53,6 +53,7 @@ import br.com.conductor.heimdall.core.repository.AccessTokenRepository;
 import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.repository.DeveloperRepository;
 import br.com.conductor.heimdall.core.repository.PlanRepository;
+import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 import br.com.conductor.heimdall.core.util.Pageable;
 import br.com.twsoftware.alfred.object.Objeto;
 import net.bytebuddy.utility.RandomString;
@@ -77,6 +78,9 @@ public class AppService {
      
      @Autowired
      private AccessTokenRepository acessTokenRepository;
+
+     @Autowired
+     private AMQPCacheService amqpCacheService;
 
      /**
       * Finds a {@link App} by its ID.
@@ -179,6 +183,8 @@ public class AppService {
           app = GenericConverter.mapperWithMapping(appDTO, app, new AppMap());
           app = appRepository.save(app);
           
+          amqpCacheService.dispatchClean();
+          
           return app;
      }
      
@@ -192,6 +198,8 @@ public class AppService {
 
           App app = appRepository.findOne(id);
           HeimdallException.checkThrow(isBlank(app), GLOBAL_RESOURCE_NOT_FOUND);
+          
+          amqpCacheService.dispatchClean();
           
           appRepository.delete(app);
      }
