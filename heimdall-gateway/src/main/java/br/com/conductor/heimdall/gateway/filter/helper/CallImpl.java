@@ -1,4 +1,3 @@
-
 package br.com.conductor.heimdall.gateway.filter.helper;
 
 /*-

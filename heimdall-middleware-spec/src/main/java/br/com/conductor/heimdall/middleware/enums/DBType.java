@@ -1,8 +1,8 @@
-package br.com.conductor.heimdall.gateway.filter.helper;
+package br.com.conductor.heimdall.middleware.enums;
 
 /*-
  * =========================LICENSE_START==================================
- * heimdall-gateway
+ * heimdall-middleware-spec
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
@@ -20,26 +20,14 @@ package br.com.conductor.heimdall.gateway.filter.helper;
  * ==========================LICENSE_END===================================
  */
 
-import java.util.Map;
-
-import br.com.conductor.heimdall.middleware.spec.ApiResponse;
-import lombok.Data;
 
 /**
- * Data class that represents a ApiResponse.
- *
- * @author Filipe Germano
+ * Enumeration of database types.
+ * @author Jefferson X. Cardoso
  *
  */
-@Data
-public class ApiResponseImpl implements ApiResponse {
-
-     private static final long serialVersionUID = -5283776526915350208L;
-
-     private String body;
-
-     private Map<String, String> headers;
-
-     private Integer status;
-
+public enum DBType {
+	
+	MONGODB;
+	
 }
