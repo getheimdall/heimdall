@@ -19,6 +19,7 @@ import br.com.conductor.heimdall.core.exception.BadRequestException;
 import br.com.conductor.heimdall.core.exception.NotFoundException;
 import br.com.conductor.heimdall.core.repository.AccessTokenRepository;
 import br.com.conductor.heimdall.core.repository.AppRepository;
+import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AccessTokenServiceTest {
@@ -31,6 +32,9 @@ public class AccessTokenServiceTest {
      
      @Mock
      private AppRepository appRespository;
+
+     @Mock
+     private AMQPCacheService amqpCacheService;
      
      @Rule
      public ExpectedException thrown = ExpectedException.none();
