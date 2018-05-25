@@ -25,6 +25,7 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_R
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ONLY_ONE_OPERATION_PER_RESOURCE;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.OPERATION_ATTACHED_TO_INTERCEPTOR;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.OPERATION_CANT_HAVE_SINGLE_WILDCARD;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END;
 import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 import static br.com.twsoftware.alfred.object.Objeto.notBlank;
 
@@ -169,7 +170,9 @@ public class OperationService {
           Operation operation = GenericConverter.mapper(operationDTO, Operation.class);
           operation.setResource(resource);
           
-          HeimdallException.checkThrow(validateOperationPath(operation), OPERATION_CANT_HAVE_SINGLE_WILDCARD);
+          HeimdallException.checkThrow(validateSingleWildCardOperationPath(operation), OPERATION_CANT_HAVE_SINGLE_WILDCARD);
+          HeimdallException.checkThrow(validateDoubleWildCardOperationPath(operation), OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END);
+
           operation = operationRepository.save(operation);
           
           amqpRoute.dispatchRoutes();
@@ -199,7 +202,9 @@ public class OperationService {
           
           operation = GenericConverter.mapper(operationDTO, operation);
           
-          HeimdallException.checkThrow(validateOperationPath(operation), OPERATION_CANT_HAVE_SINGLE_WILDCARD);
+          HeimdallException.checkThrow(validateSingleWildCardOperationPath(operation), OPERATION_CANT_HAVE_SINGLE_WILDCARD);
+          HeimdallException.checkThrow(validateDoubleWildCardOperationPath(operation), OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END);
+          
           operation = operationRepository.save(operation);
           
           amqpRoute.dispatchRoutes();
@@ -238,9 +243,23 @@ public class OperationService {
       * 
       * @return  true when the path of the operation contains a single wild card, false otherwise
       */
-     private static boolean validateOperationPath(Operation operation) {
+     private static boolean validateSingleWildCardOperationPath(Operation operation) {
          
           return Arrays.asList(operation.getPath().split("/")).contains("*");
+     }
+     
+     /*
+      * A Operation can have a one double wild card that must to be at the end of it, not at any other point.
+      * 
+      * @return true when the path has more than one double wild card or one not at the end, false otherwise
+      */
+     private static boolean validateDoubleWildCardOperationPath(Operation operation) {
+          List<String> path = Arrays.asList(operation.getPath().split("/"));
+          
+          if (path.stream().filter(o -> o.equals("**")).count() > 1)
+               return true;
+          else 
+               return !operation.getPath().endsWith("**");
      }
 
 }
