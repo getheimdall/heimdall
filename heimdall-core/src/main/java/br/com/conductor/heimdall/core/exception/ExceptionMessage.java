@@ -98,8 +98,9 @@ public enum ExceptionMessage {
      
      ENVIRONMENT_ATTACHED_TO_API(BAD_REQUEST.value(), "Environment attached to Api", BadRequestException.class),
      
-     OPERATION_ATTACHED_TO_INTERCEPTOR(BAD_REQUEST.value(), "Operation attached to Interceptor", BadRequestException.class);
+     OPERATION_ATTACHED_TO_INTERCEPTOR(BAD_REQUEST.value(), "Operation attached to Interceptor", BadRequestException.class),
      
+     OPERATION_CANT_HAVE_SINGLE_WILDCARD(BAD_REQUEST.value(), "Operation can not have a single wild card (/*)", BadRequestException.class);
      
      @Getter
      private Integer httpCode;

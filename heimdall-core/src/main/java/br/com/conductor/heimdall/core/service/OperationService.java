@@ -24,9 +24,11 @@ package br.com.conductor.heimdall.core.service;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ONLY_ONE_OPERATION_PER_RESOURCE;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.OPERATION_ATTACHED_TO_INTERCEPTOR;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.OPERATION_CANT_HAVE_SINGLE_WILDCARD;
 import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 import static br.com.twsoftware.alfred.object.Objeto.notBlank;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +55,7 @@ import br.com.conductor.heimdall.core.util.ConstantsCache;
 import br.com.conductor.heimdall.core.util.Pageable;
 
 /**
- * This class provides methods to create, read, updade and delete a {@link Operation} resource.
+ * This class provides methods to create, read, update and delete a {@link Operation} resource.
  * 
  * @author Filipe Germano
  *
@@ -167,6 +169,7 @@ public class OperationService {
           Operation operation = GenericConverter.mapper(operationDTO, Operation.class);
           operation.setResource(resource);
           
+          HeimdallException.checkThrow(validateOperationPath(operation), OPERATION_CANT_HAVE_SINGLE_WILDCARD);
           operation = operationRepository.save(operation);
           
           amqpRoute.dispatchRoutes();
@@ -196,6 +199,7 @@ public class OperationService {
           
           operation = GenericConverter.mapper(operationDTO, operation);
           
+          HeimdallException.checkThrow(validateOperationPath(operation), OPERATION_CANT_HAVE_SINGLE_WILDCARD);
           operation = operationRepository.save(operation);
           
           amqpRoute.dispatchRoutes();
@@ -227,6 +231,16 @@ public class OperationService {
           
           
           amqpRoute.dispatchRoutes();
+     }
+     
+     /*
+      * A Operation can not have a single wild card at any point in it.
+      * 
+      * @return  true when the path of the operation contains a single wild card, false otherwise
+      */
+     private static boolean validateOperationPath(Operation operation) {
+         
+          return Arrays.asList(operation.getPath().split("/")).contains("*");
      }
 
 }
