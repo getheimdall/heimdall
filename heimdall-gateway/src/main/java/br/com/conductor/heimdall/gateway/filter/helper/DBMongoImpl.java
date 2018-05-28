@@ -114,7 +114,7 @@ public class DBMongoImpl implements DBMongo {
      public <T> Boolean delete(T object) {
 
           this.datastore().delete(object);
-          return true;// TODO Rever método
+          return true;
      }
 
      @Override
@@ -346,11 +346,9 @@ public class DBMongoImpl implements DBMongo {
                try {
                     return id.get(object);
                } catch (IllegalArgumentException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    log.error(e.getMessage(), e);
                } catch (IllegalAccessException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    log.error(e.getMessage(), e);
                }
           }
           return null;
