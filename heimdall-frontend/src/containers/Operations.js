@@ -148,6 +148,8 @@ class Operations extends Component {
                             color = '#f93e3e'
                         } else if (operation.method === 'PUT') {
                             color = '#fca130'
+                        } else if (operation.method === 'PATCH') {
+                            color = '#50e3c2'
                         }
 
                         let description = (operation.description === 'null' || operation.description === null) ? '' : operation.description

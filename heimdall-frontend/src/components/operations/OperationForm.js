@@ -54,6 +54,7 @@ class OperationForm extends Component {
                                         <Option value="GET">GET</Option>
                                         <Option value="POST">POST</Option>
                                         <Option value="PUT">PUT</Option>
+                                        <Option value="PATCH">PATCH</Option>
                                         <Option value="DELETE">DELETE</Option>
                                     </Select>
                                 )}

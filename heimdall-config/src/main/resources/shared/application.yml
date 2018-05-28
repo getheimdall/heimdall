@@ -43,13 +43,13 @@ heimdall:
         sendStringParametersAsUnicode: false
     mongo:
         enabled: false
-        #serverName: 
+        #serverName:
         #url: 
-        #port: 27017
-        #dataBase: logging
-        #collection: logs
-        #username: admin
-        #password: admin
+#        port: 27017
+#        dataBase: logging
+#        collection: logs
+#        username: admin
+#        password: admin
     trace:
         printAllTrace: true
         sanitizes:
