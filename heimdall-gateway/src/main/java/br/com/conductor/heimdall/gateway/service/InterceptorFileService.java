@@ -47,6 +47,7 @@ import com.netflix.zuul.filters.FilterRegistry;
 import br.com.conductor.heimdall.core.dto.InterceptorFileDTO;
 import br.com.conductor.heimdall.core.dto.interceptor.AccessTokenClientIdDTO;
 import br.com.conductor.heimdall.core.dto.interceptor.MockDTO;
+import br.com.conductor.heimdall.core.dto.interceptor.OAuthDTO;
 import br.com.conductor.heimdall.core.dto.interceptor.RattingDTO;
 import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.entity.Operation;
@@ -72,6 +73,7 @@ import lombok.extern.slf4j.Slf4j;
  *
  * @author Filipe Germano
  * @author Marcos Filho
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
 @Service
@@ -223,6 +225,9 @@ public class InterceptorFileService {
                     case MIDDLEWARE:
                          file = ResourceUtils.getFile(filePath + File.separator + "middleware.mustache");
                          break;
+                    case OAUTH:
+        				file = ResourceUtils.getFile(filePath + File.separator + "oauth.mustache");
+        				break;
                     default:
                          break;
                }
@@ -388,6 +393,15 @@ public class InterceptorFileService {
                     parameters.put("interval", rattingDTO.getInterval().name());
                }
 
+               if (objectCustom instanceof OAuthDTO) {
+
+					OAuthDTO oAuthDTO = (OAuthDTO) objectCustom;
+					parameters.put("providerId", oAuthDTO.getProviderId());
+					parameters.put("typeOAuth", oAuthDTO.getTypeOAuth());
+					parameters.put("timeAccessToken", oAuthDTO.getTimeAccessToken());
+					parameters.put("timeRefreshToken", oAuthDTO.getTimeRefreshToken());
+   			   }
+               
                if (objectCustom instanceof String) {
 
                     parameters.put("content", objectCustom);
@@ -470,7 +484,16 @@ public class InterceptorFileService {
                          log.error(e.getMessage(), e);
                     }
                     break;
-
+               case OAUTH:
+            	   try {
+            		   
+            		   OAuthDTO oAuthDTO = JsonUtils.convertJsonToObject(content, OAuthDTO.class);
+       				   response = oAuthDTO;
+            	   } catch(Exception e) {
+            		   
+            		   log.error(e.getMessage(), e);
+       				   ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(type.name(), TemplateUtils.TEMPLATE_OAUTH);
+            	   }
                default:
                     break;
           }

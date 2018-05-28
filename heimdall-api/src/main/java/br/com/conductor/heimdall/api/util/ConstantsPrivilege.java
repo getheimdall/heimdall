@@ -22,10 +22,13 @@ package br.com.conductor.heimdall.api.util;
  */
 
 /**
+ * <h1>ConstantsPrivilege</h1><br/>
+ * 
  * Class that holds the Privilege constants.
  *
  * @author Marcos Filho
- *
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ * 
  */
 public class ConstantsPrivilege {
      
@@ -97,9 +100,10 @@ public class ConstantsPrivilege {
      public static final String PRIVILEGE_UPDATE_USER = "hasAuthority('UPDATE_USER')";
      public static final String PRIVILEGE_DELETE_USER = "hasAuthority('DELETE_USER')";
      
-     
-     
-     
+     public static final String PRIVILEGE_READ_PROVIDER = "hasAuthority('READ_PROVIDER')";
+     public static final String PRIVILEGE_CREATE_PROVIDER = "hasAuthority('CREATE_PROVIDER')";
+     public static final String PRIVILEGE_UPDATE_PROVIDER = "hasAuthority('UPDATE_PROVIDER')";
+     public static final String PRIVILEGE_DELETE_PROVIDER = "hasAuthority('DELETE_PROVIDER')";
      
      
 }

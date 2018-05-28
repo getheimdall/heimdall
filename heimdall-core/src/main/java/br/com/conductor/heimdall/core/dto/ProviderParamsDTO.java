@@ -1,5 +1,10 @@
+package br.com.conductor.heimdall.core.dto;
 
-package br.com.conductor.heimdall.core.util;
+import java.io.Serializable;
+
+import javax.validation.constraints.NotNull;
+
+import lombok.Data;
 
 /*-
  * =========================LICENSE_START==================================
@@ -22,17 +27,22 @@ package br.com.conductor.heimdall.core.util;
  */
 
 /**
- * This class provides templates for Ratting, AccessToken and Mock.
+ * <h1>ProviderParamsPersist</h1>
  * 
- * @author Filipe Germano
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
- * 
+ *
  */
-public class TemplateUtils {
+@Data
+public class ProviderParamsDTO implements Serializable{
 
-     public static final String TEMPLATE_RATTING = "{\"calls\":20,\"interval\":\"MINUTES\"}";
-     public static final String TEMPLATE_ACCESS_TOKEN = "{\"location\": \"HEADER\", \"name\": \"access_token\"}";
-     public static final String TEMPLATE_MOCK = "{\"body\": \"Example Mock\", \"status\": \"200\"}";
-     public static final String TEMPLATE_OAUTH = "{\"providerId\": 1 , \"typeOAuth\":\"GENERATE\", \"timeAccessToken\":20, \"timeRefreshToken\":3600 }";
-     
+	private static final long serialVersionUID = -7064468716388569224L;
+	
+	@NotNull
+	private String name;
+	
+	@NotNull
+	private String location;
+	
+	@NotNull
+	private String value;
 }

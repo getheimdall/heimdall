@@ -1,5 +1,4 @@
-
-package br.com.conductor.heimdall.core.util;
+package br.com.conductor.heimdall.core.exception;
 
 /*-
  * =========================LICENSE_START==================================
@@ -22,17 +21,15 @@ package br.com.conductor.heimdall.core.util;
  */
 
 /**
- * This class provides templates for Ratting, AccessToken and Mock.
- * 
- * @author Filipe Germano
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
- * 
+ *
  */
-public class TemplateUtils {
+public class ProviderException extends HeimdallException{
 
-     public static final String TEMPLATE_RATTING = "{\"calls\":20,\"interval\":\"MINUTES\"}";
-     public static final String TEMPLATE_ACCESS_TOKEN = "{\"location\": \"HEADER\", \"name\": \"access_token\"}";
-     public static final String TEMPLATE_MOCK = "{\"body\": \"Example Mock\", \"status\": \"200\"}";
-     public static final String TEMPLATE_OAUTH = "{\"providerId\": 1 , \"typeOAuth\":\"GENERATE\", \"timeAccessToken\":20, \"timeRefreshToken\":3600 }";
-     
+	private static final long serialVersionUID = 8893084733623183851L;
+
+	public ProviderException(ExceptionMessage exceptionMessage) {
+		super(exceptionMessage);
+	}
+
 }

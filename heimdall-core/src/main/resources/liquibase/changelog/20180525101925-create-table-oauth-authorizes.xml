@@ -1,0 +1,46 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+	<changeSet id="01" author="conductor\dijalma.silva">
+		
+		<createTable tableName="OAUTH_AUTHORIZES">
+		
+			<column type="VARCHAR(250)" name="CLIENT_ID">
+				<constraints nullable="false" unique="true"
+					primaryKey="true" />
+			</column>
+		
+			<column type="VARCHAR(250)" name="TOKEN_AUTHORIZE">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+
+		<rollback>
+			<dropTable tableName="OAUTH_AUTHORIZES" />
+		</rollback>
+	</changeSet>
+
+	<changeSet id="02" author="conductor\dijalma.silav">
+		
+		<preConditions>
+			<tableExists tableName="OAUTH_AUTHORIZES" />
+		</preConditions>
+		
+		<addForeignKeyConstraint
+			baseTableName="OAUTH_AUTHORIZES" baseColumnNames="CLIENT_ID"
+			constraintName="FK_CLIENT_ID" deferrable="false"
+			initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+			referencedTableName="APPS" referencedColumnNames="CLIENT_ID"
+			validate="true" />
+
+		<rollback>
+			<dropForeignKeyConstraint
+				baseTableName="OAUTH_AUTHORIZES" constraintName="FK_CLIENT_ID" />
+		</rollback>
+	</changeSet>
+
+</databaseChangeLog>

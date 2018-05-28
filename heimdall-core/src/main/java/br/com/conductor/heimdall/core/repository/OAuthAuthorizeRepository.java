@@ -1,5 +1,4 @@
-
-package br.com.conductor.heimdall.core.util;
+package br.com.conductor.heimdall.core.repository;
 
 /*-
  * =========================LICENSE_START==================================
@@ -21,18 +20,14 @@ package br.com.conductor.heimdall.core.util;
  * ==========================LICENSE_END===================================
  */
 
-/**
- * This class provides templates for Ratting, AccessToken and Mock.
- * 
- * @author Filipe Germano
- * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
- * 
- */
-public class TemplateUtils {
+import org.springframework.data.jpa.repository.JpaRepository;
 
-     public static final String TEMPLATE_RATTING = "{\"calls\":20,\"interval\":\"MINUTES\"}";
-     public static final String TEMPLATE_ACCESS_TOKEN = "{\"location\": \"HEADER\", \"name\": \"access_token\"}";
-     public static final String TEMPLATE_MOCK = "{\"body\": \"Example Mock\", \"status\": \"200\"}";
-     public static final String TEMPLATE_OAUTH = "{\"providerId\": 1 , \"typeOAuth\":\"GENERATE\", \"timeAccessToken\":20, \"timeRefreshToken\":3600 }";
-     
+import br.com.conductor.heimdall.core.entity.OAuthAuthorize;
+
+/**
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ *
+ */
+public interface OAuthAuthorizeRepository extends JpaRepository<OAuthAuthorize, String> {
+
 }

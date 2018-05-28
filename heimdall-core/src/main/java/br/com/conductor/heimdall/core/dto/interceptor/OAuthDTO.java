@@ -1,5 +1,8 @@
+package br.com.conductor.heimdall.core.dto.interceptor;
 
-package br.com.conductor.heimdall.core.util;
+import java.io.Serializable;
+
+import lombok.Data;
 
 /*-
  * =========================LICENSE_START==================================
@@ -22,17 +25,16 @@ package br.com.conductor.heimdall.core.util;
  */
 
 /**
- * This class provides templates for Ratting, AccessToken and Mock.
- * 
- * @author Filipe Germano
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
- * 
+ *
  */
-public class TemplateUtils {
+@Data
+public class OAuthDTO implements Serializable {
 
-     public static final String TEMPLATE_RATTING = "{\"calls\":20,\"interval\":\"MINUTES\"}";
-     public static final String TEMPLATE_ACCESS_TOKEN = "{\"location\": \"HEADER\", \"name\": \"access_token\"}";
-     public static final String TEMPLATE_MOCK = "{\"body\": \"Example Mock\", \"status\": \"200\"}";
-     public static final String TEMPLATE_OAUTH = "{\"providerId\": 1 , \"typeOAuth\":\"GENERATE\", \"timeAccessToken\":20, \"timeRefreshToken\":3600 }";
-     
+	private static final long serialVersionUID = 5878585926721281260L;
+	
+	private Long providerId;
+	private String typeOAuth;
+	private Integer timeAccessToken;
+	private Integer timeRefreshToken;
 }

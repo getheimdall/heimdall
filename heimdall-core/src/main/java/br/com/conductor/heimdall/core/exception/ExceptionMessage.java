@@ -37,6 +37,7 @@ import lombok.extern.slf4j.Slf4j;
  * Enum that concentrates the messages and validations of the exceptions <br/>
  * 
  * @author Filipe Germano
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  * 
  */
 @Slf4j
@@ -97,6 +98,18 @@ public enum ExceptionMessage {
      ACCESS_DENIED(UNAUTHORIZED.value(), "Access Denied", UnauthorizedException.class),
      
      ENVIRONMENT_ATTACHED_TO_API(BAD_REQUEST.value(), "Environment attached to Api", BadRequestException.class),
+     
+     PROVIDER_NOT_FOUND(BAD_REQUEST.value(), "Provider not found", BadRequestException.class),
+     
+     PROVIDER_USER_UNAUTHORIZED(UNAUTHORIZED.value(), "User provider unauthorized", UnauthorizedException.class),
+     
+     TOKEN_EXPIRED(UNAUTHORIZED.value(), "Token expired", UnauthorizedException.class),
+     
+     CODE_NOT_FOUND(UNAUTHORIZED.value(), "Code already used to generate token or not defined", UnauthorizedException.class),
+     
+     GRANT_TYPE_NOT_EXIST(BAD_REQUEST.value(), "GrantType not found", BadRequestException.class),
+     
+     REFRESH_TOKEN_NOT_EXIST(BAD_REQUEST.value(), "RefreshToken not found", BadRequestException.class),
      
      OPERATION_ATTACHED_TO_INTERCEPTOR(BAD_REQUEST.value(), "Operation attached to Interceptor", BadRequestException.class);
      

@@ -1,5 +1,6 @@
+package br.com.conductor.heimdall.core.dto.page;
 
-package br.com.conductor.heimdall.core.util;
+import java.io.Serializable;
 
 /*-
  * =========================LICENSE_START==================================
@@ -21,18 +22,31 @@ package br.com.conductor.heimdall.core.util;
  * ==========================LICENSE_END===================================
  */
 
-/**
- * This class provides templates for Ratting, AccessToken and Mock.
- * 
- * @author Filipe Germano
- * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
- * 
- */
-public class TemplateUtils {
+import br.com.conductor.heimdall.core.dto.PageDTO;
+import br.com.conductor.heimdall.core.entity.Provider;
 
-     public static final String TEMPLATE_RATTING = "{\"calls\":20,\"interval\":\"MINUTES\"}";
-     public static final String TEMPLATE_ACCESS_TOKEN = "{\"location\": \"HEADER\", \"name\": \"access_token\"}";
-     public static final String TEMPLATE_MOCK = "{\"body\": \"Example Mock\", \"status\": \"200\"}";
-     public static final String TEMPLATE_OAUTH = "{\"providerId\": 1 , \"typeOAuth\":\"GENERATE\", \"timeAccessToken\":20, \"timeRefreshToken\":3600 }";
-     
+/**
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ *
+ */
+public class ProviderPage extends PageDTO<Provider> implements Serializable{
+
+	private static final long serialVersionUID = -7965991050428158318L;
+
+	public ProviderPage(PageDTO<Provider> p){
+        super(p.getNumber(), 
+                  p.size, 
+                  p.totalPages, 
+                  p.numberOfElements, 
+                  p.totalElements, 
+                  p.firstPage, 
+                  p.hasPreviousPage, 
+                  p.hasNextPage, 
+                  p.hasContent, 
+                  p.first, 
+                  p.last, 
+                  p.nextPage, 
+                  p.previousPage, 
+                  p.content);          
+   }
 }
