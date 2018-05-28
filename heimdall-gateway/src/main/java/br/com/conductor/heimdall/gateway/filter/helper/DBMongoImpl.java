@@ -100,6 +100,7 @@ public class DBMongoImpl implements DBMongo {
                this.datastore().save(object);
                return object;
           } catch (Exception e) {
+               log.error(e.getMessage(), e);
                return null;
           }
      }
@@ -320,6 +321,7 @@ public class DBMongoImpl implements DBMongo {
                ds.merge(object);
                return findOne(object);
           } catch (Exception e) {
+               log.error(e.getMessage(), e);
                return null;
           }
 
@@ -365,7 +367,7 @@ public class DBMongoImpl implements DBMongo {
                try {
                     value = field.get(criteria);
                } catch (IllegalArgumentException | IllegalAccessException e) {
-                    e.printStackTrace();
+                    log.error(e.getMessage(), e);
                }
                if (value != null) {
                     query.criteria(field.getName()).equal(value);

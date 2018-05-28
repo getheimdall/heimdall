@@ -86,7 +86,7 @@ public class HelperImpl implements Helper {
                case MONGODB:
                     return new DBMongoImpl(databaseName);
                default:
-                    return null;
+                    return new DBMongoImpl(databaseName);
           }
      }
 
