@@ -137,7 +137,8 @@ public class DBMongoImpl implements DBMongo {
           Query<T> query = this.prepareQuery(criteria, this.datastore());
 
           List<T> list = Lists.newArrayList();
-
+          Long totalElements = query.count();
+          
           page = page == null ? PAGE : page;
           limit = limit == null || limit > LIMIT ? LIMIT : limit;
 
@@ -155,7 +156,6 @@ public class DBMongoImpl implements DBMongo {
                list = query.asList(new FindOptions().limit(limit));
           }
 
-          Long totalElements = (long) list.size();
 
           return (Page<T>) buildPage(list, page, limit, totalElements);
      }
