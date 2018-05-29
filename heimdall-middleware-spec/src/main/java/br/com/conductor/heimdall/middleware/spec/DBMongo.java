@@ -64,11 +64,11 @@ public interface DBMongo extends DB {
      /**
       * Returns the {@link Query} provider.
       *
-      * @param classType
+      * @param criteria
       * Class type
       * @return The Query provider
       */
-     public <T> Query<T> getQueryProvider(Class<T> classType);
+     public <T> Query<T> getQueryProvider(Object criteria);
 
      /**
       * Returns a Page from the {@link MongoCollection} of {@link Document}, classType, {@link Bson}, page number and limit.
