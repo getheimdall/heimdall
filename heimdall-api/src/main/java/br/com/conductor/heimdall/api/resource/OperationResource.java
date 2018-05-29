@@ -70,14 +70,17 @@ public class OperationResource {
 
      @Autowired
      private AMQPRouteService aMQPRouteService;
-     
+
      /**
       * Finds a {@link Operation} by its Id.
       * 
-      * @param apiId				The Api Id
-      * @param resourceId			The Resource Id
-      * @param operationId			The Operation Id
-      * @return						{@link ResponseEntity}
+      * @param apiId
+      * The Api Id
+      * @param resourceId
+      * The Resource Id
+      * @param operationId
+      * The Operation Id
+      * @return {@link ResponseEntity}
       */
      @ResponseBody
      @ApiOperation(value = "Find Operation by id", response = Operation.class)
@@ -93,25 +96,29 @@ public class OperationResource {
      /**
       * Finds all {@link Operation} from a request.
       * 
-      * @param apiId				The Api Id
-      * @param resourceId			The Resource Id
-      * @param operationDTO			{@link OperationDTO}
-      * @param pageableDTO			{@link PageableDTO}
-      * @return						{@link ResponseEntity}
+      * @param apiId
+      * The Api Id
+      * @param resourceId
+      * The Resource Id
+      * @param operationDTO
+      * {@link OperationDTO}
+      * @param pageableDTO
+      * {@link PageableDTO}
+      * @return {@link ResponseEntity}
       */
      @ResponseBody
      @ApiOperation(value = "Find all Operations", responseContainer = "List", response = Operation.class)
      @GetMapping
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_OPERATION)
      public ResponseEntity<?> findAll(@PathVariable("apiId") Long apiId, @PathVariable("resourceId") Long resourceId, @ModelAttribute OperationDTO operationDTO, @ModelAttribute PageableDTO pageableDTO) {
-          
+
           if (Objeto.notBlank(pageableDTO)) {
-               
-               OperationPage operationPage = operationService.list(apiId, resourceId, operationDTO, pageableDTO);      
+
+               OperationPage operationPage = operationService.list(apiId, resourceId, operationDTO, pageableDTO);
                return ResponseEntity.ok(operationPage);
           } else {
-               
-               List<Operation> operations = operationService.list(apiId, resourceId, operationDTO);      
+
+               List<Operation> operations = operationService.list(apiId, resourceId, operationDTO);
                return ResponseEntity.ok(operations);
           }
      }
@@ -119,10 +126,13 @@ public class OperationResource {
      /**
       * Saves a {@link Operation}.
       * 
-      * @param apiId				The Api Id
-      * @param resourceId			The Resource Id
-      * @param operationDTO			{@link OperationDTO}
-      * @return						{@link ResponseEntity}
+      * @param apiId
+      * The Api Id
+      * @param resourceId
+      * The Resource Id
+      * @param operationDTO
+      * {@link OperationDTO}
+      * @return {@link ResponseEntity}
       */
      @ResponseBody
      @ApiOperation(value = "Save a new Operation")
@@ -132,17 +142,21 @@ public class OperationResource {
 
           Operation operation = operationService.save(apiId, resourceId, operationDTO);
 
-          return ResponseEntity.created(URI.create(String.format("/%s/%s/%s/%s/%s/%s", "api", apiId.toString(), "resources", resourceId.toString(),  "operations", operation.getId().toString()))).build();
+          return ResponseEntity.created(URI.create(String.format("/%s/%s/%s/%s/%s/%s", "api", apiId.toString(), "resources", resourceId.toString(), "operations", operation.getId().toString()))).build();
      }
 
      /**
       * Updates a {@link Operation}.
       * 
-      * @param apiId				The Api Id
-      * @param resourceId			The Resource Id
-      * @param operationId			The Operation Id
-      * @param operationDTO			{@link OperationDTO}
-      * @return						{@link ResponseEntity}
+      * @param apiId
+      * The Api Id
+      * @param resourceId
+      * The Resource Id
+      * @param operationId
+      * The Operation Id
+      * @param operationDTO
+      * {@link OperationDTO}
+      * @return {@link ResponseEntity}
       */
      @ResponseBody
      @ApiOperation(value = "Update Operation")
@@ -158,10 +172,13 @@ public class OperationResource {
      /**
       * Deletes a {@link Operation}.
       * 
-      * @param apiId				The Api Id
-      * @param resourceId			The Resource Id
-      * @param operationId			The Operation Id
-      * @return						{@link ResponseEntity}
+      * @param apiId
+      * The Api Id
+      * @param resourceId
+      * The Resource Id
+      * @param operationId
+      * The Operation Id
+      * @return {@link ResponseEntity}
       */
      @ResponseBody
      @ApiOperation(value = "Delete Operation")
@@ -177,18 +194,20 @@ public class OperationResource {
      /**
       * Refreshes all {@link Operation}.
       * 
-      * @param apiId				The Api Id
-      * @param resourceId			The Resource Id
-      * @return						{@link ResponseEntity}
+      * @param apiId
+      * The Api Id
+      * @param resourceId
+      * The Resource Id
+      * @return {@link ResponseEntity}
       */
      @ResponseBody
      @ApiOperation(value = "Refresh all Operations")
      @PostMapping(value = "/refresh")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_REFRESH_OPERATION)
      public ResponseEntity<?> refresh(@PathVariable("apiId") Long apiId, @PathVariable("resourceId") Long resourceId) {
-          
+
           aMQPRouteService.dispatchAllRoutes();
-          
+
           return ResponseEntity.noContent().build();
      }
 

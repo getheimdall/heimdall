@@ -334,6 +334,7 @@ public class InterceptorFileService {
                     AccessTokenClientIdDTO accessTokenClientIdDTO = (AccessTokenClientIdDTO) objectCustom;
                     parameters.put("name", accessTokenClientIdDTO.getName());
                     parameters.put("location", accessTokenClientIdDTO.getLocation());
+                    parameters.put("apiId", interceptor.getApi().getId());
                     
                     if (TypeInterceptor.ACCESS_TOKEN.equals(interceptor.getType())) {
                          

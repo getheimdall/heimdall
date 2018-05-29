@@ -130,16 +130,16 @@ public class AccessTokenResource {
       * Updates a {@link AccessToken}.
       * 
       * @param id					The AccessToken Id
-      * @param accessTokenRequest	{@link AccessTokenRequest}
+      * @param accessTokenPersist	{@link AccessTokenPersist}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
      @ApiOperation(value = "Update AccessToken")
      @PutMapping(value = "/{accessTokenId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_ACCESSTOKEN)
-     public ResponseEntity<?> update(@PathVariable("accessTokenId") Long id, @RequestBody AccessTokenRequest accessTokenRequest) {
+     public ResponseEntity<?> update(@PathVariable("accessTokenId") Long id, @RequestBody AccessTokenPersist accessTokenPersist) {
 
-          AccessToken accessToken = accessTokenService.update(id, accessTokenRequest);
+          AccessToken accessToken = accessTokenService.update(id, accessTokenPersist);
           
           return ResponseEntity.ok(accessToken);
      }
