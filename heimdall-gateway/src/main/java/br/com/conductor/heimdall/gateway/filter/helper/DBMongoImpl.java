@@ -144,7 +144,7 @@ public class DBMongoImpl implements DBMongo {
 
           if ((page != null && page > 1) && (limit != null && limit > 0) && (limit <= LIMIT)) {
 
-               list = query.asList(new FindOptions().limit(limit).skip(page - 1));
+               list = query.asList(new FindOptions().limit(limit).skip(page * limit));
 
           } else if ((page != null && page == 0) && (limit != null && limit > 0) && (limit <= LIMIT)) {
                list = query.asList(new FindOptions().limit(limit));
@@ -230,14 +230,14 @@ public class DBMongoImpl implements DBMongo {
           page = page == null ? PAGE : page;
           limit = limit == null || limit > LIMIT ? LIMIT : limit;
           FindIterable<Document> documents = null;
-          if ((page != null && page > 1) && (limit != null && limit > 0) && (limit <= LIMIT)) {
+          if ((page != null && page > 0) && (limit != null && limit > 0) && (limit <= LIMIT)) {
 
                if (Objeto.notBlank(filters)) {
 
-                    documents = collection.find(Filters.and(filters)).limit(limit).skip(page - 1);
+                    documents = collection.find(Filters.and(filters)).limit(limit).skip(page * limit);
                } else {
 
-                    documents = collection.find().limit(limit).skip(page - 1);
+                    documents = collection.find().limit(limit).skip(page * limit);
                }
           } else if ((page != null && page == 0) && (limit != null && limit > 0) && (limit <= LIMIT)) {
 
