@@ -176,10 +176,8 @@ public class CallImpl implements Call {
                     
                     Map<String, String> params = Maps.newHashMap();
                     names.forEach(name -> {
-                         
-                         if (Objeto.notBlank(r.getHeader(name))) {
-                              
-                              params.put(name, r.getHeader(name));
+                         if (Objeto.notBlank(r.getParameter(name))) {
+                              params.put(name, r.getParameter(name));
                          }
                     });
                     
@@ -286,6 +284,11 @@ public class CallImpl implements Call {
                     context.setRouteHost(urlParse);
                     context.set("requestURI", "");
                }
+          }
+
+          @Override
+          public String getUrl() {
+               return context.getRequest().getRequestURI();
           }
           
           @Override
