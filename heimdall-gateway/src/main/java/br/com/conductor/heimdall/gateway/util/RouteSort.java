@@ -1,4 +1,3 @@
-
 package br.com.conductor.heimdall.gateway.util;
 
 /*-
@@ -20,6 +19,7 @@ package br.com.conductor.heimdall.gateway.util;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+
 
 import java.util.Comparator;
 
@@ -69,4 +69,6 @@ public class RouteSort implements Comparator<ZuulRoute> {
 
           return pattern1.compareTo(pattern2);
      }
+
+
 }

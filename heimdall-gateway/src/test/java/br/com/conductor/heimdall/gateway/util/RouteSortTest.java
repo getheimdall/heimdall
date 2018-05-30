@@ -1,4 +1,3 @@
-
 package br.com.conductor.heimdall.gateway.util;
 
 import static org.junit.Assert.assertThat;
@@ -14,7 +13,8 @@ import org.junit.Test;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties.ZuulRoute;
 
 public class RouteSortTest {
-     
+
+	
      List<ZuulRoute> expected = new LinkedList<>();
      List<ZuulRoute> actual = new LinkedList<>();
      
@@ -145,6 +145,4 @@ public class RouteSortTest {
 
           assertThat(actual, is(expected));
      }
-     
-     
 }

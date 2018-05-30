@@ -15,7 +15,6 @@ import org.junit.Test;
 import br.com.conductor.heimdall.core.entity.Operation;
 
 public class OperationSortTest {
-     
      List<Operation> expected = new LinkedList<>();
      List<Operation> actual = new LinkedList<>();
 
@@ -170,6 +169,5 @@ public class OperationSortTest {
 
           assertThat(actual, is(expected));
      }
-
 
 }

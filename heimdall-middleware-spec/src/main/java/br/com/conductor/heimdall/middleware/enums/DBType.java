@@ -1,9 +1,8 @@
-
-package br.com.conductor.heimdall.core.util;
+package br.com.conductor.heimdall.middleware.enums;
 
 /*-
  * =========================LICENSE_START==================================
- * heimdall-core
+ * heimdall-middleware-spec
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
@@ -21,19 +20,14 @@ package br.com.conductor.heimdall.core.util;
  * ==========================LICENSE_END===================================
  */
 
+
 /**
- * This class holds the global interceptor constants.
- *
- * @author Filipe Germano
- * @author Marcos Filho
+ * Enumeration of database types.
+ * @author Jefferson X. Cardoso
  *
  */
-public class ConstantsInterceptors {
-
-     public static final String GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND = "Could not find a required %s or it is not valid";
-
-     public static final String GLOBAL_MOCK_INTERCEPTOR_LOCALIZED = "Localized mock interceptor";
-     
-     public static final String GLOBAL_ACCESS_NOT_ALLOWED_API = "Access not allowed for this API";
-     
+public enum DBType {
+	
+	MONGODB;
+	
 }

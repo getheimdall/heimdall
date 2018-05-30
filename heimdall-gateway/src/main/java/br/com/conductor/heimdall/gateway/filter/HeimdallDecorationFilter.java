@@ -95,15 +95,15 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
      private UrlPathHelper urlPathHelper = new UrlPathHelper();
 
      private ProxyRequestHelper proxyRequestHelper;
-     
+
      private OperationRepository operationRepository;
 
      private PathMatcher pathMatcher = new AntPathMatcher();
 
      private RequestHelper requestHelper;
-     
+
      private FilterDetail detail = new FilterDetail();
-     
+
      public HeimdallDecorationFilter(ProxyRouteLocator routeLocator, String dispatcherServletPath, ZuulProperties properties, ProxyRequestHelper proxyRequestHelper, OperationRepository operationRepository, RequestHelper requestHelper) {
 
           super(routeLocator, dispatcherServletPath, properties, proxyRequestHelper);
@@ -116,10 +116,10 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
           this.zuulServletPath = properties.getServletPath();
           this.requestHelper = requestHelper;
      }
-     
+
      @Override
      public boolean shouldFilter() {
-          
+
           long startTime = System.currentTimeMillis();
 
           boolean should = super.shouldFilter();
@@ -133,6 +133,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
 
      @Override
      public Object run() {
+
           long startTime = System.currentTimeMillis();
           try {
                process();
@@ -142,47 +143,47 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                throw e;
           } finally {
                long endTime = System.currentTimeMillis();
-               
+
                long duration = (endTime - startTime);
-               
+
                detail.setName(this.getClass().getSimpleName());
                detail.setTimeInMillisRun(duration);
                TraceContextHolder.getInstance().getActualTrace().addFilter(detail);
           }
-          
+
           return null;
-          
+
      }
 
      protected void process() {
 
           RequestContext ctx = RequestContext.getCurrentContext();
           final String requestURI = getPathWithoutStripSuffix(ctx.getRequest());
-    
+
           if (pathMatcher.match(ConstantsPath.PATH_MANAGER_PATTERN, requestURI) || "/error".equals(requestURI)) {
                ctx.set(FORWARD_TO_KEY, requestURI);
                return;
           }
-    
+
           final String method = ctx.getRequest().getMethod().toUpperCase();
           HeimdallRoute heimdallRoute = getMatchingHeimdallRoute(requestURI, method, ctx);
-          
-          if (ctx.getRequest().getHeader("access_token") != null) {               
+
+          if (ctx.getRequest().getHeader("access_token") != null) {
                TraceContextHolder.getInstance().getActualTrace().setAccessToken(ctx.getRequest().getHeader("access_token"));
           }
-          
+
           if (ctx.getRequest().getHeader("client_id") != null) {
                TraceContextHolder.getInstance().getActualTrace().setClientId(ctx.getRequest().getHeader("client_id"));
           }
           if (heimdallRoute != null) {
-    
+
                if (heimdallRoute.isMethodNotAllowed()) {
                     ctx.setSendZuulResponse(false);
                     ctx.setResponseStatusCode(HttpStatus.METHOD_NOT_ALLOWED.value());
                     ctx.setResponseBody(HttpStatus.METHOD_NOT_ALLOWED.getReasonPhrase());
                     return;
                }
-               
+
                if (heimdallRoute.getRoute() == null || heimdallRoute.getRoute().getLocation() == null) {
                     log.warn("Environment not configured for this location: {} and inbound: {}", ctx.getRequest().getRequestURL(), requestURI);
                     ctx.setSendZuulResponse(false);
@@ -191,8 +192,8 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                     ctx.getResponse().setContentType(MediaType.TEXT_PLAIN_VALUE);
                     TraceContextHolder.getInstance().getActualTrace().setRequest(requestHelper.dumpRequest());
                     return;
-               } 
-               
+               }
+
                String location = heimdallRoute.getRoute().getLocation();
                ctx.put(REQUEST_URI_KEY, heimdallRoute.getRoute().getPath());
                ctx.put(PROXY_KEY, heimdallRoute.getRoute().getId());
@@ -201,11 +202,11 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                } else {
                     this.proxyRequestHelper.addIgnoredHeaders(heimdallRoute.getRoute().getSensitiveHeaders().toArray(new String[0]));
                }
-    
+
                if (heimdallRoute.getRoute().getRetryable() != null) {
                     ctx.put(RETRYABLE_KEY, heimdallRoute.getRoute().getRetryable());
                }
-    
+
                if (location.startsWith(HTTP_SCHEME + ":") || location.startsWith(HTTPS_SCHEME + ":")) {
                     ctx.setRouteHost(UrlUtil.getUrl(location));
                     ctx.addOriginResponseHeader(SERVICE_HEADER, location);
@@ -272,7 +273,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                if (Objeto.notBlank(entry.getKey())) {
                     String pattern = entry.getKey();
                     if (this.pathMatcher.match(pattern, requestURI)) {
-                          
+
                          auxMatch = true;
                          List<Operation> operations = operationRepository.findByEndPoint(pattern);
                          Operation operation = null;
@@ -286,41 +287,44 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                               String basePath = operation.getResource().getApi().getBasePath();
                               requestURI = org.apache.commons.lang.StringUtils.removeStart(requestURI, basePath);
                               ctx.put("pattern", org.apache.commons.lang.StringUtils.removeStart(pattern, basePath));
-                              
+
                               List<Environment> environments = operation.getResource().getApi().getEnvironments();
-                              
+
                               String location = null;
                               if (Objeto.notBlank(environments)) {
-                                   
-                                   String host = ctx.getRequest().getHeader("Host");                                   
+
+                                   String host = ctx.getRequest().getHeader("Host");
                                    if (Objeto.isBlank(host)) {
 
                                         host = ctx.getRequest().getHeader("host");
                                    }
-                                   
+
                                    Optional<Environment> environment = Optional.ofNullable(null);
                                    if (Objeto.notBlank(host)) {
                                         String tempHost = host;
-                                        environment = environments.stream().filter(e -> e.getInboundURL().toLowerCase().contains(tempHost.toLowerCase())).findFirst();                                        
+                                        environment = environments.stream().filter(e -> e.getInboundURL().toLowerCase().contains(tempHost.toLowerCase())).findFirst();
                                    } else {
                                         environment = environments.stream().filter(e -> ctx.getRequest().getRequestURL().toString().toLowerCase().contains(e.getInboundURL().toLowerCase())).findFirst();
                                    }
-                                   
+
                                    if (environment.isPresent()) {
                                         location = environment.get().getOutboundURL();
                                         ctx.put("environmentVariables", environment.get().getVariables());
                                    }
-                              }                              
+                              }
                               Route route = new Route(zuulRoute.getId(), requestURI, location, "", zuulRoute.getRetryable() != null ? zuulRoute.getRetryable() : false, zuulRoute.isCustomSensitiveHeaders() ? zuulRoute.getSensitiveHeaders() : null);
 
-                              TraceContextHolder.getInstance().getActualTrace().setApiId(operation.getResource().getApi().getId());
-                              TraceContextHolder.getInstance().getActualTrace().setApiName(operation.getResource().getApi().getName());
-                              TraceContextHolder.getInstance().getActualTrace().setResourceId(operation.getResource().getId());
-                              TraceContextHolder.getInstance().getActualTrace().setOperationId(operation.getId());
-                              TraceContextHolder.getInstance().getActualTrace().setPattern(operation.getPath());
+                              TraceContextHolder traceContextHolder = TraceContextHolder.getInstance();
+                              
+                              traceContextHolder.getActualTrace().setApiId(operation.getResource().getApi().getId());
+                              traceContextHolder.getActualTrace().setApiName(operation.getResource().getApi().getName());
+                              traceContextHolder.getActualTrace().setResourceId(operation.getResource().getId());
+                              traceContextHolder.getActualTrace().setOperationId(operation.getId());
+                              traceContextHolder.getActualTrace().setPattern(operation.getPath());
+                              
                               return new HeimdallRoute(pattern, route, false);
                          } else {
-                              
+
                               ctx.put(INTERRUPT, true);
                          }
                     }
