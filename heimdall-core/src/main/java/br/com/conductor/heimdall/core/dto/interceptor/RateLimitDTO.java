@@ -1,5 +1,5 @@
 
-package br.com.conductor.heimdall.core.util;
+package br.com.conductor.heimdall.core.dto.interceptor;
 
 /*-
  * =========================LICENSE_START==================================
@@ -21,19 +21,18 @@ package br.com.conductor.heimdall.core.util;
  * ==========================LICENSE_END===================================
  */
 
+import br.com.conductor.heimdall.core.enums.Interval;
+import lombok.Data;
+
 /**
- * This class holds the global interceptor constants.
+ * Class is a Data Transfer Object for the RateLimit.
  *
- * @author Filipe Germano
  * @author Marcos Filho
  *
  */
-public class ConstantsInterceptors {
+@Data
+public class RateLimitDTO {
 
-     public static final String GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND = "Could not find a required %s or it is not valid";
-
-     public static final String GLOBAL_MOCK_INTERCEPTOR_LOCALIZED = "Localized mock interceptor";
-     
-     public static final String GLOBAL_ACCESS_NOT_ALLOWED_API = "Access not allowed for this API";
-     
+     private Long calls;
+     private Interval interval;
 }

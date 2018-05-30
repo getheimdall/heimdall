@@ -16,7 +16,7 @@ import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.enums.Location;
 import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
-import br.com.conductor.heimdall.core.repository.AppRepository;
+import br.com.conductor.heimdall.gateway.service.SecurityService;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.core.util.BeanManager;
 import br.com.conductor.heimdall.core.util.ConstantsInterceptors;
@@ -30,7 +30,7 @@ public class ClientIdInterceptor extends HeimdallFilter {
 
      private static Set<String> pathsNotAllowed;
 
-     private AppRepository appRepository;
+     private SecurityService securityService;
 
      private static String inboundURL;
 
@@ -81,10 +81,14 @@ public class ClientIdInterceptor extends HeimdallFilter {
      	return "{{name}}"
      }
 
+     public Long getApiId() {
+          return {{apiId}};
+     }
+
      @Override
      public void execute() throws Throwable {
 
-          appRepository = (AppRepository) BeanManager.getBean(AppRepository.class);
+          securityService = (SecurityService) BeanManager.getBean(SecurityService.class);
           RequestContext ctx = RequestContext.getCurrentContext();
           HttpServletRequest request = ctx.getRequest();
           
@@ -99,28 +103,7 @@ public class ClientIdInterceptor extends HeimdallFilter {
                clientId = request.getParameter(name);               
           }
           
-          if (Objeto.notBlank(clientId)) {
-               
-               TraceContextHolder.getInstance().getActualTrace().setClientId(DigestUtils.digestMD5(clientId));
-               App app = appRepository.findByClientId(clientId);
-               
-               if (Objeto.isBlank(app)) {
-
-                    ctx.setSendZuulResponse(false);
-                    ctx.put(INTERRUPT, true);
-                    ctx.setResponseBody(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, "Client Id"));
-                    ctx.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());               
-               } else {
-                    
-                    TraceContextHolder.getInstance().getActualTrace().setAppDeveloper(app.getDeveloper().getEmail());
-               }
-          } else {
-
-               ctx.setSendZuulResponse(false);
-               ctx.put(INTERRUPT, true);
-               ctx.setResponseBody(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, "Client Id"));
-               ctx.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
-          }
+          securityService.validadeClientId(ctx, helper, getApiId(), clientId);
      }
      
 }

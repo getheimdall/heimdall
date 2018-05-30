@@ -1,9 +1,8 @@
-
-package br.com.conductor.heimdall.core.dto.interceptor;
+package br.com.conductor.heimdall.middleware.enums;
 
 /*-
  * =========================LICENSE_START==================================
- * heimdall-core
+ * heimdall-middleware-spec
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
@@ -21,18 +20,14 @@ package br.com.conductor.heimdall.core.dto.interceptor;
  * ==========================LICENSE_END===================================
  */
 
-import br.com.conductor.heimdall.core.enums.Interval;
-import lombok.Data;
 
 /**
- * Class is a Data Transfer Object for the Ratting.
- *
- * @author Marcos Filho
+ * Enumeration of database types.
+ * @author Jefferson X. Cardoso
  *
  */
-@Data
-public class RattingDTO {
-
-     private Long calls;
-     private Interval interval;
+public enum DBType {
+	
+	MONGODB;
+	
 }

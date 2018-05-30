@@ -29,6 +29,6 @@ package br.com.conductor.heimdall.core.enums;
  */
 public enum HttpMethod {
      
-     GET, POST, PUT, DELETE, PATH, OPTIONS;
+     GET, POST, PUT, DELETE, PATCH, OPTIONS;
 
 }

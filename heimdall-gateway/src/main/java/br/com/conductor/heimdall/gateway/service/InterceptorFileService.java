@@ -47,7 +47,7 @@ import com.netflix.zuul.filters.FilterRegistry;
 import br.com.conductor.heimdall.core.dto.InterceptorFileDTO;
 import br.com.conductor.heimdall.core.dto.interceptor.AccessTokenClientIdDTO;
 import br.com.conductor.heimdall.core.dto.interceptor.MockDTO;
-import br.com.conductor.heimdall.core.dto.interceptor.RattingDTO;
+import br.com.conductor.heimdall.core.dto.interceptor.RateLimitDTO;
 import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.entity.Operation;
 import br.com.conductor.heimdall.core.entity.Resource;
@@ -334,6 +334,7 @@ public class InterceptorFileService {
                     AccessTokenClientIdDTO accessTokenClientIdDTO = (AccessTokenClientIdDTO) objectCustom;
                     parameters.put("name", accessTokenClientIdDTO.getName());
                     parameters.put("location", accessTokenClientIdDTO.getLocation());
+                    parameters.put("apiId", interceptor.getApi().getId());
                     
                     if (TypeInterceptor.ACCESS_TOKEN.equals(interceptor.getType())) {
                          
@@ -380,11 +381,11 @@ public class InterceptorFileService {
 
                }
 
-               if (objectCustom instanceof RattingDTO) {
+               if (objectCustom instanceof RateLimitDTO) {
 
-                    RattingDTO rattingDTO = (RattingDTO) objectCustom;
-                    parameters.put("calls", rattingDTO.getCalls());
-                    parameters.put("interval", rattingDTO.getInterval().name());
+                    RateLimitDTO rateLimitDTO = (RateLimitDTO) objectCustom;
+                    parameters.put("calls", rateLimitDTO.getCalls());
+                    parameters.put("interval", rateLimitDTO.getInterval().name());
                }
 
                if (objectCustom instanceof String) {
@@ -443,8 +444,8 @@ public class InterceptorFileService {
                case RATTING:
                     try {
 
-                         RattingDTO rattingDTO = JsonUtils.convertJsonToObject(content, RattingDTO.class);
-                         response = rattingDTO;
+                         RateLimitDTO rateLimitDTO = JsonUtils.convertJsonToObject(content, RateLimitDTO.class);
+                         response = rateLimitDTO;
                     } catch (Exception e) {
 
                          log.error(e.getMessage(), e);
