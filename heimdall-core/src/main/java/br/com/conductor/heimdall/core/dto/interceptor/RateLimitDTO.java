@@ -25,13 +25,13 @@ import br.com.conductor.heimdall.core.enums.Interval;
 import lombok.Data;
 
 /**
- * Class is a Data Transfer Object for the Ratting.
+ * Class is a Data Transfer Object for the RateLimit.
  *
  * @author Marcos Filho
  *
  */
 @Data
-public class RattingDTO {
+public class RateLimitDTO {
 
      private Long calls;
      private Interval interval;
