@@ -23,9 +23,12 @@ package br.com.conductor.heimdall.core.service;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.API_BASEPATH_EXIST;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.API_BASEPATH_MALFORMED;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.API_BASEPATH_EMPTY;
 import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 import static br.com.twsoftware.alfred.object.Objeto.notBlank;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,12 +125,16 @@ public class ApiService {
       * @param 	apiDTO					{@link ApiDTO}
       * @return							The saved {@link Api}
       * @throws	BadRequestException		The basepath defined exist
+      * @throws     BadRequestException      Api basepath can not contain wild card
+      * @throws     BadRequestException      Basepath can not be empty
       */
      public Api save(ApiDTO apiDTO) {
           
           Api validateApi = apiRepository.findByBasePath(apiDTO.getBasePath());
           HeimdallException.checkThrow(notBlank(validateApi), API_BASEPATH_EXIST);
-          
+          HeimdallException.checkThrow(validateBasepath(apiDTO), API_BASEPATH_MALFORMED);
+          HeimdallException.checkThrow(isBlank(apiDTO.getBasePath()), API_BASEPATH_EMPTY);
+
           Api api = GenericConverter.mapperWithMapping(apiDTO, Api.class, new ApiMap());
           
           api = apiRepository.save(api);
@@ -144,6 +151,8 @@ public class ApiService {
       * @return							The updated {@link Api}
       * @throws	NotFoundException		Resource not found
       * @throws	BadRequestException		The basepath defined exist
+      * @throws     BadRequestException      Api basepath can not contain wild card
+      * @throws     BadRequestException      Basepath can not be empty
       */
      public Api update(Long id, ApiDTO apiDTO) {
 
@@ -152,7 +161,9 @@ public class ApiService {
           
           Api validateApi = apiRepository.findByBasePath(apiDTO.getBasePath());
           HeimdallException.checkThrow(notBlank(validateApi) && validateApi.getId() != api.getId(), API_BASEPATH_EXIST);
-          
+          HeimdallException.checkThrow(validateBasepath(apiDTO), API_BASEPATH_MALFORMED);
+          HeimdallException.checkThrow(isBlank(apiDTO.getBasePath()), API_BASEPATH_EMPTY);
+
           api = GenericConverter.mapperWithMapping(apiDTO, api, new ApiMap());
           api = apiRepository.save(api);
           
@@ -176,4 +187,15 @@ public class ApiService {
           amqpRoute.dispatchRoutes();
      }
 
+     /*
+      * A Api basepath can not have any sort of wild card.
+      */
+     private static boolean validateBasepath(ApiDTO apiDTO) {
+          List<String> basepath = Arrays.asList(
+                    apiDTO.getBasePath()
+                    .split("/")
+                );
+          
+          return basepath.contains("*") || basepath.contains("**");
+     }
 }

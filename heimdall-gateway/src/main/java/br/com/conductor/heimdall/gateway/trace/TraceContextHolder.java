@@ -42,23 +42,28 @@ public class TraceContextHolder {
      private static final ThreadLocal<String> contextHolder = new ThreadLocal<>();
 
      private static final ConcurrentHashMap<String, Trace> traceMap = new ConcurrentHashMap<>();
-
-     private static TraceContextHolder instance;
      
      private boolean shouldPrint;
 
      /**
+      * Implementation of the Initialization-on-demand holder idiom.
+      * 
+      * @author Marcelo Rodrigues
+      * @see <a href="http://literatejava.com/jvm/fastest-threadsafe-singleton-jvm/">Fastest Thread-safe Singleton in Java</a>
+      * 
+      */
+     private static class LazyHolder {
+          static final TraceContextHolder INSTANCE = new TraceContextHolder();
+     }
+
+     /**
       * Thread safe singleton initializer.
       * 
-      * @return		{@link TraceContextHolder} instantce
+      * @return		{@link TraceContextHolder} instance
       */
-     public static synchronized TraceContextHolder getInstance() {
+     public static TraceContextHolder getInstance() {
 
-          if (instance == null) {
-               instance = new TraceContextHolder();
-          }
-
-          return instance;
+          return LazyHolder.INSTANCE;
      }
 
      /**
