@@ -254,12 +254,12 @@ public class OperationService {
       * @return true when the path has more than one double wild card or one not at the end, false otherwise
       */
      private static boolean validateDoubleWildCardOperationPath(Operation operation) {
-          List<String> path = Arrays.asList(operation.getPath().split("/"));
-          
-          if (path.stream().filter(o -> o.equals("**")).count() > 1)
-               return true;
-          else 
-               return !operation.getPath().endsWith("**");
-     }
+         List<String> path = Arrays.asList(operation.getPath().split("/"));
+                   
+         if (path.contains("**"))
+        	 return !operation.getPath().endsWith("**") || !(path.stream().filter(o -> o.equals("**")).count() == 1);              
+         else 
+       	 	 return false;
+    }
 
 }
