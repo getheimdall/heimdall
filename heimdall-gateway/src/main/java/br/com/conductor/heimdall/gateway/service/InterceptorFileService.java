@@ -396,10 +396,11 @@ public class InterceptorFileService {
                if (objectCustom instanceof OAuthDTO) {
 
 					OAuthDTO oAuthDTO = (OAuthDTO) objectCustom;
-					parameters.put("providerId", oAuthDTO.getProviderId());
+					
+					parameters.put("providerId", Objeto.isBlank(oAuthDTO.getProviderId()) ? 0L : oAuthDTO.getProviderId());
+					parameters.put("timeAccessToken", Objeto.isBlank(oAuthDTO.getTimeAccessToken()) ? 10 : oAuthDTO.getTimeAccessToken());
+					parameters.put("timeRefreshToken", Objeto.isBlank(oAuthDTO.getTimeRefreshToken()) ? 1800 : oAuthDTO.getTimeRefreshToken());
 					parameters.put("typeOAuth", oAuthDTO.getTypeOAuth());
-					parameters.put("timeAccessToken", oAuthDTO.getTimeAccessToken());
-					parameters.put("timeRefreshToken", oAuthDTO.getTimeRefreshToken());
    			   }
                
                if (objectCustom instanceof String) {

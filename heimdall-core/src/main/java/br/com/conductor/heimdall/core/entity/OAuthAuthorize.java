@@ -21,6 +21,7 @@ package br.com.conductor.heimdall.core.entity;
  */
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.Base64;
 
 import javax.persistence.Column;
@@ -65,7 +66,7 @@ public class OAuthAuthorize implements Serializable {
 	private String tokenAuthorize;
 	
 	public void generateTokenAuthorize() {
-		String toEncode = System.currentTimeMillis() + clientId;
+		String toEncode = LocalDateTime.now().toString() + clientId;
 		this.tokenAuthorize = Base64.getEncoder().encodeToString(toEncode.getBytes());
 	}
 

@@ -1,5 +1,8 @@
 package br.com.conductor.heimdall.core.service;
 
+import java.util.Optional;
+import java.util.Set;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -72,11 +75,17 @@ public class OAuthService {
 		return tokenOAuth;
 	}
 
-	public boolean validateToken(String token, String clientId) {
+	public boolean tokenExpired(String token, String clientId) {
 		return jwtUtils.tokenExpired(token, clientId);
 	}
+	
+	public boolean tokenIsValidToResource(String token, String clientId, String pathRequest) {
+		Set<String> operationsFromToken = jwtUtils.getOperationsFromToken(token, clientId);
+		Optional<String> findFirst = operationsFromToken.stream().filter(o -> o.equals(pathRequest)).findFirst();
+		return findFirst.isPresent();
+	}
 
-	public Provider getProvider(Long providerId) {
+	public Provider getProvider(Long providerId) throws ProviderException{
 		Provider provider = providerService.findOne(providerId);
 		if (Objeto.isBlank(provider)) {
 			throw new ProviderException(ExceptionMessage.PROVIDER_NOT_FOUND);

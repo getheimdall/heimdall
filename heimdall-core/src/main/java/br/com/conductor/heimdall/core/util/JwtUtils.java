@@ -25,6 +25,7 @@ import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
@@ -34,11 +35,13 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
+@Slf4j
 @Component
 public class JwtUtils {
 
@@ -55,11 +58,24 @@ public class JwtUtils {
 		try {
 			claimsFromTheToken = getClaimsFromTheToken(token, getSecretKeyByClientId(clientId));
 		} catch (Exception e) {
-			//TraceContextHolder.getInstance().getActualTrace().trace(e.getMessage(), e);
+			log.error(e.getMessage());
 			return true;
 		}
 		
 		return new Date().after(claimsFromTheToken.getExpiration());
+	}
+	
+	@SuppressWarnings("unchecked")
+	public Set<String> getOperationsFromToken(String token, String clientId) {
+		Claims claimsFromTheToken;
+		try {
+			claimsFromTheToken = getClaimsFromTheToken(token, getSecretKeyByClientId(clientId));
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			return new HashSet<>();
+		}
+		
+		return (Set<String>) claimsFromTheToken.get("operations", Set.class);
 	}
 	
 	private TokenOAuth generateToken(String clientId, int timeToken, int timeRefreshToken, Set<String> operationsPath) {

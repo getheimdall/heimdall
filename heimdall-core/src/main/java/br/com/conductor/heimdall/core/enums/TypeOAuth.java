@@ -1,5 +1,8 @@
 package br.com.conductor.heimdall.core.enums;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -24,17 +27,11 @@ package br.com.conductor.heimdall.core.enums;
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
+@Getter
+@AllArgsConstructor
 public enum TypeOAuth {
 	
 	AUTHORIZE("AUTHORIZE"), GENERATE("GENERATE"), VALIDATE("VALIDATE");
 	
-	private String value;
-	
-	TypeOAuth(String value) {
-		this.value = value;
-	}	
-	
-	public String getValue() {
-		return this.value;
-	}
+	private String typeOAuth;
 }
