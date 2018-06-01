@@ -1,0 +1,14 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="conductor\dijalma.silva" id="1">
+		<preConditions>
+			<tableExists tableName="PRIVILEGES"/>
+		</preConditions>
+		<sql>
+			INSERT INTO roles_privileges (role_id, privilege_id) SELECT r.id, p.id FROM privileges p, roles r WHERE r.id = 1 and p.id NOT IN (SELECT roles_privileges.privilege_id FROM roles_privileges)
+		</sql>
+	</changeSet>
+</databaseChangeLog>
