@@ -30,6 +30,7 @@ import org.bson.Document;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
+import com.mongodb.MongoClientURI;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -53,7 +54,6 @@ import lombok.extern.slf4j.Slf4j;
 public class MongoDBAppender extends AppenderBase<LoggingEvent> {
 
      private MongoClient mongoClient;
-
      private MongoCollection<Document> collection;
      
      @Setter @Getter
@@ -64,7 +64,8 @@ public class MongoDBAppender extends AppenderBase<LoggingEvent> {
      private String dataBase;
      @Setter @Getter
      private String collectionName;
-     
+     @Setter @Getter
+     private String uri;
      
      public MongoDBAppender(String url, Long port, String dataBase, String collectionName) {
           this.url = url;
@@ -72,13 +73,24 @@ public class MongoDBAppender extends AppenderBase<LoggingEvent> {
           this.dataBase = dataBase;
           this.collectionName = collectionName;
      }
+     
+     public MongoDBAppender(String uri, String dataBase, String collectionName) {
+    	 this.uri = uri;
+    	 this.dataBase = dataBase;
+    	 this.collectionName = collectionName;
+     }
 
      @Override
      public void start() {
           log.info("Initializing Mongodb Appender");
-          MongoClientOptions options = new MongoClientOptions.Builder().socketKeepAlive(true).build();
-          ServerAddress address = new ServerAddress(this.url, this.port.intValue());
-          this.mongoClient = new MongoClient(address, options);
+          if (this.uri != null) {
+        	  this.mongoClient = new MongoClient(new MongoClientURI(this.uri));
+          } else {
+        	  MongoClientOptions options = new MongoClientOptions.Builder().socketKeepAlive(true).build();
+        	  ServerAddress address = new ServerAddress(this.url, this.port.intValue());
+        	  this.mongoClient = new MongoClient(address, options);  
+          }
+          
           MongoDatabase database = this.mongoClient.getDatabase(this.dataBase);
           this.collection = database.getCollection(this.collectionName);
           log.info("Starting connection with url: {} - port: {}", this.url, this.port);

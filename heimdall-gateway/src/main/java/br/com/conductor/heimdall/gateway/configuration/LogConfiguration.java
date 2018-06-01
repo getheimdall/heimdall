@@ -77,9 +77,13 @@ public class LogConfiguration {
           if (property.getMongo().getEnabled()) {
                LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
                Logger logger = (Logger) LoggerFactory.getLogger(Trace.class);
-
                @SuppressWarnings("rawtypes")
-               Appender appender = new MongoDBAppender(property.getMongo().getServerName(), property.getMongo().getPort(), property.getMongo().getDataBase(), property.getMongo().getCollection());
+               Appender appender;
+               if (property.getMongo().getUrl() != null) {
+            	   appender = new MongoDBAppender(property.getMongo().getUrl(), property.getMongo().getDataBase(), property.getMongo().getCollection());
+               } else {
+            	   appender = new MongoDBAppender(property.getMongo().getServerName(), property.getMongo().getPort(), property.getMongo().getDataBase(), property.getMongo().getCollection());            	   
+               }
                appender.setContext(lc);
                appender.start();
 
