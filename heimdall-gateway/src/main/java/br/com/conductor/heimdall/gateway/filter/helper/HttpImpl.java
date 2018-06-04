@@ -118,6 +118,14 @@ public class HttpImpl implements Http {
           return this;
      }
 
+     public HttpImpl body(String params) {
+
+          body = json.parse(params);          
+          
+          return this;
+          
+     }
+     
      public ApiResponseImpl sendGet() {
           
           ResponseEntity<String> entity = null;

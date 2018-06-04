@@ -74,6 +74,14 @@ public interface Http {
      public Http body(Map<String, Object> params);
 
      /**
+      * Sets a body to the Http.
+      * 
+      * @param params   The String representation of the body
+      * @return               The updated Http
+      */
+     public Http body(String params);
+     
+     /**
       * Sends a GET request to the Api and receives a {@link ApiResponse}.
       * 
       * @return			A ApiResponse object

@@ -314,11 +314,14 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                               }
                               Route route = new Route(zuulRoute.getId(), requestURI, location, "", zuulRoute.getRetryable() != null ? zuulRoute.getRetryable() : false, zuulRoute.isCustomSensitiveHeaders() ? zuulRoute.getSensitiveHeaders() : null);
 
-                              TraceContextHolder.getInstance().getActualTrace().setApiId(operation.getResource().getApi().getId());
-                              TraceContextHolder.getInstance().getActualTrace().setApiName(operation.getResource().getApi().getName());
-                              TraceContextHolder.getInstance().getActualTrace().setResourceId(operation.getResource().getId());
-                              TraceContextHolder.getInstance().getActualTrace().setOperationId(operation.getId());
-                              TraceContextHolder.getInstance().getActualTrace().setPattern(operation.getPath());
+                              TraceContextHolder traceContextHolder = TraceContextHolder.getInstance();
+                              
+                              traceContextHolder.getActualTrace().setApiId(operation.getResource().getApi().getId());
+                              traceContextHolder.getActualTrace().setApiName(operation.getResource().getApi().getName());
+                              traceContextHolder.getActualTrace().setResourceId(operation.getResource().getId());
+                              traceContextHolder.getActualTrace().setOperationId(operation.getId());
+                              traceContextHolder.getActualTrace().setPattern(operation.getPath());
+                              
                               return new HeimdallRoute(pattern, route, false);
                          } else {
 

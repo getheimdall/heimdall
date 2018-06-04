@@ -137,25 +137,16 @@ public class DBMongoImpl implements DBMongo {
           Query<T> query = this.prepareQuery(criteria, this.datastore());
 
           List<T> list = Lists.newArrayList();
-
+          Long totalElements = query.count();
+          
           page = page == null ? PAGE : page;
           limit = limit == null || limit > LIMIT ? LIMIT : limit;
-
-          if ((page != null && page > 1) && (limit != null && limit > 0) && (limit <= LIMIT)) {
-
-               list = query.asList(new FindOptions().limit(limit).skip(page - 1));
-
-          } else if ((page != null && page == 0) && (limit != null && limit > 0) && (limit <= LIMIT)) {
-               list = query.asList(new FindOptions().limit(limit));
-
-          } else if ((limit != null && limit > 0) && (limit <= LIMIT)) {
-               list = query.asList(new FindOptions().limit(limit));
-
+          
+          if ( page >= 1 &&  limit > 0  && limit <= LIMIT) {
+               list = query.asList(new FindOptions().limit(limit).skip(page * limit));  
           } else {
                list = query.asList(new FindOptions().limit(limit));
           }
-
-          Long totalElements = (long) list.size();
 
           return (Page<T>) buildPage(list, page, limit, totalElements);
      }
@@ -170,11 +161,11 @@ public class DBMongoImpl implements DBMongo {
           pageResponse.numberOfElements = limit;
           pageResponse.totalElements = totalElements;
           pageResponse.hasPreviousPage = page > 0;
-          pageResponse.hasNextPage = page < pageResponse.totalPages;
+          pageResponse.hasNextPage = page < (pageResponse.totalPages - 1);
           pageResponse.hasContent = Objeto.notBlank(list);
           pageResponse.first = page == 0;
-          pageResponse.last = page == pageResponse.totalPages;
-          pageResponse.nextPage = page == pageResponse.totalPages ? pageResponse.totalPages : page + 1;
+          pageResponse.last = page == (pageResponse.totalPages - 1);
+          pageResponse.nextPage = page == (pageResponse.totalPages - 1) ? page : page + 1;
           pageResponse.previousPage = page == 0 ? 0 : page - 1;
           pageResponse.content = list;
 
@@ -217,9 +208,9 @@ public class DBMongoImpl implements DBMongo {
      }
 
      @Override
-     public <T> Query<T> getQueryProvider(Class<T> classType) {
+     public <T> Query<T> getQueryProvider(Object criteria) {
 
-          Query<T> query = (Query<T>) this.prepareQuery(classType, this.datastore());
+          Query<T> query = (Query<T>) this.prepareQuery(criteria, this.datastore());
 
           return query;
      }
@@ -230,14 +221,14 @@ public class DBMongoImpl implements DBMongo {
           page = page == null ? PAGE : page;
           limit = limit == null || limit > LIMIT ? LIMIT : limit;
           FindIterable<Document> documents = null;
-          if ((page != null && page > 1) && (limit != null && limit > 0) && (limit <= LIMIT)) {
+          if ((page != null && page > 0) && (limit != null && limit > 0) && (limit <= LIMIT)) {
 
                if (Objeto.notBlank(filters)) {
 
-                    documents = collection.find(Filters.and(filters)).limit(limit).skip(page - 1);
+                    documents = collection.find(Filters.and(filters)).limit(limit).skip(page * limit);
                } else {
 
-                    documents = collection.find().limit(limit).skip(page - 1);
+                    documents = collection.find().limit(limit).skip(page * limit);
                }
           } else if ((page != null && page == 0) && (limit != null && limit > 0) && (limit <= LIMIT)) {
 
