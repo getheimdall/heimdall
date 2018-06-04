@@ -23,9 +23,11 @@ package br.com.conductor.heimdall.core.util;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.stereotype.Component;
@@ -68,14 +70,20 @@ public class JwtUtils {
 	@SuppressWarnings("unchecked")
 	public Set<String> getOperationsFromToken(String token, String clientId) {
 		Claims claimsFromTheToken;
+		Set<String> operations = new HashSet<>();
 		try {
 			claimsFromTheToken = getClaimsFromTheToken(token, getSecretKeyByClientId(clientId));
 		} catch (Exception e) {
 			log.error(e.getMessage());
-			return new HashSet<>();
+			return operations;
 		}
 		
-		return (Set<String>) claimsFromTheToken.get("operations", Set.class);
+		List<String> list = claimsFromTheToken.get("operations", ArrayList.class);
+		list.forEach(o -> {
+			operations.add(o);
+		});
+		
+		return operations;
 	}
 	
 	private TokenOAuth generateToken(String clientId, int timeToken, int timeRefreshToken, Set<String> operationsPath) {
