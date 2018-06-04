@@ -130,28 +130,43 @@ public class OAuthInterceptor extends HeimdallFilter {
               for (ProviderParam param: provider.getProviderParams()) {
                 if (param.getLocation().equals("HEADER")) {
                   if (Objeto.isBlank(param.getValue())){
-                    http = http.header(param.getName(), helper.call().request().header().get(param.getName()));  
+                    String valueParam = helper.call().request().header().get(param.getName());
+                    if (!Objeto.isBlank(valueParam)){
+                      http = http.header(param.getName(), valueParam);  
+                    } else {
+                      generateResponseWithError("All parameters of the provider need to be informed.");
+                      return null;
+                    } 
                   }else {
                     http = http.header(param.getName(), param.getValue());
                   }
                 } else {
                   if (Objeto.isBlank(param.getValue())) {
-                    http = http.queryParam(param.getName(), helper.call().request().query().get(param.getName()));
+                    String valueParam = helper.call().request().query().get(param.getName());
+                    if (!Objeto.isBlank(valueParam)){
+                      http = http.queryParam(param.getName(), valueParam);    
+                    } else {
+                      generateResponseWithError("All parameters of the provider need to be informed.");
+                      return null;
+                    }
                   } else {
                     http = http.queryParam(param.getName(), param.getValue());
                   }
                 }
               }
 
-              ApiResponse apiResponse = http.sendPost();
-              
-              if (Series.valueOf(apiResponse.getStatus()) == Series.SUCCESSFUL) {
-                String codeAuthorize = oAuthService.generateAuthorize(clientId, providerId);
-                generateResponseWithSuccess("{\"code\": \""+ codeAuthorize + "\"}");
-              } else {
-                TraceContextHolder.getInstance().getActualTrace().trace("Erro de autenticação do usuario.");
-                throw new UnauthorizedException(ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);
-                return null;
+              try {
+                ApiResponse apiResponse = http.sendPost();
+                if (Series.valueOf(apiResponse.getStatus()) == Series.SUCCESSFUL) {
+                  String codeAuthorize = oAuthService.generateAuthorize(clientId, providerId);
+                  generateResponseWithSuccess("{\"code\": \""+ codeAuthorize + "\"}");
+                } else {
+                  generateResponseWithError("User provider unauthorized");
+                  return null;
+                }
+              } catch (Exception ex) {
+                  generateResponseWithError("User provider unauthorized or bad request");
+                  return null;
               }
               
             } else {
