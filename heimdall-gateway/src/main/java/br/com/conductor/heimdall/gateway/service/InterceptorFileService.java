@@ -9,9 +9,9 @@ package br.com.conductor.heimdall.gateway.service;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -74,456 +74,455 @@ import lombok.extern.slf4j.Slf4j;
  * @author Filipe Germano
  * @author Marcos Filho
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
- *
  */
 @Service
 @Slf4j
 public class InterceptorFileService {
-     
-     @Autowired
-     private InterceptorRepository interceptorRepository;
-     
-     @Autowired
-     private OperationRepository operationRepository;
-          
-     @Value("${zuul.filter.root}")
-     private String zuulFilterRoot;
-     
-     /**
-      * Creates a {@link Interceptor} from its Id.
-      * 
-      * @param id	The {@link Interceptor} Id
-      * @throws BadRequestException
-      */
-     @Transactional(readOnly = true)
-     public void createFileInterceptor(Long id) {
 
-          try {
+    @Autowired
+    private InterceptorRepository interceptorRepository;
 
-               Interceptor interceptor = interceptorRepository.findOne(id);
-               HeimdallException.checkThrow(Objeto.isBlank(interceptor), ExceptionMessage.INTERCEPTOR_NOT_EXIST);
+    @Autowired
+    private OperationRepository operationRepository;
 
-               File file = templateInterceptor(interceptor.getType(), interceptor.getExecutionPoint());               
-               
-               String template = Files.toString(file, Charsets.UTF_8);
-               generateFileInterceptor(interceptor, template, buildParametersFile(interceptor, file));
-               
-          } catch (IOException e) {
+    @Value("${zuul.filter.root}")
+    private String zuulFilterRoot;
 
-               log.error(e.getMessage(), e);
-          }
+    /**
+     * Creates a {@link Interceptor} from its Id.
+     *
+     * @param id The {@link Interceptor} Id
+     * @throws BadRequestException
+     */
+    @Transactional(readOnly = true)
+    public void createFileInterceptor(Long id) {
 
-     }     
-     
-     /*
-      * Constructs a parameter file from a Interceptor.
-      */
-     private HashMap<String, Object> buildParametersFile(Interceptor interceptor, File file) {
-          
-          if (Objeto.notBlank(file)) {
+        try {
 
-               HashMap<String, Object> parameters = new HashMap<String, Object>();
-               parameters.put("order", StringUtils.generateOrder(definePrefixOrder(interceptor.getLifeCycle()), interceptor.getOrder()));
-               parameters.put("executionPoint", interceptor.getExecutionPoint().getFilterType());
-               parameters.put("pathsAllowed", pathsAllowed(interceptor));
-               parameters.put("pathsNotAllowed", pathsNotAllowed(interceptor));
-               parameters.put("lifeCycle", interceptor.getLifeCycle().name());
-               parameters.put("name", StringUtils.concatCamelCase(interceptor.getLifeCycle().name(), interceptor.getType().name(), interceptor.getExecutionPoint().getFilterType(), interceptor.getId().toString()));
-               if (Objeto.notBlank(interceptor.getOperation())) {
-                    
-                    parameters.put("method", interceptor.getOperation().getMethod().name());
-               }
-               
-               if (Objeto.notBlank(interceptor.getEnvironment())) {
+            Interceptor interceptor = interceptorRepository.findOne(id);
+            HeimdallException.checkThrow(Objeto.isBlank(interceptor), ExceptionMessage.INTERCEPTOR_NOT_EXIST);
 
-                    parameters.put("inboundURL", interceptor.getEnvironment().getInboundURL());
-               } else {
+            File file = templateInterceptor(interceptor.getType(), interceptor.getExecutionPoint());
 
-                    parameters.put("inboundURL", null);
-               }
+            String template = Files.toString(file, Charsets.UTF_8);
+            generateFileInterceptor(interceptor, template, buildParametersFile(interceptor, file));
 
-               return parameters = buildCustom(parameters, interceptor);
-          } else {
+        } catch (IOException e) {
 
-               String[] message = { ExceptionMessage.INTERCEPTOR_TEMPLATE_NOT_EXIST.getMessage(), interceptor.getId().toString(), interceptor.getType().name(), interceptor.getExecutionPoint().name() };
-               String erro = StringUtils.join(", ", message);
-               log.error(erro);
-               
-               return null;
-          }
-     }
+            log.error(e.getMessage(), e);
+        }
 
-     /**
-      * Removes a {@link Interceptor} file.
-      * 
-      * @param interceptor		{@link InterceptorFileDTO}
-      */
-     public void removeFileInterceptor(InterceptorFileDTO interceptor) {
+    }
 
-          File interceptorFile = new File(interceptor.getPath());
+    /*
+     * Constructs a parameter file from a Interceptor.
+     */
+    private HashMap<String, Object> buildParametersFile(Interceptor interceptor, File file) {
 
-          if (interceptorFile.exists() && interceptorFile.isFile()) {
-               String filter = interceptorFile.getAbsolutePath() + interceptorFile.getName();
-               if (interceptorFile.delete()) {
-                    log.info("File - Removing File Filter: {}", interceptorFile.getAbsolutePath());
-                    FilterRegistry.instance().remove(filter);
-                    clearLoaderCache();
-                    log.debug("FilterRegistry - Removing File Filter {}", filter);
-               } else {
-                    log.warn("Not possible to remove File: {} with Interceptor ID: {}", interceptorFile.getAbsolutePath(), interceptor.getId());
-               }
-          }
-     }
-     
-     /*
-      * Clears the loader cache
-      */
-     private void clearLoaderCache() {
-          FilterLoader filterLoader = FilterLoader.getInstance();
-          Field field = ReflectionUtils.findField(FilterLoader.class, "hashFiltersByType");
-          ReflectionUtils.makeAccessible(field);
-          Map<?, ?> cache = (Map<?, ?>) ReflectionUtils.getField(field, filterLoader);
-          cache.clear();
-     }
-     
-     /*
-      * Creates a File that represents the Interceptor type. If its a type Log, adds the execution point
-      */
-     private File templateInterceptor(TypeInterceptor type, TypeExecutionPoint executionPoint) {
+        if (Objeto.notBlank(file)) {
 
-          File file = null;
-          try {
-               String filePath = "template-interceptor";
-               switch (type) {
-                    case ACCESS_TOKEN:
-                         file = ResourceUtils.getFile(filePath  + File.separator + "access_token.mustache");
-                         break;
-                    case CLIENT_ID:
-                         file = ResourceUtils.getFile(filePath + File.separator + "client_id.mustache");
-                         break;
-                    case MOCK:
-                         file = ResourceUtils.getFile(filePath + File.separator + "mock.mustache");
-                         break;
-                    case RATTING:
-                         file = ResourceUtils.getFile(filePath + File.separator + "ratting.mustache");
-                         break;
-                    case CUSTOM:
-                         file = ResourceUtils.getFile(filePath + File.separator + "custom.mustache");
-                         break;
-                    case LOG:
-                         switch (executionPoint) {
-                              case FIRST:
-                                   file = ResourceUtils.getFile(filePath + File.separator + "request_log.mustache");
-                                   break;
-                              case SECOND:
-                                   file = ResourceUtils.getFile(filePath + File.separator + "response_log.mustache");
-                                   break;
-                              default:
-                                   break;
-                         }
-                         break;
-                    case MIDDLEWARE:
-                         file = ResourceUtils.getFile(filePath + File.separator + "middleware.mustache");
-                         break;
-                    case OAUTH:
-        				file = ResourceUtils.getFile(filePath + File.separator + "oauth.mustache");
-        				break;
-                    default:
-                         break;
-               }
+            HashMap<String, Object> parameters = new HashMap<String, Object>();
+            parameters.put("order", StringUtils.generateOrder(definePrefixOrder(interceptor.getLifeCycle()), interceptor.getOrder()));
+            parameters.put("executionPoint", interceptor.getExecutionPoint().getFilterType());
+            parameters.put("pathsAllowed", pathsAllowed(interceptor));
+            parameters.put("pathsNotAllowed", pathsNotAllowed(interceptor));
+            parameters.put("lifeCycle", interceptor.getLifeCycle().name());
+            parameters.put("name", StringUtils.concatCamelCase(interceptor.getLifeCycle().name(), interceptor.getType().name(), interceptor.getExecutionPoint().getFilterType(), interceptor.getId().toString()));
+            if (Objeto.notBlank(interceptor.getOperation())) {
 
-          } catch (IOException e) {
+                parameters.put("method", interceptor.getOperation().getMethod().name());
+            }
 
-               log.error(e.getMessage(), e);
-          }
+            if (Objeto.notBlank(interceptor.getEnvironment())) {
 
-          return file;
+                parameters.put("inboundURL", interceptor.getEnvironment().getInboundURL());
+            } else {
 
-     }
-     
-     /*
-      * Defines the prefix order of a InterceptorLifeCycle.
-      */
-     private Integer definePrefixOrder(InterceptorLifeCycle lifeCycle) {
+                parameters.put("inboundURL", null);
+            }
 
-          Integer prefixOrder = 0;
-          switch (lifeCycle) {
-               case PLAN:
-                    prefixOrder = 1;
+            return parameters = buildCustom(parameters, interceptor);
+        } else {
+
+            String[] message = {ExceptionMessage.INTERCEPTOR_TEMPLATE_NOT_EXIST.getMessage(), interceptor.getId().toString(), interceptor.getType().name(), interceptor.getExecutionPoint().name()};
+            String erro = StringUtils.join(", ", message);
+            log.error(erro);
+
+            return null;
+        }
+    }
+
+    /**
+     * Removes a {@link Interceptor} file.
+     *
+     * @param interceptor {@link InterceptorFileDTO}
+     */
+    public void removeFileInterceptor(InterceptorFileDTO interceptor) {
+
+        File interceptorFile = new File(interceptor.getPath());
+
+        if (interceptorFile.exists() && interceptorFile.isFile()) {
+            String filter = interceptorFile.getAbsolutePath() + interceptorFile.getName();
+            if (interceptorFile.delete()) {
+                log.info("File - Removing File Filter: {}", interceptorFile.getAbsolutePath());
+                FilterRegistry.instance().remove(filter);
+                clearLoaderCache();
+                log.debug("FilterRegistry - Removing File Filter {}", filter);
+            } else {
+                log.warn("Not possible to remove File: {} with Interceptor ID: {}", interceptorFile.getAbsolutePath(), interceptor.getId());
+            }
+        }
+    }
+
+    /*
+     * Clears the loader cache
+     */
+    private void clearLoaderCache() {
+        FilterLoader filterLoader = FilterLoader.getInstance();
+        Field field = ReflectionUtils.findField(FilterLoader.class, "hashFiltersByType");
+        ReflectionUtils.makeAccessible(field);
+        Map<?, ?> cache = (Map<?, ?>) ReflectionUtils.getField(field, filterLoader);
+        cache.clear();
+    }
+
+    /*
+     * Creates a File that represents the Interceptor type. If its a type Log, adds the execution point
+     */
+    private File templateInterceptor(TypeInterceptor type, TypeExecutionPoint executionPoint) {
+
+        File file = null;
+        try {
+            String filePath = "template-interceptor";
+            switch (type) {
+                case ACCESS_TOKEN:
+                    file = ResourceUtils.getFile(filePath + File.separator + "access_token.mustache");
                     break;
-               case RESOURCE:
-                    prefixOrder = 2;
+                case CLIENT_ID:
+                    file = ResourceUtils.getFile(filePath + File.separator + "client_id.mustache");
                     break;
-               case OPERATION:
-                    prefixOrder = 3;
+                case MOCK:
+                    file = ResourceUtils.getFile(filePath + File.separator + "mock.mustache");
                     break;
-               default:
+                case RATTING:
+                    file = ResourceUtils.getFile(filePath + File.separator + "ratting.mustache");
                     break;
-          }
-
-          return prefixOrder;
-
-     }
-     
-     /*
-      * Returns a Set<String> of allowed paths of a Interceptor.
-      */
-     private Set<String> pathsAllowed(Interceptor interceptor) {
-
-          Set<String> patterns = Sets.newHashSet();
-          switch (interceptor.getLifeCycle()) {
-               case PLAN:                    
-                    patterns = Sets.newHashSet(interceptor.getPlan().getApi().getBasePath());
+                case CUSTOM:
+                    file = ResourceUtils.getFile(filePath + File.separator + "custom.mustache");
                     break;
-               case RESOURCE:
-                    List<Operation> operations = operationRepository.findByResourceId(interceptor.getResource().getId());
-                    operations.sort(new OperationSort());
-                    if (Objeto.notBlank(operations)) {
-
-                         for (Operation operation : operations) {
-
-                              patterns.add(operation.getResource().getApi().getBasePath() + operation.getPath());
-                         }
+                case LOG:
+                    switch (executionPoint) {
+                        case FIRST:
+                            file = ResourceUtils.getFile(filePath + File.separator + "request_log.mustache");
+                            break;
+                        case SECOND:
+                            file = ResourceUtils.getFile(filePath + File.separator + "response_log.mustache");
+                            break;
+                        default:
+                            break;
                     }
                     break;
-               case OPERATION:
-                    patterns.add(interceptor.getOperation().getResource().getApi().getBasePath() + interceptor.getOperation().getPath());
+                case MIDDLEWARE:
+                    file = ResourceUtils.getFile(filePath + File.separator + "middleware.mustache");
                     break;
-               default:
+                case OAUTH:
+                    file = ResourceUtils.getFile(filePath + File.separator + "oauth.mustache");
                     break;
-          }
+                default:
+                    break;
+            }
 
-          return patterns;
-     }
-     
-     /*
-      * Returns a Set<String> of not allowed paths of a Interceptor.
-      */
-     private Set<String> pathsNotAllowed(Interceptor interceptor) {
+        } catch (IOException e) {
 
-          Set<String> pathsNotAllowed = Sets.newHashSet();
-          if (Objeto.notBlank(interceptor) && Objeto.notBlank(interceptor.getIgnoredResources())) {
+            log.error(e.getMessage(), e);
+        }
 
-               for (Resource resource : interceptor.getIgnoredResources()) {
+        return file;
 
-                    if (Objeto.notBlank(resource.getOperations())) {
+    }
 
-                         for (Operation operation : resource.getOperations()) {
+    /*
+     * Defines the prefix order of a InterceptorLifeCycle.
+     */
+    private Integer definePrefixOrder(InterceptorLifeCycle lifeCycle) {
 
-                              pathsNotAllowed.add(resource.getApi().getBasePath() + operation.getPath());
-                         }
+        Integer prefixOrder = 0;
+        switch (lifeCycle) {
+            case PLAN:
+                prefixOrder = 1;
+                break;
+            case RESOURCE:
+                prefixOrder = 2;
+                break;
+            case OPERATION:
+                prefixOrder = 3;
+                break;
+            default:
+                break;
+        }
+
+        return prefixOrder;
+
+    }
+
+    /*
+     * Returns a Set<String> of allowed paths of a Interceptor.
+     */
+    private Set<String> pathsAllowed(Interceptor interceptor) {
+
+        Set<String> patterns = Sets.newHashSet();
+        switch (interceptor.getLifeCycle()) {
+            case PLAN:
+                patterns = Sets.newHashSet(interceptor.getPlan().getApi().getBasePath());
+                break;
+            case RESOURCE:
+                List<Operation> operations = operationRepository.findByResourceId(interceptor.getResource().getId());
+                operations.sort(new OperationSort());
+                if (Objeto.notBlank(operations)) {
+
+                    for (Operation operation : operations) {
+
+                        patterns.add(operation.getResource().getApi().getBasePath() + operation.getPath());
+                    }
+                }
+                break;
+            case OPERATION:
+                patterns.add(interceptor.getOperation().getResource().getApi().getBasePath() + interceptor.getOperation().getPath());
+                break;
+            default:
+                break;
+        }
+
+        return patterns;
+    }
+
+    /*
+     * Returns a Set<String> of not allowed paths of a Interceptor.
+     */
+    private Set<String> pathsNotAllowed(Interceptor interceptor) {
+
+        Set<String> pathsNotAllowed = Sets.newHashSet();
+        if (Objeto.notBlank(interceptor) && Objeto.notBlank(interceptor.getIgnoredResources())) {
+
+            for (Resource resource : interceptor.getIgnoredResources()) {
+
+                if (Objeto.notBlank(resource.getOperations())) {
+
+                    for (Operation operation : resource.getOperations()) {
+
+                        pathsNotAllowed.add(resource.getApi().getBasePath() + operation.getPath());
+                    }
+                }
+
+            }
+        }
+
+        if (Objeto.notBlank(interceptor) && Objeto.notBlank(interceptor.getIgnoredOperations())) {
+
+            for (Operation operation : interceptor.getIgnoredOperations()) {
+
+                pathsNotAllowed.add(operation.getResource().getApi().getBasePath() + operation.getPath());
+
+            }
+        }
+
+        return pathsNotAllowed;
+    }
+
+    private HashMap<String, Object> buildCustom(HashMap<String, Object> parameters, Interceptor interceptor) {
+
+        Object objectCustom = validateTemplate(interceptor.getType(), interceptor.getContent());
+        if (Objeto.notBlank(objectCustom)) {
+
+            if (objectCustom instanceof AccessTokenClientIdDTO) {
+
+                AccessTokenClientIdDTO accessTokenClientIdDTO = (AccessTokenClientIdDTO) objectCustom;
+                parameters.put("name", accessTokenClientIdDTO.getName());
+                parameters.put("location", accessTokenClientIdDTO.getLocation());
+                parameters.put("apiId", interceptor.getApi().getId());
+
+                if (TypeInterceptor.ACCESS_TOKEN.equals(interceptor.getType())) {
+
+                    InterceptorLifeCycle lifeCycle = interceptor.getLifeCycle();
+                    List<Interceptor> interceptors = Lists.newArrayList();
+                    switch (lifeCycle) {
+                        case PLAN:
+                            interceptors = interceptorRepository.findByTypeAndPlanId(TypeInterceptor.CLIENT_ID, interceptor.getPlan().getId());
+                            break;
+                        case RESOURCE:
+                            interceptors = interceptorRepository.findByTypeAndResourceId(TypeInterceptor.CLIENT_ID, interceptor.getResource().getId());
+                            break;
+                        case OPERATION:
+                            interceptors = interceptorRepository.findByTypeAndOperationId(TypeInterceptor.CLIENT_ID, interceptor.getOperation().getId());
+                            break;
+                        default:
+                            break;
                     }
 
-               }
-          }
+                    for (Interceptor interc : interceptors) {
 
-          if (Objeto.notBlank(interceptor) && Objeto.notBlank(interceptor.getIgnoredOperations())) {
+                        try {
+                            AccessTokenClientIdDTO clientIdDTO = JsonUtils.convertJsonToObject(interc.getContent(), AccessTokenClientIdDTO.class);
+                            if (Objeto.notBlank(clientIdDTO) && Objeto.notBlank(clientIdDTO.getName())) {
 
-               for (Operation operation : interceptor.getIgnoredOperations()) {
+                                parameters.put("client_id", clientIdDTO.getName());
+                                break;
+                            }
 
-                    pathsNotAllowed.add(operation.getResource().getApi().getBasePath() + operation.getPath());
+                        } catch (IOException e) {
 
-               }
-          }
-
-          return pathsNotAllowed;
-     }
-     
-     private HashMap<String, Object> buildCustom(HashMap<String, Object> parameters, Interceptor interceptor) {
-
-          Object objectCustom = validateTemplate(interceptor.getType(), interceptor.getContent());
-          if (Objeto.notBlank(objectCustom)) {
-
-               if (objectCustom instanceof AccessTokenClientIdDTO) {
-
-                    AccessTokenClientIdDTO accessTokenClientIdDTO = (AccessTokenClientIdDTO) objectCustom;
-                    parameters.put("name", accessTokenClientIdDTO.getName());
-                    parameters.put("location", accessTokenClientIdDTO.getLocation());
-                    parameters.put("apiId", interceptor.getApi().getId());
-                    
-                    if (TypeInterceptor.ACCESS_TOKEN.equals(interceptor.getType())) {
-                         
-                         InterceptorLifeCycle lifeCycle = interceptor.getLifeCycle();
-                         List<Interceptor> interceptors = Lists.newArrayList();
-                         switch (lifeCycle) {
-                              case PLAN:                              
-                                   interceptors = interceptorRepository.findByTypeAndPlanId(TypeInterceptor.CLIENT_ID, interceptor.getPlan().getId());
-                                   break;
-                              case RESOURCE:                              
-                                   interceptors = interceptorRepository.findByTypeAndResourceId(TypeInterceptor.CLIENT_ID, interceptor.getResource().getId());
-                                   break;
-                              case OPERATION:                              
-                                   interceptors = interceptorRepository.findByTypeAndOperationId(TypeInterceptor.CLIENT_ID, interceptor.getOperation().getId());
-                                   break;
-                              default:
-                                   break;
-                         }
-                         
-                         for (Interceptor interc : interceptors) {
-                              
-                              try {
-                                   AccessTokenClientIdDTO clientIdDTO = JsonUtils.convertJsonToObject(interc.getContent(), AccessTokenClientIdDTO.class);
-                                   if (Objeto.notBlank(clientIdDTO) && Objeto.notBlank(clientIdDTO.getName())) {
-                                        
-                                        parameters.put("client_id", clientIdDTO.getName());
-                                        break;
-                                   }
-                                   
-                              } catch (IOException e) {
-                                   
-                                   log.error(e.getMessage(), e);
-                              }
-                         }
+                            log.error(e.getMessage(), e);
+                        }
                     }
-                    
-               }
+                }
 
-               if (objectCustom instanceof MockDTO) {
+            }
 
-                    MockDTO mockDTO = (MockDTO) objectCustom;
-                    parameters.put("status", mockDTO.getStatus());
-                    parameters.put("body", mockDTO.getBody());
+            if (objectCustom instanceof MockDTO) {
 
-               }
+                MockDTO mockDTO = (MockDTO) objectCustom;
+                parameters.put("status", mockDTO.getStatus());
+                parameters.put("body", mockDTO.getBody());
 
-               if (objectCustom instanceof RateLimitDTO) {
+            }
 
-                    RateLimitDTO rateLimitDTO = (RateLimitDTO) objectCustom;
-                    parameters.put("calls", rateLimitDTO.getCalls());
-                    parameters.put("interval", rateLimitDTO.getInterval().name());
-               }
+            if (objectCustom instanceof RateLimitDTO) {
 
-               if (objectCustom instanceof OAuthDTO) {
+                RateLimitDTO rateLimitDTO = (RateLimitDTO) objectCustom;
+                parameters.put("calls", rateLimitDTO.getCalls());
+                parameters.put("interval", rateLimitDTO.getInterval().name());
+            }
 
-					OAuthDTO oAuthDTO = (OAuthDTO) objectCustom;
-					
-					parameters.put("providerId", Objeto.isBlank(oAuthDTO.getProviderId()) ? 0L : oAuthDTO.getProviderId());
-					parameters.put("timeAccessToken", Objeto.isBlank(oAuthDTO.getTimeAccessToken()) ? 10 : oAuthDTO.getTimeAccessToken());
-					parameters.put("timeRefreshToken", Objeto.isBlank(oAuthDTO.getTimeRefreshToken()) ? 1800 : oAuthDTO.getTimeRefreshToken());
-					parameters.put("typeOAuth", oAuthDTO.getTypeOAuth());
-   			   }
-               
-               if (objectCustom instanceof String) {
+            if (objectCustom instanceof OAuthDTO) {
 
-                    parameters.put("content", objectCustom);
-               }
-          }
-          
-          if (TypeInterceptor.MIDDLEWARE.equals(interceptor.getType())) {
-               
-               String api = interceptor.getOperation().getResource().getApi().getId().toString();
-               String pathReferences = String.join("/", zuulFilterRoot, MIDDLEWARE_API_ROOT, api, MIDDLEWARE_ROOT);
-               parameters.put("pathMiddleware", pathReferences);
-          }
+                OAuthDTO oAuthDTO = (OAuthDTO) objectCustom;
 
-          return parameters;
-     }
+                parameters.put("providerId", Objeto.isBlank(oAuthDTO.getProviderId()) ? 0L : oAuthDTO.getProviderId());
+                parameters.put("timeAccessToken", Objeto.isBlank(oAuthDTO.getTimeAccessToken()) ? 10 : oAuthDTO.getTimeAccessToken());
+                parameters.put("timeRefreshToken", Objeto.isBlank(oAuthDTO.getTimeRefreshToken()) ? 1800 : oAuthDTO.getTimeRefreshToken());
+                parameters.put("typeOAuth", oAuthDTO.getTypeOAuth());
+            }
 
-     private Object validateTemplate(TypeInterceptor type, String content) {
+            if (objectCustom instanceof String) {
 
-          Object response = null;
-          switch (type) {
-               case ACCESS_TOKEN:
-                    try {
+                parameters.put("content", objectCustom);
+            }
+        }
 
-                         AccessTokenClientIdDTO accessTokenDTO = JsonUtils.convertJsonToObject(content, AccessTokenClientIdDTO.class);
-                         response = accessTokenDTO;
-                    } catch (Exception e) {
+        if (TypeInterceptor.MIDDLEWARE.equals(interceptor.getType())) {
 
-                         log.error(e.getMessage(), e);
-                         ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(type.name(), TemplateUtils.TEMPLATE_ACCESS_TOKEN);
-                    }
-                    break;
-               case CLIENT_ID:
-                    try {
+            String api = interceptor.getOperation().getResource().getApi().getId().toString();
+            String pathReferences = String.join("/", zuulFilterRoot, MIDDLEWARE_API_ROOT, api, MIDDLEWARE_ROOT);
+            parameters.put("pathMiddleware", pathReferences);
+        }
 
-                         AccessTokenClientIdDTO clientIdDTO = JsonUtils.convertJsonToObject(content, AccessTokenClientIdDTO.class);
-                         response = clientIdDTO;
-                    } catch (Exception e) {
+        return parameters;
+    }
 
-                         log.error(e.getMessage(), e);
-                         ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(type.name(), TemplateUtils.TEMPLATE_ACCESS_TOKEN);
-                    }
-                    break;
-               case MOCK:
-                    try {
+    private Object validateTemplate(TypeInterceptor type, String content) {
 
-                         MockDTO mockDTO = JsonUtils.convertJsonToObject(content, MockDTO.class);
-                         response = mockDTO;
-                    } catch (Exception e) {
+        Object response = null;
+        switch (type) {
+            case ACCESS_TOKEN:
+                try {
 
-                         log.error(e.getMessage(), e);
-                         ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(type.name(), TemplateUtils.TEMPLATE_MOCK);
-                    }
-                    break;
-               case RATTING:
-                    try {
+                    AccessTokenClientIdDTO accessTokenDTO = JsonUtils.convertJsonToObject(content, AccessTokenClientIdDTO.class);
+                    response = accessTokenDTO;
+                } catch (Exception e) {
 
-                         RateLimitDTO rateLimitDTO = JsonUtils.convertJsonToObject(content, RateLimitDTO.class);
-                         response = rateLimitDTO;
-                    } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(type.name(), TemplateUtils.TEMPLATE_ACCESS_TOKEN);
+                }
+                break;
+            case CLIENT_ID:
+                try {
 
-                         log.error(e.getMessage(), e);
-                         ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(type.name(), TemplateUtils.TEMPLATE_RATTING);
-                    }
-                    break;
-               case CUSTOM:
-                    try {
+                    AccessTokenClientIdDTO clientIdDTO = JsonUtils.convertJsonToObject(content, AccessTokenClientIdDTO.class);
+                    response = clientIdDTO;
+                } catch (Exception e) {
 
-                         response = content;
-                    } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(type.name(), TemplateUtils.TEMPLATE_ACCESS_TOKEN);
+                }
+                break;
+            case MOCK:
+                try {
 
-                         log.error(e.getMessage(), e);
-                    }
-                    break;
-               case MIDDLEWARE:
-                    try {
-                         
-                         response = content;
-                    } catch (Exception e) {
-                         
-                         log.error(e.getMessage(), e);
-                    }
-                    break;
-               case OAUTH:
-            	   try {
-            		   
-            		   OAuthDTO oAuthDTO = JsonUtils.convertJsonToObject(content, OAuthDTO.class);
-       				   response = oAuthDTO;
-            	   } catch(Exception e) {
-            		   
-            		   log.error(e.getMessage(), e);
-       				   ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(type.name(), TemplateUtils.TEMPLATE_OAUTH);
-            	   }
-               default:
-                    break;
-          }
+                    MockDTO mockDTO = JsonUtils.convertJsonToObject(content, MockDTO.class);
+                    response = mockDTO;
+                } catch (Exception e) {
 
-          return response;
-     }
-     
-     private void generateFileInterceptor(Interceptor interceptor, String template, HashMap<String, Object> parameters) {
+                    log.error(e.getMessage(), e);
+                    ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(type.name(), TemplateUtils.TEMPLATE_MOCK);
+                }
+                break;
+            case RATTING:
+                try {
 
-          try {
-               String codeInterceptor = GenerateMustache.generateTemplate(template, parameters);
-               String fileName = StringUtils.concatCamelCase(interceptor.getLifeCycle().name(), interceptor.getType().name(), interceptor.getExecutionPoint().getFilterType(), interceptor.getId().toString()) + ".groovy";
-               
-               String pathName = null;
-               if (TypeInterceptor.MIDDLEWARE.equals(interceptor.getType())) {
+                    RateLimitDTO rateLimitDTO = JsonUtils.convertJsonToObject(content, RateLimitDTO.class);
+                    response = rateLimitDTO;
+                } catch (Exception e) {
 
-                    pathName = String.join(File.separator, zuulFilterRoot, MIDDLEWARE_API_ROOT, interceptor.getOperation().getResource().getApi().getId().toString(), fileName);
-               } else {
-                    
-                    pathName = String.join(File.separator, zuulFilterRoot, interceptor.getExecutionPoint().getFilterType(), fileName);
-               }
-               File file = new File(pathName);
+                    log.error(e.getMessage(), e);
+                    ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(type.name(), TemplateUtils.TEMPLATE_RATTING);
+                }
+                break;
+            case CUSTOM:
+                try {
 
-               Files.write(codeInterceptor, file, Charsets.UTF_8);
-          } catch (IOException e) {
+                    response = content;
+                } catch (Exception e) {
 
-               log.error(e.getMessage(), e);
-          }
+                    log.error(e.getMessage(), e);
+                }
+                break;
+            case MIDDLEWARE:
+                try {
 
-     }
+                    response = content;
+                } catch (Exception e) {
+
+                    log.error(e.getMessage(), e);
+                }
+                break;
+            case OAUTH:
+                try {
+
+                    OAuthDTO oAuthDTO = JsonUtils.convertJsonToObject(content, OAuthDTO.class);
+                    response = oAuthDTO;
+                } catch (Exception e) {
+
+                    log.error(e.getMessage(), e);
+                    ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(type.name(), TemplateUtils.TEMPLATE_OAUTH);
+                }
+            default:
+                break;
+        }
+
+        return response;
+    }
+
+    private void generateFileInterceptor(Interceptor interceptor, String template, HashMap<String, Object> parameters) {
+
+        try {
+            String codeInterceptor = GenerateMustache.generateTemplate(template, parameters);
+            String fileName = StringUtils.concatCamelCase(interceptor.getLifeCycle().name(), interceptor.getType().name(), interceptor.getExecutionPoint().getFilterType(), interceptor.getId().toString()) + ".groovy";
+
+            String pathName = null;
+            if (TypeInterceptor.MIDDLEWARE.equals(interceptor.getType())) {
+
+                pathName = String.join(File.separator, zuulFilterRoot, MIDDLEWARE_API_ROOT, interceptor.getOperation().getResource().getApi().getId().toString(), fileName);
+            } else {
+
+                pathName = String.join(File.separator, zuulFilterRoot, interceptor.getExecutionPoint().getFilterType(), fileName);
+            }
+            File file = new File(pathName);
+
+            Files.write(codeInterceptor, file, Charsets.UTF_8);
+        } catch (IOException e) {
+
+            log.error(e.getMessage(), e);
+        }
+
+    }
 
 }

@@ -9,9 +9,9 @@ package br.com.conductor.heimdall.core.dto;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,29 +32,29 @@ import br.com.conductor.heimdall.core.enums.Status;
 import lombok.Data;
 
 /**
- * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
- *
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma
+ * Silva</a>
  */
 @Data
-public class ProviderDTO implements Serializable{
+public class ProviderDTO implements Serializable {
 
-	private static final long serialVersionUID = 6270561769116836980L;
-	
-	@NotNull
-	private String name;
-    
+    private static final long serialVersionUID = 6270561769116836980L;
+
+    @NotNull
+    private String name;
+
     private String description;
 
     @NotNull
     private String path;
-    
+
     @NotNull
     private List<ProviderParamsDTO> providerParams;
-    
+
     @JsonIgnore
     private LocalDateTime creationDate;
-    
+
     @JsonIgnore
     private Status status = Status.ACTIVE;
-    
+
 }
