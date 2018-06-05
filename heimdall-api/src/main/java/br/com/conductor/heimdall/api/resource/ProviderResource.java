@@ -2,7 +2,7 @@ package br.com.conductor.heimdall.api.resource;
 
 /*-
  * =========================LICENSE_START==================================
- * heimdall-core
+ * heimdall-api
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================

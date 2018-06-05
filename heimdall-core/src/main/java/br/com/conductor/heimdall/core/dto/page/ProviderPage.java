@@ -1,7 +1,5 @@
 package br.com.conductor.heimdall.core.dto.page;
 
-import java.io.Serializable;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -22,6 +20,7 @@ import java.io.Serializable;
  * ==========================LICENSE_END===================================
  */
 
+import java.io.Serializable;
 import br.com.conductor.heimdall.core.dto.PageDTO;
 import br.com.conductor.heimdall.core.entity.Provider;
 

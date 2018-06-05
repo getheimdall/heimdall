@@ -2,7 +2,7 @@ package br.com.conductor.heimdall.core.util;
 
 /*-
  * =========================LICENSE_START==================================
- * heimdall-gateway
+ * heimdall-core
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================

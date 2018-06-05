@@ -21,11 +21,10 @@ package br.com.conductor.heimdall.core.repository;
  */
 
 import org.springframework.data.jpa.repository.JpaRepository;
-
 import br.com.conductor.heimdall.core.entity.Provider;
 
 /**
- * <h1>ProviderRepository</h1><br>
+ * Provider Repository.	
  * 
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *

@@ -1,13 +1,5 @@
 package br.com.conductor.heimdall.core.service;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.StringMatcher;
-import org.springframework.data.domain.Page;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -28,8 +20,13 @@ import org.springframework.data.domain.Page;
  * ==========================LICENSE_END===================================
  */
 
+import java.util.List;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.ExampleMatcher.StringMatcher;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.PageDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
@@ -40,8 +37,7 @@ import br.com.conductor.heimdall.core.repository.ProviderRepository;
 import br.com.conductor.heimdall.core.util.Pageable;
 
 /**
- * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma
- *         Silva</a>
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
 @Service

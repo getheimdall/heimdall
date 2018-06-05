@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.api.util;
  */
 
 /**
- * <h1>ConstantsPrivilege</h1><br/>
- * 
  * Class that holds the Privilege constants.
  *
  * @author Marcos Filho

@@ -1,11 +1,5 @@
 package br.com.conductor.heimdall.core.dto;
 
-import java.io.Serializable;
-
-import javax.validation.constraints.NotNull;
-
-import lombok.Data;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -26,9 +20,11 @@ import lombok.Data;
  * ==========================LICENSE_END===================================
  */
 
+import java.io.Serializable;
+import javax.validation.constraints.NotNull;
+import lombok.Data;
+
 /**
- * <h1>ProviderParamsPersist</h1>
- * 
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */

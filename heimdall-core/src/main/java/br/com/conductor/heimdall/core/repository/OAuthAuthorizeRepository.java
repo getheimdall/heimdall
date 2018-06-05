@@ -21,10 +21,11 @@ package br.com.conductor.heimdall.core.repository;
  */
 
 import org.springframework.data.jpa.repository.JpaRepository;
-
 import br.com.conductor.heimdall.core.entity.OAuthAuthorize;
 
 /**
+ * OAuthAuthorize Repository.
+ * 
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */

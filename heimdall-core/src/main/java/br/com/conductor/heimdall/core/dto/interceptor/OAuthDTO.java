@@ -1,9 +1,5 @@
 package br.com.conductor.heimdall.core.dto.interceptor;
 
-import java.io.Serializable;
-
-import lombok.Data;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -23,6 +19,9 @@ import lombok.Data;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+
+import java.io.Serializable;
+import lombok.Data;
 
 /**
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>

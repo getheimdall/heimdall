@@ -1,8 +1,5 @@
 package br.com.conductor.heimdall.core.enums;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -22,6 +19,9 @@ import lombok.Getter;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
