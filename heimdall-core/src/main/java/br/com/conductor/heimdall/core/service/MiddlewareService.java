@@ -29,6 +29,8 @@ import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 import static br.com.twsoftware.alfred.object.Objeto.notBlank;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -172,8 +174,29 @@ public class MiddlewareService {
      @Transactional
      public Middleware save(Long apiId, MiddlewareDTO middlewareDTO, MultipartFile file) {
           
+    	  // TODO - get this parameter from the application.yml
+    	  Integer param = 0;
+    	  
           List<Middleware> middlewares = middlewareRepository.findByApiId(apiId);
-          middlewares.forEach(middleware -> middleware.setStatus(Status.INACTIVE));
+          Middleware active = middlewares.stream()
+           		  .filter(o -> o.getStatus().equals(Status.ACTIVE))
+          	      .findFirst()
+          	      .orElse(null);
+          
+          if (Objeto.notBlank(active))
+        	  active.setStatus(Status.INACTIVE);
+          
+          if (param != 0) {
+        	  Map<Status, List<Middleware>> middlewareMap = middlewares.stream()
+            		  .collect(Collectors.groupingBy(m -> m.getStatus()));
+              
+              middlewareMap.get(Status.INACTIVE).sort((m1, m2) -> m2.getCreationDate().compareTo(m1.getCreationDate()));
+              
+        	  if (middlewareMap.get(Status.INACTIVE).size() > param) {
+        		  List<Middleware> newDeprecatedMiddleware = middlewareMap.get(Status.INACTIVE).subList(param, middlewareMap.get(Status.INACTIVE).size());
+        		  newDeprecatedMiddleware.forEach(m -> this.depreciateMiddleware(m));
+        	  }
+          }
           
           middlewareRepository.save(middlewares);
           
@@ -255,6 +278,18 @@ public class MiddlewareService {
           amqpMiddlewareService.dispatchRemoveMiddlewares(middleware.getPath());
           middlewareRepository.delete(middleware.getId());
           
+     }
+     
+     /*
+      * Performs the depreciation algorithm for a middleware.
+      */
+     private Middleware depreciateMiddleware(Middleware middleware) {
+    	 
+    	 middleware.setStatus(Status.DEPRECATED);
+    	 
+    	 // TODO - remove blob from database
+    	 
+    	 return middleware;
      }
 
 }
