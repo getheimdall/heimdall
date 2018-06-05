@@ -1,5 +1,4 @@
-
-package br.com.conductor.heimdall.core.appender;
+package br.com.conductor.heimdall.gateway.appender;
 
 /*-
  * =========================LICENSE_START==================================
@@ -35,7 +34,7 @@ import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
-import ch.qos.logback.classic.spi.LoggingEvent;
+import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.AppenderBase;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -51,7 +50,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @NoArgsConstructor
-public class MongoDBAppender extends AppenderBase<LoggingEvent> {
+public class MongoDBAppender extends AppenderBase<ILoggingEvent> {
 
      private MongoClient mongoClient;
      private MongoCollection<Document> collection;
@@ -106,10 +105,10 @@ public class MongoDBAppender extends AppenderBase<LoggingEvent> {
      }
 
      @Override
-     protected void append(LoggingEvent e) {
+     protected void append(ILoggingEvent e) {
           Map<String, Object> objLog = new HashMap<>();
           objLog.put("ts", new Date(e.getTimeStamp()));
-          objLog.put("msg", e.getFormattedMessage());
+          objLog.put("trace", BasicDBObject.parse(e.getFormattedMessage()));
           objLog.put("level", e.getLevel().toString());
           objLog.put("logger", e.getLoggerName());
           objLog.put("thread", e.getThreadName());
@@ -123,7 +122,6 @@ public class MongoDBAppender extends AppenderBase<LoggingEvent> {
           if (mdc != null && !mdc.isEmpty()) {
                objLog.put("mdc", new BasicDBObject(mdc));
           }
-//          BasicDBObject content = new BasicDBObject(objLog);
           collection.insertOne(new Document(objLog));
      }
 

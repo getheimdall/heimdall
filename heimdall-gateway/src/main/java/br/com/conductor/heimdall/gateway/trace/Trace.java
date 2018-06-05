@@ -31,6 +31,9 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -56,6 +59,8 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 @Slf4j
 public class Trace {
+	
+	 private static final Logger logMongo = LoggerFactory.getLogger("mongo");
 
      private String method;
 
@@ -107,6 +112,10 @@ public class Trace {
      
      @JsonIgnore
      private boolean printAllTrace;
+     
+     public Trace() {
+    	 
+     }
 
      /**
       * Creates a Trace.
@@ -200,6 +209,7 @@ public class Trace {
                     }
                     
                     log.info(append("call", this), " [HEIMDALL-TRACE] - " + url);
+                    logMongo.info(new ObjectMapper().writeValueAsString(this));
                }
 
           } catch (Exception e) {
