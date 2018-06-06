@@ -51,8 +51,8 @@ public class ProviderService {
     /**
      * Saves a {@link Provider} to the repository
      *
-     * @param providerPersist           The {@link ProviderDTO}
-     * @return                          The saved {@link Provider}
+     * @param providerPersist The {@link ProviderDTO}
+     * @return The saved {@link Provider}
      */
     public Provider save(ProviderDTO providerPersist) {
         Provider provider = GenericConverter.mapper(providerPersist, Provider.class);
@@ -62,9 +62,9 @@ public class ProviderService {
     /**
      * Edits a {@link Provider} by its Id
      *
-     * @param idProvider                The {@link Provider} Id
-     * @param providerEdit              The {@link ProviderDTO}
-     * @return                          The edited {@link Provider}
+     * @param idProvider   The {@link Provider} Id
+     * @param providerEdit The {@link ProviderDTO}
+     * @return The edited {@link Provider}
      */
     public Provider edit(Long idProvider, ProviderDTO providerEdit) {
         Provider found = this.providerRepository.findOne(idProvider);
@@ -75,9 +75,9 @@ public class ProviderService {
     /**
      * Generates a paged list of {@link Provider} from a request
      *
-     * @param providerDTO               The {@link ProviderDTO}
-     * @param pageableDTO               The {@link PageableDTO}
-     * @return                          The paged {@link Provider} list as a {@link ProviderPage} object
+     * @param providerDTO The {@link ProviderDTO}
+     * @param pageableDTO The {@link PageableDTO}
+     * @return The paged {@link Provider} list as a {@link ProviderPage} object
      */
     public ProviderPage listWithPageableAndFilter(ProviderDTO providerDTO, PageableDTO pageableDTO) {
 
@@ -95,8 +95,8 @@ public class ProviderService {
     /**
      * Generates a list of {@link Provider} from a request
      *
-     * @param providerDTO               The {@link ProviderDTO}
-     * @return                          The list of {@link Provider}
+     * @param providerDTO The {@link ProviderDTO}
+     * @return The list of {@link Provider}
      */
     public List<Provider> listWithFilter(ProviderDTO providerDTO) {
 
@@ -110,8 +110,8 @@ public class ProviderService {
     /**
      * Finds a {@link Provider} by its Id
      *
-     * @param id                        The {@link Provider} Id
-     * @return                          The {@link Provider}
+     * @param id The {@link Provider} Id
+     * @return The {@link Provider}
      */
     public Provider findOne(Long id) {
         return this.providerRepository.findOne(id);
@@ -120,7 +120,7 @@ public class ProviderService {
     /**
      * Deletes a {@link Provider} by its Id
      *
-     * @param id                        The {@link Provider} Id
+     * @param id The {@link Provider} Id
      */
     public void delete(Long id) {
         this.providerRepository.delete(id);

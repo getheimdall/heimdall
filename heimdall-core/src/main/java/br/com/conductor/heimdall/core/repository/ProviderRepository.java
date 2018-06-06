@@ -9,9 +9,9 @@ package br.com.conductor.heimdall.core.repository;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,11 +24,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import br.com.conductor.heimdall.core.entity.Provider;
 
 /**
- * Provider Repository.	
- * 
- * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ * Provider Repository.
  *
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
-public interface ProviderRepository extends JpaRepository<Provider, Long>{
+public interface ProviderRepository extends JpaRepository<Provider, Long> {
 
 }
