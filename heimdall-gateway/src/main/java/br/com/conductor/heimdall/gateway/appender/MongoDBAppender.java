@@ -52,77 +52,82 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor
 public class MongoDBAppender extends AppenderBase<ILoggingEvent> {
 
-     private MongoClient mongoClient;
-     private MongoCollection<Document> collection;
-     
-     @Setter @Getter
-     private String url;
-     @Setter @Getter
-     private Long port;
-     @Setter @Getter
-     private String dataBase;
-     @Setter @Getter
-     private String collectionName;
-     @Setter @Getter
-     private String uri;
-     
-     public MongoDBAppender(String url, Long port, String dataBase, String collectionName) {
-          this.url = url;
-          this.port = port;
-          this.dataBase = dataBase;
-          this.collectionName = collectionName;
-     }
-     
-     public MongoDBAppender(String uri, String dataBase, String collectionName) {
-    	 this.uri = uri;
-    	 this.dataBase = dataBase;
-    	 this.collectionName = collectionName;
-     }
+	private MongoClient mongoClient;
+	private MongoCollection<Document> collection;
 
-     @Override
-     public void start() {
-          log.info("Initializing Mongodb Appender");
-          if (this.uri != null) {
-        	  this.mongoClient = new MongoClient(new MongoClientURI(this.uri));
-          } else {
-        	  MongoClientOptions options = new MongoClientOptions.Builder().socketKeepAlive(true).build();
-        	  ServerAddress address = new ServerAddress(this.url, this.port.intValue());
-        	  this.mongoClient = new MongoClient(address, options);  
-          }
-          
-          MongoDatabase database = this.mongoClient.getDatabase(this.dataBase);
-          this.collection = database.getCollection(this.collectionName);
-          log.info("Starting connection with url: {} - port: {}", this.url, this.port);
-          log.info("Database used: {} - Collection: {}", this.dataBase, this.collectionName);
-          super.start();
-     }
-     
-     @Override
-     public void stop() {
-          log.info("Closing mongodb appender");
-          this.mongoClient.close();
-          super.stop();
-     }
+	@Setter
+	@Getter
+	private String url;
+	@Setter
+	@Getter
+	private Long port;
+	@Setter
+	@Getter
+	private String dataBase;
+	@Setter
+	@Getter
+	private String collectionName;
+	@Setter
+	@Getter
+	private String uri;
 
-     @Override
-     protected void append(ILoggingEvent e) {
-          Map<String, Object> objLog = new HashMap<>();
-          objLog.put("ts", new Date(e.getTimeStamp()));
-          objLog.put("trace", BasicDBObject.parse(e.getFormattedMessage()));
-          objLog.put("level", e.getLevel().toString());
-          objLog.put("logger", e.getLoggerName());
-          objLog.put("thread", e.getThreadName());
+	public MongoDBAppender(String url, Long port, String dataBase, String collectionName) {
+		this.url = url;
+		this.port = port;
+		this.dataBase = dataBase;
+		this.collectionName = collectionName;
+	}
 
-          if (e.hasCallerData()) {
-               StackTraceElement st = e.getCallerData()[0];
-               String callerData = String.format("%s.%s:%d", st.getClassName(), st.getMethodName(), st.getLineNumber());
-               objLog.put("caller", callerData);
-          }
-          Map<String, String> mdc = e.getMDCPropertyMap();
-          if (mdc != null && !mdc.isEmpty()) {
-               objLog.put("mdc", new BasicDBObject(mdc));
-          }
-          collection.insertOne(new Document(objLog));
-     }
+	public MongoDBAppender(String uri, String dataBase, String collectionName) {
+		this.uri = uri;
+		this.dataBase = dataBase;
+		this.collectionName = collectionName;
+	}
+
+	@Override
+	public void start() {
+		log.info("Initializing Mongodb Appender");
+		if (this.uri != null) {
+			this.mongoClient = new MongoClient(new MongoClientURI(this.uri));
+		} else {
+			MongoClientOptions options = new MongoClientOptions.Builder().socketKeepAlive(true).build();
+			ServerAddress address = new ServerAddress(this.url, this.port.intValue());
+			this.mongoClient = new MongoClient(address, options);
+		}
+
+		MongoDatabase database = this.mongoClient.getDatabase(this.dataBase);
+		this.collection = database.getCollection(this.collectionName);
+		log.info("Starting connection with url: {} - port: {}", this.url, this.port);
+		log.info("Database used: {} - Collection: {}", this.dataBase, this.collectionName);
+		super.start();
+	}
+
+	@Override
+	public void stop() {
+		log.info("Closing mongodb appender");
+		this.mongoClient.close();
+		super.stop();
+	}
+
+	@Override
+	protected void append(ILoggingEvent e) {
+		Map<String, Object> objLog = new HashMap<>();
+		objLog.put("ts", new Date(e.getTimeStamp()));
+		objLog.put("trace", BasicDBObject.parse(e.getFormattedMessage()));
+		objLog.put("level", e.getLevel().toString());
+		objLog.put("logger", e.getLoggerName());
+		objLog.put("thread", e.getThreadName());
+
+		if (e.hasCallerData()) {
+			StackTraceElement st = e.getCallerData()[0];
+			String callerData = String.format("%s.%s:%d", st.getClassName(), st.getMethodName(), st.getLineNumber());
+			objLog.put("caller", callerData);
+		}
+		Map<String, String> mdc = e.getMDCPropertyMap();
+		if (mdc != null && !mdc.isEmpty()) {
+			objLog.put("mdc", new BasicDBObject(mdc));
+		}
+		collection.insertOne(new Document(objLog));
+	}
 
 }
