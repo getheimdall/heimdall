@@ -21,6 +21,8 @@ package br.com.conductor.heimdall.core.exception;
  */
 
 /**
+ * This class represents the exceptions related to Provider errors.
+ *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */

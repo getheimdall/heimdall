@@ -9,9 +9,9 @@ package br.com.conductor.heimdall.core.service;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,6 +21,7 @@ package br.com.conductor.heimdall.core.service;
  */
 
 import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -37,54 +38,91 @@ import br.com.conductor.heimdall.core.repository.ProviderRepository;
 import br.com.conductor.heimdall.core.util.Pageable;
 
 /**
- * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ * This class provides methos to create, read, update and delete a {@link Provider}
  *
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Service
 public class ProviderService {
 
-	@Autowired
-	private ProviderRepository providerRepository;
-	
-	public Provider save(ProviderDTO providerPersist) {
-		Provider provider = GenericConverter.mapper(providerPersist, Provider.class);
-		return this.providerRepository.save(provider);
-	}
+    @Autowired
+    private ProviderRepository providerRepository;
 
-	public Provider edit(Long idProvider, ProviderDTO providerEdit) {
-		Provider found = this.providerRepository.findOne(idProvider);
-		Provider provider = GenericConverter.mapper(providerEdit, found);
-		return this.providerRepository.save(provider);
-	}
+    /**
+     * Saves a {@link Provider} to the repository
+     *
+     * @param providerPersist           The {@link ProviderDTO}
+     * @return                          The saved {@link Provider}
+     */
+    public Provider save(ProviderDTO providerPersist) {
+        Provider provider = GenericConverter.mapper(providerPersist, Provider.class);
+        return this.providerRepository.save(provider);
+    }
 
-	public ProviderPage listWithPageableAndFilter(ProviderDTO providerDTO, PageableDTO pageableDTO) {
+    /**
+     * Edits a {@link Provider} by its Id
+     *
+     * @param idProvider                The {@link Provider} Id
+     * @param providerEdit              The {@link ProviderDTO}
+     * @return                          The edited {@link Provider}
+     */
+    public Provider edit(Long idProvider, ProviderDTO providerEdit) {
+        Provider found = this.providerRepository.findOne(idProvider);
+        Provider provider = GenericConverter.mapper(providerEdit, found);
+        return this.providerRepository.save(provider);
+    }
 
-		Provider provider = GenericConverter.mapper(providerDTO, Provider.class);
-		Example<Provider> example = Example.of(provider,
-				ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+    /**
+     * Generates a paged list of {@link Provider} from a request
+     *
+     * @param providerDTO               The {@link ProviderDTO}
+     * @param pageableDTO               The {@link PageableDTO}
+     * @return                          The paged {@link Provider} list as a {@link ProviderPage} object
+     */
+    public ProviderPage listWithPageableAndFilter(ProviderDTO providerDTO, PageableDTO pageableDTO) {
 
-		Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+        Provider provider = GenericConverter.mapper(providerDTO, Provider.class);
+        Example<Provider> example = Example.of(provider,
+                ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 
-		Page<Provider> page = this.providerRepository.findAll(example, pageable);
+        Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
 
-		return new ProviderPage(PageDTO.build(page));
-	}
+        Page<Provider> page = this.providerRepository.findAll(example, pageable);
 
-	public List<Provider> listWithFilter(ProviderDTO providerDTO) {
+        return new ProviderPage(PageDTO.build(page));
+    }
 
-		Provider provider = GenericConverter.mapper(providerDTO, Provider.class);
-		Example<Provider> example = Example.of(provider,
-				ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+    /**
+     * Generates a list of {@link Provider} from a request
+     *
+     * @param providerDTO               The {@link ProviderDTO}
+     * @return                          The list of {@link Provider}
+     */
+    public List<Provider> listWithFilter(ProviderDTO providerDTO) {
 
-		return this.providerRepository.findAll(example);
-	}
-	
+        Provider provider = GenericConverter.mapper(providerDTO, Provider.class);
+        Example<Provider> example = Example.of(provider,
+                ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 
-	public Provider findOne(Long id) {
-		return this.providerRepository.findOne(id);
-	}
-	
-	public void delete(Long id) {
-		this.providerRepository.delete(id);
-	}
+        return this.providerRepository.findAll(example);
+    }
+
+    /**
+     * Finds a {@link Provider} by its Id
+     *
+     * @param id                        The {@link Provider} Id
+     * @return                          The {@link Provider}
+     */
+    public Provider findOne(Long id) {
+        return this.providerRepository.findOne(id);
+    }
+
+    /**
+     * Deletes a {@link Provider} by its Id
+     *
+     * @param id                        The {@link Provider} Id
+     */
+    public void delete(Long id) {
+        this.providerRepository.delete(id);
+    }
 }

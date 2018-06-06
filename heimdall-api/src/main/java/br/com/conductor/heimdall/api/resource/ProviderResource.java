@@ -51,6 +51,8 @@ import br.com.twsoftware.alfred.object.Objeto;
 import io.swagger.annotations.ApiOperation;
 
 /**
+ * Uses a {@link ProviderService} to provide methods to create, read, update and delete a {@link Provider}
+ *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
@@ -65,8 +67,8 @@ public class ProviderResource {
 	/**
 	 * Save a new {@link Provider}.
 	 * 
-	 * @param providerPersist 		- {@link ProviderDTO}
-	 * @return 						{@link ResponseEntity}
+	 * @param providerPersist 		    The {@link ProviderDTO}
+	 * @return 						    {@link ResponseEntity}
 	 */
 	@ResponseBody
 	@ApiOperation(value = "Save a nem provider")
@@ -80,9 +82,9 @@ public class ProviderResource {
 	/**
      * Finds all {@link Provider} from a request.
      * 
-     * @param providerDTO		- {@link ProviderDTO}
-     * @param pageableDTO			- {@link PageableDTO}
-     * @return						{@link ResponseEntity}
+     * @param providerDTO               {@link ProviderDTO}
+     * @param pageableDTO			    {@link PageableDTO}
+     * @return						    {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Find all Providers with filter and pageable", responseContainer = "List", response = Provider.class)
@@ -101,11 +103,11 @@ public class ProviderResource {
     }
     
     /**
-     * Updates a {@link Provider}
+     * Updates a {@link Provider} by its Id
      * 
-     * @param idProvider 		- The Provider id
-     * @param providerDTO		- {@link ProviderDTO}
-     * @return					- {@link ResponseEntity}
+     * @param idProvider 		        The {@link Provider} Id
+     * @param providerDTO		        The {@link ProviderDTO}
+     * @return					        {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Update provider")
@@ -115,8 +117,13 @@ public class ProviderResource {
     	
     	return ResponseEntity.ok(providerEdit);
     }
-    
-    
+
+    /**
+     * Deletes a {@link Provider} by its Id
+     *
+     * @param providerId                The {@link Provider} Id
+     * @return                          {@link ResponseEntity}
+     */
     @ResponseBody
     @ApiOperation(value = "Delete Provider")
     @DeleteMapping(value = "/{providerId}")

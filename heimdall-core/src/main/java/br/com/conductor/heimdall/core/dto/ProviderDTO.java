@@ -27,13 +27,14 @@ import java.util.List;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import br.com.conductor.heimdall.core.entity.Provider;
 import br.com.conductor.heimdall.core.enums.Status;
 import lombok.Data;
 
 /**
- * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma
- * Silva</a>
+ * Class is a Data Transfer Object for the {@link Provider}.
+ *
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Data
 public class ProviderDTO implements Serializable {

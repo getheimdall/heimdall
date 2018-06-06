@@ -22,7 +22,7 @@ package br.com.conductor.heimdall.core.util;
  */
 
 /**
- * This class provides templates for Ratting, AccessToken and Mock.
+ * This class provides templates for Ratting, AccessToken, Mock and OAuth.
  * 
  * @author Filipe Germano
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>

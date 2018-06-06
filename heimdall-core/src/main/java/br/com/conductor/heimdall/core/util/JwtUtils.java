@@ -40,6 +40,8 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * This class provides methods to generate and validate token with JWT
+ *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  * 
  */
@@ -47,14 +49,37 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class JwtUtils {
 
+    /**
+     * This method generate a new token.
+     *
+     * @param clientId                  The clientId that is used to get the SecretKey
+     * @param operationsPath            Paths that the token can be used
+     * @param timeToken                 Time to expire the accessToken
+     * @param timeRefreshToken          Time to expire the refreshToken
+     * @return                          The new {@link TokenOAuth}
+     */
     public TokenOAuth generateNewToken(String clientId, Set<String> operationsPath, int timeToken, int timeRefreshToken) {
         return generateToken(clientId, timeToken, timeRefreshToken, operationsPath);
     }
 
+    /**
+     * This method generate a new token with default time in accessToken and refreshToken
+     *
+     * @param clientId                  The clientId that is used to get the SecretKey
+     * @param operationsPath            Paths that the token can be used
+     * @return                          The new {@link TokenOAuth}
+     */
     public TokenOAuth generateNewTokenTimeDefault(String clientId, Set<String> operationsPath) {
         return generateToken(clientId, 20, 3600, operationsPath);
     }
 
+    /**
+     * This method validate if token is expired
+     *
+     * @param token                     The token to be validate
+     * @param clientId                  The clientId that is used to get the SecretKey
+     * @return                          True if token is expired or false otherwise
+     */
     public boolean tokenExpired(String token, String clientId) {
         Claims claimsFromTheToken;
         try {
@@ -67,6 +92,13 @@ public class JwtUtils {
         return new Date().after(claimsFromTheToken.getExpiration());
     }
 
+    /**
+     * This method recover from the Token the Operations.
+     *
+     * @param token                     The token that contain the operations
+     * @param clientId                  The clientId that is used to get the SecretKey
+     * @return                          The operations from the token
+     */
     @SuppressWarnings("unchecked")
     public Set<String> getOperationsFromToken(String token, String clientId) {
         Claims claimsFromTheToken;
@@ -86,6 +118,15 @@ public class JwtUtils {
         return operations;
     }
 
+    /**
+     * This method generate a new token.
+     *
+     * @param clientId                  The clientId that is used to get the SecretKey
+     * @param operationsPath            Paths that the token can be used
+     * @param timeToken                 Time to expire the accessToken
+     * @param timeRefreshToken          Time to expire the refreshToken
+     * @return                          The new {@link TokenOAuth}
+     */
     private TokenOAuth generateToken(String clientId, int timeToken, int timeRefreshToken, Set<String> operationsPath) {
         final LocalDateTime now = LocalDateTime.now();
         final LocalDateTime dateExpiredAccessToken = now.plusSeconds(timeToken);
@@ -118,6 +159,14 @@ public class JwtUtils {
         return tokenOAuth;
     }
 
+    /**
+     * This method return {@link Claims} from the token
+     *
+     * @param token                     The token that contain the {@link Claims}
+     * @param secretKey                 To validate token and recover {@link Claims}
+     * @return                          The {@link Claims}
+     * @throws Exception                Token expired
+     */
     private Claims getClaimsFromTheToken(String token, String secretKey) throws Exception {
 
         Claims claims;
@@ -134,6 +183,12 @@ public class JwtUtils {
         return claims;
     }
 
+    /**
+     * This method generate a SecretKey from the param clientId of the type {@link String}
+     *
+     * @param clientId                  Information to get a SecretKey
+     * @return                          The SecretKey of the type @{link {@link String}}
+     */
     private String getSecretKeyByClientId(String clientId) {
         return Base64.getEncoder().encodeToString(clientId.getBytes());
     }

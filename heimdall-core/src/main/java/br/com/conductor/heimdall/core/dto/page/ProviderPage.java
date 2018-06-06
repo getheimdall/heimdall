@@ -23,11 +23,19 @@ package br.com.conductor.heimdall.core.dto.page;
 import java.io.Serializable;
 import br.com.conductor.heimdall.core.dto.PageDTO;
 import br.com.conductor.heimdall.core.entity.Provider;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
+ * Class that represents a paged {@link Provider} list.
+ *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper=false)
 public class ProviderPage extends PageDTO<Provider> implements Serializable{
 
 	private static final long serialVersionUID = -7965991050428158318L;

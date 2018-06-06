@@ -39,7 +39,7 @@ import br.com.conductor.heimdall.core.util.JwtUtils;
 import br.com.twsoftware.alfred.object.Objeto;
 
 /**
- * This class provides methods to create and validate the {@link TokenOAuth}.
+ * This class provides methods to create and validate the {@link TokenOAuth}
  * 
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
@@ -56,8 +56,17 @@ public class OAuthService {
 	private OAuthAuthorizeRepository oAuthAuthorizeRepository;
 	@Autowired
 	private ProviderService providerService;
-	
-	
+
+	/**
+	 * Generates token from Code Authorize or from RefreshToken
+	 *
+	 * @param oAuthRequest					The {@link OAuthRequest}
+	 * @param timeAccessToken				The time to expire the accessToken
+	 * @param timeRefreshToken				The time to expire the RefreshToken
+	 * @return								The {@link TokenOAuth}
+	 * @throws UnauthorizedException		Token expired or code already used
+	 * @throws BadRequestException			Code not found or GrantType not informed
+	 */
 	public TokenOAuth generateToken(OAuthRequest oAuthRequest, int timeAccessToken, int timeRefreshToken) throws UnauthorizedException, BadRequestException {
 
 		TokenOAuth tokenOAuth = new TokenOAuth();
@@ -95,16 +104,38 @@ public class OAuthService {
 		return tokenOAuth;
 	}
 
+	/**
+	 * Validates if token is expired.
+	 *
+	 * @param token							The token to be validate
+	 * @param clientId						The clientId that is used to get the SecretKey
+	 * @return								True if token is expired or false otherwise
+	 */
 	public boolean tokenExpired(String token, String clientId) {
 		return jwtUtils.tokenExpired(token, clientId);
 	}
-	
+
+	/**
+	 * Validates if token contain in operations the URL from request
+	 *
+	 * @param token							The token that contain the Operations
+	 * @param clientId						The clientId that is used to get the SecretKey
+	 * @param pathRequest					The URL from request
+	 * @return								True if token contain URL from request in Operations or false otherwise
+	 */
 	public boolean tokenIsValidToResource(String token, String clientId, String pathRequest) {
 		Set<String> operationsFromToken = jwtUtils.getOperationsFromToken(token, clientId);
 		Optional<String> findFirst = operationsFromToken.stream().filter(o -> o.equals(pathRequest)).findFirst();
 		return findFirst.isPresent();
 	}
 
+	/**
+	 * Finds the {@link Provider} by its Id
+	 *
+	 * @param providerId					The {@link Provider} Id
+	 * @return								The {@link Provider}
+	 * @throws ProviderException			Provider not found
+	 */
 	public Provider getProvider(Long providerId) throws ProviderException{
 		Provider provider = providerService.findOne(providerId);
 		if (Objeto.isBlank(provider)) {
@@ -112,7 +143,14 @@ public class OAuthService {
 		}
 		return provider;
 	}
-	
+
+	/**
+	 * Generates the code authorize by clientId and {@link Provider} Id
+	 *
+	 * @param clientId						The clientId
+	 * @param providerId					The {@link Provider} Id
+	 * @return								The code authorize
+	 */
 	public String generateAuthorize(String clientId, Long providerId) {
 		
 		OAuthAuthorize found = oAuthAuthorizeRepository.findOne(clientId);

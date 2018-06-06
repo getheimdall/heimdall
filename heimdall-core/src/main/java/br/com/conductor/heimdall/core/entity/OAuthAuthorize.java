@@ -37,6 +37,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
+ * This class represents a OAuthAuthorize registered to the system.
+ *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
@@ -64,7 +66,10 @@ public class OAuthAuthorize implements Serializable {
 	
 	@Column(name = "TOKEN_AUTHORIZE", length = 250, nullable = false)
 	private String tokenAuthorize;
-	
+
+    /**
+     * This method generates a new code authorize.
+     */
 	public void generateTokenAuthorize() {
 		String toEncode = LocalDateTime.now().toString() + clientId;
 		this.tokenAuthorize = Base64.getEncoder().encodeToString(toEncode.getBytes());

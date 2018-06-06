@@ -23,8 +23,11 @@ package br.com.conductor.heimdall.core.dto;
 import java.io.Serializable;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
+import br.com.conductor.heimdall.core.entity.ProviderParam;
 
 /**
+ * Class is a Data Transfer Object for the {@link ProviderParam}.
+ *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */

@@ -26,6 +26,8 @@ import javax.validation.constraints.NotNull;
 import lombok.Data;
 
 /**
+ * Class is a Data Transfer Object for the OAuthRequest
+ *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */

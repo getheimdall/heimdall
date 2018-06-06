@@ -42,6 +42,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 /**
+ * This class represents a ProviderParams registered to the system.
+ *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
