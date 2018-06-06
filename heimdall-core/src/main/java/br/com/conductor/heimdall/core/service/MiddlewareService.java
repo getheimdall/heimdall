@@ -175,27 +175,32 @@ public class MiddlewareService {
      public Middleware save(Long apiId, MiddlewareDTO middlewareDTO, MultipartFile file) {
           
     	  // TODO - get this parameter from the application.yml
-    	  Integer param = 0;
+    	  Integer param = 2;
     	  
           List<Middleware> middlewares = middlewareRepository.findByApiId(apiId);
-          Middleware active = middlewares.stream()
-           		  .filter(o -> o.getStatus().equals(Status.ACTIVE))
-          	      .findFirst()
-          	      .orElse(null);
-          
-          if (Objeto.notBlank(active))
-        	  active.setStatus(Status.INACTIVE);
-          
-          if (param != 0) {
-        	  Map<Status, List<Middleware>> middlewareMap = middlewares.stream()
-            		  .collect(Collectors.groupingBy(m -> m.getStatus()));
-              
-              middlewareMap.get(Status.INACTIVE).sort((m1, m2) -> m2.getCreationDate().compareTo(m1.getCreationDate()));
-              
-        	  if (middlewareMap.get(Status.INACTIVE).size() > param) {
-        		  List<Middleware> newDeprecatedMiddleware = middlewareMap.get(Status.INACTIVE).subList(param, middlewareMap.get(Status.INACTIVE).size());
-        		  newDeprecatedMiddleware.forEach(m -> this.depreciateMiddleware(m));
+          Map<Status, List<Middleware>> middlewareMap = middlewares.stream()
+        		  .collect(Collectors.groupingBy(m -> m.getStatus()));
+    	  
+          if (Objeto.notBlank(param) && param != 0) {
+        	    
+        	  List<Middleware> active = middlewareMap.get(Status.ACTIVE);
+        	  List<Middleware> inactive = middlewareMap.get(Status.INACTIVE);
+        	  
+        	  active.forEach(m -> m.setStatus(Status.INACTIVE));
+        	  inactive.addAll(active);
+        	  inactive.sort((m1, m2) -> m1.getCreationDate().compareTo(m2.getCreationDate()));
+        	  
+        	  if (inactive.size() > param) {
+        		  Middleware m;
+        		  for(int i = 0; i < param; i++) {
+        			  m = inactive.get(i);
+        			  this.depreciate(m.getApi().getId(), m.getId());
+        		  }
+        		  
         	  }
+        	  
+          } else {
+        	  middlewareMap.get(Status.ACTIVE).forEach(m -> m.setStatus(Status.INACTIVE));
           }
           
           middlewareRepository.save(middlewares);
@@ -221,7 +226,6 @@ public class MiddlewareService {
                log.error(e.getMessage(), e);
                HeimdallException.checkThrow(isBlank(api), MIDDLEWARE_INVALID_FILE);
           }
-          middleware = middlewareRepository.save(middleware);
           
           List<Interceptor> interceptors = interceptorRepository.findByTypeAndOperationResourceApiId(TypeInterceptor.MIDDLEWARE, middleware.getApi().getId());
           middleware.setInterceptors(interceptors);
@@ -280,16 +284,26 @@ public class MiddlewareService {
           
      }
      
-     /*
-      * Performs the depreciation algorithm for a middleware.
+     /**
+      * Depreciates a Middleware. Sets the status to deprecated and remove
+      *  the middleware file from the database.
+      *  
+      * @param apiId
+      * @param middlewareId
+      * @throws NotFoundException		Resource not found
+      * @throws BadRequestException		Middleware still contains interceptors associated
       */
-     private Middleware depreciateMiddleware(Middleware middleware) {
+     public Middleware depreciate(Long apiId, Long middlewareId) {
     	 
+    	 Middleware middleware = middlewareRepository.findByApiIdAndId(apiId, middlewareId);
+    	 HeimdallException.checkThrow(isBlank(middleware), GLOBAL_RESOURCE_NOT_FOUND);
+         HeimdallException.checkThrow((Objeto.notBlank(middleware.getInterceptors()) && middleware.getInterceptors().size() > 0), ExceptionMessage.MIDDLEWARE_CONTAINS_INTERCEOPTORS);
+         
     	 middleware.setStatus(Status.DEPRECATED);
     	 
     	 // TODO - remove blob from database
-    	 
     	 return middleware;
+    	 
      }
 
 }
