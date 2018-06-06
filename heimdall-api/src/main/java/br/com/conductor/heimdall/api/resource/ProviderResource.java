@@ -9,9 +9,9 @@ package br.com.conductor.heimdall.api.resource;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -54,75 +54,74 @@ import io.swagger.annotations.ApiOperation;
  * Uses a {@link ProviderService} to provide methods to create, read, update and delete a {@link Provider}
  *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
- *
  */
-@io.swagger.annotations.Api(value = PATH_PROVIDER, produces = MediaType.APPLICATION_JSON_VALUE, tags = { ConstantsTag.TAG_PROVIDERS })
+@io.swagger.annotations.Api(value = PATH_PROVIDER, produces = MediaType.APPLICATION_JSON_VALUE, tags = {ConstantsTag.TAG_PROVIDERS})
 @RestController
 @RequestMapping(PATH_PROVIDER)
 public class ProviderResource {
 
-	@Autowired
-	private ProviderService providerService;
-	
-	/**
-	 * Save a new {@link Provider}.
-	 * 
-	 * @param providerPersist 		    The {@link ProviderDTO}
-	 * @return 						    {@link ResponseEntity}
-	 */
-	@ResponseBody
-	@ApiOperation(value = "Save a nem provider")
-	@PostMapping
-	@PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_PROVIDER)
-	public ResponseEntity<?> save(@RequestBody ProviderDTO providerPersist) {
-		Provider saved = this.providerService.save(providerPersist);
-		return new ResponseEntity<>(saved, HttpStatus.CREATED);
-	}
-	
-	/**
+    @Autowired
+    private ProviderService providerService;
+
+    /**
+     * Save a new {@link Provider}.
+     *
+     * @param providerPersist The {@link ProviderDTO}
+     * @return {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Save a nem provider")
+    @PostMapping
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_PROVIDER)
+    public ResponseEntity<?> save(@RequestBody ProviderDTO providerPersist) {
+        Provider saved = this.providerService.save(providerPersist);
+        return new ResponseEntity<>(saved, HttpStatus.CREATED);
+    }
+
+    /**
      * Finds all {@link Provider} from a request.
-     * 
-     * @param providerDTO               {@link ProviderDTO}
-     * @param pageableDTO			    {@link PageableDTO}
-     * @return						    {@link ResponseEntity}
+     *
+     * @param providerDTO {@link ProviderDTO}
+     * @param pageableDTO {@link PageableDTO}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Find all Providers with filter and pageable", responseContainer = "List", response = Provider.class)
     @GetMapping
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_PROVIDER)
     public ResponseEntity<?> findAll(@ModelAttribute ProviderDTO providerDTO, @ModelAttribute PageableDTO pageableDTO) {
-         
-         if (Objeto.notBlank(pageableDTO)) {
-              
-              ProviderPage providerPage = providerService.listWithPageableAndFilter(providerDTO, pageableDTO);      
-              return ResponseEntity.ok(providerPage);
-         } else {
-              List<Provider> listProviders = providerService.listWithFilter(providerDTO);      
-              return ResponseEntity.ok(listProviders);
-         }
+
+        if (Objeto.notBlank(pageableDTO)) {
+
+            ProviderPage providerPage = providerService.listWithPageableAndFilter(providerDTO, pageableDTO);
+            return ResponseEntity.ok(providerPage);
+        } else {
+            List<Provider> listProviders = providerService.listWithFilter(providerDTO);
+            return ResponseEntity.ok(listProviders);
+        }
     }
-    
+
     /**
      * Updates a {@link Provider} by its Id
-     * 
-     * @param idProvider 		        The {@link Provider} Id
-     * @param providerDTO		        The {@link ProviderDTO}
-     * @return					        {@link ResponseEntity}
+     *
+     * @param idProvider  The {@link Provider} Id
+     * @param providerDTO The {@link ProviderDTO}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Update provider")
     @PutMapping(value = "/{idProvider}")
     public ResponseEntity<?> update(@PathVariable Long idProvider, @RequestBody ProviderDTO providerDTO) {
-    	Provider providerEdit = this.providerService.edit(idProvider, providerDTO);
-    	
-    	return ResponseEntity.ok(providerEdit);
+        Provider providerEdit = this.providerService.edit(idProvider, providerDTO);
+
+        return ResponseEntity.ok(providerEdit);
     }
 
     /**
      * Deletes a {@link Provider} by its Id
      *
-     * @param providerId                The {@link Provider} Id
-     * @return                          {@link ResponseEntity}
+     * @param providerId The {@link Provider} Id
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Delete Provider")
@@ -131,7 +130,7 @@ public class ProviderResource {
     public ResponseEntity<?> delete(@PathVariable Long providerId) {
 
         this.providerService.delete(providerId);
-        
+
         return ResponseEntity.noContent().build();
     }
 }
