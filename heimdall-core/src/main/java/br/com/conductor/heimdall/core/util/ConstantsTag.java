@@ -26,6 +26,7 @@ package br.com.conductor.heimdall.core.util;
  * 
  * @author Filipe Germano
  * @author Marcos Filho
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
 public class ConstantsTag {
@@ -47,5 +48,6 @@ public class ConstantsTag {
      public static final String TAG_USERS = "Users";
      public static final String TAG_ROLES = "Roles";
      public static final String TAG_PRIVILEGES = "Privileges";
+     public static final String TAG_PROVIDERS = "Providers";
 
 }
