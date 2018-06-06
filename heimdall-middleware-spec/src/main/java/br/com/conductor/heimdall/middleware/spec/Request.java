@@ -63,8 +63,14 @@ public interface Request {
       * @param routeUrl	The url to the request
       */
      public void setUrl(String routeUrl);
-     
-     /**
+    /**
+     * Get request url.
+     *
+     * @return	The URL of the request
+     */
+    String getUrl();
+
+    /**
       * Gets the path of a parameter by its name.
       * 
       * @param name 	The name of the path
