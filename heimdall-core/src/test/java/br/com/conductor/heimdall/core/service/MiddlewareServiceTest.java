@@ -28,6 +28,8 @@ import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.entity.Middleware;
 import br.com.conductor.heimdall.core.enums.Status;
 import br.com.conductor.heimdall.core.enums.TypeInterceptor;
+import br.com.conductor.heimdall.core.environment.Property;
+import br.com.conductor.heimdall.core.environment.Property.Middlewares;
 import br.com.conductor.heimdall.core.repository.ApiRepository;
 import br.com.conductor.heimdall.core.repository.InterceptorRepository;
 import br.com.conductor.heimdall.core.repository.MiddlewareRepository;
@@ -51,13 +53,22 @@ public class MiddlewareServiceTest {
 	@Mock
 	private AMQPMiddlewareService amqpMiddlewareService;
 	
-	@Value("${zuul.filter.root}")
-    private String root; 
+	@Mock
+	private Property property;
 
+	@Value("${zuul.filter.root}")
+	private String root;
+	
 	private Api api;
 	private List<Middleware> middlewares;
 	private List<Interceptor> interceptors = new ArrayList<>();
-	private Middleware m1, m2, m3, m4, m5;
+	private Middleware m1, m2, m3, m4, m5, middleware;
+	
+	private Property p;
+	private Middlewares middlewareProperty;
+	
+	private MiddlewareDTO middlewareDTO;
+	private MockMultipartFile multipartFile;
 
 	@Before
 	public void setUp() {
@@ -81,14 +92,13 @@ public class MiddlewareServiceTest {
 		m3.setApi(api);
 		m3.setId(30L);
 		m3.setCreationDate(LocalDateTime.of(2015, Month.JULY, 29, 19, 30, 40));
-		
+
 		m4 = new Middleware();
 		m4.setStatus(Status.DEPRECATED);
 		m4.setApi(api);
 		m4.setId(30L);
 		m4.setCreationDate(LocalDateTime.of(2014, Month.JULY, 29, 19, 30, 40));
-		
-		
+
 		m5 = new Middleware();
 		m5.setStatus(Status.DEPRECATED);
 		m5.setApi(api);
@@ -101,35 +111,38 @@ public class MiddlewareServiceTest {
 		middlewares.add(m3);
 		middlewares.add(m4);
 		middlewares.add(m5);
-
-	}
-
-	@Test
-	public void saveNewMiddlewareTest() {
-
-		MiddlewareDTO middlewareDTO = new MiddlewareDTO();
+		
+		
+		p = new Property();
+		middlewareProperty = p.getMiddlewares();
+		middlewareProperty.setRollbackLevels(0);
+		
+		middlewareDTO = new MiddlewareDTO();
 		middlewareDTO.setStatus(Status.ACTIVE);
 		middlewareDTO.setVersion("0.0.1");
-		
-		MockMultipartFile multipartFile = new MockMultipartFile("artifact", "strongbox-validate-8.1.jar",
+
+		multipartFile = new MockMultipartFile("artifact", "strongbox-validate-8.1.jar",
 				"application/octet-stream", "some content".getBytes());
-		
-		Middleware middleware = GenericConverter.mapper(middlewareDTO, Middleware.class);
-        middleware.setApi(api);
-        middleware.setPath(root + "/api/" + api.getId() + "/middleware");
-        middleware.setType("jar");
-        middleware.setStatus(Status.ACTIVE);
-        try {
+
+		middleware = GenericConverter.mapper(middlewareDTO, Middleware.class);
+		middleware.setApi(api);
+		middleware.setPath(root + "/api/" + api.getId() + "/middleware");
+		middleware.setType("jar");
+		middleware.setStatus(Status.ACTIVE);
+		try {
 			middleware.setFile(multipartFile.getBytes());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+
 		
 		Mockito.when(middlewareRepository.findByApiId(api.getId())).thenReturn(middlewares);
 		Mockito.when(apiRepository.findOne(api.getId())).thenReturn(api);
 		Mockito.when(interceptorRepository.findByTypeAndOperationResourceApiId(TypeInterceptor.MIDDLEWARE, api.getId()))
 				.thenReturn(interceptors);
 		
+		Mockito.when(property.getMiddlewares()).thenReturn(middlewareProperty);
+
 		Mockito.when(middlewareRepository.save(middleware)).thenReturn(middleware);
 		Mockito.when(middlewareRepository.save(middlewares)).thenReturn(middlewares);
 
@@ -138,33 +151,58 @@ public class MiddlewareServiceTest {
 		Mockito.when(middlewareRepository.findByApiIdAndId(api.getId(), m3.getId())).thenReturn(m3);
 		Mockito.when(middlewareRepository.findByApiIdAndId(api.getId(), m4.getId())).thenReturn(m4);
 		Mockito.when(middlewareRepository.findByApiIdAndId(api.getId(), m5.getId())).thenReturn(m5);
+		
+	}
 
+	@Test
+	public void saveNewMiddlewareTest() {
+		
+		middlewareProperty.setRollbackLevels(1);
+		
 		Middleware saved = service.save(api.getId(), middlewareDTO, multipartFile);
-		
+
 		Map<Status, List<Middleware>> middlewareMap = middlewares.stream()
-      		  .collect(Collectors.groupingBy(m -> m.getStatus()));
-		
-		System.out.println(m1.getStatus());
-		System.out.println(m2.getStatus());
-		System.out.println(m3.getStatus());
-		System.out.println(m4.getStatus());
-		System.out.println(m5.getStatus());
+				.collect(Collectors.groupingBy(m -> m.getStatus()));
 		
 		assertTrue(saved.equals(middleware));
-		assertNull(middlewareMap.get(Status.ACTIVE));
-		assertEquals(2, middlewareMap.get(Status.INACTIVE).size());
-		assertEquals(3, middlewareMap.get(Status.DEPRECATED).size());
-		assertEquals(Status.DEPRECATED, m3.getStatus());
-		
+		assertEquals(Status.ACTIVE, saved.getStatus());
+		assertEquals(1, middlewareMap.get(Status.INACTIVE).size());
+		assertEquals(4, middlewareMap.get(Status.DEPRECATED).size());
+
 	}
 	
 	@Test
-	public void deprecateMiddleware() {
+	public void saveNewMiddlewareNoRollbackTest() {
 		
-		Mockito.when(middlewareRepository.findByApiIdAndId(api.getId(), m1.getId())).thenReturn(m1);
+		middlewareProperty.setRollbackLevels(null);
 		
-		Middleware modified = service.depreciate(api.getId(), m1.getId());
+		Middleware saved = service.save(api.getId(), middlewareDTO, multipartFile);
+
+		Map<Status, List<Middleware>> middlewareMap = middlewares.stream()
+				.collect(Collectors.groupingBy(m -> m.getStatus()));
 		
-		assertTrue(modified.getStatus().equals(Status.DEPRECATED));
+		assertTrue(saved.equals(middleware));
+		assertEquals(Status.ACTIVE, saved.getStatus());
+		assertEquals(3, middlewareMap.get(Status.INACTIVE).size());
+		assertEquals(2, middlewareMap.get(Status.DEPRECATED).size());
+
 	}
+	
+	@Test
+	public void saveNewMiddlewareHugeRollbackTest() {
+		
+		middlewareProperty.setRollbackLevels(99999999);
+		
+		Middleware saved = service.save(api.getId(), middlewareDTO, multipartFile);
+
+		Map<Status, List<Middleware>> middlewareMap = middlewares.stream()
+				.collect(Collectors.groupingBy(m -> m.getStatus()));
+		
+		assertTrue(saved.equals(middleware));
+		assertEquals(Status.ACTIVE, saved.getStatus());
+		assertEquals(3, middlewareMap.get(Status.INACTIVE).size());
+		assertEquals(2, middlewareMap.get(Status.DEPRECATED).size());
+
+	}
+	
 }
