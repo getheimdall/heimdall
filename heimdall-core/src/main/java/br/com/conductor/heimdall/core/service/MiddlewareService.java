@@ -53,6 +53,7 @@ import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.entity.Middleware;
 import br.com.conductor.heimdall.core.enums.Status;
 import br.com.conductor.heimdall.core.enums.TypeInterceptor;
+import br.com.conductor.heimdall.core.environment.Property;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.ApiRepository;
@@ -82,6 +83,9 @@ public class MiddlewareService {
      @Autowired
      private InterceptorRepository interceptorRepository;
      
+     @Autowired
+     private Property property;
+
      @Value("${zuul.filter.root}")
      private String root; 
      
@@ -174,30 +178,25 @@ public class MiddlewareService {
      @Transactional
      public Middleware save(Long apiId, MiddlewareDTO middlewareDTO, MultipartFile file) {
           
-    	  // TODO - get this parameter from the application.yml
-    	  Integer param = 2;
-    	  
-          List<Middleware> middlewares = middlewareRepository.findByApiId(apiId);
+    	  List<Middleware> middlewares = middlewareRepository.findByApiId(apiId);
           Map<Status, List<Middleware>> middlewareMap = middlewares.stream()
         		  .collect(Collectors.groupingBy(m -> m.getStatus()));
+          
+          Integer rollbackLevels = property.getMiddlewares().getRollbackLevels();
     	  
-          if (Objeto.notBlank(param) && param != 0) {
+          if (Objeto.notBlank(rollbackLevels) && rollbackLevels != 0) {
         	    
         	  List<Middleware> active = middlewareMap.get(Status.ACTIVE);
         	  List<Middleware> inactive = middlewareMap.get(Status.INACTIVE);
         	  
         	  active.forEach(m -> m.setStatus(Status.INACTIVE));
         	  inactive.addAll(active);
-        	  inactive.sort((m1, m2) -> m1.getCreationDate().compareTo(m2.getCreationDate()));
+        	  inactive.sort((m1, m2) -> m2.getCreationDate().compareTo(m1.getCreationDate()));
         	  
-        	  if (inactive.size() > param) {
-        		  Middleware m;
-        		  for(int i = 0; i < param; i++) {
-        			  m = inactive.get(i);
-        			  this.depreciate(m.getApi().getId(), m.getId());
-        		  }
-        		  
-        	  }
+    		  inactive.stream().skip(rollbackLevels).forEach(m -> {
+    			  m.setStatus(Status.DEPRECATED);
+    			  m.setFile(null);
+    		  });
         	  
           } else {
         	  middlewareMap.get(Status.ACTIVE).forEach(m -> m.setStatus(Status.INACTIVE));
@@ -239,7 +238,7 @@ public class MiddlewareService {
      /**
       * Updates a middleware by Middleware ID and API ID.
       * 
-      * @param 	apiId 					The ID of the API 
+      * @param 	apiId 					The ID of the API
       * @param 	middlewareId 			The middleware ID
       * @param	middlewareDTO 			The middleware DTO
       * @return 						The middleware that was updated
@@ -256,6 +255,9 @@ public class MiddlewareService {
           HeimdallException.checkThrow(notBlank(resData) && (resData.getApi().getId() == middleware.getApi().getId()) && (resData.getId() != middleware.getId()), ONLY_ONE_MIDDLEWARE_PER_VERSION_AND_API);
           
           middleware = GenericConverter.mapper(middlewareDTO, middleware);
+          
+          if (middleware.getStatus().equals(Status.DEPRECATED))
+        	  middleware.setFile(null);
           
           middleware = middlewareRepository.save(middleware);
           
@@ -282,28 +284,6 @@ public class MiddlewareService {
           amqpMiddlewareService.dispatchRemoveMiddlewares(middleware.getPath());
           middlewareRepository.delete(middleware.getId());
           
-     }
-     
-     /**
-      * Depreciates a Middleware. Sets the status to deprecated and remove
-      *  the middleware file from the database.
-      *  
-      * @param apiId
-      * @param middlewareId
-      * @throws NotFoundException		Resource not found
-      * @throws BadRequestException		Middleware still contains interceptors associated
-      */
-     public Middleware depreciate(Long apiId, Long middlewareId) {
-    	 
-    	 Middleware middleware = middlewareRepository.findByApiIdAndId(apiId, middlewareId);
-    	 HeimdallException.checkThrow(isBlank(middleware), GLOBAL_RESOURCE_NOT_FOUND);
-         HeimdallException.checkThrow((Objeto.notBlank(middleware.getInterceptors()) && middleware.getInterceptors().size() > 0), ExceptionMessage.MIDDLEWARE_CONTAINS_INTERCEOPTORS);
-         
-    	 middleware.setStatus(Status.DEPRECATED);
-    	 
-    	 // TODO - remove blob from database
-    	 return middleware;
-    	 
      }
 
 }
