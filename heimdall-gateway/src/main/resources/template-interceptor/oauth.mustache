@@ -1,0 +1,222 @@
+import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
+
+import java.util.*;
+
+
+import com.netflix.zuul.ZuulFilter;
+
+import com.google.common.collect.Sets;
+import com.netflix.zuul.context.RequestContext;
+import br.com.conductor.heimdall.core.dto.request.OAuthRequest;
+import br.com.conductor.heimdall.core.entity.Provider;
+import br.com.conductor.heimdall.core.entity.ProviderParam;
+import br.com.conductor.heimdall.core.entity.TokenOAuth;
+import br.com.conductor.heimdall.core.enums.TypeOAuth;
+import br.com.conductor.heimdall.core.exception.ExceptionMessage;
+import br.com.conductor.heimdall.core.exception.UnauthorizedException;
+import br.com.conductor.heimdall.core.service.OAuthService;
+import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
+import br.com.conductor.heimdall.gateway.filter.helper.*;
+import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
+import br.com.conductor.heimdall.gateway.filter.helper.HelperImpl;
+import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import br.com.conductor.heimdall.middleware.spec.*;
+import br.com.conductor.heimdall.middleware.enums.HttpStatus;
+import br.com.conductor.heimdall.middleware.enums.HttpStatus.Series;
+import br.com.conductor.heimdall.middleware.spec.ApiResponse;
+import br.com.conductor.heimdall.middleware.spec.Helper;
+import br.com.conductor.heimdall.middleware.spec.Http;
+import br.com.conductor.heimdall.core.util.BeanManager;
+import br.com.twsoftware.alfred.object.Objeto;
+import org.apache.commons.lang.StringUtils;
+
+public class OAuthInterceptor extends HeimdallFilter {
+
+     private static Set<String> pathsAllowed;
+
+     private static Set<String> pathsNotAllowed;
+
+     private static String inboundURL;
+
+     private static String method;
+     
+     private Helper helper;
+
+     private Long providerId = {{providerId}};
+
+     private int timeAccessToken = {{timeAccessToken}};
+
+     private int timeRefreshToken = {{timeRefreshToken}};
+
+     private OAuthService oAuthService;
+
+     public OAuthInterceptor() {
+
+          pathsAllowed = Sets.newHashSet();
+     {{#pathsAllowed}}
+          pathsAllowed.add("{{.}}");
+     {{/pathsAllowed}}      
+
+          pathsNotAllowed = Sets.newHashSet();
+     {{#pathsNotAllowed}}
+          pathsNotAllowed.add("{{.}}");
+     {{/pathsNotAllowed}}           
+
+          inboundURL = "{{inboundURL}}";
+          method = "{{method}}";
+
+          this.helper = new HelperImpl();
+
+     }
+
+     @Override
+     public int filterOrder() {
+
+          return {{order}};
+     }
+
+     @Override
+     public String filterType() {
+
+          return "{{executionPoint}}";
+     }
+
+     @Override
+     public boolean should() {
+
+           return InterceptorLifeCycle.{{lifeCycle}}.filter(pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest());
+     }
+     
+     @Override
+     public String getName() {
+     	return "{{name}}"
+     }
+
+     @Override
+     public void execute() throws Throwable {
+                    
+        oAuthService = (OAuthService) BeanManager.getBean(OAuthService.class);
+
+         try {
+
+            TraceContextHolder.getInstance().getActualTrace().trace("Iniciando o interceptador do OAuth.");
+            String body = helper.call().request().getBody();
+            OAuthRequest oAuthRequest;
+
+            if (Objeto.isBlank(body)) {
+              oAuthRequest = new OAuthRequest();
+              oAuthRequest.setClient_id(helper.call().request().header().get("client_id"));
+            } else {
+              oAuthRequest = helper.json().parse(helper.call().request().getBody(), OAuthRequest.class);
+            }
+            
+            String clientId = oAuthRequest.getClient_id();
+            if (Objeto.isBlank(clientId)) {
+                generateResponseWithError("client_id not found.");
+                return null;
+            }
+            
+            if ("{{typeOAuth}}".equals(TypeOAuth.GENERATE.getTypeOAuth())) {
+              
+              TokenOAuth tokenOAuth = oAuthService.generateToken(oAuthRequest, timeAccessToken, timeRefreshToken);
+              String tokenOAuthJson = helper.json().parse(tokenOAuth);
+              generateResponseWithSuccess(tokenOAuthJson);
+
+            } else if ("{{typeOAuth}}".equals(TypeOAuth.AUTHORIZE.getTypeOAuth())) {
+             
+              Provider provider = oAuthService.getProvider(providerId); 
+              Http http = helper.http().url(provider.getPath());
+              
+              for (ProviderParam param: provider.getProviderParams()) {
+                if (param.getLocation().equals("HEADER")) {
+                  if (Objeto.isBlank(param.getValue())){
+                    String valueParam = helper.call().request().header().get(param.getName());
+                    if (!Objeto.isBlank(valueParam)){
+                      http = http.header(param.getName(), valueParam);  
+                    } else {
+                      generateResponseWithError("All parameters of the provider need to be informed.");
+                      return null;
+                    } 
+                  }else {
+                    http = http.header(param.getName(), param.getValue());
+                  }
+                } else {
+                  if (Objeto.isBlank(param.getValue())) {
+                    String valueParam = helper.call().request().query().get(param.getName());
+                    if (!Objeto.isBlank(valueParam)){
+                      http = http.queryParam(param.getName(), valueParam);    
+                    } else {
+                      generateResponseWithError("All parameters of the provider need to be informed.");
+                      return null;
+                    }
+                  } else {
+                    http = http.queryParam(param.getName(), param.getValue());
+                  }
+                }
+              }
+
+              try {
+                ApiResponse apiResponse = http.sendPost();
+                if (Series.valueOf(apiResponse.getStatus()) == Series.SUCCESSFUL) {
+                  String codeAuthorize = oAuthService.generateAuthorize(clientId, providerId);
+                  generateResponseWithSuccess("{\"code\": \""+ codeAuthorize + "\"}");
+                } else {
+                  generateResponseWithError("User provider unauthorized");
+                  return null;
+                }
+              } catch (Exception ex) {
+                  generateResponseWithError("User provider unauthorized or bad request");
+                  return null;
+              }
+              
+            } else {
+              
+              String authorization = helper.call().request().header().get("Authorization");
+              if (Objeto.isBlank(authorization)) {
+                generateResponseWithError("Authorization not defined in header.");
+                return null;
+              }
+
+              String token = authorization.replace("Bearer ", "");
+              if (oAuthService.tokenExpired(token, clientId)) {
+                generateResponseWithError("Token expired");
+                return null;
+              }
+
+              String requestURL = RequestContext.getCurrentContext().getRequest().getRequestURL();
+              if (StringUtils.endsWith(requestURL, "/")){
+                requestURL = StringUtils.removeEnd(requestURL.trim(), "/");
+              }
+
+              if (!oAuthService.tokenIsValidToResource(token, clientId, requestURL)) {
+                generateResponseWithError("Token not valid to this request");
+                return null;
+              }
+            }
+            
+          } catch (Exception e) {
+            TraceContextHolder.getInstance().getActualTrace().trace(e.getMessage(), e);
+            generateResponseWithError(e.getMessage());
+          }
+
+          return null;
+          
+     }
+
+  private void generateResponseWithError(String message) {
+		  helper.call().response().setStatus(HttpStatus.UNAUTHORIZED.value());
+	  	generateResponse("{ \"error\" : \"" + message + "\" }");
+	}
+	
+	private void generateResponseWithSuccess(String message) {
+      helper.call().response().setStatus(HttpStatus.OK.value());
+      generateResponse(message);
+	}
+	
+	private void generateResponse(String message) {
+      TraceContextHolder.getInstance().getActualTrace().trace(message);
+      helper.call().response().header().add("Content-Type", "application/json");
+  		helper.call().response().setBody(message);
+	}
+
+}

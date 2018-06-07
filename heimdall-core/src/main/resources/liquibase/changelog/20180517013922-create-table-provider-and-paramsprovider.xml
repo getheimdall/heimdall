@@ -1,0 +1,91 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+	<!-- Create table Providers -->
+	<changeSet author="conductor\dijalma.silva" id="1">
+		<createTable tableName="PROVIDERS">
+			<column name="ID" autoIncrement="true" type="BIGINT">
+				<constraints unique="true" primaryKey="true"
+					nullable="false" />
+			</column>
+			<column name="NAME" type="VARCHAR(180)">
+				<constraints nullable="false" />
+			</column>
+			<column name="DESCRIPTION" type="VARCHAR(200)" />
+			<column name="PATH" type="VARCHAR(1000)">
+				<constraints nullable="false" />
+			</column>
+			<column name="CREATION_DATE" type="datetime">
+				<constraints nullable="false" />
+			</column>
+			<column name="STATUS" type="varchar(10)">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		<rollback>
+			<dropTable tableName="PROVIDERS"/>
+		</rollback>
+	</changeSet>
+	
+	<!-- Create table Params_Provider -->
+	<changeSet author="conductor\dijalma.silva" id="2">
+		<preConditions>
+			<tableExists tableName="PROVIDERS" />
+		</preConditions>
+		<createTable tableName="PROVIDER_PARAMS">
+			<column name="ID" autoIncrement="true" type="BIGINT">
+				<constraints unique="true" primaryKey="true"
+					nullable="false" />
+			</column>
+			<column name="NAME" type="VARCHAR(180)">
+				<constraints nullable="false" />
+			</column>
+			<column name="LOCATION" type="VARCHAR(100)">
+				<constraints nullable="false" />
+			</column>
+			<column name="VALUE" type="VARCHAR(200)">
+				<constraints nullable="false" />
+			</column>
+			<column name="CREATION_DATE" type="datetime">
+				<constraints nullable="false" />
+			</column>
+			<column name="STATUS" type="varchar(10)">
+				<constraints nullable="false" />
+			</column>
+			<column name="PROVIDER_ID" type="BIGINT">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+		<rollback>
+			<dropTable tableName="PROVIDER_PARAMS" />
+		</rollback>
+	</changeSet>
+	
+	<!-- Add foreignKey to ProviderId in Provider_Params -->
+	<changeSet author="conductor\dijalma.silva" id="3">
+		<preConditions>
+			<tableExists tableName="PROVIDERS"/>
+			<tableExists tableName="PROVIDER_PARAMS"/>
+		</preConditions>
+		<addForeignKeyConstraint 
+			baseTableName="PROVIDER_PARAMS" 
+			baseColumnNames="PROVIDER_ID" 
+			constraintName="FK_PROVIDER_ID" 
+			deferrable="false" 
+			initiallyDeferred="false" 
+			onDelete="NO ACTION" 
+			onUpdate="NO ACTION" 
+			referencedTableName="PROVIDERS" 
+			referencedColumnNames="ID" 
+			validate="true"/>
+		
+		<rollback>
+			<dropForeignKeyConstraint baseTableName="PROVIDER_PARAMS" constraintName="FK_PROVIDER_ID"/>
+		</rollback>
+	</changeSet>
+	
+</databaseChangeLog>

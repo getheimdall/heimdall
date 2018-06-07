@@ -51,7 +51,7 @@ import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
 import br.com.conductor.heimdall.core.dto.interceptor.AccessTokenClientIdDTO;
 import br.com.conductor.heimdall.core.dto.interceptor.MockDTO;
-import br.com.conductor.heimdall.core.dto.interceptor.RattingDTO;
+import br.com.conductor.heimdall.core.dto.interceptor.RateLimitDTO;
 import br.com.conductor.heimdall.core.dto.page.InterceptorPage;
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Interceptor;
@@ -277,8 +277,8 @@ public class InterceptorService {
                case RATTING:
                     try {
 
-                         RattingDTO rattingDTO = JsonUtils.convertJsonToObject(content, RattingDTO.class);
-                         if (Objeto.notBlank(rattingDTO)) {
+                         RateLimitDTO rateLimitDTO = JsonUtils.convertJsonToObject(content, RateLimitDTO.class);
+                         if (Objeto.notBlank(rateLimitDTO)) {
                               
                               valid = true;
                          }
@@ -390,9 +390,9 @@ public class InterceptorService {
 
      protected void mountRatelimitInRedis(Interceptor interceptor) {
 
-         RattingDTO rattingDTO = new RattingDTO();
+         RateLimitDTO rateLimitDTO = new RateLimitDTO();
          try {
-              rattingDTO = JsonUtils.convertJsonToObject(interceptor.getContent(), RattingDTO.class);
+              rateLimitDTO = JsonUtils.convertJsonToObject(interceptor.getContent(), RateLimitDTO.class);
          } catch (Exception e) {
 
               log.error(e.getMessage(), e);
@@ -411,7 +411,7 @@ public class InterceptorService {
               path = op.getResource().getApi().getBasePath() + "-" + op.getResource().getName() + "-" + op.getPath();
          }
          
-         RateLimit rate = new RateLimit(path, rattingDTO.getCalls(), rattingDTO.getInterval());
+         RateLimit rate = new RateLimit(path, rateLimitDTO.getCalls(), rateLimitDTO.getInterval());
          ratelimitRepository.save(rate);
     }
 

@@ -57,4 +57,11 @@ public interface Call {
 	  */
      public Environment environment();
 
+     /**
+      * Gets the info from the call.
+      * 
+      * @return		The info from the call
+      */
+     public Info info();
+
 }

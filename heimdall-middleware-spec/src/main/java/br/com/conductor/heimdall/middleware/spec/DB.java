@@ -22,106 +22,78 @@ package br.com.conductor.heimdall.middleware.spec;
  */
 
 import java.util.List;
-
-import org.bson.Document;
-import org.bson.conversions.Bson;
-import org.mongodb.morphia.query.Query;
-
-import com.mongodb.client.MongoCollection;
-
 import br.com.conductor.heimdall.middleware.util.Page;
 
 /**
- * This interface represents a connection to a mongoDB database.
+ * This interface represents a connection to a database.
  *
  * @author Filipe Germano
+ * @author Jefferson X. Cardoso
  *
  */
 public interface DB {
-     
+
      /**
-      * Inserts a List of objects to a {@link MongoCollection} of {@link Document}.
-      * 
-      * @param collection     {@link MongoCollection} of {@link Document}
-      * @param object         List of Objects to insert
-      */
-	public <T> void insertMany(MongoCollection<Document> collection, List<T> objects); 
-     
-	/**
-      * Inserts a object in a {@link MongoCollection} of {@link Document}.
-      * 
-      * @param collection     {@link MongoCollection} of {@link Document}
-      * @param object         Object to insert
-      */
-     public <T> void insertOne(MongoCollection<Document> collection, T object);
-     
-     /**
-      * Builds a Page from a List of Objects, a page number to start, a limit of pages to create and a number of total elements.
-      * 
-      * @param list                	The List of Objects
-      * @param page                	The start page
-      * @param limit               	The limit of pages to create
-      * @param totalElements		The total number of elements
-      * @return                     The {@link Page} list of elements
-      */
-     public <T> Page<T> buildPage(List<T> list, Integer page, Integer limit, Long totalElements);
-     
-     /**
-      * Returns a Page from the {@link MongoCollection} of {@link Document}, classType, {@link Bson}, page number and limit.
-      * 
-      * @param collection     	{@link MongoCollection} of {@link Document}
-      * @param classType 		The type of paged files
-      * @param filters        	{@link Bson}
-      * @param page           	Integer that represents the page number
-      * @param limit          	Limits the number of pages to return
-      * @return
-      */
-     public <T> Page<T> find(MongoCollection<Document> collection, Class<T> classType, Bson filters, Integer page, Integer limit);
-     
-     /**
-      * Delete a document of the collection
-      * 
-      * @param object   
-      */
-     public void delete(Object object);
-     
-     /**
-      * Save a document of the collection.
-      * 
-      * @param object   Object to be saved to the DB
-      */
-     public <T> T save(T object);
-     
-     /**
-      * Returns the {@link Query} provider.
+      * Save a record in DB.
       * 
       * @param object
-      * @return				The Query provider
+      * Object to be saved in DB
+      * 
       */
-     public <T> Query<T> getQueryProvider(Object criteria);
-     
+     public <T> T save(T object);
+
+     /**
+      * Update a record in the DB.
+      * 
+      * @param object
+      * Object to be updated in DB
+      * 
+      */
+     public <T> T update(T object);
+
+     /**
+      * Delete a record in DB
+      * 
+      * @param object
+      * Object to be deleted in DB
+      */
+     public <T> Boolean delete(T object);
+
+     /**
+      * Find a object in DB
+      * 
+      * @param object
+      * @return
+      */
+     public <T> T findOne(T object);
+
+     /**
+      * Find all objects in DB
+      * 
+      * @return
+      */
+     public <T> List<T> findAll(Class<T> classType);
+
      /**
       * Find a documents
-      * 
-      * @param object   
+      *
+      * @param object
       */
      public <T> Page<T> find(Object criteria, Integer page, Integer limit);
-     
-     /**
-      * Gets a {@link MongoCollection} from class type.
-      * @param <T>
-       * 
-       * @param classType     The class type of the {@link MongoCollection}
-      * @return               The {@link MongoCollection}
-      */
 
-     public <T> MongoCollection<Document> collection(Class<T> classType);
-     
      /**
-      * Gets a {@link MongoCollection} from name.
-      * 
-      * @param name               The name of the {@link MongoCollection}
-      * @return                   The {@link MongoCollection}
+      * Builds a Page from a List of Objects, a page number to start, a limit of pages to create and a number of total elements.
+      *
+      * @param list
+      * The List of Objects
+      * @param page
+      * The start page
+      * @param limit
+      * The limit of pages to create
+      * @param totalElements
+      * The total number of elements
+      * @return The {@link Page} list of elements
       */
-     public MongoCollection<Document> collection(String name);
+     public <T> Page<T> buildPage(List<T> list, Integer page, Integer limit, Long totalElements);
+
 }

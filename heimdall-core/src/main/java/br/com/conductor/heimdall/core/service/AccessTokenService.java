@@ -54,6 +54,7 @@ import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.AccessTokenRepository;
 import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.repository.PlanRepository;
+import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 import br.com.conductor.heimdall.core.util.Pageable;
 import br.com.twsoftware.alfred.object.Objeto;
 import net.bytebuddy.utility.RandomString;
@@ -78,6 +79,9 @@ public class AccessTokenService {
      
      @Autowired
      private PlanRepository planRepository;
+
+     @Autowired
+     private AMQPCacheService amqpCacheService; 
      
      /**
       * Looks for a {@link AccessToken} based on it's.
@@ -178,22 +182,24 @@ public class AccessTokenService {
       * Updates a {@link AccessToken} by its ID.
       * 
       * @param 	id 						The ID of the {@link AccessToken} to be updated
-      * @param 	accessTokenRequest 		{@link AccessTokenRequest} The request for {@link AccessToken}
+      * @param 	accessTokenPersist 		{@link AccessTokenPersist} The request for {@link AccessToken}
       * @return 						The {@link AccessToken} updated
       * @throws NotFoundException 		Resource not found
       * @throws BadRequestException		App not exist
       */
      @Transactional
-     public AccessToken update(Long id, AccessTokenRequest accessTokenRequest) {
+     public AccessToken update(Long id, AccessTokenPersist accessTokenPersist) {
 
           AccessToken accessToken = accessTokenRepository.findOne(id);
           HeimdallException.checkThrow(isBlank(accessToken), GLOBAL_RESOURCE_NOT_FOUND);
           
-          App appRecover = appRespository.findOne(accessTokenRequest.getApp().getId());
+          App appRecover = appRespository.findOne(accessTokenPersist.getApp().getId());
           HeimdallException.checkThrow(isBlank(appRecover), APP_NOT_EXIST);
           
-          accessToken = GenericConverter.mapper(accessTokenRequest, accessToken);
+          accessToken = GenericConverter.mapper(accessTokenPersist, accessToken);
           accessToken = accessTokenRepository.save(accessToken);
+          
+          amqpCacheService.dispatchClean();
           
           return accessToken;
      }
@@ -209,6 +215,8 @@ public class AccessTokenService {
 
           AccessToken accessToken = accessTokenRepository.findOne(id);
           HeimdallException.checkThrow(isBlank(accessToken), GLOBAL_RESOURCE_NOT_FOUND);
+          
+          amqpCacheService.dispatchClean();
           
           accessTokenRepository.delete(accessToken);
      }
