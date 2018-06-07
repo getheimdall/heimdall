@@ -78,6 +78,8 @@ heimdall:
             #userDn: your@mail.user
             #password: password
             #userSearchFilter: sAMAccountName={0}    
+    middlewares:
+        rollbackLevels: 0
 
 spring:
     pid:
