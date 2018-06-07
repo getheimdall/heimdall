@@ -60,13 +60,10 @@ public class MiddlewareServiceTest {
 	private String root;
 	
 	private Api api;
-	private List<Middleware> middlewares;
+	private List<Middleware> middlewareList;
 	private List<Interceptor> interceptors = new ArrayList<>();
-	private Middleware m1, m2, m3, m4, m5, middleware;
-	
-	private Property p;
+	private Middleware m1, m2, m3, m4, m5, middleware;	
 	private Middlewares middlewareProperty;
-	
 	private MiddlewareDTO middlewareDTO;
 	private MockMultipartFile multipartFile;
 
@@ -96,24 +93,23 @@ public class MiddlewareServiceTest {
 		m4 = new Middleware();
 		m4.setStatus(Status.DEPRECATED);
 		m4.setApi(api);
-		m4.setId(30L);
+		m4.setId(40L);
 		m4.setCreationDate(LocalDateTime.of(2014, Month.JULY, 29, 19, 30, 40));
 
 		m5 = new Middleware();
 		m5.setStatus(Status.DEPRECATED);
 		m5.setApi(api);
-		m5.setId(30L);
+		m5.setId(50L);
 		m5.setCreationDate(LocalDateTime.of(2013, Month.JULY, 29, 19, 30, 40));
 
-		middlewares = new ArrayList<>();
-		middlewares.add(m1);
-		middlewares.add(m2);
-		middlewares.add(m3);
-		middlewares.add(m4);
-		middlewares.add(m5);
+		middlewareList = new ArrayList<>();
+		middlewareList.add(m1);
+		middlewareList.add(m2);
+		middlewareList.add(m3);
+		middlewareList.add(m4);
+		middlewareList.add(m5);
 		
-		
-		p = new Property();
+		Property p = new Property();
 		middlewareProperty = p.getMiddlewares();
 		middlewareProperty.setRollbackLevels(0);
 		
@@ -136,7 +132,7 @@ public class MiddlewareServiceTest {
 		}
 
 		
-		Mockito.when(middlewareRepository.findByApiId(api.getId())).thenReturn(middlewares);
+		Mockito.when(middlewareRepository.findByApiId(api.getId())).thenReturn(middlewareList);
 		Mockito.when(apiRepository.findOne(api.getId())).thenReturn(api);
 		Mockito.when(interceptorRepository.findByTypeAndOperationResourceApiId(TypeInterceptor.MIDDLEWARE, api.getId()))
 				.thenReturn(interceptors);
@@ -144,7 +140,7 @@ public class MiddlewareServiceTest {
 		Mockito.when(property.getMiddlewares()).thenReturn(middlewareProperty);
 
 		Mockito.when(middlewareRepository.save(middleware)).thenReturn(middleware);
-		Mockito.when(middlewareRepository.save(middlewares)).thenReturn(middlewares);
+		Mockito.when(middlewareRepository.save(middlewareList)).thenReturn(middlewareList);
 
 		Mockito.when(middlewareRepository.findByApiIdAndId(api.getId(), m1.getId())).thenReturn(m1);
 		Mockito.when(middlewareRepository.findByApiIdAndId(api.getId(), m2.getId())).thenReturn(m2);
@@ -161,7 +157,7 @@ public class MiddlewareServiceTest {
 		
 		Middleware saved = service.save(api.getId(), middlewareDTO, multipartFile);
 
-		Map<Status, List<Middleware>> middlewareMap = middlewares.stream()
+		Map<Status, List<Middleware>> middlewareMap = middlewareList.stream()
 				.collect(Collectors.groupingBy(m -> m.getStatus()));
 		
 		assertTrue(saved.equals(middleware));
@@ -178,7 +174,7 @@ public class MiddlewareServiceTest {
 		
 		Middleware saved = service.save(api.getId(), middlewareDTO, multipartFile);
 
-		Map<Status, List<Middleware>> middlewareMap = middlewares.stream()
+		Map<Status, List<Middleware>> middlewareMap = middlewareList.stream()
 				.collect(Collectors.groupingBy(m -> m.getStatus()));
 		
 		assertTrue(saved.equals(middleware));
@@ -195,7 +191,7 @@ public class MiddlewareServiceTest {
 		
 		Middleware saved = service.save(api.getId(), middlewareDTO, multipartFile);
 
-		Map<Status, List<Middleware>> middlewareMap = middlewares.stream()
+		Map<Status, List<Middleware>> middlewareMap = middlewareList.stream()
 				.collect(Collectors.groupingBy(m -> m.getStatus()));
 		
 		assertTrue(saved.equals(middleware));
