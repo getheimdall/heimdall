@@ -160,5 +160,12 @@ public class Property {
           private boolean printAllTrace = false;
           private List<String> sanitizes = new ArrayList<>();
      }
+     
+     private Middlewares middlewares = new Middlewares();
+     
+     @Data
+     public class Middlewares {
+    	 private Integer rollbackLevels;
+     }
 
 }
