@@ -165,7 +165,7 @@ public class Property {
      
      @Data
      public class Middlewares {
-    	 private Integer rollbackLevels;
+    	 private Integer allowInactive;
      }
 
 }

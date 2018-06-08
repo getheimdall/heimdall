@@ -79,7 +79,7 @@ heimdall:
             #password: password
             #userSearchFilter: sAMAccountName={0}    
     middlewares:
-        rollbackLevels: 0
+        allowInactive: 0
 
 spring:
     pid:

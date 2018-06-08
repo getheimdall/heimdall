@@ -182,9 +182,9 @@ public class MiddlewareService {
           Map<Status, List<Middleware>> middlewareMap = middlewares.stream()
         		  .collect(Collectors.groupingBy(m -> m.getStatus()));
           
-          Integer rollbackLevels = property.getMiddlewares().getRollbackLevels();
+          Integer allowInactive = property.getMiddlewares().getAllowInactive();
     	  
-          if (Objeto.notBlank(rollbackLevels) && rollbackLevels != 0) {
+          if (Objeto.notBlank(allowInactive) && allowInactive != 0) {
         	    
         	  List<Middleware> active = middlewareMap.get(Status.ACTIVE);
         	  List<Middleware> inactive = middlewareMap.get(Status.INACTIVE);
@@ -193,7 +193,7 @@ public class MiddlewareService {
         	  inactive.addAll(active);
         	  inactive.sort((m1, m2) -> m2.getCreationDate().compareTo(m1.getCreationDate()));
         	  
-    		  inactive.stream().skip(rollbackLevels).forEach(m -> {
+    		  inactive.stream().skip(allowInactive).forEach(m -> {
     			  m.setStatus(Status.DEPRECATED);
     			  m.setFile(null);
     		  });

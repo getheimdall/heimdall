@@ -172,7 +172,7 @@ public class MiddlewareServiceTest {
 	@Test
 	public void saveNewMiddlewareTest() {
 		
-		middlewareProperty.setRollbackLevels(1);
+		middlewareProperty.setAllowInactive(1);
 		
 		Middleware saved = service.save(api.getId(), middlewareDTO, multipartFile);
 
@@ -189,7 +189,7 @@ public class MiddlewareServiceTest {
 	@Test
 	public void saveNewMiddlewareNoRollbackTest() {
 		
-		middlewareProperty.setRollbackLevels(null);
+		middlewareProperty.setAllowInactive(null);
 		
 		Middleware saved = service.save(api.getId(), middlewareDTO, multipartFile);
 
@@ -206,7 +206,7 @@ public class MiddlewareServiceTest {
 	@Test
 	public void saveNewMiddlewareHugeRollbackTest() {
 		
-		middlewareProperty.setRollbackLevels(99999999);
+		middlewareProperty.setAllowInactive(99999999);
 		
 		Middleware saved = service.save(api.getId(), middlewareDTO, multipartFile);
 
