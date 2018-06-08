@@ -72,17 +72,17 @@ public class MiddlewareServiceTest {
 
 	@Mock
 	private AMQPMiddlewareService amqpMiddlewareService;
-
+	
 	@Mock
 	private Property property;
 
 	@Value("${zuul.filter.root}")
 	private String root;
-
+	
 	private Api api;
 	private List<Middleware> middlewareList;
 	private List<Interceptor> interceptors = new ArrayList<>();
-	private Middleware m1, m2, m3, m4, m5, middleware;
+	private Middleware m1, m2, m3, m4, m5, middleware;	
 	private Middlewares middlewareProperty;
 	private MiddlewareDTO middlewareDTO;
 	private MockMultipartFile multipartFile;
@@ -128,16 +128,16 @@ public class MiddlewareServiceTest {
 		middlewareList.add(m3);
 		middlewareList.add(m4);
 		middlewareList.add(m5);
-
+		
 		Property p = new Property();
 		middlewareProperty = p.getMiddlewares();
-
+		
 		middlewareDTO = new MiddlewareDTO();
 		middlewareDTO.setStatus(Status.ACTIVE);
 		middlewareDTO.setVersion("0.0.1");
 
-		multipartFile = new MockMultipartFile("artifact", "strongbox-validate-8.1.jar", "application/octet-stream",
-				"some content".getBytes());
+		multipartFile = new MockMultipartFile("artifact", "strongbox-validate-8.1.jar",
+				"application/octet-stream", "some content".getBytes());
 
 		middleware = GenericConverter.mapper(middlewareDTO, Middleware.class);
 		middleware.setApi(api);
@@ -150,11 +150,12 @@ public class MiddlewareServiceTest {
 			e.printStackTrace();
 		}
 
+		
 		Mockito.when(middlewareRepository.findByApiId(api.getId())).thenReturn(middlewareList);
 		Mockito.when(apiRepository.findOne(api.getId())).thenReturn(api);
 		Mockito.when(interceptorRepository.findByTypeAndOperationResourceApiId(TypeInterceptor.MIDDLEWARE, api.getId()))
 				.thenReturn(interceptors);
-
+		
 		Mockito.when(property.getMiddlewares()).thenReturn(middlewareProperty);
 
 		Mockito.when(middlewareRepository.save(middleware)).thenReturn(middleware);
@@ -165,58 +166,58 @@ public class MiddlewareServiceTest {
 		Mockito.when(middlewareRepository.findByApiIdAndId(api.getId(), m3.getId())).thenReturn(m3);
 		Mockito.when(middlewareRepository.findByApiIdAndId(api.getId(), m4.getId())).thenReturn(m4);
 		Mockito.when(middlewareRepository.findByApiIdAndId(api.getId(), m5.getId())).thenReturn(m5);
-
+		
 	}
 
 	@Test
 	public void saveNewMiddlewareTest() {
-
+		
 		middlewareProperty.setAllowInactive(1);
-
+		
 		Middleware saved = service.save(api.getId(), middlewareDTO, multipartFile);
 
 		Map<Status, List<Middleware>> middlewareMap = middlewareList.stream()
 				.collect(Collectors.groupingBy(m -> m.getStatus()));
-
+		
 		assertTrue(saved.equals(middleware));
 		assertEquals(Status.ACTIVE, saved.getStatus());
 		assertEquals(1, middlewareMap.get(Status.INACTIVE).size());
 		assertEquals(4, middlewareMap.get(Status.DEPRECATED).size());
 
 	}
-
+	
 	@Test
 	public void saveNewMiddlewareNoRollbackTest() {
-
+		
 		middlewareProperty.setAllowInactive(null);
-
+		
 		Middleware saved = service.save(api.getId(), middlewareDTO, multipartFile);
 
 		Map<Status, List<Middleware>> middlewareMap = middlewareList.stream()
 				.collect(Collectors.groupingBy(m -> m.getStatus()));
-
+		
 		assertTrue(saved.equals(middleware));
 		assertEquals(Status.ACTIVE, saved.getStatus());
 		assertEquals(3, middlewareMap.get(Status.INACTIVE).size());
 		assertEquals(2, middlewareMap.get(Status.DEPRECATED).size());
 
 	}
-
+	
 	@Test
 	public void saveNewMiddlewareHugeRollbackTest() {
-
+		
 		middlewareProperty.setAllowInactive(99999999);
-
+		
 		Middleware saved = service.save(api.getId(), middlewareDTO, multipartFile);
 
 		Map<Status, List<Middleware>> middlewareMap = middlewareList.stream()
 				.collect(Collectors.groupingBy(m -> m.getStatus()));
-
+		
 		assertTrue(saved.equals(middleware));
 		assertEquals(Status.ACTIVE, saved.getStatus());
 		assertEquals(3, middlewareMap.get(Status.INACTIVE).size());
 		assertEquals(2, middlewareMap.get(Status.DEPRECATED).size());
 
 	}
-
+	
 }
