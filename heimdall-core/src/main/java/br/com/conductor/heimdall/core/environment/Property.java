@@ -166,6 +166,7 @@ public class Property {
      @Data
      public class Middlewares {
     	 private Integer allowInactive;
+    	 private Boolean deleteDeprecated;
      }
 
 }

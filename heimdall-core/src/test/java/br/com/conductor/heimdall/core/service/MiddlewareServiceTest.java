@@ -88,39 +88,47 @@ public class MiddlewareServiceTest {
 	private MockMultipartFile multipartFile;
 
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
 		api = new Api();
 		api.setId(10L);
 
+		multipartFile = new MockMultipartFile("artifact", "strongbox-validate-8.1.jar",
+				"application/octet-stream", "some content".getBytes());
+		
 		m1 = new Middleware();
 		m1.setStatus(Status.ACTIVE);
 		m1.setApi(api);
 		m1.setId(10L);
 		m1.setCreationDate(LocalDateTime.of(2017, Month.JULY, 29, 19, 30, 40));
+		m1.setFile(multipartFile.getBytes());
 
 		m2 = new Middleware();
 		m2.setStatus(Status.INACTIVE);
 		m2.setApi(api);
 		m2.setId(20L);
 		m2.setCreationDate(LocalDateTime.of(2016, Month.JULY, 29, 19, 30, 40));
+		m2.setFile(multipartFile.getBytes());
 
 		m3 = new Middleware();
 		m3.setStatus(Status.INACTIVE);
 		m3.setApi(api);
 		m3.setId(30L);
 		m3.setCreationDate(LocalDateTime.of(2015, Month.JULY, 29, 19, 30, 40));
+		m3.setFile(multipartFile.getBytes());
 
 		m4 = new Middleware();
 		m4.setStatus(Status.DEPRECATED);
 		m4.setApi(api);
 		m4.setId(40L);
 		m4.setCreationDate(LocalDateTime.of(2014, Month.JULY, 29, 19, 30, 40));
+		m4.setFile(multipartFile.getBytes());
 
 		m5 = new Middleware();
 		m5.setStatus(Status.DEPRECATED);
 		m5.setApi(api);
 		m5.setId(50L);
 		m5.setCreationDate(LocalDateTime.of(2013, Month.JULY, 29, 19, 30, 40));
+		m5.setFile(multipartFile.getBytes());
 
 		middlewareList = new ArrayList<>();
 		middlewareList.add(m1);
@@ -136,8 +144,7 @@ public class MiddlewareServiceTest {
 		middlewareDTO.setStatus(Status.ACTIVE);
 		middlewareDTO.setVersion("0.0.1");
 
-		multipartFile = new MockMultipartFile("artifact", "strongbox-validate-8.1.jar",
-				"application/octet-stream", "some content".getBytes());
+		
 
 		middleware = GenericConverter.mapper(middlewareDTO, Middleware.class);
 		middleware.setApi(api);
@@ -173,6 +180,7 @@ public class MiddlewareServiceTest {
 	public void saveNewMiddlewareTest() {
 		
 		middlewareProperty.setAllowInactive(1);
+		middlewareProperty.setDeleteDeprecated(true);
 		
 		Middleware saved = service.save(api.getId(), middlewareDTO, multipartFile);
 
@@ -187,10 +195,11 @@ public class MiddlewareServiceTest {
 	}
 	
 	@Test
-	public void saveNewMiddlewareNoRollbackTest() {
+	public void propertyNotSetTest() {
 		
 		middlewareProperty.setAllowInactive(null);
-		
+		middlewareProperty.setDeleteDeprecated(null);
+
 		Middleware saved = service.save(api.getId(), middlewareDTO, multipartFile);
 
 		Map<Status, List<Middleware>> middlewareMap = middlewareList.stream()
@@ -218,6 +227,52 @@ public class MiddlewareServiceTest {
 		assertEquals(3, middlewareMap.get(Status.INACTIVE).size());
 		assertEquals(2, middlewareMap.get(Status.DEPRECATED).size());
 
+	}
+	
+	@Test
+	public void doNotDeleteDeprecated() {
+		
+		middlewareProperty.setAllowInactive(1);
+		middlewareProperty.setDeleteDeprecated(false);
+		
+		Middleware saved = service.save(api.getId(), middlewareDTO, multipartFile);
+
+		Map<Status, List<Middleware>> middlewareMap = middlewareList.stream()
+				.collect(Collectors.groupingBy(m -> m.getStatus()));
+		
+		assertTrue(saved.equals(middleware));
+		assertEquals(Status.ACTIVE, saved.getStatus());
+		assertEquals(1, middlewareMap.get(Status.INACTIVE).size());
+		assertEquals(4, middlewareMap.get(Status.DEPRECATED).size());
+		assertNotNull(m2.getFile());
+		assertNotNull(m3.getFile());
+		assertNotNull(m4.getFile());
+		assertNotNull(m5.getFile());
+
+	}
+	
+	@Test
+	public void deleteDeprecated() {
+		
+		middlewareProperty.setAllowInactive(1);
+		middlewareProperty.setDeleteDeprecated(true);
+		
+		Middleware saved = service.save(api.getId(), middlewareDTO, multipartFile);
+
+		Map<Status, List<Middleware>> middlewareMap = middlewareList.stream()
+				.collect(Collectors.groupingBy(m -> m.getStatus()));
+		
+		assertTrue(saved.equals(middleware));
+		assertEquals(Status.ACTIVE, saved.getStatus());
+		assertEquals(1, middlewareMap.get(Status.INACTIVE).size());
+		assertEquals(4, middlewareMap.get(Status.DEPRECATED).size());
+		
+		assertNull(m2.getFile());
+		assertNull(m3.getFile());
+		
+		assertNotNull(m4.getFile());
+		assertNotNull(m5.getFile());
+		
 	}
 	
 }

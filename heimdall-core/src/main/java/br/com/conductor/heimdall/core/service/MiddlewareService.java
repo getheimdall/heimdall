@@ -183,6 +183,7 @@ public class MiddlewareService {
         		  .collect(Collectors.groupingBy(m -> m.getStatus()));
           
           Integer allowInactive = property.getMiddlewares().getAllowInactive();
+          Boolean deleteDeprecated = property.getMiddlewares().getDeleteDeprecated();
     	  
           if (Objeto.notBlank(allowInactive) && allowInactive != 0) {
         	    
@@ -195,7 +196,8 @@ public class MiddlewareService {
         	  
     		  inactive.stream().skip(allowInactive).forEach(m -> {
     			  m.setStatus(Status.DEPRECATED);
-    			  m.setFile(null);
+    			  if (Objeto.notBlank(deleteDeprecated) && deleteDeprecated)
+    				  m.setFile(null);
     		  });
         	  
           } else {
@@ -256,8 +258,11 @@ public class MiddlewareService {
           
           middleware = GenericConverter.mapper(middlewareDTO, middleware);
           
+          Boolean deleteDeprecated = property.getMiddlewares().getDeleteDeprecated();
+          
           if (middleware.getStatus().equals(Status.DEPRECATED))
-        	  middleware.setFile(null);
+        	  if (Objeto.notBlank(deleteDeprecated) && deleteDeprecated)
+        		  middleware.setFile(null);
           
           middleware = middlewareRepository.save(middleware);
           
