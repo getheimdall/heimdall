@@ -80,7 +80,7 @@ heimdall:
             #userSearchFilter: sAMAccountName={0}    
     middlewares:
         allowInactive: 0
-        deleteDeprecated: true
+        deleteDeprecated: false
 
 spring:
     pid:
