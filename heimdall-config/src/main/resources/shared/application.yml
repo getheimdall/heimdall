@@ -78,6 +78,9 @@ heimdall:
             #userDn: your@mail.user
             #password: password
             #userSearchFilter: sAMAccountName={0}    
+    middlewares:
+        allowInactive: 0
+        deleteDeprecated: true
 
 spring:
     pid:
