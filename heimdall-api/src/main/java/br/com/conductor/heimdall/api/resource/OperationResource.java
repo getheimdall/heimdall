@@ -132,7 +132,7 @@ public class OperationResource {
 
           Operation operation = operationService.save(apiId, resourceId, operationDTO);
 
-          return ResponseEntity.created(URI.create(String.format("/%s/%s/%s/%s/%s/%s", "api", apiId.toString(), "resources", resourceId.toString(),  "operations", operation.getId().toString()))).build();
+          return ResponseEntity.created(URI.create(String.format("/%s/%s/%s/%s/%s/%s", "apis", apiId.toString(), "resources", resourceId.toString(),  "operations", operation.getId().toString()))).build();
      }
 
      /**
