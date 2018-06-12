@@ -115,8 +115,8 @@ class Interceptors extends Component {
         } else {
             formObject.status = 'SAVE'
             let candidates = this.state.candidatesToSave
-            if (this.state.candidatesToSave.some(updatable => updatable === formObject)) {
-                candidates = this.state.candidatesToSave.filter(item => item !== formObject)
+            if (this.state.candidatesToSave.some(updatable => updatable.uuid === formObject.uuid)) {
+                candidates = this.state.candidatesToSave.filter(item => item.uuid !== formObject.uuid)
             }
 
             formObject.uuid = UUID.generate()
