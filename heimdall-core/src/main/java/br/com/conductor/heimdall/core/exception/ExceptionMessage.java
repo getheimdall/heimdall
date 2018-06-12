@@ -112,6 +112,10 @@ public enum ExceptionMessage {
      GRANT_TYPE_NOT_EXIST(BAD_REQUEST.value(), "GrantType not found", BadRequestException.class),
      
      REFRESH_TOKEN_NOT_EXIST(BAD_REQUEST.value(), "RefreshToken not found", BadRequestException.class),
+
+     TYPE_OAUTH_NOT_FOUND(BAD_REQUEST.value(), "TypeOAuth not found", BadRequestException.class),
+
+     PRIVATE_KEY_NOT_FOUND(BAD_REQUEST.value(), "Privatekey not found", BadRequestException.class),
      
      OPERATION_ATTACHED_TO_INTERCEPTOR(BAD_REQUEST.value(), "Operation attached to Interceptor", BadRequestException.class),
      

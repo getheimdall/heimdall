@@ -51,38 +51,38 @@ public class JwtUtils {
     /**
      * This method generate a new token.
      *
-     * @param clientId         The clientId that is used to get the SecretKey
+     * @param privateKey       The privateKey that is used to get the SecretKey
      * @param operationsPath   Paths that the token can be used
      * @param timeToken        Time to expire the accessToken
      * @param timeRefreshToken Time to expire the refreshToken
      * @return The new {@link TokenOAuth}
      */
-    public TokenOAuth generateNewToken(String clientId, Set<String> operationsPath, int timeToken, int timeRefreshToken) {
-        return generateToken(clientId, timeToken, timeRefreshToken, operationsPath);
+    public TokenOAuth generateNewToken(String privateKey, Set<String> operationsPath, int timeToken, int timeRefreshToken) {
+        return generateToken(privateKey, timeToken, timeRefreshToken, operationsPath);
     }
 
     /**
      * This method generate a new token with default time in accessToken and refreshToken
      *
-     * @param clientId       The clientId that is used to get the SecretKey
+     * @param privateKey     The privateKey that is used to get the SecretKey
      * @param operationsPath Paths that the token can be used
      * @return The new {@link TokenOAuth}
      */
-    public TokenOAuth generateNewTokenTimeDefault(String clientId, Set<String> operationsPath) {
-        return generateToken(clientId, 20, 3600, operationsPath);
+    public TokenOAuth generateNewTokenTimeDefault(String privateKey, Set<String> operationsPath) {
+        return generateToken(privateKey, 20, 3600, operationsPath);
     }
 
     /**
      * This method validate if token is expired
      *
-     * @param token    The token to be validate
-     * @param clientId The clientId that is used to get the SecretKey
+     * @param token      The token to be validate
+     * @param privateKey The privateKey that is used to get the SecretKey
      * @return True if token is expired or false otherwise
      */
-    public boolean tokenExpired(String token, String clientId) {
+    public boolean tokenExpired(String token, String privateKey) {
         Claims claimsFromTheToken;
         try {
-            claimsFromTheToken = getClaimsFromTheToken(token, getSecretKeyByClientId(clientId));
+            claimsFromTheToken = getClaimsFromTheToken(token, getSecretKeyByClientId(privateKey));
         } catch (Exception e) {
             log.error(e.getMessage());
             return true;
@@ -94,25 +94,23 @@ public class JwtUtils {
     /**
      * This method recover from the Token the Operations.
      *
-     * @param token    The token that contain the operations
-     * @param clientId The clientId that is used to get the SecretKey
+     * @param token      The token that contain the operations
+     * @param privateKey The privateKey that is used to get the SecretKey
      * @return The operations from the token
      */
     @SuppressWarnings("unchecked")
-    public Set<String> getOperationsFromToken(String token, String clientId) {
+    public Set<String> getOperationsFromToken(String token, String privateKey) {
         Claims claimsFromTheToken;
         Set<String> operations = new HashSet<>();
         try {
-            claimsFromTheToken = getClaimsFromTheToken(token, getSecretKeyByClientId(clientId));
+            claimsFromTheToken = getClaimsFromTheToken(token, getSecretKeyByClientId(privateKey));
         } catch (Exception e) {
             log.error(e.getMessage());
             return operations;
         }
 
         List<String> list = claimsFromTheToken.get("operations", ArrayList.class);
-        list.forEach(o -> {
-            operations.add(o);
-        });
+        operations.addAll(list);
 
         return operations;
     }
@@ -120,21 +118,20 @@ public class JwtUtils {
     /**
      * This method generate a new token.
      *
-     * @param clientId         The clientId that is used to get the SecretKey
+     * @param privateKey         The privateKey that is used to get the SecretKey
      * @param operationsPath   Paths that the token can be used
      * @param timeToken        Time to expire the accessToken
      * @param timeRefreshToken Time to expire the refreshToken
      * @return The new {@link TokenOAuth}
      */
-    private TokenOAuth generateToken(String clientId, int timeToken, int timeRefreshToken, Set<String> operationsPath) {
+    private TokenOAuth generateToken(String privateKey, int timeToken, int timeRefreshToken, Set<String> operationsPath) {
         final LocalDateTime now = LocalDateTime.now();
         final LocalDateTime dateExpiredAccessToken = now.plusSeconds(timeToken);
         final LocalDateTime dateExpiredRefreshToken = now.plusSeconds(timeRefreshToken);
-        final String secretKey = getSecretKeyByClientId(clientId);
+        final String secretKey = getSecretKeyByClientId(privateKey);
 
         String accessToken = Jwts.builder()
                 .setExpiration(Date.from(dateExpiredAccessToken.atZone(ZoneId.systemDefault()).toInstant()))
-                .claim("client_id", clientId)
                 .claim("operations", operationsPath)
                 .signWith(
                         SignatureAlgorithm.HS256,
@@ -143,7 +140,6 @@ public class JwtUtils {
                 .compact();
         String refreshToken = Jwts.builder()
                 .setExpiration(Date.from(dateExpiredRefreshToken.atZone(ZoneId.systemDefault()).toInstant()))
-                .claim("client_id", clientId)
                 .claim("operations", operationsPath)
                 .signWith(
                         SignatureAlgorithm.HS256,
@@ -183,12 +179,12 @@ public class JwtUtils {
     }
 
     /**
-     * This method generate a SecretKey from the param clientId of the type {@link String}
+     * This method generate a SecretKey from the param privateKey of the type {@link String}
      *
-     * @param clientId Information to get a SecretKey
-     * @return The SecretKey of the type @{link {@link String}}
+     * @param privateKey Information to get a SecretKey
+     * @return The SecretKey of the type @{link {@link String}} encoded
      */
-    private String getSecretKeyByClientId(String clientId) {
-        return Base64.getEncoder().encodeToString(clientId.getBytes());
+    private String getSecretKeyByClientId(String privateKey) {
+        return Base64.getEncoder().encodeToString(privateKey.getBytes());
     }
 }
