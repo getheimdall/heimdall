@@ -178,33 +178,10 @@ public class MiddlewareService {
      @Transactional
      public Middleware save(Long apiId, MiddlewareDTO middlewareDTO, MultipartFile file) {
           
-    	  List<Middleware> middlewares = middlewareRepository.findByApiId(apiId);
-          Map<Status, List<Middleware>> middlewareMap = middlewares.stream()
-        		  .collect(Collectors.groupingBy(m -> m.getStatus()));
-          
-          Integer allowInactive = property.getMiddlewares().getAllowInactive();
-          Boolean deleteDeprecated = property.getMiddlewares().getDeleteDeprecated();
-    	  
-          if (Objeto.notBlank(allowInactive) && allowInactive != 0) {
-        	    
-        	  List<Middleware> active = middlewareMap.get(Status.ACTIVE);
-        	  List<Middleware> inactive = middlewareMap.get(Status.INACTIVE);
-        	  
-        	  active.forEach(m -> m.setStatus(Status.INACTIVE));
-        	  inactive.addAll(active);
-        	  inactive.sort((m1, m2) -> m2.getCreationDate().compareTo(m1.getCreationDate()));
-        	  
-    		  inactive.stream().skip(allowInactive).forEach(m -> {
-    			  m.setStatus(Status.DEPRECATED);
-    			  if (Objeto.notBlank(deleteDeprecated) && deleteDeprecated)
-    				  m.setFile(null);
-    		  });
-        	  
-          } else {
-        	  middlewareMap.get(Status.ACTIVE).forEach(m -> m.setStatus(Status.INACTIVE));
-          }
-          
-          middlewareRepository.save(middlewares);
+    	  List<Middleware> middlewares = updateMiddlewaresStatus(middlewareRepository.findByApiId(apiId)); 
+    			  
+    	  if (Objeto.notBlank(middlewares))
+    		  middlewareRepository.save(middlewares);
           
           Api api = apiRepository.findOne(apiId);
           HeimdallException.checkThrow(isBlank(api), GLOBAL_RESOURCE_NOT_FOUND);
@@ -290,5 +267,50 @@ public class MiddlewareService {
           middlewareRepository.delete(middleware.getId());
           
      }
+     
+     /*
+      * Updates the status of current middleware repository based on the Property settings.
+      * 
+      * ACTIVE -> changes status to INACTIVE
+      * 
+      * INACTIVE -> deprecated if number exceeds property allowInactive,
+      * 			if deleteDeprecated is true, deletes the middleware file from database
+      * 
+      * DEPRECATED -> do not change status
+      */
+	 private List<Middleware> updateMiddlewaresStatus(List<Middleware> list) {
+		
+		if (Objeto.notBlank(list)) {
+			Map<Status, List<Middleware>> middlewareMap = list.stream()
+					.collect(Collectors.groupingBy(m -> m.getStatus()));
+
+			Integer allowInactive = property.getMiddlewares().getAllowInactive();
+			Boolean deleteDeprecated = property.getMiddlewares().getDeleteDeprecated();
+
+			if (Objeto.notBlank(allowInactive) && allowInactive != 0) {
+
+				List<Middleware> active = middlewareMap.get(Status.ACTIVE);
+				List<Middleware> inactive = middlewareMap.get(Status.INACTIVE);
+
+				active.forEach(m -> m.setStatus(Status.INACTIVE));
+				inactive.addAll(active);
+				inactive.sort((m1, m2) -> m2.getCreationDate().compareTo(m1.getCreationDate()));
+
+				inactive.stream().skip(allowInactive).forEach(m -> {
+					m.setStatus(Status.DEPRECATED);
+					if (Objeto.notBlank(deleteDeprecated) && deleteDeprecated)
+						m.setFile(null);
+				});
+
+			} else {
+				middlewareMap.get(Status.ACTIVE).forEach(m -> m.setStatus(Status.INACTIVE));
+			}
+		
+			return list;
+		} 
+		
+		return null;
+		
+	}
 
 }
