@@ -27,10 +27,11 @@ import br.com.conductor.heimdall.core.entity.Interceptor;
  * Enum that hold the types of {@link Interceptor}.
  *
  * @author Filipe Germano
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
 public enum TypeInterceptor {
 
-     LOG, MOCK, RATTING, ACCESS_TOKEN, CLIENT_ID, CUSTOM, MIDDLEWARE;
+	LOG, MOCK, RATTING, ACCESS_TOKEN, CLIENT_ID, CUSTOM, MIDDLEWARE, OAUTH;
 
 }

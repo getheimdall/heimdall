@@ -26,5 +26,7 @@
     <include file="changelog/DATA_ROLES_PRIVILEGES_1.xml" relativeToChangelogFile="true"/> 
     <include file="changelog/DATA_USERS_1.xml" relativeToChangelogFile="true"/>
     <include file="changelog/DATA_USERS_ROLES_1.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20180521092430-insert-privileges-to-provider.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20180521101715-add-privileges-provider-to-role-admin.xml" relativeToChangelogFile="true"/>
         
 </databaseChangeLog>

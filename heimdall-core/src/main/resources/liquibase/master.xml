@@ -20,6 +20,8 @@
     
     <property name="inteiro" value="bigint" dbms="mssql, h2, oracle"/>
     
-    <include file="changelog/20180501121201-initial-core-schemes.xml" relativeToChangelogFile="true"/>  
+    <include file="changelog/20180501121201-initial-core-schemes.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20180517013922-create-table-provider-and-paramsprovider.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20180525101925-create-table-oauth-authorizes.xml" relativeToChangelogFile="true"/>  
         
 </databaseChangeLog>
