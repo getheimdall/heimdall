@@ -275,4 +275,18 @@ public class MiddlewareServiceTest {
 		
 	}
 	
+	@Test
+	public void noMiddlewareTest() {
+				
+		Mockito.when(middlewareRepository.findByApiId(api.getId())).thenReturn(null);
+		
+		middlewareProperty.setAllowInactive(1);
+		middlewareProperty.setDeleteDeprecated(true);
+		
+		Middleware saved = service.save(api.getId(), middlewareDTO, multipartFile);
+		
+		assertTrue(saved.equals(middleware));
+		
+	}
+	
 }
