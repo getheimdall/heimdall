@@ -1,5 +1,5 @@
-
 package br.com.conductor.heimdall.gateway.configuration;
+
 
 /*-
  * =========================LICENSE_START==================================
@@ -21,16 +21,18 @@ package br.com.conductor.heimdall.gateway.configuration;
  * ==========================LICENSE_END===================================
  */
 
+import javax.annotation.PostConstruct;
+
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import br.com.conductor.heimdall.core.appender.MongoDBAppender;
 import br.com.conductor.heimdall.core.environment.Property;
-import br.com.conductor.heimdall.gateway.trace.Trace;
+import br.com.conductor.heimdall.gateway.appender.MongoDBAppender;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import net.logstash.logback.appender.LogstashTcpSocketAppender;
 import net.logstash.logback.encoder.LogstashEncoder;
@@ -47,12 +49,31 @@ public class LogConfiguration {
 
      @Autowired
      private Property property;
+     
+     @PostConstruct
+     public void onStartUp() {
+    	 if (property.getMongo().getEnabled()) {
+    		 
+             LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+             Logger logger = (Logger) LoggerFactory.getLogger("mongo");
+             logger.setAdditive(false);
+             Appender<ILoggingEvent> appender;
+             if (property.getMongo().getUrl() != null) {
+          	   appender = new MongoDBAppender(property.getMongo().getUrl(), property.getMongo().getDataBase(), property.getMongo().getCollection());
+             } else {
+          	   appender = new MongoDBAppender(property.getMongo().getServerName(), property.getMongo().getPort(), property.getMongo().getDataBase(), property.getMongo().getCollection());            	   
+             }
+             appender.setContext(lc);
+             appender.start();
+
+             logger.addAppender(appender);
+        }
+     }
 
      /**
       * Returns the proper logging strategy.
       * @return		
       */
-     @SuppressWarnings("unchecked")
      @Bean
      public Logger loggerTrace() {
 
@@ -72,18 +93,6 @@ public class LogConfiguration {
 
                logger.addAppender(appender);
 
-          }
-
-          if (property.getMongo().getEnabled()) {
-               LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-               Logger logger = (Logger) LoggerFactory.getLogger(Trace.class);
-
-               @SuppressWarnings("rawtypes")
-               Appender appender = new MongoDBAppender(property.getMongo().getServerName(), property.getMongo().getPort(), property.getMongo().getDataBase(), property.getMongo().getCollection());
-               appender.setContext(lc);
-               appender.start();
-
-               logger.addAppender(appender);
           }
 
           return null;

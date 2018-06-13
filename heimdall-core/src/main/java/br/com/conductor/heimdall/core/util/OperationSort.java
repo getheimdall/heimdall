@@ -21,9 +21,6 @@ package br.com.conductor.heimdall.core.util;
  * ==========================LICENSE_END===================================
  */
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 import java.util.Comparator;
 
 import br.com.conductor.heimdall.core.entity.Operation;
@@ -37,12 +34,38 @@ import br.com.conductor.heimdall.core.entity.Operation;
  */
 public class OperationSort implements Comparator<Operation> {
 
+     private static final int BEFORE = -1;
+     private static final int AFTER = 1;
+
      @Override
      public int compare(Operation r1, Operation r2) {
-         
-          Path path1 = Paths.get(r1.getPath());
-          Path path2 = Paths.get(r2.getPath());
-          
-          return path1.compareTo(path2);
+
+          String pattern1 = r1.getPath();
+          String pattern2 = r2.getPath();
+
+          if (pattern1.startsWith("/*")) return AFTER;
+          if (pattern2.startsWith("/*")) return BEFORE;
+
+          String[] split1 = pattern1.split("/");
+          String[] split2 = pattern2.split("/");
+
+          int max = Math.min(split1.length, split2.length);
+
+          for (int i = 0; i < max; i++) {
+
+               if (!split1[i].equals(split2[i])) {
+
+                    if (split1[i].equals("**")) return AFTER;
+                    if (split2[i].equals("**")) return BEFORE;
+
+                    if (split1[i].equals("*")) return AFTER;
+                    if (split2[i].equals("*")) return BEFORE;
+
+                    return split1[i].compareTo(split2[i]);
+               }
+          }
+
+          return pattern1.compareTo(pattern2);
      }
+
 }

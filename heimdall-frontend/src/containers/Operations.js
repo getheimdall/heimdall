@@ -3,7 +3,6 @@ import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { operationService } from '../services'
-import { toggleModal } from '../actions/operations'
 
 import { List, Avatar, Button, Row, Col, Tooltip, Modal, notification } from 'antd';
 import Loading from '../components/ui/Loading'
@@ -15,7 +14,7 @@ class Operations extends Component {
 
     constructor(props) {
         super(props)
-        this.state = { operations: null, operationSelected: 0 }
+        this.state = { operations: null, operationSelected: 0, visibleModal: false }
     }
 
     componentDidMount() {
@@ -30,15 +29,15 @@ class Operations extends Component {
     }
 
     showOperationModal = (operationId) => (e) => {
+        let newOperationId = this.state.operationSelected;
         if (operationId) {
-            this.setState({ ...this.state, operationSelected: operationId });
+            newOperationId = operationId
         }
-        this.props.toggleModal(true)
+        this.setState({ ...this.state, operationSelected: newOperationId, visibleModal: true });
     }
 
     handleCancel = (e) => {
-        this.props.toggleModal(false)
-        this.setState({ ...this.state, operationSelected: 0 });
+        this.setState({ ...this.state, operationSelected: 0, visibleModal: false });
     }
 
     reloadOperations = () => {
@@ -80,8 +79,7 @@ class Operations extends Component {
 
     handleSave = (e) => {
         this.operationForm.onSubmitForm()
-        this.setState({ ...this.state, operationSelected: 0, operations: null });
-        this.props.toggleModal(false)
+        this.setState({ ...this.state, operationSelected: 0, operations: null, visibleModal: false });
     }
 
     submitPayload = (payload) => {
@@ -104,11 +102,12 @@ class Operations extends Component {
 
         const modalOperation =
             <Modal title="Add Operation"
+            
                 footer={[
                     <Button key="back" onClick={this.handleCancel}>Cancel</Button>,
                     <Button key="submit" type="primary" loading={loading} onClick={this.handleSave}>Save</Button>
                 ]}
-                visible={this.props.visibleModal}
+                visible={this.state.visibleModal}
                 onCancel={this.handleCancel}
                 destroyOnClose >
                 <OperationForm onRef={ref => (this.operationForm = ref)} onSubmit={this.submitPayload} operationId={this.state.operationSelected} idApi={this.props.idApi} idResource={this.props.idResource} />
@@ -148,6 +147,8 @@ class Operations extends Component {
                             color = '#f93e3e'
                         } else if (operation.method === 'PUT') {
                             color = '#fca130'
+                        } else if (operation.method === 'PATCH') {
+                            color = '#50e3c2'
                         }
 
                         let description = (operation.description === 'null' || operation.description === null) ? '' : operation.description
@@ -191,16 +192,9 @@ Operations.propType = {
 
 const mapStateToProps = state => {
     return {
-        visibleModal: state.operations.visibleModal,
         loading: state.operations.loading,
         reload: state.operations.reload
     }
 }
 
-const mapDispatchToProps = dispatch => {
-    return {
-        toggleModal: bindActionCreators(toggleModal, dispatch)
-    }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(Operations)
+export default connect(mapStateToProps)(Operations)

@@ -37,6 +37,7 @@ import lombok.extern.slf4j.Slf4j;
  * Enum that concentrates the messages and validations of the exceptions <br/>
  * 
  * @author Filipe Germano
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  * 
  */
 @Slf4j
@@ -84,6 +85,8 @@ public enum ExceptionMessage {
      
      API_BASEPATH_EXIST(BAD_REQUEST.value(), "The basepath defined exist", BadRequestException.class),
      
+     API_BASEPATH_EMPTY(BAD_REQUEST.value(), "Basepath not defined", BadRequestException.class),
+     
      ONLY_ONE_OPERATION_PER_RESOURCE(BAD_REQUEST.value(), "Only one operation per resource", BadRequestException.class),
 
      ONLY_ONE_RESOURCE_PER_API(BAD_REQUEST.value(), "Only one resource per api", BadRequestException.class),
@@ -98,9 +101,26 @@ public enum ExceptionMessage {
      
      ENVIRONMENT_ATTACHED_TO_API(BAD_REQUEST.value(), "Environment attached to Api", BadRequestException.class),
      
-     OPERATION_ATTACHED_TO_INTERCEPTOR(BAD_REQUEST.value(), "Operation attached to Interceptor", BadRequestException.class);
+     PROVIDER_NOT_FOUND(BAD_REQUEST.value(), "Provider not found", BadRequestException.class),
      
+     PROVIDER_USER_UNAUTHORIZED(UNAUTHORIZED.value(), "User provider unauthorized", UnauthorizedException.class),
      
+     TOKEN_EXPIRED(UNAUTHORIZED.value(), "Token expired", UnauthorizedException.class),
+     
+     CODE_NOT_FOUND(UNAUTHORIZED.value(), "Code already used to generate token or not defined", UnauthorizedException.class),
+     
+     GRANT_TYPE_NOT_EXIST(BAD_REQUEST.value(), "GrantType not found", BadRequestException.class),
+     
+     REFRESH_TOKEN_NOT_EXIST(BAD_REQUEST.value(), "RefreshToken not found", BadRequestException.class),
+     
+     OPERATION_ATTACHED_TO_INTERCEPTOR(BAD_REQUEST.value(), "Operation attached to Interceptor", BadRequestException.class),
+     
+     OPERATION_CANT_HAVE_SINGLE_WILDCARD(BAD_REQUEST.value(), "Operation can not have a single wild card (/*)", BadRequestException.class),
+     
+     OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END(BAD_REQUEST.value(), "Operation can have a double wild card (/**), but only at the end", BadRequestException.class),
+     
+     API_BASEPATH_MALFORMED(BAD_REQUEST.value(), "Api basepath can not contain a wild card", BadRequestException.class);
+
      @Getter
      private Integer httpCode;
 

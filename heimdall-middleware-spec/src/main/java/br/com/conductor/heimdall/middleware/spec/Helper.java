@@ -1,6 +1,8 @@
 
 package br.com.conductor.heimdall.middleware.spec;
 
+import br.com.conductor.heimdall.middleware.enums.DBType;
+
 /*-
  * =========================LICENSE_START==================================
  * heimdall-middleware-spec
@@ -51,6 +53,16 @@ public interface Helper {
       * @return					The DB
       */
      public DB db(String databaseName);
+     
+     /**
+      * Gets a DBMongo.
+      * 
+      * @param databaseName		The database name
+      * @return					The DB
+      */
+     public DBMongo dbMongo(String databaseName);
+     
+     
 
      /**
       * Gets a Http.

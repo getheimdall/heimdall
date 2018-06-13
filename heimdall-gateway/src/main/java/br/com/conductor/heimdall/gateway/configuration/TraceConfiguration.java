@@ -22,6 +22,8 @@ package br.com.conductor.heimdall.gateway.configuration;
  */
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -53,7 +55,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Configuration
 @Slf4j
-public class TraceConfiguration{
+public class TraceConfiguration {
 
      @Value("${info.app.profile}")
      private String profile;
@@ -68,7 +70,7 @@ public class TraceConfiguration{
       * {@inheritDoc}
       */
      public class TraceFilter implements Filter {
-
+          private Map<String, String> cors;
           @Override
           public void destroy() { }
 
@@ -84,13 +86,7 @@ public class TraceConfiguration{
                     if (shouldDisableTrace(request)) {
                          TraceContextHolder.getInstance().disablePrint();
                     }
-                    
-                    response.setHeader("Access-Control-Allow-Origin", "*");
-                    response.setHeader("Access-Control-Allow-Credentials", "true");
-                    response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, DELETE, OPTIONS");
-                    response.setHeader("Access-Control-Allow-Headers", "origin, content-type, accept, authorization, x-requested-with, X-AUTH-TOKEN, access_token, client_id, device_id, credential");
-                    response.setHeader("Access-Control-Max-Age", "3600");
-                    
+
                     if ("OPTIONS".equalsIgnoreCase(((HttpServletRequest) request).getMethod())) {
                          response.setStatus(200);
                     } else {
@@ -104,7 +100,13 @@ public class TraceConfiguration{
                } finally {
 
                     if (TraceContextHolder.getInstance().shouldWrite()) {
-                         trace.write(response);
+                         cors.entrySet().stream()
+                                 .filter(entry -> response.getHeader(entry.getKey()) == null)
+                                 .forEach(entry -> response.addHeader(entry.getKey(), entry.getValue()));
+
+                         if (trace != null) {
+                              trace.write(response);
+                         }
                     } else {
                          TraceContextHolder.getInstance().clearActual();
                     }
@@ -114,7 +116,14 @@ public class TraceConfiguration{
           }
 
           @Override
-          public void init(FilterConfig arg0) throws ServletException { }
+          public void init(FilterConfig arg0) throws ServletException {
+               this.cors = new HashMap<>();
+               this.cors.put("Access-Control-Allow-Origin", "*");
+               this.cors.put("Access-Control-Allow-Credentials", "true");
+               this.cors.put("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, DELETE, OPTIONS");
+               this.cors.put("Access-Control-Allow-Headers", "origin, content-type, accept, authorization, x-requested-with, X-AUTH-TOKEN, access_token, client_id, device_id, credential");
+               this.cors.put("Access-Control-Max-Age", "3600");
+          }
 
      }
 
