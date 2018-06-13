@@ -33,7 +33,6 @@ import br.com.conductor.heimdall.middleware.spec.ApiResponse;
 import br.com.conductor.heimdall.middleware.spec.Helper;
 import br.com.conductor.heimdall.middleware.spec.Http;
 import br.com.twsoftware.alfred.object.Objeto;
-import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import com.netflix.zuul.context.RequestContext;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +55,16 @@ public class OAuthInterceptorService {
 
     private Helper helper;
 
+    /**
+     * Method to validate Interceptor OAuth and execute the operation correct, accord the type of the OAuth.
+     *
+     * @param typeOAuth        type of the OAuth
+     * @param privateKey       privateKey used in Token
+     * @param timeAccessToken  time to expire accessToken
+     * @param timeRefreshToken time to expire refreshToken
+     * @param providerId       {@link Provider} id
+     * @param helper           {@link Helper}
+     */
     public void executeInterceptor(String typeOAuth, String privateKey, int timeAccessToken, int timeRefreshToken, Long providerId, Helper helper) {
         this.helper = helper;
         OAuthRequest oAuthRequest = recoverOAuthRequest();
@@ -68,6 +77,12 @@ public class OAuthInterceptorService {
         }
     }
 
+    /**
+     * Method to run OAuth of the type Authorize.
+     *
+     * @param oAuthRequest {@link OAuthRequest}
+     * @param providerId   {@link Provider} id
+     */
     private void runAuthorize(OAuthRequest oAuthRequest, Long providerId) {
 
         Provider provider = oAuthService.getProvider(providerId);
@@ -88,6 +103,14 @@ public class OAuthInterceptorService {
         }
     }
 
+    /**
+     * Method to run OAuth of the type Generate.
+     *
+     * @param oAuthRequest     {@link OAuthRequest}
+     * @param privateKey       privateKey used in Token
+     * @param timeAccessToken  time to expire accessToken
+     * @param timeRefreshToken time to expire refreshToken
+     */
     private void runGenerate(OAuthRequest oAuthRequest, String privateKey, int timeAccessToken, int timeRefreshToken) {
         try {
             TokenOAuth tokenOAuth = oAuthService.generateToken(oAuthRequest, privateKey, timeAccessToken, timeRefreshToken);
@@ -98,6 +121,11 @@ public class OAuthInterceptorService {
         }
     }
 
+    /**
+     * Method to run OAuth of the type Validate.
+     *
+     * @param privateKey privateKey used in Token
+     */
     private void runValidate(String privateKey) {
         String authorization = helper.call().request().header().get("Authorization");
         if (Objeto.isBlank(authorization)) {
@@ -120,6 +148,11 @@ public class OAuthInterceptorService {
 
     }
 
+    /**
+     * Method that recover {@link OAuthRequest} from the request
+     *
+     * @return The {@link OAuthRequest}
+     */
     private OAuthRequest recoverOAuthRequest() {
 
         String body = helper.call().request().getBody();
@@ -150,6 +183,13 @@ public class OAuthInterceptorService {
         return oAuthRequest;
     }
 
+    /**
+     * Method that adds all parameters needed to make the request with the provider
+     *
+     * @param http           {@link Http}
+     * @param providerParams List of the {@link ProviderParam}
+     * @return The {@link Http} result
+     */
     private Http addAllParamsToRequestProvider(Http http, List<ProviderParam> providerParams) {
         Map<String, Object> paramsBody = new HashMap<>();
         for (ProviderParam param : providerParams) {
@@ -178,14 +218,30 @@ public class OAuthInterceptorService {
         return http;
     }
 
+    /**
+     * Method that sends a Response with error
+     *
+     * @param message Error message
+     */
     private void generateResponseWithError(String message) {
         generateResponse("{ \"error\" : \"" + message + "\" }", HttpStatus.UNAUTHORIZED);
     }
 
+    /**
+     * Method that sends a Response with success
+     *
+     * @param message Success message
+     */
     private void generateResponseWithSuccess(String message) {
         generateResponse(message, HttpStatus.OK);
     }
 
+    /**
+     * Method that sends a Response
+     *
+     * @param message    Response message
+     * @param httpStatus {@link HttpStatus} of the response
+     */
     private void generateResponse(String message, HttpStatus httpStatus) {
         TraceContextHolder.getInstance().getActualTrace().trace(message);
         helper.call().response().setStatus(httpStatus.value());
