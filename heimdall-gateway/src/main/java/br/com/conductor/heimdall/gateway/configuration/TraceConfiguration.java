@@ -86,6 +86,10 @@ public class TraceConfiguration {
                     if (shouldDisableTrace(request)) {
                          TraceContextHolder.getInstance().disablePrint();
                     }
+                    
+                    cors.entrySet().stream()
+                         .filter(entry -> !response.containsHeader(entry.getKey()))
+                         .forEach(entry -> response.addHeader(entry.getKey(), entry.getValue()));
 
                     if ("OPTIONS".equalsIgnoreCase(((HttpServletRequest) request).getMethod())) {
                          response.setStatus(200);
@@ -100,9 +104,6 @@ public class TraceConfiguration {
                } finally {
 
                     if (TraceContextHolder.getInstance().shouldWrite()) {
-                         cors.entrySet().stream()
-                                 .filter(entry -> response.getHeader(entry.getKey()) == null)
-                                 .forEach(entry -> response.addHeader(entry.getKey(), entry.getValue()));
 
                          if (trace != null) {
                               trace.write(response);
