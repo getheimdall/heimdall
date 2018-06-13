@@ -71,7 +71,7 @@ public class OAuthAuthorize implements Serializable {
      * This method generates a new code authorize.
      */
     public void generateTokenAuthorize() {
-        String toEncode = LocalDateTime.now().toString() + clientId;
+        String toEncode = LocalDateTime.now().toString() + "::" + clientId;
         this.tokenAuthorize = Base64.getEncoder().encodeToString(toEncode.getBytes());
     }
 
