@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>br.com.conductor.heimdall</groupId>
 		<artifactId>heimdall</artifactId>
-		<version>1.1.68-SNAPSHOT</version>
+		<version>1.1.68-RELEASE</version>
 	</parent>
 	<artifactId>heimdall-api</artifactId>
 	<packaging>jar</packaging>
