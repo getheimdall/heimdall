@@ -23,15 +23,10 @@ class EnvironmentForm extends Component {
                     key: objectKey,
                     value: this.props.environment.variables[objectKey],
                 })
-            });    
-        } else {
-            variablesArray.push({
-                key: '',
-                value: ''
-            })
+            });
         }
 
-        this.setState({...this.state, variables: variablesArray})
+        this.setState({ ...this.state, variables: variablesArray })
     }
 
     onSubmitForm = () => {
@@ -43,11 +38,11 @@ class EnvironmentForm extends Component {
 
                 if (variablesForm) {
                     let variables = {}
-                    
+
                     variablesForm.forEach((element, index) => {
                         variables[Object.values(element)[0]] = Object.values(element)[1]
                     });
-    
+
                     payload['variables'] = variables
                 }
 
@@ -72,14 +67,14 @@ class EnvironmentForm extends Component {
         const { form } = this.props;
         const variablesCount = form.getFieldValue('variablesCount');
 
-        if (variablesCount.length === 1) {
+        if (variablesCount.length === 0) {
             return;
         }
 
         form.setFieldsValue({
             variablesCount: variablesCount.filter((value, key) => {
-                    return key !== k
-                }
+                return key !== k
+            }
             ),
         });
 
@@ -89,6 +84,10 @@ class EnvironmentForm extends Component {
         this.setState({
             variables: variablesForm
         })
+    }
+
+    initVariables = () => {
+        this.setState({ ...this.state, variables: [{ key: '', value: '' }] })
     }
 
     add = () => {
@@ -162,7 +161,16 @@ class EnvironmentForm extends Component {
                         <Col sm={24} md={24}>
                             <fieldset>
                                 <legend><div className="ant-card-head-title">Variables</div></legend>
-                                <ListVariablesEnvironment variables={this.state.variables} form={this.props.form} add={this.add} remove={this.remove} loading={this.props.loading} />
+                                {
+                                    this.state.variables.length === 0 ?
+                                        <Row type="flex" justify="center" align="bottom">
+                                            <Col style={{ marginTop: 20 }}>
+                                                You don't have variables in this <b>Environment</b>, please <Button type="dashed" className="add-tour" onClick={this.initVariables}>Add Variable</Button>
+                                            </Col>
+                                        </Row>
+                                        :
+                                        <ListVariablesEnvironment variables={this.state.variables} form={this.props.form} add={this.add} remove={this.remove} loading={this.props.loading} />
+                                }
                             </fieldset>
                         </Col>
 
@@ -179,7 +187,7 @@ class EnvironmentForm extends Component {
 
                     </Row>
                 </Form>
-                
+
                 <Row type="flex" justify="end">
                     <Tooltip title="Delete">
                         <Button className="card-button" type="danger" ghost icon="delete" size="large" shape="circle" disabled={!environment} onClick={environment && this.showDeleteConfirm(environment.id)} loading={loading} />
