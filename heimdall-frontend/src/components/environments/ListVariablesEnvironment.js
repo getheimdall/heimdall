@@ -65,7 +65,7 @@ class ListVariablesEnvironment extends React.Component {
             getFieldDecorator('variablesCount', { initialValue: variables });
             const variablesCount = getFieldValue('variablesCount');
             
-            variablesCount.map((value, key) => {
+            variablesCount.forEach((value, key) => {
 
                 if (variablesCount[key] === variablesCount[variablesCount.length - 1]) {
                     enableButton = true
