@@ -82,7 +82,7 @@ public class TraceConfiguration {
                HttpServletResponse response = (HttpServletResponse) res;
                try {
 
-                    trace = TraceContextHolder.getInstance().init(prop.getTrace().isPrintAllTrace(), profile, request);
+                    trace = TraceContextHolder.getInstance().init(prop.getTrace().isPrintAllTrace(), profile, request, prop.getMongo().getEnabled());
                     if (shouldDisableTrace(request)) {
                          TraceContextHolder.getInstance().disablePrint();
                     }
