@@ -46,9 +46,9 @@ class Traces extends Component {
 
     render() {
         const { getFieldDecorator } = this.props.form
-        const { traces: traces, loading, history } = this.props
+        const { traces, loading } = this.props
 
-        //if (!traces) return <Loading />
+        if (!traces) return <Loading />
 
         return (
             <div>
@@ -84,7 +84,7 @@ class Traces extends Component {
                 </Row>
 
                 <Row className="h-row bg-white">
-                    <ListTraces dataSource={this.state.traces} handlePagination={this.handlePagination} loading={loading} />
+                    <ListTraces handlePagination={this.handlePagination} loading={loading} />
                 </Row>
             </div>
         )
@@ -93,9 +93,9 @@ class Traces extends Component {
 
 const mapStateToProps = state => {
     return {
-        // traces: state.traces.traces,
-        // loading: state.traces.loading,
-        // notification: state.traces.notification
+        traces: state.traces.traces,
+        loading: state.traces.loading,
+        notification: state.traces.notification
     }
 }
 

@@ -1,14 +1,12 @@
 //3rd's
 import React, { Component } from 'react'
-import { push } from 'connected-react-router';
 import { connect } from 'react-redux'
 
 // actions
-import { getUser, initLoading, clearUser, clearUsers, update, save, remove } from '../actions/users';
-import { getAllRoles } from '../actions/roles';
+import { getTracer, initLoading, finishLoading} from '../actions/traces';
 
 //components
-import { Card, Row, notification, Form, Col, Button, Tag } from 'antd'
+import { Card, Row, notification, Form, Col, Tag } from 'antd'
 import PageHeader from '../components/ui/PageHeader'
 import ReactJson from 'react-json-view'
 import Loading from '../components/ui/Loading'
@@ -22,12 +20,11 @@ class SingleTrace extends Component {
     state = { loadEntity: false, timer: Date.now(), intervalSeconds: 2 }
 
     componentDidMount() {
-        let idUser = this.props.match.params.id
-        if (idUser) {
-            this.props.dispatch(getUser(idUser))
+        let idTrace = this.props.match.params.id
+        if (idTrace) {
+            this.props.dispatch(getTracer(idTrace))
             this.setState({ ...this.state, loadEntity: true })
         }
-        this.props.dispatch(getAllRoles())
     }
 
     componentWillReceiveProps(newProps) {
@@ -37,60 +34,80 @@ class SingleTrace extends Component {
         }
     }
 
-    componentWillUnmount() {
-        this.props.dispatch(clearUser())
-    }
-
     render() {
-        //if (this.state.loadEntity && !user) return <Loading />
+        //if (this.state.loadEntity && !trace) return <Loading />
         const title = "View trace"
         const trace = {
-            "method": "DELETE",
-            "url": "http://localhost:8080/oauth/token",
-            "resultStatus": 501,
-            "durationMillis": 22,
-            "insertedOnDate": "12/06/2018 03:12:40.296",
-            "apiId": 1,
-            "apiName": "oauth",
-            "app": null,
-            "accessToken": null,
-            "receivedFromAddress": "",
-            "clientId": null,
-            "resourceId": 2,
-            "appDeveloper": null,
-            "operationId": 2,
-            "request": null,
-            "response": null,
-            "level": "ASOIDJ",
-            "pattern": "/token",
-            "traces": [],
-            "filters": [{
-                "name": "HeimdallDecorationFilter",
-                "timeInMillisRun": 6,
-                "timeInMillisShould": 0,
-                "status": "SUCCESS",
-                "totalTimeInMillis": 6
-            }, {
-                "name": "OperationOauthPre5",
-                "timeInMillisRun": 0,
-                "timeInMillisShould": 0,
-                "status": "SUCCESS",
-                "totalTimeInMillis": 0
-            }, {
-                "name": "CustomSendResponseFilter",
-                "timeInMillisRun": 0,
-                "timeInMillisShould": 0,
-                "status": "SUCCESS",
-                "totalTimeInMillis": 0
-            }],
-            "profile": "developer"
+            "id": {
+                "timestamp": 1529070668,
+                "machineIdentifier": 11183442,
+                "processIdentifier": 11432,
+                "counter": 11228599,
+                "time": 1529070668000,
+                "date": "2018-06-15T13:51:08.000+0000",
+                "timeSecond": 1529070668
+            },
+            "trace": {
+                "method": "GET",
+                "url": "http://localhost:8080/basepath/test",
+                "resultStatus": 200,
+                "durationMillis": 136,
+                "insertedOnDate": "15/06/2018 10:51:08.120",
+                "apiId": 1,
+                "apiName": "Simple API",
+                "app": null,
+                "accessToken": null,
+                "receivedFromAddress": "",
+                "clientId": null,
+                "resourceId": 1,
+                "appDeveloper": null,
+                "operationId": 1,
+                "request": null,
+                "response": null,
+                "pattern": "/test",
+                "traces": [
+                    {
+                        "description": "Localized mock interceptor",
+                        "insertedOnDate": "15/06/2018 10:51:08.136",
+                        "content": "\"{\\\"name\\\":\\\"Mock Example\\\"}\""
+                    }
+                ],
+                "filters": [
+                    {
+                        "name": "HeimdallDecorationFilter",
+                        "timeInMillisRun": 6,
+                        "timeInMillisShould": 0,
+                        "status": "SUCCESS",
+                        "totalTimeInMillis": 6
+                    },
+                    {
+                        "name": "OperationMockPre1",
+                        "timeInMillisRun": 1,
+                        "timeInMillisShould": 1,
+                        "status": "SUCCESS",
+                        "totalTimeInMillis": 2
+                    },
+                    {
+                        "name": "CustomSendResponseFilter",
+                        "timeInMillisRun": 4,
+                        "timeInMillisShould": 0,
+                        "status": "SUCCESS",
+                        "totalTimeInMillis": 4
+                    }
+                ],
+                "profile": "developer"
+            },
+            "logger": "mongo",
+            "level": "INFO",
+            "thread": "http-nio-8080-exec-5",
+            "ts": "2018-06-15T13:51:08.274+0000"
         }
 
         const extraCard = (
             <Row type="flex" justify="center" align="top">
                 <Col><Tag color={ColorUtils.getColorLevel(trace.level)} >{trace.level}</Tag></Col>
-                <Col><Tag color={ColorUtils.getColorMethod(trace.method)}>{trace.method}</Tag></Col>
-                <Col><Tag color={ColorUtils.getColorStatus(trace.resultStatus)}>{trace.resultStatus}</Tag></Col>
+                <Col><Tag color={ColorUtils.getColorMethod(trace.trace.method)}>{trace.trace.method}</Tag></Col>
+                <Col><Tag color={ColorUtils.getColorStatus(trace.trace.resultStatus)}>{trace.trace.resultStatus}</Tag></Col>
             </Row>
         )
 
@@ -115,9 +132,8 @@ class SingleTrace extends Component {
 
 const mapStateToProps = state => {
     return {
-        user: state.traces.user,
+        trace: state.traces.trace,
         loading: state.traces.loading,
-        roles: state.roles.roles,
         notification: state.traces.notification
     }
 }

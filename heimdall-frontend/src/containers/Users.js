@@ -91,9 +91,9 @@ class Users extends Component {
 
 const mapStateToProps = state => {
     return {
-        traces: state.traces.traces,
-        loading: state.traces.loading,
-        notification: state.traces.notification
+        users: state.users.users,
+        loading: state.users.loading,
+        notification: state.users.notification
     }
 }
 
