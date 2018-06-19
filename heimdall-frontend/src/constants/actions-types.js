@@ -155,6 +155,13 @@ export const RoleConstants = {
     ROLE_NOTIFICATION: 'ROLE_NOTIFICATION'
 }
 
+export const TraceConstants = {
+    GET_TRACES: 'GET_TRACES',
+    GET_TRACE: 'GET_TRACE',
+    TRACE_LOADING: 'TRACE_LOADING',
+    TRACE_LOADING_FINISH: 'TRACE_LOADING_FINISH'
+}
+
 export const CacheConstants = {
     CLEAR_CACHE: 'CLEAR_CACHE',
     CACHE_LOADING: 'CACHE_LOADING',

@@ -8,10 +8,14 @@ import { getUser, initLoading, clearUser, clearUsers, update, save, remove } fro
 import { getAllRoles } from '../actions/roles';
 
 //components
-import { Card, Row, notification, Form, Col, Input, Button, Tag } from 'antd'
+import { Card, Row, notification, Form, Col, Button, Tag } from 'antd'
 import PageHeader from '../components/ui/PageHeader'
 import ReactJson from 'react-json-view'
 import Loading from '../components/ui/Loading'
+
+//utils
+import ColorUtils from '../utils/ColorUtils'
+
 
 class SingleTrace extends Component {
 
@@ -37,65 +41,13 @@ class SingleTrace extends Component {
         this.props.dispatch(clearUser())
     }
 
-    getColorMethod(method) {
-        let color;
-        if (method === 'GET') {
-            color = '#61affe'
-        } else if (method === 'POST') {
-            color = '#49cc90'
-        } else if (method === 'DELETE') {
-            color = '#f93e3e'
-        } else if (method === 'PUT') {
-            color = '#fca130'
-        } else if (method === 'PATCH') {
-            color = '#50e3c2'
-        }
-
-        return color;
-    }
-
-    getColorStatus(status) {
-        let color;
-        status = Math.floor(status/100);
-
-        if (status  === 2) {
-            color = '#49cc90'
-        } else if (status === 3) {
-            color = '#fca130'
-        } else if (status === 4) {
-            color = '#f93e3e'
-        } else {
-            color = '#61affe'
-        }
-
-        return color;
-    }
-
-    getColorLevel(level) {
-        let color;
-
-        if (level === 'INFO') {
-            color = '#61affe'
-        } else if (level === 'DEBUG') {
-            color = '#49cc90'
-        } else if (level === 'ERROR') {
-            color = '#f93e3e'
-        } else if (level === 'WARN') {
-            color = '#fca130'
-        } else {
-            color = '#50e3c2'
-        }
-
-        return color;
-    }
-
     render() {
         //if (this.state.loadEntity && !user) return <Loading />
         const title = "View trace"
         const trace = {
-            "method": "POST",
+            "method": "DELETE",
             "url": "http://localhost:8080/oauth/token",
-            "resultStatus": 401,
+            "resultStatus": 501,
             "durationMillis": 22,
             "insertedOnDate": "12/06/2018 03:12:40.296",
             "apiId": 1,
@@ -109,7 +61,7 @@ class SingleTrace extends Component {
             "operationId": 2,
             "request": null,
             "response": null,
-            "level": "DEBUG",
+            "level": "ASOIDJ",
             "pattern": "/token",
             "traces": [],
             "filters": [{
@@ -132,13 +84,13 @@ class SingleTrace extends Component {
                 "totalTimeInMillis": 0
             }],
             "profile": "developer"
-        };
+        }
 
         const extraCard = (
             <Row type="flex" justify="center" align="top">
-                <Col><Tag color={this.getColorLevel(trace.level)} >{trace.level}</Tag></Col>
-                <Col><Tag color={this.getColorMethod(trace.method)}>{trace.method}</Tag></Col>
-                <Col><Tag color={this.getColorStatus(trace.resultStatus)}>{trace.resultStatus}</Tag></Col>
+                <Col><Tag color={ColorUtils.getColorLevel(trace.level)} >{trace.level}</Tag></Col>
+                <Col><Tag color={ColorUtils.getColorMethod(trace.method)}>{trace.method}</Tag></Col>
+                <Col><Tag color={ColorUtils.getColorStatus(trace.resultStatus)}>{trace.resultStatus}</Tag></Col>
             </Row>
         )
 
@@ -163,10 +115,10 @@ class SingleTrace extends Component {
 
 const mapStateToProps = state => {
     return {
-        user: state.users.user,
-        loading: state.users.loading,
+        user: state.traces.user,
+        loading: state.traces.loading,
         roles: state.roles.roles,
-        notification: state.users.notification
+        notification: state.traces.notification
     }
 }
 

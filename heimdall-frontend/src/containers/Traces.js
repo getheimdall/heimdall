@@ -3,7 +3,7 @@ import React, {Component} from 'react'
 import {connect} from 'react-redux'
 
 //actions
-import {getAllUsers, initLoading, remove} from '../actions/users'
+import {getAllTraces, initLoading} from "../actions/traces";
 
 //components
 import {Button, Card, Col, Form, Input, notification, Row} from 'antd'
@@ -11,13 +11,14 @@ import PageHeader from '../components/ui/PageHeader'
 import ListTraces from '../components/traces/ListTraces'
 import Loading from '../components/ui/Loading'
 
+
 class Traces extends Component {
 
-    state = { page: 0, pageSize: 10, searchQuery: {} }
+    state = { page: 0, pageSize: 10, searchQuery: {}, traces: [{}, {}, {}]  }
 
     componentDidMount() {
         this.props.dispatch(initLoading())
-        this.props.dispatch(getAllUsers())
+        this.props.dispatch(getAllTraces())
     }
 
     componentWillReceiveProps(newProps) {
@@ -27,22 +28,17 @@ class Traces extends Component {
         }
     }
 
-    handleDelete = (userId) => {
-        this.props.dispatch(initLoading())
-        this.props.dispatch(remove(userId))
-    }
-
     handlePagination = (page, pageSize) => {
         this.setState({ ...this.state, page: page - 1, pageSize: pageSize })
         this.props.dispatch(initLoading())
-        this.props.dispatch(getAllUsers({ offset: page - 1, limit: 10, ...this.state.searchQuery }))
+        this.props.dispatch(getAllTraces({ offset: page - 1, limit: 10, ...this.state.searchQuery }))
     }
 
     onSearchForm = () => {
         this.props.form.validateFieldsAndScroll((err, payload) => {
             if (!err) {
                 this.props.dispatch(initLoading())
-                this.props.dispatch(getAllUsers({ offset: 0, limit: 10, ...payload }))
+                this.props.dispatch(getAllTraces({ offset: 0, limit: 10, ...payload }))
                 this.setState({ ...this.state, searchQuery: payload })
             }
         });
@@ -50,9 +46,9 @@ class Traces extends Component {
 
     render() {
         const { getFieldDecorator } = this.props.form
-        const { users, loading, history } = this.props
+        const { traces: traces, loading, history } = this.props
 
-        if (!users) return <Loading />
+        //if (!traces) return <Loading />
 
         return (
             <div>
@@ -88,7 +84,7 @@ class Traces extends Component {
                 </Row>
 
                 <Row className="h-row bg-white">
-                    <ListTraces dataSource={users} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading} />
+                    <ListTraces dataSource={this.state.traces} handlePagination={this.handlePagination} loading={loading} />
                 </Row>
             </div>
         )
@@ -97,12 +93,12 @@ class Traces extends Component {
 
 const mapStateToProps = state => {
     return {
-        users: state.users.users,
-        loading: state.users.loading,
-        notification: state.users.notification
+        // traces: state.traces.traces,
+        // loading: state.traces.loading,
+        // notification: state.traces.notification
     }
 }
 
-const UsersWrapped = Form.create({})(Traces)
+const TracesWrapped = Form.create({})(Traces)
 
-export default connect(mapStateToProps)(UsersWrapped)
+export default connect(mapStateToProps)(TracesWrapped)
