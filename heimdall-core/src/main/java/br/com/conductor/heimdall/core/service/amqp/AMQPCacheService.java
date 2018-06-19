@@ -21,16 +21,11 @@ package br.com.conductor.heimdall.core.service.amqp;
  * ==========================LICENSE_END===================================
  */
 
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import br.com.conductor.heimdall.core.service.CacheService;
 import br.com.conductor.heimdall.core.util.RabbitConstants;
-import br.com.twsoftware.alfred.object.Objeto;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * This class controls a Advanced Message Queuing Protocol (AMQP) cache service.
@@ -40,45 +35,10 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Service
-@Slf4j
 public class AMQPCacheService {
 
      @Autowired
-     private RabbitTemplate rabbitTemplate;
-     
-     @Autowired
-     private CacheService cacheService;
-     
-     /**
-      * Dispatch a message to clean cache by message.
-      * 
-      * @param message
-      */
-     @RabbitListener( queues = RabbitConstants.LISTENER_HEIMDALL_CLEAN_CACHE)
-     public void cleanCaches(final Message message) {
-          
-          String key = (String) rabbitTemplate.getMessageConverter().fromMessage(message);
-          
-          
-          if (Objeto.notBlank(key)) {
-               
-               if (key.contains(";")) {
-                    
-                    String[] split = key.split(";");
-                    log.info("Clean cache with key: {} and id: {} ", split[0], split[1]);
-                    cacheService.clean(split[0], split[1]);
-               } else {
-                    
-                    log.info("Clean cache with key: {}", key);
-                    cacheService.clean(key);
-               }
-          } else {
-               
-               log.info("Clean all caches");
-               cacheService.clean();
-          }
-          
-     }     
+     private RabbitTemplate rabbitTemplate;     
 
      /**
       * Dispatch a message to clean cache by key
