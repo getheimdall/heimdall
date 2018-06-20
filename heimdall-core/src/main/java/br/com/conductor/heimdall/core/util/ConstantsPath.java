@@ -71,6 +71,6 @@ public class ConstantsPath {
      
      public static final String PATH_PRIVILEGES = PATH_API + "/privileges";
      
-     public static final String PATH_PROVIDER = PATH_API + "/provider";
+     public static final String PATH_PROVIDER = PATH_API + "/providers";
      
 }
