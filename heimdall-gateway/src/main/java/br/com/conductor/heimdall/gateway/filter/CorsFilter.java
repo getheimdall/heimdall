@@ -30,6 +30,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 import org.springframework.stereotype.Component;
 
 import com.netflix.util.Pair;
+import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 
 /**
@@ -39,7 +40,7 @@ import com.netflix.zuul.context.RequestContext;
  */
 
 @Component
-public class CorsFilter extends HeimdallFilter {
+public class CorsFilter extends ZuulFilter {
 
 	private Map<String, String> cors;
 
@@ -51,14 +52,14 @@ public class CorsFilter extends HeimdallFilter {
 		this.cors.put("Access-Control-Allow-Headers", "origin, content-type, accept, authorization, x-requested-with, X-AUTH-TOKEN, access_token, client_id, device_id, credential");
 		this.cors.put("Access-Control-Max-Age", "3600");
 	}
-
+	
 	@Override
-	public boolean should() {
+	public boolean shouldFilter() {
 		return true;
 	}
 
 	@Override
-	public void execute() throws Throwable {
+	public Object run() {
 		RequestContext ctx = RequestContext.getCurrentContext();
 
 		HttpServletResponse response = ctx.getResponse();
@@ -71,11 +72,7 @@ public class CorsFilter extends HeimdallFilter {
 			.filter(entry -> !headersFromResponse.contains(entry.getKey()))
 			.forEach(entry -> response.setHeader(entry.getKey(), entry.getValue()));
 		
-	}
-
-	@Override
-	public String getName() {
-		return "CORSFilter";
+		return null;
 	}
 
 	@Override
@@ -87,5 +84,5 @@ public class CorsFilter extends HeimdallFilter {
 	public String filterType() {
 		return POST_TYPE;
 	}
-
+	
 }
