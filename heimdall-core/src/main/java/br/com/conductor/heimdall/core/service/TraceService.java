@@ -37,6 +37,7 @@ import br.com.conductor.heimdall.core.dto.TraceDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.entity.LogTrace;
 import br.com.conductor.heimdall.core.util.MongoLogConnector;
+import br.com.twsoftware.alfred.object.Objeto;
 
 /**
  * This class provides methods to read the (@link LogTrace} resource.
@@ -47,11 +48,11 @@ import br.com.conductor.heimdall.core.util.MongoLogConnector;
 public class TraceService {
 	
 	@Autowired
-	private MongoLogConnector connection;
+	private MongoLogConnector mongoConnection;
 	
 	public List<LogTrace> findAll() {
 		
-		return connection.findAll(LogTrace.class);
+		return mongoConnection.findAll();
 	}
 	
 	
@@ -59,7 +60,11 @@ public class TraceService {
 		
 		Map<String, Object> query = prepareQuery(traceDTO);
 		
-		List<LogTrace> page = connection.find(new LogTrace(), query);
+		if (Objeto.notBlank(query.get("trace.url"))) {
+			query.put("trace.url", ".*" + query.get("trace.url") + ".*");
+		}
+			
+		List<LogTrace> page = mongoConnection.find(query);
 
 		return page;
 	}
@@ -69,7 +74,7 @@ public class TraceService {
 		LogTrace object = new LogTrace();
 		object.setId(oid);
 		
-		return connection.findOne(object);
+		return mongoConnection.findOne(object);
 	}
 
 	private static Map<String, Object> prepareQuery(Object obj) {
