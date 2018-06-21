@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
 import br.com.conductor.heimdall.core.dto.TraceDTO;
+import br.com.conductor.heimdall.core.dto.page.LogTracePage;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.entity.LogTrace;
 import br.com.conductor.heimdall.core.entity.Trace;
@@ -71,7 +72,7 @@ public class TracesResource {
          
          if (Objeto.notBlank(pageableDTO)) {
         	 
-        	 List<LogTrace> logTracePage = traceService.listWithPageableAndFilter(traceDTO, pageableDTO);
+        	 LogTracePage logTracePage = traceService.list(traceDTO, pageableDTO);
         	 
         	 return ResponseEntity.ok(logTracePage);
          } else {
