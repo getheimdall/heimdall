@@ -112,5 +112,33 @@ public class PageDTO<T> {
               return page;
          }
      }
+     
+     public static <T> PageDTO<T> build(br.com.conductor.heimdall.core.util.Page<T> p) {
+         if (p == null){
+
+              return null;
+         } else {
+              
+              PageDTO<T> page = new PageDTO<>();
+              page.setContent(p.getContent());
+              page.setHasContent(p.isHasContent());
+              page.setNumber(p.getNumber());
+              page.setNumberOfElements(p.getNumberOfElements());
+              page.setSize(p.getTotalPages());
+              page.setTotalElements(p.getTotalElements());
+              page.setTotalPages(p.getTotalPages());
+              page.setHasNextPage(p.isHasNextPage());
+              page.setHasPreviousPage(p.isHasPreviousPage());
+              page.setFirst(p.isFirst());
+              page.setLast(p.isLast());
+              if (p.isHasPreviousPage()) {
+                   page.setPreviousPage(p.getPreviousPage());
+              }
+              if (p.isHasNextPage()) {
+                   page.setNextPage(p.getNextPage());
+              }
+              return page;
+         }
+     }
 
 }
