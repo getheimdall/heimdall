@@ -49,5 +49,6 @@ public class ConstantsTag {
      public static final String TAG_ROLES = "Roles";
      public static final String TAG_PRIVILEGES = "Privileges";
      public static final String TAG_PROVIDERS = "Providers";
-
+     public static final String TAG_TRACES = "Traces";
+     
 }

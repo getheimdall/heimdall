@@ -73,4 +73,6 @@ public class ConstantsPath {
      
      public static final String PATH_PROVIDER = PATH_API + "/provider";
      
+     public static final String PATH_TRACES = PATH_API + "/traces";
+     
 }
