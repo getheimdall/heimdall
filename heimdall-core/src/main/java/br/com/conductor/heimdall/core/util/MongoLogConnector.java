@@ -3,7 +3,7 @@ package br.com.conductor.heimdall.core.util;
 
 /*-
  * =========================LICENSE_START==================================
- * heimdall-gateway
+ * heimdall-core
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
@@ -23,6 +23,7 @@ package br.com.conductor.heimdall.core.util;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -32,10 +33,12 @@ import javax.annotation.PostConstruct;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 import org.mongodb.morphia.annotations.Id;
+import org.mongodb.morphia.query.FindOptions;
 import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.google.common.collect.Lists;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoClientURI;
@@ -49,6 +52,10 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ * This class creates a connection fo the MongoDB used by Heimdall
+ * to save its logs.
+ * 
+ * @author Marcelo Aguair
  *
  */
 @Slf4j
@@ -63,10 +70,10 @@ public class MongoLogConnector implements Serializable {
      @Autowired
      private Property property;
 
-//     private final static Integer PAGE = 0;
-//
-//     private final static Integer LIMIT = 100;
-//     
+     private final static Integer PAGE = 0;
+
+     private final static Integer LIMIT = 100;
+     
      @PostConstruct
      public void init() {
     	 this.databaseName = property.getMongo().getDataBase();
@@ -95,28 +102,33 @@ public class MongoLogConnector implements Serializable {
           return datastore().createQuery(LogTrace.class).asList();
      }
 
-//     public <T> Page<T> find(Object criteria, Integer page, Integer limit) {
-//
-//          Query<T> query = this.prepareQuery(criteria, this.datastore());
-//
-//          List<T> list = Lists.newArrayList();
-//          Long totalElements = query.count();
-//          
-//          page = page == null ? PAGE : page;
-//          limit = limit == null || limit > LIMIT ? LIMIT : limit;
-//          
-//          if ( page >= 1 &&  limit > 0  && limit <= LIMIT) {
-//               list = query.asList(new FindOptions().limit(limit).skip(page * limit));  
-//          } else {
-//               list = query.asList(new FindOptions().limit(limit));
-//          }
-//
-//          return (Page<T>) buildPage(list, page, limit, totalElements);
-//     }
+     public Page<LogTrace> find(Map<String, Object> queries, Integer page, Integer limit) {
+
+          Query<LogTrace> query = this.prepareQuery(queries);
+
+          List<LogTrace> list = Lists.newArrayList();
+          Long totalElements = query.count();
+          
+          page = page == null ? PAGE : page;
+          limit = limit == null || limit > LIMIT ? LIMIT : limit;
+          
+          if ( page >= 1 &&  limit > 0  && limit <= LIMIT) {
+               list = query.asList(new FindOptions().limit(limit).skip(page * limit));  
+          } else {
+               list = query.asList(new FindOptions().limit(limit));
+          }
+
+          return buildPage(list, page, limit, totalElements);
+     }
      
      public List<LogTrace> find(Map<String, Object> queries) {
+    	 
+    	 return this.prepareQuery(queries).asList();
+     }
+     
+     private Query<LogTrace> prepareQuery(Map<String, Object> queries) {
     	 Query<LogTrace> query = this.datastore().createQuery(LogTrace.class);
-    	     	 
+     	 
     	 queries.forEach((k, v) -> {
     		 if (v != null) {
     			 if (k.equals("trace.url")) {
@@ -127,31 +139,28 @@ public class MongoLogConnector implements Serializable {
     		 }
     	 });
     	 
-    	 return query.asList();
+    	 return query;
      }
      
-//     public <T> Page<T> buildPage(List<T> list, Integer page, Integer limit, Long totalElements) {
-//
-//          Page<T> pageResponse = new Page<>();
-//
-//          pageResponse.number = page;
-//          pageResponse.totalPages = new BigDecimal(totalElements).divide(new BigDecimal(limit), BigDecimal.ROUND_UP, 0).intValue();
-//          pageResponse.numberOfElements = limit;
-//          pageResponse.totalElements = totalElements;
-//          pageResponse.hasPreviousPage = page > 0;
-//          pageResponse.hasNextPage = page < (pageResponse.totalPages - 1);
-//          pageResponse.hasContent = Objeto.notBlank(list);
-//          pageResponse.first = page == 0;
-//          pageResponse.last = page == (pageResponse.totalPages - 1);
-//          pageResponse.nextPage = page == (pageResponse.totalPages - 1) ? page : page + 1;
-//          pageResponse.previousPage = page == 0 ? 0 : page - 1;
-//          pageResponse.content = list;
-//
-//          return pageResponse;
-//     }
+     public Page<LogTrace> buildPage(List<LogTrace> list, Integer page, Integer limit, Long totalElements) {
 
+          Page<LogTrace> pageResponse = new Page<>();
 
+          pageResponse.number = page;
+          pageResponse.totalPages = new BigDecimal(totalElements).divide(new BigDecimal(limit), BigDecimal.ROUND_UP, 0).intValue();
+          pageResponse.numberOfElements = limit;
+          pageResponse.totalElements = totalElements;
+          pageResponse.hasPreviousPage = page > 0;
+          pageResponse.hasNextPage = page < (pageResponse.totalPages - 1);
+          pageResponse.hasContent = Objeto.notBlank(list);
+          pageResponse.first = page == 0;
+          pageResponse.last = page == (pageResponse.totalPages - 1);
+          pageResponse.nextPage = page == (pageResponse.totalPages - 1) ? page : page + 1;
+          pageResponse.previousPage = page == 0 ? 0 : page - 1;
+          pageResponse.content = list;
 
+          return pageResponse;
+     }
 
      private MongoClient createMongoClient() {
 
@@ -170,7 +179,6 @@ public class MongoLogConnector implements Serializable {
           return client;
      }
 
-     
      private Datastore datastore() {
 
           Morphia morphia = new Morphia();

@@ -1,5 +1,5 @@
 
-package br.com.conductor.heimdall.core.dto;
+package br.com.conductor.heimdall.core.dto.page;
 
 /*-
  * =========================LICENSE_START==================================
@@ -23,27 +23,40 @@ package br.com.conductor.heimdall.core.dto;
 
 import java.io.Serializable;
 
+import br.com.conductor.heimdall.core.dto.PageDTO;
+import br.com.conductor.heimdall.core.entity.LogTrace;
 import br.com.conductor.heimdall.core.entity.Trace;
-import br.com.conductor.heimdall.core.enums.HttpMethod;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
- * This is a Data Transfer Object for the {@link Trace}
+ * This class represents a paged {@link Trace} list.
  * 
  * @author Marcelo Aguiar
  *
  */
 @Data
-public class TraceDTO implements Serializable {
-	
-	private static final long serialVersionUID = -8264906278477847182L;
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper=false)
+public class LogTracePage extends PageDTO<LogTrace> implements Serializable {
 
-	private HttpMethod method;
-	
-	private Integer resultStatus;
-	
-	private String url;
-	
-	private String insertedOnDate;
-	
+	private static final long serialVersionUID = -4118769430976134457L;
+
+	public LogTracePage(PageDTO<LogTrace> p){
+        super(p.getNumber(), 
+                p.size, 
+                p.totalPages, 
+                p.numberOfElements, 
+                p.totalElements, 
+                p.firstPage, 
+                p.hasPreviousPage, 
+                p.hasNextPage, 
+                p.hasContent, 
+                p.first, 
+                p.last, 
+                p.nextPage, 
+                p.previousPage, 
+                p.content);          
+ }
 }

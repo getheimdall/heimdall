@@ -32,11 +32,16 @@ import java.util.Map;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.com.conductor.heimdall.core.dto.TraceDTO;
+import br.com.conductor.heimdall.core.dto.page.LogTracePage;
+import br.com.conductor.heimdall.core.dto.PageDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.entity.LogTrace;
+import br.com.conductor.heimdall.core.entity.Trace;
 import br.com.conductor.heimdall.core.util.MongoLogConnector;
+import br.com.conductor.heimdall.core.util.Page;
 import br.com.twsoftware.alfred.object.Objeto;
 
 /**
@@ -55,8 +60,15 @@ public class TraceService {
 		return mongoConnection.findAll();
 	}
 	
-	
-	public List<LogTrace> listWithPageableAndFilter(TraceDTO traceDTO, PageableDTO pageableDTO) {
+	/**
+	 * Generates a paged list of the {@link Trace} saved.
+	 * 
+	 * @param traceDTO
+	 * @param pageableDTO
+	 * @return
+	 */
+    @Transactional(readOnly = true)
+	public LogTracePage list(TraceDTO traceDTO, PageableDTO pageableDTO) {
 		
 		Map<String, Object> query = prepareQuery(traceDTO);
 		
@@ -64,11 +76,20 @@ public class TraceService {
 			query.put("trace.url", ".*" + query.get("trace.url") + ".*");
 		}
 			
-		List<LogTrace> page = mongoConnection.find(query);
+		Page<LogTrace> page = mongoConnection.find(query, pageableDTO.getOffset(), pageableDTO.getLimit());
 
-		return page;
+		LogTracePage pages = new LogTracePage(PageDTO.build(page));
+		
+		return pages;
 	}
 	
+    /**
+     * Finds a {@link Trace} by its Id.
+     * 
+     * @param id The Trace Id
+     * @return Trace found
+     */
+    @Transactional(readOnly = true)
 	public LogTrace findById(String id) {
 		ObjectId oid = new ObjectId(id);
 		LogTrace object = new LogTrace();
@@ -77,7 +98,12 @@ public class TraceService {
 		return mongoConnection.findOne(object);
 	}
 
-	private static Map<String, Object> prepareQuery(Object obj) {
+	
+	/*
+	 * Transforms a TraceDTO into a Map<String, Object> for the morphia queries.
+	 * This is required to create a dotNotation for nested queries in mongodb.
+	 */
+	private static Map<String, Object> prepareQuery(TraceDTO obj) {
  	    Map<String, Object> result = new HashMap<String, Object>();
  	    BeanInfo info= null;
  		try {

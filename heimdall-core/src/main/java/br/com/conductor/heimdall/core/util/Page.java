@@ -3,7 +3,7 @@ package br.com.conductor.heimdall.core.util;
 
 /*-
  * =========================LICENSE_START==================================
- * heimdall-middleware-spec
+ * heimdall-core
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
@@ -26,12 +26,15 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+import lombok.Data;
+
 /**
  * This class provides a paging system for a response from a database.
  *
  * @author Filipe Germano
  *
  */
+@Data
 public class Page<T> {
      
      @JsonInclude(Include.ALWAYS)
