@@ -79,6 +79,7 @@ public class OAuthInterceptorService {
             runValidate(privateKey);
         }
     }
+
     /**
      * Method to run OAuth of the type Authorize.
      *
@@ -87,21 +88,25 @@ public class OAuthInterceptorService {
      */
     private void runAuthorize(OAuthRequest oAuthRequest, Long providerId) {
 
-        Provider provider = oAuthService.getProvider(providerId);
-        Http http = helper.http().url(provider.getPath());
+        if (Objeto.isBlank(oAuthRequest.getClientId())) {
+            generateResponseWithError("client_id not found");
+        } else {
+            Provider provider = oAuthService.getProvider(providerId);
+            Http http = helper.http().url(provider.getPath());
 
-        http = addAllParamsToRequestProvider(http, provider.getProviderParams());
+            http = addAllParamsToRequestProvider(http, provider.getProviderParams());
 
-        try {
-            ApiResponse apiResponse = http.sendPost();
-            if (Series.valueOf(apiResponse.getStatus()) == Series.SUCCESSFUL) {
-                String codeAuthorize = oAuthService.generateAuthorize(oAuthRequest.getClientId());
-                generateResponseWithSuccess("{\"code\": \"" + codeAuthorize + "\"}");
-            } else {
-                generateResponseWithError("User provider unauthorized");
+            try {
+                ApiResponse apiResponse = http.sendPost();
+                if (Series.valueOf(apiResponse.getStatus()) == Series.SUCCESSFUL) {
+                    String codeAuthorize = oAuthService.generateAuthorize(oAuthRequest.getClientId());
+                    generateResponseWithSuccess("{\"code\": \"" + codeAuthorize + "\"}");
+                } else {
+                    generateResponseWithError("User provider unauthorized");
+                }
+            } catch (Exception ex) {
+                generateResponseWithError("User provider unauthorized or bad request");
             }
-        } catch (Exception ex) {
-            generateResponseWithError("User provider unauthorized or bad request");
         }
     }
 
@@ -112,6 +117,7 @@ public class OAuthInterceptorService {
      * @param privateKey       privateKey used in Token
      * @param timeAccessToken  time to expire accessToken
      * @param timeRefreshToken time to expire refreshToken
+     * @param claimsJson       Claims to payload in JSON
      */
     private void runGenerate(OAuthRequest oAuthRequest, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsJson) {
         try {

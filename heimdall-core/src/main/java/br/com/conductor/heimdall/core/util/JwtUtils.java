@@ -55,6 +55,7 @@ public class JwtUtils {
      * @param operationsPath   Paths that the token can be used
      * @param timeToken        Time to expire the accessToken
      * @param timeRefreshToken Time to expire the refreshToken
+     * @param claims           The {@link Map}<{@link String}, {@link Object}> claims
      * @return The new {@link TokenOAuth}
      */
     public TokenOAuth generateNewToken(String privateKey, Set<String> operationsPath, int timeToken, int timeRefreshToken, Map<String, Object> claims) {
@@ -66,6 +67,7 @@ public class JwtUtils {
      *
      * @param privateKey     The privateKey that is used to get the SecretKey
      * @param operationsPath Paths that the token can be used
+     * @param claims         The {@link Map}<{@link String}, {@link Object}> claims
      * @return The new {@link TokenOAuth}
      */
     public TokenOAuth generateNewTokenTimeDefault(String privateKey, Set<String> operationsPath, Map<String, Object> claims) {
@@ -115,6 +117,12 @@ public class JwtUtils {
         return operations;
     }
 
+    /**
+     * Convert JsonObject to {@link Map}<{@link String}, {@link Object}>
+     *
+     * @param jsonObject The JsonObject
+     * @return {@link Map}<{@link String}, {@link Object}>
+     */
     public Map<String, Object> getClaimsFromJSONObjectBodyRequest(String jsonObject) {
 
         Map<String, Object> claims = new HashMap<>();
@@ -131,10 +139,11 @@ public class JwtUtils {
     /**
      * This method generate a new token.
      *
-     * @param privateKey         The privateKey that is used to get the SecretKey
+     * @param privateKey       The privateKey that is used to get the SecretKey
      * @param operationsPath   Paths that the token can be used
      * @param timeToken        Time to expire the accessToken
      * @param timeRefreshToken Time to expire the refreshToken
+     * @param claims           The {@link Map}<{@link String}, {@link Object}> claims
      * @return The new {@link TokenOAuth}
      */
     private TokenOAuth generateToken(String privateKey, int timeToken, int timeRefreshToken, Set<String> operationsPath, Map<String, Object> claims) {
@@ -207,15 +216,13 @@ public class JwtUtils {
         Map<String, Object> map = new HashMap<String, Object>();
 
         Iterator<String> keysItr = object.keys();
-        while(keysItr.hasNext()) {
+        while (keysItr.hasNext()) {
             String key = keysItr.next();
             Object value = object.get(key);
 
-            if(value instanceof JSONArray) {
+            if (value instanceof JSONArray) {
                 value = toList((JSONArray) value);
-            }
-
-            else if(value instanceof JSONObject) {
+            } else if (value instanceof JSONObject) {
                 value = toMap((JSONObject) value);
             }
             map.put(key, value);
@@ -225,13 +232,11 @@ public class JwtUtils {
 
     public static List<Object> toList(JSONArray array) throws JSONException {
         List<Object> list = new ArrayList<Object>();
-        for(int i = 0; i < array.length(); i++) {
+        for (int i = 0; i < array.length(); i++) {
             Object value = array.get(i);
-            if(value instanceof JSONArray) {
+            if (value instanceof JSONArray) {
                 value = toList((JSONArray) value);
-            }
-
-            else if(value instanceof JSONObject) {
+            } else if (value instanceof JSONObject) {
                 value = toMap((JSONObject) value);
             }
             list.add(value);

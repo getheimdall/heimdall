@@ -65,6 +65,7 @@ public class OAuthService {
      * @param oAuthRequest     The {@link OAuthRequest}
      * @param timeAccessToken  The time to expire the accessToken
      * @param timeRefreshToken The time to expire the RefreshToken
+     * @param claimsObject     The claimsObject in {@link String}
      * @return The {@link TokenOAuth}
      * @throws UnauthorizedException Token expired or code already used
      * @throws BadRequestException   Code not found or GrantType not informed
