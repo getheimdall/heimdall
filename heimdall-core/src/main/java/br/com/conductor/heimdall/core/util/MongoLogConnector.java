@@ -42,6 +42,7 @@ import com.mongodb.MongoClientURI;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 
+import br.com.conductor.heimdall.core.entity.LogTrace;
 import br.com.conductor.heimdall.core.environment.Property;
 import br.com.twsoftware.alfred.object.Objeto;
 import lombok.NoArgsConstructor;
@@ -83,15 +84,15 @@ public class MongoLogConnector implements Serializable {
 
      }
 
-     public <T> T findOne(T object) {
+     public LogTrace findOne(LogTrace object) {
 
          Object idMongo = getValueId(object);
-         return (T) this.datastore().get(object.getClass(), idMongo);
+         return this.datastore().get(object.getClass(), idMongo);
      }
      
-     public <T> List<T> findAll(Class<T> classType) {
+     public List<LogTrace> findAll() {
     	 
-          return datastore().createQuery(classType).asList();
+          return datastore().createQuery(LogTrace.class).asList();
      }
 
 //     public <T> Page<T> find(Object criteria, Integer page, Integer limit) {
@@ -113,12 +114,17 @@ public class MongoLogConnector implements Serializable {
 //          return (Page<T>) buildPage(list, page, limit, totalElements);
 //     }
      
-     public <T> List<T> find(Object criteria, Map<String, Object> queries) {
-    	 Query<T> query = (Query<T>) this.datastore().createQuery(criteria.getClass());
+     public List<LogTrace> find(Map<String, Object> queries) {
+    	 Query<LogTrace> query = this.datastore().createQuery(LogTrace.class);
     	     	 
     	 queries.forEach((k, v) -> {
-    		 if (v != null)
-    			 query.field(k).equal(v);
+    		 if (v != null) {
+    			 if (k.equals("trace.url")) {
+    				 query.field(k).contains((String) v);
+    			 } else {
+    				 query.field(k).equal(v);
+    			 }
+    		 }
     	 });
     	 
     	 return query.asList();
