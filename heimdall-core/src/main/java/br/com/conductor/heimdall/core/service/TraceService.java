@@ -25,17 +25,19 @@ import java.beans.BeanInfo;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import br.com.conductor.heimdall.core.dto.LogTraceDTO;
+import br.com.conductor.heimdall.core.dto.page.LogTraceDTOPage;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.conductor.heimdall.core.dto.TraceDTO;
-import br.com.conductor.heimdall.core.dto.page.LogTracePage;
 import br.com.conductor.heimdall.core.dto.PageDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.entity.LogTrace;
@@ -48,6 +50,7 @@ import br.com.twsoftware.alfred.object.Objeto;
  * This class provides methods to read the (@link LogTrace} resource.
  * 
  * @author Marcelo Aguiar
+ *
  */
 @Service
 public class TraceService {
@@ -55,32 +58,35 @@ public class TraceService {
 	@Autowired
 	private MongoLogConnector mongoConnection;
 	
-	public List<LogTrace> findAll() {
-		
-		return mongoConnection.findAll();
+	public List<LogTraceDTO> findAll() {
+		List<LogTrace> logTraces = mongoConnection.findAll();
+
+		List<LogTraceDTO> logTraceDTOS = new ArrayList<>();
+
+		logTraces.forEach(logTrace -> logTraceDTOS.add(new LogTraceDTO(logTrace)));
+
+		return logTraceDTOS;
 	}
 	
 	/**
 	 * Generates a paged list of the {@link Trace} saved.
 	 * 
-	 * @param traceDTO
-	 * @param pageableDTO
+	 * @param traceDTO Trace DTO
+	 * @param pageableDTO Pageable DTO
 	 * @return
 	 */
     @Transactional(readOnly = true)
-	public LogTracePage list(TraceDTO traceDTO, PageableDTO pageableDTO) {
+	public LogTraceDTOPage list(TraceDTO traceDTO, PageableDTO pageableDTO) {
 		
 		Map<String, Object> query = prepareQuery(traceDTO);
 		
 		if (Objeto.notBlank(query.get("trace.url"))) {
 			query.put("trace.url", ".*" + query.get("trace.url") + ".*");
 		}
-			
 		Page<LogTrace> page = mongoConnection.find(query, pageableDTO.getOffset(), pageableDTO.getLimit());
+        Page<LogTraceDTO> response = createPagedResponse(page);
 
-		LogTracePage pages = new LogTracePage(PageDTO.build(page));
-		
-		return pages;
+        return new LogTraceDTOPage(PageDTO.build(response));
 	}
 	
     /**
@@ -90,12 +96,13 @@ public class TraceService {
      * @return Trace found
      */
     @Transactional(readOnly = true)
-	public LogTrace findById(String id) {
+	public LogTraceDTO findById(String id) {
 		ObjectId oid = new ObjectId(id);
 		LogTrace object = new LogTrace();
 		object.setId(oid);
-		
-		return mongoConnection.findOne(object);
+		LogTrace logTrace = mongoConnection.findOne(object);
+
+		return new LogTraceDTO(logTrace);
 	}
 
 	
@@ -111,7 +118,8 @@ public class TraceService {
  		} catch (Exception e) {
  			e.printStackTrace();
  		}
- 	    for (PropertyDescriptor pd : info.getPropertyDescriptors()) {
+        assert info != null;
+        for (PropertyDescriptor pd : info.getPropertyDescriptors()) {
  	        Method reader = pd.getReadMethod();
  	        if (reader != null)
  				try {
@@ -124,4 +132,35 @@ public class TraceService {
  	    }
  	    return result;
  	}
+
+ 	/*
+ 	 * Method to transform a Page<LogTrace> into a Page<LogTraceDTO>.
+ 	 * The reason for this is that the id field from the mongo response
+ 	 * is a ObjecId, and the response to the Api should be the string
+ 	 * representaiton of that object.
+ 	 */
+ 	private Page<LogTraceDTO> createPagedResponse(Page<LogTrace> page) {
+
+        Page<LogTraceDTO> p = new Page<>();
+
+        p.first = page.first;
+        p.hasContent = page.hasContent;
+        p.hasNextPage = page.hasNextPage;
+        p.hasPreviousPage = page.hasPreviousPage;
+        p.last = page.last;
+        p.nextPage = page.nextPage;
+        p.number = page.number;
+        p.numberOfElements = page.numberOfElements;
+        p.previousPage = page.previousPage;
+        p.totalElements = page.totalElements;
+        p.totalPages = page.totalPages;
+
+        List<LogTraceDTO> logTraces = new ArrayList<>();
+
+	    page.content.forEach(logTrace -> logTraces.add(new LogTraceDTO(logTrace)));
+
+	    p.content = logTraces;
+
+	    return p;
+    }
 }

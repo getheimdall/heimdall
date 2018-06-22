@@ -1,5 +1,5 @@
 
-package br.com.conductor.heimdall.core.dto.page;
+package br.com.conductor.heimdall.core.dto;
 
 /*-
  * =========================LICENSE_START==================================
@@ -10,9 +10,9 @@ package br.com.conductor.heimdall.core.dto.page;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,42 +21,39 @@ package br.com.conductor.heimdall.core.dto.page;
  * ==========================LICENSE_END===================================
  */
 
-import java.io.Serializable;
-
-import br.com.conductor.heimdall.core.dto.PageDTO;
 import br.com.conductor.heimdall.core.entity.LogTrace;
 import br.com.conductor.heimdall.core.entity.Trace;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+
+import java.util.Date;
 
 /**
- * This class represents a paged {@link Trace} list.
- * 
+ * This class is a Data Transfer Object for the {@link LogTrace}.
+ *
  * @author Marcelo Aguiar
  *
  */
 @Data
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper=false)
-public class LogTracePage extends PageDTO<LogTrace> implements Serializable {
+public class LogTraceDTO {
 
-	private static final long serialVersionUID = -4118769430976134457L;
+    private String id;
 
-	public LogTracePage(PageDTO<LogTrace> p){
-        super(p.getNumber(), 
-                p.size, 
-                p.totalPages, 
-                p.numberOfElements, 
-                p.totalElements, 
-                p.firstPage, 
-                p.hasPreviousPage, 
-                p.hasNextPage, 
-                p.hasContent, 
-                p.first, 
-                p.last, 
-                p.nextPage, 
-                p.previousPage, 
-                p.content);          
- }
+    private Trace trace;
+
+    private String logger;
+
+    private String level;
+
+    private String thread;
+
+    private Date ts;
+
+    public LogTraceDTO(LogTrace logTrace) {
+        this.id = logTrace.getId().toString();
+        this.trace = logTrace.getTrace();
+        this.logger = logTrace.getLogger();
+        this.level = logTrace.getLevel();
+        this.thread = logTrace.getThread();
+        this.ts = logTrace.getTs();
+    }
 }

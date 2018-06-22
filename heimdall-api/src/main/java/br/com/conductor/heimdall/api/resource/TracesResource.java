@@ -24,6 +24,8 @@ import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_TRACES;
 
 import java.util.List;
 
+import br.com.conductor.heimdall.core.dto.LogTraceDTO;
+import br.com.conductor.heimdall.core.dto.page.LogTraceDTOPage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,10 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
 import br.com.conductor.heimdall.core.dto.TraceDTO;
-import br.com.conductor.heimdall.core.dto.page.LogTracePage;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
-import br.com.conductor.heimdall.core.entity.LogTrace;
-import br.com.conductor.heimdall.core.entity.Trace;
 import br.com.conductor.heimdall.core.service.TraceService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
 import br.com.twsoftware.alfred.object.Objeto;
@@ -65,19 +64,19 @@ public class TracesResource {
 	 * @return {@link ResponseEntity}
 	 */
 	@ResponseBody
-    @ApiOperation(value = "Find all Traces with filter and pageable", responseContainer = "List", response = Trace.class)
+    @ApiOperation(value = "Find all Traces with filter and pageable", responseContainer = "List", response = LogTraceDTO.class)
 	@GetMapping
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_TRACES)
     public ResponseEntity<?> findAll(@ModelAttribute TraceDTO traceDTO, @ModelAttribute PageableDTO pageableDTO) {
          
          if (Objeto.notBlank(pageableDTO)) {
         	 
-        	 LogTracePage logTracePage = traceService.list(traceDTO, pageableDTO);
-        	 
+        	 LogTraceDTOPage logTracePage = traceService.list(traceDTO, pageableDTO);
+
         	 return ResponseEntity.ok(logTracePage);
          } else {
         	 
-        	 List<LogTrace> logTraces = traceService.findAll();      
+        	 List<LogTraceDTO> logTraces = traceService.findAll();
              return ResponseEntity.ok(logTraces);
          }
     }
@@ -88,12 +87,12 @@ public class TracesResource {
 	 * @return {@link ResponseEntity}
 	 */
 	@ResponseBody
-    @ApiOperation(value = "Find Trace by id", response = Trace.class)
+    @ApiOperation(value = "Find Trace by id", response = LogTraceDTO.class)
 	@GetMapping(value = "/{traceId}")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_TRACES)
     public ResponseEntity<?> findOne(@PathVariable("traceId") String id) {
          
-    	 LogTrace logTrace = traceService.findById(id);
+    	 LogTraceDTO logTrace = traceService.findById(id);
     	 
     	 return ResponseEntity.ok(logTrace);
     }
