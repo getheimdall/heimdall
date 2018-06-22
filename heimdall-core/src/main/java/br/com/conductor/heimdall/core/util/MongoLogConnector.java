@@ -106,13 +106,13 @@ public class MongoLogConnector implements Serializable {
 
           Query<LogTrace> query = this.prepareQuery(queries);
 
-          List<LogTrace> list = Lists.newArrayList();
+          List<LogTrace> list;
           Long totalElements = query.count();
           
           page = page == null ? PAGE : page;
           limit = limit == null || limit > LIMIT ? LIMIT : limit;
           
-          if ( page >= 1 &&  limit > 0  && limit <= LIMIT) {
+          if (page >= 1 && limit > 0) {
                list = query.asList(new FindOptions().limit(limit).skip(page * limit));  
           } else {
                list = query.asList(new FindOptions().limit(limit));
@@ -142,7 +142,7 @@ public class MongoLogConnector implements Serializable {
     	 return query;
      }
      
-     public Page<LogTrace> buildPage(List<LogTrace> list, Integer page, Integer limit, Long totalElements) {
+     private Page<LogTrace> buildPage(List<LogTrace> list, Integer page, Integer limit, Long totalElements) {
 
           Page<LogTrace> pageResponse = new Page<>();
 
@@ -188,14 +188,12 @@ public class MongoLogConnector implements Serializable {
 
      private <T> Object getValueId(T object) {
 
-          Field id = Arrays.asList(object.getClass().getDeclaredFields()).stream().filter(field -> field.getAnnotation(Id.class) != null).findFirst().get();
+          Field id = Arrays.stream(object.getClass().getDeclaredFields()).filter(field -> field.getAnnotation(Id.class) != null).findFirst().orElse(null);
           if (id != null) {
                id.setAccessible(true);
                try {
                     return id.get(object);
-               } catch (IllegalArgumentException e) {
-                    log.error(e.getMessage(), e);
-               } catch (IllegalAccessException e) {
+               } catch (IllegalArgumentException | IllegalAccessException e) {
                     log.error(e.getMessage(), e);
                }
           }
