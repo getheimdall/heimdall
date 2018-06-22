@@ -95,7 +95,7 @@ public class StartServer implements ServletContextListener {
      @Override
      public void contextInitialized(ServletContextEvent sce) {
 
-          log.info("Initializing Goovy Interceptors");
+          log.info("Initializing Groovy Interceptors");
           initGroovyFilterManager();
 
      }
