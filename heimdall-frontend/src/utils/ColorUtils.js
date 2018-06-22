@@ -52,8 +52,18 @@ const getColorLevel = (level) => {
     return color;
 }
 
+const getColorActivate = (active) => {
+
+    if (active === 'ACTIVE') {
+        return 'green'
+    } else {
+        return 'red'
+    }
+}
+
 export default {
     getColorMethod,
     getColorLevel,
-    getColorStatus
+    getColorStatus,
+    getColorActivate
 }

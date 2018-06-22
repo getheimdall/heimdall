@@ -10,9 +10,9 @@ package br.com.conductor.heimdall.core.enums;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,211 +21,187 @@ package br.com.conductor.heimdall.core.enums;
  * ==========================LICENSE_END===================================
  */
 
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-
+import br.com.conductor.heimdall.core.entity.Interceptor;
+import br.com.twsoftware.alfred.object.Objeto;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 
-import br.com.conductor.heimdall.core.entity.Interceptor;
-import br.com.twsoftware.alfred.object.Objeto;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Set;
 
 /**
  * This enum lists the stages of a {@link Interceptor} life cycle.<br/>
  * It provides a validation for each of the stages.
- * 
- * @author Filipe Germano
- * @see Should
  *
+ * @author Filipe Germano
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ * @see Should
  */
 public enum InterceptorLifeCycle implements Should {
 
-     PLAN {
+    PLAN {
+        @Override
+        public boolean filter(Set<String> pathsAllowed, Set<String> pathsNotAllowed, String inboundURL, String method, HttpServletRequest req) {
 
-          @Override
-          public boolean filter(Set<String> pathsAllowed, Set<String> pathsNotAllowed, String inboundURL, String method, HttpServletRequest req) {
+            PathMatcher pathMatcher = new AntPathMatcher();
 
-               PathMatcher pathMatcher = new AntPathMatcher();
-               
-               if (Objeto.notBlank(inboundURL) && !isHostValidToInboundURL(req, inboundURL)) {
-                    
-                    return false;
-               }
-               
-               if (Objeto.notBlank(pathsNotAllowed)) {
-                    
-                    for (String path : pathsNotAllowed) {
+            if (Objeto.notBlank(inboundURL) && !isHostValidToInboundURL(req, inboundURL)) {
 
-                         String uri = req.getRequestURI();
-                         if (Objeto.notBlank(uri) && StringUtils.endsWith(uri, "/")) {
-                              
-                              uri = StringUtils.removeEnd(uri.trim(), "/");
-                         }
-                         if (pathMatcher.match(path, uri)) {
+                return false;
+            }
 
-                              return false;
-                         }
+            if (InterceptorLifeCycle.listContainURI(req.getRequestURI(), pathsNotAllowed, pathMatcher)) {
+                return false;
+            }
+
+            if (Objeto.notBlank(pathsAllowed)) {
+
+                for (String path : pathsAllowed) {
+
+                    if (req.getRequestURI().contains(path)) {
+
+                        return true;
                     }
-               }
+                }
+            }
 
-               if (Objeto.notBlank(pathsAllowed)) {
-                    
-                    for (String path : pathsAllowed) {
-                         
-                         if (req.getRequestURI().contains(path)) {
-                              
-                              return true;
-                         }
+            return false;
+        }
+
+    },
+
+    RESOURCE {
+        @Override
+        public boolean filter(Set<String> pathsAllowed, Set<String> pathsNotAllowed, String inboundURL, String method, HttpServletRequest req) {
+
+
+            if (Objeto.notBlank(inboundURL) && !isHostValidToInboundURL(req, inboundURL)) {
+                return false;
+            }
+
+            PathMatcher pathMatcher = new AntPathMatcher();
+            final String uri = req.getRequestURI();
+
+            if (Objeto.notBlank(pathsNotAllowed)) {
+
+                for (String path : pathsNotAllowed) {
+
+                    String mutableUri = uri;
+                    if (Objeto.notBlank(uri) && StringUtils.endsWith(uri, "/")) {
+
+                        mutableUri = StringUtils.removeEnd(uri.trim(), "/");
                     }
-               }
 
-               return false;
-          }
-
-     },
-
-     RESOURCE {
-
-          @Override
-          public boolean filter(Set<String> pathsAllowed, Set<String> pathsNotAllowed, String inboundURL, String method, HttpServletRequest req) {
-               
-               
-               if (Objeto.notBlank(inboundURL) && !isHostValidToInboundURL(req, inboundURL)) {
-                    return false;
-               }
-               
-               PathMatcher pathMatcher = new AntPathMatcher();
-               final String uri = req.getRequestURI();
-
-               if (Objeto.notBlank(pathsNotAllowed)) {
-                    
-                    for (String path : pathsNotAllowed) {
-                         
-                         String mutableUri = uri;
-                         if (Objeto.notBlank(uri) && StringUtils.endsWith(uri, "/")) {
-                              
-                              mutableUri = StringUtils.removeEnd(uri.trim(), "/");
-                         }
-                         
-                         if (pathMatcher.match(path, mutableUri)) {
-                              return false;
-                         }
+                    if (pathMatcher.match(path, mutableUri)) {
+                        return false;
                     }
-               }
+                }
+            }
 
-               if (Objeto.notBlank(pathsAllowed)) {
-                    
-                    for (String path : pathsAllowed) {
-                         
-                         String mutableUri = uri;
-                         if (Objeto.notBlank(uri) && StringUtils.endsWith(uri, "/")) {
-                              mutableUri = StringUtils.removeEnd(uri.trim(), "/");
-                         }
-                         
-                         if (pathMatcher.match(path, mutableUri)) {
-                              return true;
-                         }
+            if (Objeto.notBlank(pathsAllowed)) {
+
+                for (String path : pathsAllowed) {
+
+                    String mutableUri = uri;
+                    if (Objeto.notBlank(uri) && StringUtils.endsWith(uri, "/")) {
+                        mutableUri = StringUtils.removeEnd(uri.trim(), "/");
                     }
-               }
 
-               return false;
-          }
-
-     },
-
-     OPERATION {
-
-          @Override
-          public boolean filter(Set<String> pathsAllowed, Set<String> pathsNotAllowed, String inboundURL, String method, HttpServletRequest req) {
-
-               PathMatcher pathMatcher = new AntPathMatcher();
-               
-               if (!isMethodValidToRequest(req, method)) {
-                    
-                    return false;
-               }
-               
-               if (Objeto.notBlank(inboundURL) && !isHostValidToInboundURL(req, inboundURL)) {
-                    
-                    return false;
-               }
-               
-               if (Objeto.notBlank(pathsNotAllowed)) {
-                    
-                    for (String path : pathsNotAllowed) {
-                         
-                         String uri = req.getRequestURI();
-                         if (Objeto.notBlank(uri) && StringUtils.endsWith(uri, "/")) {
-                              
-                              uri = StringUtils.removeEnd(uri.trim(), "/");
-                         }
-                         if (pathMatcher.match(path, uri)) {
-
-                              return false;
-                         }
+                    if (pathMatcher.match(path, mutableUri)) {
+                        return true;
                     }
-               }
+                }
+            }
 
-               if (Objeto.notBlank(pathsAllowed)) {
-                    
-                    for (String path : pathsAllowed) {
-                         
-                         String uri = req.getRequestURI();
-                         if (Objeto.notBlank(uri) && StringUtils.endsWith(uri, "/")) {
-                              
-                              uri = StringUtils.removeEnd(uri.trim(), "/");
-                         }
-                         if (pathMatcher.match(path, uri)) {
-                              
-                              return true;
-                         }
-                    }
-               }
+            return false;
+        }
 
-               return false;
-          }
+    },
 
-     };     
-     
-     private static boolean isHostValidToInboundURL(HttpServletRequest req, String inboundURL) {
-          
-          String host = req.getHeader("Host");                                   
-          if (Objeto.isBlank(host)) {
-               
-               host = req.getHeader("host");
-          }
-          
-          if (Objeto.notBlank(host)) {
-               
-               if (Objeto.notBlank(inboundURL) && inboundURL.toLowerCase().contains(host.toLowerCase())) {
-                    
+    OPERATION {
+        @Override
+        public boolean filter(Set<String> pathsAllowed, Set<String> pathsNotAllowed, String inboundURL, String method, HttpServletRequest req) {
+
+            PathMatcher pathMatcher = new AntPathMatcher();
+
+            if (!isMethodValidToRequest(req, method)) {
+
+                return false;
+            }
+
+            if (Objeto.notBlank(inboundURL) && !isHostValidToInboundURL(req, inboundURL)) {
+
+                return false;
+            }
+
+            if (listContainURI(req.getRequestURI(), pathsNotAllowed, pathMatcher)) {
+                return false;
+            }
+
+            return listContainURI(req.getRequestURI(), pathsAllowed, pathMatcher);
+
+        }
+
+    };
+
+    private static boolean isHostValidToInboundURL(HttpServletRequest req, String inboundURL) {
+
+        String host = req.getHeader("Host");
+        if (Objeto.isBlank(host)) {
+
+            host = req.getHeader("host");
+        }
+
+        if (Objeto.notBlank(host)) {
+
+            return Objeto.notBlank(inboundURL) && inboundURL.toLowerCase().contains(host.toLowerCase());
+        } else {
+
+            return Objeto.notBlank(inboundURL) && req.getRequestURL().toString().toLowerCase().contains(inboundURL.toLowerCase());
+        }
+
+    }
+
+
+    private static boolean isMethodValidToRequest(HttpServletRequest req, String method) {
+
+        if (Objeto.notBlank(method)) {
+
+            if (method.equals(HttpMethod.ALL.name())) {
+                return true;
+            }
+
+            return req.getMethod().toLowerCase().equals(method.trim().toLowerCase());
+        }
+
+        return false;
+    }
+
+    /**
+     * Verify if {@link Set<String>} contains URI
+     *
+     * @param uri         The URI
+     * @param paths       The {@link Set<String>}
+     * @param pathMatcher The {@link PathMatcher}
+     * @return True if contains, otherwise false
+     */
+    private static boolean listContainURI(String uri, Set<String> paths, PathMatcher pathMatcher) {
+        if (Objeto.notBlank(paths)) {
+
+            for (String path : paths) {
+
+                if (Objeto.notBlank(uri) && StringUtils.endsWith(uri, "/")) {
+
+                    uri = StringUtils.removeEnd(uri.trim(), "/");
+                }
+                if (pathMatcher.match(path, uri)) {
+
                     return true;
-               }
-          } else {
-               
-               if (Objeto.notBlank(inboundURL) && req.getRequestURL().toString().toLowerCase().contains(inboundURL.toLowerCase())) {
-                    
-                    return true;
-               }
-          }
-          
-          return false;
-     }
-      
-     
-     private static boolean isMethodValidToRequest(HttpServletRequest req, String method) {
-          
-          if (Objeto.notBlank(method)) {
-               
-               if (req.getMethod().toLowerCase().equals(method.trim().toLowerCase())) {
-                    
-                    return true;
-               }
-          }
-          
-          return false;
-     }
-     
+                }
+            }
+        }
+
+        return false;
+    }
 }

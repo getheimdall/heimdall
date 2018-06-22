@@ -1,5 +1,5 @@
 
-package br.com.conductor.heimdall.core.enums;
+package br.com.conductor.heimdall.core.trace;
 
 /*-
  * =========================LICENSE_START==================================
@@ -21,15 +21,23 @@ package br.com.conductor.heimdall.core.enums;
  * ==========================LICENSE_END===================================
  */
 
+import java.util.Map;
+
+import lombok.Data;
+
 /**
- * This enum lists the HTTP methods that can be used.
- * 
- * @author Filipe Germano
- * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ * Data class a that represents a Request Response parser.
+ *
+ * @author Thiago Sampaio
  *
  */
-public enum HttpMethod {
-     
-     GET, POST, PUT, DELETE, PATCH, OPTIONS, ALL
+@Data
+public class RequestResponseParser {
+
+     private String uri;
+
+     private Map<String, String> headers;
+
+     private String body;
 
 }

@@ -1,5 +1,5 @@
 
-package br.com.conductor.heimdall.core.enums;
+package br.com.conductor.heimdall.core.dto;
 
 /*-
  * =========================LICENSE_START==================================
@@ -10,9 +10,9 @@ package br.com.conductor.heimdall.core.enums;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,15 +21,39 @@ package br.com.conductor.heimdall.core.enums;
  * ==========================LICENSE_END===================================
  */
 
+import br.com.conductor.heimdall.core.entity.LogTrace;
+import br.com.conductor.heimdall.core.entity.Trace;
+import lombok.Data;
+
+import java.util.Date;
+
 /**
- * This enum lists the HTTP methods that can be used.
- * 
- * @author Filipe Germano
- * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ * This class is a Data Transfer Object for the {@link LogTrace}.
+ *
+ * @author Marcelo Aguiar
  *
  */
-public enum HttpMethod {
-     
-     GET, POST, PUT, DELETE, PATCH, OPTIONS, ALL
+@Data
+public class LogTraceDTO {
 
+    private String id;
+
+    private Trace trace;
+
+    private String logger;
+
+    private String level;
+
+    private String thread;
+
+    private Date ts;
+
+    public LogTraceDTO(LogTrace logTrace) {
+        this.id = logTrace.getId().toString();
+        this.trace = logTrace.getTrace();
+        this.logger = logTrace.getLogger();
+        this.level = logTrace.getLevel();
+        this.thread = logTrace.getThread();
+        this.ts = logTrace.getTs();
+    }
 }

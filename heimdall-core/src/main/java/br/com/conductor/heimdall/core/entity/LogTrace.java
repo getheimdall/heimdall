@@ -1,5 +1,4 @@
-
-package br.com.conductor.heimdall.core.enums;
+package br.com.conductor.heimdall.core.entity;
 
 /*-
  * =========================LICENSE_START==================================
@@ -21,15 +20,37 @@ package br.com.conductor.heimdall.core.enums;
  * ==========================LICENSE_END===================================
  */
 
-/**
- * This enum lists the HTTP methods that can be used.
- * 
- * @author Filipe Germano
- * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
- *
- */
-public enum HttpMethod {
-     
-     GET, POST, PUT, DELETE, PATCH, OPTIONS, ALL
+import java.io.Serializable;
+import java.util.Date;
 
+import org.bson.types.ObjectId;
+import org.mongodb.morphia.annotations.Entity;
+import org.mongodb.morphia.annotations.Id;
+
+import lombok.Data;
+
+/**
+ * This class represents a log trace of the requests that are saved to the MongoDB
+ * 
+ * @author Marcelo Rodrigues
+ */
+@Entity(noClassnameStored=true, value="logs")
+@Data
+public class LogTrace implements Serializable {
+
+	private static final long serialVersionUID = -3756531883939035456L;
+
+	@Id
+	private ObjectId id;
+	
+	private Trace trace;
+
+	private String logger;
+	
+	private String level;
+	
+	private String thread;
+	
+	private Date ts;
+	
 }

@@ -1,5 +1,5 @@
 
-package br.com.conductor.heimdall.core.enums;
+package br.com.conductor.heimdall.core.dto;
 
 /*-
  * =========================LICENSE_START==================================
@@ -21,15 +21,29 @@ package br.com.conductor.heimdall.core.enums;
  * ==========================LICENSE_END===================================
  */
 
+import java.io.Serializable;
+
+import br.com.conductor.heimdall.core.entity.Trace;
+import br.com.conductor.heimdall.core.enums.HttpMethod;
+import lombok.Data;
+
 /**
- * This enum lists the HTTP methods that can be used.
+ * This is a Data Transfer Object for the {@link Trace}
  * 
- * @author Filipe Germano
- * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ * @author Marcelo Aguiar
  *
  */
-public enum HttpMethod {
-     
-     GET, POST, PUT, DELETE, PATCH, OPTIONS, ALL
+@Data
+public class TraceDTO implements Serializable {
+	
+	private static final long serialVersionUID = -8264906278477847182L;
 
+	private HttpMethod method;
+	
+	private Integer resultStatus;
+	
+	private String url;
+	
+	private String insertedOnDate;
+	
 }

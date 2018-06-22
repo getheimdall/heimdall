@@ -70,7 +70,7 @@ public class ProviderResource {
      * @return {@link ResponseEntity}
      */
     @ResponseBody
-    @ApiOperation(value = "Save a nem provider")
+    @ApiOperation(value = "Save a new provider")
     @PostMapping
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_PROVIDER)
     public ResponseEntity<?> save(@RequestBody ProviderDTO providerPersist) {

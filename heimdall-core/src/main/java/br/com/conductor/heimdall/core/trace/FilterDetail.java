@@ -1,5 +1,5 @@
 
-package br.com.conductor.heimdall.core.enums;
+package br.com.conductor.heimdall.core.trace;
 
 /*-
  * =========================LICENSE_START==================================
@@ -21,15 +21,35 @@ package br.com.conductor.heimdall.core.enums;
  * ==========================LICENSE_END===================================
  */
 
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
 /**
- * This enum lists the HTTP methods that can be used.
- * 
- * @author Filipe Germano
- * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ * Data class that represents the Filter detais.
+ *
+ * @author Thiago Sampaio
  *
  */
-public enum HttpMethod {
+@Data
+public class FilterDetail {
+     private String name;
+     private long timeInMillisRun;
+     private long timeInMillisShould;
+     private String status;
+     @Setter(value=AccessLevel.NONE)
+     @Getter(AccessLevel.NONE)
+     private long totalTimeInMillis;
      
-     GET, POST, PUT, DELETE, PATCH, OPTIONS, ALL
 
+     /**
+      * Returns the total time in milliseconds.
+      * 
+      * @return Time in milliseconds
+      */
+     public long getTotalTimeInMillis() {
+
+          return timeInMillisRun + timeInMillisShould;
+     }
 }

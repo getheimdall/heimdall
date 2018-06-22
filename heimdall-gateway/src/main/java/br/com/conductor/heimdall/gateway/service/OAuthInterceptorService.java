@@ -32,9 +32,11 @@ import br.com.conductor.heimdall.middleware.enums.HttpStatus.Series;
 import br.com.conductor.heimdall.middleware.spec.ApiResponse;
 import br.com.conductor.heimdall.middleware.spec.Helper;
 import br.com.conductor.heimdall.middleware.spec.Http;
+import br.com.conductor.heimdall.middleware.spec.Json;
 import br.com.twsoftware.alfred.object.Objeto;
 import com.netflix.zuul.context.RequestContext;
 import org.apache.commons.lang.StringUtils;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -69,7 +71,8 @@ public class OAuthInterceptorService {
         this.helper = helper;
         OAuthRequest oAuthRequest = recoverOAuthRequest();
         if (typeOAuth.equals(TypeOAuth.GENERATE.getTypeOAuth())) {
-            runGenerate(oAuthRequest, privateKey, timeAccessToken, timeRefreshToken);
+            String body = recoverBodyAsJsonObject();
+            runGenerate(oAuthRequest, privateKey, timeAccessToken, timeRefreshToken, body);
         } else if (typeOAuth.equals(TypeOAuth.AUTHORIZE.getTypeOAuth())) {
             runAuthorize(oAuthRequest, providerId);
         } else {
@@ -85,21 +88,25 @@ public class OAuthInterceptorService {
      */
     private void runAuthorize(OAuthRequest oAuthRequest, Long providerId) {
 
-        Provider provider = oAuthService.getProvider(providerId);
-        Http http = helper.http().url(provider.getPath());
+        if (Objeto.isBlank(oAuthRequest.getClientId())) {
+            generateResponseWithError("client_id not found");
+        } else {
+            Provider provider = oAuthService.getProvider(providerId);
+            Http http = helper.http().url(provider.getPath());
 
-        http = addAllParamsToRequestProvider(http, provider.getProviderParams());
+            http = addAllParamsToRequestProvider(http, provider.getProviderParams());
 
-        try {
-            ApiResponse apiResponse = http.sendPost();
-            if (Series.valueOf(apiResponse.getStatus()) == Series.SUCCESSFUL) {
-                String codeAuthorize = oAuthService.generateAuthorize(oAuthRequest.getClientId());
-                generateResponseWithSuccess("{\"code\": \"" + codeAuthorize + "\"}");
-            } else {
-                generateResponseWithError("User provider unauthorized");
+            try {
+                ApiResponse apiResponse = http.sendPost();
+                if (Series.valueOf(apiResponse.getStatus()) == Series.SUCCESSFUL) {
+                    String codeAuthorize = oAuthService.generateAuthorize(oAuthRequest.getClientId());
+                    generateResponseWithSuccess("{\"code\": \"" + codeAuthorize + "\"}");
+                } else {
+                    generateResponseWithError("User provider unauthorized");
+                }
+            } catch (Exception ex) {
+                generateResponseWithError("User provider unauthorized or bad request");
             }
-        } catch (Exception ex) {
-            generateResponseWithError("User provider unauthorized or bad request");
         }
     }
 
@@ -110,10 +117,11 @@ public class OAuthInterceptorService {
      * @param privateKey       privateKey used in Token
      * @param timeAccessToken  time to expire accessToken
      * @param timeRefreshToken time to expire refreshToken
+     * @param claimsJson       Claims to payload in JSON
      */
-    private void runGenerate(OAuthRequest oAuthRequest, String privateKey, int timeAccessToken, int timeRefreshToken) {
+    private void runGenerate(OAuthRequest oAuthRequest, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsJson) {
         try {
-            TokenOAuth tokenOAuth = oAuthService.generateToken(oAuthRequest, privateKey, timeAccessToken, timeRefreshToken);
+            TokenOAuth tokenOAuth = oAuthService.generateToken(oAuthRequest, privateKey, timeAccessToken, timeRefreshToken, claimsJson);
             String tokenOAuthJson = helper.json().parse(tokenOAuth);
             generateResponseWithSuccess(tokenOAuthJson);
         } catch (Exception e) {
@@ -248,4 +256,9 @@ public class OAuthInterceptorService {
         helper.call().response().header().add("Content-Type", "application/json");
         helper.call().response().setBody(message);
     }
+
+    private String recoverBodyAsJsonObject() {
+        return helper.call().request().getBody();
+    }
+
 }

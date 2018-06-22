@@ -1,4 +1,3 @@
-
 package br.com.conductor.heimdall.gateway.configuration;
 
 /*-
@@ -22,8 +21,6 @@ package br.com.conductor.heimdall.gateway.configuration;
  */
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -57,104 +54,101 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TraceConfiguration {
 
-     @Value("${info.app.profile}")
-     private String profile;
-     
-     @Value("${management.context-path}")
-     private String managerPath;
-     
-     @Autowired
-     private Property prop;
+	@Value("${info.app.profile}")
+	private String profile;
 
-     /**
-      * {@inheritDoc}
-      */
-     public class TraceFilter implements Filter {
-          private Map<String, String> cors;
-          @Override
-          public void destroy() { }
+	@Value("${management.context-path}")
+	private String managerPath;
 
-          @Override
-          public void doFilter(ServletRequest request, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+	@Autowired
+	private Property prop;
 
-               Trace trace = null;
+	/**
+	 * {@inheritDoc}
+	 */
+	public class TraceFilter implements Filter {
 
-               HttpServletResponse response = (HttpServletResponse) res;
-               try {
+		@Override
+		public void destroy() {
+		}
 
-                    trace = TraceContextHolder.getInstance().init(prop.getTrace().isPrintAllTrace(), profile, request);
-                    if (shouldDisableTrace(request)) {
-                         TraceContextHolder.getInstance().disablePrint();
-                    }
-                    
-                    cors.entrySet().stream()
-                         .filter(entry -> !response.containsHeader(entry.getKey()))
-                         .forEach(entry -> response.addHeader(entry.getKey(), entry.getValue()));
+		@Override
+		public void doFilter(ServletRequest request, ServletResponse res, FilterChain chain) throws IOException, ServletException {
 
-                    if ("OPTIONS".equalsIgnoreCase(((HttpServletRequest) request).getMethod())) {
-                         response.setStatus(200);
-                    } else {
-                         //chain.doFilter(request, response);
-                         chain.doFilter(request, response);
-                    }
-                    
-               } catch (Exception e) {
-                    
-                    log.error("Error {} during request {} exception {}", e.getMessage(), ((HttpServletRequest) request).getRequestURL(), e);
-               } finally {
+			Trace trace = null;
 
-                    if (TraceContextHolder.getInstance().shouldWrite()) {
+			HttpServletResponse response = (HttpServletResponse) res;
+			try {
 
-                         if (trace != null) {
-                              trace.write(response);
-                         }
-                    } else {
-                         TraceContextHolder.getInstance().clearActual();
-                    }
-                    TraceContextHolder.getInstance().unset();
-                    
-               }
-          }
+				trace = TraceContextHolder.getInstance().init(prop.getTrace().isPrintAllTrace(), profile, request, prop.getMongo().getEnabled());
+				if (shouldDisableTrace(request)) {
+					TraceContextHolder.getInstance().disablePrint();
+				}
 
-          @Override
-          public void init(FilterConfig arg0) throws ServletException {
-               this.cors = new HashMap<>();
-               this.cors.put("Access-Control-Allow-Origin", "*");
-               this.cors.put("Access-Control-Allow-Credentials", "true");
-               this.cors.put("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, DELETE, OPTIONS");
-               this.cors.put("Access-Control-Allow-Headers", "origin, content-type, accept, authorization, x-requested-with, X-AUTH-TOKEN, access_token, client_id, device_id, credential");
-               this.cors.put("Access-Control-Max-Age", "3600");
-          }
+				if ("OPTIONS".equalsIgnoreCase(((HttpServletRequest) request).getMethod())) {
+					response.setHeader("Access-Control-Allow-Origin", "*");
+					response.setHeader("Access-Control-Allow-Credentials", "true");
+					response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, DELETE, OPTIONS");
+					response.setHeader("Access-Control-Allow-Headers", "origin, content-type, accept, authorization, x-requested-with, X-AUTH-TOKEN, access_token, client_id, device_id, credential");
+					response.setHeader("Access-Control-Max-Age", "3600");
+					response.setStatus(200);
+				} else {
+					chain.doFilter(request, response);
+				}
+				
 
-     }
+			} catch (Exception e) {
 
-     /**
-      * Checks if it should disable the Trace from a c.
-      * 
-      * @param request		{@link ServletRequest}
-      * @return				True if trace should be disable, false otherwise
-      */
-     public boolean shouldDisableTrace(ServletRequest request) {
+				log.error("Error {} during request {} exception {}", e.getMessage(), ((HttpServletRequest) request).getRequestURL(), e);
+			} finally {
 
-          String uri = ((HttpServletRequest) request).getRequestURI();
-          return (uri.equalsIgnoreCase("/") || uri.startsWith(managerPath));
-     }
+				if (TraceContextHolder.getInstance().shouldWrite()) {
 
-     /**
-      * Configures and returns the {@link FilterRegistrationBean}.
-      * 
-      * @return {@link FilterRegistrationBean}
-      */
-     @Bean
-     public FilterRegistrationBean filterRegistrationBean() {
+					if (trace != null) {
+						trace.write(response);
+					}
+				} else {
+					TraceContextHolder.getInstance().clearActual();
+				}
+				TraceContextHolder.getInstance().unset();
+			}
+		}
 
-          FilterRegistrationBean filtroRestAuth = new FilterRegistrationBean();
-          filtroRestAuth.setFilter(new TraceFilter());
-          filtroRestAuth.addUrlPatterns("/*");
-          filtroRestAuth.setOrder(Ordered.HIGHEST_PRECEDENCE);
-          filtroRestAuth.setName("traceFilter");
+		@Override
+		public void init(FilterConfig arg0) throws ServletException {
+			
+		}
 
-          return filtroRestAuth;
-     }
+	}
+
+	/**
+	 * Checks if it should disable the Trace from a c.
+	 * 
+	 * @param request
+	 *            {@link ServletRequest}
+	 * @return True if trace should be disable, false otherwise
+	 */
+	public boolean shouldDisableTrace(ServletRequest request) {
+
+		String uri = ((HttpServletRequest) request).getRequestURI();
+		return (uri.equalsIgnoreCase("/") || uri.startsWith(managerPath));
+	}
+
+	/**
+	 * Configures and returns the {@link FilterRegistrationBean}.
+	 * 
+	 * @return {@link FilterRegistrationBean}
+	 */
+	@Bean
+	public FilterRegistrationBean filterRegistrationBean() {
+
+		FilterRegistrationBean filtroRestAuth = new FilterRegistrationBean();
+		filtroRestAuth.setFilter(new TraceFilter());
+		filtroRestAuth.addUrlPatterns("/*");
+		filtroRestAuth.setOrder(Ordered.HIGHEST_PRECEDENCE);
+		filtroRestAuth.setName("traceFilter");
+
+		return filtroRestAuth;
+	}
 
 }
