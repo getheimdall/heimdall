@@ -79,10 +79,7 @@ public class TraceService {
 	public LogTraceDTOPage list(TraceDTO traceDTO, PageableDTO pageableDTO) {
 		
 		Map<String, Object> query = prepareQuery(traceDTO);
-		
-		if (Objeto.notBlank(query.get("trace.url"))) {
-			query.put("trace.url", ".*" + query.get("trace.url") + ".*");
-		}
+
 		Page<LogTrace> page = mongoConnection.find(query, pageableDTO.getOffset(), pageableDTO.getLimit());
         Page<LogTraceDTO> response = createPagedResponse(page);
 
@@ -111,7 +108,7 @@ public class TraceService {
 	 * This is required to create a dotNotation for nested queries in mongodb.
 	 */
 	private static Map<String, Object> prepareQuery(TraceDTO obj) {
- 	    Map<String, Object> result = new HashMap<String, Object>();
+ 	    Map<String, Object> result = new HashMap<>();
  	    BeanInfo info= null;
  		try {
  			info = Introspector.getBeanInfo(obj.getClass());
@@ -121,15 +118,21 @@ public class TraceService {
         assert info != null;
         for (PropertyDescriptor pd : info.getPropertyDescriptors()) {
  	        Method reader = pd.getReadMethod();
- 	        if (reader != null)
- 				try {
- 					if (!pd.getName().equals("class"))
- 						result.put("trace." + pd.getName(), reader.invoke(obj));
- 				} catch (Exception e) {
- 					e.printStackTrace();
- 				
- 				}
+ 	        if (reader != null) {
+                try {
+                    if (!pd.getName().equals("class")) {
+                        result.put("trace." + pd.getName(), reader.invoke(obj));
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
  	    }
+
+ 	    if (result.get("trace.url") != null)
+            result.put("trace.url", ".*" + result.get("trace.url") + ".*");
+
  	    return result;
  	}
 
