@@ -1,30 +1,35 @@
 //3rd's
-import React, { Component } from 'react'
-import { push } from 'connected-react-router';
-import { connect } from 'react-redux'
+import React, {Component} from 'react'
+import {push} from 'connected-react-router';
+import {connect} from 'react-redux'
 
 // actions
-import { getApp, initLoading, clearApp, clearApps, update, save, remove } from '../actions/apps';
-import { developerSource, getDeveloperSourceByEmail, clearDeveloperSource, fetchingDeveloper } from '../actions/developers';
-import { getAllPlans, clearPlans } from '../actions/plans'
+import {getApp, initLoading, clearApp, clearApps, update, save, remove} from '../actions/apps';
+import {
+    developerSource,
+    getDeveloperSourceByEmail,
+    clearDeveloperSource,
+    fetchingDeveloper
+} from '../actions/developers';
+import {getAllPlans, clearPlans} from '../actions/plans'
 
 //components
-import { Card, Row } from 'antd'
+import {Card, Row} from 'antd'
 import PageHeader from '../components/ui/PageHeader'
 import Loading from '../components/ui/Loading'
-import AppForm from '../components/apps/AppForm';
-import { isEmpty } from '../utils/CommonUtils';
+import AppForm from '../components/apps/AppForm'
+import {isEmpty} from '../utils/CommonUtils'
 import moment from 'moment'
 
 class SingleApp extends Component {
 
-    state = { loadEntity: false, timer: Date.now(), intervalSeconds: 2 }
+    state = {loadEntity: false, timer: Date.now(), intervalSeconds: 2}
 
     componentDidMount() {
         let idApp = this.props.match.params.id
         if (idApp) {
             this.props.dispatch(getApp(idApp))
-            this.setState({ ...this.state, loadEntity: true })
+            this.setState({...this.state, loadEntity: true})
         }
         this.props.dispatch(getAllPlans({offset: 0, limit: 50}))
     }
@@ -46,7 +51,7 @@ class SingleApp extends Component {
             var duration = moment.duration(moment().diff(this.state.timer));
             var seconds = duration.asSeconds();
             if (seconds > this.state.intervalSeconds) {
-                this.setState({ ...this.state, timer: Date.now() })
+                this.setState({...this.state, timer: Date.now()})
                 this.props.dispatch(clearDeveloperSource())
                 this.props.dispatch(fetchingDeveloper())
                 this.props.dispatch(getDeveloperSourceByEmail(searchObject))
@@ -71,25 +76,25 @@ class SingleApp extends Component {
     }
 
     render() {
-        const { app } = this.props
+        const {app} = this.props
 
-        if (this.state.loadEntity && !app) return <Loading />
+        if (this.state.loadEntity && !app) return <Loading/>
         const title = app ? 'Edit' : 'Add'
-        const { developerSource } = this.props
+        const {developerSource} = this.props
 
         return (
             <div>
-                <PageHeader title="Apps" icon="appstore" />
+                <PageHeader title="Apps" icon="appstore"/>
                 <Row className="h-row bg-white">
-                    <Card style={{ width: '100%' }} title={title + ' App'}>
+                    <Card style={{width: '100%'}} title={title + ' App'}>
                         <AppForm app={app}
-                            plans={this.props.plans}
-                            handleDelete={this.handleDelete}
-                            handleSubmit={this.handleSubmit}
-                            handleSearch={this.handleSearch}
-                            loading={this.props.loading}
-                            developerSource={developerSource}
-                            fetching={this.props.fetching} />
+                                 plans={this.props.plans}
+                                 handleDelete={this.handleDelete}
+                                 handleSubmit={this.handleSubmit}
+                                 handleSearch={this.handleSearch}
+                                 loading={this.props.loading}
+                                 developerSource={developerSource}
+                                 fetching={this.props.fetching}/>
                     </Card>
                 </Row>
             </div>
