@@ -69,7 +69,7 @@ public class TracesResource {
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_TRACES)
     public ResponseEntity<?> findAll(@ModelAttribute TraceDTO traceDTO, @ModelAttribute PageableDTO pageableDTO) {
          
-         if (Objeto.notBlank(pageableDTO)) {
+         if (Objeto.notBlank(pageableDTO) || Objeto.notBlank(traceDTO)) {
         	 
         	 LogTraceDTOPage logTracePage = traceService.list(traceDTO, pageableDTO);
 

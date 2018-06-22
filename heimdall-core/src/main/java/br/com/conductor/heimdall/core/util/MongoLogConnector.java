@@ -38,7 +38,6 @@ import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.google.common.collect.Lists;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoClientURI;
@@ -73,6 +72,8 @@ public class MongoLogConnector implements Serializable {
      private final static Integer PAGE = 0;
 
      private final static Integer LIMIT = 100;
+
+     private MongoClient client;
      
      @PostConstruct
      public void init() {
@@ -162,28 +163,29 @@ public class MongoLogConnector implements Serializable {
           return pageResponse;
      }
 
-     private MongoClient createMongoClient() {
+     private void createMongoClient() {
 
-          MongoClient client;
           if (Objeto.notBlank(property.getMongo().getUrl())) {
 
                MongoClientURI uri = new MongoClientURI(property.getMongo().getUrl());
-               client = new MongoClient(uri);
+               this.client = new MongoClient(uri);
           } else {
                ServerAddress address = new ServerAddress(property.getMongo().getServerName(), property.getMongo().getPort().intValue());
                MongoCredential mongoCredential = MongoCredential.createCredential(property.getMongo().getUsername(), property.getMongo().getUsername(), property.getMongo().getPassword().toCharArray());
                MongoClientOptions mongoClientOptions = MongoClientOptions.builder().build();
-               client = new MongoClient(address, mongoCredential, mongoClientOptions);
+               this.client = new MongoClient(address, mongoCredential, mongoClientOptions);
           }
-
-          return client;
      }
 
      private Datastore datastore() {
 
           Morphia morphia = new Morphia();
 
-          return morphia.createDatastore(createMongoClient(), this.databaseName);
+          if (this.client == null) {
+              this.createMongoClient();
+          }
+
+          return morphia.createDatastore(this.client, this.databaseName);
      }
 
      private <T> Object getValueId(T object) {
