@@ -20,7 +20,7 @@ export const getAllTraces = (query = {offset: 0, limit: 10}) => dispatch => {
 
 export const getTracer = tracerId => dispatch => {
     traceService.getTrace(tracerId)
-        .then(data => dispatch({type: TraceConstants.GET_TRACE, user: data}))
+        .then(data => dispatch({type: TraceConstants.GET_TRACE, trace: data}))
         .catch(error => console.log(error))
 }
 

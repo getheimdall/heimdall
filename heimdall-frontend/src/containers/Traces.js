@@ -14,7 +14,7 @@ import Loading from '../components/ui/Loading'
 
 class Traces extends Component {
 
-    state = { page: 0, pageSize: 10, searchQuery: {}, traces: [{}, {}, {}]  }
+    state = { page: 0, pageSize: 10, searchQuery: {} }
 
     componentDidMount() {
         this.props.dispatch(initLoading())
@@ -84,7 +84,7 @@ class Traces extends Component {
                 </Row>
 
                 <Row className="h-row bg-white">
-                    <ListTraces handlePagination={this.handlePagination} loading={loading} />
+                    <ListTraces dataSource={traces} handlePagination={this.handlePagination} loading={loading} />
                 </Row>
             </div>
         )

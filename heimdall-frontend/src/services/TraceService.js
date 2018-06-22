@@ -1,8 +1,7 @@
 import {HTTPv1} from "../utils/Http";
 
-
 const getTrace = (traceId) => {
-    if (isNaN(traceId)) {
+    if (!traceId) {
         return Promise.reject(new Error('Invalid parameter'))
     }
 
@@ -20,10 +19,9 @@ const getTrace = (traceId) => {
 }
 
 const getTraces = (params = {params: {}}) => {
-    return HTTPv1.get('/users', params)
+    return HTTPv1.get('/traces', params)
         .then(res => {
             return Promise.resolve(res.data)
-
         })
         .catch(error => {
             console.log('Error: ', error)
