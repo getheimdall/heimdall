@@ -40,8 +40,6 @@ public class LocalDateTimeSerializer extends JsonSerializer<TemporalAccessor> {
 
      private static final DateTimeFormatter ISOFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneId.systemDefault());
 
-     public static final LocalDateTimeSerializer INSTANCE = new LocalDateTimeSerializer();
-
      LocalDateTimeSerializer(){}
 
      @Override
