@@ -1,20 +1,28 @@
 //3rd's
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
-
 //actions
 import {getAllTraces, initLoading} from "../actions/traces";
-
 //components
-import {Button, Card, Col, Form, Input, notification, Row} from 'antd'
+import {Card, Col, Form, notification, Row, Select, Input, Button} from 'antd'
 import PageHeader from '../components/ui/PageHeader'
 import ListTraces from '../components/traces/ListTraces'
 import Loading from '../components/ui/Loading'
+import FilterTraceUtils from "../utils/FilterTraceUtils";
+
+const {Option} = Select
 
 
 class Traces extends Component {
 
-    state = { page: 0, pageSize: 10, searchQuery: {} }
+    state = {
+        page: 0,
+        pageSize: 10,
+        searchQuery: {},
+        filters: FilterTraceUtils.getFilters(),
+        filtersSelected: [],
+        filterOrder: 0
+    }
 
     componentDidMount() {
         this.props.dispatch(initLoading())
@@ -23,68 +31,188 @@ class Traces extends Component {
 
     componentWillReceiveProps(newProps) {
         if (newProps.notification && newProps.notification !== this.props.notification) {
-            const { type, message, description } = newProps.notification
-            notification[type]({ message, description })
+            const {type, message, description} = newProps.notification
+            notification[type]({message, description})
         }
     }
 
     handlePagination = (page, pageSize) => {
-        this.setState({ ...this.state, page: page - 1, pageSize: pageSize })
+        this.setState({...this.state, page: page - 1, pageSize: pageSize})
         this.props.dispatch(initLoading())
-        this.props.dispatch(getAllTraces({ offset: page - 1, limit: 10, ...this.state.searchQuery }))
+        this.props.dispatch(getAllTraces({ offset: page - 1, limit: 10, ...this.state.filtersSelected}))
     }
 
-    onSearchForm = () => {
-        this.props.form.validateFieldsAndScroll((err, payload) => {
-            if (!err) {
-                this.props.dispatch(initLoading())
-                this.props.dispatch(getAllTraces({ offset: 0, limit: 10, ...payload }))
-                this.setState({ ...this.state, searchQuery: payload })
-            }
-        });
+    // onSearchForm = () => {
+    //     this.props.form.validateFieldsAndScroll((err, payload) => {
+    //         if (!err) {
+    //             this.props.dispatch(initLoading())
+    //             this.props.dispatch(getAllTraces({ offset: 0, limit: 10, ...payload }))
+    //             this.setState({ ...this.state, searchQuery: payload })
+    //         }
+    //     });
+    // }
+
+    sendFilters = () => {
+        this.props.dispatch(initLoading())
+        console.log(this.state.filtersSelected)
+        this.props.dispatch(getAllTraces({offset: 0, limit: 10, ...this.state.filtersSelected}))
+        //this.props.dispatch(finishLoading())
+    }
+
+    updateFiltersSelected = (element) => {
+        let orderFilter = this.state.filterOrder
+        if (!element.order) {
+            element.order = ++orderFilter
+        }
+        const {filtersSelected} = this.state
+        const newFiltersSelected = filtersSelected.filter((e) => e.name !== element.name)
+        newFiltersSelected.push(element)
+        newFiltersSelected.sort(this.orderFiltersSelected)
+        this.setState({...this.state, filtersSelected: newFiltersSelected, filterOrder: orderFilter})
+    }
+
+    removeFromFiltersSelected = (element) => {
+        const {filtersSelected} = this.state
+        const newFiltersSelected = filtersSelected.filter((e) => e.name !== element.name)
+        this.setState({...this.state, filtersSelected: newFiltersSelected})
+    }
+
+    handleSelectFilter = (value) => {
+        const {filters} = this.state
+        const elementFound = filters[value]
+        this.updateFiltersSelected(elementFound)
+    }
+
+    handleChangeFilter = element => valueSelected => {
+        element.operationSelected = valueSelected
+        this.updateFiltersSelected(element)
+    }
+
+    handleChangeValueFilter = element => valueFilter => {
+        if (valueFilter.target){
+            element.firstValue = valueFilter.target.value
+        }else {
+            element.firstValue = valueFilter
+        }
+
+        this.updateFiltersSelected(element)
+    }
+
+    handleChangeValue2Filter = element => valueFilter => {
+        if (valueFilter.target){
+            element.secondValue = valueFilter.target.value
+        }else {
+            element.secondValue = valueFilter
+        }
+        this.updateFiltersSelected(element)
+    }
+
+    orderFiltersSelected = (a, b) => {
+        if (a.order > b.order) {
+            return 1
+        }
+
+        if (b.order > a.order)
+            return -1
+
+        return 0
+    }
+
+    validateOperationSelectedToViewInputValue = (operationSelected) => {
+        return operationSelected !== "today" && operationSelected !== "yesterday" &&
+            operationSelected !== "this week" && operationSelected !== "last week" &&
+            operationSelected !== "this month" && operationSelected !== "last month" &&
+            operationSelected !== "this year" && operationSelected !== "all"
     }
 
     render() {
-        const { getFieldDecorator } = this.props.form
-        const { traces, loading } = this.props
+        // const { getFieldDecorator } = this.props.form
+        const {traces, loading} = this.props
+        const {filters, filtersSelected} = this.state
 
-        if (!traces) return <Loading />
+        if (!traces) return <Loading/>
 
         return (
             <div>
-                <PageHeader title="Traces" icon="sync" />
+                <PageHeader title="Traces" icon="sync"/>
 
                 <Row className="search-box">
                     <Card>
                         <Form>
-                            <Row gutter={24}>
-                                <Col sm={24} md={4}>
-                                    {getFieldDecorator('method')(<Input.Search onSearch={this.onSearchForm} placeholder="Method" />)}
-                                </Col>
-                                <Col sm={24} md={4}>
-                                    {getFieldDecorator('status')(<Input.Search onSearch={this.onSearchForm} placeholder="Status response" />)}
-                                </Col>
-                                <Col sm={24} md={4}>
-                                    {getFieldDecorator('path')(<Input.Search onSearch={this.onSearchForm} placeholder="Path" />)}
-                                </Col>
-                                <Col sm={24} md={4}>
-                                    {getFieldDecorator('date')(<Input.Search onSearch={this.onSearchForm} placeholder="yyyy/mm/dd" />)}
-                                </Col>
-                                <Col sm={24} md={4}>
-                                    {getFieldDecorator('level')(<Input.Search onSearch={this.onSearchForm} placeholder="Level" />)}
-                                </Col>
-                                <Col sm={24} md={4}>
-                                    <Row type="flex" justify="end">
-                                        <Button className="card-button" type="primary" icon="search" onClick={this.onSearchForm}>Apply Filters</Button>
-                                    </Row>
+                            <Row>
+                                <Col sm={24} md={8}>
+                                    <h3>Add filter:</h3>
+                                    <Select onChange={this.handleSelectFilter} key="filterSelect">
+                                        {
+                                            filters.map((element, i) => {
+                                                return <Option key={i}>{element.label}</Option>
+                                            })
+                                        }
+                                    </Select>
                                 </Col>
                             </Row>
+                            {filtersSelected.length > 0 && (
+                                <Row>
+                                    {
+                                        filtersSelected.map((element, i) => {
+                                            const options = element.operations.map((operation) => {
+                                                return <Option key={operation}>{operation}</Option>
+                                            })
+
+                                            return (
+                                                <Row key={element.name} gutter={16} justify="left"
+                                                     className="heimdall-select-filters">
+                                                    <Col sm={24} md={1}>
+                                                        <Button key={element.name} icon="close"
+                                                                onClick={() => this.removeFromFiltersSelected(element)}/>
+                                                    </Col>
+                                                    <Col sm={24} md={4}>
+                                                        <h3>{element.label}</h3>
+                                                    </Col>
+                                                    <Col sm={24} md={4}>
+                                                        <Select key={i} defaultValue={element.operationSelected.length > 0 ? element.operationSelected : "select operation"} placeholder="Select operation"
+                                                                onChange={this.handleChangeFilter(element)}>{options}</Select>
+                                                    </Col>
+                                                    {
+                                                        this.validateOperationSelectedToViewInputValue(element.operationSelected) &&
+                                                        <Col sm={24} md={4}>
+                                                            {
+                                                                element.type === "type" ?
+                                                                    <Select placeholder="value" defaultValue={element.firstValue.length > 0 ? element.firstValue : "select a value"}
+                                                                            onChange={this.handleChangeValueFilter(element)}>
+                                                                        {
+                                                                            element.possibleValues.map((value) => {
+                                                                                return <Option
+                                                                                    key={value}>{value}</Option>
+                                                                            })
+                                                                        }
+                                                                    </Select>
+                                                                    : <Input placeholder="value" value={element.firstValue} onChange={this.handleChangeValueFilter(element)}/>
+                                                            }
+                                                        </Col>
+                                                    }
+                                                    {
+                                                        element.operationSelected === "between" &&
+                                                        <Col sm={24} md={4}>
+                                                            <Input placeholder="value2" value={element.secondValue} onChange={this.handleChangeValue2Filter(element)}/>
+                                                        </Col>
+                                                    }
+                                                </Row>
+                                            )
+                                        })
+                                    }
+                                </Row>
+                            )}
+                            <br/>
+                            <div style={{width: "100%", textAlign: "left"}}>
+                                <Button type="primary" onClick={() => this.sendFilters()} icon="search" disabled={this.state.filtersSelected.length === 0}>Apply filters</Button>
+                            </div>
                         </Form>
                     </Card>
                 </Row>
 
                 <Row className="h-row bg-white">
-                    <ListTraces dataSource={traces} handlePagination={this.handlePagination} loading={loading} />
+                    <ListTraces dataSource={traces} handlePagination={this.handlePagination} loading={loading}/>
                 </Row>
             </div>
         )

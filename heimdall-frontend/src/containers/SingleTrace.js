@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 
 // actions
-import { getTracer, initLoading, finishLoading} from '../actions/traces';
+import { getTracer } from '../actions/traces';
 
 //components
 import { Card, Row, notification, Form, Col, Tag } from 'antd'
@@ -60,7 +60,6 @@ class SingleTrace extends Component {
 
         return (
             <div>
-                {console.log(trace)}
                 <PageHeader title="Traces" icon="sync" />
                 <Row className="h-row bg-white">
                     <Card className="heimdall-card-extra"  title={title} extra={extraCard}>
