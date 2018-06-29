@@ -16,6 +16,7 @@ import Loading from '../components/ui/Loading';
 import { getAllResourcesByApi, clearResources } from '../actions/resources';
 import { getAllOperations, clearOperations } from '../actions/operations';
 import DnDInterceptorType from '../components/interceptors/DnDInterceptorType';
+import ColorUtils from "../utils/ColorUtils";
 
 const Option = Select.Option
 
@@ -115,8 +116,8 @@ class Interceptors extends Component {
         } else {
             formObject.status = 'SAVE'
             let candidates = this.state.candidatesToSave
-            if (this.state.candidatesToSave.some(updatable => updatable === formObject)) {
-                candidates = this.state.candidatesToSave.filter(item => item !== formObject)
+            if (this.state.candidatesToSave.some(updatable => updatable.uuid === formObject.uuid)) {
+                candidates = this.state.candidatesToSave.filter(item => item.uuid !== formObject.uuid)
             }
 
             formObject.uuid = UUID.generate()
@@ -308,7 +309,7 @@ class Interceptors extends Component {
                                     <Select defaultValue={0} onChange={this.handleSelectChange('OP')} disabled={!this.props.operations}>
                                         <Option value={0}>All</Option>
                                         {this.props.operations && this.props.operations.map((op, index) => (
-                                            <Option key={index} value={op.id}>{op.path}</Option>
+                                            <Option key={index} value={op.id}><Tag color={ColorUtils.getColorMethod(op.method)}>{op.method}</Tag> {op.path}</Option>
                                         ))}
                                     </Select>
                                 </Form.Item>

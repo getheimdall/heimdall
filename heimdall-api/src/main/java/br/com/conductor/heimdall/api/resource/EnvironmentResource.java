@@ -142,8 +142,6 @@ public class EnvironmentResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_ENVIRONMENT)
      public ResponseEntity<?> update(@PathVariable("environmentId") Long id, @RequestBody EnvironmentDTO environmentDTO) {
 
-    	  System.out.println("######");
-    	  System.out.println(environmentDTO);
           Environment environment = environmentService.update(id, environmentDTO);
           amqpCacheService.dispatchClean();
           

@@ -2,16 +2,49 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 
 import { Row, Form, Input, Col, Switch, Tooltip, Button, Modal } from 'antd'
+import ListVariablesEnvironment from './ListVariablesEnvironment'
 
 const FormItem = Form.Item
-const confirm = Modal.confirm;
+const confirm = Modal.confirm
+let uuid = 0
 
 class EnvironmentForm extends Component {
+
+    state = {
+        variables: []
+    }
+
+    componentDidMount() {
+        let variablesArray = []
+
+        if (this.props.environment && Object.keys(this.props.environment.variables).length > 0) {
+            Object.keys(this.props.environment.variables).forEach((objectKey, index) => {
+                variablesArray.push({
+                    key: objectKey,
+                    value: this.props.environment.variables[objectKey],
+                })
+            });
+        }
+
+        this.setState({ ...this.state, variables: variablesArray })
+    }
 
     onSubmitForm = () => {
         this.props.form.validateFieldsAndScroll((err, payload) => {
             if (!err) {
                 payload.status = payload.status ? 'ACTIVE' : 'INACTIVE'
+                const { getFieldValue } = this.props.form;
+                const variablesForm = getFieldValue('variables');
+
+                if (variablesForm) {
+                    let variables = {}
+
+                    variablesForm.forEach((element, index) => {
+                        variables[Object.values(element)[0]] = Object.values(element)[1]
+                    });
+
+                    payload['variables'] = variables
+                }
 
                 this.props.handleSubmit(payload)
             }
@@ -30,9 +63,51 @@ class EnvironmentForm extends Component {
         });
     }
 
+    remove = (k) => {
+        const { form } = this.props;
+        const variablesCount = form.getFieldValue('variablesCount');
+
+        if (variablesCount.length === 0) {
+            return;
+        }
+
+        form.setFieldsValue({
+            variablesCount: variablesCount.filter((value, key) => {
+                return key !== k
+            }
+            ),
+        });
+
+        const variablesForm = form.getFieldValue('variables');
+        variablesForm.splice(k, 1)
+
+        this.setState({
+            variables: variablesForm
+        })
+    }
+
+    initVariables = () => {
+        this.setState({ ...this.state, variables: [{ key: '', value: '' }] })
+    }
+
+    add = () => {
+        const { form } = this.props;
+        const variablesCount = form.getFieldValue('variablesCount');
+        const variablesForm = form.getFieldValue('variables');
+        const nextKeys = variablesCount.concat(uuid);
+        uuid++;
+
+        form.setFieldsValue({
+            variablesCount: nextKeys,
+        });
+
+        this.setState({
+            variables: variablesForm
+        })
+    }
+
     render() {
         const { getFieldDecorator } = this.props.form
-
         const { environment } = this.props
         const { loading } = this.props
 
@@ -83,7 +158,23 @@ class EnvironmentForm extends Component {
                             </FormItem>
                         </Col>
 
-                        <Col sm={24} md={5}>
+                        <Col sm={24} md={24}>
+                            <fieldset>
+                                <legend><div className="ant-card-head-title">Variables</div></legend>
+                                {
+                                    this.state.variables.length === 0 ?
+                                        <Row type="flex" justify="center" align="bottom">
+                                            <Col style={{ marginTop: 20 }}>
+                                                You don't have variables in this <b>Environment</b>, please <Button type="dashed" className="add-tour" onClick={this.initVariables}>Add Variable</Button>
+                                            </Col>
+                                        </Row>
+                                        :
+                                        <ListVariablesEnvironment variables={this.state.variables} form={this.props.form} add={this.add} remove={this.remove} loading={this.props.loading} />
+                                }
+                            </fieldset>
+                        </Col>
+
+                        <Col sm={24} md={24}>
                             <FormItem label="Status">
                                 {
                                     getFieldDecorator('status', {
@@ -93,6 +184,7 @@ class EnvironmentForm extends Component {
                                 }
                             </FormItem>
                         </Col>
+
                     </Row>
                 </Form>
 

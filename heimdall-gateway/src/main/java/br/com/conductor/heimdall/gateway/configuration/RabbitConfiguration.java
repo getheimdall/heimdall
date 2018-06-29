@@ -1,5 +1,5 @@
 
-package br.com.conductor.heimdall.core.configuration;
+package br.com.conductor.heimdall.gateway.configuration;
 
 /*-
  * =========================LICENSE_START==================================
