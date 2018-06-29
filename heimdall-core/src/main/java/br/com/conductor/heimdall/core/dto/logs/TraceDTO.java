@@ -1,5 +1,5 @@
 
-package br.com.conductor.heimdall.core.dto;
+package br.com.conductor.heimdall.core.dto.logs;
 
 /*-
  * =========================LICENSE_START==================================

@@ -1,5 +1,5 @@
 
-package br.com.conductor.heimdall.core.dto.page;
+package br.com.conductor.heimdall.core.dto.logs;
 
 /*-
  * =========================LICENSE_START==================================
@@ -21,41 +21,39 @@ package br.com.conductor.heimdall.core.dto.page;
  * ==========================LICENSE_END===================================
  */
 
-import br.com.conductor.heimdall.core.dto.logs.LogTraceDTO;
-import br.com.conductor.heimdall.core.dto.PageDTO;
+import br.com.conductor.heimdall.core.entity.LogTrace;
+import br.com.conductor.heimdall.core.entity.Trace;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
+import java.util.Date;
 
 /**
- * Class that represents a paged {@link LogTraceDTO} list.
+ * This class is a Data Transfer Object for the {@link LogTrace}.
  *
  * @author Marcelo Aguiar
  *
  */
 @Data
-@NoArgsConstructor
-@EqualsAndHashCode(callSuper=false)
-public class LogTraceDTOPage extends PageDTO<LogTraceDTO> implements Serializable {
+public class LogTraceDTO {
 
-    private static final long serialVersionUID = -4118769430976134457L;
+    private String id;
 
-    public LogTraceDTOPage(PageDTO<LogTraceDTO> p){
-        super(p.getNumber(),
-                p.size,
-                p.totalPages,
-                p.numberOfElements,
-                p.totalElements,
-                p.firstPage,
-                p.hasPreviousPage,
-                p.hasNextPage,
-                p.hasContent,
-                p.first,
-                p.last,
-                p.nextPage,
-                p.previousPage,
-                p.content);
+    private Trace trace;
+
+    private String logger;
+
+    private String level;
+
+    private String thread;
+
+    private Date ts;
+
+    public LogTraceDTO(LogTrace logTrace) {
+        this.id = logTrace.getId().toString();
+        this.trace = logTrace.getTrace();
+        this.logger = logTrace.getLogger();
+        this.level = logTrace.getLevel();
+        this.thread = logTrace.getThread();
+        this.ts = logTrace.getTs();
     }
 }
