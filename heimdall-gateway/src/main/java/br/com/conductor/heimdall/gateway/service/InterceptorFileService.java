@@ -20,35 +20,8 @@ package br.com.conductor.heimdall.gateway.service;
  * ==========================LICENSE_END===================================
  */
 
-import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
-import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_ROOT;
-
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ReflectionUtils;
-
-import com.google.common.base.Charsets;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import com.google.common.io.Files;
-import com.netflix.zuul.FilterLoader;
-import com.netflix.zuul.filters.FilterRegistry;
-
 import br.com.conductor.heimdall.core.dto.InterceptorFileDTO;
-import br.com.conductor.heimdall.core.dto.interceptor.AccessTokenClientIdDTO;
-import br.com.conductor.heimdall.core.dto.interceptor.MockDTO;
-import br.com.conductor.heimdall.core.dto.interceptor.OAuthDTO;
-import br.com.conductor.heimdall.core.dto.interceptor.RateLimitDTO;
+import br.com.conductor.heimdall.core.dto.interceptor.*;
 import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.entity.Operation;
 import br.com.conductor.heimdall.core.entity.Resource;
@@ -59,14 +32,31 @@ import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.InterceptorRepository;
 import br.com.conductor.heimdall.core.repository.OperationRepository;
-import br.com.conductor.heimdall.core.util.GenerateMustache;
-import br.com.conductor.heimdall.core.util.JsonUtils;
-import br.com.conductor.heimdall.core.util.OperationSort;
-import br.com.conductor.heimdall.core.util.ResourceUtils;
-import br.com.conductor.heimdall.core.util.StringUtils;
-import br.com.conductor.heimdall.core.util.TemplateUtils;
+import br.com.conductor.heimdall.core.util.*;
 import br.com.twsoftware.alfred.object.Objeto;
+import com.google.common.base.Charsets;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
+import com.google.common.io.Files;
+import com.netflix.zuul.FilterLoader;
+import com.netflix.zuul.filters.FilterRegistry;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ReflectionUtils;
+
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
+import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_ROOT;
 
 /**
  * Provides methods to create and remove the {@link Interceptor} files.
@@ -227,6 +217,8 @@ public class InterceptorFileService {
                 case OAUTH:
                     file = ResourceUtils.getFile(filePath + File.separator + "oauth.mustache");
                     break;
+                case BLACKLIST:
+                    file = ResourceUtils.getFile(filePath + File.separator + "blacklist_ip.mustache");
                 default:
                     break;
             }
@@ -403,6 +395,14 @@ public class InterceptorFileService {
                 parameters.put("privateKey", oAuthDTO.getPrivateKey());
             }
 
+            if (objectCustom instanceof IpsDTO){
+
+                IpsDTO ipsDTO = (IpsDTO) objectCustom;
+                if (interceptor.getType().equals(TypeInterceptor.BLACKLIST)){
+                    parameters.put("ips", ipsDTO.getIps());
+                }
+            }
+
             if (objectCustom instanceof String) {
 
                 parameters.put("content", objectCustom);
@@ -495,6 +495,15 @@ public class InterceptorFileService {
                     log.error(e.getMessage(), e);
                     ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(type.name(), TemplateUtils.TEMPLATE_OAUTH);
                 }
+                break;
+            case BLACKLIST:
+                try {
+                    response = JsonUtils.convertJsonToObject(content, IpsDTO.class);
+                } catch (IOException e) {
+                    log.error(e.getMessage(), e);
+                    ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(type.name(), TemplateUtils.TEMPLATE_BLOCK_IPS);
+                }
+                break;
             default:
                 break;
         }

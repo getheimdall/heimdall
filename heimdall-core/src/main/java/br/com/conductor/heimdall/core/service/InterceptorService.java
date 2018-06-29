@@ -30,7 +30,7 @@ import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 import java.io.File;
 import java.util.List;
 
-import br.com.conductor.heimdall.core.dto.interceptor.OAuthDTO;
+import br.com.conductor.heimdall.core.dto.interceptor.*;
 import br.com.conductor.heimdall.core.enums.TypeOAuth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,9 +51,6 @@ import br.com.conductor.heimdall.core.dto.InterceptorFileDTO;
 import br.com.conductor.heimdall.core.dto.PageDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
-import br.com.conductor.heimdall.core.dto.interceptor.AccessTokenClientIdDTO;
-import br.com.conductor.heimdall.core.dto.interceptor.MockDTO;
-import br.com.conductor.heimdall.core.dto.interceptor.RateLimitDTO;
 import br.com.conductor.heimdall.core.dto.page.InterceptorPage;
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Interceptor;
@@ -340,6 +337,20 @@ public class InterceptorService {
                     log.error(e.getMessage(), e);
                     ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(type.name(), TemplateUtils.TEMPLATE_OAUTH);
                 }
+                break;
+            case BLACKLIST:
+                try {
+
+                    if (Objeto.notBlank(JsonUtils.convertJsonToObject(content, IpsDTO.class))) {
+
+                        valid = true;
+                    }
+                } catch (Exception e) {
+
+                    log.error(e.getMessage(), e);
+                    ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(type.name(), TemplateUtils.TEMPLATE_BLOCK_IPS);
+                }
+                break;
             default:
                 break;
         }
