@@ -131,7 +131,7 @@ public class InterceptorFileService {
                 parameters.put("inboundURL", null);
             }
 
-            return parameters = buildCustom(parameters, interceptor);
+            return buildCustom(parameters, interceptor);
         } else {
 
             String[] message = {ExceptionMessage.INTERCEPTOR_TEMPLATE_NOT_EXIST.getMessage(), interceptor.getId().toString(), interceptor.getType().name(), interceptor.getExecutionPoint().name()};
@@ -219,6 +219,10 @@ public class InterceptorFileService {
                     break;
                 case BLACKLIST:
                     file = ResourceUtils.getFile(filePath + File.separator + "blacklist_ip.mustache");
+                    break;
+                case WHITELIST:
+                    file = ResourceUtils.getFile(filePath + File.separator + "whitelist_ip.mustache");
+                    break;
                 default:
                     break;
             }
@@ -398,9 +402,7 @@ public class InterceptorFileService {
             if (objectCustom instanceof IpsDTO){
 
                 IpsDTO ipsDTO = (IpsDTO) objectCustom;
-                if (interceptor.getType().equals(TypeInterceptor.BLACKLIST)){
-                    parameters.put("ips", ipsDTO.getIps());
-                }
+                parameters.put("ips", ipsDTO.getIps());
             }
 
             if (objectCustom instanceof String) {
@@ -504,12 +506,22 @@ public class InterceptorFileService {
                     ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(type.name(), TemplateUtils.TEMPLATE_BLOCK_IPS);
                 }
                 break;
+            case WHITELIST:
+                try {
+                    response = JsonUtils.convertJsonToObject(content, IpsDTO.class);
+                } catch (IOException e) {
+                    log.error(e.getMessage(), e);
+                    ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(type.name(), TemplateUtils.TEMPLATE_BLOCK_IPS);
+                }
+                break;
             default:
                 break;
         }
 
         return response;
     }
+
+
 
     private void generateFileInterceptor(Interceptor interceptor, String template, HashMap<String, Object> parameters) {
 

@@ -13,13 +13,13 @@ import br.com.conductor.heimdall.core.util.BeanManager;
 import br.com.conductor.heimdall.gateway.service.IpsInterceptorService;
 import org.springframework.http.HttpStatus;
 
-public class BlacklistInterceptor extends HeimdallFilter {
+public class WhitelistInterceptor extends HeimdallFilter {
 
      private static Set<String> pathsAllowed;
 
      private static Set<String> pathsNotAllowed;
 
-     private static Set<String> blacklist;
+     private static Set<String> whitelist;
 
      private static String inboundURL;
 
@@ -27,7 +27,7 @@ public class BlacklistInterceptor extends HeimdallFilter {
 
      private IpsInterceptorService ipsInterceptorService;
 
-     public BlacklistInterceptor() {
+     public WhitelistInterceptor() {
 
           pathsAllowed = Sets.newHashSet(); {{#pathsAllowed}}
           pathsAllowed.add("{{.}}");     {{/pathsAllowed}}
@@ -35,8 +35,8 @@ public class BlacklistInterceptor extends HeimdallFilter {
           pathsNotAllowed = Sets.newHashSet();     {{#pathsNotAllowed}}
           pathsNotAllowed.add("{{.}}");     {{/pathsNotAllowed}}
 
-          blacklist = Sets.newHashSet();   {{#ips}}
-          blacklist.add("{{.}}");      {{/ips}}
+          whitelist = Sets.newHashSet();   {{#ips}}
+          whitelist.add("{{.}}");      {{/ips}}
 
           inboundURL = "{{inboundURL}}";
           method = "{{method}}";
@@ -75,7 +75,7 @@ public class BlacklistInterceptor extends HeimdallFilter {
 
                 ipsInterceptorService = (IpsInterceptorService) BeanManager.getBean(IpsInterceptorService.class);
 
-                if (ipsInterceptorService.verifyIpInList(ctx.getRequest(), blacklist)){
+                if (!ipsInterceptorService.verifyIpInList(ctx.getRequest(), whitelist)){
                     ctx.getResponse().sendError(HttpStatus.UNAUTHORIZED.value(), "IP unauthorized");
                 }
             } catch (IOException e) {

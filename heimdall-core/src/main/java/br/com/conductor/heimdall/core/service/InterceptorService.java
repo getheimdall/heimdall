@@ -351,6 +351,19 @@ public class InterceptorService {
                     ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(type.name(), TemplateUtils.TEMPLATE_BLOCK_IPS);
                 }
                 break;
+            case WHITELIST:
+                try {
+
+                    if (Objeto.notBlank(JsonUtils.convertJsonToObject(content, IpsDTO.class))) {
+
+                        valid = true;
+                    }
+                } catch (Exception e) {
+
+                    log.error(e.getMessage(), e);
+                    ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(type.name(), TemplateUtils.TEMPLATE_BLOCK_IPS);
+                }
+                break;
             default:
                 break;
         }

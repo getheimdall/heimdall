@@ -33,7 +33,7 @@ import java.util.Set;
 @Service
 public class IpsInterceptorService {
 
-    public boolean verifyIpInBlacklist(HttpServletRequest req, Set<String> ips) {
+    public boolean verifyIpInList(HttpServletRequest req, Set<String> ips) {
         String ipFromRequest = getIpFromRequest(req);
         return ips.contains(ipFromRequest);
     }

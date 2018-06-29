@@ -32,6 +32,6 @@ import br.com.conductor.heimdall.core.entity.Interceptor;
  */
 public enum TypeInterceptor {
 
-	LOG, MOCK, RATTING, ACCESS_TOKEN, CLIENT_ID, CUSTOM, MIDDLEWARE, OAUTH, BLACKLIST
+	LOG, MOCK, RATTING, ACCESS_TOKEN, CLIENT_ID, CUSTOM, MIDDLEWARE, OAUTH, BLACKLIST, WHITELIST
 
 }
