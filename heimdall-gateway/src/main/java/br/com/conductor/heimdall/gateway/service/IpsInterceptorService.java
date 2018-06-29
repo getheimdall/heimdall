@@ -20,9 +20,11 @@ package br.com.conductor.heimdall.gateway.service;
  * ==========================LICENSE_END===================================
  */
 
-import br.com.twsoftware.alfred.object.Objeto;
 import org.springframework.stereotype.Service;
+
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -34,22 +36,29 @@ import java.util.Set;
 public class IpsInterceptorService {
 
     public boolean verifyIpInList(HttpServletRequest req, Set<String> ips) {
-        String ipFromRequest = getIpFromRequest(req);
-        return ips.contains(ipFromRequest);
+        Set<String> ipsFromRequest = getIpFromRequest(req);
+        return containsInList(ipsFromRequest, ips);
     }
 
-    private String getIpFromRequest(HttpServletRequest req) {
+    private Set<String> getIpFromRequest(HttpServletRequest req) {
 
-        String remoteAddress = "";
+        Set<String> ipsFromRequest = new HashSet<>();
 
         if (req != null) {
-            remoteAddress = req.getHeader("X-FORWARDED-FOR");
-            if (Objeto.isBlank(remoteAddress)){
-                remoteAddress = req.getRemoteAddr();
-            }
+
+            Arrays.stream(req.getHeader("X-FORWARDED-FOR").split(","))
+                    .forEach(ip -> ipsFromRequest.add(ip.trim()));
+
+            ipsFromRequest.add(req.getRemoteAddr());
+
         }
 
-        return remoteAddress;
+        return ipsFromRequest;
+    }
+
+    private boolean containsInList(Set<String> ipsReceived, Set<String> ipsCompare) {
+        String s = ipsReceived.stream().filter(ipsCompare::contains).findFirst().orElse(null);
+        return s != null;
     }
 
 }
