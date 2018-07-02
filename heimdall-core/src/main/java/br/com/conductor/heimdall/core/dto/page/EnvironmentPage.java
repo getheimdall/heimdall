@@ -27,7 +27,6 @@ import br.com.conductor.heimdall.core.dto.PageDTO;
 import br.com.conductor.heimdall.core.entity.Environment;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 /**
  * Class that represents a paged {@link Environment} list.
@@ -36,7 +35,6 @@ import lombok.NoArgsConstructor;
  *
  */
 @Data
-@NoArgsConstructor
 @EqualsAndHashCode(callSuper=false)
 public class EnvironmentPage extends PageDTO<Environment> implements Serializable {
 

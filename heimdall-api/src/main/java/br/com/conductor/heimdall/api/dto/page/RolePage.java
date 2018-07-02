@@ -27,7 +27,6 @@ import br.com.conductor.heimdall.api.entity.Role;
 import br.com.conductor.heimdall.core.dto.PageDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 /**
  * Represents a {@link Role} page.
@@ -36,7 +35,6 @@ import lombok.NoArgsConstructor;
  *
  */
 @Data
-@NoArgsConstructor
 @EqualsAndHashCode(callSuper=false)
 public class RolePage extends PageDTO<Role> implements Serializable {
 
