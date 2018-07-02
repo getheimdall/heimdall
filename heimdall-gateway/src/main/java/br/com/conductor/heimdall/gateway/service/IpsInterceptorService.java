@@ -35,11 +35,24 @@ import java.util.Set;
 @Service
 public class IpsInterceptorService {
 
+    /**
+     * Method that verifies if Ips from the interceptor Blacklist or Whitelist contains any IP from request
+     *
+     * @param req {@link HttpServletRequest}
+     * @param ips {@link Set}<{@link String}>
+     * @return True if contains or false otherwise
+     */
     public boolean verifyIpInList(HttpServletRequest req, Set<String> ips) {
         Set<String> ipsFromRequest = getIpFromRequest(req);
         return containsInList(ipsFromRequest, ips);
     }
 
+    /**
+     * Method that recovers Ips from {@link HttpServletRequest}
+     *
+     * @param req The {@link HttpServletRequest}
+     * @return {@link Set}<{@link String}> of request Ips
+     */
     private Set<String> getIpFromRequest(HttpServletRequest req) {
 
         Set<String> ipsFromRequest = new HashSet<>();
@@ -56,9 +69,15 @@ public class IpsInterceptorService {
         return ipsFromRequest;
     }
 
+    /**
+     * Matches the reference list of ips with the request list.
+     *
+     * @param ipsReceived {@link Set}<{@link String}>
+     * @param ipsCompare  {@link Set}<{@link String}>
+     * @return Returns true if there is any match, false otherwise
+     */
     private boolean containsInList(Set<String> ipsReceived, Set<String> ipsCompare) {
-        String s = ipsReceived.stream().filter(ipsCompare::contains).findFirst().orElse(null);
-        return s != null;
+        return ipsCompare.stream().anyMatch(ipsReceived::contains);
     }
 
 }
