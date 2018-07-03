@@ -3,7 +3,7 @@ package br.com.conductor.heimdall.core.spec;
 
 /*-
  * =========================LICENSE_START==================================
- * heimdall-middleware-spec
+ * heimdall-core
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================

@@ -21,8 +21,11 @@ package br.com.conductor.heimdall.gateway.trace;
  * ==========================LICENSE_END===================================
  */
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
+import br.com.conductor.heimdall.core.util.LocalDateTimeSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 
 /**
@@ -35,8 +38,9 @@ import lombok.Data;
 public class GeneralTrace {
 
      private String description;
-     
-     private String insertedOnDate = br.com.twsoftware.alfred.data.Data.getDataFormatada(new Date(), "dd/MM/yyyy hh:mm:ss.SSS");
+
+     @JsonSerialize(using = LocalDateTimeSerializer.class)
+     private LocalDateTime insertedOnDate = LocalDateTime.now();
 
      private Object content;
 
