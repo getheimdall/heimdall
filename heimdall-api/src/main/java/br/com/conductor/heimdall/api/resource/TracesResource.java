@@ -80,7 +80,7 @@ public class TracesResource {
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_TRACES)
     public ResponseEntity<?> find(@RequestBody List<FiltersDTO> filtersSelected, @ModelAttribute PageableDTO pageableDTO) {
 
-        LogTraceDTOPage logTrace = traceService.find(filtersSelected, pageableDTO);
+            LogTraceDTOPage logTrace = traceService.find(filtersSelected, pageableDTO);
 
         return ResponseEntity.ok(logTrace);
     }

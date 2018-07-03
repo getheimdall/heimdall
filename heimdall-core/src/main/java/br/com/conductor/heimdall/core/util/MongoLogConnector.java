@@ -109,9 +109,13 @@ public class MongoLogConnector implements Serializable {
 
              try {
                  value1 = Integer.parseInt(filtersDTO.getFirstValue());
-                 value2 = Integer.parseInt(filtersDTO.getSecondValue());
              } catch (NumberFormatException e) {
                  value1 = filtersDTO.getFirstValue();
+             }
+
+             try {
+                 value2 = Integer.parseInt(filtersDTO.getSecondValue());
+             }catch (NumberFormatException e) {
                  value2 = filtersDTO.getSecondValue();
              }
 
@@ -164,7 +168,7 @@ public class MongoLogConnector implements Serializable {
                  }
                  case YESTERDAY: {
                      query.field(filtersDTO.getName())
-                             .containsIgnoreCase(LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_DATE_TIME));
+                             .containsIgnoreCase(LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_DATE));
                      break;
                  }
                  case THIS_WEEK: {

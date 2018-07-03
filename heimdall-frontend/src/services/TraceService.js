@@ -1,4 +1,5 @@
 import {HTTPv1} from "../utils/Http";
+import {EnumFilters} from "../utils/EnumFiltersUtils";
 
 const getTrace = (traceId) => {
     if (!traceId) {
@@ -19,7 +20,11 @@ const getTrace = (traceId) => {
 }
 
 const getTraces = (params = {params: {}}) => {
-    return HTTPv1.get('/traces', params)
+    const offset = params.params.offset
+    const limit = params.params.limit
+    const filtersSelected = updateOperationSelectedToEnum(params.params.filtersSelected)
+    console.log(JSON.stringify(filtersSelected))
+    return HTTPv1.post(`/traces?offset=${offset}&limit=${limit}`, filtersSelected)
         .then(res => {
             return Promise.resolve(res.data)
         })
@@ -30,6 +35,24 @@ const getTraces = (params = {params: {}}) => {
             }
             throw error;
         })
+}
+
+const updateOperationSelectedToEnum = (filters) => {
+
+    let filtersToSend = [];
+
+    filters.forEach((f) => {
+        let filter = {};
+        filter['operationSelected'] = EnumFilters[f.operationSelected]
+        filter['firstValue'] = f.firstValue
+        filter['secondValue'] = f.secondValue
+        filter['name'] = f.name
+        filter['type'] = f.type
+
+        filtersToSend.push(filter)
+    })
+
+    return filtersToSend;
 }
 
 export const traceService = {

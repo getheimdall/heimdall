@@ -22,6 +22,7 @@ package br.com.conductor.heimdall.core.util;
  */
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,8 +49,8 @@ public class CalendarUtils {
 
         Map<String, LocalDate> week = new HashMap<>();
 
-        week.put("first", LocalDate.now().minusDays(today == MONDAY ? 0 : today - MONDAY));
-        week.put("last", LocalDate.now().plusDays(today == SUNDAY ? 0 : SUNDAY - today));
+        week.put("first", date.minusDays(today == MONDAY ? 0 : today - MONDAY));
+        week.put("last", date.plusDays(today == SUNDAY ? 0 : SUNDAY - today));
 
         return week;
     }
@@ -62,7 +63,7 @@ public class CalendarUtils {
      */
     public static String yearAndMonth(LocalDate date) {
 
-        return date.getYear() + "-" + date.getMonth().getValue();
+        return date.format(DateTimeFormatter.ofPattern("yyyy-MM"));
     }
 
     /**
@@ -72,7 +73,7 @@ public class CalendarUtils {
      * @return String yyyy
      */
     public static String year(LocalDate date) {
-        return "" + date.getYear();
+        return date.format(DateTimeFormatter.ofPattern("yyyy"));
     }
 
 }

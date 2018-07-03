@@ -51,7 +51,7 @@ const getFilters = () => {
             label: "Request time duration"
         },
         {
-            name: "trace.insertOnDate",
+            name: "trace.insertedOnDate",
             type: "date",
             operations: getOperations("date"),
             possibleValues: getPossibleValues(""),
@@ -230,9 +230,9 @@ const getOperations = (type) => {
                 "not equals",
                 "between",
                 "less than",
-                "great than",
+                "greater than",
                 "less than or equals",
-                "great than or equals",
+                "greater than or equals",
                 "none",
                 "all"
             ]
@@ -256,9 +256,9 @@ const getOperations = (type) => {
                 "not equals",
                 "between",
                 "less than",
-                "great than",
+                "greater than",
                 "less than or equals",
-                "great than or equals",
+                "greater than or equals",
                 "today",
                 "yesterday",
                 "this week",

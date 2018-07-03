@@ -26,7 +26,7 @@ class Traces extends Component {
 
     componentDidMount() {
         this.props.dispatch(initLoading())
-        this.props.dispatch(getAllTraces())
+        this.props.dispatch(getAllTraces({offset: 0, limit: 10, filtersSelected: this.state.filtersSelected}))
     }
 
     componentWillReceiveProps(newProps) {
@@ -39,24 +39,13 @@ class Traces extends Component {
     handlePagination = (page, pageSize) => {
         this.setState({...this.state, page: page - 1, pageSize: pageSize})
         this.props.dispatch(initLoading())
-        this.props.dispatch(getAllTraces({ offset: page - 1, limit: 10, ...this.state.filtersSelected}))
+        this.props.dispatch(getAllTraces({ offset: page - 1, limit: 10, filtersSelected: this.state.filtersSelected}))
     }
-
-    // onSearchForm = () => {
-    //     this.props.form.validateFieldsAndScroll((err, payload) => {
-    //         if (!err) {
-    //             this.props.dispatch(initLoading())
-    //             this.props.dispatch(getAllTraces({ offset: 0, limit: 10, ...payload }))
-    //             this.setState({ ...this.state, searchQuery: payload })
-    //         }
-    //     });
-    // }
 
     sendFilters = () => {
         this.props.dispatch(initLoading())
         console.log(this.state.filtersSelected)
-        this.props.dispatch(getAllTraces({offset: 0, limit: 10, ...this.state.filtersSelected}))
-        //this.props.dispatch(finishLoading())
+        this.props.dispatch(getAllTraces({offset: 0, limit: 10, filtersSelected: this.state.filtersSelected}))
     }
 
     updateFiltersSelected = (element) => {
@@ -119,14 +108,14 @@ class Traces extends Component {
     }
 
     validateOperationSelectedToViewInputValue = (operationSelected) => {
-        return operationSelected !== "today" && operationSelected !== "yesterday" &&
-            operationSelected !== "this week" && operationSelected !== "last week" &&
-            operationSelected !== "this month" && operationSelected !== "last month" &&
+        operationSelected = operationSelected.toUpperCase()
+        return operationSelected !== "TODAY" && operationSelected !== "yesterday" &&
+            operationSelected !== "THIS_WEEK" && operationSelected !== "last week" &&
+            operationSelected !== "THIS MONTH" && operationSelected !== "last month" &&
             operationSelected !== "this year" && operationSelected !== "all"
     }
 
     render() {
-        // const { getFieldDecorator } = this.props.form
         const {traces, loading} = this.props
         const {filters, filtersSelected} = this.state
 
@@ -191,8 +180,9 @@ class Traces extends Component {
                                                             }
                                                         </Col>
                                                     }
+                                                    {console.log(element.operationSelected)}
                                                     {
-                                                        element.operationSelected === "between" &&
+                                                        element.operationSelected.toUpperCase() === "BETWEEN" &&
                                                         <Col sm={24} md={4}>
                                                             <Input placeholder="value2" value={element.secondValue} onChange={this.handleChangeValue2Filter(element)}/>
                                                         </Col>
@@ -205,7 +195,7 @@ class Traces extends Component {
                             )}
                             <br/>
                             <div style={{width: "100%", textAlign: "left"}}>
-                                <Button type="primary" onClick={() => this.sendFilters()} icon="search" disabled={this.state.filtersSelected.length === 0}>Apply filters</Button>
+                                <Button type="primary" onClick={() => this.sendFilters()} icon="search">Apply filters</Button>
                             </div>
                         </Form>
                     </Card>
