@@ -23,7 +23,7 @@ package br.com.conductor.heimdall.gateway.trace;
 
 import static net.logstash.logback.marker.Markers.append;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -31,6 +31,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import br.com.conductor.heimdall.core.util.LocalDateTimeSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +75,8 @@ public class Trace {
 
      private Long durationMillis;
 
-     private String insertedOnDate = br.com.twsoftware.alfred.data.Data.getDataFormatada(new Date(), "dd/MM/yyyy hh:mm:ss.SSS");
+     @JsonSerialize(using = LocalDateTimeSerializer.class)
+     private LocalDateTime insertedOnDate = LocalDateTime.now();
 
      private Long apiId;
 
@@ -132,7 +135,7 @@ public class Trace {
           this.printAllTrace = printAllTrace;
           this.printMongo = printMongo;
           HttpServletRequest request = (HttpServletRequest) servletRequest;
-          HeimdallException.checkThrow(request == null ? true : false, ExceptionMessage.GLOBAL_REQUEST_NOT_FOUND);
+          HeimdallException.checkThrow(request == null, ExceptionMessage.GLOBAL_REQUEST_NOT_FOUND);
 
           setInitialTime(System.currentTimeMillis());
           setMethod(request.getMethod());
@@ -143,7 +146,7 @@ public class Trace {
 
                List<String> listaIPs = Lists.newArrayList();
                while (headers.hasMoreElements()) {
-                    String ip = (String) headers.nextElement();
+                    String ip = headers.nextElement();
                     listaIPs.add(ip);
                }
 

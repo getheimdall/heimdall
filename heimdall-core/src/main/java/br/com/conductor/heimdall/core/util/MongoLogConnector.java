@@ -21,15 +21,13 @@ package br.com.conductor.heimdall.core.util;
  * ==========================LICENSE_END===================================
  */
 
-import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
-
+import br.com.conductor.heimdall.core.dto.logs.FiltersDTO;
+import br.com.conductor.heimdall.core.entity.LogTrace;
+import br.com.conductor.heimdall.core.environment.Property;
+import br.com.twsoftware.alfred.object.Objeto;
+import com.mongodb.*;
+import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 import org.mongodb.morphia.annotations.Id;
@@ -38,17 +36,15 @@ import org.mongodb.morphia.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
-import com.mongodb.MongoClientURI;
-import com.mongodb.MongoCredential;
-import com.mongodb.ServerAddress;
-
-import br.com.conductor.heimdall.core.entity.LogTrace;
-import br.com.conductor.heimdall.core.environment.Property;
-import br.com.twsoftware.alfred.object.Objeto;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import javax.annotation.PostConstruct;
+import java.io.Serializable;
+import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class creates a connection fo the MongoDB used by Heimdall
@@ -98,51 +94,125 @@ public class MongoLogConnector implements Serializable {
          return this.datastore().get(object.getClass(), idMongo);
      }
      
-     public List<LogTrace> findAll() {
-    	 
-          return datastore().createQuery(LogTrace.class).asList();
+     public Page<LogTrace> find(List<FiltersDTO> filtersDTOS, Integer page, Integer  limit) {
+         Query<LogTrace> query = this.prepareQuery(filtersDTOS);
+
+         return preparePage(query, page, limit);
      }
 
-     public Page<LogTrace> find(Map<String, Object> queries, Integer page, Integer limit) {
+     private Query<LogTrace> prepareQuery(List<FiltersDTO> filtersDTOs) {
+         Query<LogTrace> query = this.datastore().createQuery(LogTrace.class);
 
-          Query<LogTrace> query = this.prepareQuery(queries);
+         filtersDTOs.forEach(filtersDTO -> {
 
-          List<LogTrace> list;
-          Long totalElements = query.count();
-          
-          page = page == null ? PAGE : page;
-          limit = limit == null || limit > LIMIT ? LIMIT : limit;
-          
-          if (page >= 1 && limit > 0) {
-               list = query.asList(new FindOptions().limit(limit).skip(page * limit));  
-          } else {
-               list = query.asList(new FindOptions().limit(limit));
-          }
+             Object value1, value2;
 
-          return buildPage(list, page, limit, totalElements);
+             try {
+                 value1 = Integer.parseInt(filtersDTO.getFirstValue());
+                 value2 = Integer.parseInt(filtersDTO.getSecondValue());
+             } catch (NumberFormatException e) {
+                 value1 = filtersDTO.getFirstValue();
+                 value2 = filtersDTO.getSecondValue();
+             }
+
+             switch (filtersDTO.getOperationSelected()) {
+                 case EQUALS: {
+                     query.field(filtersDTO.getName()).equal(value1);
+                     break;
+                 }
+                 case NOT_EQUALS: {
+                     query.field(filtersDTO.getName()).notEqual(value1);
+                     break;
+                 }
+                 case CONTAINS: {
+                     query.field(filtersDTO.getName()).containsIgnoreCase(value1.toString());
+                     break;
+                 }
+                 case BETWEEN: {
+                     query.field(filtersDTO.getName()).greaterThanOrEq(value1);
+                     query.field(filtersDTO.getName()).lessThanOrEq(value2);
+                     break;
+                 }
+                 case LESS_THAN: {
+                     query.field(filtersDTO.getName()).lessThan(value1);
+                     break;
+                 }
+                 case LESS_THAN_EQUALS: {
+                     query.field(filtersDTO.getName()).lessThanOrEq(value1);
+                     break;
+                 }
+                 case GREATER_THAN: {
+                     query.field(filtersDTO.getName()).greaterThan(value1);
+                     break;
+                 }
+                 case GREATER_THAN_EQUALS: {
+                     query.field(filtersDTO.getName()).greaterThanOrEq(value1);
+                     break;
+                 }
+                 case ALL: {
+                     query.field(filtersDTO.getName()).exists();
+                     break;
+                 }
+                 case NONE: {
+                     query.field(filtersDTO.getName()).doesNotExist();
+                     break;
+                 }
+                 case TODAY: {
+                     query.field(filtersDTO.getName())
+                             .containsIgnoreCase(LocalDate.now().format(DateTimeFormatter.ISO_DATE));
+                     break;
+                 }
+                 case YESTERDAY: {
+                     query.field(filtersDTO.getName())
+                             .containsIgnoreCase(LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_DATE_TIME));
+                     break;
+                 }
+                 case THIS_WEEK: {
+                     Map<String, LocalDate> week = CalendarUtils.firstAndLastDaysOfWeek(LocalDate.now());
+                     query.field(filtersDTO.getName()).greaterThanOrEq(week.get("first").format(DateTimeFormatter.ISO_DATE));
+                     query.field(filtersDTO.getName()).lessThanOrEq(week.get("last").format(DateTimeFormatter.ISO_DATE));
+                     break;
+                 }
+                 case LAST_WEEK: {
+                     Map<String, LocalDate> week = CalendarUtils.firstAndLastDaysOfWeek(LocalDate.now().minusWeeks(1));
+                     query.field(filtersDTO.getName()).greaterThanOrEq(week.get("first").format(DateTimeFormatter.ISO_DATE));
+                     query.field(filtersDTO.getName()).lessThanOrEq(week.get("last").format(DateTimeFormatter.ISO_DATE));
+                     break;
+                 }
+                 case THIS_MONTH: {
+                     query.field(filtersDTO.getName()).containsIgnoreCase(CalendarUtils.yearAndMonth(LocalDate.now()));
+                     break;
+                 }
+                 case LAST_MONTH: {
+                     query.field(filtersDTO.getName()).containsIgnoreCase(CalendarUtils.yearAndMonth(LocalDate.now().minusMonths(1)));
+                     break;
+                 }
+                 case THIS_YEAR: {
+                     query.field(filtersDTO.getName()).containsIgnoreCase(CalendarUtils.year(LocalDate.now()));
+                     break;
+                 }
+             }
+         });
+
+         return query;
      }
-     
-     public List<LogTrace> find(Map<String, Object> queries) {
-    	 
-    	 return this.prepareQuery(queries).asList();
+
+     private Page<LogTrace> preparePage(Query<LogTrace> query, Integer page, Integer limit) {
+         List<LogTrace> list;
+         Long totalElements = query.count();
+
+         page = page == null ? PAGE : page;
+         limit = limit == null || limit > LIMIT ? LIMIT : limit;
+
+         if (page >= 1 && limit > 0) {
+             list = query.asList(new FindOptions().limit(limit).skip(page * limit));
+         } else {
+             list = query.asList(new FindOptions().limit(limit));
+         }
+
+         return buildPage(list, page, limit, totalElements);
      }
-     
-     private Query<LogTrace> prepareQuery(Map<String, Object> queries) {
-    	 Query<LogTrace> query = this.datastore().createQuery(LogTrace.class);
-     	 
-    	 queries.forEach((k, v) -> {
-    		 if (v != null) {
-    			 if (k.equals("trace.url")) {
-    				 query.field(k).contains((String) v);
-    			 } else {
-    				 query.field(k).equal(v);
-    			 }
-    		 }
-    	 });
-    	 
-    	 return query;
-     }
-     
+
      private Page<LogTrace> buildPage(List<LogTrace> list, Integer page, Integer limit, Long totalElements) {
 
           Page<LogTrace> pageResponse = new Page<>();
