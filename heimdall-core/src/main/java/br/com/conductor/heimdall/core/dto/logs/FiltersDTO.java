@@ -1,5 +1,5 @@
 
-package br.com.conductor.heimdall.core.dto;
+package br.com.conductor.heimdall.core.dto.logs;
 
 /*-
  * =========================LICENSE_START==================================
@@ -21,39 +21,29 @@ package br.com.conductor.heimdall.core.dto;
  * ==========================LICENSE_END===================================
  */
 
-import br.com.conductor.heimdall.core.entity.LogTrace;
-import br.com.conductor.heimdall.core.entity.Trace;
 import lombok.Data;
 
-import java.util.Date;
-
 /**
- * This class is a Data Transfer Object for the {@link LogTrace}.
+ * Trace filters for mongo search
  *
  * @author Marcelo Aguiar
  *
  */
 @Data
-public class LogTraceDTO {
+public class FiltersDTO {
 
-    private String id;
+    private String name;
 
-    private Trace trace;
+    private String type;
 
-    private String logger;
+    private Operation operationSelected;
 
-    private String level;
+    private String firstValue;
 
-    private String thread;
+    private String secondValue;
 
-    private Date ts;
-
-    public LogTraceDTO(LogTrace logTrace) {
-        this.id = logTrace.getId().toString();
-        this.trace = logTrace.getTrace();
-        this.logger = logTrace.getLogger();
-        this.level = logTrace.getLevel();
-        this.thread = logTrace.getThread();
-        this.ts = logTrace.getTs();
+    public enum Operation {
+        EQUALS, NOT_EQUALS, CONTAINS, BETWEEN, LESS_THAN, GREATER_THAN, LESS_THAN_EQUALS, GREATER_THAN_EQUALS,
+        ALL, NONE, TODAY, YESTERDAY, THIS_WEEK, LAST_WEEK, THIS_MONTH, LAST_MONTH, THIS_YEAR
     }
 }
