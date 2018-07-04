@@ -164,7 +164,7 @@ public class OperationService {
           Resource resource = resourceRepository.findByApiIdAndId(apiId, resourceId);
           HeimdallException.checkThrow(isBlank(resource), GLOBAL_RESOURCE_NOT_FOUND);
                     
-          Operation resData = operationRepository.findByResourceIdAndMethodAndPath(resourceId, operationDTO.getMethod(), operationDTO.getPath());
+          Operation resData = operationRepository.findByResourceApiIdAndMethodAndPath(apiId, operationDTO.getMethod(), operationDTO.getPath());
           HeimdallException.checkThrow(notBlank(resData) && (resData.getResource().getId() == resource.getId()), ONLY_ONE_OPERATION_PER_RESOURCE);
           
           Operation operation = GenericConverter.mapper(operationDTO, Operation.class);
@@ -197,7 +197,7 @@ public class OperationService {
           Operation operation = operationRepository.findByResourceApiIdAndResourceIdAndId(apiId, resourceId, operationId);
           HeimdallException.checkThrow(isBlank(operation), GLOBAL_RESOURCE_NOT_FOUND);
           
-          Operation resData = operationRepository.findByMethodAndPath(operationDTO.getMethod(), operationDTO.getPath());
+          Operation resData = operationRepository.findByResourceApiIdAndMethodAndPath(apiId, operationDTO.getMethod(), operationDTO.getPath());
           HeimdallException.checkThrow(notBlank(resData) && (resData.getResource().getId() == operation.getResource().getId()) && (resData.getId() != operation.getId()), ONLY_ONE_OPERATION_PER_RESOURCE);
           
           operation = GenericConverter.mapper(operationDTO, operation);
