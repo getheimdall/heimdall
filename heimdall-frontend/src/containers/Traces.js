@@ -4,7 +4,7 @@ import {connect} from 'react-redux'
 //actions
 import {getAllTraces, initLoading} from "../actions/traces";
 //components
-import {Card, Col, Form, notification, Row, Select, Input, Button} from 'antd'
+import {Card, Col, Form, notification, Row, Select, Input, Button, DatePicker, TimePicker} from 'antd'
 import PageHeader from '../components/ui/PageHeader'
 import ListTraces from '../components/traces/ListTraces'
 import Loading from '../components/ui/Loading'
@@ -39,12 +39,11 @@ class Traces extends Component {
     handlePagination = (page, pageSize) => {
         this.setState({...this.state, page: page - 1, pageSize: pageSize})
         this.props.dispatch(initLoading())
-        this.props.dispatch(getAllTraces({ offset: page - 1, limit: 10, filtersSelected: this.state.filtersSelected}))
+        this.props.dispatch(getAllTraces({offset: page - 1, limit: 10, filtersSelected: this.state.filtersSelected}))
     }
 
     sendFilters = () => {
         this.props.dispatch(initLoading())
-        console.log(this.state.filtersSelected)
         this.props.dispatch(getAllTraces({offset: 0, limit: 10, filtersSelected: this.state.filtersSelected}))
     }
 
@@ -78,20 +77,24 @@ class Traces extends Component {
     }
 
     handleChangeValueFilter = element => valueFilter => {
-        if (valueFilter.target){
+        if (valueFilter && valueFilter.target) {
             element.firstValue = valueFilter.target.value
-        }else {
+        } else if (valueFilter) {
             element.firstValue = valueFilter
+        } else {
+            element.firstValue = ""
         }
 
         this.updateFiltersSelected(element)
     }
 
     handleChangeValue2Filter = element => valueFilter => {
-        if (valueFilter.target){
+        if (valueFilter && valueFilter.target) {
             element.secondValue = valueFilter.target.value
-        }else {
+        } else if (valueFilter) {
             element.secondValue = valueFilter
+        } else {
+            element.secondValue = ""
         }
         this.updateFiltersSelected(element)
     }
@@ -108,16 +111,18 @@ class Traces extends Component {
     }
 
     validateOperationSelectedToViewInputValue = (operationSelected) => {
-        operationSelected = operationSelected.toUpperCase()
-        return operationSelected !== "TODAY" && operationSelected !== "yesterday" &&
-            operationSelected !== "THIS_WEEK" && operationSelected !== "last week" &&
-            operationSelected !== "THIS MONTH" && operationSelected !== "last month" &&
-            operationSelected !== "this year" && operationSelected !== "all"
+        return operationSelected !== "today" && operationSelected !== "yesterday" &&
+            operationSelected !== "this week" && operationSelected !== "last week" &&
+            operationSelected !== "this month" && operationSelected !== "last month" &&
+            operationSelected !== "this year" && operationSelected !== "none" && operationSelected !== "all"
     }
 
     render() {
         const {traces, loading} = this.props
         const {filters, filtersSelected} = this.state
+        const formatDate = "YYYY-MM-DD HH:mm:ss"
+        const formatHour = "HH:mm"
+        const timeInput = <TimePicker format={formatHour}/>
 
         if (!traces) return <Loading/>
 
@@ -159,32 +164,56 @@ class Traces extends Component {
                                                         <h3>{element.label}</h3>
                                                     </Col>
                                                     <Col sm={24} md={4}>
-                                                        <Select key={i} defaultValue={element.operationSelected.length > 0 ? element.operationSelected : "select operation"} placeholder="Select operation"
+                                                        <Select key={i}
+                                                                defaultValue={element.operationSelected.length > 0 ? element.operationSelected : "select operation"}
+                                                                placeholder="Select operation"
                                                                 onChange={this.handleChangeFilter(element)}>{options}</Select>
                                                     </Col>
                                                     {
                                                         this.validateOperationSelectedToViewInputValue(element.operationSelected) &&
                                                         <Col sm={24} md={4}>
                                                             {
-                                                                element.type === "type" ?
-                                                                    <Select placeholder="value" defaultValue={element.firstValue.length > 0 ? element.firstValue : "select a value"}
-                                                                            onChange={this.handleChangeValueFilter(element)}>
-                                                                        {
-                                                                            element.possibleValues.map((value) => {
-                                                                                return <Option
-                                                                                    key={value}>{value}</Option>
-                                                                            })
-                                                                        }
-                                                                    </Select>
-                                                                    : <Input placeholder="value" value={element.firstValue} onChange={this.handleChangeValueFilter(element)}/>
+                                                                element.type === "date" &&
+                                                                <DatePicker
+                                                                    showTime={timeInput} format={formatDate}
+                                                                    onChange={this.handleChangeValueFilter(element)}
+                                                                    style={{width: "100%"}}/>
+                                                            }
+                                                            {
+                                                                element.type === "type" &&
+                                                                <Select placeholder="value"
+                                                                        defaultValue={element.firstValue.length > 0 ? element.firstValue : "select a value"}
+                                                                        onChange={this.handleChangeValueFilter(element)}>
+                                                                    {
+                                                                        element.possibleValues.map((value) => {
+                                                                            return <Option
+                                                                                key={value}>{value}</Option>
+                                                                        })
+                                                                    }
+                                                                </Select>
+                                                            }
+                                                            {
+                                                                element.type !== "date" && element.type !== "type" &&
+                                                                <Input placeholder="value" value={element.firstValue}
+                                                                       onChange={this.handleChangeValueFilter(element)}/>
                                                             }
                                                         </Col>
                                                     }
-                                                    {console.log(element.operationSelected)}
                                                     {
                                                         element.operationSelected.toUpperCase() === "BETWEEN" &&
                                                         <Col sm={24} md={4}>
-                                                            <Input placeholder="value2" value={element.secondValue} onChange={this.handleChangeValue2Filter(element)}/>
+                                                            {
+                                                                element.type === "date" ?
+                                                                    <DatePicker
+                                                                        showTime={timeInput} format={formatDate}
+                                                                        onChange={this.handleChangeValue2Filter(element)}
+                                                                        style={{width: "100%"}}/>
+                                                                    :
+                                                                    <Input placeholder="value2"
+                                                                           value={element.secondValue}
+                                                                           onChange={this.handleChangeValue2Filter(element)}/>
+                                                            }
+
                                                         </Col>
                                                     }
                                                 </Row>
@@ -195,7 +224,8 @@ class Traces extends Component {
                             )}
                             <br/>
                             <div style={{width: "100%", textAlign: "left"}}>
-                                <Button type="primary" onClick={() => this.sendFilters()} icon="search">Apply filters</Button>
+                                <Button type="primary" onClick={() => this.sendFilters()} icon="search">Apply
+                                    filters</Button>
                             </div>
                         </Form>
                     </Card>

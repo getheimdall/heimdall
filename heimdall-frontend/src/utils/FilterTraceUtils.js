@@ -1,16 +1,6 @@
 const getFilters = () => {
     return [
         {
-            name: "id",
-            type: "string",
-            operations: getOperations("string"),
-            possibleValues: getPossibleValues("id"),
-            operationSelected: "",
-            firstValue: "",
-            secondValue: "",
-            label: "ID"
-        },
-        {
             name: "trace.method",
             type: "type",
             operations: getOperations("type"),
@@ -169,46 +159,6 @@ const getFilters = () => {
             firstValue: "",
             secondValue: "",
             label: "Profile"
-        },
-        {
-            name: "logger",
-            type: "string",
-            operations: getOperations("string"),
-            possibleValues: getPossibleValues(""),
-            operationSelected: "",
-            firstValue: "",
-            secondValue: "",
-            label: "Logger"
-        },
-        {
-            name: "level",
-            type: "type",
-            operations: getOperations("type"),
-            possibleValues: getPossibleValues("level"),
-            operationSelected: "",
-            firstValue: "",
-            secondValue: "",
-            label: "Level of the trace"
-        },
-        {
-            name: "thread",
-            type: "string",
-            operations: getOperations("string"),
-            possibleValues: getPossibleValues(""),
-            operationSelected: "",
-            firstValue: "",
-            secondValue: "",
-            label: "Thread"
-        },
-        {
-            name: "ts",
-            type: "date",
-            operations: getOperations("date"),
-            possibleValues: getPossibleValues(""),
-            operationSelected: "",
-            firstValue: "",
-            secondValue: "",
-            label: "Date TS"
         }
     ]
 }
