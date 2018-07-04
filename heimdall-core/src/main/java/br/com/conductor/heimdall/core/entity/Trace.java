@@ -5,7 +5,7 @@ import java.util.List;
 import br.com.conductor.heimdall.core.trace.FilterDetail;
 import br.com.conductor.heimdall.core.trace.GeneralTrace;
 import br.com.conductor.heimdall.core.trace.RequestResponseParser;
-import br.com.conductor.heimdall.core.spec.StackTrace;
+import br.com.conductor.heimdall.core.trace.StackTrace;
 import lombok.Data;
 
 @Data
