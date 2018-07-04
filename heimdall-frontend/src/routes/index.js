@@ -4,7 +4,7 @@ import { Switch, Redirect } from 'react-router'
 import FadeIn from '../components/wrappers/FadeIn'
 import AppRoute from '../components/wrappers/AppRouter'
 
-//Layouts 
+//Layouts
 import MainLayout from '../components/layout/MainLayout'
 import LoginLayout from '../components/layout/LoginLayout'
 
@@ -35,6 +35,8 @@ import AccessTokens from '../containers/AccessTokens';
 import SingleAccessToken from '../containers/SingleAccessToken';
 import Users from '../containers/Users';
 import SingleUser from '../containers/SingleUser';
+import Traces from "../containers/Traces";
+import SingleTrace from "../containers/SingleTrace";
 
 const routes = ({ history }) => (
     <Switch>
@@ -65,6 +67,8 @@ const routes = ({ history }) => (
         <AppRoute layout={MainLayout} history={history} exact path="/users" component={Authorization()(FadeIn(Users))} />
         <AppRoute layout={MainLayout} history={history} exact path="/users/new" component={Authorization()(FadeIn(SingleUser))} />
         <AppRoute layout={MainLayout} history={history} exact path="/users/:id" component={Authorization()(FadeIn(SingleUser))} />
+        <AppRoute layout={MainLayout} history={history} exact path="/traces" component={Authorization()(FadeIn(Traces))} />
+        <AppRoute layout={MainLayout} history={history} exact path="/traces/:id" component={Authorization()(FadeIn(SingleTrace))} />
 
         {/* routes not finded or 404 */}
         <Redirect to="/" />

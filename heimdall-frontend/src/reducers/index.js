@@ -14,6 +14,7 @@ import queue from './Queue'
 import users from './Users'
 import roles from './Roles'
 import caches from './Caches'
+import traces from './Traces'
 
 export default combineReducers({
     apis,
@@ -29,5 +30,6 @@ export default combineReducers({
     queue,
     users,
     roles,
-    caches
+    caches,
+    traces
 })

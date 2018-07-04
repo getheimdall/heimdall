@@ -52,8 +52,8 @@ class SideBar extends Component {
                         <SidebarLink to="/users" label="Users" history={history} icon="user" />
                     </Menu.Item>
 
-                    <Menu.Item key="Tracer" disabled>
-                        <SidebarLink to="/" label="Tracer" history={history} icon="sync" />
+                    <Menu.Item key="traces" className="traces">
+                        <SidebarLink to="/traces" label="Traces" history={history} icon="sync" />
                     </Menu.Item>
                 </Menu>
             </Sider>
