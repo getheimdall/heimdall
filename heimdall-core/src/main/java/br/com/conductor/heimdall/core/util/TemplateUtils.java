@@ -34,5 +34,5 @@ public class TemplateUtils {
      public static final String TEMPLATE_ACCESS_TOKEN = "{\"location\": \"HEADER\", \"name\": \"access_token\"}";
      public static final String TEMPLATE_MOCK = "{\"body\": \"Example Mock\", \"status\": \"200\"}";
      public static final String TEMPLATE_OAUTH = "{\"providerId\": 1 , \"typeOAuth\":\"GENERATE\", \"timeAccessToken\":20, \"timeRefreshToken\":1800, \"privateKey\":\"privateKey\" }";
-     
+     public static final String TEMPLATE_BLOCK_IPS = "{\"ips\": [ \"127.0.0.0\", \"127.0.0.1\" ]}";
 }

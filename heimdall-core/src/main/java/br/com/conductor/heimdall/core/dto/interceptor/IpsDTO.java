@@ -1,5 +1,4 @@
-
-package br.com.conductor.heimdall.core.enums;
+package br.com.conductor.heimdall.core.dto.interceptor;
 
 /*-
  * =========================LICENSE_START==================================
@@ -10,9 +9,9 @@ package br.com.conductor.heimdall.core.enums;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,17 +20,18 @@ package br.com.conductor.heimdall.core.enums;
  * ==========================LICENSE_END===================================
  */
 
-import br.com.conductor.heimdall.core.entity.Interceptor;
+import lombok.Data;
+
+import java.io.Serializable;
+import java.util.Set;
 
 /**
- * Enum that hold the types of {@link Interceptor}.
+ * Class is a Data Transfer Object for the Blacklist or Whitelist.
  *
- * @author Filipe Germano
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
- *
  */
-public enum TypeInterceptor {
+@Data
+public class IpsDTO implements Serializable {
 
-	LOG, MOCK, RATTING, ACCESS_TOKEN, CLIENT_ID, CUSTOM, MIDDLEWARE, OAUTH, BLACKLIST, WHITELIST
-
+    private Set<String> ips;
 }
