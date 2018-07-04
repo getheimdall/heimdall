@@ -23,7 +23,6 @@ const getTraces = (params = {params: {}}) => {
     const offset = params.params.offset
     const limit = params.params.limit
     const filtersSelected = updateOperationSelectedToEnum(params.params.filtersSelected)
-    console.log(JSON.stringify(filtersSelected))
     return HTTPv1.post(`/traces?offset=${offset}&limit=${limit}`, filtersSelected)
         .then(res => {
             return Promise.resolve(res.data)

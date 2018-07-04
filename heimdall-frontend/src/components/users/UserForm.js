@@ -12,14 +12,12 @@ class UserForm extends Component {
         this.props.form.validateFieldsAndScroll((err, payload) => {
             if (!err) {
                 payload.status = payload.status ? 'ACTIVE' : 'INACTIVE'
-                // payload.api.id = Number(payload.api.id)
-                // payload.roles =
                 if (payload.roles) {
                     let roles = payload.roles;
                     payload.roles = roles.map((role) => ({ id: role }))
                 }
-                console.log(JSON.stringify(payload))
-                // this.props.handleSubmit(payload)
+
+                this.props.handleSubmit(payload)
             }
         });
     }
