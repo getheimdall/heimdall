@@ -21,17 +21,12 @@ package br.com.conductor.heimdall.core.exception;
  * ==========================LICENSE_END===================================
  */
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.REQUEST_TIMEOUT;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
-
 import br.com.twsoftware.alfred.object.Objeto;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+
+import static org.springframework.http.HttpStatus.*;
 
 /**
  * Enum that concentrates the messages and validations of the exceptions <br/>
@@ -72,6 +67,8 @@ public enum ExceptionMessage {
      MIDDLEWARE_CONTAINS_INTERCEOPTORS(BAD_REQUEST.value(), "Middleware still contains interceptors associated", BadRequestException.class),
      
      MIDDLEWARE_INVALID_FILE(BAD_REQUEST.value(), "Invalid file", BadRequestException.class),
+
+     MIDDLEWARE_PAYLOAD_TOO_LARGE(PAYLOAD_TOO_LARGE.value(), "Content is to big. Maximal allowed request size is 25MB", MultipartException.class),
 
      ACCESS_TOKEN_NOT_DEFINED(BAD_REQUEST.value(), "Access token not defined", BadRequestException.class),
      
