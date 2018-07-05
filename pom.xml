@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.5.7.RELEASE</version>
+		<version>1.5.14.RELEASE</version>
 		<relativePath />
 	</parent>
 
@@ -162,6 +162,11 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20171018</version>
+		</dependency>
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
@@ -266,8 +271,8 @@
 	</dependencyManagement>
 
 	<modules>
-		<module>heimdall-core</module>
 		<module>heimdall-middleware-spec</module>
+		<module>heimdall-core</module>
 		<module>heimdall-gateway</module>
 		<module>heimdall-api</module>
 		<module>heimdall-config</module>
