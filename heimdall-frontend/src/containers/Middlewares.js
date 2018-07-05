@@ -9,18 +9,6 @@ const Column = Table.Column
 class Middlewares extends Component {
 
     state = {
-        environmentId: 0,
-        planId: 0,
-        resourceId: 0,
-        operationId: 0,
-        planSelected: false,
-        resourceSelected: false,
-        operationSelected: false,
-        candidatesToSave: [],
-        candidatesToUpdate: [],
-        candidatesToDelete: [],
-        showProgress: false,
-        progress: 0,
         apiId: this.props.api.id,
         version: "",
         page: 0,
@@ -161,14 +149,8 @@ class Middlewares extends Component {
 const mapStateToProps = state => {
     return {
         middlewares: state.middlewares.middlewares,
-        interceptors: state.interceptors.interceptors,
         loading: state.middlewares.loading,
-        interceptorTypes: state.interceptors.interceptorTypes,
-        plans: state.plans.plans,
-        resources: state.resources.resources,
-        operations: state.operations.operations,
-        notification: state.middlewares.notification,
-        queueCount: state.queue.count
+        notification: state.middlewares.notification
     }
 }
 
