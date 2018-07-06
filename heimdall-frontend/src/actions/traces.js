@@ -13,6 +13,7 @@ export const getAllTraces = (query = {offset: 0, limit: 10}) => dispatch => {
     const parameters = {params: query}
     traceService.getTraces(parameters)
         .then(data => {
+            data.content = data.content.filter((objectTrace) => objectTrace.trace !== null)
             dispatch({type: TraceConstants.GET_TRACES, traces: data})
             dispatch(finishLoading())
         })

@@ -25,7 +25,8 @@ class Middlewares extends Component {
         if (status === 'done') {
             this.setState({...this.state, version: ""})
             message.success(`${info.file.name} file uploaded successfully.`)
-
+            this.props.dispatch(initLoading())
+            this.props.dispatch(getMiddlewares({offset: this.state.page, limit: 10}, this.state.apiId))
         } else if (status === 'error') {
             message.error(`${info.file.name} file upload failed.`)
             message.error(info.file.error.response.data.message)

@@ -37,6 +37,7 @@ class MainLayout extends Component {
 	render() {
 		const { Header, Content, Footer } = Layout
 		const { history } = this.props
+		// const version = process.env.REACT_APP_VERSION
 
 		return (
 			<Layout className="App">
@@ -54,6 +55,8 @@ class MainLayout extends Component {
 					</Content>
 					<Footer>
 						<a href="http://www.conductor.com.br">Conductor Tecnologia</a>
+						<br/>
+						{/*<span>Version: {version}</span>*/}
 					</Footer>
 				</Layout>
 			</Layout>
