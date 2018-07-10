@@ -1,5 +1,19 @@
 # Heimdall Changelog
 
+### v1.4.0-stable
+
+* **Feature**
+
+    * Updates in front-end [Pull Request #74](https://github.com/getheimdall/heimdall/pull/74)
+        * Dispatch to update list the middlewares when save one middleware;
+        * Add method ALL in operations;
+        * Create template to Blacklist and Whitelist;
+        *  Filter traces not null to show in Traces;
+
+* **Bugfix**
+
+    * Remove header method from middleware helper class was not working. [Pull Request #76](https://github.com/getheimdall/heimdall/pull/76)
+
 ### v1.3.0-stable
 
 * **Feature**
