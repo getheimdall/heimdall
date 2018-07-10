@@ -181,59 +181,14 @@ public class InterceptorFileService {
     private File templateInterceptor(TypeInterceptor type, TypeExecutionPoint executionPoint) {
 
         File file = null;
+        String filePath = "template-interceptor";
         try {
-            String filePath = "template-interceptor";
-            switch (type) {
-                case ACCESS_TOKEN:
-                    file = ResourceUtils.getFile(filePath + File.separator + "access_token.mustache");
-                    break;
-                case CLIENT_ID:
-                    file = ResourceUtils.getFile(filePath + File.separator + "client_id.mustache");
-                    break;
-                case MOCK:
-                    file = ResourceUtils.getFile(filePath + File.separator + "mock.mustache");
-                    break;
-                case RATTING:
-                    file = ResourceUtils.getFile(filePath + File.separator + "ratting.mustache");
-                    break;
-                case CUSTOM:
-                    file = ResourceUtils.getFile(filePath + File.separator + "custom.mustache");
-                    break;
-                case LOG:
-                    switch (executionPoint) {
-                        case FIRST:
-                            file = ResourceUtils.getFile(filePath + File.separator + "request_log.mustache");
-                            break;
-                        case SECOND:
-                            file = ResourceUtils.getFile(filePath + File.separator + "response_log.mustache");
-                            break;
-                        default:
-                            break;
-                    }
-                    break;
-                case MIDDLEWARE:
-                    file = ResourceUtils.getFile(filePath + File.separator + "middleware.mustache");
-                    break;
-                case OAUTH:
-                    file = ResourceUtils.getFile(filePath + File.separator + "oauth.mustache");
-                    break;
-                case BLACKLIST:
-                    file = ResourceUtils.getFile(filePath + File.separator + "blacklist_ip.mustache");
-                    break;
-                case WHITELIST:
-                    file = ResourceUtils.getFile(filePath + File.separator + "whitelist_ip.mustache");
-                    break;
-                default:
-                    break;
-            }
-
+            file = ResourceUtils.getFile(filePath + File.separator + type.getHeimdallInterceptor().getFile(executionPoint));
         } catch (IOException e) {
-
             log.error(e.getMessage(), e);
         }
 
         return file;
-
     }
 
     /*
