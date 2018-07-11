@@ -23,6 +23,7 @@ package br.com.conductor.heimdall.core.service;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ENVIRONMENT_ATTACHED_TO_API;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ENVIRONMENT_INBOUND_DNS_PATTERN;
 import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 import static br.com.twsoftware.alfred.object.Objeto.notBlank;
 
@@ -126,6 +127,8 @@ public class EnvironmentService {
           HeimdallException.checkThrow(notBlank(environment), ExceptionMessage.ENVIRONMENT_INBOUND_URL_ALREADY_EXISTS);
           
           environment = GenericConverter.mapper(environmentDTO, Environment.class);
+
+          HeimdallException.checkThrow(validateInboundURL(environment.getInboundURL()), ENVIRONMENT_INBOUND_DNS_PATTERN);
           environment = environmentRepository.save(environment);
           
           return environment;
@@ -150,6 +153,8 @@ public class EnvironmentService {
           HeimdallException.checkThrow(notBlank(environmentVerify) && environmentVerify.getId() != environment.getId(), ExceptionMessage.ENVIRONMENT_INBOUND_URL_ALREADY_EXISTS);
           
           environment = GenericConverter.mapper(environmentDTO, environment);
+
+          HeimdallException.checkThrow(validateInboundURL(environment.getInboundURL()), ENVIRONMENT_INBOUND_DNS_PATTERN);
           environmentRepository.save(environment);
           
           return environment;
@@ -173,5 +178,20 @@ public class EnvironmentService {
           
           environmentRepository.delete(environment);
      }
+
+     /*
+      * Validates if the String follows the pattern: (http[s]:// | www.)host.domain[:port]
+      */
+    private boolean validateInboundURL(String inbound) {
+
+        if (inbound.matches("(http://|https://|www\\.)(.+)")) {
+            String temp = inbound.replaceAll("(http://|https://|www\\.)(.+)", "$2");
+
+            if (temp.matches(".+\\..+"))
+                return !temp.matches(".*/.*");
+        }
+
+        return false;
+    }
 
 }
