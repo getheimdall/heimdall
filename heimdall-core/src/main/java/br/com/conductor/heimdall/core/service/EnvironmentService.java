@@ -181,7 +181,9 @@ public class EnvironmentService {
      }
 
      /*
-      * Validates if the String follows the pattern: (http[s]:// | www.)host.domain[:port]
+      * Validates if the String follow one of the patterns:
+      *     * http[s]://host.domain[:port]
+      *     * www.host.domain[:port]
       */
     private boolean validateInboundURL(String inbound) {
 
