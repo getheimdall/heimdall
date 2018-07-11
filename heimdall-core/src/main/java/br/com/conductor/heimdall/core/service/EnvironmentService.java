@@ -28,6 +28,7 @@ import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 import static br.com.twsoftware.alfred.object.Objeto.notBlank;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -150,7 +151,7 @@ public class EnvironmentService {
           HeimdallException.checkThrow(isBlank(environment), GLOBAL_RESOURCE_NOT_FOUND);
 
           Environment environmentVerify = environmentRepository.findByInboundURL(environmentDTO.getInboundURL());
-          HeimdallException.checkThrow(notBlank(environmentVerify) && environmentVerify.getId() != environment.getId(), ExceptionMessage.ENVIRONMENT_INBOUND_URL_ALREADY_EXISTS);
+          HeimdallException.checkThrow(notBlank(environmentVerify) && !Objects.equals(environmentVerify.getId(), environment.getId()), ExceptionMessage.ENVIRONMENT_INBOUND_URL_ALREADY_EXISTS);
           
           environment = GenericConverter.mapper(environmentDTO, environment);
 
