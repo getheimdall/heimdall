@@ -76,7 +76,7 @@ public class AccessToken implements Serializable {
 
      @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
      @JoinColumn(name = "APP_ID")
-     @JsonIgnoreProperties({ "accessTokens", "plans", "developer" })
+     @JsonIgnoreProperties({ "accessTokens", "developer" })
      private App app;
      
      @Column(name = "EXPIRED_DATE")
