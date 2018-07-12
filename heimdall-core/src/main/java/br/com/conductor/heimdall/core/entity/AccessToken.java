@@ -54,7 +54,7 @@ import lombok.EqualsAndHashCode;
  *  The Access Token is required for a safe connection to be established.
  * 
  * @author Filipe Germano
- *
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Data
 @Table(name = "ACCESS_TOKENS")

@@ -59,7 +59,7 @@ import io.swagger.annotations.ApiOperation;
  * Uses the {@link AppService} to provide methods to create, read, update and delete a {@link App}.
  *
  * @author Filipe Germano
- *
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @io.swagger.annotations.Api(value = PATH_APPS, produces = MediaType.APPLICATION_JSON_VALUE, tags = { ConstantsTag.TAG_APPS })
 @RestController

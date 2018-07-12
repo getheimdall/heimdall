@@ -97,6 +97,8 @@ public enum ExceptionMessage {
      ACCESS_DENIED(UNAUTHORIZED.value(), "Access Denied", UnauthorizedException.class),
      
      ENVIRONMENT_ATTACHED_TO_API(BAD_REQUEST.value(), "Environment attached to Api", BadRequestException.class),
+
+     SOME_PLAN_NOT_PRESENT_IN_APP(BAD_REQUEST.value(), "Some informed plans does not belong to the App plans", BadRequestException.class),
      
      PROVIDER_NOT_FOUND(BAD_REQUEST.value(), "Provider not found", BadRequestException.class),
      
