@@ -60,6 +60,8 @@ public class HttpImpl implements Http {
      String body;
 
      MultiValueMap<String, String> formData;
+     
+     RestTemplate restTemplate;
 
      public HttpImpl header(String name, String value) {
 
@@ -217,9 +219,19 @@ public class HttpImpl implements Http {
 
      private RestTemplate rest() {
 
-          RestTemplate restTemplate = new RestTemplate();
+          if (restTemplate == null) {
+               
+               this.restTemplate = new RestTemplate();
+          }
 
           return restTemplate;
-     }    
+     }
+     
+     public RestTemplate clientProvider(RestTemplate restTemplate) {
+          
+          this.restTemplate = new RestTemplate();
+          return this.restTemplate;
+     }
+     
 
 }

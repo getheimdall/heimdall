@@ -23,6 +23,8 @@ package br.com.conductor.heimdall.middleware.spec;
 
 import java.util.Map;
 
+import org.springframework.web.client.RestTemplate;
+
 /**
  * This interface provides methods to handle a {@link Http} and a {@link ApiResponse}.
  *
@@ -109,4 +111,10 @@ public interface Http {
       */
      public ApiResponse sendDelete();
 
+     /**
+     * Set RestTemplate custom object
+     * @return               A RestTemplate object
+     */
+     public RestTemplate clientProvider(RestTemplate restTemplate);
+     
 }
