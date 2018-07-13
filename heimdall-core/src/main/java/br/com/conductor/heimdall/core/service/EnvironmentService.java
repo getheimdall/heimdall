@@ -129,7 +129,7 @@ public class EnvironmentService {
           
           environment = GenericConverter.mapper(environmentDTO, Environment.class);
 
-          HeimdallException.checkThrow(validateInboundURL(environment.getInboundURL()), ENVIRONMENT_INBOUND_DNS_PATTERN);
+          HeimdallException.checkThrow(!validateInboundURL(environment.getInboundURL()), ENVIRONMENT_INBOUND_DNS_PATTERN);
           environment = environmentRepository.save(environment);
           
           return environment;
@@ -155,7 +155,7 @@ public class EnvironmentService {
           
           environment = GenericConverter.mapper(environmentDTO, environment);
 
-          HeimdallException.checkThrow(validateInboundURL(environment.getInboundURL()), ENVIRONMENT_INBOUND_DNS_PATTERN);
+          HeimdallException.checkThrow(!validateInboundURL(environment.getInboundURL()), ENVIRONMENT_INBOUND_DNS_PATTERN);
           environmentRepository.save(environment);
           
           return environment;
@@ -184,6 +184,8 @@ public class EnvironmentService {
       * Validates if the String follow one of the patterns:
       *     * http[s]://host.domain[:port]
       *     * www.host.domain[:port]
+      *
+      * @return true if it is a a valid inbound, false otherwise
       */
     private boolean validateInboundURL(String inbound) {
 
