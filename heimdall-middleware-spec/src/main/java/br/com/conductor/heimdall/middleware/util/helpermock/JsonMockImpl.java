@@ -22,7 +22,6 @@ package br.com.conductor.heimdall.middleware.util.helpermock;
  */
 
 import br.com.conductor.heimdall.middleware.spec.Json;
-import br.com.twsoftware.alfred.object.Objeto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -63,7 +62,7 @@ public class JsonMockImpl implements Json {
                 JSONArray array = new JSONArray(string);
                 return array.toString();
             } catch (JSONException ex1) {
-                if (Objeto.notBlank(string))
+                if (!string.isEmpty())
                     return string;
             }
         }
@@ -115,8 +114,7 @@ public class JsonMockImpl implements Json {
         try {
             JSONObject jsonObject = new JSONObject(string);
 
-            if (Objeto.notBlank(jsonObject))
-                valid = true;
+            valid = true;
         } catch (JSONException e) {
 
             try {
