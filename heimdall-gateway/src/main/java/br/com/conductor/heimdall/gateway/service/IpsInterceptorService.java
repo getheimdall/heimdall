@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -34,6 +35,8 @@ import java.util.Set;
  */
 @Service
 public class IpsInterceptorService {
+
+    private final String X_FORWARDED_FOR = "X-FORWARDED-FOR";
 
     /**
      * Method that verifies if Ips from the interceptor Blacklist or Whitelist contains any IP from request
@@ -57,10 +60,12 @@ public class IpsInterceptorService {
 
         Set<String> ipsFromRequest = new HashSet<>();
 
-        if (req != null) {
+        if (Objects.nonNull(req)) {
 
-            Arrays.stream(req.getHeader("X-FORWARDED-FOR").split(","))
-                    .forEach(ip -> ipsFromRequest.add(ip.trim()));
+            if (Objects.nonNull(req.getHeader(X_FORWARDED_FOR))){
+                Arrays.stream(req.getHeader(X_FORWARDED_FOR).split(","))
+                        .forEach(ip -> ipsFromRequest.add(ip.trim()));
+            }
 
             ipsFromRequest.add(req.getRemoteAddr());
 
