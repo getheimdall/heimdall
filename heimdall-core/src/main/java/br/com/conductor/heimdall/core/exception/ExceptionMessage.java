@@ -83,7 +83,9 @@ public enum ExceptionMessage {
      API_BASEPATH_EXIST(BAD_REQUEST.value(), "The basepath defined exist", BadRequestException.class),
      
      API_BASEPATH_EMPTY(BAD_REQUEST.value(), "Basepath not defined", BadRequestException.class),
-     
+
+     API_CANT_ENVIRONMENT_INBOUND_URL_EQUALS(BAD_REQUEST.value(), "Apis can't have environments with the same inbound url", BadRequestException.class),
+
      ONLY_ONE_OPERATION_PER_RESOURCE(BAD_REQUEST.value(), "Only one operation per resource", BadRequestException.class),
 
      ONLY_ONE_RESOURCE_PER_API(BAD_REQUEST.value(), "Only one resource per api", BadRequestException.class),
