@@ -26,7 +26,6 @@ import br.com.conductor.heimdall.core.dto.PageDTO;
 import br.com.conductor.heimdall.core.entity.Resource;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 /**
  * Class that represents a paged {@link Resource} list.
@@ -35,7 +34,6 @@ import lombok.NoArgsConstructor;
  *
  */
 @Data
-@NoArgsConstructor
 @EqualsAndHashCode(callSuper=false)
 public class ResourcePage extends PageDTO<Resource> implements Serializable {
 

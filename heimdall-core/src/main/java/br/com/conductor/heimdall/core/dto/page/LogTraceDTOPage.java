@@ -1,6 +1,8 @@
 
 package br.com.conductor.heimdall.core.dto.page;
 
+import java.io.Serializable;
+
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -25,9 +27,6 @@ import br.com.conductor.heimdall.core.dto.logs.LogTraceDTO;
 import br.com.conductor.heimdall.core.dto.PageDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
 
 /**
  * Class that represents a paged {@link LogTraceDTO} list.
@@ -36,7 +35,6 @@ import java.io.Serializable;
  *
  */
 @Data
-@NoArgsConstructor
 @EqualsAndHashCode(callSuper=false)
 public class LogTraceDTOPage extends PageDTO<LogTraceDTO> implements Serializable {
 

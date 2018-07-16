@@ -42,7 +42,6 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class RateLimit implements Serializable {
 
      public static final int MIN_REMAINING = 0;

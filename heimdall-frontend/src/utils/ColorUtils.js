@@ -22,7 +22,7 @@ const getColorStatus = (status) => {
     if (status === 1){
         color = '#99c2ff'
     } else if (status === 2) {
-        color = '#70ff7b'
+        color = '#56b63f'
     } else if (status === 3) {
         color = '#ffae7a'
     } else if (status === 4) {

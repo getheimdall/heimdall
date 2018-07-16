@@ -26,7 +26,6 @@ import br.com.conductor.heimdall.core.dto.PageDTO;
 import br.com.conductor.heimdall.core.entity.Provider;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 /**
  * Class that represents a paged {@link Provider} list.
@@ -34,7 +33,6 @@ import lombok.NoArgsConstructor;
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Data
-@NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class ProviderPage extends PageDTO<Provider> implements Serializable {
 

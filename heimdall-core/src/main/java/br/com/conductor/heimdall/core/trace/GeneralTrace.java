@@ -33,7 +33,6 @@ import lombok.NoArgsConstructor;
  *
  */
 @Data
-@NoArgsConstructor
 public class GeneralTrace {
 
      private String description;

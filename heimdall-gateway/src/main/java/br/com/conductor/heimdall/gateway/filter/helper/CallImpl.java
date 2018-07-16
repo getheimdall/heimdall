@@ -648,7 +648,7 @@ public class CallImpl implements Call {
 
                     List<String> names = Collections.list(super.getHeaderNames());
                     
-                    if (Objeto.notBlank(name) && !names.stream().filter(s -> s.equalsIgnoreCase(name)).findFirst().isPresent()) {
+                    if (Objeto.notBlank(name) && names.stream().anyMatch(s -> s.equalsIgnoreCase(name))) {
                          
                          names.remove(name);
                     }

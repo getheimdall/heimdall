@@ -21,17 +21,12 @@ package br.com.conductor.heimdall.core.exception;
  * ==========================LICENSE_END===================================
  */
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.REQUEST_TIMEOUT;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
-
 import br.com.twsoftware.alfred.object.Objeto;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+
+import static org.springframework.http.HttpStatus.*;
 
 /**
  * Enum that concentrates the messages and validations of the exceptions <br/>
@@ -73,6 +68,8 @@ public enum ExceptionMessage {
      
      MIDDLEWARE_INVALID_FILE(BAD_REQUEST.value(), "Invalid file", BadRequestException.class),
 
+     MIDDLEWARE_PAYLOAD_TOO_LARGE(PAYLOAD_TOO_LARGE.value(), "Content is to big. Maximal allowed request size is 25MB", MultipartException.class),
+
      ACCESS_TOKEN_NOT_DEFINED(BAD_REQUEST.value(), "Access token not defined", BadRequestException.class),
      
      APP_REPEATED(BAD_REQUEST.value(), "App repeated", BadRequestException.class),
@@ -86,7 +83,9 @@ public enum ExceptionMessage {
      API_BASEPATH_EXIST(BAD_REQUEST.value(), "The basepath defined exist", BadRequestException.class),
      
      API_BASEPATH_EMPTY(BAD_REQUEST.value(), "Basepath not defined", BadRequestException.class),
-     
+
+     API_CANT_ENVIRONMENT_INBOUND_URL_EQUALS(BAD_REQUEST.value(), "Apis can't have environments with the same inbound url", BadRequestException.class),
+
      ONLY_ONE_OPERATION_PER_RESOURCE(BAD_REQUEST.value(), "Only one operation per resource", BadRequestException.class),
 
      ONLY_ONE_RESOURCE_PER_API(BAD_REQUEST.value(), "Only one resource per api", BadRequestException.class),
