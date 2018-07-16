@@ -34,6 +34,7 @@ public class RequestMock implements Request {
 
     private String body;
     private String url;
+    private String appName;
 
     @Override
     public Header header() {
@@ -67,19 +68,48 @@ public class RequestMock implements Request {
 
     @Override
     public String pathParam(String name) {
-        // TODO
-        return null;
+
+        name = "{"+ name +"}";
+
+        String patternText = "";
+        String requestURIText = "";
+        String separator = "/";
+        String[] a = patternText.split(separator);
+        String[] b = requestURIText.split(separator);
+
+        String value = null;
+
+        for (int i = 0; i < a.length; i++) {
+
+            if (a[i].equals(name) && !a[i].equals(b[i])) {
+
+                value = b[i];
+                break;
+            }
+        }
+
+        return value;
+
+
     }
 
     @Override
     public String getAppName() {
-        // TODO
-        return null;
+        return this.appName;
     }
 
     @Override
     public void setSendResponse(boolean value) {
-        // TODO
+        boolean sendResponse = value;
+    }
+
+    /**
+     * Set method designed for mock purposes
+     *
+     * @param appName app name
+     */
+    public void setAppName(String appName) {
+        this.appName = appName;
     }
 }
 

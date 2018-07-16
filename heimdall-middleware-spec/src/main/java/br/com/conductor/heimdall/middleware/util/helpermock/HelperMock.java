@@ -49,7 +49,6 @@ public class HelperMock implements Helper {
 
     @Override
     public DB db(String databaseName) {
-
         return new DBMockImpl(databaseName);
     }
 

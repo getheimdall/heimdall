@@ -23,6 +23,7 @@ package br.com.conductor.heimdall.middleware.util.helpermock;
 
 import br.com.conductor.heimdall.middleware.spec.ApiResponse;
 import br.com.conductor.heimdall.middleware.spec.Http;
+import br.com.conductor.heimdall.middleware.spec.Json;
 
 import java.util.Map;
 
@@ -32,53 +33,82 @@ import java.util.Map;
  * @author Marcelo Aguiar
  */
 public class HttpMockImpl implements Http {
+
+    private Json json = new JsonMockImpl();
+    private Map<String, String> headers;
+    private Map<String, String> queryParams;
+    private String url;
+    private String body;
+
+
     @Override
     public Http header(String name, String value) {
-        return null;
+
+        this.headers.put(name, value);
+
+        return this;
     }
 
     @Override
     public Http header(Map<String, String> params) {
-        return null;
+
+        params.forEach((k, v) -> {
+            if (v != null) {
+                this.headers.put(k, v);
+            }
+        });
+
+        return this;
     }
 
     @Override
     public Http url(String url) {
-        return null;
+        this.url = url;
+        return this;
     }
 
     @Override
     public Http queryParam(String name, String value) {
-        return null;
+        this.queryParams.put(name, value);
+        return this;
     }
 
     @Override
     public Http body(Map<String, Object> params) {
-        return null;
+        this.body = json.parse(params);
+        return this;
     }
 
     @Override
     public Http body(String params) {
-        return null;
+        this.body = json.parse(params);
+        return this;
     }
 
     @Override
     public ApiResponse sendGet() {
-        return null;
+
+        ApiResponse response = new ApiResponseMockImpl();
+
+        response.setHeaders(headers);
+        response.setBody(body);
+        response.setStatus(200);
+
+        return response;
     }
 
     @Override
     public ApiResponse sendPost() {
-        return null;
+        return this.sendGet();
     }
 
     @Override
     public ApiResponse sendPut() {
-        return null;
+        return this.sendGet();
     }
 
     @Override
     public ApiResponse sendDelete() {
-        return null;
+        return this.sendGet();
     }
 }
