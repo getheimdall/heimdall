@@ -162,7 +162,7 @@ public class DBMongoImpl implements DBMongo {
           pageResponse.totalElements = totalElements;
           pageResponse.hasPreviousPage = page > 0;
           pageResponse.hasNextPage = page < (pageResponse.totalPages - 1);
-          pageResponse.hasContent = Objeto.notBlank(list);
+          pageResponse.hasContent = list != null && list.size() > 0;
           pageResponse.first = page == 0;
           pageResponse.last = page == (pageResponse.totalPages - 1);
           pageResponse.nextPage = page == (pageResponse.totalPages - 1) ? page : page + 1;

@@ -10,9 +10,9 @@ package br.com.conductor.heimdall.core.service;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -51,134 +51,160 @@ import br.com.conductor.heimdall.core.util.Pageable;
 
 /**
  * This class provides methods to create, read, update and delete the {@link Environment} resource.
- * 
- * @author Filipe Germano
  *
+ * @author Filipe Germano
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Service
 public class EnvironmentService {
 
-     @Autowired
-     private EnvironmentRepository environmentRepository;
-     
-     /**
-      * Finds a {@link Environment} by its ID.
-      * 
-      * @param 	id 						The id of the {@link Environment} 
-      * @return 						The {@link Environment} that was found
-      * @throws NotFoundException 		Resource not found
-      */
-     public Environment find(Long id) {
-          
-          Environment environment = environmentRepository.findOne(id);      
-          HeimdallException.checkThrow(isBlank(environment), GLOBAL_RESOURCE_NOT_FOUND);
-                              
-          return environment;
-     }
-     
-     /**
-      * Generates a paged list of {@link Environment} from a request.
-      * 
-      * @param environmentDTO			The {@link EnvironmentDTO}
-      * @param pageableDTO				The {@link PageableDTO}
-      * @return							The paged {@link Environment} list as a {@link EnvironmentPage} object
-      */
-     public EnvironmentPage list(EnvironmentDTO environmentDTO, PageableDTO pageableDTO) {
+    @Autowired
+    private EnvironmentRepository environmentRepository;
 
-          Environment environment = GenericConverter.mapper(environmentDTO, Environment.class);
-          
-          Example<Environment> example = Example.of(environment, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
-          
-          Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
-          Page<Environment> page = environmentRepository.findAll(example, pageable);
-          
-          EnvironmentPage environmentPage = new EnvironmentPage(PageDTO.build(page));
-          
-          return environmentPage;
-     }
+    /**
+     * Finds a {@link Environment} by its ID.
+     *
+     * @param id The id of the {@link Environment}
+     * @return The {@link Environment} that was found
+     * @throws NotFoundException Resource not found
+     */
+    public Environment find(Long id) {
 
-     /**
-      * Generates a list of {@link Environment} from a request.
-      * 
-      * @param environmentDTO			The {@link EnvironmentDTO}
-      * @return							The List<{@link Environment}>
-      */
-     public List<Environment> list(EnvironmentDTO environmentDTO) {
-          
-          Environment environment = GenericConverter.mapper(environmentDTO, Environment.class);
-          
-          Example<Environment> example = Example.of(environment, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
-          
-          List<Environment> environments = environmentRepository.findAll(example);
-          
-          return environments;
-     }
-     
-     /**
-      * Saves a {@link Environment} in the repository.
-      * 
-      * @param environmentDTO			The {@link EnvironmentDTO}
-      * @return							The saved {@link Environment}
-      * @throws BadRequestException		Inbound URL already exists
-      */
-     @Transactional
-     public Environment save(EnvironmentDTO environmentDTO) {
+        Environment environment = environmentRepository.findOne(id);
+        HeimdallException.checkThrow(isBlank(environment), GLOBAL_RESOURCE_NOT_FOUND);
 
-          Environment environment = environmentRepository.findByInboundURL(environmentDTO.getInboundURL());
-          HeimdallException.checkThrow(notBlank(environment), ExceptionMessage.ENVIRONMENT_INBOUND_URL_ALREADY_EXISTS);
-          
-          environment = GenericConverter.mapper(environmentDTO, Environment.class);
+        return environment;
+    }
 
-          HeimdallException.checkThrow(!validateInboundURL(environment.getInboundURL()), ENVIRONMENT_INBOUND_DNS_PATTERN);
-          environment = environmentRepository.save(environment);
-          
-          return environment;
-     }
+    /**
+     * Generates a paged list of {@link Environment} from a request.
+     *
+     * @param environmentDTO The {@link EnvironmentDTO}
+     * @param pageableDTO    The {@link PageableDTO}
+     * @return The paged {@link Environment} list as a {@link EnvironmentPage} object
+     */
+    public EnvironmentPage list(EnvironmentDTO environmentDTO, PageableDTO pageableDTO) {
 
-     /**
-      * Updates a {@link Environment} by its ID.
-      * 
-      * @param 	id 						The id of the {@link Environment} 
-      * @param environmentDTO			The {@link EnvironmentDTO}
-      * @return							The updated {@link Environment}
-      * @throws NotFoundException		Resource not found
-      * @throws BadRequestException		Inbound URL already exists
-      */
-     @Transactional
-     public Environment update(Long id, EnvironmentDTO environmentDTO) {
+        Environment environment = GenericConverter.mapper(environmentDTO, Environment.class);
 
-          Environment environment = environmentRepository.findOne(id);
-          HeimdallException.checkThrow(isBlank(environment), GLOBAL_RESOURCE_NOT_FOUND);
+        Example<Environment> example = Example.of(environment, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 
+        Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+        Page<Environment> page = environmentRepository.findAll(example, pageable);
+
+        EnvironmentPage environmentPage = new EnvironmentPage(PageDTO.build(page));
+
+        return environmentPage;
+    }
+
+    /**
+     * Generates a list of {@link Environment} from a request.
+     *
+     * @param environmentDTO The {@link EnvironmentDTO}
+     * @return The List<{@link Environment}>
+     */
+    public List<Environment> list(EnvironmentDTO environmentDTO) {
+
+        Environment environment = GenericConverter.mapper(environmentDTO, Environment.class);
+
+        Example<Environment> example = Example.of(environment, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+
+        List<Environment> environments = environmentRepository.findAll(example);
+
+        return environments;
+    }
+
+    /**
+     * Saves a {@link Environment} in the repository.
+     *
+     * @param environmentDTO The {@link EnvironmentDTO}
+     * @throws BadRequestException Inbound URL already exists
+     * @return The saved {@link Environment}
+     */
+    @Transactional
+    public Environment save(EnvironmentDTO environmentDTO) {
+
+        List<Environment> environments = environmentRepository.findByInboundURL(environmentDTO.getInboundURL());
+
+        Environment environmentEqual = environments.stream().filter(e -> e.getOutboundURL().equals(environmentDTO.getOutboundURL())).findFirst().orElse(null);
+        HeimdallException.checkThrow(notBlank(environmentEqual), ExceptionMessage.ENVIRONMENT_ALREADY_EXISTS);
+
+        Environment environment = GenericConverter.mapper(environmentDTO, Environment.class);
+
+        HeimdallException.checkThrow(!validateInboundURL(environment.getInboundURL()), ENVIRONMENT_INBOUND_DNS_PATTERN);
+        environment = environmentRepository.save(environment);
+
+        return environment;
+    }
+
+    /**
+     * Updates a {@link Environment} by its ID.
+     *
+     * @param id             The id of the {@link Environment}
+     * @param environmentDTO The {@link EnvironmentDTO}
+     * @throws NotFoundException   Resource not found
+     * @throws BadRequestException Inbound URL already exists
+     * @return The updated {@link Environment}
+     */
+    @Transactional
+    public Environment update(Long id, EnvironmentDTO environmentDTO) {
+
+        Environment environment = environmentRepository.findOne(id);
+        HeimdallException.checkThrow(isBlank(environment), GLOBAL_RESOURCE_NOT_FOUND);
+
+        List<Environment> environments = environmentRepository.findByInboundURL(environmentDTO.getInboundURL());
+
+        Environment environmentEqual = environments.stream().filter(e -> e.getOutboundURL().equals(environmentDTO.getOutboundURL())).findFirst().orElse(null);
+        HeimdallException.checkThrow(notBlank(environmentEqual) && !environmentEqual.getId().equals(environment.getId()), ExceptionMessage.ENVIRONMENT_ALREADY_EXISTS);
+
+        Integer apis = environmentRepository.findApiWithOtherEnvironmentEqualsInbound(environment.getId(), environmentDTO.getInboundURL());
+        HeimdallException.checkThrow(apis > 0, ExceptionMessage.API_CANT_ENVIRONMENT_INBOUND_URL_EQUALS);
+
+        environment = GenericConverter.mapper(environmentDTO, environment);
+
+        HeimdallException.checkThrow(!validateInboundURL(environment.getInboundURL()), ENVIRONMENT_INBOUND_DNS_PATTERN);
+        environmentRepository.save(environment);
+
+        return environment;
+    }
+
+    /**
+     * Deletes a {@link Environment} by its ID.
+     *
+     * @param id The id of the {@link Environment}
+     * @throws NotFoundException Resource not found
+     */
+    @Transactional
+    public void delete(Long id) {
           Environment environmentVerify = environmentRepository.findByInboundURL(environmentDTO.getInboundURL());
           HeimdallException.checkThrow(notBlank(environmentVerify) && !Objects.equals(environmentVerify.getId(), environment.getId()), ExceptionMessage.ENVIRONMENT_INBOUND_URL_ALREADY_EXISTS);
-          
+
           environment = GenericConverter.mapper(environmentDTO, environment);
 
           HeimdallException.checkThrow(!validateInboundURL(environment.getInboundURL()), ENVIRONMENT_INBOUND_DNS_PATTERN);
           environmentRepository.save(environment);
-          
+
           return environment;
      }
-     
+
      /**
       * Deletes a {@link Environment} by its ID.
-      * 
+      *
       * @param 	id 						The id of the {@link Environment}
       * @throws NotFoundException		Resource not found
       */
      @Transactional
      public void delete(Long id) {
 
-          Environment environment = environmentRepository.findOne(id);
-          HeimdallException.checkThrow(isBlank(environment), GLOBAL_RESOURCE_NOT_FOUND);
-          
-          Integer totalEnvironmentsAttached = environmentRepository.findApisWithEnvironment(id);
-          HeimdallException.checkThrow(totalEnvironmentsAttached == 1, ENVIRONMENT_ATTACHED_TO_API);
-          
-          
-          environmentRepository.delete(environment);
-     }
+        Environment environment = environmentRepository.findOne(id);
+        HeimdallException.checkThrow(isBlank(environment), GLOBAL_RESOURCE_NOT_FOUND);
+
+        Integer totalEnvironmentsAttached = environmentRepository.findApisWithEnvironment(id);
+        HeimdallException.checkThrow(totalEnvironmentsAttached == 1, ENVIRONMENT_ATTACHED_TO_API);
+
+
+        environmentRepository.delete(environment);
+    }
 
      /*
       * Validates if the String follow one of the patterns:
