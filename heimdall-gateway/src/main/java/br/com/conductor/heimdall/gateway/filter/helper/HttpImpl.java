@@ -229,7 +229,6 @@ public class HttpImpl implements Http {
      
      public RestTemplate clientProvider(RestTemplate restTemplate) {
           
-          this.restTemplate = new RestTemplate();
           return this.restTemplate;
      }
      
