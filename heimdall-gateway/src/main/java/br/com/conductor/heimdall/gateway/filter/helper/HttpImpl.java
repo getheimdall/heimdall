@@ -219,16 +219,17 @@ public class HttpImpl implements Http {
 
      private RestTemplate rest() {
 
-          if (restTemplate == null) {
+          if (this.restTemplate == null) {
                
                this.restTemplate = new RestTemplate();
           }
 
-          return restTemplate;
+          return this.restTemplate;
      }
      
      public RestTemplate clientProvider(RestTemplate restTemplate) {
-          
+      
+          this.restTemplate = restTemplate;
           return this.restTemplate;
      }
      
