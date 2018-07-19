@@ -21,6 +21,8 @@ package br.com.conductor.heimdall.middleware.spec;
  * ==========================LICENSE_END===================================
  */
 
+import org.springframework.web.client.RestTemplate;
+
 import java.util.Map;
 
 /**
@@ -109,4 +111,9 @@ public interface Http {
       */
      public ApiResponse sendDelete();
 
+    /**
+     * Set RestTemplate custom object
+     * @return               A RestTemplate object
+     */
+     public RestTemplate clientProvider(RestTemplate restTemplate);
 }

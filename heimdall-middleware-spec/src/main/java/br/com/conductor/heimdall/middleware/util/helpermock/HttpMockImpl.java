@@ -24,6 +24,7 @@ package br.com.conductor.heimdall.middleware.util.helpermock;
 import br.com.conductor.heimdall.middleware.spec.ApiResponse;
 import br.com.conductor.heimdall.middleware.spec.Http;
 import br.com.conductor.heimdall.middleware.spec.Json;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -116,5 +117,10 @@ public class HttpMockImpl implements Http {
     @Override
     public ApiResponse sendDelete() {
         return this.sendGet();
+    }
+
+    @Override
+    public RestTemplate clientProvider(RestTemplate restTemplate) {
+        return new RestTemplate();
     }
 }
