@@ -69,7 +69,7 @@ public enum ExceptionMessage {
     MIDDLEWARE_INVALID_FILE(BAD_REQUEST.value(), "Invalid file", BadRequestException.class),
 
     MIDDLEWARE_PAYLOAD_TOO_LARGE(PAYLOAD_TOO_LARGE.value(), "Content is to big. Maximal allowed request size is 25MB", MultipartException.class),
-    
+
     ACCESS_TOKEN_NOT_DEFINED(BAD_REQUEST.value(), "Access token not defined", BadRequestException.class),
 
     APP_REPEATED(BAD_REQUEST.value(), "App repeated", BadRequestException.class),
@@ -89,9 +89,11 @@ public enum ExceptionMessage {
     ONLY_ONE_OPERATION_PER_RESOURCE(BAD_REQUEST.value(), "Only one operation per resource", BadRequestException.class),
 
     ONLY_ONE_RESOURCE_PER_API(BAD_REQUEST.value(), "Only one resource per api", BadRequestException.class),
-
+  
+    SOME_PLAN_NOT_PRESENT_IN_APP(BAD_REQUEST.value(), "Some of the informed plans do not belong to the App plans", BadRequestException.class),
+  
     ONLY_ONE_MIDDLEWARE_PER_VERSION_AND_API(BAD_REQUEST.value(), "Only one middleware per version and api", BadRequestException.class),
-
+     
     ENVIRONMENT_ALREADY_EXISTS(BAD_REQUEST.value(), "Environment already exists", BadRequestException.class),
 
     PRIVILEGES_NOT_EXIST(BAD_REQUEST.value(), "Privileges {} defined to attach in role not exist ", BadRequestException.class),
@@ -100,18 +102,16 @@ public enum ExceptionMessage {
 
     ENVIRONMENT_ATTACHED_TO_API(BAD_REQUEST.value(), "Environment attached to Api", BadRequestException.class),
 
-    SOME_PLAN_NOT_PRESENT_IN_APP(BAD_REQUEST.value(), "Some of the informed plans do not belong to the App plans", BadRequestException.class),
-
-    PROVIDER_NOT_FOUND(BAD_REQUEST.value(), "Provider not found", BadRequestException.class),
-
+    ENVIRONMENT_INBOUND_DNS_PATTERN(BAD_REQUEST.value(), "Environment inbound URL has to follow the pattern http[s]://host.domain[:port] or www.host.domain[:port]", BadRequestException.class),PROVIDER_NOT_FOUND(BAD_REQUEST.value(), "Provider not found", BadRequestException.class),
+     
     PROVIDER_USER_UNAUTHORIZED(UNAUTHORIZED.value(), "User provider unauthorized", UnauthorizedException.class),
-
+     
     TOKEN_EXPIRED(UNAUTHORIZED.value(), "Token expired", UnauthorizedException.class),
-
+     
     CODE_NOT_FOUND(UNAUTHORIZED.value(), "Code already used to generate token or not defined", UnauthorizedException.class),
-
+     
     GRANT_TYPE_NOT_EXIST(BAD_REQUEST.value(), "GrantType not found", BadRequestException.class),
-
+     
     REFRESH_TOKEN_NOT_EXIST(BAD_REQUEST.value(), "RefreshToken not found", BadRequestException.class),
 
     TYPE_OAUTH_NOT_FOUND(BAD_REQUEST.value(), "TypeOAuth not found", BadRequestException.class),
