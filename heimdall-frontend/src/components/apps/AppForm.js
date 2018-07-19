@@ -145,7 +145,7 @@ class AppForm extends Component {
                         </Col>
                     </Row>
                 </Form>
-                {data.length > 0 &&
+                {data && data.length > 0 &&
                 (
                     <div>
                         <fieldset>

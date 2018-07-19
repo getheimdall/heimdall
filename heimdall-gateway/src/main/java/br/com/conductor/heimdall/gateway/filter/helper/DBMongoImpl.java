@@ -68,7 +68,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DBMongoImpl implements DBMongo {
 
-     Json json = new JsonImpl();
+     private Json json = new JsonImpl();
 
      private String databaseName;
 
@@ -136,19 +136,19 @@ public class DBMongoImpl implements DBMongo {
 
           Query<T> query = this.prepareQuery(criteria, this.datastore());
 
-          List<T> list = Lists.newArrayList();
+          List<T> list;
           Long totalElements = query.count();
           
           page = page == null ? PAGE : page;
           limit = limit == null || limit > LIMIT ? LIMIT : limit;
           
-          if ( page >= 1 &&  limit > 0  && limit <= LIMIT) {
+          if (page >= 1 && limit > 0) {
                list = query.asList(new FindOptions().limit(limit).skip(page * limit));  
           } else {
                list = query.asList(new FindOptions().limit(limit));
           }
 
-          return (Page<T>) buildPage(list, page, limit, totalElements);
+          return buildPage(list, page, limit, totalElements);
      }
 
      @Override
@@ -162,7 +162,7 @@ public class DBMongoImpl implements DBMongo {
           pageResponse.totalElements = totalElements;
           pageResponse.hasPreviousPage = page > 0;
           pageResponse.hasNextPage = page < (pageResponse.totalPages - 1);
-          pageResponse.hasContent = Objeto.notBlank(list);
+          pageResponse.hasContent = list != null && list.size() > 0;
           pageResponse.first = page == 0;
           pageResponse.last = page == (pageResponse.totalPages - 1);
           pageResponse.nextPage = page == (pageResponse.totalPages - 1) ? page : page + 1;
@@ -210,9 +210,7 @@ public class DBMongoImpl implements DBMongo {
      @Override
      public <T> Query<T> getQueryProvider(Object criteria) {
 
-          Query<T> query = (Query<T>) this.prepareQuery(criteria, this.datastore());
-
-          return query;
+          return this.prepareQuery(criteria, this.datastore());
      }
 
      @Override
@@ -220,8 +218,9 @@ public class DBMongoImpl implements DBMongo {
 
           page = page == null ? PAGE : page;
           limit = limit == null || limit > LIMIT ? LIMIT : limit;
-          FindIterable<Document> documents = null;
-          if ((page != null && page > 0) && (limit != null && limit > 0) && (limit <= LIMIT)) {
+          FindIterable<Document> documents;
+
+          if (page > 0 && limit > 0) {
 
                if (Objeto.notBlank(filters)) {
 
@@ -230,7 +229,7 @@ public class DBMongoImpl implements DBMongo {
 
                     documents = collection.find().limit(limit).skip(page * limit);
                }
-          } else if ((page != null && page == 0) && (limit != null && limit > 0) && (limit <= LIMIT)) {
+          } else if (page == 0 && limit > 0) {
 
                if (Objeto.notBlank(filters)) {
 
@@ -239,7 +238,7 @@ public class DBMongoImpl implements DBMongo {
 
                     documents = collection.find(Filters.and(filters)).limit(limit);
                }
-          } else if ((limit != null && limit > 0) && (limit <= LIMIT)) {
+          } else if (limit > 0) {
 
                if (Objeto.notBlank(filters)) {
 
@@ -274,17 +273,13 @@ public class DBMongoImpl implements DBMongo {
      @Override
      public MongoCollection<Document> collection(String name) {
 
-          MongoCollection<Document> collection = database().getCollection(name);
-
-          return collection;
+          return database().getCollection(name);
      }
 
      @Override
      public <T> MongoCollection<Document> collection(Class<T> classType) {
 
-          MongoCollection<Document> collection = database().getCollection(classType.getSimpleName());
-
-          return collection;
+          return database().getCollection(classType.getSimpleName());
      }
 
      private MongoClient createMongoClient() {
@@ -327,22 +322,17 @@ public class DBMongoImpl implements DBMongo {
 
      private MongoDatabase database() {
 
-          MongoDatabase database = createMongoClient().getDatabase(databaseName);
-          return database;
+          return createMongoClient().getDatabase(databaseName);
      }
 
      private <T> Object getValueId(T object) {
 
-          Field id = Arrays.asList(object.getClass().getDeclaredFields()).stream().filter(field -> field.getAnnotation(Id.class) != null).findFirst().get();
-          if (id != null) {
-               id.setAccessible(true);
-               try {
-                    return id.get(object);
-               } catch (IllegalArgumentException e) {
-                    log.error(e.getMessage(), e);
-               } catch (IllegalAccessException e) {
-                    log.error(e.getMessage(), e);
-               }
+          Field id = Arrays.stream(object.getClass().getDeclaredFields()).filter(field -> field.getAnnotation(Id.class) != null).findFirst().get();
+          id.setAccessible(true);
+          try {
+               return id.get(object);
+          } catch (IllegalArgumentException | IllegalAccessException e) {
+               log.error(e.getMessage(), e);
           }
           return null;
      }
