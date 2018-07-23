@@ -21,12 +21,14 @@ package br.com.conductor.heimdall.core.service;
  * ==========================LICENSE_END===================================
  */
 
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ENVIRONMENT_INBOUND_DNS_PATTERN;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ENVIRONMENT_ATTACHED_TO_API;
 import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 import static br.com.twsoftware.alfred.object.Objeto.notBlank;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -90,9 +92,7 @@ public class EnvironmentService {
         Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
         Page<Environment> page = environmentRepository.findAll(example, pageable);
 
-        EnvironmentPage environmentPage = new EnvironmentPage(PageDTO.build(page));
-
-        return environmentPage;
+         return new EnvironmentPage(PageDTO.build(page));
     }
 
     /**
@@ -107,9 +107,7 @@ public class EnvironmentService {
 
         Example<Environment> example = Example.of(environment, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 
-        List<Environment> environments = environmentRepository.findAll(example);
-
-        return environments;
+         return environmentRepository.findAll(example);
     }
 
     /**
@@ -128,6 +126,8 @@ public class EnvironmentService {
         HeimdallException.checkThrow(notBlank(environmentEqual), ExceptionMessage.ENVIRONMENT_ALREADY_EXISTS);
 
         Environment environment = GenericConverter.mapper(environmentDTO, Environment.class);
+        HeimdallException.checkThrow(!validateInboundURL(environment.getInboundURL()), ENVIRONMENT_INBOUND_DNS_PATTERN);
+
         environment = environmentRepository.save(environment);
 
         return environment;
@@ -151,25 +151,27 @@ public class EnvironmentService {
         List<Environment> environments = environmentRepository.findByInboundURL(environmentDTO.getInboundURL());
 
         Environment environmentEqual = environments.stream().filter(e -> e.getOutboundURL().equals(environmentDTO.getOutboundURL())).findFirst().orElse(null);
-        HeimdallException.checkThrow(notBlank(environmentEqual) && !environmentEqual.getId().equals(environment.getId()), ExceptionMessage.ENVIRONMENT_ALREADY_EXISTS);
+        HeimdallException.checkThrow(notBlank(environmentEqual) && !Objects.requireNonNull(environmentEqual).getId().equals(environment.getId()), ExceptionMessage.ENVIRONMENT_ALREADY_EXISTS);
 
         Integer apis = environmentRepository.findApiWithOtherEnvironmentEqualsInbound(environment.getId(), environmentDTO.getInboundURL());
         HeimdallException.checkThrow(apis > 0, ExceptionMessage.API_CANT_ENVIRONMENT_INBOUND_URL_EQUALS);
 
         environment = GenericConverter.mapper(environmentDTO, environment);
+        HeimdallException.checkThrow(!validateInboundURL(environment.getInboundURL()), ENVIRONMENT_INBOUND_DNS_PATTERN);
+
         environmentRepository.save(environment);
 
         return environment;
     }
 
-    /**
-     * Deletes a {@link Environment} by its ID.
-     *
-     * @param id The id of the {@link Environment}
-     * @throws NotFoundException Resource not found
-     */
-    @Transactional
-    public void delete(Long id) {
+     /**
+      * Deletes a {@link Environment} by its ID.
+      *
+      * @param 	id 						The id of the {@link Environment}
+      * @throws NotFoundException		Resource not found
+      */
+     @Transactional
+     public void delete(Long id) {
 
         Environment environment = environmentRepository.findOne(id);
         HeimdallException.checkThrow(isBlank(environment), GLOBAL_RESOURCE_NOT_FOUND);
@@ -179,6 +181,25 @@ public class EnvironmentService {
 
 
         environmentRepository.delete(environment);
+    }
+
+     /*
+      * Validates if the String follow one of the patterns:
+      *     * http[s]://host.domain[:port]
+      *     * www.host.domain[:port]
+      *
+      * @return true if it is a a valid inbound, false otherwise
+      */
+    private boolean validateInboundURL(String inbound) {
+
+        if (inbound.matches("(http://|https://|www\\.)(.+)")) {
+            String temp = inbound.replaceAll("(http://|https://|www\\.)(.+)", "$2");
+
+            if (temp.matches(".+\\..+"))
+                return !temp.matches(".*/.*");
+        }
+
+        return false;
     }
 
 }

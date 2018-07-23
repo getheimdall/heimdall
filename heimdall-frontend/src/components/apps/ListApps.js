@@ -26,7 +26,7 @@ class ListApps extends Component {
         const { loading } = this.props
         return (
             <div>
-                <Table dataSource={dataSource.content} rowKey={record => record.id} loading={loading} pagination={false}>
+                <Table dataSource={dataSource.content} rowKey={record => record.id} loading={loading} scroll={{x: 990}} pagination={false}>
                     <Column title="ID" dataIndex="id" id="id" width={90} />
                     <Column title="Name" dataIndex="name" id="name" />
                     <Column title="Description" dataIndex="description" id="name" />
