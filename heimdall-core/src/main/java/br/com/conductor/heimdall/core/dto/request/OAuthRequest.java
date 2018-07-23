@@ -43,6 +43,9 @@ public class OAuthRequest implements Serializable {
     @JsonProperty("grant_type")
     private String grantType;
 
+    @JsonProperty("response_type")
+    private String responseType;
+
     private Set<String> operations;
 
     @JsonProperty("refresh_token")
