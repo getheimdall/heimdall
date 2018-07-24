@@ -10,6 +10,10 @@
         * Create template to Blacklist and Whitelist;
         *  Filter traces not null to show in Traces;
 
+    * Allow creation of one app with informed clientId [Pull Request #89](https://github.com/getheimdall/heimdall/pull/89)
+        * Create new class AppPersist
+        * Create tests
+    
 * **Bugfix**
 
     * Remove header method from middleware helper class was not working. [Pull Request #76](https://github.com/getheimdall/heimdall/pull/76)
