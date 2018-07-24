@@ -9,6 +9,10 @@
         * Add method ALL in operations;
         * Create template to Blacklist and Whitelist;
         *  Filter traces not null to show in Traces;
+        
+    * Adding implicit OAuth [Pull Request #88](https://github.com/getheimdall/heimdall/pull/88)
+        * Refactored code
+        * Change methods to static in JwtUtils.java
 
 * **Bugfix**
 
