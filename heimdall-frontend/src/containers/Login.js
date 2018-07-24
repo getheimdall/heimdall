@@ -1,12 +1,10 @@
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
-import { login, logout } from '../actions/auth'
-
-import { Row, Card } from 'antd'
+import React, {Component} from 'react'
+import {connect} from 'react-redux'
+import {bindActionCreators} from 'redux'
+import {login, logout} from '../actions/auth'
 
 import logo from '../icon-heimdall.png'
-import formLogo from '../form-heimdall.png'
+import formLogo from '../logo-form.png'
 
 import LoginForm from '../components/login/LoginForm'
 
@@ -19,18 +17,13 @@ class Login extends Component {
 
     render() {
         return (
-            <Row type="flex" justify="center" className="login-row">
-
-                <Row type="flex" justify="center" className="heimdall-logo-form">
-                    <img src={logo} alt="" className="heimdall-logo" />
-                </Row>
-                <Card className="login-cardbox">
-                    <Row type="flex" justify="center">
-                        <img src={formLogo} alt="" style={{ marginBottom: 30, width: 250, height: 56 }} />
-                    </Row>
-                    <LoginForm submit={this.props.login} loading={this.props.loading} />
-                </Card>
-            </Row>
+            <div className="login-form">
+                <img src={logo} alt="logo" className="logo" align="center"/>
+                <br/>
+                <img src={formLogo} alt="api-name" className="logo-name"/>
+                <br/>
+                <LoginForm submit={this.props.login} loading={this.props.loading}/>
+            </div>
         )
     }
 }
