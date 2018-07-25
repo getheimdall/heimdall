@@ -20,6 +20,7 @@ package br.com.conductor.heimdall.core.service;
  * ==========================LICENSE_END===================================
  */
 
+import static br.com.conductor.heimdall.core.util.ConstantsOAuth.*;
 import br.com.conductor.heimdall.core.dto.request.OAuthRequest;
 import br.com.conductor.heimdall.core.dto.response.TokenImplicit;
 import br.com.conductor.heimdall.core.entity.OAuthAuthorize;
@@ -47,10 +48,6 @@ import java.util.stream.Collectors;
 @Service
 public class OAuthService {
 
-    private final static String GRANT_TYPE_PASSWORD = "PASSWORD";
-    private final static String GRANT_TYPE_REFRESH_TOKEN = "REFRESH_TOKEN";
-    public final static String GRANT_TYPE_IMPLICIT = "IMPLICIT";
-
     @Autowired
     private OAuthAuthorizeRepository oAuthAuthorizeRepository;
     @Autowired
@@ -70,7 +67,7 @@ public class OAuthService {
     public TokenOAuth generateTokenOAuth(OAuthRequest oAuthRequest, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsObject) throws HeimdallException {
         //verify if grantType exist
         if (Objeto.isBlank(oAuthRequest.getGrantType())) {
-            throw new BadRequestException(ExceptionMessage.GRANT_TYPE_NOT_EXIST);
+            throw new BadRequestException(ExceptionMessage.GRANT_TYPE_NOT_FOUND);
         }
         //verify type of the grantType
         switch (oAuthRequest.getGrantType().toUpperCase()) {
@@ -115,7 +112,7 @@ public class OAuthService {
                 return tokenOAuth;
             case GRANT_TYPE_REFRESH_TOKEN:
                 if (Objeto.isBlank(oAuthRequest.getRefreshToken())) {
-                    throw new BadRequestException(ExceptionMessage.REFRESH_TOKEN_NOT_EXIST);
+                    throw new BadRequestException(ExceptionMessage.REFRESH_TOKEN_NOT_FOUND);
                 }
                 //validate token
                 tokenIsValid(oAuthRequest.getRefreshToken(), privateKey);
@@ -151,7 +148,7 @@ public class OAuthService {
                 }
                 throw new ServerErrorException(ExceptionMessage.TOKEN_NOT_GENERATE);
             default:
-                throw new BadRequestException(ExceptionMessage.GRANT_TYPE_NOT_EXIST);
+                throw new BadRequestException(ExceptionMessage.GRANT_TYPE_NOT_FOUND);
         }
 
     }
@@ -163,7 +160,7 @@ public class OAuthService {
      * @param privateKey      The privateKey used to generate Token
      * @param timeAccessToken The time to expire the accessToken
      * @param claimsObject    The claimsObject in {@link String}
-     * @return
+     * @return {@link TokenImplicit}
      */
     public TokenImplicit generateTokenImplicit(OAuthRequest oAuthRequest, String privateKey, int timeAccessToken, String claimsObject) {
         final Map<String, Object> claimsFromJSONObjectBodyRequest = JwtUtils.getClaimsFromJSONObjectBodyRequest(claimsObject);

@@ -20,6 +20,7 @@ package br.com.conductor.heimdall.gateway.service;
  * ==========================LICENSE_END===================================
  */
 
+import static br.com.conductor.heimdall.core.util.ConstantsOAuth.*;
 import br.com.conductor.heimdall.core.dto.request.OAuthRequest;
 import br.com.conductor.heimdall.core.dto.response.TokenImplicit;
 import br.com.conductor.heimdall.core.entity.OAuthAuthorize;
@@ -124,9 +125,6 @@ public class OAuthInterceptorService {
             throw new UnauthorizedException(ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);
         }
 
-        final String CODE = "code";
-        final String TOKEN = "token";
-
         if (Objeto.isBlank(oAuthRequest.getResponseType())) {
             throw new BadRequestException(ExceptionMessage.RESPONSE_TYPE_NOT_FOUND);
         }
@@ -134,7 +132,7 @@ public class OAuthInterceptorService {
         switch (oAuthRequest.getResponseType().toLowerCase()) {
             case CODE:
                 String codeAuthorize = oAuthService.generateAuthorize(oAuthRequest.getClientId());
-                generateResponseWithSuccess("{\"code\": \"" + codeAuthorize + "\"}");
+                generateResponseWithSuccess("{\""+CODE+"\": \"" + codeAuthorize + "\"}");
                 break;
             case TOKEN:
                 TokenImplicit tokenImplicit = oAuthService.generateTokenImplicit(oAuthRequest, privateKey, timeAccessToken, claimsJson);
@@ -194,7 +192,7 @@ public class OAuthInterceptorService {
             throw new ForbiddenException(ExceptionMessage.TOKEN_INVALID);
         }
         //verify if token is Implicit, case yes, generate new token
-        if (oAuthAuthorizeFromToken.getGrantType().equals(OAuthService.GRANT_TYPE_IMPLICIT)) {
+        if (oAuthAuthorizeFromToken.getGrantType().equals(GRANT_TYPE_IMPLICIT)) {
             generateTokenImplicit(privateKey, token, oAuthAuthorizeFromToken);
         }
         //delete token from database
@@ -217,7 +215,7 @@ public class OAuthInterceptorService {
                     oAuthAuthorizeFromToken.getClientId(),
                     tokenImplicit.getAccessToken(),
                     JwtUtils.recoverDateExpirationFromToken(tokenImplicit.getAccessToken(), privateKey),
-                    OAuthService.GRANT_TYPE_IMPLICIT,
+                    GRANT_TYPE_IMPLICIT,
                     oAuthAuthorizeFromToken.getExpirationTime()
             );
             helper.call().response().header().set("access_token", tokenImplicit.getAccessToken());

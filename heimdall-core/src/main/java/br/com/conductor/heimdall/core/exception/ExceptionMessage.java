@@ -114,9 +114,9 @@ public enum ExceptionMessage {
 
     CODE_NOT_FOUND(UNAUTHORIZED.value(), "Code already used to generate token or not defined", UnauthorizedException.class),
 
-    GRANT_TYPE_NOT_EXIST(BAD_REQUEST.value(), "grant_type not found", BadRequestException.class),
+    GRANT_TYPE_NOT_FOUND(BAD_REQUEST.value(), "grant_type not found", BadRequestException.class),
 
-    REFRESH_TOKEN_NOT_EXIST(BAD_REQUEST.value(), "refresh_token not found", BadRequestException.class),
+    REFRESH_TOKEN_NOT_FOUND(BAD_REQUEST.value(), "refresh_token not found", BadRequestException.class),
 
     TYPE_OAUTH_NOT_FOUND(BAD_REQUEST.value(), "TypeOAuth not found", BadRequestException.class),
 
