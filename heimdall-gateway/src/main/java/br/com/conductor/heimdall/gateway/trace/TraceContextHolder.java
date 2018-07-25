@@ -44,8 +44,6 @@ public class TraceContextHolder {
 
      private static final ConcurrentHashMap<String, Trace> traceMap = new ConcurrentHashMap<>();
 
-     private static final ThreadLocal<Boolean> shouldPrint = new ThreadLocal<>();
-
      /**
       * Implementation of the Initialization-on-demand holder idiom.
       * 
@@ -76,7 +74,6 @@ public class TraceContextHolder {
       * @return					{@link Trace}
       */
      public Trace init(boolean printAllTrace, String profile, ServletRequest request, boolean printMongo) {
-          shouldPrint.set(true);
           String uuid = UUID.randomUUID().toString();
           contextHolder.set(uuid);
           traceMap.put(uuid, new Trace(printAllTrace, profile, request, printMongo));
@@ -85,23 +82,7 @@ public class TraceContextHolder {
           return getActualTrace();
 
      }
-     
-     /**
-      * Disables the printing.
-      */
-     public void disablePrint() {
-          shouldPrint.set(false);
-     }
-     
-     /**
-      * Returns boolean that indicates if is safe to write.
-      * 
-      * @return		boolean should write
-      */
-     public Boolean shouldWrite() {
-          return shouldPrint.get();
-     }
-     
+
      /**
       * Returns the actual {@link Trace}.
       * 
