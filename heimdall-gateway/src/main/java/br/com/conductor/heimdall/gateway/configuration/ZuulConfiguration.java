@@ -21,7 +21,10 @@ package br.com.conductor.heimdall.gateway.configuration;
  * ==========================LICENSE_END===================================
  */
 
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.web.ErrorController;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
@@ -70,6 +73,7 @@ public class ZuulConfiguration extends ZuulProxyAutoConfiguration {
      @Autowired
      private RequestHelper requestHelper;
 
+     @Qualifier("heimdallErrorController")
      @Autowired(required = false)
      private ErrorController errorController;
 
@@ -91,11 +95,16 @@ public class ZuulConfiguration extends ZuulProxyAutoConfiguration {
 
           return new CustomSendResponseFilter();
      }
+
+     @Bean
+     public CloseableHttpClient closeableHttpClient() {
+          return HttpClients.createDefault();
+     }
      
      @Bean
      @ConditionalOnMissingBean(SimpleHostRoutingFilter.class)
-     public SimpleHostRoutingFilter simpleHostRoutingFilter(ProxyRequestHelper helper, ZuulProperties zuulProperties) {
-          return new CustomHostRoutingFilter(helper, zuulProperties);
+     public SimpleHostRoutingFilter simpleHostRoutingFilter(@Qualifier("proxyRequestHelper") ProxyRequestHelper helper, ZuulProperties zuulProperties, CloseableHttpClient httpClient) {
+          return new CustomHostRoutingFilter(helper, zuulProperties, httpClient);
      }
 
      @Bean
