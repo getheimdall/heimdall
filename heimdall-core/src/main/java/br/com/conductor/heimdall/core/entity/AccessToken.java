@@ -54,7 +54,7 @@ import lombok.EqualsAndHashCode;
  *  The Access Token is required for a safe connection to be established.
  * 
  * @author Filipe Germano
- *
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Data
 @Table(name = "ACCESS_TOKENS")
@@ -76,7 +76,7 @@ public class AccessToken implements Serializable {
 
      @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
      @JoinColumn(name = "APP_ID")
-     @JsonIgnoreProperties({ "accessTokens", "plans", "developer" })
+     @JsonIgnoreProperties({ "accessTokens", "developer" })
      private App app;
      
      @Column(name = "EXPIRED_DATE")

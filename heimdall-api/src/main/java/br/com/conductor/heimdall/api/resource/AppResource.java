@@ -59,7 +59,7 @@ import io.swagger.annotations.ApiOperation;
  * Uses the {@link AppService} to provide methods to create, read, update and delete a {@link App}.
  *
  * @author Filipe Germano
- *
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @io.swagger.annotations.Api(value = PATH_APPS, produces = MediaType.APPLICATION_JSON_VALUE, tags = { ConstantsTag.TAG_APPS })
 @RestController
@@ -105,7 +105,7 @@ public class AppResource {
                
                if (!appPage.getContent().isEmpty()) {
                     List<App> apps = appPage.getContent();
-                    apps = apps.stream().map(app -> new App(app.getId(), app.getClientId(), app.getName(), app.getDescription(), app.getDeveloper(), app.getCreationDate(), app.getStatus(), null, null, null, app.getTags())).collect(Collectors.toList());
+                    apps = apps.stream().map(app -> new App(app.getId(), app.getClientId(), app.getName(), app.getDescription(), app.getDeveloper(), app.getCreationDate(), app.getStatus(), null, app.getPlans(), null, app.getTags())).collect(Collectors.toList());
                     appPage.setContent(apps);
                }
                return ResponseEntity.ok(appPage);
@@ -114,7 +114,7 @@ public class AppResource {
                List<App> apps = appService.list(appDTO);
                
                if (!apps.isEmpty()) {
-                    apps = apps.stream().map(app -> new App(app.getId(), app.getClientId(), app.getName(), app.getDescription(), app.getDeveloper(), app.getCreationDate(), app.getStatus(), null, null, null, app.getTags())).collect(Collectors.toList());
+                    apps = apps.stream().map(app -> new App(app.getId(), app.getClientId(), app.getName(), app.getDescription(), app.getDeveloper(), app.getCreationDate(), app.getStatus(), null, app.getPlans(), null, app.getTags())).collect(Collectors.toList());
                }
                return ResponseEntity.ok(apps);
           }
