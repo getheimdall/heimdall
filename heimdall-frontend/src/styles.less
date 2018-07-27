@@ -440,7 +440,6 @@ body {
     }
 }
 
-
 @media screen and (max-width: 400px) {
     .no-mobile-padding {
         padding-left: 0;
@@ -490,6 +489,31 @@ body {
 
         .logo-name {
             width: 180px;
+        }
+    }
+}
+
+@media (max-width: 690px) {
+    .list-environments {
+        .ant-list-item {
+            display: block;
+            .ant-list-item-meta {
+                display: block;
+                .ant-list-item-meta-avatar{
+                    display: none;
+                }
+            }
+
+            .ant-list-item-content {
+                display: block;
+                text-align: left;
+                margin-top: 4px;
+            }
+
+            .ant-list-item-action {
+                text-align: right;
+                margin-top: 6px;
+            }
         }
     }
 }

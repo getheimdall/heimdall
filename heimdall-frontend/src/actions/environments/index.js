@@ -58,6 +58,7 @@ export const update = environment => dispatch => {
             if (error.response && error.response.status === 400) {
                 dispatch(sendNotification({ type: 'error', message: 'Error', description: error.response.data.message }))
             }
+            dispatch(getEnvironment(environment.id))
             dispatch(finishLoading())
         })
 }
@@ -72,6 +73,7 @@ export const remove = environmentId => dispatch => {
             if (error.response && error.response.status === 400) {
                 dispatch(sendNotification({ type: 'error', message: 'Error', description: error.response.data.message }))
             }
+            dispatch(getAllEnvironments())
             dispatch(finishLoading())
         })
 }
