@@ -10,6 +10,8 @@
         * Create template to Blacklist and Whitelist;
         *  Filter traces not null to show in Traces;
 
+    * Adding scroll in tables and update list of the environments [Pull Request #92](https://github.com/getheimdall/heimdall/pull/92)
+
 * **Bugfix**
 
     * Remove header method from middleware helper class was not working. [Pull Request #76](https://github.com/getheimdall/heimdall/pull/76)
