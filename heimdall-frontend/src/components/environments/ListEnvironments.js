@@ -25,6 +25,7 @@ class ListEnvironments extends Component {
             <div>
                 <List
                     itemLayout="horizontal"
+                    className="list-environments"
                     bordered
                     dataSource={this.props.environments}
                     renderItem={env => (

@@ -117,6 +117,9 @@ public class Trace {
      private boolean printAllTrace;
      @JsonIgnore
      private boolean printMongo;
+
+     @JsonIgnore
+     private boolean shouldPrint;
      
      public Trace() {
     	 
@@ -131,6 +134,7 @@ public class Trace {
       */
      public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printMongo){
 
+          this.shouldPrint = true;
           this.profile = profile;
           this.printAllTrace = printAllTrace;
           this.printMongo = printMongo;
