@@ -60,6 +60,7 @@ import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
  *
  * @author Filipe Germano
  * @author Thiago Sampaio
+ * @author Marcelo Aguiar Rodrigues
  *
  */
 @Slf4j

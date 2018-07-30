@@ -32,6 +32,7 @@ import java.util.Comparator;
  * Middleware representation.
  *
  * @author Filipe Germano
+ * @author Marcelo Aguiar Rodrigues
  *
  */
 public class Middleware {
@@ -50,7 +51,7 @@ public class Middleware {
      public Middleware(String pathReferences) {
 
           this.pathReferences = pathReferences;
-          classLoad(pathReferences);
+          loadClassPath();
      }
 
      /**
@@ -90,13 +91,12 @@ public class Middleware {
      /**
       * Returns a {@link GroovyClassLoader} created from a reference path.
       * 
-      * @param pathReferences	- The path with the references
       * @return					{@link GroovyClassLoader}
       */
-     private GroovyClassLoader classLoad(String pathReferences) {
+     private GroovyClassLoader loadClassPath() {
 
           classLoader = new GroovyClassLoader();
-          File lastModifiedFile = listFiles((dir, name) -> name.contains(JAR));
+          File lastModifiedFile = lastModified((dir, name) -> name.contains(JAR));
           
           classLoader.addClasspath(pathReferences + File.separator + lastModifiedFile.getName());
           
@@ -109,7 +109,7 @@ public class Middleware {
       * @param filter		- The FilenameFilter
       * @return				List<Files>
       */
-     private File listFiles(FilenameFilter filter) {
+     private File lastModified(FilenameFilter filter) {
 
           File directory = new File(pathReferences);
           
