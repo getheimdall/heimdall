@@ -160,17 +160,12 @@ public class StartServer implements ServletContextListener {
      /**
       * Creates all {@link Interceptor} from the repository
       */
-     public void createInterceptors() {
+     private void createInterceptors() {
           
-          apis = apiRepository.findAll();
           List<Interceptor> interceptors = interceptorRepository.findAll();
           if (Objeto.notBlank(interceptors)) {
                
-               interceptors.forEach(interceptor -> {
-
-                    interceptorFileService.createFileInterceptor(interceptor.getId());
-                    
-               });
+               interceptors.forEach(interceptor -> interceptorFileService.createFileInterceptor(interceptor.getId()));
 
           }
      }
@@ -181,7 +176,7 @@ public class StartServer implements ServletContextListener {
       * @param middlewareId		The {@link Middleware} Id
       */
      public void createMiddlewaresInterceptor(Long middlewareId) {
-          
+
           Middleware middleware = middlewareRepository.findOne(middlewareId);
           if (Objeto.notBlank(middleware) && Objeto.notBlank(middleware.getInterceptors())) {
                
@@ -199,17 +194,12 @@ public class StartServer implements ServletContextListener {
       * 
       * @param root		The folder root
       */
-     public void cleanFilesFolder(String root) {
+     private void cleanFilesFolder(String root) {
           
           File interceptorsFolder = new File(root);
-          Collection<File> files = Arquivo.listarArquivos(interceptorsFolder, new FilenameFilter(){
-               
-               @Override
-               public boolean accept(File dir, String name) {
-                    return name.contains(".groovy") || name.contains(".java") || name.contains(".jar");
-               }
-               
-          }, true);
+          Collection<File> files = Arquivo.listarArquivos(interceptorsFolder,
+                  (dir, name) -> name.contains(".groovy") || name.contains(".java") || name.contains(".jar"),
+                  true);
           
           files.forEach(f -> {
                try {
@@ -225,7 +215,7 @@ public class StartServer implements ServletContextListener {
      /**
       * Creates the folders necessary for the routes.
       */
-     public void createFolders() {
+     private void createFolders() {
           
           File interceptorsFolder = new File(zuulFilterRoot);
           if (!interceptorsFolder.exists()) {
@@ -252,8 +242,8 @@ public class StartServer implements ServletContextListener {
                middlewareFolder.mkdirs();
           }
 
-          List<Api> findAll = apiRepository.findAll();
-          for (Api api : findAll) {
+          apis = apiRepository.findAll();
+          for (Api api : apis) {
                
                File apiFolder = new File(zuulFilterRoot, MIDDLEWARE_API_ROOT + File.separator + api.getId().toString() + File.separator + Constants.MIDDLEWARE_ROOT);
                if (!apiFolder.exists()) {
@@ -265,7 +255,7 @@ public class StartServer implements ServletContextListener {
      /**
       * Loads all Middleware files.
       */
-     public void loadAllMiddlewareFiles() {
+     private void loadAllMiddlewareFiles() {
           
           try {
                
@@ -289,7 +279,7 @@ public class StartServer implements ServletContextListener {
       * 
       * @param middlewareId		The {@link Middleware} Id
       */
-     public void loadMiddlewareFiles(Long middlewareId) {
+     void loadMiddlewareFiles(Long middlewareId) {
           
           try {
                
@@ -314,7 +304,7 @@ public class StartServer implements ServletContextListener {
       * 
       * @param path			The path to the {@link Middleware} files
       */
-     public void removeMiddlewareFiles(String path) {
+     void removeMiddlewareFiles(String path) {
           
           try {
                
