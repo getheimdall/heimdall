@@ -21,28 +21,6 @@ package br.com.conductor.heimdall.gateway.listener;
  * ==========================LICENSE_END===================================
  */
 
-import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
-
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
-import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-
-import com.google.common.collect.Lists;
-import com.netflix.zuul.FilterFileManager;
-import com.netflix.zuul.FilterLoader;
-import com.netflix.zuul.groovy.GroovyCompiler;
-import com.netflix.zuul.groovy.GroovyFileFilter;
-
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.entity.Middleware;
@@ -55,10 +33,28 @@ import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.service.InterceptorFileService;
 import br.com.twsoftware.alfred.io.Arquivo;
 import br.com.twsoftware.alfred.object.Objeto;
+import com.google.common.collect.Lists;
+import com.netflix.zuul.FilterFileManager;
+import com.netflix.zuul.FilterLoader;
+import com.netflix.zuul.groovy.GroovyCompiler;
+import com.netflix.zuul.groovy.GroovyFileFilter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+
+import javax.annotation.PostConstruct;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+
+import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
 
 /**
- * <h1>StartServer</h1><br/>
+ * StartServer
  * 
  * {@link ServletContextListener} implementation.
  *
