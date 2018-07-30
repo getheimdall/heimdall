@@ -24,6 +24,7 @@ package br.com.conductor.heimdall.api.resource;
 import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_PRIVILEGES;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -100,5 +101,20 @@ public class PrivilegeResource {
                return ResponseEntity.ok(privileges);
           }
 
+     }
+
+     @ResponseBody
+     @ApiOperation(value = "Find all Privileges by username", responseContainer = "List", response = Privilege.class)
+     @GetMapping("/username/${username}")
+     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_PRIVILEGE)
+     public ResponseEntity findPrivilegesByUsername(@PathVariable String username) {
+
+          Set<Privilege> list = privilegeService.list(username);
+
+          if (list.isEmpty()){
+               return ResponseEntity.notFound().build();
+          }
+
+          return ResponseEntity.ok(list);
      }
 }
