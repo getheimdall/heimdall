@@ -21,6 +21,7 @@ package br.com.conductor.heimdall.gateway.configuration;
  * ==========================LICENSE_END===================================
  */
 
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -97,7 +98,7 @@ public class ZuulConfiguration extends ZuulProxyAutoConfiguration {
      }
 
      @Bean
-     @ConditionalOnMissingBean(SimpleHostRoutingFilter.class)
+     @ConditionalOnMissingBean({SimpleHostRoutingFilter.class, CloseableHttpClient.class})
      public SimpleHostRoutingFilter simpleHostRoutingFilter(ProxyRequestHelper helper,
                                                             ZuulProperties zuulProperties,
                                                             ApacheHttpClientConnectionManagerFactory connectionManagerFactory,
