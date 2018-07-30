@@ -21,14 +21,12 @@ package br.com.conductor.heimdall.gateway.filter.helper;
  * ==========================LICENSE_END===================================
  */
 
+import groovy.lang.GroovyClassLoader;
+
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.Collection;
-import java.util.List;
-
-import com.google.common.collect.Lists;
-
-import groovy.lang.GroovyClassLoader;
+import java.util.Arrays;
+import java.util.Comparator;
 
 /**
  * Middleware representation.
@@ -98,13 +96,9 @@ public class Middleware {
      private GroovyClassLoader classLoad(String pathReferences) {
 
           classLoader = new GroovyClassLoader();
-          classLoader.addClasspath(pathReferences);
-          Collection<File> listFiles = listFiles(fileFilter(JAR));
+          File lastModifiedFile = listFiles((dir, name) -> name.contains(JAR));
           
-          listFiles.forEach(f -> {
-
-               classLoader.addClasspath(pathReferences + File.separator + f.getName());
-          });
+          classLoader.addClasspath(pathReferences + File.separator + lastModifiedFile.getName());
           
           return classLoader;
      }
@@ -115,51 +109,18 @@ public class Middleware {
       * @param filter		- The FilenameFilter
       * @return				List<Files>
       */
-     private List<File> listFiles(FilenameFilter filter) {
+     private File listFiles(FilenameFilter filter) {
 
           File directory = new File(pathReferences);
           
-          List<File> files = Lists.newArrayList();
           File[] entries = directory.listFiles();
-          Long lastModified = 0l;
-          for (File entry : entries) {
-               if (filter == null || filter.accept(directory, entry.getName())) {                    
-                    if (lastModified == 0l) {
-                         
-                         lastModified = entry.lastModified();     
-                         files = Lists.newArrayList();
-                         files.add(entry);
-                    } else if (entry.lastModified() > lastModified) {
-                         
-                         lastModified = entry.lastModified();     
-                         files = Lists.newArrayList();
-                         files.add(entry);
-                    }
-               }
-               if (entry.isDirectory()) {
-                    files.addAll(listFiles(filter));
-               }
-          }
 
-          return files;
+          assert entries != null;
+          return Arrays.stream(entries)
+                  .filter(e -> filter.accept(directory, e.getName()))
+                  .max(Comparator.comparingLong(File::lastModified))
+                  .get();
+
      }
 
-     /*
-      * Creates a new FilenameFilter with specific extension.
-      * 
-      * @param		- The file extension
-      */
-     private FilenameFilter fileFilter(String fileExtension) {
-
-          return new FilenameFilter() {
-
-               @Override
-               public boolean accept(File dir, String name) {
-
-                    return name.contains(fileExtension);
-               }
-
-          };
-     }
-     
 }
