@@ -44,7 +44,7 @@ heimdall:
     mongo:
         enabled: false
         #serverName:
-        #url: 
+        #url:
 #        port: 27017
 #        dataBase: logging
 #        collection: logs
@@ -77,7 +77,10 @@ heimdall:
             #searchBase: DC=name,DC=name
             #userDn: your@mail.user
             #password: password
-            #userSearchFilter: sAMAccountName={0}    
+            #userSearchFilter: sAMAccountName={0}
+        jwt:
+            expiration-time: 20
+            secret: secretKey
     middlewares:
         allowInactive: 0
         deleteDeprecated: false
@@ -117,8 +120,8 @@ springfox:
         swagger:
             v2:
                 path: /docs
-                
-endpoints:    
+
+endpoints:
     routes:
         enabled: true
         sensitive: false
@@ -144,7 +147,7 @@ management:
 zuul:
     filter:
         root: /tmp/interceptores
-        
+
 security:
     basic:
         enabled: false

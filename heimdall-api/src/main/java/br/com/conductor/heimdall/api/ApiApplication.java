@@ -21,6 +21,7 @@ package br.com.conductor.heimdall.api;
  * ==========================LICENSE_END===================================
  */
 
+import br.com.conductor.heimdall.api.environment.JwtProperty;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
@@ -43,7 +44,7 @@ import br.com.conductor.heimdall.core.util.RabbitQueueUtils;
  * 
  */
 @SpringBootApplication(exclude = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class})
-@EnableConfigurationProperties({ Property.class, LdapProperty.class })
+@EnableConfigurationProperties({ Property.class, LdapProperty.class, JwtProperty.class})
 @ComponentScan(basePackages = { "br.com.conductor.heimdall.api", "br.com.conductor.heimdall.core" })
 @EntityScan({"br.com.conductor.heimdall.core.entity", "br.com.conductor.heimdall.api.entity"})
 @EnableJpaRepositories({"br.com.conductor.heimdall.core.repository", "br.com.conductor.heimdall.api.repository"})
