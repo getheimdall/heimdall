@@ -1,5 +1,10 @@
 # Heimdall Changelog
 
+### v1.4.1
+
+* **Bugfix**
+    * The class path loader when adding a new middleware had some issues that in some circumstances could cause the new middleware to not be loaded. [Pull Request #96](https://github.com/getheimdall/heimdall/pull/96)
+
 ### v1.4.0-stable
 
 * **Feature**
