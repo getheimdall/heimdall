@@ -22,6 +22,8 @@ package br.com.conductor.heimdall.api.service;
 
 import br.com.conductor.heimdall.api.enums.CredentialStateEnum;
 import br.com.conductor.heimdall.api.environment.JwtProperty;
+import br.com.conductor.heimdall.core.exception.ExceptionMessage;
+import br.com.conductor.heimdall.core.exception.HeimdallException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -110,7 +112,7 @@ public class TokenAuthenticationService {
                 }
             } catch (ExpiredJwtException ex) {
                 credentialStateService.logout(token);
-                throw new IOException(ex);
+                HeimdallException.checkThrow(true, ExceptionMessage.TOKEN_EXPIRED);
             }
         }
 
