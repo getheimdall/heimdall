@@ -25,7 +25,7 @@ class ListUsers extends Component {
         const { dataSource, loading } = this.props
         return (
             <div>
-                <Table dataSource={dataSource.content} rowKey={record => record.id} loading={loading} pagination={false}>
+                <Table dataSource={dataSource.content} rowKey={record => record.id} scroll={{x: 626}} loading={loading} pagination={false}>
                     <Column title="ID" dataIndex="id" id="id" />
                     <Column title="Username" dataIndex="userName" id="name" />
                     <Column title="Email" dataIndex="email" id="email" />

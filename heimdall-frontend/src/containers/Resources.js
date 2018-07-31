@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux'
 import { getAllResourcesByApi, clearResources, toggleModal, remove } from '../actions/resources'
 import PropTypes from 'prop-types'
 
-import { Row, Col, Button, Tooltip, Modal } from 'antd'
+import {Row, Col, Button, Tooltip, Modal, notification} from 'antd'
 
 import Loading from '../components/ui/Loading'
 import Operations from './Operations'
@@ -41,6 +41,13 @@ class Resources extends Component {
     componentWillUnmount() {
         this.props.clearResources()
         // this.setState({...this.state, steps: []})
+    }
+
+    componentWillReceiveProps(newProps) {
+        if (newProps.notification && newProps.notification !== this.props.notification) {
+            const { type, message, description } = newProps.notification
+            notification[type]({ message, description })
+        }
     }
 
     callback(keys) {
@@ -154,7 +161,8 @@ const mapStateToProps = state => {
         resources: state.resources.resources,
         operations: state.operations.list,
         visibleModal: state.resources.visibleModal,
-        loading: state.resources.loading
+        loading: state.resources.loading,
+        notification: state.resources.notification
     }
 }
 
