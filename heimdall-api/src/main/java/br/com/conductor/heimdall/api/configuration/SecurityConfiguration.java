@@ -22,7 +22,6 @@ package br.com.conductor.heimdall.api.configuration;
 
 import br.com.conductor.heimdall.api.environment.LdapProperty;
 import br.com.conductor.heimdall.api.filter.JWTAuthenticationFilter;
-import br.com.conductor.heimdall.api.filter.JwtLoginFilter;
 import br.com.conductor.heimdall.api.service.TokenAuthenticationService;
 import br.com.conductor.heimdall.core.util.ConstantsPath;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,10 +80,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests().antMatchers("/error").permitAll()
                 .and()
                 .authorizeRequests().antMatchers("/v1/api/integrations/**").permitAll()
+                .antMatchers("/v1/index.html", "/v1/swagger**", "/docs", "/v1/favicon**").permitAll()
                 .antMatchers(HttpMethod.POST, ConstantsPath.PATH_LOGIN).permitAll()
                 .anyRequest().authenticated()
                 .and()
-                .addFilterBefore(new JwtLoginFilter(ConstantsPath.PATH_LOGIN, authenticationManager(), tokenAuthenticationService), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JWTAuthenticationFilter(tokenAuthenticationService), UsernamePasswordAuthenticationFilter.class);
 
         httpSecurity.csrf().disable();

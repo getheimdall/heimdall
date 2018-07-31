@@ -22,13 +22,16 @@ package br.com.conductor.heimdall.api.service;
 
 import br.com.conductor.heimdall.api.enums.CredentialStateEnum;
 import br.com.conductor.heimdall.api.environment.JwtProperty;
+import br.com.conductor.heimdall.api.security.AccountCredentials;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -40,6 +43,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Collections;
 import java.util.Date;
 import java.util.UUID;
 
@@ -49,6 +53,7 @@ import java.util.UUID;
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Service
+@Slf4j
 public class TokenAuthenticationService {
 
     @Autowired
@@ -60,11 +65,34 @@ public class TokenAuthenticationService {
     @Autowired
     private CredentialStateService credentialStateService;
 
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
     private static final String TOKEN_PREFIX = "Bearer ";
 
     private static final String HEIMDALL_AUTHORIZATION_NAME = "Authorization";
 
-    public void addAuthentication(HttpServletResponse response, String username, String jti) throws IOException {
+    public void login(AccountCredentials accountCredentials, HttpServletResponse response) {
+        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                accountCredentials.getUsername(),
+                accountCredentials.getPassword(),
+                Collections.emptyList()
+        ));
+
+        if (authenticate != null) {
+            addAuthentication(response, accountCredentials.getUsername(), null);
+            response.setStatus(200);
+            try {
+                response.getWriter().write("{ \"Login with success!\" }");
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            }
+        } else {
+            HeimdallException.checkThrow(true, ExceptionMessage.USERNAME_OR_PASSWORD_INCORRECT);
+        }
+    }
+
+    public void addAuthentication(HttpServletResponse response, String username, String jti) {
         LocalDateTime now = LocalDateTime.now();
         final LocalDateTime expirationDate = now.plusSeconds(jwtProperty.getExpirationTime());
 
@@ -88,7 +116,7 @@ public class TokenAuthenticationService {
         response.setHeader(HEIMDALL_AUTHORIZATION_NAME, jwt);
     }
 
-    public Authentication getAuthentication(HttpServletRequest request, HttpServletResponse response) throws IOException{
+    public Authentication getAuthentication(HttpServletRequest request, HttpServletResponse response) {
 
         String token = request.getHeader(HEIMDALL_AUTHORIZATION_NAME);
 
