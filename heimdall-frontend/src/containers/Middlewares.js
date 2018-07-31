@@ -44,7 +44,7 @@ class Middlewares extends Component {
         const type = splitName[splitName.length - 1]
         const isJar = type === "jar"
         if (!isJar) {
-            message.error('You can only upload JPG file!')
+            message.error('You can only upload JAR file!')
         }
 
         const isLtOrE25M = file.size / 1024 / 1024 <= 25;
