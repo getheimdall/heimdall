@@ -36,6 +36,7 @@ import br.com.conductor.heimdall.core.enums.TypeInterceptor;
  * Provides methods to access a {@link Interceptor}
  *
  * @author Filipe Germano
+ * @author Marcelo Aguiar Rodrigues
  *
  */
 public interface InterceptorRepository extends JpaRepository<Interceptor, Long> {
@@ -75,5 +76,21 @@ public interface InterceptorRepository extends JpaRepository<Interceptor, Long> 
       * @return					The List of Interceptor associated
 	  */
      List<Interceptor> findByTypeAndOperationResourceApiId(TypeInterceptor type, Long apiId);
-          
+
+	 /**
+	  * Finds all Interceptors by {@link Operation} Id.
+	  *
+	  * @param operationId		The Operation Id
+	  * @return					The List of Interceptor associated
+	  */
+	 List<Interceptor> findByOperationId(Long operationId);
+
+	 /**
+	  * Finds all Interceptors by {@link Resource} Id.
+	  *
+	  * @param resourceId		The Resource Id
+	  * @return					The List of Interceptor associated
+	  */
+	 List<Interceptor> findByResourceId(Long resourceId);
+
 }
