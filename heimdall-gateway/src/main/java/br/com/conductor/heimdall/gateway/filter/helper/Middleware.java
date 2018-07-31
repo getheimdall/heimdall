@@ -97,8 +97,9 @@ public class Middleware {
 
           classLoader = new GroovyClassLoader();
           File lastModifiedFile = lastModified((dir, name) -> name.contains(JAR));
-          
-          classLoader.addClasspath(pathReferences + File.separator + lastModifiedFile.getName());
+
+          if (lastModifiedFile != null)
+               classLoader.addClasspath(pathReferences + File.separator + lastModifiedFile.getName());
           
           return classLoader;
      }
@@ -115,12 +116,28 @@ public class Middleware {
           
           File[] entries = directory.listFiles();
 
-          assert entries != null;
-          return Arrays.stream(entries)
+          return (entries != null)
+             ? Arrays.stream(entries)
                   .filter(e -> filter.accept(directory, e.getName()))
                   .max(Comparator.comparingLong(File::lastModified))
-                  .get();
+                  .get()
+             : null;
 
+     }
+
+     /*
+      * Converts the middleware version from the name of the file.
+      *
+      * This functionality is not used yet but it will be needed when we implement the automatic middleware versioning.
+      *
+      * Ex.: version 2.15.57
+      *      integer generated: 2015057
+      */
+     private static Integer version(File file) {
+          String[] values = file.getName().replaceAll(".+\\.\\d{14}\\.(.+)\\.jar", "$1").split("\\.");
+          return Integer.parseInt(values[0])*1000000 +
+                  Integer.parseInt(values[1])*1000 +
+                  Integer.parseInt(values[2]);
      }
 
 }
