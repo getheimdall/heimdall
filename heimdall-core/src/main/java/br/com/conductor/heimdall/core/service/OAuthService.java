@@ -20,113 +20,190 @@ package br.com.conductor.heimdall.core.service;
  * ==========================LICENSE_END===================================
  */
 
-import java.util.Base64;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
+import static br.com.conductor.heimdall.core.util.ConstantsOAuth.*;
 import br.com.conductor.heimdall.core.dto.request.OAuthRequest;
+import br.com.conductor.heimdall.core.dto.response.TokenImplicit;
 import br.com.conductor.heimdall.core.entity.OAuthAuthorize;
 import br.com.conductor.heimdall.core.entity.Provider;
 import br.com.conductor.heimdall.core.entity.TokenOAuth;
-import br.com.conductor.heimdall.core.exception.BadRequestException;
-import br.com.conductor.heimdall.core.exception.ExceptionMessage;
-import br.com.conductor.heimdall.core.exception.ProviderException;
-import br.com.conductor.heimdall.core.exception.UnauthorizedException;
+import br.com.conductor.heimdall.core.exception.*;
 import br.com.conductor.heimdall.core.repository.OAuthAuthorizeRepository;
 import br.com.conductor.heimdall.core.util.JwtUtils;
 import br.com.twsoftware.alfred.object.Objeto;
+import io.jsonwebtoken.Claims;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class provides methods to create and validate the {@link TokenOAuth}
  *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
+@Slf4j
 @Service
 public class OAuthService {
 
-    private final static String GRANT_TYPE_PASSWORD = "PASSWORD";
-    private final static String GRANT_TYPE_REFRESH_TOKEN = "REFRESH_TOKEN";
-
-    @Autowired
-    private JwtUtils jwtUtils;
     @Autowired
     private OAuthAuthorizeRepository oAuthAuthorizeRepository;
     @Autowired
     private ProviderService providerService;
 
     /**
-     * Generates token from Code Authorize or from RefreshToken
+     * Generates {@link TokenOAuth} from Code Authorize or RefreshToken
      *
      * @param oAuthRequest     The {@link OAuthRequest}
+     * @param privateKey       The privateKey used to generate Token
      * @param timeAccessToken  The time to expire the accessToken
      * @param timeRefreshToken The time to expire the RefreshToken
      * @param claimsObject     The claimsObject in {@link String}
      * @return The {@link TokenOAuth}
-     * @throws UnauthorizedException Token expired or code already used
-     * @throws BadRequestException   Code not found or GrantType not informed
+     * @throws HeimdallException Token expired, code not found, grant_type not found, Code already used
      */
-    public TokenOAuth generateToken(OAuthRequest oAuthRequest, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsObject) throws UnauthorizedException, BadRequestException {
-
-        TokenOAuth tokenOAuth;
-
+    public TokenOAuth generateTokenOAuth(OAuthRequest oAuthRequest, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsObject) throws HeimdallException {
+        //verify if grantType exist
+        if (Objeto.isBlank(oAuthRequest.getGrantType())) {
+            throw new BadRequestException(ExceptionMessage.GRANT_TYPE_NOT_FOUND);
+        }
+        //verify type of the grantType
         switch (oAuthRequest.getGrantType().toUpperCase()) {
             case GRANT_TYPE_PASSWORD:
-
-                if (Objeto.notBlank(oAuthRequest.getCode())) {
-                    String decodedCode = new String(Base64.getDecoder().decode(oAuthRequest.getCode()));
-                    String clientId = decodedCode.split("::")[1];
-
-                    OAuthAuthorize foundCode = oAuthAuthorizeRepository.findOne(clientId);
-
-                    if (Objeto.notBlank(foundCode)) {
-                        if (foundCode.getTokenAuthorize().equals(oAuthRequest.getCode())) {
-                            final Map<String, Object> claimsFromJSONObjectBodyRequest = jwtUtils.getClaimsFromJSONObjectBodyRequest(claimsObject);
-                            tokenOAuth = jwtUtils.generateNewToken(privateKey, oAuthRequest.getOperations(), timeAccessToken, timeRefreshToken, claimsFromJSONObjectBodyRequest);
-                            oAuthAuthorizeRepository.delete(foundCode);
-                        } else {
-                            throw new BadRequestException(ExceptionMessage.CODE_NOT_FOUND);
-                        }
-                    } else {
-                        throw new BadRequestException(ExceptionMessage.CODE_NOT_FOUND);
-                    }
-                } else {
+                //verify if code exist
+                if (Objeto.isBlank(oAuthRequest.getCode())) {
                     throw new BadRequestException(ExceptionMessage.CODE_NOT_FOUND);
                 }
-
-                break;
+                //decode code
+                String decodedCode = new String(Base64.getDecoder().decode(oAuthRequest.getCode()));
+                //get clientId from code
+                String clientId = decodedCode.split("::")[1];
+                //get OAuthAuthorize from database by clientId and token
+                OAuthAuthorize foundCode = oAuthAuthorizeRepository.findByClientIdAndTokenAuthorize(clientId, oAuthRequest.getCode());
+                //verify if OAuthAuthorize exist
+                if (Objeto.isBlank(foundCode)) {
+                    throw new BadRequestException(ExceptionMessage.CODE_NOT_FOUND);
+                }
+                //get objects the from body request
+                final Map<String, Object> claimsFromJSONObjectBodyRequest = JwtUtils.getClaimsFromJSONObjectBodyRequest(claimsObject);
+                //generate TokenOAuth
+                TokenOAuth tokenOAuth = JwtUtils.generateTokenOAuth(privateKey, timeAccessToken, timeRefreshToken, claimsFromJSONObjectBodyRequest);
+                //save accessToken
+                saveToken(
+                        clientId,
+                        tokenOAuth.getAccessToken(),
+                        JwtUtils.recoverDateExpirationFromToken(tokenOAuth.getAccessToken(), privateKey),
+                        GRANT_TYPE_PASSWORD,
+                        timeAccessToken
+                );
+                //save refreshToken
+                saveToken(
+                        clientId,
+                        tokenOAuth.getRefreshToken(),
+                        JwtUtils.recoverDateExpirationFromToken(tokenOAuth.getRefreshToken(), privateKey),
+                        GRANT_TYPE_REFRESH_TOKEN,
+                        timeRefreshToken
+                );
+                //delete token used
+                this.oAuthAuthorizeRepository.delete(foundCode);
+                //return new tokens
+                return tokenOAuth;
             case GRANT_TYPE_REFRESH_TOKEN:
                 if (Objeto.isBlank(oAuthRequest.getRefreshToken())) {
-                    throw new BadRequestException(ExceptionMessage.REFRESH_TOKEN_NOT_EXIST);
+                    throw new BadRequestException(ExceptionMessage.REFRESH_TOKEN_NOT_FOUND);
                 }
-                boolean tokenExpired = jwtUtils.tokenExpired(oAuthRequest.getRefreshToken(), privateKey);
-                if (tokenExpired) {
-                    throw new UnauthorizedException(ExceptionMessage.TOKEN_EXPIRED);
-                } else {
-                    final Map<String, Object> claimsFromJSONObjectBodyRequest = jwtUtils.getClaimsFromJSONObjectBodyRequest(claimsObject);
-                    tokenOAuth = jwtUtils.generateNewToken(privateKey, oAuthRequest.getOperations(), timeAccessToken, timeRefreshToken, claimsFromJSONObjectBodyRequest);
+                //validate token
+                tokenIsValid(oAuthRequest.getRefreshToken(), privateKey);
+                //get OAuthAuthorize from database
+                OAuthAuthorize tokenFound = oAuthAuthorizeRepository.findByTokenAuthorize(oAuthRequest.getRefreshToken());
+                // verify if grantType of the token is equal REFRESH_TOKEN
+                if (!tokenFound.getGrantType().equals(GRANT_TYPE_REFRESH_TOKEN)) {
+                    throw new ForbiddenException(ExceptionMessage.TOKEN_INVALID);
                 }
-                break;
+                //generate tokenOAuthGenerated
+                TokenOAuth tokenOAuthGenerated = generateTokenOAuthFromOtherToken(tokenFound.getTokenAuthorize(), privateKey, timeAccessToken, timeRefreshToken);
+                if (Objects.nonNull(tokenOAuthGenerated)) {
+                    //save accessToken
+                    saveToken(
+                            tokenFound.getClientId(),
+                            tokenOAuthGenerated.getAccessToken(),
+                            JwtUtils.recoverDateExpirationFromToken(tokenOAuthGenerated.getAccessToken(), privateKey),
+                            GRANT_TYPE_PASSWORD,
+                            timeAccessToken
+                    );
+                    //save refreshToken
+                    saveToken(
+                            tokenFound.getClientId(),
+                            tokenOAuthGenerated.getRefreshToken(),
+                            JwtUtils.recoverDateExpirationFromToken(tokenOAuthGenerated.getRefreshToken(), privateKey),
+                            GRANT_TYPE_REFRESH_TOKEN,
+                            timeRefreshToken
+                    );
+                    //delete token used
+                    this.oAuthAuthorizeRepository.delete(tokenFound);
+                    //return new tokens
+                    return tokenOAuthGenerated;
+                }
+                throw new ServerErrorException(ExceptionMessage.TOKEN_NOT_GENERATE);
             default:
-                throw new BadRequestException(ExceptionMessage.GRANT_TYPE_NOT_EXIST);
+                throw new BadRequestException(ExceptionMessage.GRANT_TYPE_NOT_FOUND);
         }
 
-        return tokenOAuth;
     }
 
     /**
-     * Validates if token is expired.
+     * Generates {@link TokenImplicit} to OAuth Implicit.
      *
-     * @param token      The token to be validate
-     * @param privateKey The privateKey that is used to get the SecretKey
-     * @return True if token is expired or false otherwise
+     * @param oAuthRequest    The {@link OAuthRequest}
+     * @param privateKey      The privateKey used to generate Token
+     * @param timeAccessToken The time to expire the accessToken
+     * @param claimsObject    The claimsObject in {@link String}
+     * @return {@link TokenImplicit}
      */
-    public boolean tokenExpired(String token, String privateKey) {
-        return jwtUtils.tokenExpired(token, privateKey);
+    public TokenImplicit generateTokenImplicit(OAuthRequest oAuthRequest, String privateKey, int timeAccessToken, String claimsObject) {
+        final Map<String, Object> claimsFromJSONObjectBodyRequest = JwtUtils.getClaimsFromJSONObjectBodyRequest(claimsObject);
+        TokenImplicit tokenImplicit = JwtUtils.generateTokenImplicit(privateKey, timeAccessToken, claimsFromJSONObjectBodyRequest);
+        saveToken(
+                oAuthRequest.getClientId(),
+                tokenImplicit.getAccessToken(),
+                JwtUtils.recoverDateExpirationFromToken(tokenImplicit.getAccessToken(), privateKey),
+                GRANT_TYPE_IMPLICIT,
+                timeAccessToken
+        );
+        return tokenImplicit;
+    }
+
+    /**
+     * Validate if token exist and not expired.
+     *
+     * @param token      The token
+     * @param privateKey The privateKey used to generate token
+     * @throws HeimdallException If token not valid.
+     */
+    public void tokenIsValid(String token, String privateKey) throws HeimdallException {
+        if (!tokenExist(token)) {
+            throw new UnauthorizedException(ExceptionMessage.TOKEN_INVALID);
+        }
+        try {
+            JwtUtils.tokenExpired(token, privateKey);
+        } catch (HeimdallException ex) {
+
+            this.oAuthAuthorizeRepository.delete(this.oAuthAuthorizeRepository.findByTokenAuthorize(token));
+            throw new UnauthorizedException(ExceptionMessage.TOKEN_EXPIRED);
+        }
+    }
+
+
+    /**
+     * Validates if token exist in database.
+     *
+     * @param token The token
+     * @return True if exist and false otherwise.
+     */
+    private boolean tokenExist(String token) {
+        return Objects.nonNull(this.oAuthAuthorizeRepository.findByTokenAuthorize(token));
     }
 
     /**
@@ -138,7 +215,7 @@ public class OAuthService {
      * @return True if token contain URL from request in Operations or false otherwise
      */
     public boolean tokenIsValidToResource(String token, String privateKey, String pathRequest) {
-        Set<String> operationsFromToken = jwtUtils.getOperationsFromToken(token, privateKey);
+        Set<String> operationsFromToken = JwtUtils.getOperationsFromToken(token, privateKey);
         Optional<String> findFirst = operationsFromToken.stream().filter(o -> o.equals(pathRequest)).findFirst();
         return findFirst.isPresent();
     }
@@ -166,14 +243,83 @@ public class OAuthService {
      */
     public String generateAuthorize(String clientId) {
 
-        OAuthAuthorize found = oAuthAuthorizeRepository.findOne(clientId);
+        OAuthAuthorize found = oAuthAuthorizeRepository.findByClientIdAndExpirationDateIsNull(clientId);
 
         if (Objeto.isBlank(found)) {
             OAuthAuthorize oAuthAuthorize = new OAuthAuthorize(clientId);
             return this.oAuthAuthorizeRepository.save(oAuthAuthorize).getTokenAuthorize();
         }
 
-        found.generateTokenAuthorize();
+        found.generateCodeAuthorize();
         return this.oAuthAuthorizeRepository.save(found).getTokenAuthorize();
+    }
+
+    /**
+     * Save a token to one clientId.
+     *
+     * @param clientId The clientId
+     * @param token    The token
+     */
+    public void saveToken(String clientId, String token, LocalDateTime expirationDate, String grantType, int expirationTime) {
+        OAuthAuthorize oAuthAuthorizeAccessToken = new OAuthAuthorize();
+        oAuthAuthorizeAccessToken.setClientId(clientId);
+        oAuthAuthorizeAccessToken.setTokenAuthorize(token);
+        oAuthAuthorizeAccessToken.setExpirationDate(expirationDate);
+        oAuthAuthorizeAccessToken.setGrantType(grantType);
+        oAuthAuthorizeAccessToken.setExpirationTime(expirationTime);
+        oAuthAuthorizeRepository.save(oAuthAuthorizeAccessToken);
+    }
+
+    /**
+     * Delete one {@link OAuthAuthorize}
+     *
+     * @param oAuthAuthorize The {@link OAuthAuthorize}
+     */
+    public void delete(OAuthAuthorize oAuthAuthorize) {
+        oAuthAuthorizeRepository.delete(oAuthAuthorize);
+    }
+
+    /**
+     * Generate a new {@link TokenOAuth} from other token valid.
+     *
+     * @param token            The token
+     * @param privateKey       The privateKey to be encoded
+     * @param timeAccessToken  Time to expire accessToken
+     * @param timeRefreshToken Time to expire refreshToken
+     * @return The new {@link TokenOAuth}
+     */
+    private TokenOAuth generateTokenOAuthFromOtherToken(String token, String privateKey, int timeAccessToken, int timeRefreshToken) throws HeimdallException {
+        String secretKey = JwtUtils.encodePrivateKey(privateKey);
+        Claims claimsFromTheToken = JwtUtils.getClaimsFromTheToken(token, secretKey);
+        Map<String, Object> claims = claimsFromTheToken.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        return JwtUtils.generateTokenOAuth(privateKey, timeAccessToken, timeRefreshToken, claims);
+    }
+
+    /**
+     * Generate a new {@link TokenImplicit} from other token valid.
+     *
+     * @param token      The token
+     * @param privateKey The privateKey to be encoded
+     * @return The new {@link TokenImplicit}
+     */
+    public TokenImplicit generateTokenImplicitFromOtherToken(String token, String privateKey, int timeAccessToken) throws HeimdallException {
+        String secretKey = JwtUtils.encodePrivateKey(privateKey);
+        Claims claimsFromTheToken = JwtUtils.getClaimsFromTheToken(token, secretKey);
+        Map<String, Object> claims = claimsFromTheToken.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        return JwtUtils.generateTokenImplicit(privateKey, timeAccessToken, claims);
+    }
+
+    /**
+     * Obtain {@link OAuthAuthorize} by Token
+     *
+     * @param token The token
+     * @return {@link OAuthAuthorize}
+     */
+    public OAuthAuthorize getOAuthAuthorizeFromToken(String token) {
+        return this.oAuthAuthorizeRepository.findByTokenAuthorize(token);
     }
 }
