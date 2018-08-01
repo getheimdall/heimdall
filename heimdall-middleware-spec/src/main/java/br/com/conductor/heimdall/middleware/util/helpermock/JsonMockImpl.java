@@ -1,6 +1,19 @@
 
 package br.com.conductor.heimdall.middleware.util.helpermock;
 
+import java.util.Map;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
 /*-
  * =========================LICENSE_START==================================
  * heimdall-middleware-spec
@@ -22,16 +35,6 @@ package br.com.conductor.heimdall.middleware.util.helpermock;
  */
 
 import br.com.conductor.heimdall.middleware.spec.Json;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.Map;
 
 /**
  * Mock class created to help unit test the root request class of a middleware.
@@ -91,6 +94,19 @@ public class JsonMockImpl implements Json {
             return null;
         }
     }
+    
+    @Override
+	public <T> T parse(String json, TypeReference<T> type) {
+    	   
+    	try {
+               mapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+               @SuppressWarnings("unchecked")
+               T obj = (T) mapper().readValue(json, type);
+               return obj;
+           } catch (Exception e) {
+               return null;
+           }
+	}
 
     public <T> Map<String, Object> parseToMap(T object) {
 
