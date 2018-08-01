@@ -95,6 +95,20 @@ class AppForm extends Component {
                                 }
                             </FormItem>
                         </Col>
+                        {  !app &&
+                            <Col sm={24} md={24}>
+                                <FormItem label="Client ID">
+                                    {
+                                        getFieldDecorator('clientId', {
+                                            initialValue: app && app.clientId,
+                                            rules: [
+                                                {min: 6, message: 'Min of 6 Characters to clientId!'}
+                                            ]
+                                        })(<Input/>)
+                                    }
+                                </FormItem>
+                            </Col>
+                        }
                         <Col sm={24} md={24}>
                             <FormItem label="Developer">
                                 {
