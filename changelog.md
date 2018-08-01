@@ -9,10 +9,11 @@
         * Add method ALL in operations;
         * Create template to Blacklist and Whitelist;
         *  Filter traces not null to show in Traces;
-        
     * Adding implicit OAuth [Pull Request #88](https://github.com/getheimdall/heimdall/pull/88)
         * Refactored code
         * Change methods to static in JwtUtils.java
+    * Changed login page layout [Pull Request #90](https://github.com/getheimdall/heimdall/pull/90)
+    * Adding scroll in tables and update list of the environments [Pull Request #92](https://github.com/getheimdall/heimdall/pull/92)
 
 * **Bugfix**
 

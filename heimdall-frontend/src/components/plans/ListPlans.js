@@ -26,7 +26,7 @@ class ListPlans extends Component {
         const { loading } = this.props
         return (
             <div>
-                <Table dataSource={dataSource.content} rowKey={record => record.id} loading={loading} pagination={false}>
+                <Table dataSource={dataSource.content} rowKey={record => record.id} scroll={{x:694}} loading={loading} pagination={false}>
                     <Column title="ID" dataIndex="id" id="id" />
                     <Column title="Name" dataIndex="name" id="name" />
                     <Column title="Description" dataIndex="description" id="description" />

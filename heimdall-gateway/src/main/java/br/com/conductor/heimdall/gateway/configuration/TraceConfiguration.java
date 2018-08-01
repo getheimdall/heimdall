@@ -82,7 +82,7 @@ public class TraceConfiguration {
 
 				trace = TraceContextHolder.getInstance().init(prop.getTrace().isPrintAllTrace(), profile, request, prop.getMongo().getEnabled());
 				if (shouldDisableTrace(request)) {
-					TraceContextHolder.getInstance().disablePrint();
+					trace.setShouldPrint(false);
 				}
 
 				if ("OPTIONS".equalsIgnoreCase(((HttpServletRequest) request).getMethod())) {
@@ -102,14 +102,14 @@ public class TraceConfiguration {
 				log.error("Error {} during request {} exception {}", e.getMessage(), ((HttpServletRequest) request).getRequestURL(), e);
 			} finally {
 
-				if (TraceContextHolder.getInstance().shouldWrite()) {
-
-					if (trace != null) {
+				if (trace != null) {
+					if (trace.isShouldPrint()) {
 						trace.write(response);
+					} else {
+						TraceContextHolder.getInstance().clearActual();
 					}
-				} else {
-					TraceContextHolder.getInstance().clearActual();
 				}
+
 				TraceContextHolder.getInstance().unset();
 			}
 		}
@@ -142,13 +142,13 @@ public class TraceConfiguration {
 	@Bean
 	public FilterRegistrationBean filterRegistrationBean() {
 
-		FilterRegistrationBean filtroRestAuth = new FilterRegistrationBean();
-		filtroRestAuth.setFilter(new TraceFilter());
-		filtroRestAuth.addUrlPatterns("/*");
-		filtroRestAuth.setOrder(Ordered.HIGHEST_PRECEDENCE);
-		filtroRestAuth.setName("traceFilter");
+		FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
+		filterRegistrationBean.setFilter(new TraceFilter());
+		filterRegistrationBean.addUrlPatterns("/*");
+		filterRegistrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+		filterRegistrationBean.setName("traceFilter");
 
-		return filtroRestAuth;
+		return filterRegistrationBean;
 	}
 
 }

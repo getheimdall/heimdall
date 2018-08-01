@@ -6,10 +6,8 @@ import particlesParams from '../../utils/particles'
 
 class LoginLayout extends Component {
     render() {
-        const { Content } = Layout
-
         return (
-            <Layout className="layout login-layout">
+            <Layout className="login-new-layout">
                 <Particles
                     params={particlesParams}
                     style={{
@@ -17,11 +15,7 @@ class LoginLayout extends Component {
                         height: '100%'
                     }}
                 />
-                <Layout>
-                    <Content className="login-content">
-                        {this.props.children}
-                    </Content>
-                </Layout>
+                {this.props.children}
             </Layout>
         )
     }
