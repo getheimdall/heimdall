@@ -63,7 +63,7 @@ public class OAuthHeimdallInterceptor implements HeimdallInterceptor {
         OAuthDTO oAuthDTO = (OAuthDTO) objectCustom;
 
         parameters.put("providerId", Objeto.isBlank(oAuthDTO.getProviderId()) ? 0L : oAuthDTO.getProviderId());
-        parameters.put("timeAccessToken", Objeto.isBlank(oAuthDTO.getTimeAccessToken()) ? 20 : oAuthDTO.getTimeAccessToken());
+        parameters.put("timeAccessToken", Objeto.isBlank(oAuthDTO.getTimeAccessToken()) ? 0 : oAuthDTO.getTimeAccessToken());
         parameters.put("timeRefreshToken", Objeto.isBlank(oAuthDTO.getTimeRefreshToken()) ? 1800 : oAuthDTO.getTimeRefreshToken());
         parameters.put("typeOAuth", oAuthDTO.getTypeOAuth());
         parameters.put("privateKey", oAuthDTO.getPrivateKey());

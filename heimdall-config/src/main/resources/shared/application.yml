@@ -43,8 +43,8 @@ heimdall:
         sendStringParametersAsUnicode: false
     mongo:
         enabled: false
-        #serverName:
-        #url: 
+#        serverName:
+#        url:
 #        port: 27017
 #        dataBase: logging
 #        collection: logs

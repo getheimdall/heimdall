@@ -1,4 +1,3 @@
-
 package br.com.conductor.heimdall.api.resource;
 
 /*-
@@ -29,6 +28,7 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import br.com.conductor.heimdall.core.dto.persist.AppPersist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -130,7 +130,7 @@ public class AppResource {
      @ApiOperation(value = "Save a new App")
      @PostMapping
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_APP)
-     public ResponseEntity<?> save(@RequestBody @Valid AppDTO appDTO) {
+     public ResponseEntity<?> save(@RequestBody @Valid AppPersist appDTO) {
 
           App app = appService.save(appDTO);
 
