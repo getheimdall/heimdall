@@ -1,0 +1,30 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <changeSet id="01" author="conductor\dijalma.silva">
+        <dropUniqueConstraint tableName="OAUTH_AUTHORIZES" constraintName="pk_oauth_authorizes"/>
+
+        <rollback>
+            <addUniqueConstraint tableName="OAUTH_AUTHORIZES" columnNames="pk_oauth_authorizes"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="02" author="conductor\dijalma.silva">
+        <preConditions>
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE constraint_name='pk_oauth_authorizes'
+            </sqlCheck>
+        </preConditions>
+        <addColumn tableName="OAUTH_AUTHORIZES">
+            <column autoIncrement="true" name="ID" type="bigint">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_oauth_authorizes"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

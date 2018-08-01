@@ -17,7 +17,7 @@ class LoginForm extends Component {
     render() {
         const { getFieldDecorator } = this.props.form;
         return (
-            <Form onSubmit={this.handleSubmit} className="login-form">
+            <Form onSubmit={this.handleSubmit}>
                 <Row>
                     <Col>
                         <FormItem>
@@ -50,7 +50,7 @@ class LoginForm extends Component {
                     </Col>
                 </Row> */}
                 <Col>
-                    <Button style={{ width: '100%' }} type="primary" htmlType="submit" className="login-form-button" loading={this.props.loading}>
+                    <Button style={{ width: '100%', background: 'transparent', border: '1px solid #D9B217' }} type="primary" htmlType="submit" className="login-form-button" loading={this.props.loading}>
                         Log in
                     </Button>
                 </Col>
