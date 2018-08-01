@@ -143,8 +143,7 @@
 		<hikaricp.version>2.6.1</hikaricp.version>
 		<mssql-jdbc.version>6.2.1.jre8</mssql-jdbc.version>
 		<jackson.version>2.9.2</jackson.version>
-		<spring-cloud.version>Dalston.SR4</spring-cloud.version>
-		<versao>${project.version}</versao>
+		<spring-cloud.version>Edgware.SR4</spring-cloud.version>
 		<scala.version>2.11.7</scala.version>
 		<gatling.version>2.2.0</gatling.version>
 		<scala-maven-plugin.version>3.2.2</scala-maven-plugin.version>
