@@ -60,8 +60,8 @@ public abstract class HeimdallFilter extends ZuulFilter {
                return false;
           }
           
-          boolean validateExecution = should ? validateExecution() : should;
-          should = should ? should() : should;
+          boolean validateExecution = should && validateExecution();
+          should = should && should();
           
           long endTime = System.currentTimeMillis();
           long duration = (endTime - startTime);
