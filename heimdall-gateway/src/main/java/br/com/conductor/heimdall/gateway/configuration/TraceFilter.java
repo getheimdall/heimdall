@@ -31,11 +31,15 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import br.com.conductor.heimdall.core.environment.Property;
+import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
 import br.com.conductor.heimdall.gateway.trace.Trace;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +54,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class TraceFilter implements Filter {
 
 	@Value("${info.app.profile}")
@@ -87,14 +92,15 @@ public class TraceFilter implements Filter {
 				response.setHeader("Access-Control-Allow-Headers", "origin, content-type, accept, authorization, x-requested-with, X-AUTH-TOKEN, access_token, client_id, device_id, credential");
 				response.setHeader("Access-Control-Max-Age", "3600");
 				response.setStatus(200);
-			} else {
+			} else {			
 				chain.doFilter(request, response);
 			}
-
+			
 		} catch (Exception e) {
 
-			log.error("Error {} during request {} exception {}", e.getMessage(),
-					((HttpServletRequest) request).getRequestURL(), e);
+			log.error("Error {} during request {} exception {}", e.getMessage(),((HttpServletRequest) request).getRequestURL(), e.getStackTrace());
+			trace.setStackTrace(new StackTraceImpl(e.getClass().getName(), e.getMessage(), ExceptionUtils.getStackTrace(e)));
+			throw e;
 		} finally {
 
 			if (trace != null) {
