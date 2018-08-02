@@ -20,21 +20,15 @@ package br.com.conductor.heimdall.core.entity;
  * ==========================LICENSE_END===================================
  */
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Base64;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import javax.persistence.*;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Base64;
 
 /**
  * This class represents a OAuthAuthorize registered to the system.
@@ -46,34 +40,47 @@ import lombok.EqualsAndHashCode;
 @Entity
 @DynamicUpdate
 @DynamicInsert
-@EqualsAndHashCode(of = {"clientId"})
-@AllArgsConstructor
+@EqualsAndHashCode(of = {"id"})
 public class OAuthAuthorize implements Serializable {
 
     private static final long serialVersionUID = -591348072727902230L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "CLIENT_ID", length = 250, nullable = false, unique = true)
+    private String clientId;
+
+    @Column(name = "TOKEN_AUTHORIZE", nullable = false)
+    private String tokenAuthorize;
+
+    @Column(name = "GRANT_TYPE", length = 100)
+    private String grantType;
+
+    @Column(name = "EXPIRATION_DATE")
+    private LocalDateTime expirationDate;
+
+    @Column(name = "EXPIRATION_TIME")
+    private int expirationTime;
 
     public OAuthAuthorize() {
     }
 
     public OAuthAuthorize(String clientId) {
         this.clientId = clientId;
-        this.generateTokenAuthorize();
+        this.generateCodeAuthorize();
+        this.setGrantType("");
+        this.setExpirationDate(null);
+        this.setExpirationTime(0);
     }
-
-    @Id
-    @Column(name = "CLIENT_ID", length = 250, nullable = false, unique = true)
-    private String clientId;
-
-    @Column(name = "TOKEN_AUTHORIZE", length = 250, nullable = false)
-    private String tokenAuthorize;
 
     /**
      * This method generates a new code authorize.
      */
-    public void generateTokenAuthorize() {
+    public void generateCodeAuthorize() {
         String toEncode = LocalDateTime.now().toString() + "::" + clientId;
         this.tokenAuthorize = Base64.getEncoder().encodeToString(toEncode.getBytes());
     }
-
 
 }

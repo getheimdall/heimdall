@@ -24,5 +24,8 @@
     <include file="changelog/20180517013922-create-table-provider-and-paramsprovider.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20180525101925-create-table-oauth-authorizes.xml" relativeToChangelogFile="true"/>  
     <include file="changelog/20180709102922-update-unique-constraints-environments.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20180718115333-add-column-id-and-update-unique-constraints-in-oauth-authorizes.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20180718175848-update-column-token-in-oauth-authorizes.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20180719142230-add_columns-grantType-expirationDate-expirationTime-in-oauth-authorizes.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

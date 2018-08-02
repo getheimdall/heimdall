@@ -22,7 +22,6 @@ package br.com.conductor.heimdall.middleware.spec;
  */
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JavaType;
 
 import java.util.Map;
 
@@ -76,6 +75,13 @@ public interface Json {
       */
      public <T> T parse(String json, Class<?> parametrized, Class<?>... parameterClasses);
 
+     /**
+      * @param json
+      * @param type
+      * @return
+      */
+     public <T> T parse(String json, TypeReference<T> type);
+     
      /**
       * Parses a object to a Map<String, Object>.
       * 

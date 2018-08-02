@@ -107,16 +107,20 @@ public enum ExceptionMessage {
     PROVIDER_USER_UNAUTHORIZED(UNAUTHORIZED.value(), "User provider unauthorized", UnauthorizedException.class),
      
     TOKEN_EXPIRED(UNAUTHORIZED.value(), "Token expired", UnauthorizedException.class),
-     
+
+    TOKEN_INVALID(UNAUTHORIZED.value(), "Token not valid", ForbiddenException.class),
+
+    TOKEN_NOT_GENERATE(INTERNAL_SERVER_ERROR.value(), "Error to generate token", ForbiddenException.class),
+
     CODE_NOT_FOUND(UNAUTHORIZED.value(), "Code already used to generate token or not defined", UnauthorizedException.class),
-     
-    GRANT_TYPE_NOT_EXIST(BAD_REQUEST.value(), "GrantType not found", BadRequestException.class),
-     
-    REFRESH_TOKEN_NOT_EXIST(BAD_REQUEST.value(), "RefreshToken not found", BadRequestException.class),
+
+    GRANT_TYPE_NOT_FOUND(BAD_REQUEST.value(), "grant_type not found", BadRequestException.class),
+
+    REFRESH_TOKEN_NOT_FOUND(BAD_REQUEST.value(), "refresh_token not found", BadRequestException.class),
 
     TYPE_OAUTH_NOT_FOUND(BAD_REQUEST.value(), "TypeOAuth not found", BadRequestException.class),
 
-    PRIVATE_KEY_NOT_FOUND(BAD_REQUEST.value(), "Privatekey not found", BadRequestException.class),
+    PRIVATE_KEY_NOT_FOUND(BAD_REQUEST.value(), "privateKey not found", BadRequestException.class),
 
     OPERATION_ATTACHED_TO_INTERCEPTOR(BAD_REQUEST.value(), "Operation attached to Interceptor", BadRequestException.class),
 
@@ -124,7 +128,15 @@ public enum ExceptionMessage {
 
     OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END(BAD_REQUEST.value(), "Operation can have a double wild card (/**), but only at the end", BadRequestException.class),
 
-    API_BASEPATH_MALFORMED(BAD_REQUEST.value(), "Api basepath can not contain a wild card", BadRequestException.class);
+    API_BASEPATH_MALFORMED(BAD_REQUEST.value(), "Api basepath can not contain a wild card", BadRequestException.class),
+
+    CLIENT_ID_ALREADY(BAD_REQUEST.value(), "clientId already used", BadRequestException.class),
+
+    CLIENT_ID_NOT_FOUND(BAD_REQUEST.value(), "client_id not found", BadRequestException.class),
+
+    AUTHORIZATION_NOT_FOUND(UNAUTHORIZED.value(), "Authorization not found in header", UnauthorizedException.class),
+
+    RESPONSE_TYPE_NOT_FOUND(BAD_REQUEST.value(), "response_type not found", BadRequestException.class);
 
     @Getter
     private Integer httpCode;

@@ -1,4 +1,4 @@
-package br.com.conductor.heimdall.core.repository;
+package br.com.conductor.heimdall.core.dto.persist;
 
 /*-
  * =========================LICENSE_START==================================
@@ -20,19 +20,43 @@ package br.com.conductor.heimdall.core.repository;
  * ==========================LICENSE_END===================================
  */
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import br.com.conductor.heimdall.core.entity.OAuthAuthorize;
+import java.io.Serializable;
+import java.util.List;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
+import br.com.conductor.heimdall.core.entity.App;
+import br.com.conductor.heimdall.core.enums.Status;
+import lombok.Data;
 
 /**
- * OAuthAuthorize Repository.
+ * Class is a Data Transfer Object for the {@link App}.
  *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ *
  */
-public interface OAuthAuthorizeRepository extends JpaRepository<OAuthAuthorize, Long> {
+@Data
+public class AppPersist implements Serializable {
 
-    OAuthAuthorize findByClientIdAndExpirationDateIsNull(String clientId);
+    private static final long serialVersionUID = 4168592185106510648L;
 
-    OAuthAuthorize findByClientIdAndTokenAuthorize(String clientId, String tokenAuthorize);
+    @NotNull
+    @Size(max = 180)
+    private String name;
 
-    OAuthAuthorize findByTokenAuthorize(String tokenAuthorize);
+    @Size(max = 200)
+    private String description;
+
+    @NotNull
+    private ReferenceIdDTO developer;
+
+    private List<String> tags;
+
+    private Status status;
+
+    private List<ReferenceIdDTO> plans;
+
+    private String clientId;
 }

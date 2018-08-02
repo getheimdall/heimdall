@@ -1,4 +1,4 @@
-package br.com.conductor.heimdall.core.repository;
+package br.com.conductor.heimdall.core.converter;
 
 /*-
  * =========================LICENSE_START==================================
@@ -20,19 +20,40 @@ package br.com.conductor.heimdall.core.repository;
  * ==========================LICENSE_END===================================
  */
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import br.com.conductor.heimdall.core.entity.OAuthAuthorize;
+import br.com.conductor.heimdall.core.dto.persist.AppPersist;
+import br.com.conductor.heimdall.core.entity.App;
+import br.com.twsoftware.alfred.object.Objeto;
+import org.modelmapper.AbstractConverter;
+import org.modelmapper.Converter;
+import org.modelmapper.PropertyMap;
+
+import java.util.List;
 
 /**
- * OAuthAuthorize Repository.
+ * Maps a {@link AppPersist} to a {@link App} object.
  *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
-public interface OAuthAuthorizeRepository extends JpaRepository<OAuthAuthorize, Long> {
+public class AppPersistMap extends PropertyMap<AppPersist, App> {
 
-    OAuthAuthorize findByClientIdAndExpirationDateIsNull(String clientId);
+    @Override
+    protected void configure() {
 
-    OAuthAuthorize findByClientIdAndTokenAuthorize(String clientId, String tokenAuthorize);
+        using(tagsConverter).map(source.getTags(), destination.getTag());
+    }
 
-    OAuthAuthorize findByTokenAuthorize(String tokenAuthorize);
+    Converter<List<String>, String> tagsConverter = new AbstractConverter<List<String>, String>() {
+
+        protected String convert(List<String> tags) {
+
+            String tag = null;
+            if (Objeto.notBlank(tags)) {
+
+                tag = String.join(";", tags);
+            }
+
+            return tag;
+        }
+    };
+
 }

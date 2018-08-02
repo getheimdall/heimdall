@@ -36,27 +36,27 @@ heimdall:
         appName: HEIMDALL
         databaseName: HEIMDALL
         portNumber: 1433
-        serverName: 10.60.30.91
+        serverName: 10.60.33.91
         username: UserPier
         password: UserPier
         runLiquibase: true
         sendStringParametersAsUnicode: false
     mongo:
         enabled: false
-#        serverName:
-#        url:
-#        port: 27017
-#        dataBase: logging
-#        collection: logs
-#        username: admin
-#        password: admin
+        serverName: 192.168.10.203
+        #url:
+        port: 27017
+        dataBase: logging
+        collection: logs
+        username: admin
+        password: admin
     trace:
         printAllTrace: true
         sanitizes:
             - access_token
             - client_id
     redis:
-        host: 192.168.10.200
+        host: 10.60.30.49
         port: 6379
         maxTotal: 128
         maxIdle: 128
@@ -78,7 +78,7 @@ heimdall:
             #userDn: your@mail.user
             #password: password
             #userSearchFilter: sAMAccountName={0}    
-     middlewares:
+    middlewares:
         allowInactive: 0
         deleteDeprecated: false
 
@@ -100,7 +100,7 @@ spring:
             INDENT_OUTPUT: true
             WRITE-DATES-AS-TIMESTAMPS: false
     rabbitmq:
-        host: 192.168.10.200
+        host: 10.60.30.49
         port: 5672
         virtual-host: desenvolvimento
         requested-heartbeat: 10

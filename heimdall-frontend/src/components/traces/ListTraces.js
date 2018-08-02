@@ -29,7 +29,7 @@ class ListTraces extends Component {
                         key="action"
                         render={(text, record) => (
                             <span>
-                                <Tooltip title="Edit">
+                                <Tooltip title="View">
                                     <Link to={"/traces/" + record.id}><Button type="primary" icon="search"/></Link>
                                 </Tooltip>
                             </span>
