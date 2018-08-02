@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
-import {Upload, message, Icon, Input, Row, Card, Table, Pagination, Tag} from 'antd'
-import {save, initLoading, getMiddlewares} from '../actions/middlewares'
+import {Button, Card, Icon, Input, message, notification, Pagination, Row, Table, Tag, Tooltip, Upload} from 'antd'
+import {downloadMiddleware, getMiddlewares, initLoading, save} from '../actions/middlewares'
 
 const Dragger = Upload.Dragger
 const Column = Table.Column
@@ -9,15 +9,23 @@ const Column = Table.Column
 class Middlewares extends Component {
 
     state = {
-        apiId: this.props.api.id,
+        apiId: 0,
         version: "",
         page: 0,
         pageSize: 10
     }
 
     componentDidMount() {
+        this.setState(...this.state, {apiId: this.props.api.id})
         this.props.dispatch(initLoading())
-        this.props.dispatch(getMiddlewares({offset: 0, limit: 10}, this.state.apiId))
+        this.props.dispatch(getMiddlewares({offset: 0, limit: 10}, this.props.api.id))
+    }
+
+    componentWillReceiveProps(newProps) {
+        if (newProps.notification && newProps.notification !== this.props.notification) {
+            const { type, message, description } = newProps.notification
+            notification[type]({ message, description })
+        }
     }
 
     handleChangeUpload = (info) => {
@@ -69,6 +77,13 @@ class Middlewares extends Component {
         this.setState({...this.state, version: event.target.value})
     }
 
+    handleFileDownload = (middlewareId, version) => {
+        const {apiId} = this.state
+        const apiName = this.props.api.name;
+        this.props.dispatch(initLoading())
+        this.props.dispatch(downloadMiddleware(middlewareId, apiId, apiName, version))
+    }
+
     verifyVersionIsEmpty = () => {
         return this.state.version.length === 0
     }
@@ -85,10 +100,6 @@ class Middlewares extends Component {
             accept: '.jar',
             customRequest: this.sendFileUpload
         };
-
-
-
-        console.log(middlewares)
 
         return (
             <div>
@@ -133,6 +144,11 @@ class Middlewares extends Component {
                                     </span>
                                 )}/>
                                 <Column title="Created on" dataIndex="creationDate"/>
+                                <Column title="Download" render={(record) => (
+                                    <Tooltip title="Download this file">
+                                        <Button className="card-button add-tour" type="primary" icon="download" onClick={() => this.handleFileDownload(record.id, record.version)} size="large" shape="circle" />
+                                    </Tooltip>
+                                )}/>
                             </Table>
                             <Row type="flex" justify="center" className="h-row">
                                 <Pagination total={middlewares.totalElements} onChange={this.handlePagination}/>

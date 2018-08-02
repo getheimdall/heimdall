@@ -1,5 +1,6 @@
 import {MiddlewaresConstants} from "../../constants/actions-types";
 import {middlewareService} from "../../services/MiddlewareService";
+import {FileUtils} from "../../utils/FileUtils";
 
 export const initLoading = () => dispatch => {
     dispatch({type: MiddlewaresConstants.MIDDLEWARE_LOADING})
@@ -39,5 +40,17 @@ export const getMiddleware = (id, apiId) => dispatch => {
         .then(data => {
             dispatch({ type: MiddlewaresConstants.GET_MIDDLEWARE, middleware: data})
             dispatch(finishLoading())
+        })
+}
+
+export const downloadMiddleware = (id, apiId, apiName, versionMiddleware) => dispatch => {
+    middlewareService.downloadMiddleware(id, apiId)
+        .then(data => {
+            FileUtils.fileDownload(data, `${apiName}-${versionMiddleware}.jar`, FileUtils.JAR_FILE)
+            dispatch({ type: MiddlewaresConstants.MIDDLEWARE_DOWNLOAD})
+            dispatch(finishLoading())
+        })
+        .catch(error => {
+            dispatch(sendNotification({ type: "error", message: "Failed to download file" }))
         })
 }
