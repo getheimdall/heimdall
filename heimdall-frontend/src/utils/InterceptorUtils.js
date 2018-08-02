@@ -2,6 +2,7 @@ export const TEMPLATE_ACCESS_TOKEN = "{\"location\": \"HEADER\", \"name\": \"acc
 export const TEMPLATE_MOCK = "{\"body\": \"{'name': 'Mock Example'}\", \"status\": \"200\"}"
 export const TEMPLATE_RATTING = "{\"calls\":20,\"interval\":\"MINUTES\"}";
 export const TEMPLATE_IPS = "{\"ips\": [ \"127.0.0.0\", \"127.0.0.1\" ]}"
+export const TEMPLATE_CACHE = "{\"cache\":\"cache-name\"}";
 
 export const getTemplate = (type) => {
     if (type === 'ACCESS_TOKEN') {
@@ -22,6 +23,10 @@ export const getTemplate = (type) => {
 
     if (type === 'BLACKLIST' || type === 'WHITELIST'){
         return TEMPLATE_IPS
+    }
+
+    if (type === 'CACHE') {
+        return TEMPLATE_CACHE
     }
 }
 
