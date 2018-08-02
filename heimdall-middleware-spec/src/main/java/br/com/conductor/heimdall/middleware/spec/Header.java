@@ -61,6 +61,13 @@ public interface Header {
       * @param value	The value of the header
       */
      public void add(String name, String value);
+
+    /**
+     * Adds a Map of headers
+     *
+     * @param values    The headers to be added
+     */
+    public void addAll(Map<String, String> values);
      
      /**
       * Removes a header.

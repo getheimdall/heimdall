@@ -142,6 +142,12 @@ public class CallImpl implements Call {
                }
 
                @Override
+               public void addAll(Map<String, String> values) {
+
+                    values.forEach((k, v) -> context.addZuulRequestHeader(k, v));
+               }
+
+               @Override
                public void remove(String name) {
 
                     if (Objeto.notBlank(name)) {
@@ -400,7 +406,14 @@ public class CallImpl implements Call {
                     
                     r.addHeader(name, value);
                }
-               
+
+               @Override
+               public void addAll(Map<String, String> values) {
+                    HttpServletResponse r = context.getResponse();
+
+                    values.forEach(r::addHeader);
+               }
+
                @Override
                public void remove(String name) {
                     
