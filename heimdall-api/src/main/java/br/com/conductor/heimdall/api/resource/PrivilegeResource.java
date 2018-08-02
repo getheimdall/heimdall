@@ -105,7 +105,7 @@ public class PrivilegeResource {
 
      @ResponseBody
      @ApiOperation(value = "Find all Privileges by username", responseContainer = "List", response = Privilege.class)
-     @GetMapping("/username/${username}")
+     @GetMapping("/username/{username}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_PRIVILEGE)
      public ResponseEntity findPrivilegesByUsername(@PathVariable String username) {
 
