@@ -20,23 +20,33 @@ package br.com.conductor.heimdall.api.resource;
  * ==========================LICENSE_END===================================
  */
 
+import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_TRACES;
+
+import java.util.List;
+
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.logs.FiltersDTO;
 import br.com.conductor.heimdall.core.dto.logs.LogTraceDTO;
 import br.com.conductor.heimdall.core.dto.page.LogTraceDTOPage;
+import br.com.conductor.heimdall.core.environment.Property;
 import br.com.conductor.heimdall.core.service.TraceService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-
-import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_TRACES;
 
 /**
  * Uses a LogTraceService to provide access to the Log Traces
@@ -50,6 +60,9 @@ public class TracesResource {
 
     @Autowired
     private TraceService traceService;
+    
+    @Autowired
+    private Property property;
 
     /**
      * Returns a one LogTrace by its id
@@ -61,7 +74,9 @@ public class TracesResource {
     @GetMapping(value = "/{traceId}")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_TRACES)
     public ResponseEntity<?> findOne(@PathVariable("traceId") String id) {
-
+    	
+    	if (!property.getMongo().getEnabled()) return ResponseEntity.ok(new JSONObject().toString());
+    	
         LogTraceDTO logTrace = traceService.findById(id);
 
         return ResponseEntity.ok(logTrace);
@@ -79,6 +94,8 @@ public class TracesResource {
     @PostMapping
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_TRACES)
     public ResponseEntity<?> find(@RequestBody List<FiltersDTO> filtersSelected, @ModelAttribute PageableDTO pageableDTO) {
+    	
+    	if (!property.getMongo().getEnabled()) return ResponseEntity.ok(new JSONObject().toString());
 
         LogTraceDTOPage logTrace = traceService.find(filtersSelected, pageableDTO);
 
