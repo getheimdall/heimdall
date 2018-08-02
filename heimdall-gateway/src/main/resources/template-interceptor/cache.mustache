@@ -1,0 +1,76 @@
+import java.util.*;
+
+import br.com.conductor.heimdall.core.util.BeanManager;
+import br.com.conductor.heimdall.gateway.filter.helper.HelperImpl;
+import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
+import br.com.conductor.heimdall.middleware.spec.ApiResponse;
+import br.com.conductor.heimdall.middleware.spec.Helper;
+import com.netflix.zuul.context.RequestContext;
+import org.redisson.api.RMap;
+import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+
+import static br.com.conductor.heimdall.gateway.util.Constants.REDIS_MAP_CACHE;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
+
+
+public class CacheFilter extends HeimdallFilter {
+
+    private RedissonClient redisson;
+
+    private RMap<String, ApiResponse> map;
+
+    private static String cacheName;
+
+    private Helper helper;
+
+    public CacheFilter() {
+        cacheName = "{{cache}}";
+
+        this.helper = new HelperImpl();
+    }
+
+    @Override
+    public boolean should() {
+        return !cacheName.isEmpty();
+    }
+
+    @Override
+    public void execute() throws Throwable {
+
+        this.redisson = (RedissonClient) BeanManager.getBean(RedissonClient.class);
+        this.map = redisson.getMap(REDIS_MAP_CACHE);
+
+        RequestContext context = RequestContext.getCurrentContext();
+
+        if (map.get(cacheName) == null) {
+            context.put(REDIS_MAP_CACHE, true);
+            context.put("cache-map", map);
+            context.put("cache-key", cacheName);
+        } else {
+            ApiResponse response = map.get(cacheName);
+
+            helper.call().response().header().addAll(response.getHeaders());
+            helper.call().response().setBody(response.getBody());
+            helper.call().response().setStatus(response.getStatus());
+        }
+    }
+
+    @Override
+    public String getName() {
+        return "{{name}}";
+    }
+
+    @Override
+    public String filterType() {
+        return PRE_TYPE;
+    }
+
+    @Override
+    public int filterOrder() {
+        return {{order}};
+    }
+}
