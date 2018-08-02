@@ -10,9 +10,9 @@ package br.com.conductor.heimdall.core.service;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,12 +21,14 @@ package br.com.conductor.heimdall.core.service;
  * ==========================LICENSE_END===================================
  */
 
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.DEVELOPER_NOT_EXIST;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 
 import java.util.List;
+import java.util.Objects;
 
+import br.com.conductor.heimdall.core.converter.AppPersistMap;
+import br.com.conductor.heimdall.core.dto.persist.AppPersist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -60,22 +62,22 @@ import net.bytebuddy.utility.RandomString;
 
 /**
  * This class provides methods to create, read, update and delete the {@link App} resource.
- * 
- * @author Filipe Germano
  *
+ * @author Filipe Germano
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Service
 public class AppService {
 
      @Autowired
      private AppRepository appRepository;
-     
+
      @Autowired
      private DeveloperRepository devRepository;
 
      @Autowired
      private PlanRepository planRepository;
-     
+
      @Autowired
      private AccessTokenRepository acessTokenRepository;
 
@@ -84,24 +86,24 @@ public class AppService {
 
      /**
       * Finds a {@link App} by its ID.
-      * 
+      *
       * @param 	id						The id of the {@link App}
       * @return							The {@link App} that was found
       * @throws NotFoundException		Resource not found
       */
      @Transactional(readOnly = true)
      public App find(Long id) {
-          
+
           App app = appRepository.findOne(id);
           HeimdallException.checkThrow(isBlank(app), GLOBAL_RESOURCE_NOT_FOUND);
           app.setAccessTokens(acessTokenRepository.findByAppId(app.getId()));
-                              
+
           return app;
      }
-     
+
      /**
       * Generates a paged list of App.
-      * 
+      *
       * @param 	appDTO					The {@link AppDTO}
       * @param 	pageableDTO				The {@link PageableDTO}
       * @return							The paged {@link App} list as a {@link AppPage} object
@@ -110,65 +112,70 @@ public class AppService {
      public AppPage list(AppRequestDTO appDTO, PageableDTO pageableDTO) {
 
           App app = GenericConverter.mapper(appDTO, App.class);
-          
+
           Example<App> example = Example.of(app, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
-          
+
           Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
           Page<App> page = appRepository.findAll(example, pageable);
-          
+
           AppPage appPage = new AppPage(PageDTO.build(page));
-          
+
           return appPage;
      }
 
      /**
       * Generates a list of {@link App}.
-      * 
+      *
       * @param 	appDTO					The {@link AppDTO}
       * @return							The list of {@link App}'s
       */
      @Transactional(readOnly = true)
      public List<App> list(AppRequestDTO appDTO) {
-          
+
           App app = GenericConverter.mapper(appDTO, App.class);
-          
+
           Example<App> example = Example.of(app, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
-          
+
           List<App> apps = appRepository.findAll(example);
-          
+
           return apps;
      }
-     
+
      /**
       * Saves a {@link App} to the repository.
       * 
-      * @param 	appDTO					The {@link AppDTO}
+      * @param 	appDTO					The {@link AppPersist}
       * @return							The saved {@link App}
-      * @throws HeimdallException		Developer not exist
+      * @throws HeimdallException		Developer not exist, ClientId already used
       */
-     public App save(AppDTO appDTO) {
+     public App save(AppPersist appDTO) {
 
-          App app = GenericConverter.mapperWithMapping(appDTO, App.class, new AppMap());
+          if (Objeto.notBlank(appDTO.getClientId())) {
+               App app = appRepository.findByClientId(appDTO.getClientId());
+               HeimdallException.checkThrow(Objects.nonNull(app), CLIENT_ID_ALREADY);
+          } else {
+               RandomString randomString = new RandomString(12);
+               String token = randomString.nextString();
+
+               while (appRepository.findByClientId(token) != null) {
+                    token = randomString.nextString();
+               }
+
+               appDTO.setClientId(token);
+          }
+
+          App app = GenericConverter.mapperWithMapping(appDTO, App.class, new AppPersistMap());
 
           Developer dev = devRepository.findOne(app.getDeveloper().getId());
           HeimdallException.checkThrow(isBlank(dev), DEVELOPER_NOT_EXIST);
 
-          RandomString randomString = new RandomString(12);
-          String token = randomString.nextString();
+          return appRepository.save(app);
 
-          while (appRepository.findByClientId(token) != null) {
-               token = randomString.nextString();
-          }
-
-          app.setClientId(token);
-          app = appRepository.save(app);
-
-          return app;
      }
 
      /**
       * Updates a {@link App} by its ID.
-      * 
+      *
       * @param 	id						The ID of the {@link App}
       * @param 	appDTO					{@link AppDTO}
       * @return							The updated {@link App}
@@ -198,15 +205,15 @@ public class AppService {
 
           App app = appRepository.findOne(id);
           HeimdallException.checkThrow(isBlank(app), GLOBAL_RESOURCE_NOT_FOUND);
-          
+
           amqpCacheService.dispatchClean();
-          
+
           appRepository.delete(app);
      }
 
      /**
       * Saves a {@link App}.
-      * 
+      *
       * @param  reqBody					{@link AppCallbackDTO}
       * @return							The {@link App} saved
       * @throws HeimdallException		Developer not exist
@@ -214,37 +221,37 @@ public class AppService {
      @Transactional
      public App save(AppCallbackDTO reqBody) {
           App app = appRepository.findByClientId(reqBody.getCode());
-          
+
           Developer dev = devRepository.findByEmail(reqBody.getDeveloper());
           HeimdallException.checkThrow(isBlank(dev), DEVELOPER_NOT_EXIST);
-          
+
           if (isBlank(app)) {
-               
+
                app = new App();
-               
+
           } else {
-               
+
                List<Plan> plans = appRepository.findPlansByApp(app.getId());
                app.setPlans(plans);
           }
-          
+
           app.setClientId(reqBody.getCode());
           app.setDeveloper(dev);
           app.setDescription(reqBody.getDescription());
           app.setName(reqBody.getName());
-          
+
           if (app.getPlans() != null && app.getPlans().isEmpty()) {
-               
+
                Plan plan = planRepository.findOne(1l);
                if (Objeto.notBlank(plan)) {
 //                    app.setPlans(Arrays.asList(plan));
                     app.setPlans(Lists.newArrayList(plan));
-                    
+
                }
           }
-          
+
           app = appRepository.save(app);
-          
+
           return app;
      }
 

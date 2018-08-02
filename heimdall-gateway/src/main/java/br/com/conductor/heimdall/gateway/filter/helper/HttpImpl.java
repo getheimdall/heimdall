@@ -201,16 +201,23 @@ public class HttpImpl implements Http {
           return apiResponse;
      }
 
-     public ApiResponseImpl sendDelete() {
+	public ApiResponseImpl sendDelete() {
 
-          ResponseEntity<String> entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.DELETE, null, String.class);
-          ApiResponseImpl apiResponse = new ApiResponseImpl();
-          apiResponse.setHeaders(entity.getHeaders().toSingleValueMap());
-          apiResponse.setBody(entity.getBody());
-          apiResponse.setStatus(entity.getStatusCodeValue());
+		ResponseEntity<String> entity;
 
-          return apiResponse;
-     }
+		if (headers.isEmpty()) {
+			entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.DELETE, null, String.class);
+		} else {
+			entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.DELETE, new HttpEntity<>(headers), String.class);
+		}
+
+		ApiResponseImpl apiResponse = new ApiResponseImpl();
+		apiResponse.setHeaders(entity.getHeaders().toSingleValueMap());
+		apiResponse.setBody(entity.getBody());
+		apiResponse.setStatus(entity.getStatusCodeValue());
+
+		return apiResponse;
+	}
 
      private RestTemplate rest() {
           if (this.restTemplate == null) {

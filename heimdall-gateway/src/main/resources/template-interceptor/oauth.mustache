@@ -1,21 +1,19 @@
-import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
-
 import java.util.*;
-
-
 import com.netflix.zuul.ZuulFilter;
 import com.google.common.collect.Sets;
 import com.netflix.zuul.context.RequestContext;
+import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
+import br.com.conductor.heimdall.core.exception.HeimdallException;
+import br.com.conductor.heimdall.core.util.BeanManager;
 import br.com.conductor.heimdall.gateway.filter.helper.*;
 import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
 import br.com.conductor.heimdall.gateway.filter.helper.HelperImpl;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import br.com.conductor.heimdall.gateway.service.OAuthInterceptorService;
 import br.com.conductor.heimdall.middleware.spec.*;
 import br.com.conductor.heimdall.middleware.spec.Helper;
 import br.com.conductor.heimdall.middleware.spec.Http;
-import br.com.conductor.heimdall.core.util.BeanManager;
-import br.com.conductor.heimdall.gateway.service.OAuthInterceptorService;
 
 public class OAuthInterceptor extends HeimdallFilter {
 
@@ -26,7 +24,7 @@ public class OAuthInterceptor extends HeimdallFilter {
      private static String inboundURL;
 
      private static String method;
-     
+
      private Helper helper;
 
      private Long providerId = {{providerId}};
@@ -44,12 +42,12 @@ public class OAuthInterceptor extends HeimdallFilter {
           pathsAllowed = Sets.newHashSet();
      {{#pathsAllowed}}
           pathsAllowed.add("{{.}}");
-     {{/pathsAllowed}}      
+     {{/pathsAllowed}}
 
           pathsNotAllowed = Sets.newHashSet();
      {{#pathsNotAllowed}}
           pathsNotAllowed.add("{{.}}");
-     {{/pathsNotAllowed}}           
+     {{/pathsNotAllowed}}
 
           inboundURL = "{{inboundURL}}";
           method = "{{method}}";
@@ -75,7 +73,7 @@ public class OAuthInterceptor extends HeimdallFilter {
 
            return InterceptorLifeCycle.{{lifeCycle}}.filter(pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest());
      }
-     
+
      @Override
      public String getName() {
      	return "{{name}}"
@@ -83,12 +81,28 @@ public class OAuthInterceptor extends HeimdallFilter {
 
      @Override
      public void execute() throws Throwable {
-                    
+
         oAuthInterceptorService = (OAuthInterceptorService) BeanManager.getBean(OAuthInterceptorService.class);
 
-        oAuthInterceptorService.executeInterceptor("{{typeOAuth}}", privateKey, timeAccessToken, timeRefreshToken, providerId, helper);
-
+        try {
+            oAuthInterceptorService.executeInterceptor("{{typeOAuth}}", privateKey, timeAccessToken, timeRefreshToken, providerId, helper);
+        } catch( HeimdallException ex ){
+            generateResponse( ex.getMsgEnum().getMessage(), ex.getMsgEnum().getHttpCode());
+        }
         return null;
-          
+     }
+
+     /**
+     * Method that sends a Response
+     *
+     * @param message    Response message
+     * @param httpStatus {@link HttpStatus} of the response
+     */
+     private void generateResponse(String message, int httpStatus) {
+         message = "{ \"error\" : \"" + message + "\" }";
+         TraceContextHolder.getInstance().getActualTrace().trace(message);
+         this.helper.call().response().setStatus(httpStatus);
+         this.helper.call().response().header().add("Content-Type", "application/json");
+         this.helper.call().response().setBody(message);
      }
 }

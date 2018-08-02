@@ -23,6 +23,8 @@ package br.com.conductor.heimdall.middleware.spec;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+
 /**
  * This interface provides methods to parse Json Strings to a java object and reverse.
  *
@@ -62,6 +64,13 @@ public interface Json {
       * @return
       */
      public <T> T parse(String json, Class<?> classType);
+
+     /**
+     * @param json
+     * @param type
+     * @return
+     */
+    public <T> T parse(String json, TypeReference<T> type);
      
      /**
       * Parses a object to a Map<String, Object>.
