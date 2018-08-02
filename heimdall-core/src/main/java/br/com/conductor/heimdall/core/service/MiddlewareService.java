@@ -282,7 +282,7 @@ public class MiddlewareService {
 		
 		if (Objeto.notBlank(list)) {
 			Map<Status, List<Middleware>> middlewareMap = list.stream()
-					.collect(Collectors.groupingBy(m -> m.getStatus()));
+					.collect(Collectors.groupingBy(Middleware::getStatus));
 
 			Integer allowInactive = property.getMiddlewares().getAllowInactive();
 			Boolean deleteDeprecated = property.getMiddlewares().getDeleteDeprecated();

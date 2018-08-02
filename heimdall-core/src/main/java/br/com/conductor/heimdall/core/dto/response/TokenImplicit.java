@@ -1,4 +1,4 @@
-package br.com.conductor.heimdall.core.repository;
+package br.com.conductor.heimdall.core.dto.response;
 
 /*-
  * =========================LICENSE_START==================================
@@ -20,19 +20,18 @@ package br.com.conductor.heimdall.core.repository;
  * ==========================LICENSE_END===================================
  */
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import br.com.conductor.heimdall.core.entity.OAuthAuthorize;
+import lombok.Data;
+import java.io.Serializable;
 
 /**
- * OAuthAuthorize Repository.
+ * This class represents the structure of Token in OAuth implicit.
  *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
-public interface OAuthAuthorizeRepository extends JpaRepository<OAuthAuthorize, Long> {
+@Data
+public class TokenImplicit implements Serializable {
 
-    OAuthAuthorize findByClientIdAndExpirationDateIsNull(String clientId);
+    private String accessToken;
+    private long expiration;
 
-    OAuthAuthorize findByClientIdAndTokenAuthorize(String clientId, String tokenAuthorize);
-
-    OAuthAuthorize findByTokenAuthorize(String tokenAuthorize);
 }

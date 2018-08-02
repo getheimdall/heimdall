@@ -1,4 +1,4 @@
-package br.com.conductor.heimdall.core.repository;
+package br.com.conductor.heimdall.core.util;
 
 /*-
  * =========================LICENSE_START==================================
@@ -20,19 +20,16 @@ package br.com.conductor.heimdall.core.repository;
  * ==========================LICENSE_END===================================
  */
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import br.com.conductor.heimdall.core.entity.OAuthAuthorize;
-
 /**
- * OAuthAuthorize Repository.
+ * This class holds oAuth constants
  *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
-public interface OAuthAuthorizeRepository extends JpaRepository<OAuthAuthorize, Long> {
+public class ConstantsOAuth {
 
-    OAuthAuthorize findByClientIdAndExpirationDateIsNull(String clientId);
-
-    OAuthAuthorize findByClientIdAndTokenAuthorize(String clientId, String tokenAuthorize);
-
-    OAuthAuthorize findByTokenAuthorize(String tokenAuthorize);
+    public final static String GRANT_TYPE_PASSWORD = "PASSWORD";
+    public final static String GRANT_TYPE_REFRESH_TOKEN = "REFRESH_TOKEN";
+    public final static String GRANT_TYPE_IMPLICIT = "IMPLICIT";
+    public final static String CODE = "code";
+    public final static String TOKEN = "token";
 }
