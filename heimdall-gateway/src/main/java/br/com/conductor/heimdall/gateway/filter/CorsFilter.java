@@ -1,3 +1,4 @@
+
 package br.com.conductor.heimdall.gateway.filter;
 
 /*-
@@ -65,7 +66,7 @@ public class CorsFilter extends ZuulFilter {
 		HttpServletResponse response = ctx.getResponse();
 		List<Pair<String, String>> zuulResponseHeaders = ctx.getZuulResponseHeaders();
 		
-		List<String> headersFromResponse = zuulResponseHeaders.stream().map(pair -> pair.first()).collect(Collectors.toList());
+		List<String> headersFromResponse = zuulResponseHeaders.stream().map(Pair::first).collect(Collectors.toList());
 		
 		cors.entrySet()
 			.stream()
