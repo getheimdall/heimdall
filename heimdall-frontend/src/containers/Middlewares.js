@@ -9,14 +9,12 @@ const Column = Table.Column
 class Middlewares extends Component {
 
     state = {
-        apiId: 0,
         version: "",
         page: 0,
         pageSize: 10
     }
 
     componentDidMount() {
-        this.setState(...this.state, {apiId: this.props.api.id})
         this.props.dispatch(initLoading())
         this.props.dispatch(getMiddlewares({offset: 0, limit: 10}, this.props.api.id))
     }
@@ -34,7 +32,7 @@ class Middlewares extends Component {
             this.setState({...this.state, version: ""})
             message.success(`${info.file.name} file uploaded successfully.`)
             this.props.dispatch(initLoading())
-            this.props.dispatch(getMiddlewares({offset: this.state.page, limit: 10}, this.state.apiId))
+            this.props.dispatch(getMiddlewares({offset: this.state.page, limit: 10}, this.props.api.id))
         } else if (status === 'error') {
             message.error(`${info.file.name} file upload failed.`)
             message.error(info.file.error.response.data.message)
@@ -44,7 +42,7 @@ class Middlewares extends Component {
     handlePagination = (page, pageSize) => {
         this.setState({...this.state, page: page - 1, pageSize: pageSize})
         this.props.dispatch(initLoading())
-        this.props.dispatch(getMiddlewares({offset: page - 1, limit: 10}, this.state.apiId))
+        this.props.dispatch(getMiddlewares({offset: page - 1, limit: 10}, this.props.api.id))
     }
 
     handleBeforeUpload = (file) => {
@@ -52,7 +50,7 @@ class Middlewares extends Component {
         const type = splitName[splitName.length - 1]
         const isJar = type === "jar"
         if (!isJar) {
-            message.error('You can only upload JPG file!')
+            message.error('You can only upload JAR file!')
         }
 
         const isLtOrE25M = file.size / 1024 / 1024 <= 25;
@@ -64,13 +62,13 @@ class Middlewares extends Component {
     }
 
     sendFileUpload = (info) => {
-        const {apiId, version} = this.state
+        const {version} = this.state
         const data = new FormData()
         data.append("file", info.file)
         data.append("version", version)
         data.append("status", "ACTIVE")
 
-        this.props.dispatch(save(data, apiId, info))
+        this.props.dispatch(save(data, this.props.api.id, info))
     }
 
     handleOnChangeVersion = (event) => {
@@ -78,10 +76,9 @@ class Middlewares extends Component {
     }
 
     handleFileDownload = (middlewareId, version) => {
-        const {apiId} = this.state
         const apiName = this.props.api.name;
         this.props.dispatch(initLoading())
-        this.props.dispatch(downloadMiddleware(middlewareId, apiId, apiName, version))
+        this.props.dispatch(downloadMiddleware(middlewareId, this.props.api.id, apiName, version))
     }
 
     verifyVersionIsEmpty = () => {
