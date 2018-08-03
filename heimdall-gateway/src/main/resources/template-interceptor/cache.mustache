@@ -1,11 +1,15 @@
 import java.util.*;
 
+import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.util.BeanManager;
 import br.com.conductor.heimdall.gateway.filter.helper.HelperImpl;
 import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
 import br.com.conductor.heimdall.middleware.spec.ApiResponse;
 import br.com.conductor.heimdall.middleware.spec.Helper;
+
+import com.google.common.collect.Sets;
 import com.netflix.zuul.context.RequestContext;
+
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,25 +20,48 @@ import javax.annotation.PostConstruct;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 
 
-public class CacheFilter extends HeimdallFilter {
+public class CacheInterceptor extends HeimdallFilter {
 
     private RedissonClient redisson;
 
     private RMap<String, ApiResponse> map;
 
+    private static Set<String> pathsAllowed;
+
+    private static Set<String> pathsNotAllowed;
+
+    private static String inboundURL;
+
+    private static String method;
+
     private static String cacheName;
 
     private Helper helper;
 
-    public CacheFilter() {
+    public CacheInterceptor() {
+
         cacheName = "{{cache}}";
+
+        method = "{{method}}";
+
+        pathsAllowed = Sets.newHashSet();
+        {{#pathsAllowed}}
+            pathsAllowed.add("{{.}}");
+        {{/pathsAllowed}}
+
+        pathsNotAllowed = Sets.newHashSet();
+        {{#pathsNotAllowed}}
+            pathsNotAllowed.add("{{.}}");
+        {{/pathsNotAllowed}}
+
+        inboundURL = "{{inboundURL}}";
 
         this.helper = new HelperImpl();
     }
 
     @Override
     public boolean should() {
-        return !cacheName.isEmpty();
+        return InterceptorLifeCycle.{{lifeCycle}}.filter(pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest());
     }
 
     @Override
