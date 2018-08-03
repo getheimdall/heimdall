@@ -86,10 +86,6 @@ class Middlewares extends Component {
             customRequest: this.sendFileUpload
         };
 
-
-
-        console.log(middlewares)
-
         return (
             <div>
                 <Card

@@ -18,7 +18,6 @@ class ApiDefinition extends Component {
     onSubmitApi() {
         this.props.form.validateFieldsAndScroll((err, payload) => {
             if (!err) {
-                console.log(payload)
                 if (payload.environments) {
                     let environments = payload.environments;
                     payload.environments = environments.map((env) => ({ id: env }))

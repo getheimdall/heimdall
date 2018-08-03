@@ -17,7 +17,6 @@ const interceptorSpec = {
         const dropResult = monitor.getDropResult()
         const didDrop = monitor.didDrop()
         if (didDrop) {
-            // console.log(component.state)
             component.setState({ ...component.state, showModal: true, executionPoint: dropResult.executionPoint })
         }
     },
