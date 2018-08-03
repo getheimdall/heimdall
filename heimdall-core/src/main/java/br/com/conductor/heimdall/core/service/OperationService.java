@@ -23,7 +23,6 @@ package br.com.conductor.heimdall.core.service;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ONLY_ONE_OPERATION_PER_RESOURCE;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.OPERATION_ATTACHED_TO_INTERCEPTOR;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.OPERATION_CANT_HAVE_SINGLE_WILDCARD;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END;
 import static br.com.twsoftware.alfred.object.Objeto.isBlank;
@@ -32,6 +31,8 @@ import static br.com.twsoftware.alfred.object.Objeto.notBlank;
 import java.util.Arrays;
 import java.util.List;
 
+import br.com.conductor.heimdall.core.entity.Interceptor;
+import br.com.conductor.heimdall.core.repository.InterceptorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -59,6 +60,7 @@ import br.com.conductor.heimdall.core.util.Pageable;
  * This class provides methods to create, read, update and delete a {@link Operation} resource.
  * 
  * @author Filipe Germano
+ * @author Marcelo Aguiar Rodrigues
  *
  */
 @Service
@@ -69,6 +71,12 @@ public class OperationService {
 
      @Autowired
      private ResourceRepository resourceRepository;
+
+     @Autowired
+     private InterceptorRepository interceptorRepository;
+
+     @Autowired
+     private InterceptorService interceptorService;
 
      @Autowired
      private AMQPRouteService amqpRoute;
@@ -198,7 +206,7 @@ public class OperationService {
           HeimdallException.checkThrow(isBlank(operation), GLOBAL_RESOURCE_NOT_FOUND);
           
           Operation resData = operationRepository.findByResourceApiIdAndMethodAndPath(apiId, operationDTO.getMethod(), operationDTO.getPath());
-          HeimdallException.checkThrow(notBlank(resData) && (resData.getResource().getId() == operation.getResource().getId()) && (resData.getId() != operation.getId()), ONLY_ONE_OPERATION_PER_RESOURCE);
+          HeimdallException.checkThrow(notBlank(resData) && (resData.getResource().getId().equals(operation.getResource().getId())) && (resData.getId() != operation.getId()), ONLY_ONE_OPERATION_PER_RESOURCE);
           
           operation = GenericConverter.mapper(operationDTO, operation);
           
@@ -227,10 +235,11 @@ public class OperationService {
 
           Operation operation = operationRepository.findByResourceApiIdAndResourceIdAndId(apiId, resourceId, operationId);
           HeimdallException.checkThrow(isBlank(operation), GLOBAL_RESOURCE_NOT_FOUND);
-          
-          Integer totalOperationsAttached = operationRepository.findInterceptorWithOperation(operationId);
-          HeimdallException.checkThrow(totalOperationsAttached == 1, OPERATION_ATTACHED_TO_INTERCEPTOR);
-          
+
+          // Deletes all interceptors attached to the Operation
+          List<Interceptor> interceptors = interceptorRepository.findByOperationId(operationId);
+          interceptors.forEach(interceptor -> interceptorService.delete(interceptor.getId()));
+
           operationRepository.delete(operation.getId());
           amqpCacheService.dispatchClean(ConstantsCache.OPERATION_ACTIVE_FROM_ENDPOINT, operation.getResource().getApi().getBasePath() + operation.getPath());
           
