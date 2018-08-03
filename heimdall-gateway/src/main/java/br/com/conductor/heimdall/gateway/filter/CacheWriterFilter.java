@@ -21,7 +21,10 @@ package br.com.conductor.heimdall.gateway.filter;
  * ==========================LICENSE_END===================================
  */
 
+import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.filter.helper.ApiResponseImpl;
+import br.com.conductor.heimdall.gateway.trace.FilterDetail;
+import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.middleware.spec.ApiResponse;
 import com.google.common.collect.Maps;
 import com.netflix.zuul.ZuulFilter;
@@ -33,7 +36,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.Collection;
 import java.util.Map;
 
-import static br.com.conductor.heimdall.gateway.util.Constants.REDIS_MAP_CACHE;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
 
 /**
@@ -43,6 +45,8 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
  */
 @Component
 public class CacheWriterFilter extends ZuulFilter {
+
+    private FilterDetail detail = new FilterDetail();
 
     @Override
     public String filterType() {
@@ -57,16 +61,34 @@ public class CacheWriterFilter extends ZuulFilter {
     @Override
     public boolean shouldFilter() {
         RequestContext context = RequestContext.getCurrentContext();
-        Boolean should = false;
 
-        if (context.get(REDIS_MAP_CACHE) != null)
-            should = (Boolean) context.get(REDIS_MAP_CACHE);
-
-        return should;
+        return (context.get("cache") != null);
     }
 
     @Override
     public Object run() {
+
+        long startTime = System.currentTimeMillis();
+        try {
+            process();
+            detail.setStatus(Constants.SUCCESS);
+        } catch (Exception e) {
+            detail.setStatus(Constants.FAILED);
+            throw e;
+        } finally {
+            long endTime = System.currentTimeMillis();
+
+            long duration = (endTime - startTime);
+
+            detail.setName(this.getClass().getSimpleName());
+            detail.setTimeInMillisRun(duration);
+            TraceContextHolder.getInstance().getActualTrace().addFilter(detail);
+        }
+
+        return null;
+    }
+
+    private void process() {
         RequestContext context = RequestContext.getCurrentContext();
 
         RMap<String, ApiResponse> map = (RMap<String, ApiResponse>) context.get("cache-map");
@@ -80,7 +102,6 @@ public class CacheWriterFilter extends ZuulFilter {
         apiResponse.setStatus(response.getStatus());
 
         map.put(key, apiResponse);
-        return null;
     }
 
     /*

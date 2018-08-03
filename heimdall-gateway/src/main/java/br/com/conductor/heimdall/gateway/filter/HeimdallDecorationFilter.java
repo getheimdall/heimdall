@@ -289,6 +289,11 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                         requestURI = org.apache.commons.lang.StringUtils.removeStart(requestURI, basePath);
                         ctx.put("pattern", org.apache.commons.lang.StringUtils.removeStart(pattern, basePath));
 
+                        String apiName = operation.getResource().getApi().getName();
+                        String apiId = operation.getResource().getApi().getId().toString();
+                        ctx.put("api-id", apiId);
+                        ctx.put("api-name", apiName);
+
                         List<Environment> environments = operation.getResource().getApi().getEnvironments();
 
                         String location = null;
@@ -300,7 +305,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                                 host = ctx.getRequest().getHeader("host");
                             }
 
-                            Optional<Environment> environment = Optional.ofNullable(null);
+                            Optional<Environment> environment;
                             if (Objeto.notBlank(host)) {
                                 String tempHost = host;
                                 environment = environments.stream().filter(e -> e.getInboundURL().toLowerCase().contains(tempHost.toLowerCase())).findFirst();
