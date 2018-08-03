@@ -1,0 +1,103 @@
+import java.util.*;
+
+import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
+import br.com.conductor.heimdall.core.util.BeanManager;
+import br.com.conductor.heimdall.gateway.filter.helper.HelperImpl;
+import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
+import br.com.conductor.heimdall.middleware.spec.ApiResponse;
+import br.com.conductor.heimdall.middleware.spec.Helper;
+
+import com.google.common.collect.Sets;
+import com.netflix.zuul.context.RequestContext;
+
+import org.redisson.api.RMap;
+import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
+
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
+
+
+public class CacheClearInterceptor extends HeimdallFilter {
+
+    private RedissonClient redisson;
+
+    private RMap<String, ApiResponse> map;
+
+    private static Set<String> pathsAllowed;
+
+    private static Set<String> pathsNotAllowed;
+
+    private static String inboundURL;
+
+    private static String method;
+
+    private static String cacheName;
+
+    private Helper helper;
+
+    public CacheClearInterceptor() {
+
+        cacheName = "{{cache}}";
+
+        method = "{{method}}";
+
+        pathsAllowed = Sets.newHashSet();
+        {{#pathsAllowed}}
+            pathsAllowed.add("{{.}}");
+        {{/pathsAllowed}}
+
+        pathsNotAllowed = Sets.newHashSet();
+        {{#pathsNotAllowed}}
+            pathsNotAllowed.add("{{.}}");
+        {{/pathsNotAllowed}}
+
+        inboundURL = "{{inboundURL}}";
+
+        this.helper = new HelperImpl();
+    }
+
+    @Override
+    public boolean should() {
+        return InterceptorLifeCycle.{{lifeCycle}}.filter(pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest());
+    }
+
+    @Override
+    public void execute() throws Throwable {
+
+        this.redisson = (RedissonClient) BeanManager.getBean(RedissonClient.class);
+
+        RequestContext context = RequestContext.getCurrentContext();
+
+        String apiId = (String) context.get("api-id");
+        String apiName = (String) context.get("api-name");
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(apiId)
+            .append(".")
+            .append(apiName);
+
+        String mapCache = stringBuilder.toString();
+
+        this.map = redisson.getMap(mapCache);
+
+        if (map != null)
+            map.remove(cacheName);
+    }
+
+    @Override
+    public String getName() {
+        return "{{name}}";
+    }
+
+    @Override
+    public String filterType() {
+        return POST_TYPE;
+    }
+
+    @Override
+    public int filterOrder() {
+        return {{order}};
+    }
+}

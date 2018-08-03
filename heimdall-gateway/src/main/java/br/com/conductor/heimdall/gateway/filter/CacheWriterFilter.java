@@ -30,6 +30,7 @@ import com.google.common.collect.Maps;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import org.redisson.api.RMap;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletResponse;
@@ -96,8 +97,11 @@ public class CacheWriterFilter extends ZuulFilter {
 
         HttpServletResponse response = context.getResponse();
 
-        ApiResponseImpl apiResponse = new ApiResponseImpl();
-        apiResponse.setHeaders(getResponseHeaders(response));
+        Map<String, String> headers = getResponseHeaders(response);
+        headers.put(HttpHeaders.CONTENT_TYPE, context.getResponse().getContentType());
+
+        ApiResponse apiResponse = new ApiResponseImpl();
+        apiResponse.setHeaders(headers);
         apiResponse.setBody(context.getResponseBody());
         apiResponse.setStatus(response.getStatus());
 

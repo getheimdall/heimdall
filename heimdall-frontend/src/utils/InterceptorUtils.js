@@ -25,7 +25,7 @@ export const getTemplate = (type) => {
         return TEMPLATE_IPS
     }
 
-    if (type === 'CACHE') {
+    if (type === 'CACHE' || type === 'CACHE_CLEAR') {
         return TEMPLATE_CACHE
     }
 }
