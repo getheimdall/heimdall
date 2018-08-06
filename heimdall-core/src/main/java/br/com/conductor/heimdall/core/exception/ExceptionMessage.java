@@ -21,17 +21,12 @@ package br.com.conductor.heimdall.core.exception;
  * ==========================LICENSE_END===================================
  */
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
-import static org.springframework.http.HttpStatus.REQUEST_TIMEOUT;
-import static org.springframework.http.HttpStatus.UNAUTHORIZED;
-
 import br.com.twsoftware.alfred.object.Objeto;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+
+import static org.springframework.http.HttpStatus.*;
 
 /**
  * Enum that concentrates the messages and validations of the exceptions <br/>
@@ -43,229 +38,242 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public enum ExceptionMessage {
 
-     GLOBAL_ERROR_ZUUL(INTERNAL_SERVER_ERROR.value(), "Gateway Internal Server Error", ServerErrorException.class),
+    GLOBAL_ERROR_ZUUL(INTERNAL_SERVER_ERROR.value(), "Gateway Internal Server Error", ServerErrorException.class),
 
-     GLOBAL_REQUEST_NOT_FOUND(NOT_FOUND.value(), "Request not found", NotFoundException.class),
+    GLOBAL_REQUEST_NOT_FOUND(NOT_FOUND.value(), "Request not found", NotFoundException.class),
+
+    GLOBAL_RESOURCE_NOT_FOUND(NOT_FOUND.value(), "Resource not found", NotFoundException.class),
+
+    GLOBAL_JSON_INVALID_FORMAT(BAD_REQUEST.value(), "Json invalid format", BadRequestException.class),
+
+    GLOBAL_TIMEOUT(REQUEST_TIMEOUT.value(), REQUEST_TIMEOUT.getReasonPhrase(), TimeoutException.class),
+
+    ACCESS_TOKEN_ALREADY_EXISTS(BAD_REQUEST.value(), "Token already exists", BadRequestException.class),
+
+    INTERCEPTOR_LIMIT_REACHED(BAD_REQUEST.value(), "Intercept limit reached", BadRequestException.class),
+
+    INTERCEPTOR_INVALID_CONTENT(BAD_REQUEST.value(), "Content for {} interceptor is incorrect. Use the standard: {}", BadRequestException.class),
+
+    INTERCEPTOR_NOT_EXIST(BAD_REQUEST.value(), "Interceptor defined not exist", BadRequestException.class),
+
+    INTERCEPTOR_TEMPLATE_NOT_EXIST(BAD_REQUEST.value(), "Template interceptor not exist", BadRequestException.class),
+
+    INTERCEPTOR_REFERENCE_NOT_FOUND(BAD_REQUEST.value(), "Reference interceptor not found", BadRequestException.class),
+
+    INTERCEPTOR_IGNORED_INVALID(BAD_REQUEST.value(), "Reference operations invalid: {}", BadRequestException.class),
+
+    MIDDLEWARE_UNSUPPORTED_TYPE(BAD_REQUEST.value(), "File type differs from .jar not supported", BadRequestException.class),
+
+    MIDDLEWARE_CONTAINS_INTERCEOPTORS(BAD_REQUEST.value(), "Middleware still contains interceptors associated", BadRequestException.class),
+
+    MIDDLEWARE_INVALID_FILE(BAD_REQUEST.value(), "Invalid file", BadRequestException.class),
+
+    MIDDLEWARE_PAYLOAD_TOO_LARGE(PAYLOAD_TOO_LARGE.value(), "Content is to big. Maximal allowed request size is 25MB", MultipartException.class),
+
+    ACCESS_TOKEN_NOT_DEFINED(BAD_REQUEST.value(), "Access token not defined", BadRequestException.class),
+
+    APP_REPEATED(BAD_REQUEST.value(), "App repeated", BadRequestException.class),
+
+    DEVELOPER_NOT_EXIST(BAD_REQUEST.value(), "Developer not exist", BadRequestException.class),
+
+    RESOURCE_METHOD_NOT_ACCEPT(BAD_REQUEST.value(), "method not accepted please use: GET, POST, PUT, PATH or DELETE", BadRequestException.class),
+
+    APP_NOT_EXIST(BAD_REQUEST.value(), "App not exist", BadRequestException.class),
+
+    API_BASEPATH_EXIST(BAD_REQUEST.value(), "The basepath defined exist", BadRequestException.class),
+
+    API_BASEPATH_EMPTY(BAD_REQUEST.value(), "Basepath not defined", BadRequestException.class),
+
+    API_CANT_ENVIRONMENT_INBOUND_URL_EQUALS(BAD_REQUEST.value(), "Apis can't have environments with the same inbound url", BadRequestException.class),
+
+    ONLY_ONE_OPERATION_PER_RESOURCE(BAD_REQUEST.value(), "Only one operation per resource", BadRequestException.class),
+
+    ONLY_ONE_RESOURCE_PER_API(BAD_REQUEST.value(), "Only one resource per api", BadRequestException.class),
+  
+    SOME_PLAN_NOT_PRESENT_IN_APP(BAD_REQUEST.value(), "Some of the informed plans do not belong to the App plans", BadRequestException.class),
+  
+    ONLY_ONE_MIDDLEWARE_PER_VERSION_AND_API(BAD_REQUEST.value(), "Only one middleware per version and api", BadRequestException.class),
      
-     GLOBAL_RESOURCE_NOT_FOUND(NOT_FOUND.value(), "Resource not found", NotFoundException.class),
+    ENVIRONMENT_ALREADY_EXISTS(BAD_REQUEST.value(), "Environment already exists", BadRequestException.class),
 
-     GLOBAL_JSON_INVALID_FORMAT(BAD_REQUEST.value(), "Json invalid format", BadRequestException.class),
+    PRIVILEGES_NOT_EXIST(BAD_REQUEST.value(), "Privileges {} defined to attach in role not exist ", BadRequestException.class),
 
-     GLOBAL_TIMEOUT(REQUEST_TIMEOUT.value(), REQUEST_TIMEOUT.getReasonPhrase(), TimeoutException.class),
+    ACCESS_DENIED(UNAUTHORIZED.value(), "Access Denied", UnauthorizedException.class),
 
-     ACCESS_TOKEN_ALREADY_EXISTS(BAD_REQUEST.value(), "Token already exists", BadRequestException.class),
+    ENVIRONMENT_ATTACHED_TO_API(BAD_REQUEST.value(), "Environment attached to Api", BadRequestException.class),
+
+    ENVIRONMENT_INBOUND_DNS_PATTERN(BAD_REQUEST.value(), "Environment inbound URL has to follow the pattern http[s]://host.domain[:port] or www.host.domain[:port]", BadRequestException.class),PROVIDER_NOT_FOUND(BAD_REQUEST.value(), "Provider not found", BadRequestException.class),
      
-     INTERCEPTOR_LIMIT_REACHED(BAD_REQUEST.value(), "Intercept limit reached", BadRequestException.class),
-
-     INTERCEPTOR_INVALID_CONTENT(BAD_REQUEST.value(), "Content for {} interceptor is incorrect. Use the standard: {}", BadRequestException.class),
-
-     INTERCEPTOR_NOT_EXIST(BAD_REQUEST.value(), "Interceptor defined not exist", BadRequestException.class),
-
-     INTERCEPTOR_TEMPLATE_NOT_EXIST(BAD_REQUEST.value(), "Template interceptor not exist", BadRequestException.class),
-
-     INTERCEPTOR_REFERENCE_NOT_FOUND(BAD_REQUEST.value(), "Reference interceptor not found", BadRequestException.class),
-
-     INTERCEPTOR_IGNORED_INVALID(BAD_REQUEST.value(), "Reference operations invalid: {}", BadRequestException.class),
-
-     MIDDLEWARE_UNSUPPORTED_TYPE(BAD_REQUEST.value(), "File type differs from .jar not supported", BadRequestException.class),
-
-     MIDDLEWARE_CONTAINS_INTERCEOPTORS(BAD_REQUEST.value(), "Middleware still contains interceptors associated", BadRequestException.class),
+    PROVIDER_USER_UNAUTHORIZED(UNAUTHORIZED.value(), "User provider unauthorized", UnauthorizedException.class),
      
-     MIDDLEWARE_INVALID_FILE(BAD_REQUEST.value(), "Invalid file", BadRequestException.class),
+    TOKEN_EXPIRED(UNAUTHORIZED.value(), "Token expired", UnauthorizedException.class),
 
-     ACCESS_TOKEN_NOT_DEFINED(BAD_REQUEST.value(), "Access token not defined", BadRequestException.class),
-     
-     APP_REPEATED(BAD_REQUEST.value(), "App repeated", BadRequestException.class),
+    TOKEN_INVALID(UNAUTHORIZED.value(), "Token not valid", ForbiddenException.class),
 
-     DEVELOPER_NOT_EXIST(BAD_REQUEST.value(), "Developer not exist", BadRequestException.class),
+    TOKEN_NOT_GENERATE(INTERNAL_SERVER_ERROR.value(), "Error to generate token", ForbiddenException.class),
 
-     RESOURCE_METHOD_NOT_ACCEPT(BAD_REQUEST.value(), "method not accepted please use: GET, POST, PUT, PATH or DELETE", BadRequestException.class),
+    CODE_NOT_FOUND(UNAUTHORIZED.value(), "Code already used to generate token or not defined", UnauthorizedException.class),
 
-     APP_NOT_EXIST(BAD_REQUEST.value(), "App not exist", BadRequestException.class),
-     
-     API_BASEPATH_EXIST(BAD_REQUEST.value(), "The basepath defined exist", BadRequestException.class),
-     
-     API_BASEPATH_EMPTY(BAD_REQUEST.value(), "Basepath not defined", BadRequestException.class),
-     
-     ONLY_ONE_OPERATION_PER_RESOURCE(BAD_REQUEST.value(), "Only one operation per resource", BadRequestException.class),
+    GRANT_TYPE_NOT_FOUND(BAD_REQUEST.value(), "grant_type not found", BadRequestException.class),
 
-     ONLY_ONE_RESOURCE_PER_API(BAD_REQUEST.value(), "Only one resource per api", BadRequestException.class),
+    REFRESH_TOKEN_NOT_FOUND(BAD_REQUEST.value(), "refresh_token not found", BadRequestException.class),
 
-     ONLY_ONE_MIDDLEWARE_PER_VERSION_AND_API(BAD_REQUEST.value(), "Only one middleware per version and api", BadRequestException.class),
-     
-     ENVIRONMENT_INBOUND_URL_ALREADY_EXISTS(BAD_REQUEST.value(), "Inbound URL already exists", BadRequestException.class),
-     
-     PRIVILEGES_NOT_EXIST(BAD_REQUEST.value(), "Privileges {} defined to attach in role not exist ", BadRequestException.class),
-     
-     ACCESS_DENIED(UNAUTHORIZED.value(), "Access Denied", UnauthorizedException.class),
-     
-     ENVIRONMENT_ATTACHED_TO_API(BAD_REQUEST.value(), "Environment attached to Api", BadRequestException.class),
-     
-     PROVIDER_NOT_FOUND(BAD_REQUEST.value(), "Provider not found", BadRequestException.class),
-     
-     PROVIDER_USER_UNAUTHORIZED(UNAUTHORIZED.value(), "User provider unauthorized", UnauthorizedException.class),
-     
-     TOKEN_EXPIRED(UNAUTHORIZED.value(), "Token expired", UnauthorizedException.class),
-     
-     CODE_NOT_FOUND(UNAUTHORIZED.value(), "Code already used to generate token or not defined", UnauthorizedException.class),
-     
-     GRANT_TYPE_NOT_EXIST(BAD_REQUEST.value(), "GrantType not found", BadRequestException.class),
-     
-     REFRESH_TOKEN_NOT_EXIST(BAD_REQUEST.value(), "RefreshToken not found", BadRequestException.class),
-     
-     OPERATION_ATTACHED_TO_INTERCEPTOR(BAD_REQUEST.value(), "Operation attached to Interceptor", BadRequestException.class),
-     
-     OPERATION_CANT_HAVE_SINGLE_WILDCARD(BAD_REQUEST.value(), "Operation can not have a single wild card (/*)", BadRequestException.class),
-     
-     OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END(BAD_REQUEST.value(), "Operation can have a double wild card (/**), but only at the end", BadRequestException.class),
-     
-     API_BASEPATH_MALFORMED(BAD_REQUEST.value(), "Api basepath can not contain a wild card", BadRequestException.class);
+    TYPE_OAUTH_NOT_FOUND(BAD_REQUEST.value(), "TypeOAuth not found", BadRequestException.class),
 
-     @Getter
-     private Integer httpCode;
+    PRIVATE_KEY_NOT_FOUND(BAD_REQUEST.value(), "privateKey not found", BadRequestException.class),
 
-     @Getter
-     @Setter
-     private String message;
+    OPERATION_ATTACHED_TO_INTERCEPTOR(BAD_REQUEST.value(), "Operation attached to Interceptor", BadRequestException.class),
 
-     private String defaultMessage;
+    OPERATION_CANT_HAVE_SINGLE_WILDCARD(BAD_REQUEST.value(), "Operation can not have a single wild card (/*)", BadRequestException.class),
 
-     @Getter
-     private Class<? extends HeimdallException> klass;
+    OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END(BAD_REQUEST.value(), "Operation can have a double wild card (/**), but only at the end", BadRequestException.class),
 
-     ExceptionMessage(int httpCode, String message, Class<? extends HeimdallException> klass) {
+    API_BASEPATH_MALFORMED(BAD_REQUEST.value(), "Api basepath can not contain a wild card", BadRequestException.class),
 
-          this.httpCode = httpCode;
-          this.defaultMessage = message;
-          this.klass = klass;
-          this.message = Objeto.isBlank(this.message) ? this.defaultMessage.replace("{}", "") : this.message;
-     }
+    CLIENT_ID_ALREADY(BAD_REQUEST.value(), "clientId already used", BadRequestException.class),
 
-     /**
-      * Method responsible for triggering the exception
-      * 
-      * @throws BadRequestException
-      * @throws UnauthorizedException
-      * @throws ForbiddenException
-      * @throws NotFoundException
-      * @throws ServerErrorException
-      */
-     public void raise() {
+    CLIENT_ID_NOT_FOUND(BAD_REQUEST.value(), "client_id not found", BadRequestException.class),
 
-          log.debug("Raising error: {}", this);
+    AUTHORIZATION_NOT_FOUND(UNAUTHORIZED.value(), "Authorization not found in header", UnauthorizedException.class),
 
-          this.message = Objeto.isBlank(this.message) ? this.defaultMessage.replace("{}", "") : this.message;
+    RESPONSE_TYPE_NOT_FOUND(BAD_REQUEST.value(), "response_type not found", BadRequestException.class);
 
-          if (this.badRequest()) {
+    @Getter
+    private Integer httpCode;
 
-               throw new BadRequestException(this);
-          } else if (this.unauthorized()) {
+    @Getter
+    @Setter
+    private String message;
 
-               throw new UnauthorizedException(this);
-          } else if (this.forbidden()) {
+    private String defaultMessage;
 
-               throw new ForbiddenException(this);
-          } else if (this.notFound()) {
+    @Getter
+    private Class<? extends HeimdallException> klass;
 
-               throw new NotFoundException(this);
-          } else if (this.timeout()) {
-               
-               throw new TimeoutException(this);
-          } else if (this.serverError()) {
+    ExceptionMessage(int httpCode, String message, Class<? extends HeimdallException> klass) {
 
-               throw new ServerErrorException(this);
-          }
+        this.httpCode = httpCode;
+        this.defaultMessage = message;
+        this.klass = klass;
+        this.message = Objeto.isBlank(this.message) ? this.defaultMessage.replace("{}", "") : this.message;
+    }
 
-     }
+    /**
+     * Method responsible for triggering the exception
+     *
+     * @throws BadRequestException
+     * @throws UnauthorizedException
+     * @throws ForbiddenException
+     * @throws NotFoundException
+     * @throws ServerErrorException
+     */
+    public void raise() {
 
-     /**
-      * Method responsible for exception triggering with partial or total custom message inclusion.
-      * 
-      * @param dynamicText				This parameter will replace the symbols: {},
-      * 								included in the message respectively. If more
-      * 								than one symbol is given: {}, and only one parameter
-      * 								pass, it will replace all the keys for the parameter entered.
-      * 
-      */
-     public void raise(String... dynamicText) {
+        log.debug("Raising error: {}", this);
 
-          if (dynamicText != null && dynamicText.length > 0) {
+        this.message = Objeto.isBlank(this.message) ? this.defaultMessage.replace("{}", "") : this.message;
 
-               Integer count = 0;
-               String baseMessage = this.defaultMessage;
-               while (baseMessage.contains("{}")) {
+        if (this.badRequest()) {
 
-                    if (dynamicText.length == 1) {
+            throw new BadRequestException(this);
+        } else if (this.unauthorized()) {
 
-                         this.message = this.defaultMessage.replace("{}", dynamicText[count]);
-                         baseMessage = this.message;
-                    } else {
+            throw new UnauthorizedException(this);
+        } else if (this.forbidden()) {
 
-                         this.defaultMessage = this.defaultMessage.replaceFirst("\\{\\}", dynamicText[count]);
-                         this.message = this.defaultMessage;
-                         baseMessage = this.message;
-                         
-                    }
-                    count++;
-               }
-          }
-          raise();
-     }
-     
-     /**
-      * Method responsible for validation of error codes with code 400.
-      * 
-      */
-     private Boolean badRequest() {
+            throw new ForbiddenException(this);
+        } else if (this.notFound()) {
 
-          return this.httpCode == BAD_REQUEST.value();
-     }
+            throw new NotFoundException(this);
+        } else if (this.timeout()) {
 
-     /**
-      * Method responsible for validation of error codes with code 401.
-      * 
-      */
-     private Boolean unauthorized() {
+            throw new TimeoutException(this);
+        } else if (this.serverError()) {
 
-          return this.httpCode == UNAUTHORIZED.value();
-     }
+            throw new ServerErrorException(this);
+        }
 
-     /**
-      * Method responsible for validation of error codes with code 403.
-      * 
-      */
-     private Boolean forbidden() {
+    }
 
-          return this.httpCode == FORBIDDEN.value();
-     }
+    /**
+     * Method responsible for exception triggering with partial or total custom message inclusion.
+     *
+     * @param dynamicText This parameter will replace the symbols: {},
+     *                    included in the message respectively. If more
+     *                    than one symbol is given: {}, and only one parameter
+     *                    pass, it will replace all the keys for the parameter entered.
+     */
+    public void raise(String... dynamicText) {
 
-     /**
-      * Method responsible for validation of error codes with code 404.
-      * 
-      */
-     private Boolean notFound() {
+        if (dynamicText != null && dynamicText.length > 0) {
 
-          return this.httpCode == NOT_FOUND.value();
-     }
+            Integer count = 0;
+            String baseMessage = this.defaultMessage;
+            while (baseMessage.contains("{}")) {
 
-     /**
-      * 
-      * Method responsible for validation of error codes with code 408.
-      * 
-      */
-     private Boolean timeout() {
-          
-          return this.httpCode == REQUEST_TIMEOUT.value();
-     }
+                if (dynamicText.length == 1) {
 
-     /**
-      * 
-      * Method responsible for validation of error codes with code 500.
-      * 
-      */
-     private Boolean serverError() {
+                    this.message = this.defaultMessage.replace("{}", dynamicText[count]);
+                    baseMessage = this.message;
+                } else {
 
-          return this.httpCode == INTERNAL_SERVER_ERROR.value();
-     }
+                    this.defaultMessage = this.defaultMessage.replaceFirst("\\{\\}", dynamicText[count]);
+                    this.message = this.defaultMessage;
+                    baseMessage = this.message;
+
+                }
+                count++;
+            }
+        }
+        raise();
+    }
+
+    /**
+     * Method responsible for validation of error codes with code 400.
+     */
+    private Boolean badRequest() {
+
+        return this.httpCode == BAD_REQUEST.value();
+    }
+
+    /**
+     * Method responsible for validation of error codes with code 401.
+     */
+    private Boolean unauthorized() {
+
+        return this.httpCode == UNAUTHORIZED.value();
+    }
+
+    /**
+     * Method responsible for validation of error codes with code 403.
+     */
+    private Boolean forbidden() {
+
+        return this.httpCode == FORBIDDEN.value();
+    }
+
+    /**
+     * Method responsible for validation of error codes with code 404.
+     */
+    private Boolean notFound() {
+
+        return this.httpCode == NOT_FOUND.value();
+    }
+
+    /**
+     * Method responsible for validation of error codes with code 408.
+     */
+    private Boolean timeout() {
+
+        return this.httpCode == REQUEST_TIMEOUT.value();
+    }
+
+    /**
+     * Method responsible for validation of error codes with code 500.
+     */
+    private Boolean serverError() {
+
+        return this.httpCode == INTERNAL_SERVER_ERROR.value();
+    }
 
 }

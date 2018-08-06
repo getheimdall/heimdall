@@ -89,6 +89,7 @@ class InterceptorForm extends Component {
             <Row>
                 <Form>
                     {interceptor && getFieldDecorator('id', { initialValue: interceptor.id })(<Input type='hidden' />)}
+                    {interceptor && interceptor.uuid && getFieldDecorator('uuid', { initialValue: interceptor.uuid })(<Input type='hidden' />)}
                     {getFieldDecorator('referenceId', { initialValue: interceptor ? interceptor.referenceId : referenceId })(<Input type='hidden' />)}
                     {environmentId && getFieldDecorator('environment', { initialValue: environmentId })(<Input type='hidden' />)}
 

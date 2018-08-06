@@ -20,24 +20,24 @@ package br.com.conductor.heimdall.core.util;
  * ==========================LICENSE_END===================================
  */
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.springframework.stereotype.Component;
-
+import br.com.conductor.heimdall.core.dto.response.TokenImplicit;
 import br.com.conductor.heimdall.core.entity.TokenOAuth;
+import br.com.conductor.heimdall.core.exception.ExceptionMessage;
+import br.com.conductor.heimdall.core.exception.HeimdallException;
+import br.com.conductor.heimdall.core.exception.UnauthorizedException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
+
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class provides methods to generate and validate token with JWT
@@ -45,112 +45,24 @@ import lombok.extern.slf4j.Slf4j;
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Slf4j
-@Component
 public class JwtUtils {
 
     /**
-     * This method generate a new token.
+     * This method generate a new token with refreshToken.
      *
-     * @param clientId         The clientId that is used to get the SecretKey
-     * @param operationsPath   Paths that the token can be used
+     * @param privateKey       The privateKey that is used to get the SecretKey
      * @param timeToken        Time to expire the accessToken
      * @param timeRefreshToken Time to expire the refreshToken
+     * @param claims           The {@link Map}<{@link String}, {@link Object}> claims
      * @return The new {@link TokenOAuth}
      */
-    public TokenOAuth generateNewToken(String clientId, Set<String> operationsPath, int timeToken, int timeRefreshToken) {
-        return generateToken(clientId, timeToken, timeRefreshToken, operationsPath);
-    }
+    public static TokenOAuth generateTokenOAuth(String privateKey, int timeToken, int timeRefreshToken, Map<String, Object> claims) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime dateExpiredAccessToken = now.plusSeconds(timeToken);
+        LocalDateTime dateExpiredRefreshToken = now.plusSeconds(timeRefreshToken);
 
-    /**
-     * This method generate a new token with default time in accessToken and refreshToken
-     *
-     * @param clientId       The clientId that is used to get the SecretKey
-     * @param operationsPath Paths that the token can be used
-     * @return The new {@link TokenOAuth}
-     */
-    public TokenOAuth generateNewTokenTimeDefault(String clientId, Set<String> operationsPath) {
-        return generateToken(clientId, 20, 3600, operationsPath);
-    }
-
-    /**
-     * This method validate if token is expired
-     *
-     * @param token    The token to be validate
-     * @param clientId The clientId that is used to get the SecretKey
-     * @return True if token is expired or false otherwise
-     */
-    public boolean tokenExpired(String token, String clientId) {
-        Claims claimsFromTheToken;
-        try {
-            claimsFromTheToken = getClaimsFromTheToken(token, getSecretKeyByClientId(clientId));
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return true;
-        }
-
-        return new Date().after(claimsFromTheToken.getExpiration());
-    }
-
-    /**
-     * This method recover from the Token the Operations.
-     *
-     * @param token    The token that contain the operations
-     * @param clientId The clientId that is used to get the SecretKey
-     * @return The operations from the token
-     */
-    @SuppressWarnings("unchecked")
-    public Set<String> getOperationsFromToken(String token, String clientId) {
-        Claims claimsFromTheToken;
-        Set<String> operations = new HashSet<>();
-        try {
-            claimsFromTheToken = getClaimsFromTheToken(token, getSecretKeyByClientId(clientId));
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return operations;
-        }
-
-        List<String> list = claimsFromTheToken.get("operations", ArrayList.class);
-        list.forEach(o -> {
-            operations.add(o);
-        });
-
-        return operations;
-    }
-
-    /**
-     * This method generate a new token.
-     *
-     * @param clientId         The clientId that is used to get the SecretKey
-     * @param operationsPath   Paths that the token can be used
-     * @param timeToken        Time to expire the accessToken
-     * @param timeRefreshToken Time to expire the refreshToken
-     * @return The new {@link TokenOAuth}
-     */
-    private TokenOAuth generateToken(String clientId, int timeToken, int timeRefreshToken, Set<String> operationsPath) {
-        final LocalDateTime now = LocalDateTime.now();
-        final LocalDateTime dateExpiredAccessToken = now.plusSeconds(timeToken);
-        final LocalDateTime dateExpiredRefreshToken = now.plusSeconds(timeRefreshToken);
-        final String secretKey = getSecretKeyByClientId(clientId);
-
-        String accessToken = Jwts.builder()
-                .setExpiration(Date.from(dateExpiredAccessToken.atZone(ZoneId.systemDefault()).toInstant()))
-                .claim("client_id", clientId)
-                .claim("operations", operationsPath)
-                .signWith(
-                        SignatureAlgorithm.HS256,
-                        secretKey
-                )
-                .compact();
-        String refreshToken = Jwts.builder()
-                .setExpiration(Date.from(dateExpiredRefreshToken.atZone(ZoneId.systemDefault()).toInstant()))
-                .claim("client_id", clientId)
-                .claim("operations", operationsPath)
-                .signWith(
-                        SignatureAlgorithm.HS256,
-                        secretKey
-                )
-                .compact();
-
+        String accessToken = generateToken(privateKey, dateExpiredAccessToken, claims);
+        String refreshToken = generateToken(privateKey, dateExpiredRefreshToken, claims);
         TokenOAuth tokenOAuth = new TokenOAuth();
         tokenOAuth.setAccessToken(accessToken);
         tokenOAuth.setRefreshToken(refreshToken);
@@ -159,36 +71,137 @@ public class JwtUtils {
     }
 
     /**
-     * This method return {@link Claims} from the token
+     * This method generate a new token with OAuthImplicit.
      *
-     * @param token     The token that contain the {@link Claims}
-     * @param secretKey To validate token and recover {@link Claims}
-     * @return The {@link Claims}
-     * @throws Exception Token expired
+     * @param privateKey The privateKey that is used to get the SecretKey
+     * @param timeToken  Time to expire the accessToken
+     * @param claims     The {@link Map}<{@link String}, {@link Object}> claims
+     * @return The new {@link TokenImplicit}
      */
-    private Claims getClaimsFromTheToken(String token, String secretKey) throws Exception {
+    public static TokenImplicit generateTokenImplicit(String privateKey, int timeToken, Map<String, Object> claims) {
+        LocalDateTime dateExpiredAccessToken = LocalDateTime.now().plusSeconds(timeToken);
+        String token = generateToken(privateKey, dateExpiredAccessToken, claims);
+        TokenImplicit tokenImplicit = new TokenImplicit();
+        tokenImplicit.setAccessToken(token);
+        tokenImplicit.setExpiration(LocalDateTime.now().until(dateExpiredAccessToken, ChronoUnit.SECONDS));
+        return tokenImplicit;
+    }
 
-        Claims claims;
+    /**
+     * This method validate if token is expired
+     *
+     * @param token      The token to be validate
+     * @param privateKey The privateKey that is used to get the SecretKey
+     * @throws HeimdallException If token expired
+     */
+    public static void tokenExpired(String token, String privateKey) throws HeimdallException {
+        getClaimsFromTheToken(token, encodePrivateKey(privateKey));
+    }
+
+    /**
+     * This method recover from the Token the Operations.
+     *
+     * @param token      The token that contain the operations
+     * @param privateKey The privateKey that is used to get the SecretKey
+     * @return The operations from the token
+     */
+    @SuppressWarnings("unchecked")
+    public static Set<String> getOperationsFromToken(String token, String privateKey) {
+        Claims claimsFromTheToken;
+        Set<String> operations = new HashSet<>();
+        try {
+            claimsFromTheToken = getClaimsFromTheToken(token, encodePrivateKey(privateKey));
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return operations;
+        }
+
+        List<String> list = claimsFromTheToken.get("operations", ArrayList.class);
+        operations.addAll(list);
+
+        return operations;
+    }
+
+    /**
+     * Convert JsonObject to {@link Map}<{@link String}, {@link Object}>
+     *
+     * @param jsonObject The JsonObject
+     * @return {@link Map}<{@link String}, {@link Object}>
+     */
+    @SuppressWarnings("unchecked")
+    public static Map<String, Object> getClaimsFromJSONObjectBodyRequest(String jsonObject) {
+
+        Map<String, Object> claims = new HashMap<>();
 
         try {
-            claims = Jwts.parser()
-                    .setSigningKey(secretKey)
-                    .parseClaimsJws(token)
-                    .getBody();
-        } catch (ExpiredJwtException e) {
-            throw new Exception("JWT expired");
+            claims = new ObjectMapper().readValue(jsonObject, HashMap.class);
+            claims = claims.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
         }
 
         return claims;
     }
 
     /**
-     * This method generate a SecretKey from the param clientId of the type {@link String}
+     * This method generate a new token
      *
-     * @param clientId Information to get a SecretKey
-     * @return The SecretKey of the type @{link {@link String}}
+     * @param privateKey      The privateKey that is used to get the SecretKey
+     * @param dateExpireToken Date the expiration of type {@link LocalDateTime}
+     * @return The new token as {@link String}
      */
-    private String getSecretKeyByClientId(String clientId) {
-        return Base64.getEncoder().encodeToString(clientId.getBytes());
+    private static String generateToken(String privateKey, LocalDateTime dateExpireToken, Map<String, Object> claims) {
+        final String secretKey = encodePrivateKey(privateKey);
+        return Jwts.builder()
+                .addClaims(claims)
+                .setIssuedAt(Date.from(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()))
+                .setExpiration(Date.from(dateExpireToken.atZone(ZoneId.systemDefault()).toInstant()))
+                .signWith(
+                        SignatureAlgorithm.HS256,
+                        secretKey
+                )
+                .compact();
+    }
+
+    /**
+     * This method return {@link Claims} from the token
+     *
+     * @param token     The token that contain the {@link Claims}
+     * @param secretKey To validate token and recover {@link Claims}
+     * @return The {@link Claims}
+     * @throws HeimdallException Token expired
+     */
+    public static Claims getClaimsFromTheToken(String token, String secretKey) throws HeimdallException {
+        try {
+            return Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (ExpiredJwtException e) {
+            throw new UnauthorizedException(ExceptionMessage.TOKEN_EXPIRED);
+        }
+    }
+
+    /**
+     * Get expiration {@link LocalDateTime} from token.
+     *
+     * @param token      The token
+     * @param privateKey The privateKey used to generate token
+     * @return The expiration {@link LocalDateTime}
+     * @throws HeimdallException If token expired
+     */
+    public static LocalDateTime recoverDateExpirationFromToken(String token, String privateKey) throws HeimdallException {
+        Claims claims = getClaimsFromTheToken(token, encodePrivateKey(privateKey));
+        return claims.getExpiration().toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+    }
+
+    /**
+     * This method encrypt the privateKey of the type {@link String}
+     *
+     * @param privateKey Information to be encrypt.
+     * @return The privateKey of the type @{link {@link String}} encoded
+     */
+    public static String encodePrivateKey(String privateKey) {
+        return Base64.getEncoder().encodeToString(privateKey.getBytes());
     }
 }

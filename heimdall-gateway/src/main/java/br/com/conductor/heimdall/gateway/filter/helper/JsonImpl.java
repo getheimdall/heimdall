@@ -22,12 +22,14 @@ package br.com.conductor.heimdall.gateway.filter.helper;
 
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -45,111 +47,138 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class JsonImpl implements Json {
 
-     public String parse(Map<String, Object> body) {
+	public String parse(Map<String, Object> body) {
 
-          try {
-               String json = mapper().writeValueAsString(body);
+		try {
+			String json = mapper().writeValueAsString(body);
 
-               return json;
-          } catch (JsonProcessingException e) {
+			return json;
+		} catch (JsonProcessingException e) {
 
-               log.error(e.getMessage(), e);
-               return null;
-          }
-     }
+			log.error(e.getMessage(), e);
+			return null;
+		}
+	}
 
-     public String parse(String string) {          
-          
-          try {
-               
-               JSONObject jsonObject = new JSONObject(string);
-               
-               return jsonObject.toString();
-          } catch (JSONException e) {
+	public String parse(String string) {
 
-               if (Objeto.notBlank(string)) {
-                    
-                    return string;
-               } else {
-                    
-                    log.error(e.getMessage(), e);
-                    return null;
-               }
-          }
-     }
-     
-     public <T> String parse(T object) {
+		try {
 
-          try {
-               
-               String jsonInString = mapper().writeValueAsString(object);
-               
-               return jsonInString;
-          } catch (Exception e) {
-               
-               log.error(e.getMessage(), e);
-               return null;
-          }
-     }
+			JSONObject jsonObject = new JSONObject(string);
 
-     public <T> T parse(String json, Class<?> classType) {
+			return jsonObject.toString();
+		} catch (JSONException e) {
+			try {
+				JSONArray array = new JSONArray(string);
+				return array.toString();
+			} catch (JSONException ex1) {
+				if (Objeto.notBlank(string)) {
+					return string;
+				}
+			}
+		}
 
-          try {
-               mapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-               @SuppressWarnings("unchecked")
-               T obj = (T) mapper().readValue(json, classType);
-               return obj;
-          } catch (Exception e) {
+		return null;
+	}
 
-               log.error(e.getMessage(), e);
-               return null;
-          } 
-     }
-     
-     public <T> Map<String, Object> parseToMap(T object) {
+	public <T> String parse(T object) {
 
-          try {
-               mapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-               ObjectMapper mapper = mapper().setSerializationInclusion(Include.NON_NULL);
-               String jsonInString = mapper.writeValueAsString(object);
-               
-               @SuppressWarnings("unchecked")
-               Map<String, Object> map = mapper.readValue(jsonInString, Map.class);
-               return map;
-          } catch (Exception e) {
+		try {
 
-               log.error(e.getMessage(), e);
-               return null;
-          } 
-     }
-     
-     public boolean isJson(String string) {          
-          
-          boolean valid = false;
-          try {
-               
-               JSONObject jsonObject = new JSONObject(string);
-               if (Objeto.notBlank(jsonObject)) {
-                    
-                    valid = true;
-               }
-          } catch (JSONException e) {
+			String jsonInString = mapper().writeValueAsString(object);
 
-               valid = false;
-          }
-          
-          return valid;
-     }
+			return jsonInString;
+		} catch (Exception e) {
+
+			log.error(e.getMessage(), e);
+			return null;
+		}
+	}
+
+	public <T> T parse(String json, Class<?> classType) {
+
+		try {
+			@SuppressWarnings("unchecked")
+			T obj = (T) mapper().readValue(json, classType);
+			return obj;
+		} catch (Exception e) {
+
+			log.error(e.getMessage(), e);
+			return null;
+		}
+	}
+	
+	@Override
+	public <T> T parse(String json, TypeReference<T> type) {
+		try {
+			mapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+			@SuppressWarnings("unchecked")
+			T obj = (T) mapper().readValue(json, type);
+			return obj;
+		} catch (Exception e) {
+
+			log.error(e.getMessage(), e);
+			return null;
+		}
+	}
 
 
-     private ObjectMapper mapper() {
-          
-          ObjectMapper mapper = new ObjectMapper();
-          mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-          mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);          
-          
-          return mapper;
-     }    
-     
-     
+	public <T> T parse(String json, Class<?> parametrized, Class<?>... parameterClasses) {
+		try {
+			@SuppressWarnings("unchecked")
+			T obj = (T) mapper().readValue(json, TypeFactory.defaultInstance().constructParametricType(parametrized, parameterClasses));
+			return obj;
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return null;
+		}
+	}
+
+	public <T> Map<String, Object> parseToMap(T object) {
+
+		try {
+			ObjectMapper mapper = mapper().setSerializationInclusion(Include.NON_NULL);
+			String jsonInString = mapper.writeValueAsString(object);
+
+			@SuppressWarnings("unchecked")
+			Map<String, Object> map = mapper.readValue(jsonInString, Map.class);
+			return map;
+		} catch (Exception e) {
+
+			log.error(e.getMessage(), e);
+			return null;
+		}
+	}
+
+	public boolean isJson(String string) {
+
+		boolean valid = false;
+		try {
+
+			JSONObject jsonObject = new JSONObject(string);
+			if (Objeto.notBlank(jsonObject)) {
+
+				valid = true;
+			}
+		} catch (JSONException e) {
+
+			try {
+				new JSONArray(string);
+				valid = true;
+			} catch (JSONException ex1) {
+				valid = false;
+			}
+		}
+
+		return valid;
+	}
+
+	private ObjectMapper mapper() {
+
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+		return mapper;
+	}
 }

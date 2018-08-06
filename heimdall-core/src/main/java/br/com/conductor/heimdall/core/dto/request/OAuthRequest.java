@@ -24,6 +24,7 @@ import java.io.Serializable;
 import java.util.Set;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 /**
@@ -36,14 +37,19 @@ public class OAuthRequest implements Serializable {
 
     private static final long serialVersionUID = 6985307454557101510L;
 
-    @NotNull(message = "client_id needs to be informed.")
-    private String client_id;
+    @JsonProperty("client_id")
+    private String clientId;
 
-    private String grant_type;
+    @JsonProperty("grant_type")
+    private String grantType;
+
+    @JsonProperty("response_type")
+    private String responseType;
 
     private Set<String> operations;
 
-    private String refresh_token;
+    @JsonProperty("refresh_token")
+    private String refreshToken;
 
     private String code;
 }

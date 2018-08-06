@@ -8,6 +8,7 @@ import PageHeader from '../components/ui/PageHeader'
 import Loading from '../components/ui/Loading';
 import EnvironmentForm from '../components/environments/EnvironmentForm';
 import { push } from 'connected-react-router';
+import {notification} from "antd/lib/index";
 
 class SingleEnvironment extends Component {
 
@@ -25,6 +26,13 @@ class SingleEnvironment extends Component {
         this.props.dispatch(clearEnvironment())
     }
 
+    componentWillReceiveProps(newProps) {
+        if (newProps.notification && newProps.notification !== this.props.notification) {
+            const { type, message, description } = newProps.notification
+            notification[type]({ message, description })
+        }
+    }
+
     handleSubmit = (formObject) => {
         this.props.dispatch(initLoading())
         if (formObject.id) {
@@ -36,7 +44,6 @@ class SingleEnvironment extends Component {
     }
 
     handleDelete = (environmentId) => {
-        console.log(environmentId)
         this.props.dispatch(remove(environmentId))
         this.props.dispatch(clearEnvironments())
         this.props.dispatch(push('/environments'))
@@ -64,7 +71,8 @@ class SingleEnvironment extends Component {
 const mapStateToProps = state => {
     return {
         environment: state.environments.environment,
-        loading: state.environments.loading
+        loading: state.environments.loading,
+        notification: state.environments.notification
     }
 }
 

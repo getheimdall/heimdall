@@ -26,7 +26,7 @@ class ListAccessTokens extends Component {
         const { loading } = this.props
         return (
             <div>
-                <Table dataSource={dataSource.content} rowKey={record => record.id} loading={loading} pagination={false}>
+                <Table dataSource={dataSource.content} rowKey={record => record.id} scroll={{x:1155}} loading={loading} pagination={false}>
                     <Column title="ID" dataIndex="id" id="id" width={200} />
                     <Column title="Status" id="status" key="status" width={200} render={(record) => (
                         <span>

@@ -1,4 +1,3 @@
-
 package br.com.conductor.heimdall.api.resource;
 
 /*-
@@ -29,6 +28,7 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import br.com.conductor.heimdall.core.dto.persist.AppPersist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -59,7 +59,7 @@ import io.swagger.annotations.ApiOperation;
  * Uses the {@link AppService} to provide methods to create, read, update and delete a {@link App}.
  *
  * @author Filipe Germano
- *
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @io.swagger.annotations.Api(value = PATH_APPS, produces = MediaType.APPLICATION_JSON_VALUE, tags = { ConstantsTag.TAG_APPS })
 @RestController
@@ -105,7 +105,7 @@ public class AppResource {
                
                if (!appPage.getContent().isEmpty()) {
                     List<App> apps = appPage.getContent();
-                    apps = apps.stream().map(app -> new App(app.getId(), app.getClientId(), app.getName(), app.getDescription(), app.getDeveloper(), app.getCreationDate(), app.getStatus(), null, null, null, app.getTags())).collect(Collectors.toList());
+                    apps = apps.stream().map(app -> new App(app.getId(), app.getClientId(), app.getName(), app.getDescription(), app.getDeveloper(), app.getCreationDate(), app.getStatus(), null, app.getPlans(), null, app.getTags())).collect(Collectors.toList());
                     appPage.setContent(apps);
                }
                return ResponseEntity.ok(appPage);
@@ -114,7 +114,7 @@ public class AppResource {
                List<App> apps = appService.list(appDTO);
                
                if (!apps.isEmpty()) {
-                    apps = apps.stream().map(app -> new App(app.getId(), app.getClientId(), app.getName(), app.getDescription(), app.getDeveloper(), app.getCreationDate(), app.getStatus(), null, null, null, app.getTags())).collect(Collectors.toList());
+                    apps = apps.stream().map(app -> new App(app.getId(), app.getClientId(), app.getName(), app.getDescription(), app.getDeveloper(), app.getCreationDate(), app.getStatus(), null, app.getPlans(), null, app.getTags())).collect(Collectors.toList());
                }
                return ResponseEntity.ok(apps);
           }
@@ -130,7 +130,7 @@ public class AppResource {
      @ApiOperation(value = "Save a new App")
      @PostMapping
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_APP)
-     public ResponseEntity<?> save(@RequestBody @Valid AppDTO appDTO) {
+     public ResponseEntity<?> save(@RequestBody @Valid AppPersist appDTO) {
 
           App app = appService.save(appDTO);
 

@@ -24,6 +24,8 @@ import java.io.Serializable;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * Class is a Data Transfer Object for the OAuth.
  *
@@ -35,7 +37,13 @@ public class OAuthDTO implements Serializable {
     private static final long serialVersionUID = 5878585926721281260L;
 
     private Long providerId;
+
+    @NotNull
     private String typeOAuth;
+
     private Integer timeAccessToken;
+
     private Integer timeRefreshToken;
+
+    private String privateKey;
 }

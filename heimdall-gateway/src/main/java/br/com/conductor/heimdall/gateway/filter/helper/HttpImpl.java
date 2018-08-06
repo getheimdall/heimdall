@@ -1,5 +1,5 @@
-package br.com.conductor.heimdall.gateway.filter.helper;
 
+package br.com.conductor.heimdall.gateway.filter.helper;
 
 /*-
  * =========================LICENSE_START==================================
@@ -23,7 +23,6 @@ package br.com.conductor.heimdall.gateway.filter.helper;
  
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.http.entity.ContentType;
 import org.springframework.http.HttpEntity;
@@ -49,17 +48,19 @@ import br.com.twsoftware.alfred.object.Objeto;
  */
 public class HttpImpl implements Http {
 
-     Json json = new JsonImpl();
-     
-     HttpHeaders headers = new HttpHeaders();
+     private Json json = new JsonImpl();
 
-     UriComponentsBuilder uriComponentsBuilder;
+     private HttpHeaders headers = new HttpHeaders();
 
-     HttpEntity<String> requestBody;
-     
-     String body;
+     private UriComponentsBuilder uriComponentsBuilder;
 
-     MultiValueMap<String, String> formData;
+     private HttpEntity<String> requestBody;
+
+     private String body;
+
+     private MultiValueMap<String, String> formData;
+
+     private RestTemplate restTemplate;
 
      public HttpImpl header(String name, String value) {
 
@@ -73,13 +74,10 @@ public class HttpImpl implements Http {
 
      public HttpImpl header(Map<String, String> params) {
 
-          for (Map.Entry<String, String> entry : params.entrySet()) {
-
-               if (Objeto.notBlank(entry.getValue())) {
-                    
-                    headers.add(entry.getKey(), entry.getValue());
-               }
-          }
+          params.forEach((key, value) -> {
+               if (value != null)
+                    headers.add(key, value);
+          });
 
           return this;
      }
@@ -104,12 +102,11 @@ public class HttpImpl implements Http {
      public HttpImpl body(Map<String, Object> params) {
 
           if (headers.containsKey("Content-Type") && headers.get("Content-Type").get(0).equals(ContentType.APPLICATION_FORM_URLENCODED.getMimeType())) {
-               formData = new LinkedMultiValueMap<String, String>();
-               for (Entry<String, Object> entry : params.entrySet()) {
-                    
-                    List<String> values = Lists.newArrayList(entry.getValue().toString());
-                    formData.put(entry.getKey(), values);
-               }               
+               formData = new LinkedMultiValueMap<>();
+               params.forEach((key, value) -> {
+                    List<String> values = Lists.newArrayList(value.toString());
+                    formData.put(key, values);
+               });
           } else {
                
                body = json.parse(params);          
@@ -128,7 +125,7 @@ public class HttpImpl implements Http {
      
      public ApiResponseImpl sendGet() {
           
-          ResponseEntity<String> entity = null;
+          ResponseEntity<String> entity;
           
           if (headers.isEmpty()) {
                
@@ -148,7 +145,7 @@ public class HttpImpl implements Http {
 
      public ApiResponseImpl sendPost() {
 
-          ResponseEntity<String> entity = null;
+          ResponseEntity<String> entity;
           if (headers.isEmpty()) {
                
                requestBody = new HttpEntity<>(body);
@@ -157,7 +154,7 @@ public class HttpImpl implements Http {
                
                if (Objeto.notBlank(formData)) {
                     
-                    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(formData, headers);
+                    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
                     entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.POST, request, String.class);
                } else {
                     
@@ -179,7 +176,7 @@ public class HttpImpl implements Http {
 
      public ApiResponseImpl sendPut() {
 
-          ResponseEntity<String> entity = null;
+          ResponseEntity<String> entity;
           if (headers.isEmpty()) {
                
                requestBody = new HttpEntity<>(body);
@@ -188,7 +185,7 @@ public class HttpImpl implements Http {
                
                if (Objeto.notBlank(formData)) {
                     
-                    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<MultiValueMap<String, String>>(formData, headers);
+                    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
                     entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PUT, request, String.class);
                } else {
                     
@@ -204,22 +201,38 @@ public class HttpImpl implements Http {
           return apiResponse;
      }
 
-     public ApiResponseImpl sendDelete() {
+	public ApiResponseImpl sendDelete() {
 
-          ResponseEntity<String> entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.DELETE, null, String.class);
-          ApiResponseImpl apiResponse = new ApiResponseImpl();
-          apiResponse.setHeaders(entity.getHeaders().toSingleValueMap());
-          apiResponse.setBody(entity.getBody());
-          apiResponse.setStatus(entity.getStatusCodeValue());
+		ResponseEntity<String> entity;
 
-          return apiResponse;
-     }
+		if (headers.isEmpty()) {
+			entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.DELETE, null, String.class);
+		} else {
+			entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.DELETE, new HttpEntity<>(headers), String.class);
+		}
+
+		ApiResponseImpl apiResponse = new ApiResponseImpl();
+		apiResponse.setHeaders(entity.getHeaders().toSingleValueMap());
+		apiResponse.setBody(entity.getBody());
+		apiResponse.setStatus(entity.getStatusCodeValue());
+
+		return apiResponse;
+	}
 
      private RestTemplate rest() {
+          if (this.restTemplate == null) {
 
-          RestTemplate restTemplate = new RestTemplate();
+               this.restTemplate = new RestTemplate();
+          }
 
-          return restTemplate;
-     }    
+          return this.restTemplate;
+     }
+
+     public RestTemplate clientProvider(RestTemplate restTemplate) {
+
+          this.restTemplate = restTemplate;
+          return this.restTemplate;
+     }
+
 
 }

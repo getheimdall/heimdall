@@ -10,6 +10,7 @@ import { Card, Row, Tabs, Button, Icon } from 'antd'
 import ApiDefinition from './ApiDefinition'
 import Resources from '../../containers/Resources'
 import Interceptors from '../../containers/Interceptors'
+import Middlewares from '../../containers/Middlewares'
 
 import Loading from '../ui/Loading'
 
@@ -62,6 +63,9 @@ class SingleApi extends Component {
                             </TabPane>
                             <TabPane tab={<div role="tab" className="ant-tabs-tab interceptors">Interceptors</div>} key="3">
                                 <Interceptors api={api} />
+                            </TabPane>
+                            <TabPane tab={<div role="tab" className="ant-tabs-tab middlewares">Middlewares</div>} key="4">
+                                <Middlewares api={api} />
                             </TabPane>
                         </Tabs>
                     </Card>

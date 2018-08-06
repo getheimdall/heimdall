@@ -43,8 +43,8 @@ heimdall:
         sendStringParametersAsUnicode: false
     mongo:
         enabled: false
-        #serverName:
-        #url: 
+#        serverName:
+#        url:
 #        port: 27017
 #        dataBase: logging
 #        collection: logs
@@ -78,6 +78,9 @@ heimdall:
             #userDn: your@mail.user
             #password: password
             #userSearchFilter: sAMAccountName={0}    
+    middlewares:
+        allowInactive: 0
+        deleteDeprecated: false
 
 spring:
     pid:
@@ -103,6 +106,11 @@ spring:
         requested-heartbeat: 10
     cache:
         type: redis
+    http:
+        multipart:
+            enabled: true
+            max-file-size: 25MB
+            max-request-size: 25MB
 
 springfox:
     documentation:

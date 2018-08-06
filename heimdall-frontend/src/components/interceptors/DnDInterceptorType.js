@@ -17,7 +17,6 @@ const interceptorSpec = {
         const dropResult = monitor.getDropResult()
         const didDrop = monitor.didDrop()
         if (didDrop) {
-            // console.log(component.state)
             component.setState({ ...component.state, showModal: true, executionPoint: dropResult.executionPoint })
         }
     },
@@ -77,7 +76,7 @@ class DnDInterceptorType extends Component {
                     </Badge>
                     <span>{type}</span>
 
-                    <Modal title="Add Resource"
+                    <Modal title="Add Interceptor"
                         footer={[
                             <Button key="back" onClick={this.handleCancel}>Cancel</Button>,
                             <Button key="submit" type="primary" onClick={this.handleSave}>

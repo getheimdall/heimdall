@@ -22,7 +22,7 @@ zuul:
     include-debug-header: false
     debug: 
         parameter: debug
-        request: true
+        request: false
     filter: 
         interval: 5
     host: 

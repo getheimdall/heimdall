@@ -21,7 +21,6 @@ const getResourcesByApi = (idApi) => {
 }
 
 const getResource = (idApi, id) => {
-    console.log(idApi, id)
     if (isNaN(idApi) || isNaN(id)) {
         return Promise.reject(new Error('Invalid parameter'))
     }
