@@ -39,7 +39,6 @@ class SingleDeveloper extends Component {
     }
 
     handleDelete = (developerId) => {
-        console.log(developerId)
         this.props.dispatch(remove(developerId))
         this.props.dispatch(clearDevelopers())
         this.props.dispatch(push('/developers'))
