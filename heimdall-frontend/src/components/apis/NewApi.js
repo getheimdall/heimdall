@@ -32,7 +32,6 @@ class NewApi extends Component {
     componentDidMount() {
         this.props.clearEnvironments()
         this.props.getAllEnvironments()
-        console.log(this.props.newApi)
         if (!this.props.newApi) {
             this.props.apiInit()
         }

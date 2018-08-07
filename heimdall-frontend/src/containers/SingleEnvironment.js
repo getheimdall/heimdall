@@ -44,7 +44,6 @@ class SingleEnvironment extends Component {
     }
 
     handleDelete = (environmentId) => {
-        console.log(environmentId)
         this.props.dispatch(remove(environmentId))
         this.props.dispatch(clearEnvironments())
         this.props.dispatch(push('/environments'))

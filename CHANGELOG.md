@@ -6,6 +6,7 @@
         * Changing basic auth for authentication with Jwt token, validating and generating new tokens on all requests;
         * Adding Authentication in Swagger;
         * Updating resources tests in api module.
+    * Adding feature to download Middleware file [Pull Request #105](https://github.com/getheimdall/heimdall/pull/105)
     
 * **Bugfix**
     * The class path loader when adding a new middleware had some issues that in some circumstances could cause the new middleware to not be loaded. [Pull Request #96](https://github.com/getheimdall/heimdall/pull/96)
