@@ -13,9 +13,6 @@ const login = (login, password) => {
             const user = JwtUtils.decodePayloadAsJson(token).sub
             localStorage.setItem('token', token)
             localStorage.setItem('user', user)
-            HTTPv1.get('/privileges/username/' + user).then(res => {
-                localStorage.setItem('privileges', JSON.stringify(res.data))
-            });
             return Promise.resolve(accountCredentials)
         })
         .catch(error => {
@@ -28,9 +25,7 @@ const logout = () => {
     if (localStorage.getItem('token')) {
         const headers = {'Authorization': localStorage.getItem('token')}
         HTTP.get('/v1/api/logout', {headers}).then(res => {
-            localStorage.removeItem('token')
-            localStorage.removeItem('user')
-            localStorage.removeItem('privileges')
+            localStorage.clear()
         });
     }
 }

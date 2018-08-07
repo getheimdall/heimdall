@@ -26,9 +26,7 @@ HTTPv1.interceptors.response.use(res => {
 }, error => {
     const response = error.response
     if (response.status === 401 || response.status === 403 || response.data.message === "Token expired") {
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-        localStorage.removeItem('privileges')
+        localStorage.clear()
         window.location.pathname = '/login'
     }
 
