@@ -22,12 +22,14 @@ package br.com.conductor.heimdall.gateway.filter.helper;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -96,7 +98,6 @@ public class JsonImpl implements Json {
 	public <T> T parse(String json, Class<?> classType) {
 
 		try {
-			mapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			@SuppressWarnings("unchecked")
 			T obj = (T) mapper().readValue(json, classType);
 			return obj;
@@ -106,11 +107,36 @@ public class JsonImpl implements Json {
 			return null;
 		}
 	}
+	
+	@Override
+	public <T> T parse(String json, TypeReference<T> type) {
+		try {
+			mapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+			@SuppressWarnings("unchecked")
+			T obj = (T) mapper().readValue(json, type);
+			return obj;
+		} catch (Exception e) {
+
+			log.error(e.getMessage(), e);
+			return null;
+		}
+	}
+
+
+	public <T> T parse(String json, Class<?> parametrized, Class<?>... parameterClasses) {
+		try {
+			@SuppressWarnings("unchecked")
+			T obj = (T) mapper().readValue(json, TypeFactory.defaultInstance().constructParametricType(parametrized, parameterClasses));
+			return obj;
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return null;
+		}
+	}
 
 	public <T> Map<String, Object> parseToMap(T object) {
 
 		try {
-			mapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			ObjectMapper mapper = mapper().setSerializationInclusion(Include.NON_NULL);
 			String jsonInString = mapper.writeValueAsString(object);
 
@@ -155,5 +181,4 @@ public class JsonImpl implements Json {
 
 		return mapper;
 	}
-
 }

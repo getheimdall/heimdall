@@ -177,7 +177,7 @@ public class EnvironmentService {
         HeimdallException.checkThrow(isBlank(environment), GLOBAL_RESOURCE_NOT_FOUND);
 
         Integer totalEnvironmentsAttached = environmentRepository.findApisWithEnvironment(id);
-        HeimdallException.checkThrow(totalEnvironmentsAttached == 1, ENVIRONMENT_ATTACHED_TO_API);
+        HeimdallException.checkThrow(totalEnvironmentsAttached > 0, ENVIRONMENT_ATTACHED_TO_API);
 
 
         environmentRepository.delete(environment);

@@ -31,14 +31,15 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
 
 import br.com.conductor.heimdall.core.environment.Property;
+import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
 import br.com.conductor.heimdall.gateway.trace.Trace;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import lombok.extern.slf4j.Slf4j;
@@ -50,9 +51,11 @@ import lombok.extern.slf4j.Slf4j;
  * @author Thiago Sampaio
  *
  */
-@Configuration
+
+@Component
 @Slf4j
-public class TraceConfiguration {
+@Order(Ordered.HIGHEST_PRECEDENCE)
+public class TraceFilter implements Filter {
 
 	@Value("${info.app.profile}")
 	private String profile;
@@ -63,61 +66,57 @@ public class TraceConfiguration {
 	@Autowired
 	private Property prop;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	public class TraceFilter implements Filter {
+	@Override
+	public void destroy() {
+	}
 
-		@Override
-		public void destroy() {
-		}
+	@Override
+	public void doFilter(ServletRequest request, ServletResponse res, FilterChain chain)
+			throws IOException, ServletException {
 
-		@Override
-		public void doFilter(ServletRequest request, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+		Trace trace = null;
 
-			Trace trace = null;
+		HttpServletResponse response = (HttpServletResponse) res;
+		try {
 
-			HttpServletResponse response = (HttpServletResponse) res;
-			try {
-
-				trace = TraceContextHolder.getInstance().init(prop.getTrace().isPrintAllTrace(), profile, request, prop.getMongo().getEnabled());
-				if (shouldDisableTrace(request)) {
-					trace.setShouldPrint(false);
-				}
-
-				if ("OPTIONS".equalsIgnoreCase(((HttpServletRequest) request).getMethod())) {
-					response.setHeader("Access-Control-Allow-Origin", "*");
-					response.setHeader("Access-Control-Allow-Credentials", "true");
-					response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, DELETE, OPTIONS");
-					response.setHeader("Access-Control-Allow-Headers", "origin, content-type, accept, authorization, x-requested-with, X-AUTH-TOKEN, access_token, client_id, device_id, credential");
-					response.setHeader("Access-Control-Max-Age", "3600");
-					response.setStatus(200);
-				} else {
-					chain.doFilter(request, response);
-				}
-				
-
-			} catch (Exception e) {
-
-				log.error("Error {} during request {} exception {}", e.getMessage(), ((HttpServletRequest) request).getRequestURL(), e);
-			} finally {
-
-				if (trace != null) {
-					if (trace.isShouldPrint()) {
-						trace.write(response);
-					} else {
-						TraceContextHolder.getInstance().clearActual();
-					}
-				}
-
-				TraceContextHolder.getInstance().unset();
+			trace = TraceContextHolder.getInstance().init(prop.getTrace().isPrintAllTrace(), profile, request,
+					prop.getMongo().getEnabled());
+			if (shouldDisableTrace(request)) {
+				trace.setShouldPrint(false);
 			}
-		}
 
-		@Override
-		public void init(FilterConfig arg0) throws ServletException {
+			if ("OPTIONS".equalsIgnoreCase(((HttpServletRequest) request).getMethod())) {
+				response.setHeader("Access-Control-Allow-Origin", "*");
+				response.setHeader("Access-Control-Allow-Credentials", "true");
+				response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, DELETE, OPTIONS");
+				response.setHeader("Access-Control-Allow-Headers", "origin, content-type, accept, authorization, x-requested-with, X-AUTH-TOKEN, access_token, client_id, device_id, credential");
+				response.setHeader("Access-Control-Max-Age", "3600");
+				response.setStatus(200);
+			} else {			
+				chain.doFilter(request, response);
+			}
 			
+		} catch (Exception e) {
+
+			log.error("Error {} during request {} exception {}", e.getMessage(),((HttpServletRequest) request).getRequestURL(), e.getStackTrace());
+			trace.setStackTrace(new StackTraceImpl(e.getClass().getName(), e.getMessage(), ExceptionUtils.getStackTrace(e)));
+			throw e;
+		} finally {
+
+			if (trace != null) {
+				if (trace.isShouldPrint()) {
+					trace.write(response);
+				} else {
+					TraceContextHolder.getInstance().clearActual();
+				}
+			}
+
+			TraceContextHolder.getInstance().unset();
 		}
+	}
+
+	@Override
+	public void init(FilterConfig arg0) throws ServletException {
 
 	}
 
@@ -133,22 +132,4 @@ public class TraceConfiguration {
 		String uri = ((HttpServletRequest) request).getRequestURI();
 		return (uri.equalsIgnoreCase("/") || uri.startsWith(managerPath));
 	}
-
-	/**
-	 * Configures and returns the {@link FilterRegistrationBean}.
-	 * 
-	 * @return {@link FilterRegistrationBean}
-	 */
-	@Bean
-	public FilterRegistrationBean filterRegistrationBean() {
-
-		FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
-		filterRegistrationBean.setFilter(new TraceFilter());
-		filterRegistrationBean.addUrlPatterns("/*");
-		filterRegistrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
-		filterRegistrationBean.setName("traceFilter");
-
-		return filterRegistrationBean;
-	}
-
 }

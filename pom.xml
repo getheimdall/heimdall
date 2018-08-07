@@ -12,7 +12,7 @@
 
 	<groupId>br.com.conductor.heimdall</groupId>
 	<artifactId>heimdall</artifactId>
-	<version>1.5.0-SNAPSHOT</version>
+	<version>1.6.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Heimdall</name>
@@ -143,8 +143,7 @@
 		<hikaricp.version>2.6.1</hikaricp.version>
 		<mssql-jdbc.version>6.2.1.jre8</mssql-jdbc.version>
 		<jackson.version>2.9.2</jackson.version>
-		<spring-cloud.version>Dalston.SR4</spring-cloud.version>
-		<versao>${project.version}</versao>
+		<spring-cloud.version>Edgware.SR4</spring-cloud.version>
 		<scala.version>2.11.7</scala.version>
 		<gatling.version>2.2.0</gatling.version>
 		<scala-maven-plugin.version>3.2.2</scala-maven-plugin.version>
@@ -248,12 +247,12 @@
 			<dependency>
 				<groupId>br.com.conductor.heimdall</groupId>
 				<artifactId>heimdall-core</artifactId>
-				<version>1.5.0-SNAPSHOT</version>
+				<version>1.6.0-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>br.com.conductor.heimdall</groupId>
 				<artifactId>heimdall-middleware-spec</artifactId>
-				<version>1.5.0-SNAPSHOT</version>
+				<version>1.6.0-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mongodb</groupId>
