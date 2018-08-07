@@ -26,7 +26,7 @@ public class CacheClearHeimdallInterceptor implements HeimdallInterceptor {
             return JsonUtils.convertJsonToObject(content, CacheDTO.class);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(TypeInterceptor.CACHE_CLEAR.name(), TemplateUtils.TEMPLATE_CACHE);
+            ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(TypeInterceptor.CACHE_CLEAR.name(), TemplateUtils.TEMPLATE_CACHE_CLEAR);
         }
 
         return null;    }

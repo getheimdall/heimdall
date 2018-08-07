@@ -32,4 +32,7 @@ import lombok.Data;
 public class CacheDTO {
 
     public String cache;
+
+    public Long timeToLive;
+
 }

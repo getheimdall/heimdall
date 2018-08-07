@@ -42,4 +42,8 @@ public class ConstantsCache {
 
      public static final String APPS_CLIENT_ID = "APPS_CLIENT_ID";
 
+     public static final String CACHE_TIME_TO_LIVE = "CACHE_TIME_TO_LIVE";
+
+     public static final String CACHE_BUCKET = "CACHE_BUCKET";
+
 }

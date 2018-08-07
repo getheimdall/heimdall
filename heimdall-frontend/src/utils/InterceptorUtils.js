@@ -2,7 +2,8 @@ export const TEMPLATE_ACCESS_TOKEN = "{\"location\": \"HEADER\", \"name\": \"acc
 export const TEMPLATE_MOCK = "{\"body\": \"{'name': 'Mock Example'}\", \"status\": \"200\"}"
 export const TEMPLATE_RATTING = "{\"calls\":20,\"interval\":\"MINUTES\"}";
 export const TEMPLATE_IPS = "{\"ips\": [ \"127.0.0.0\", \"127.0.0.1\" ]}"
-export const TEMPLATE_CACHE = "{\"cache\":\"cache-name\"}";
+export const TEMPLATE_CACHE_CLEAR = "{\"cache\":\"cache-name\"}";
+export const TEMPLATE_CACHE = "{\"cache\":\"cache-name\", \"timeToLive\": 10000}";
 
 export const getTemplate = (type) => {
     if (type === 'ACCESS_TOKEN') {
@@ -25,8 +26,12 @@ export const getTemplate = (type) => {
         return TEMPLATE_IPS
     }
 
-    if (type === 'CACHE' || type === 'CACHE_CLEAR') {
+    if (type === 'CACHE') {
         return TEMPLATE_CACHE
+    }
+
+    if (type === 'CACHE_CLEAR') {
+        return TEMPLATE_CACHE_CLEAR
     }
 }
 

@@ -2,15 +2,20 @@ import java.util.*;
 
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.util.BeanManager;
+import br.com.conductor.heimdall.core.util.UrlUtil;
 import br.com.conductor.heimdall.gateway.filter.helper.HelperImpl;
 import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
 import br.com.conductor.heimdall.middleware.spec.ApiResponse;
 import br.com.conductor.heimdall.middleware.spec.Helper;
 
 import com.google.common.collect.Sets;
+import com.google.common.hash.Hashing;
 import com.netflix.zuul.context.RequestContext;
 
-import org.redisson.api.RMap;
+import java.nio.charset.StandardCharsets;
+
+import org.redisson.api.RBucket;
+import org.redisson.api.RBuckets;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,10 +26,6 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 
 
 public class CacheClearInterceptor extends HeimdallFilter {
-
-    private RedissonClient redisson;
-
-    private RMap<String, ApiResponse> map;
 
     private static Set<String> pathsAllowed;
 
@@ -46,12 +47,12 @@ public class CacheClearInterceptor extends HeimdallFilter {
 
         pathsAllowed = Sets.newHashSet();
         {{#pathsAllowed}}
-            pathsAllowed.add("{{.}}");
+        pathsAllowed.add("{{.}}");
         {{/pathsAllowed}}
 
         pathsNotAllowed = Sets.newHashSet();
         {{#pathsNotAllowed}}
-            pathsNotAllowed.add("{{.}}");
+        pathsNotAllowed.add("{{.}}");
         {{/pathsNotAllowed}}
 
         inboundURL = "{{inboundURL}}";
@@ -67,23 +68,33 @@ public class CacheClearInterceptor extends HeimdallFilter {
     @Override
     public void execute() throws Throwable {
 
-        this.redisson = (RedissonClient) BeanManager.getBean(RedissonClient.class);
+        RedissonClient redisson = (RedissonClient) BeanManager.getBean(RedissonClient.class);
 
         RequestContext context = RequestContext.getCurrentContext();
 
         String apiId = (String) context.get("api-id");
         String apiName = (String) context.get("api-name");
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(apiId)
-            .append(".")
-            .append(apiName);
 
-        String mapCache = stringBuilder.toString();
+        StringBuilder cacheKey = new StringBuilder();
 
-        this.map = redisson.getMap(mapCache);
+        cacheKey
+            .append(apiId)
+            .append("-")
+            .append(apiName)
+            .append(":")
+            .append(cacheName)
+            .append("-")
+            .append(UrlUtil.getCurrentUrl(context.getRequest()));
 
-        if (map != null)
-            map.remove(cacheName);
+        String hashedKey = Hashing.sha512().hashString(cacheKey.toString(), StandardCharsets.UTF_8).toString();
+
+        RBuckets rBuckets = redisson.getBuckets();
+
+        List<RBucket<ApiResponse>> rBucketList = rBuckets.find(cacheKey.toString());
+
+        if (!rBucketList.isEmpty()) {
+            rBucketList.stream().findFirst().get().delete();
+        }
     }
 
     @Override

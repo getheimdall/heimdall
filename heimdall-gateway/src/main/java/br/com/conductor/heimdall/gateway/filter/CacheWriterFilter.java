@@ -29,15 +29,20 @@ import br.com.conductor.heimdall.middleware.spec.ApiResponse;
 import com.google.common.collect.Maps;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
-import org.redisson.api.RMap;
+import org.redisson.api.RBucket;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import static br.com.conductor.heimdall.core.util.ConstantsCache.CACHE_BUCKET;
+import static br.com.conductor.heimdall.core.util.ConstantsCache.CACHE_TIME_TO_LIVE;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SEND_FORWARD_FILTER_ORDER;
 
 /**
  * Filter to create a cache. When this filter is enabled it will create a cache from the response in Redis.
@@ -56,14 +61,14 @@ public class CacheWriterFilter extends ZuulFilter {
 
     @Override
     public int filterOrder() {
-        return 105;
+        return SEND_FORWARD_FILTER_ORDER;
     }
 
     @Override
     public boolean shouldFilter() {
         RequestContext context = RequestContext.getCurrentContext();
 
-        return (context.get("cache") != null);
+        return (context.get(CACHE_BUCKET) != null);
     }
 
     @Override
@@ -92,8 +97,7 @@ public class CacheWriterFilter extends ZuulFilter {
     private void process() {
         RequestContext context = RequestContext.getCurrentContext();
 
-        RMap<String, ApiResponse> map = (RMap<String, ApiResponse>) context.get("cache-map");
-        String key = (String) context.get("cache-key");
+        RBucket<ApiResponse> rBucket = (RBucket<ApiResponse>) context.get(CACHE_BUCKET);
 
         HttpServletResponse response = context.getResponse();
 
@@ -105,7 +109,13 @@ public class CacheWriterFilter extends ZuulFilter {
         apiResponse.setBody(context.getResponseBody());
         apiResponse.setStatus(response.getStatus());
 
-        map.put(key, apiResponse);
+        Long timeToLive = (Long) context.get(CACHE_TIME_TO_LIVE);
+
+        if (timeToLive != null && timeToLive > 0)
+            rBucket.set(apiResponse, timeToLive, TimeUnit.MILLISECONDS);
+        else
+            rBucket.set(apiResponse);
+
     }
 
     /*
