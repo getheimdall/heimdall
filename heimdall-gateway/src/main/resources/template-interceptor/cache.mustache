@@ -10,7 +10,6 @@ import br.com.conductor.heimdall.middleware.spec.ApiResponse;
 import br.com.conductor.heimdall.middleware.spec.Helper;
 
 import com.google.common.collect.Sets;
-import com.google.common.hash.Hashing;
 import com.netflix.zuul.context.RequestContext;
 
 import java.nio.charset.StandardCharsets;
@@ -92,8 +91,6 @@ public class CacheInterceptor extends HeimdallFilter {
             .append(cacheName)
             .append("-")
             .append(UrlUtil.getCurrentUrl(context.getRequest()));
-
-        String hashedKey = Hashing.sha512().hashString(cacheKey.toString(), StandardCharsets.UTF_8).toString();
 
         RBucket<ApiResponse> rBucket = redisson.getBucket(cacheKey.toString());
 
