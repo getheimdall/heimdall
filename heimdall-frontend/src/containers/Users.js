@@ -11,6 +11,8 @@ import PageHeader from '../components/ui/PageHeader'
 import ListUsers from '../components/users/ListUsers'
 import Loading from '../components/ui/Loading'
 import FloatButton from '../components/ui/FloatButton'
+import ComponentAuthority from "../components/ComponentAuthority";
+import {privileges} from "../constants/privileges-types";
 
 class Users extends Component {
 
@@ -81,8 +83,9 @@ class Users extends Component {
 
                 <Row className="h-row bg-white">
                     <ListUsers dataSource={users} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading} />
-
-                    <FloatButton history={history} to="/users/new" label="Add new API" />
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_USER]}>
+                        <FloatButton history={history} to="/users/new" label="Add new API" />
+                    </ComponentAuthority>
                 </Row>
             </div>
         )
