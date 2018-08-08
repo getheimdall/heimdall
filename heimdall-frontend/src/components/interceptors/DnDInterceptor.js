@@ -5,6 +5,8 @@ import ItemTypes from '../../constants/items-types'
 
 import { Button, Badge, Modal, Tooltip, Icon } from 'antd'
 import InterceptorForm from './InterceptorForm'
+import ComponentAuthority from "../ComponentAuthority";
+import {privileges} from "../../constants/privileges-types";
 
 const interceptorSpec = {
     beginDrag(props) {
@@ -73,12 +75,14 @@ class DnDInterceptor extends Component {
                     </Tooltip>
                     <span>{type}</span>
 
-                    <Modal title="Add Resource"
+                    <Modal title="Interceptor"
                         footer={[
                             <Button key="back" onClick={this.handleCancel}>Cancel</Button>,
-                            <Button key="submit" type="primary" onClick={this.handleSave}>
-                                Save
-                            </Button>
+                            <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_INTERCEPTOR, privileges.PRIVILEGE_UPDATE_INTERCEPTOR]}>
+                                <Button key="submit" type="primary" onClick={this.handleSave}>
+                                    Save
+                                </Button>
+                            </ComponentAuthority>
                         ]}
                         visible={this.state.showModal}
                         onCancel={this.handleCancel}
