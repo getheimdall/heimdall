@@ -45,11 +45,9 @@ class ListAccessTokens extends Component {
                         align="right"
                         render={(text, record) => (
                             <span>
-                                <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_UPDATE_ACCESSTOKEN]}>
-                                    <Tooltip title="Edit">
-                                        <Link to={"/tokens/" + record.id}><Button type="primary" icon="edit"/></Link>
-                                    </Tooltip>
-                                </ComponentAuthority>
+                                <Tooltip title="Edit">
+                                    <Link to={"/tokens/" + record.id}><Button type="primary" icon="edit"/></Link>
+                                </Tooltip>
                                 <Divider type="vertical"/>
                                 <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_ACCESSTOKEN]}>
                                     <Tooltip title="Delete">

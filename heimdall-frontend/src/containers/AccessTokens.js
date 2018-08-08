@@ -79,10 +79,7 @@ class AccessTokens extends Component {
                     </Card>
                 </Row>
                 <Row className="h-row bg-white">
-                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_READ_ACCESSTOKEN]}>
-                        <ListAccessTokens dataSource={accessTokens} handleDelete={this.handleDelete}
-                                          handlePagination={this.handlePagination} loading={loading}/>
-                    </ComponentAuthority>
+                    <ListAccessTokens dataSource={accessTokens} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading}/>
                     <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_ACCESSTOKEN]}>
                         <FloatButton history={history} to="/tokens/new" label="Add new Access Token"/>
                     </ComponentAuthority>
