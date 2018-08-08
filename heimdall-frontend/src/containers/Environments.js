@@ -8,6 +8,8 @@ import PageHeader from '../components/ui/PageHeader'
 import ListEnvironments from '../components/environments/ListEnvironments';
 import Loading from '../components/ui/Loading';
 import FloatButton from '../components/ui/FloatButton'
+import ComponentAuthority from "../components/ComponentAuthority";
+import {privileges} from "../constants/privileges-types";
 
 class Environments extends Component {
 
@@ -39,8 +41,9 @@ class Environments extends Component {
                 <Row className="h-row bg-white">
                     <ListEnvironments environments={environments} handleDelete={this.handleDelete} />
                     {loading && <Loading />}
-
-                    <FloatButton history={history} to="/environments/new" label="Add new Environment" />
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_ENVIRONMENT]}>
+                        <FloatButton history={history} to="/environments/new" label="Add new Environment" />
+                    </ComponentAuthority>
                 </Row>
             </div>
         )
