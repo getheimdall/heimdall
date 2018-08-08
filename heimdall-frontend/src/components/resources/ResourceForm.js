@@ -7,6 +7,8 @@ import { isEmpty } from '../../utils/CommonUtils'
 
 import { toggleModal, resetResource, getResource, save, update } from '../../actions/resources'
 import Loading from '../ui/Loading'
+import {PrivilegeUtils} from "../../utils/PrivilegeUtils";
+import {privileges} from "../../constants/privileges-types";
 
 const FormItem = Form.Item
 
@@ -57,7 +59,7 @@ class ResourceForm extends Component {
                                     getFieldDecorator('name', {
                                         initialValue: this.props.resource ? this.props.resource.name : '',
                                         rules: [{ required: true, message: 'Please input your api name!' }]
-                                    })(<Input required />)
+                                    })(<Input required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_RESOURCE, privileges.PRIVILEGE_UPDATE_RESOURCE])}/>)
                                 }
                             </FormItem>
                         </Col>
@@ -66,7 +68,7 @@ class ResourceForm extends Component {
                                 {
                                     getFieldDecorator('description', {
                                         initialValue: this.props.resource ? this.props.resource.description : ''
-                                    })(<Input required />)
+                                    })(<Input required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_RESOURCE, privileges.PRIVILEGE_UPDATE_RESOURCE])}/>)
                                 }
                             </FormItem>
                         </Col>

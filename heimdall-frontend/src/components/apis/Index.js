@@ -7,7 +7,7 @@ import {Button, Col, Form, Input, notification, Row, Tooltip} from 'antd'
 import {getAllApis} from '../../actions/apis'
 import Loading from '../ui/Loading';
 import ComponentAuthority from "../ComponentAuthority";
-import {PRIVILEGE_CREATE_API} from "../../utils/ConstantsPrivileges";
+import { privileges } from '../../constants/privileges-types'
 
 const FormItem = Form.Item
 
@@ -64,7 +64,7 @@ class Index extends Component {
                 </Row>
 
                 {listApi}
-                <ComponentAuthority privilegesAllowed={[PRIVILEGE_CREATE_API]}>
+                <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_API]}>
                     <Tooltip placement="left" title="Add new API">
                         <Button style={{position: 'fixed', bottom: '30px', right: '30px', zIndex: 9}}
                                 className="floatButton" type="primary" icon="plus"

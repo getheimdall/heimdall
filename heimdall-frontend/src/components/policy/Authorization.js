@@ -14,7 +14,12 @@ const Authorization = (privilegesAllowed) => (WrappedComponent) => {
         }
 
         render() {
-            return <ComponentAuthority privilegesAllowed={privilegesAllowed}> <WrappedComponent {...this.props} /></ComponentAuthority>
+            return (
+                <ComponentAuthority privilegesAllowed={privilegesAllowed}>
+                    <WrappedComponent {...this.props} />
+                </ComponentAuthority>
+            )
+
         }
 
     }

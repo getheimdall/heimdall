@@ -17,6 +17,9 @@ import { getAllResourcesByApi, clearResources } from '../actions/resources';
 import { getAllOperations, clearOperations } from '../actions/operations';
 import DnDInterceptorType from '../components/interceptors/DnDInterceptorType';
 import ColorUtils from "../utils/ColorUtils";
+import ComponentAuthority from "../components/ComponentAuthority";
+import {privileges} from "../constants/privileges-types";
+import {PrivilegeUtils} from "../utils/PrivilegeUtils";
 
 const Option = Select.Option
 
@@ -335,8 +338,8 @@ class Interceptors extends Component {
                                 <DnDInterceptorType key={index}
                                     type={interceptor.type}
                                     icon='code-o'
-                                    canAddInterceptor={canAddInterceptor}
-                                    color={canAddInterceptor && '#989898'}
+                                    canAddInterceptor={PrivilegeUtils.verifyPrivileges(privileges.PRIVILEGE_CREATE_INTERCEPTOR) && canAddInterceptor}
+                                    color={PrivilegeUtils.verifyPrivileges(privileges.PRIVILEGE_CREATE_INTERCEPTOR) && canAddInterceptor && '#989898'}
                                     environmentId={this.state.environmentId !== 0 && this.state.environmentId}
                                     planId={this.state.planId !== 0 && this.state.planId}
                                     resourceId={this.state.resourceId !== 0 && this.state.resourceId}
@@ -361,9 +364,11 @@ class Interceptors extends Component {
                             <Button className="card-button" type="danger" disabled={hasNoChanges} onClick={this.discardChanges}>
                                 <Icon type="delete" /> Discard
                             </Button>
-                            <Button className="card-button" type="primary" disabled={hasNoChanges} onClick={this.saveChanges}>
-                                <Icon type="save" /> Save Changes
-                            </Button>
+                            <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_INTERCEPTOR]}>
+                                <Button className="card-button" type="primary" disabled={hasNoChanges} onClick={this.saveChanges}>
+                                    <Icon type="save" /> Save Changes
+                                </Button>
+                            </ComponentAuthority>
                         </Row>
                     </Col>
                 </Row>

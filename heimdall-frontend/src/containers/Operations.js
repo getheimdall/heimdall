@@ -6,6 +6,9 @@ import { operationService } from '../services'
 import { List, Avatar, Button, Row, Col, Tooltip, Modal, notification } from 'antd';
 import Loading from '../components/ui/Loading'
 import OperationForm from '../components/operations/OperationForm';
+import ComponentAuthority from "../components/ComponentAuthority";
+import {privileges} from "../constants/privileges-types";
+import {PrivilegeUtils} from "../utils/PrivilegeUtils";
 
 const ButtonGroup = Button.Group;
 
@@ -104,7 +107,9 @@ class Operations extends Component {
             
                 footer={[
                     <Button key="back" onClick={this.handleCancel}>Cancel</Button>,
-                    <Button key="submit" type="primary" loading={loading} onClick={this.handleSave}>Save</Button>
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_OPERATION, privileges.PRIVILEGE_UPDATE_OPERATION]}>
+                        <Button key="submit" type="primary" loading={loading} onClick={this.handleSave}>Save</Button>
+                    </ComponentAuthority>
                 ]}
                 visible={this.state.visibleModal}
                 onCancel={this.handleCancel}
@@ -115,9 +120,17 @@ class Operations extends Component {
         if (operations && operations.length === 0) {
             return (
                 <Row type="flex" justify="center" align="bottom">
+                    {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_OPERATION]) &&
+                        <Col style={{ marginTop: 20 }}>
+                            You don't have <b>OPERATIONS</b> in this <b>RESOURCE</b>, please <Button type="dashed" onClick={this.showOperationModal()}>Add Operation</Button>
+                        </Col>
+                    }
+                    {!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_OPERATION]) &&
                     <Col style={{ marginTop: 20 }}>
-                        You don't have <b>OPERATIONS</b> in this <b>RESOURCE</b>, please <Button type="dashed" onClick={this.showOperationModal()}>Add Operation</Button>
+                        You don't have <b>OPERATIONS</b> in this <b>RESOURCE</b>
                     </Col>
+                    }
+
 
                     {modalOperation}
                 </Row>
@@ -126,11 +139,13 @@ class Operations extends Component {
 
         return (
             <div>
-                <Row type="flex" justify="center">
-                    <Tooltip title="Add Operation">
-                        <Button type="dashed" icon="plus" onClick={this.showOperationModal()}>Add Operation</Button>
-                    </Tooltip>
-                </Row>
+                <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_OPERATION]}>
+                    <Row type="flex" justify="center">
+                        <Tooltip title="Add Operation">
+                            <Button type="dashed" icon="plus" onClick={this.showOperationModal()}>Add Operation</Button>
+                        </Tooltip>
+                    </Row>
+                </ComponentAuthority>
                 {/* <hr /> */}
                 <List
                     className="demo-loadmore-list"
@@ -168,9 +183,11 @@ class Operations extends Component {
                                         <Tooltip title="Update">
                                             <Button type="primary" icon="edit" onClick={this.showOperationModal(operation.id)} />
                                         </Tooltip>
-                                        <Tooltip title="Delete">
-                                            <Button type="danger" icon="delete" onClick={this.remove(operation.id)} />
-                                        </Tooltip>
+                                        <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_OPERATION]}>
+                                            <Tooltip title="Delete">
+                                                <Button type="danger" icon="delete" onClick={this.remove(operation.id)} />
+                                            </Tooltip>
+                                        </ComponentAuthority>
                                     </ButtonGroup>
                                 </Row>
                             </List.Item>

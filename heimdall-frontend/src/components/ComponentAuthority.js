@@ -1,20 +1,14 @@
 import {Component} from 'react'
-import {userService} from "../services";
 import PropTypes from "prop-types";
+import {PrivilegeUtils} from "../utils/PrivilegeUtils";
 
 class ComponentAuthority extends Component {
 
     render() {
 
         const { privilegesAllowed } = this.props
-
-        if (userService.isUserLogged() && localStorage.getItem('privileges')) {
-            const rolesFromUser = localStorage.getItem('privileges')
-            const roles = JSON.parse(rolesFromUser)
-            const contains = roles.filter(role => privilegesAllowed.includes(role.name));
-            if (contains.length === privilegesAllowed.length) {
-                return this.props.children
-            }
+        if (PrivilegeUtils.verifyPrivileges(privilegesAllowed)){
+            return this.props.children
         }
 
         return null
@@ -22,6 +16,10 @@ class ComponentAuthority extends Component {
 }
 
 ComponentAuthority.propTypes = {
+    children: PropTypes.oneOfType([
+        PropTypes.element,
+        PropTypes.arrayOf(PropTypes.element)
+    ]).isRequired,
     privilegesAllowed: PropTypes.array.isRequired
 }
 
