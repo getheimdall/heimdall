@@ -11,7 +11,7 @@ import { getAllInterceptors, initLoading, getAllInterceptorsTypes, clearIntercep
 import { getAllPlans, clearPlans } from '../actions/plans';
 import { receiveQueue, clearQueue } from '../actions/queues'
 
-import { Row, Col, Form, Select, Icon, Card, Button, notification, Progress, Tag, Alert } from 'antd'
+import { Row, Col, Form, Select, Icon, Card, Button, notification, Progress, Tag, Alert, Badge } from 'antd'
 import Loading from '../components/ui/Loading';
 import { getAllResourcesByApi, clearResources } from '../actions/resources';
 import { getAllOperations, clearOperations } from '../actions/operations';
@@ -20,6 +20,7 @@ import ColorUtils from "../utils/ColorUtils";
 import ComponentAuthority from "../components/ComponentAuthority";
 import {privileges} from "../constants/privileges-types";
 import {PrivilegeUtils} from "../utils/PrivilegeUtils";
+import {countInterceptorsInOperation} from "../utils/BadgeUtils";
 
 const Option = Select.Option
 
@@ -309,10 +310,13 @@ class Interceptors extends Component {
 
                             <Col sm={24} md={6}>
                                 <Form.Item label="Operations">
-                                    <Select defaultValue={0} onChange={this.handleSelectChange('OP')} disabled={!this.props.operations}>
+                                    <Select defaultValue={0} onChange={this.handleSelectChange('OP')} disabled={!this.props.operations} className="heimdall-select-operation-filter">
                                         <Option value={0}>All</Option>
                                         {this.props.operations && this.props.operations.map((op, index) => (
-                                            <Option key={index} value={op.id}><Tag color={ColorUtils.getColorMethod(op.method)}>{op.method}</Tag> {op.path}</Option>
+                                            <Option key={index} value={op.id}>
+                                                <Badge className="heimdall-badge-operation-filter" count={countInterceptorsInOperation(allInterceptors, op.id)}/>
+                                                <Tag color={ColorUtils.getColorMethod(op.method)}>{op.method}</Tag> {op.path}
+                                            </Option>
                                         ))}
                                     </Select>
                                 </Form.Item>
