@@ -1,9 +1,9 @@
-export const countInterceptorsInOperation = (interceptors, operationId) => {
+export const countInterceptorsByCycle = (interceptors, typeCycle, referenceId) => {
     if (!interceptors){
         return 0
     }
     return interceptors.filter(f => {
-        return f.lifeCycle === 'OPERATION' && f.referenceId === operationId
+        return f.lifeCycle === typeCycle && f.referenceId === referenceId
         }
     ).length
 }

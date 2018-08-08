@@ -20,7 +20,7 @@ import ColorUtils from "../utils/ColorUtils";
 import ComponentAuthority from "../components/ComponentAuthority";
 import {privileges} from "../constants/privileges-types";
 import {PrivilegeUtils} from "../utils/PrivilegeUtils";
-import {countInterceptorsInOperation} from "../utils/BadgeUtils";
+import {countInterceptorsByCycle} from "../utils/BadgeUtils";
 
 const Option = Select.Option
 
@@ -289,20 +289,24 @@ class Interceptors extends Component {
                             </Col>
                             <Col sm={24} md={6}>
                                 <Form.Item label="Plans">
-                                    <Select defaultValue={0} onChange={this.handleSelectChange('PLAN')} disabled={!this.props.plans}>
+                                    <Select defaultValue={0} onChange={this.handleSelectChange('PLAN')} disabled={!this.props.plans} className="heimdall-select-filter-complete">
                                         <Option value={0}>All</Option>
                                         {this.props.plans && this.props.plans.content.map((plan, index) => (
-                                            <Option key={index} value={plan.id}>{plan.name}</Option>
+                                            <Option key={index} value={plan.id}>{plan.name}
+                                                <Badge title="Numbers of interceptors" className="heimdall-badge-interceptors-count" count={countInterceptorsByCycle(interceptors && interceptors.content, 'PLAN', plan.id)}/>
+                                            </Option>
                                         ))}
                                     </Select>
                                 </Form.Item>
                             </Col>
                             <Col sm={24} md={6}>
                                 <Form.Item label="Resources">
-                                    <Select defaultValue={0} onChange={this.handleSelectChange('RES')} disabled={!this.props.resources}>
+                                    <Select defaultValue={0} onChange={this.handleSelectChange('RES')} disabled={!this.props.resources} className="heimdall-select-filter-complete">
                                         <Option value={0}>All</Option>
                                         {this.props.resources && this.props.resources.map((res, index) => (
-                                            <Option key={index} value={res.id}>{res.name}</Option>
+                                            <Option key={index} value={res.id}>
+                                                <Badge title="Numbers of interceptors" className="heimdall-badge-interceptors-count" count={countInterceptorsByCycle(interceptors && interceptors.content, 'RESOURCE', res.id)}/>
+                                                {res.name}</Option>
                                         ))}
                                     </Select>
                                 </Form.Item>
@@ -310,11 +314,11 @@ class Interceptors extends Component {
 
                             <Col sm={24} md={6}>
                                 <Form.Item label="Operations">
-                                    <Select defaultValue={0} onChange={this.handleSelectChange('OP')} disabled={!this.props.operations} className="heimdall-select-operation-filter">
+                                    <Select defaultValue={0} onChange={this.handleSelectChange('OP')} disabled={!this.props.operations} className="heimdall-select-filter-complete">
                                         <Option value={0}>All</Option>
                                         {this.props.operations && this.props.operations.map((op, index) => (
                                             <Option key={index} value={op.id}>
-                                                <Badge className="heimdall-badge-operation-filter" count={countInterceptorsInOperation(allInterceptors, op.id)}/>
+                                                <Badge title="Numbers of interceptors" className="heimdall-badge-interceptors-count" count={countInterceptorsByCycle(interceptors && interceptors.content, 'OPERATION', op.id)}/>
                                                 <Tag color={ColorUtils.getColorMethod(op.method)}>{op.method}</Tag> {op.path}
                                             </Option>
                                         ))}
