@@ -198,8 +198,29 @@ class Interceptors extends Component {
     }
 
     render() {
+        const { interceptors, api, operations } = this.props
 
-        const { interceptors, api } = this.props
+        let environmentPath
+        let operationPath
+
+        if (this.state.environmentId !== 0 && api && api.environments){
+            const env = api.environments.find(e => e.id === this.state.environmentId)
+            if (env) {
+                environmentPath = env.inboundURL
+            } else {
+                environmentPath = ''
+            }
+        }
+
+        if (this.state.operationId !== 0 && operations) {
+            const op = operations.find(o => o.id === this.state.operationId)
+            if (op) {
+                operationPath = op.path
+            } else {
+                operationPath = ''
+            }
+        }
+
         let allInterceptors
 
         let interceptorsPreFiltered
@@ -274,6 +295,9 @@ class Interceptors extends Component {
                     title="Choose your Interceptors"
                     style={{ marginBottom: 20 }}
                     className="inside-shadow"
+                    extra={
+                        <span>{environmentPath}{api.basePath}{operationPath}</span>
+                    }
                 >
                     <Form>
                         <Row gutter={20} type="flex" justify="space-between" align="middle">
