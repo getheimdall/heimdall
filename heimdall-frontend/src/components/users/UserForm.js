@@ -59,7 +59,6 @@ class UserForm extends Component {
                                 }
                             </FormItem>
                         </Col>
-                        {!user &&
                         <Col sm={24} md={12} >
                             <FormItem label="Password">
                                 {
@@ -69,11 +68,10 @@ class UserForm extends Component {
                                             { required: true, message: 'Please input a password!' },
                                             { min: 5, message: 'Min of 5 characters to the password!' }
                                         ]
-                                    })(<Input type="password" disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_USER, privileges.PRIVILEGE_UPDATE_USER])} />)
+                                    })(<Input type={user ? 'hidden': 'password'} disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_USER, privileges.PRIVILEGE_UPDATE_USER])} />)
                                 }
                             </FormItem>
                         </Col>
-                        }
                         <Col sm={24} md={12} >
                             <FormItem label="First Name">
                                 {
