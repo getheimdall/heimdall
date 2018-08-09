@@ -55,11 +55,11 @@ class UserForm extends Component {
                                             { required: true, message: 'Please input an username!' },
                                             { min: 5, message: 'Min of 5 characters to username!' }
                                         ]
-                                    })(<Input disabled={!PrivilegeUtils.verifyPrivileges(privileges.PRIVILEGE_CREATE_USER, privileges.PRIVILEGE_UPDATE_USER)} />)
+                                    })(<Input disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_USER, privileges.PRIVILEGE_UPDATE_USER])} />)
                                 }
                             </FormItem>
                         </Col>
-                        {user && !user.id &&
+                        {!user &&
                         <Col sm={24} md={12} >
                             <FormItem label="Password">
                                 {
@@ -69,7 +69,7 @@ class UserForm extends Component {
                                             { required: true, message: 'Please input a password!' },
                                             { min: 5, message: 'Min of 5 characters to the password!' }
                                         ]
-                                    })(<Input type="password" disabled={!PrivilegeUtils.verifyPrivileges(privileges.PRIVILEGE_CREATE_USER, privileges.PRIVILEGE_UPDATE_USER)} />)
+                                    })(<Input type="password" disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_USER, privileges.PRIVILEGE_UPDATE_USER])} />)
                                 }
                             </FormItem>
                         </Col>
@@ -83,7 +83,7 @@ class UserForm extends Component {
                                             { required: true, message: 'Please input a first name!' },
                                             { min: 3, message: 'Min of 3 characters to first name!' }
                                         ]
-                                    })(<Input disabled={!PrivilegeUtils.verifyPrivileges(privileges.PRIVILEGE_CREATE_USER, privileges.PRIVILEGE_UPDATE_USER)} />)
+                                    })(<Input disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_USER, privileges.PRIVILEGE_UPDATE_USER])} />)
                                 }
                             </FormItem>
                         </Col>
@@ -96,7 +96,7 @@ class UserForm extends Component {
                                             { required: true, message: 'Please input a last name!' },
                                             { min: 3, message: 'Min of 3 characters to last name!' }
                                         ]
-                                    })(<Input disabled={!PrivilegeUtils.verifyPrivileges(privileges.PRIVILEGE_CREATE_USER, privileges.PRIVILEGE_UPDATE_USER)} />)
+                                    })(<Input disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_USER, privileges.PRIVILEGE_UPDATE_USER])} />)
                                 }
                             </FormItem>
                         </Col>
@@ -108,7 +108,7 @@ class UserForm extends Component {
                                         rules: [
                                             { required: true, type: 'email', message: 'Please input a valid email!' }
                                         ]
-                                    })(<Input disabled={!PrivilegeUtils.verifyPrivileges(privileges.PRIVILEGE_CREATE_USER, privileges.PRIVILEGE_UPDATE_USER)} />)
+                                    })(<Input disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_USER, privileges.PRIVILEGE_UPDATE_USER])} />)
                                 }
                             </FormItem>
                         </Col>
@@ -121,7 +121,7 @@ class UserForm extends Component {
                                             { required: true, message: 'Please select a role!' },
                                         ]
                                     })(
-                                        <Select optionFilterProp="children" mode="multiple" style={{ width: '100%' }} placeholder="Please select a role" disabled={!PrivilegeUtils.verifyPrivileges(privileges.PRIVILEGE_CREATE_USER, privileges.PRIVILEGE_UPDATE_USER) || !roles}>
+                                        <Select optionFilterProp="children" mode="multiple" style={{ width: '100%' }} placeholder="Please select a role" disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_USER, privileges.PRIVILEGE_UPDATE_USER]) || !roles}>
                                             {roles && roles.map(role => <Select.Option key={role.id} value={role.id}>{role.name}</Select.Option>)}
                                         </Select>
                                     )
@@ -134,7 +134,7 @@ class UserForm extends Component {
                                     getFieldDecorator('status', {
                                         initialValue: user ? user.status === 'ACTIVE' : true,
                                         valuePropName: 'checked'
-                                    })(<Switch disabled={!PrivilegeUtils.verifyPrivileges(privileges.PRIVILEGE_CREATE_USER, privileges.PRIVILEGE_UPDATE_USER)}  />)
+                                    })(<Switch disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_USER, privileges.PRIVILEGE_UPDATE_USER])}  />)
                                 }
                             </FormItem>
                         </Col>

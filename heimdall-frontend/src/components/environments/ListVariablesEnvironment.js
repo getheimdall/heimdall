@@ -6,7 +6,7 @@ import {PrivilegeUtils} from "../../utils/PrivilegeUtils";
 
 const FormItem = Form.Item
 const ButtonGroup = Button.Group;
-const columns = [{
+let columns = [{
     title: 'Key',
     dataIndex: 'k',
     width: '47%'
@@ -64,11 +64,19 @@ class ListVariablesEnvironment extends React.Component {
         const {variables, add, remove, form} = this.props
         let data = []
 
-        if (PrivilegeUtils.verifyPrivileges([[privileges.PRIVILEGE_CREATE_ENVIRONMENT, privileges.PRIVILEGE_UPDATE_ENVIRONMENT]])) {
-            columns.push({
+        if (PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_ENVIRONMENT, privileges.PRIVILEGE_UPDATE_ENVIRONMENT])) {
+            columns = [{
+                title: 'Key',
+                dataIndex: 'k',
+                width: '47%'
+            }, {
+                title: 'Value',
+                dataIndex: 'v',
+                width: '47%'
+            }, {
                 title: '',
                 dataIndex: 'operation'
-            });
+            }];
         }
 
         if (variables) {
@@ -92,6 +100,7 @@ class ListVariablesEnvironment extends React.Component {
             });
 
         }
+        console.log(columns)
 
         return (
             <Row>

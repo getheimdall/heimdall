@@ -346,8 +346,8 @@ class Interceptors extends Component {
                                 <DnDInterceptorType key={index}
                                     type={interceptor.type}
                                     icon='code-o'
-                                    canAddInterceptor={PrivilegeUtils.verifyPrivileges(privileges.PRIVILEGE_CREATE_INTERCEPTOR) && canAddInterceptor}
-                                    color={PrivilegeUtils.verifyPrivileges(privileges.PRIVILEGE_CREATE_INTERCEPTOR) && canAddInterceptor && '#989898'}
+                                    canAddInterceptor={PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_INTERCEPTOR, privileges.PRIVILEGE_UPDATE_INTERCEPTOR]) && canAddInterceptor}
+                                    color={PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_INTERCEPTOR, privileges.PRIVILEGE_UPDATE_INTERCEPTOR]) && canAddInterceptor && '#989898'}
                                     environmentId={this.state.environmentId !== 0 && this.state.environmentId}
                                     planId={this.state.planId !== 0 && this.state.planId}
                                     resourceId={this.state.resourceId !== 0 && this.state.resourceId}
