@@ -28,6 +28,8 @@ public class CacheInterceptor extends HeimdallFilter {
 
     private static List<String> headers;
 
+    private static List<String> queryParams;
+
     private CacheInterceptorService cacheInterceptorService;
 
     private static Long timeToLive;
@@ -46,6 +48,11 @@ public class CacheInterceptor extends HeimdallFilter {
         {{#headers}}
         headers.add("{{.}}");
         {{/headers}}
+
+        queryParams = Lists.newArrayList();
+        {{#queryParams}}
+        queryParams.add("{{.}}");
+        {{/queryParams}}
 
         pathsAllowed = Sets.newHashSet();
         {{#pathsAllowed}}
@@ -72,7 +79,7 @@ public class CacheInterceptor extends HeimdallFilter {
 
         cacheInterceptorService = (CacheInterceptorService) BeanManager.getBean(CacheInterceptorService.class);
 
-        cacheInterceptorService.cacheInterceptor(cacheName, timeToLive, helper, headers);
+        cacheInterceptorService.cacheInterceptor(cacheName, timeToLive, helper, headers, queryParams);
     }
 
     @Override

@@ -26,6 +26,8 @@ public class CacheClearInterceptor extends HeimdallFilter {
 
     private static List<String> headers;
 
+    private static List<String> queryParams;
+
     private CacheInterceptorService cacheInterceptorService;
 
     public CacheClearInterceptor() {
@@ -38,6 +40,11 @@ public class CacheClearInterceptor extends HeimdallFilter {
         {{#headers}}
         headers.add("{{.}}");
         {{/headers}}
+
+        queryParams = Lists.newArrayList();
+        {{#queryParams}}
+        queryParams.add("{{.}}");
+        {{/queryParams}}
 
         pathsAllowed = Sets.newHashSet();
         {{#pathsAllowed}}
@@ -63,7 +70,7 @@ public class CacheClearInterceptor extends HeimdallFilter {
 
         cacheInterceptorService = (CacheInterceptorService) BeanManager.getBean(CacheInterceptorService.class);
 
-        cacheInterceptorService.cacheClearInterceptor(cacheName, headers);
+        cacheInterceptorService.cacheClearInterceptor(cacheName, headers, queryParams);
     }
 
     @Override

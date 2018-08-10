@@ -22,15 +22,15 @@ package br.com.conductor.heimdall.gateway.service;
  */
 
 import br.com.conductor.heimdall.core.util.BeanManager;
-import br.com.conductor.heimdall.core.util.UrlUtil;
 import br.com.conductor.heimdall.middleware.spec.ApiResponse;
 import br.com.conductor.heimdall.middleware.spec.Helper;
 import com.netflix.zuul.context.RequestContext;
+import org.assertj.core.util.Lists;
 import org.redisson.api.RBucket;
-import org.redisson.api.RBuckets;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 import static br.com.conductor.heimdall.core.util.ConstantsCache.CACHE_BUCKET;
@@ -48,74 +48,87 @@ public class CacheInterceptorService {
      * Checks if the request is in cache. If true then returns the cached response, otherwise
      * continues the request normally and signals to create the cache for this request.
      *
-     * @param cacheName Cache name provided
-     * @param timeToLive How much time the cache will live (0 or less to live forever)
-     * @param helper {@link Helper}
+     * @param cacheName   Cache name provided
+     * @param timeToLive  How much time the cache will live (0 or less to live forever)
+     * @param helper      {@link Helper}
+     * @param headers     List of headers that when present signal that the request should be cached
+     * @param queryParams List of queryParams that when present signal that the request should be cached
      */
-    public void cacheInterceptor(String cacheName, Long timeToLive, Helper helper, List<String> headers) {
+    public void cacheInterceptor(String cacheName, Long timeToLive, Helper helper, List<String> headers, List<String> queryParams) {
 
         RedissonClient redisson = (RedissonClient) BeanManager.getBean(RedissonClient.class);
 
         RequestContext context = RequestContext.getCurrentContext();
 
-        RBucket<ApiResponse> rBucket = redisson.getBucket(createCacheKey(context, cacheName, headers));
+        if (shouldCache(context, headers, queryParams)) {
+            RBucket<ApiResponse> rBucket = redisson.getBucket(createCacheKey(context, cacheName, headers, queryParams));
 
-        if (rBucket.get() == null) {
-            context.put(CACHE_BUCKET, rBucket);
-            context.put(CACHE_TIME_TO_LIVE, timeToLive);
-        } else {
-            ApiResponse response = rBucket.get();
+            if (rBucket.get() == null) {
+                context.put(CACHE_BUCKET, rBucket);
+                context.put(CACHE_TIME_TO_LIVE, timeToLive);
+            } else {
+                ApiResponse response = rBucket.get();
 
-            helper.call().response().header().addAll(response.getHeaders());
-            helper.call().response().setBody(response.getBody());
-            helper.call().response().setStatus(response.getStatus());
+                helper.call().response().header().addAll(response.getHeaders());
+                helper.call().response().setBody(response.getBody());
+                helper.call().response().setStatus(response.getStatus());
+            }
         }
     }
 
     /**
      * Clears a cache if it exists
      *
-     * @param cacheName Cache name provided
+     * @param cacheName   Cache name provided
+     * @param headers     List of headers that when present signal that the request should be cached
+     * @param queryParams List of queryParams that when present signal that the request should be cached
      */
-    public void cacheClearInterceptor(String cacheName, List<String> headers) {
+    public void cacheClearInterceptor(String cacheName, List<String> headers, List<String> queryParams) {
 
         RedissonClient redisson = (RedissonClient) BeanManager.getBean(RedissonClient.class);
 
         RequestContext context = RequestContext.getCurrentContext();
 
-        RBuckets rBuckets = redisson.getBuckets();
-
-        List<RBucket<ApiResponse>> rBucketList = rBuckets.find(createCacheKey(context, cacheName, headers));
-
-        if (!rBucketList.isEmpty()) {
-            rBucketList.stream().findFirst().get().delete();
+        if (shouldCache(context, headers, queryParams)) {
+            RBucket<ApiResponse> rBucket = redisson.getBucket(createCacheKey(context, cacheName, headers, queryParams));
+            if (rBucket.get() != null) {
+                rBucket.delete();
+            }
         }
     }
 
     /*
-     * Creates the cache key based on the Api name, Api id, cache name.
+     * Creates the cache key
      */
-    private String createCacheKey(RequestContext context, String cacheName, List<String> headers) {
+    private String createCacheKey(RequestContext context, String cacheName, List<String> headers, List<String> queryParams) {
 
         String apiId = (String) context.get("api-id");
         String apiName = (String) context.get("api-name");
 
-        StringBuilder sb = new StringBuilder();
-        headers.forEach(s -> sb
+        StringBuilder headersBuilder = new StringBuilder();
+        headers.forEach(s -> headersBuilder
                 .append(s)
                 .append("=")
                 .append(context.getRequest().getHeader(s))
         );
 
-        return apiId +
-                "-" +
-                apiName +
-                ":" +
-                cacheName +
-                ":" +
-                UrlUtil.getCurrentUrl(context.getRequest()) +
-                "headers" +
-                sb.toString();
+        StringBuilder queryParamsBuilder = new StringBuilder();
+        queryParams.forEach(s -> queryParamsBuilder
+                .append(s)
+                .append("=")
+                .append(context.getRequestQueryParams().get(s))
+        );
+
+        return apiId + "-" + apiName + ":" +
+                cacheName + ":" +
+                context.getRequest().getRequestURL().toString() + ":" +
+                "queryParams" + queryParamsBuilder.toString() + ":" +
+                "headers" + headersBuilder.toString();
+    }
+
+    private boolean shouldCache(RequestContext context, List<String> headers, List<String> queryParams) {
+        return Collections.list(context.getRequest().getHeaderNames()).containsAll(headers) &&
+                Lists.newArrayList(context.getRequestQueryParams().keySet()).containsAll(queryParams);
     }
 
 }
