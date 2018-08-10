@@ -6,6 +6,7 @@ import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
 import br.com.conductor.heimdall.gateway.service.CacheInterceptorService;
 
 import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
 import com.netflix.zuul.context.RequestContext;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
@@ -23,6 +24,8 @@ public class CacheClearInterceptor extends HeimdallFilter {
 
     private static String cacheName;
 
+    private static List<String> headers;
+
     private CacheInterceptorService cacheInterceptorService;
 
     public CacheClearInterceptor() {
@@ -30,6 +33,11 @@ public class CacheClearInterceptor extends HeimdallFilter {
         cacheName = "{{cache}}";
 
         method = "{{method}}";
+
+        headers = Lists.newArrayList();
+        {{#headers}}
+        headers.add("{{.}}");
+        {{/headers}}
 
         pathsAllowed = Sets.newHashSet();
         {{#pathsAllowed}}
@@ -55,7 +63,7 @@ public class CacheClearInterceptor extends HeimdallFilter {
 
         cacheInterceptorService = (CacheInterceptorService) BeanManager.getBean(CacheInterceptorService.class);
 
-        cacheInterceptorService.cacheClearInterceptor(cacheName);
+        cacheInterceptorService.cacheClearInterceptor(cacheName, headers);
     }
 
     @Override

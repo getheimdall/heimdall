@@ -23,6 +23,8 @@ package br.com.conductor.heimdall.core.dto.interceptor;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * Cache Data Transfer Object
  *
@@ -31,8 +33,12 @@ import lombok.Data;
 @Data
 public class CacheDTO {
 
-    public String cache;
+    private String cache;
 
-    public Long timeToLive;
+    private Long timeToLive;
+
+    private List<String> headers;
+
+    private List<String> queryParams;
 
 }

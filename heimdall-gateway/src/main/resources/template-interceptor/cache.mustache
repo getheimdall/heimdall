@@ -8,6 +8,7 @@ import br.com.conductor.heimdall.gateway.service.CacheInterceptorService;
 import br.com.conductor.heimdall.middleware.spec.Helper;
 
 import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
 import com.netflix.zuul.context.RequestContext;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
@@ -25,6 +26,8 @@ public class CacheInterceptor extends HeimdallFilter {
 
     private static String cacheName;
 
+    private static List<String> headers;
+
     private CacheInterceptorService cacheInterceptorService;
 
     private static Long timeToLive;
@@ -38,6 +41,11 @@ public class CacheInterceptor extends HeimdallFilter {
         timeToLive = {{timeToLive}};
 
         method = "{{method}}";
+
+        headers = Lists.newArrayList();
+        {{#headers}}
+        headers.add("{{.}}");
+        {{/headers}}
 
         pathsAllowed = Sets.newHashSet();
         {{#pathsAllowed}}
@@ -64,7 +72,7 @@ public class CacheInterceptor extends HeimdallFilter {
 
         cacheInterceptorService = (CacheInterceptorService) BeanManager.getBean(CacheInterceptorService.class);
 
-        cacheInterceptorService.cacheInterceptor(cacheName, timeToLive, helper);
+        cacheInterceptorService.cacheInterceptor(cacheName, timeToLive, helper, headers);
     }
 
     @Override

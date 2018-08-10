@@ -65,6 +65,7 @@ public class CacheHeimdallInterceptor implements HeimdallInterceptor {
 
         parameters.put("cache", cacheDTO.getCache());
         parameters.put("timeToLive", cacheDTO.getTimeToLive());
+        parameters.put("headers", cacheDTO.getHeaders());
 
         return parameters;
     }

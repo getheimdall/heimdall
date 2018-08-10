@@ -52,13 +52,13 @@ public class CacheInterceptorService {
      * @param timeToLive How much time the cache will live (0 or less to live forever)
      * @param helper {@link Helper}
      */
-    public void cacheInterceptor(String cacheName, Long timeToLive, Helper helper) {
+    public void cacheInterceptor(String cacheName, Long timeToLive, Helper helper, List<String> headers) {
 
         RedissonClient redisson = (RedissonClient) BeanManager.getBean(RedissonClient.class);
 
         RequestContext context = RequestContext.getCurrentContext();
 
-        RBucket<ApiResponse> rBucket = redisson.getBucket(createCacheKey(context, cacheName));
+        RBucket<ApiResponse> rBucket = redisson.getBucket(createCacheKey(context, cacheName, headers));
 
         if (rBucket.get() == null) {
             context.put(CACHE_BUCKET, rBucket);
@@ -77,7 +77,7 @@ public class CacheInterceptorService {
      *
      * @param cacheName Cache name provided
      */
-    public void cacheClearInterceptor(String cacheName) {
+    public void cacheClearInterceptor(String cacheName, List<String> headers) {
 
         RedissonClient redisson = (RedissonClient) BeanManager.getBean(RedissonClient.class);
 
@@ -85,7 +85,7 @@ public class CacheInterceptorService {
 
         RBuckets rBuckets = redisson.getBuckets();
 
-        List<RBucket<ApiResponse>> rBucketList = rBuckets.find(createCacheKey(context, cacheName));
+        List<RBucket<ApiResponse>> rBucketList = rBuckets.find(createCacheKey(context, cacheName, headers));
 
         if (!rBucketList.isEmpty()) {
             rBucketList.stream().findFirst().get().delete();
@@ -95,18 +95,27 @@ public class CacheInterceptorService {
     /*
      * Creates the cache key based on the Api name, Api id, cache name.
      */
-    private String createCacheKey(RequestContext context, String cacheName) {
+    private String createCacheKey(RequestContext context, String cacheName, List<String> headers) {
 
         String apiId = (String) context.get("api-id");
         String apiName = (String) context.get("api-name");
+
+        StringBuilder sb = new StringBuilder();
+        headers.forEach(s -> sb
+                .append(s)
+                .append("=")
+                .append(context.getRequest().getHeader(s))
+        );
 
         return apiId +
                 "-" +
                 apiName +
                 ":" +
                 cacheName +
-                "-" +
-                UrlUtil.getCurrentUrl(context.getRequest());
+                ":" +
+                UrlUtil.getCurrentUrl(context.getRequest()) +
+                "headers" +
+                sb.toString();
     }
 
 }
