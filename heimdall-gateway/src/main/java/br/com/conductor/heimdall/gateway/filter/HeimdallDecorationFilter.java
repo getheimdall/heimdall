@@ -288,11 +288,8 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                         String basePath = operation.getResource().getApi().getBasePath();
                         requestURI = org.apache.commons.lang.StringUtils.removeStart(requestURI, basePath);
                         ctx.put("pattern", org.apache.commons.lang.StringUtils.removeStart(pattern, basePath));
-
-                        String apiName = operation.getResource().getApi().getName();
-                        String apiId = operation.getResource().getApi().getId().toString();
-                        ctx.put("api-id", apiId);
-                        ctx.put("api-name", apiName);
+                        ctx.put("api-id", operation.getResource().getApi().getId().toString());
+                        ctx.put("api-name", operation.getResource().getApi().getName());
 
                         List<Environment> environments = operation.getResource().getApi().getEnvironments();
 
