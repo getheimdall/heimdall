@@ -2,17 +2,19 @@ import java.util.*;
 
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.util.BeanManager;
-import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
+import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.service.CacheInterceptorService;
+import br.com.conductor.heimdall.gateway.trace.FilterDetail;
+import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 
 import com.google.common.collect.Sets;
 import com.google.common.collect.Lists;
 import com.netflix.zuul.context.RequestContext;
+import com.netflix.zuul.ZuulFilter;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
 
-
-public class CacheClearInterceptor extends HeimdallFilter {
+public class CacheClearInterceptor extends ZuulFilter {
 
     private static Set<String> pathsAllowed;
 
@@ -29,6 +31,8 @@ public class CacheClearInterceptor extends HeimdallFilter {
     private static List<String> queryParams;
 
     private CacheInterceptorService cacheInterceptorService;
+
+    private FilterDetail detail;
 
     public CacheClearInterceptor() {
 
@@ -58,24 +62,42 @@ public class CacheClearInterceptor extends HeimdallFilter {
 
         inboundURL = "{{inboundURL}}";
 
+        detail = new FilterDetail();
+
     }
 
     @Override
-    public boolean should() {
+    public boolean shouldFilter() {
         return InterceptorLifeCycle.{{lifeCycle}}.filter(pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest());
     }
 
     @Override
-    public void execute() throws Throwable {
+    public Object run() throws Throwable {
+        long startTime = System.currentTimeMillis();
+        try {
+            process();
+            detail.setStatus(Constants.SUCCESS);
+        } catch (Exception e) {
+            detail.setStatus(Constants.FAILED);
+            throw e;
+        } finally {
+            long endTime = System.currentTimeMillis();
 
+            long duration = (endTime - startTime);
+
+            detail.setName(this.getClass().getSimpleName());
+            detail.setTimeInMillisRun(duration);
+            TraceContextHolder.getInstance().getActualTrace().addFilter(detail);
+        }
+
+        return null;
+    }
+
+    private void process() {
         cacheInterceptorService = (CacheInterceptorService) BeanManager.getBean(CacheInterceptorService.class);
 
         cacheInterceptorService.cacheClearInterceptor(cacheName, headers, queryParams);
-    }
-
-    @Override
-    public String getName() {
-        return "{{name}}";
+        return null;
     }
 
     @Override
