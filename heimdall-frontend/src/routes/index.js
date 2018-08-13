@@ -39,6 +39,8 @@ import Users from '../containers/Users';
 import SingleUser from '../containers/SingleUser';
 import Traces from "../containers/Traces";
 import SingleTrace from "../containers/SingleTrace";
+import Roles from "../containers/Roles";
+import SingleRole from "../containers/SingleRole";
 
 const routes = ({history}) => (
     <Switch>
@@ -97,7 +99,12 @@ const routes = ({history}) => (
                   component={Authorization([privileges.PRIVILEGE_READ_TRACES])(FadeIn(Traces))}/>
         <AppRoute layout={MainLayout} history={history} exact path="/traces/:id"
                   component={Authorization([privileges.PRIVILEGE_READ_TRACES])(FadeIn(SingleTrace))}/>
-
+        <AppRoute layout={MainLayout} history={history} exact path="/roles"
+                  component={Authorization([privileges.PRIVILEGE_READ_ROLE])(FadeIn(Roles))}/>
+        <AppRoute layout={MainLayout} history={history} exact path="/roles/new"
+                  component={Authorization([privileges.PRIVILEGE_READ_ROLE])(FadeIn(SingleRole))}/>
+        <AppRoute layout={MainLayout} history={history} exact path="/roles/:id"
+                  component={Authorization([privileges.PRIVILEGE_READ_ROLE])(FadeIn(SingleRole))}/>
         {/* routes not finded or 404 */}
         <Redirect to="/"/>
         {/* <AppRoute layout={MainLayout} history={history} component={Authorization('TESTE)(FadeIn(Apis))} /> */}

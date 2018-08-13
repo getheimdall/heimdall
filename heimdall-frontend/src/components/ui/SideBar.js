@@ -56,6 +56,11 @@ class SideBar extends Component {
                         <SidebarLink to="/developers" label="Developers" history={history} icon="code"/>
                     </Menu.Item>
                     }
+                    {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_ROLE]) &&
+                    <Menu.Item key="roles" className="roles">
+                        <SidebarLink to="/roles" label="Roles" history={history} icon="solution"/>
+                    </Menu.Item>
+                    }
                     {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_USER]) &&
                     <Menu.Item key="users" className="users">
                         <SidebarLink to="/users" label="Users" history={history} icon="user"/>
