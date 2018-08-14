@@ -5,6 +5,8 @@ import { bindActionCreators } from 'redux'
 import { Menu, Icon, Row, Col, notification } from 'antd'
 import { logout, getUser } from '../../actions/auth'
 import { clearCaches, initLoading } from '../../actions/cache'
+import {PrivilegeUtils} from "../../utils/PrivilegeUtils";
+import {privileges} from "../../constants/privileges-types";
 
 const SubMenu = Menu.SubMenu
 const MenuItemGroup = Menu.ItemGroup
@@ -47,7 +49,9 @@ class NavBar extends Component {
                     <Menu id="top-bar-menu" mode="horizontal" theme="light" style={{ lineHeight: '62px' }} onClick={this.handleClick}>
                         <SubMenu title={<span><Icon type="info-circle-o" /></span>}>
                             <MenuItemGroup title="Heimdall Project">
+                                {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_DELETE_CACHES]) &&
                                 <Menu.Item key="heimdall:2">Clear Cache</Menu.Item>
+                                }
                                 {/* <Menu.Item key="heimdall:2">About</Menu.Item> */}
                                 <Menu.Item key="heimdall:4">License</Menu.Item>
                             </MenuItemGroup>

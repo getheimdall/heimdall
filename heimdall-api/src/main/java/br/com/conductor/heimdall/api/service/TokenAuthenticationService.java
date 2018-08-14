@@ -20,9 +20,13 @@ package br.com.conductor.heimdall.api.service;
  * ==========================LICENSE_END===================================
  */
 
+import br.com.conductor.heimdall.api.entity.Role;
+import br.com.conductor.heimdall.api.entity.User;
 import br.com.conductor.heimdall.api.enums.CredentialStateEnum;
 import br.com.conductor.heimdall.api.environment.JwtProperty;
+import br.com.conductor.heimdall.api.repository.UserRepository;
 import br.com.conductor.heimdall.api.security.AccountCredentials;
+import br.com.conductor.heimdall.api.security.HeimdallLdapAuthoritiesPopulator;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import io.jsonwebtoken.Claims;
@@ -34,8 +38,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,9 +49,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Collections;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Data class that holds tha JTW properties.
@@ -63,23 +68,42 @@ public class TokenAuthenticationService {
     private UserDetailsService userDetailsService;
 
     @Autowired
+    private HeimdallLdapAuthoritiesPopulator heimdallLdapAuthoritiesPopulator;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
     private CredentialStateService credentialStateService;
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private LdapAuthenticationProvider ldapAuthenticationProvider;
 
     private static final String TOKEN_PREFIX = "Bearer ";
 
     private static final String HEIMDALL_AUTHORIZATION_NAME = "Authorization";
 
     public void login(AccountCredentials accountCredentials, HttpServletResponse response) {
-        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+        UsernamePasswordAuthenticationToken userFound = new UsernamePasswordAuthenticationToken(
                 accountCredentials.getUsername(),
                 accountCredentials.getPassword(),
-                Collections.emptyList()
-        ));
+                Collections.emptyList());
+        Authentication authenticate = null;
+        try {
+            authenticate = authenticationManager.authenticate(userFound);
+        } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
+            try {
+                authenticate = ldapAuthenticationProvider.authenticate(userFound);
+            } catch (Exception exception) {
+                log.error(exception.getMessage(), exception);
+            }
+        }
 
-        if (authenticate != null) {
+        if (Objects.nonNull(authenticate)){
             addAuthentication(response, accountCredentials.getUsername(), null);
             response.setStatus(200);
             try {
@@ -92,7 +116,7 @@ public class TokenAuthenticationService {
         }
     }
 
-    public void addAuthentication(HttpServletResponse response, String username, String jti) {
+    private void addAuthentication(HttpServletResponse response, String username, String jti) {
         LocalDateTime now = LocalDateTime.now();
         final LocalDateTime expirationDate = now.plusSeconds(jwtProperty.getExpirationTime());
 
@@ -132,9 +156,9 @@ public class TokenAuthenticationService {
 
                 if (user != null) {
                     if (!credentialStateService.verifyIfTokenIsRevokeOrLogout(claims.getId())) {
-                        UserDetails userDetails = userDetailsService.loadUserByUsername(user);
-                        addAuthentication(response, userDetails.getUsername(), claims.getId());
-                        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                        User userFound = userService.findByUsername(user);
+                        addAuthentication(response, user, claims.getId());
+                        return new UsernamePasswordAuthenticationToken(userFound.getUserName(), userFound.getPassword(), getAuthoritiesByRoles(userFound.getRoles()));
                     }
                     return null;
                 }
@@ -147,4 +171,13 @@ public class TokenAuthenticationService {
         return null;
     }
 
+    private Collection<? extends GrantedAuthority> getAuthoritiesByRoles(Set<Role> roles) {
+        Set<GrantedAuthority> authorities = new HashSet<>();
+
+        roles.forEach(role -> {
+            role.getPrivileges().forEach(privilege -> authorities.add(new SimpleGrantedAuthority(privilege.getName())));
+        });
+
+        return authorities;
+    }
 }

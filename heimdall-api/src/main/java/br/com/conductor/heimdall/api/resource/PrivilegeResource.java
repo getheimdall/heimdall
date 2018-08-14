@@ -21,22 +21,6 @@ package br.com.conductor.heimdall.api.resource;
  * ==========================LICENSE_END===================================
  */
 
-import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_PRIVILEGES;
-
-import java.util.List;
-import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-
 import br.com.conductor.heimdall.api.dto.PrivilegeDTO;
 import br.com.conductor.heimdall.api.dto.page.PrivilegePage;
 import br.com.conductor.heimdall.api.entity.Privilege;
@@ -46,6 +30,16 @@ import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
 import br.com.twsoftware.alfred.object.Objeto;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Set;
+
+import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_PRIVILEGES;
 
 /**
  * Uses a {@link PrivilegeService} to provide methods to find one or more {@link Privilege}.
@@ -105,9 +99,9 @@ public class PrivilegeResource {
 
      @ResponseBody
      @ApiOperation(value = "Find all Privileges by username", responseContainer = "List", response = Privilege.class)
-     @GetMapping("/username/{username}")
+     @PostMapping("/username")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_PRIVILEGE)
-     public ResponseEntity findPrivilegesByUsername(@PathVariable String username) {
+     public ResponseEntity findPrivilegesByUsername(@RequestBody String username) {
 
           Set<Privilege> list = privilegeService.list(username);
 

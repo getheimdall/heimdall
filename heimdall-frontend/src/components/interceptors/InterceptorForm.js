@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 
 import { Row, Form, Input, InputNumber, Col, Select } from 'antd'
 import { getTemplate } from '../../utils/InterceptorUtils'
+import {PrivilegeUtils} from "../../utils/PrivilegeUtils";
+import {privileges} from "../../constants/privileges-types";
 
 const FormItem = Form.Item
 const { TextArea } = Input
@@ -130,7 +132,7 @@ class InterceptorForm extends Component {
                                         rules: [
                                             { required: true, message: 'Please define the name!' }
                                         ]
-                                    })(<Input required />)
+                                    })(<Input required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR])}/>)
                                 }
                             </FormItem>
                         </Col>
@@ -139,7 +141,7 @@ class InterceptorForm extends Component {
                                 {
                                     getFieldDecorator('description', {
                                         initialValue: interceptor && interceptor.description
-                                    })(<Input />)
+                                    })(<Input disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR])}/>)
                                 }
                             </FormItem>
                         </Col>
@@ -151,7 +153,7 @@ class InterceptorForm extends Component {
                                         rules: [
                                             { required: true, message: 'Please select the life cycle!' }
                                         ]
-                                    })(<Select onChange={this.handleLifeCycle}>
+                                    })(<Select onChange={this.handleLifeCycle} disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR])}>
                                         {planId && <Select.Option value="PLAN">PLAN</Select.Option>}
                                         {resourceId && <Select.Option value="RESOURCE">RESOURCE</Select.Option>}
                                         {operationId && <Select.Option value="OPERATION">OPERATION</Select.Option>}
@@ -164,7 +166,7 @@ class InterceptorForm extends Component {
                                 {
                                     getFieldDecorator('order', {
                                         initialValue: interceptor ? interceptor.order : 0
-                                    })(<InputNumber min={0} max={99} />)
+                                    })(<InputNumber min={0} max={99} disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR])}/>)
                                 }
                             </FormItem>
                         </Col>
@@ -176,7 +178,7 @@ class InterceptorForm extends Component {
                                         rules: [
                                             { required: true, message: 'Please select the execution point!' }
                                         ]
-                                    })(<TextArea rows={6} required />)
+                                    })(<TextArea rows={6} required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR])}/>)
                                 }
                             </FormItem>
                         </Col>}

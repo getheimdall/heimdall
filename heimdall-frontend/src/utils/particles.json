@@ -1,9 +1,9 @@
 {
     "particles": {
         "number": {
-            "value": 85,
+            "value": 90,
             "density": {
-                "enable": true,
+                "enable": false,
                 "value_area": 800
             }
         },
@@ -75,8 +75,8 @@
                 "mode": "grab"
             },
             "onclick": {
-                "enable": true,
-                "mode": "push"
+                "enable": false,
+                "mode": "repulse"
             },
             "resize": true
         },

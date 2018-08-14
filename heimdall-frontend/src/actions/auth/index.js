@@ -1,7 +1,8 @@
-import { AuthConstants } from '../../constants/actions-types'
-import { userService } from '../../services'
-import { notification } from 'antd'
-import { push } from 'connected-react-router';
+import {AuthConstants} from '../../constants/actions-types'
+import {userService} from '../../services'
+import {notification} from 'antd'
+import {push} from 'connected-react-router';
+import {privilegeService} from "../../services/PrivilegeService";
 
 const loginFailed = message => ({
     type: AuthConstants.LOGIN_FAILED,
@@ -32,8 +33,16 @@ export const login = (login, password) => dispatch => {
     .then(data => {
         notification['success']({ message: 'Welcome to Heimdall' })
         dispatch(loginSuccessful(data))
-        dispatch(push('/'))
-        dispatch(finishLoading())
+        privilegeService.getPrivilegesByUsername(login)
+            .then(data => {
+                dispatch(push('/'))
+                dispatch(finishLoading())
+            })
+            .catch(error => {
+                notification['error']({ message: 'Failed to get privileges this user' })
+                dispatch(push('/login'))
+                dispatch(finishLoading())
+            })
     }).catch(error => {
         notification['error']({ message: 'Login or password incorrect' })
         dispatch(loginFailed('Login or password incorrect'))

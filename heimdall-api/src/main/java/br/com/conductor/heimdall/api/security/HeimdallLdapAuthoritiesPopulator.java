@@ -42,6 +42,8 @@ import br.com.conductor.heimdall.api.enums.TypeUser;
 import br.com.conductor.heimdall.api.repository.RoleRepository;
 import br.com.conductor.heimdall.api.repository.UserRepository;
 
+import javax.transaction.Transactional;
+
 /**
  * Implements the {@link LdapAuthoritiesPopulator}. Provides a method to get the granted authorities.
  *
@@ -62,6 +64,7 @@ public class HeimdallLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
       * <br>
       * {@inheritDoc}
       */
+     @Transactional
      @Override
      public Collection<? extends GrantedAuthority> getGrantedAuthorities(DirContextOperations userData, String username) {
 

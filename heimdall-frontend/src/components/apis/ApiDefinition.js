@@ -1,6 +1,9 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 // import FloatMenu from '../ui/FloatMenu'
-import { Form, Input, Row, Col, Checkbox, Switch, Tooltip, Button, Modal } from 'antd'
+import {Form, Input, Row, Col, Checkbox, Switch, Tooltip, Button, Modal} from 'antd'
+import ComponentAuthority from "../ComponentAuthority";
+import { privileges } from '../../constants/privileges-types'
+import {PrivilegeUtils} from "../../utils/PrivilegeUtils";
 
 const FormItem = Form.Item
 const confirm = Modal.confirm;
@@ -20,7 +23,7 @@ class ApiDefinition extends Component {
             if (!err) {
                 if (payload.environments) {
                     let environments = payload.environments;
-                    payload.environments = environments.map((env) => ({ id: env }))
+                    payload.environments = environments.map((env) => ({id: env}))
                 }
                 payload.status = payload.status ? 'ACTIVE' : 'INACTIVE'
 
@@ -49,12 +52,12 @@ class ApiDefinition extends Component {
     }
 
     render() {
-        const { getFieldDecorator } = this.props.form
-        const { api } = this.props
+        const {getFieldDecorator} = this.props.form
+        const {api} = this.props
 
         const options = this.props.environments.map((env, index) => {
             const labered = env.name + ' [' + env.inboundURL + ']'
-            return { label: labered, value: env.id }
+            return {label: labered, value: env.id}
         })
         return (
             <Row className="h-row no-mobile-padding">
@@ -63,7 +66,7 @@ class ApiDefinition extends Component {
                         {
                             getFieldDecorator('id', {
                                 initialValue: api.id
-                            })(<Input type='hidden' />)
+                            })(<Input type='hidden'/>)
                         }
                         <Col sm={24} md={12}>
                             <Row gutter={16}>
@@ -72,8 +75,8 @@ class ApiDefinition extends Component {
                                         {
                                             getFieldDecorator('name', {
                                                 initialValue: api.name,
-                                                rules: [{ required: true, message: 'Please input your api name!' }]
-                                            })(<Input />)
+                                                rules: [{required: true, message: 'Please input your api name!'}]
+                                            })(<Input disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_API])}/>)
                                         }
                                     </FormItem>
                                 </Col>
@@ -83,8 +86,8 @@ class ApiDefinition extends Component {
                                         {
                                             getFieldDecorator('version', {
                                                 initialValue: api.version,
-                                                rules: [{ required: true, message: 'Please input your api version!' }]
-                                            })(<Input />)
+                                                rules: [{required: true, message: 'Please input your api version!'}]
+                                            })(<Input disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_API])}/>)
                                         }
                                     </FormItem>
                                 </Col>
@@ -94,8 +97,8 @@ class ApiDefinition extends Component {
                                         {
                                             getFieldDecorator('description', {
                                                 initialValue: api.description,
-                                                rules: [{ required: true, message: 'Please input your api description!' }]
-                                            })(<Input />)
+                                                rules: [{required: true, message: 'Please input your api description!'}]
+                                            })(<Input disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_API])}/>)
                                         }
                                     </FormItem>
                                 </Col>
@@ -105,8 +108,8 @@ class ApiDefinition extends Component {
                                         {
                                             getFieldDecorator('basePath', {
                                                 initialValue: api.basePath,
-                                                rules: [{ required: true, message: 'Please input your api base path!' }]
-                                            })(<Input />)
+                                                rules: [{required: true, message: 'Please input your api base path!'}]
+                                            })(<Input disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_API])}/>)
                                         }
                                     </FormItem>
                                 </Col>
@@ -117,8 +120,8 @@ class ApiDefinition extends Component {
                                             getFieldDecorator('status', {
                                                 initialValue: api.status === 'ACTIVE',
                                                 valuePropName: 'checked',
-                                                rules: [{ required: true, message: 'Please input your api base path!' }]
-                                            })(<Switch required />)
+                                                rules: [{required: true, message: 'Please input your api base path!'}]
+                                            })(<Switch required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_API])}/>)
                                         }
                                     </FormItem>
                                 </Col>
@@ -131,8 +134,8 @@ class ApiDefinition extends Component {
                                         {
                                             getFieldDecorator('environments', {
                                                 initialValue: api.environments ? api.environments.map(env => env.id) : [],
-                                                rules: [{ required: true, message: 'Please select an environment' }]
-                                            })(<Checkbox.Group className='checkbox-conductor' options={options} />)
+                                                rules: [{required: true, message: 'Please select an environment'}]
+                                            })(<Checkbox.Group className='checkbox-conductor' options={options} disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_API])}/>)
                                         }
                                     </FormItem>
                                 </Col>
@@ -142,12 +145,18 @@ class ApiDefinition extends Component {
                 </Row>
 
                 <Row type="flex" justify="end">
-                    <Tooltip title="Delete">
-                        <Button className="card-button" type="danger" ghost icon="delete" onClick={this.showDeleteConfirm} size="large" shape="circle" />
-                    </Tooltip>
-                    <Tooltip title="Save">
-                        <Button className="card-button" type="primary" icon="save" onClick={this.onSubmitApi} size="large" shape="circle" />
-                    </Tooltip>
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_API]}>
+                        <Tooltip title="Delete">
+                            <Button className="card-button" type="danger" ghost icon="delete"
+                                    onClick={this.showDeleteConfirm} size="large" shape="circle"/>
+                        </Tooltip>
+                    </ComponentAuthority>
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_UPDATE_API]}>
+                        <Tooltip title="Save">
+                            <Button className="card-button" type="primary" icon="save" onClick={this.onSubmitApi}
+                                    size="large" shape="circle"/>
+                        </Tooltip>
+                    </ComponentAuthority>
                 </Row>
             </Row>
         )
@@ -156,16 +165,16 @@ class ApiDefinition extends Component {
 
 const mapPropsToFields = (props) => {
     return {
-        id: Form.createFormField({ ...props.api.id }),
-        name: Form.createFormField({ ...props.api.name }),
-        version: Form.createFormField({ ...props.api.version }),
-        status: Form.createFormField({ ...props.api.status }),
-        description: Form.createFormField({ ...props.api.description }),
-        basePath: Form.createFormField({ ...props.api.basePath }),
-        environments: Form.createFormField({ ...props.api.environments })
+        id: Form.createFormField({...props.api.id}),
+        name: Form.createFormField({...props.api.name}),
+        version: Form.createFormField({...props.api.version}),
+        status: Form.createFormField({...props.api.status}),
+        description: Form.createFormField({...props.api.description}),
+        basePath: Form.createFormField({...props.api.basePath}),
+        environments: Form.createFormField({...props.api.environments})
     }
 }
 
-const WrappedApiDefinitionForm = Form.create({ mapPropsToFields })(ApiDefinition)
+const WrappedApiDefinitionForm = Form.create({mapPropsToFields})(ApiDefinition)
 
 export default WrappedApiDefinitionForm

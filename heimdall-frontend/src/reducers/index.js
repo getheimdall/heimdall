@@ -16,6 +16,7 @@ import roles from './Roles'
 import caches from './Caches'
 import middlewares from './middlewares'
 import traces from './Traces'
+import privileges from './Privileges'
 
 export default combineReducers({
     apis,
@@ -33,5 +34,6 @@ export default combineReducers({
     roles,
     middlewares,
     caches,
-    traces
+    traces,
+    privileges
 })

@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 
 import { List, Avatar, Tag, Tooltip, Button, Modal, Row, Col } from 'antd';
+import ComponentAuthority from "../ComponentAuthority";
+import {privileges} from "../../constants/privileges-types";
 
 const confirm = Modal.confirm;
 
@@ -33,9 +35,12 @@ class ListEnvironments extends Component {
                             <Tooltip title="Edit">
                                 <Link to={"/environments/"+env.id}><Button type="primary" icon="edit" /></Link>
                             </Tooltip>,
-                            <Tooltip title="Delete">
-                                <Button type="danger" icon="delete" onClick={this.showDeleteConfirm(env.id)} />
-                            </Tooltip>]}>
+                            <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_ENVIRONMENT]}>
+                                <Tooltip title="Delete">
+                                    <Button type="danger" icon="delete" onClick={this.showDeleteConfirm(env.id)} />
+                                </Tooltip>
+                            </ComponentAuthority>
+                        ]}>
                             <List.Item.Meta
                                 avatar={<Avatar icon="codepen" />}
                                 title={env.name}

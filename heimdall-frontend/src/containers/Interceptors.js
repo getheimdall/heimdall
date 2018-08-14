@@ -11,12 +11,16 @@ import { getAllInterceptors, initLoading, getAllInterceptorsTypes, clearIntercep
 import { getAllPlans, clearPlans } from '../actions/plans';
 import { receiveQueue, clearQueue } from '../actions/queues'
 
-import { Row, Col, Form, Select, Icon, Card, Button, notification, Progress, Tag, Alert } from 'antd'
+import { Row, Col, Form, Select, Icon, Card, Button, notification, Progress, Tag, Alert, Badge } from 'antd'
 import Loading from '../components/ui/Loading';
 import { getAllResourcesByApi, clearResources } from '../actions/resources';
 import { getAllOperations, clearOperations } from '../actions/operations';
 import DnDInterceptorType from '../components/interceptors/DnDInterceptorType';
 import ColorUtils from "../utils/ColorUtils";
+import ComponentAuthority from "../components/ComponentAuthority";
+import {privileges} from "../constants/privileges-types";
+import {PrivilegeUtils} from "../utils/PrivilegeUtils";
+import {countInterceptorsByCycle} from "../utils/BadgeUtils";
 
 const Option = Select.Option
 
@@ -194,8 +198,29 @@ class Interceptors extends Component {
     }
 
     render() {
+        const { interceptors, api, operations } = this.props
 
-        const { interceptors, api } = this.props
+        let environmentPath
+        let operationPath
+
+        if (this.state.environmentId !== 0 && api && api.environments){
+            const env = api.environments.find(e => e.id === this.state.environmentId)
+            if (env) {
+                environmentPath = env.inboundURL
+            } else {
+                environmentPath = ''
+            }
+        }
+
+        if (this.state.operationId !== 0 && operations) {
+            const op = operations.find(o => o.id === this.state.operationId)
+            if (op) {
+                operationPath = op.path
+            } else {
+                operationPath = ''
+            }
+        }
+
         let allInterceptors
 
         let interceptorsPreFiltered
@@ -270,6 +295,9 @@ class Interceptors extends Component {
                     title="Choose your Interceptors"
                     style={{ marginBottom: 20 }}
                     className="inside-shadow"
+                    extra={
+                        <span>{environmentPath}{api.basePath}{operationPath}</span>
+                    }
                 >
                     <Form>
                         <Row gutter={20} type="flex" justify="space-between" align="middle">
@@ -285,20 +313,24 @@ class Interceptors extends Component {
                             </Col>
                             <Col sm={24} md={6}>
                                 <Form.Item label="Plans">
-                                    <Select defaultValue={0} onChange={this.handleSelectChange('PLAN')} disabled={!this.props.plans}>
+                                    <Select defaultValue={0} onChange={this.handleSelectChange('PLAN')} disabled={!this.props.plans} className="heimdall-select-filter-complete">
                                         <Option value={0}>All</Option>
                                         {this.props.plans && this.props.plans.content.map((plan, index) => (
-                                            <Option key={index} value={plan.id}>{plan.name}</Option>
+                                            <Option key={index} value={plan.id}>{plan.name}
+                                                <Badge title="Numbers of interceptors" className="heimdall-badge-interceptors-count" count={countInterceptorsByCycle(interceptors && interceptors.content, 'PLAN', plan.id)}/>
+                                            </Option>
                                         ))}
                                     </Select>
                                 </Form.Item>
                             </Col>
                             <Col sm={24} md={6}>
                                 <Form.Item label="Resources">
-                                    <Select defaultValue={0} onChange={this.handleSelectChange('RES')} disabled={!this.props.resources}>
+                                    <Select defaultValue={0} onChange={this.handleSelectChange('RES')} disabled={!this.props.resources} className="heimdall-select-filter-complete">
                                         <Option value={0}>All</Option>
                                         {this.props.resources && this.props.resources.map((res, index) => (
-                                            <Option key={index} value={res.id}>{res.name}</Option>
+                                            <Option key={index} value={res.id}>
+                                                <Badge title="Numbers of interceptors" className="heimdall-badge-interceptors-count" count={countInterceptorsByCycle(interceptors && interceptors.content, 'RESOURCE', res.id)}/>
+                                                {res.name}</Option>
                                         ))}
                                     </Select>
                                 </Form.Item>
@@ -306,10 +338,13 @@ class Interceptors extends Component {
 
                             <Col sm={24} md={6}>
                                 <Form.Item label="Operations">
-                                    <Select defaultValue={0} onChange={this.handleSelectChange('OP')} disabled={!this.props.operations}>
+                                    <Select defaultValue={0} onChange={this.handleSelectChange('OP')} disabled={!this.props.operations} className="heimdall-select-filter-complete">
                                         <Option value={0}>All</Option>
                                         {this.props.operations && this.props.operations.map((op, index) => (
-                                            <Option key={index} value={op.id}><Tag color={ColorUtils.getColorMethod(op.method)}>{op.method}</Tag> {op.path}</Option>
+                                            <Option key={index} value={op.id}>
+                                                <Badge title="Numbers of interceptors" className="heimdall-badge-interceptors-count" count={countInterceptorsByCycle(interceptors && interceptors.content, 'OPERATION', op.id)}/>
+                                                <Tag color={ColorUtils.getColorMethod(op.method)}>{op.method}</Tag> {op.path}
+                                            </Option>
                                         ))}
                                     </Select>
                                 </Form.Item>
@@ -335,8 +370,8 @@ class Interceptors extends Component {
                                 <DnDInterceptorType key={index}
                                     type={interceptor.type}
                                     icon='code-o'
-                                    canAddInterceptor={canAddInterceptor}
-                                    color={canAddInterceptor && '#989898'}
+                                    canAddInterceptor={PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_INTERCEPTOR, privileges.PRIVILEGE_UPDATE_INTERCEPTOR]) && canAddInterceptor}
+                                    color={PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_INTERCEPTOR, privileges.PRIVILEGE_UPDATE_INTERCEPTOR]) && canAddInterceptor && '#989898'}
                                     environmentId={this.state.environmentId !== 0 && this.state.environmentId}
                                     planId={this.state.planId !== 0 && this.state.planId}
                                     resourceId={this.state.resourceId !== 0 && this.state.resourceId}
@@ -361,9 +396,11 @@ class Interceptors extends Component {
                             <Button className="card-button" type="danger" disabled={hasNoChanges} onClick={this.discardChanges}>
                                 <Icon type="delete" /> Discard
                             </Button>
-                            <Button className="card-button" type="primary" disabled={hasNoChanges} onClick={this.saveChanges}>
-                                <Icon type="save" /> Save Changes
-                            </Button>
+                            <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_INTERCEPTOR]}>
+                                <Button className="card-button" type="primary" disabled={hasNoChanges} onClick={this.saveChanges}>
+                                    <Icon type="save" /> Save Changes
+                                </Button>
+                            </ComponentAuthority>
                         </Row>
                     </Col>
                 </Row>

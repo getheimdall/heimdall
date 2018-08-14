@@ -72,12 +72,12 @@ heimdall:
     security:
         enabled: true
         ldap:
-            enabled: false
-            #url: ldap://your.host:port
-            #searchBase: DC=name,DC=name
-            #userDn: your@mail.user
-            #password: password
-            #userSearchFilter: sAMAccountName={0}
+            enabled: true
+            url: ldap://conductor.tecnologia:389
+            searchBase: DC=conductor,DC=tecnologia
+            userDn: sgr.admin@conductor.tecnologia
+            password: ThanaWr6
+            userSearchFilter: sAMAccountName={0}
         jwt:
             expiration-time: 600
             secret: secretKey

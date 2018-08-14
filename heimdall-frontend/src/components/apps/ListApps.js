@@ -3,6 +3,8 @@ import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 
 import { Modal, Row, Table, Divider, Tag, Tooltip, Button, Pagination } from 'antd';
+import ComponentAuthority from "../ComponentAuthority";
+import {privileges} from "../../constants/privileges-types";
 
 const confirm = Modal.confirm;
 const { Column } = Table;
@@ -48,9 +50,11 @@ class ListApps extends Component {
                                     <Link to={"/apps/" + record.id}><Button type="primary" icon="edit" /></Link>
                                 </Tooltip>
                                 <Divider type="vertical" />
-                                <Tooltip title="Delete">
-                                    <Button type="danger" icon="delete" onClick={this.showDeleteConfirm(record.id)} />
-                                </Tooltip>
+                                <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_APP]}>
+                                    <Tooltip title="Delete">
+                                        <Button type="danger" icon="delete" onClick={this.showDeleteConfirm(record.id)} />
+                                    </Tooltip>
+                                </ComponentAuthority>
                             </span>
                         )}
                     />

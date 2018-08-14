@@ -11,6 +11,8 @@ import PageHeader from '../components/ui/PageHeader'
 import ListDevelopers from '../components/developers/ListDevelopers'
 import Loading from '../components/ui/Loading'
 import FloatButton from '../components/ui/FloatButton'
+import ComponentAuthority from "../components/ComponentAuthority";
+import {privileges} from "../constants/privileges-types";
 
 class Developers extends Component {
 
@@ -83,7 +85,9 @@ class Developers extends Component {
 
                     <ListDevelopers dataSource={developers} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading} />
 
-                    <FloatButton history={history} to="/developers/new" label="Add new Developer" />
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_UPDATE_INTERCEPTOR]}>
+                        <FloatButton history={history} to="/developers/new" label="Add new Developer" />
+                    </ComponentAuthority>
                 </Row>
             </div>
         )
