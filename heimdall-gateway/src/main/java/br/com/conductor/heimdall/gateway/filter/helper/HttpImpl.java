@@ -20,10 +20,12 @@ package br.com.conductor.heimdall.gateway.filter.helper;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
- 
-import java.util.List;
-import java.util.Map;
 
+import br.com.conductor.heimdall.middleware.spec.Http;
+import br.com.conductor.heimdall.middleware.spec.Json;
+import br.com.twsoftware.alfred.object.Objeto;
+import com.google.common.collect.Lists;
+import com.netflix.zuul.context.RequestContext;
 import org.apache.http.entity.ContentType;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -34,16 +36,16 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.google.common.collect.Lists;
+import java.util.List;
+import java.util.Map;
 
-import br.com.conductor.heimdall.middleware.spec.Http;
-import br.com.conductor.heimdall.middleware.spec.Json;
-import br.com.twsoftware.alfred.object.Objeto;
+import static br.com.conductor.heimdall.core.util.ConstantsInterceptors.UNIQUE_ID;
 
 /**
  * Implementation of the {@link Http} interface.
  *
  * @author Filipe Germano
+ * @author Marcelo Aguiar Rodrigues
  *
  */
 public class HttpImpl implements Http {
@@ -124,7 +126,8 @@ public class HttpImpl implements Http {
      }
      
      public ApiResponseImpl sendGet() {
-          
+
+          setUIDFromInterceptor();
           ResponseEntity<String> entity;
           
           if (headers.isEmpty()) {
@@ -145,6 +148,7 @@ public class HttpImpl implements Http {
 
      public ApiResponseImpl sendPost() {
 
+          setUIDFromInterceptor();
           ResponseEntity<String> entity;
           if (headers.isEmpty()) {
                
@@ -176,6 +180,7 @@ public class HttpImpl implements Http {
 
      public ApiResponseImpl sendPut() {
 
+          setUIDFromInterceptor();
           ResponseEntity<String> entity;
           if (headers.isEmpty()) {
                
@@ -203,7 +208,8 @@ public class HttpImpl implements Http {
 
 	public ApiResponseImpl sendDelete() {
 
-		ResponseEntity<String> entity;
+        setUIDFromInterceptor();
+        ResponseEntity<String> entity;
 
 		if (headers.isEmpty()) {
 			entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.DELETE, null, String.class);
@@ -218,6 +224,17 @@ public class HttpImpl implements Http {
 
 		return apiResponse;
 	}
+
+	/*
+	 * Forwards the Identifier from the IdentifierInterceptor if it is set
+	 */
+    private void setUIDFromInterceptor() {
+        RequestContext context = RequestContext.getCurrentContext();
+
+        if (context.getZuulRequestHeaders().get(UNIQUE_ID) != null) {
+            headers.add(UNIQUE_ID, context.getZuulRequestHeaders().get(UNIQUE_ID));
+        }
+    }
 
      private RestTemplate rest() {
           if (this.restTemplate == null) {
