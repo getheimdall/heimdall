@@ -91,7 +91,6 @@ public class OperationService {
       * @param 	resourceId					The {@link Resource} Id
       * @param 	operationId					The {@link Operation} Id
       * @return								The {@link Operation} found
-      * @throws NotFoundException			Resource not found
       */
      @Transactional(readOnly = true)
      public Operation find(Long apiId, Long resourceId, Long operationId) {
@@ -110,7 +109,6 @@ public class OperationService {
       * @param 	operationDTO				The {@link OperationDTO}
       * @param 	pageableDTO					The {@link PageableDTO}
       * @return								The paged {@link Operation} list as a {@link OperationPage} object
-      * @throws NotFoundException			Resource not found
       */
      @Transactional(readOnly = true)
      public OperationPage list(Long apiId, Long resourceId, OperationDTO operationDTO, PageableDTO pageableDTO) {
@@ -125,10 +123,8 @@ public class OperationService {
           
           Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
           Page<Operation> page = operationRepository.findAll(example, pageable);
-          
-          OperationPage operationPage = new OperationPage(PageDTO.build(page));
-          
-          return operationPage;
+
+          return new OperationPage(PageDTO.build(page));
      }
 
      /**
@@ -138,7 +134,6 @@ public class OperationService {
       * @param 	resourceId					The {@link Resource} Id
       * @param 	operationDTO				The {@link OperationDTO}
       * @return								The list of {@link Operation}
-      * @throws NotFoundException			Resource not found
       */
      @Transactional(readOnly = true)
      public List<Operation> list(Long apiId, Long resourceId, OperationDTO operationDTO) {
@@ -150,10 +145,8 @@ public class OperationService {
           operation.setResource(resource);
           
           Example<Operation> example = Example.of(operation, ExampleMatcher.matching().withIgnorePaths("resource.api").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
-          
-          List<Operation> operations = operationRepository.findAll(example);
-          
-          return operations;
+
+          return operationRepository.findAll(example);
      }
      
      /**
@@ -163,8 +156,6 @@ public class OperationService {
       * @param 	resourceId					The {@link Resource} Id
       * @param 	operationDTO				The {@link OperationDTO}
       * @return								The saved {@link Operation}
-      * @throws NotFoundException			Resource not found
-      * @throws	BadRequestException			Only one operation per resource
       */
      @Transactional
      public Operation save(Long apiId, Long resourceId, OperationDTO operationDTO) {
@@ -196,8 +187,6 @@ public class OperationService {
       * @param 	operationId					The {@link Operation} Id
       * @param 	operationDTO				The {@link OperationDTO}
       * @return								The updated {@link Operation}
-      * @throws NotFoundException			Resource not found
-      * @throws BadRequestException			Only one operation per resource
       */
      @Transactional
      public Operation update(Long apiId, Long resourceId, Long operationId, OperationDTO operationDTO) {
@@ -228,7 +217,6 @@ public class OperationService {
       * @param  apiId						The {@link Api} Id
       * @param 	resourceId					The {@link Resource} Id
       * @param 	operationId					The {@link Operation} Id
-      * @throws NotFoundException			Resource not found
       */
      @Transactional
      public void delete(Long apiId, Long resourceId, Long operationId) {
