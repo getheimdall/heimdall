@@ -15,7 +15,6 @@ class AccessTokenForm extends Component {
     }
 
     componentDidMount() {
-        console.log(this.props.accessToken)
         if (this.props.accessToken && this.props.accessToken.app && this.props.accessToken.app.plans) {
             this.setState({...this.state, plans: this.props.accessToken.app.plans})
         }

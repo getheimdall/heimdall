@@ -29,6 +29,7 @@ class ResourceForm extends Component {
     onSubmitResource() {
         this.props.form.validateFieldsAndScroll((err, payload) => {
             if (!err) {
+
                 // this.props.onSubmit(payload)
                 if (this.props.resourceId === 0) {
                     this.props.save(this.props.idApi, payload)
