@@ -39,7 +39,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.util.List;
 import java.util.Map;
 
-import static br.com.conductor.heimdall.core.util.ConstantsInterceptors.UNIQUE_ID;
+import static br.com.conductor.heimdall.core.util.ConstantsInterceptors.IDENTIFIER_ID;
 
 /**
  * Implementation of the {@link Http} interface.
@@ -231,8 +231,8 @@ public class HttpImpl implements Http {
     private void setUIDFromInterceptor() {
         RequestContext context = RequestContext.getCurrentContext();
 
-        if (context.getZuulRequestHeaders().get(UNIQUE_ID) != null) {
-            headers.add(UNIQUE_ID, context.getZuulRequestHeaders().get(UNIQUE_ID));
+        if (context.getZuulRequestHeaders().get(IDENTIFIER_ID) != null) {
+            headers.add(IDENTIFIER_ID, context.getZuulRequestHeaders().get(IDENTIFIER_ID));
         }
     }
 

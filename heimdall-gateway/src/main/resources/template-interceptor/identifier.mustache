@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import static br.com.conductor.heimdall.core.util.ConstantsInterceptors.UNIQUE_ID;
+import static br.com.conductor.heimdall.core.util.ConstantsInterceptors.IDENTIFIER_ID;
 
 public class UniqueID extends HeimdallFilter {
 
@@ -51,7 +51,7 @@ public class UniqueID extends HeimdallFilter {
         String uid = UUID.randomUUID().toString();
 
         RequestContext context = RequestContext.getCurrentContext();
-        context.addZuulRequestHeader(UNIQUE_ID, uid);
+        context.addZuulRequestHeader(IDENTIFIER_ID, uid);
     }
 
     @Override

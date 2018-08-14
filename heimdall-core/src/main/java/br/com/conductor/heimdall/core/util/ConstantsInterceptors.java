@@ -37,5 +37,5 @@ public class ConstantsInterceptors {
      
      public static final String GLOBAL_ACCESS_NOT_ALLOWED_API = "Access not allowed for this API";
 
-     public static final String UNIQUE_ID = "unique_id";
+     public static final String IDENTIFIER_ID = "identifier_id";
 }
