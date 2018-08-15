@@ -73,7 +73,7 @@ class NewApiOverview extends Component {
                                     {
                                         getFieldDecorator('basePath', {
                                             rules: [{ required: true, message: 'Please input your api base path!' }]
-                                        })(<Input placeholder="/basepath" />)
+                                        })(<Input addonBefore={"/"} placeholder="basepath" />)
                                     }
                                 </FormItem>
                             </Col>
