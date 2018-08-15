@@ -22,6 +22,8 @@ package br.com.conductor.heimdall.api;
  */
 
 import br.com.conductor.heimdall.api.environment.JwtProperty;
+import br.com.conductor.heimdall.core.environment.Property;
+import br.com.conductor.heimdall.core.util.RabbitQueueUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
@@ -32,10 +34,6 @@ import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
-import br.com.conductor.heimdall.api.environment.LdapProperty;
-import br.com.conductor.heimdall.core.environment.Property;
-import br.com.conductor.heimdall.core.util.RabbitQueueUtils;
-
 /**
  * Since Heimdall is a SpringBoot application, this is a {@link SpringBootServletInitializer}.
  *
@@ -44,7 +42,7 @@ import br.com.conductor.heimdall.core.util.RabbitQueueUtils;
  * 
  */
 @SpringBootApplication(exclude = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class})
-@EnableConfigurationProperties({ Property.class, LdapProperty.class, JwtProperty.class})
+@EnableConfigurationProperties({ Property.class, JwtProperty.class})
 @ComponentScan(basePackages = { "br.com.conductor.heimdall.api", "br.com.conductor.heimdall.core" })
 @EntityScan({"br.com.conductor.heimdall.core.entity", "br.com.conductor.heimdall.api.entity"})
 @EnableJpaRepositories({"br.com.conductor.heimdall.core.repository", "br.com.conductor.heimdall.api.repository"})

@@ -79,4 +79,6 @@ public class ConstantsPath {
 
      public static final String PATH_LOGOUT = PATH_API + "/logout";
 
+     public static final String PATH_LDAP = PATH_API + "/ldap";
+
 }

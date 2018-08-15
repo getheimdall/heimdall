@@ -20,13 +20,12 @@ package br.com.conductor.heimdall.api.service;
  * ==========================LICENSE_END===================================
  */
 
+import br.com.conductor.heimdall.api.entity.Ldap;
 import br.com.conductor.heimdall.api.entity.Role;
 import br.com.conductor.heimdall.api.entity.User;
 import br.com.conductor.heimdall.api.enums.CredentialStateEnum;
 import br.com.conductor.heimdall.api.environment.JwtProperty;
-import br.com.conductor.heimdall.api.repository.UserRepository;
 import br.com.conductor.heimdall.api.security.AccountCredentials;
-import br.com.conductor.heimdall.api.security.HeimdallLdapAuthoritiesPopulator;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import io.jsonwebtoken.Claims;
@@ -35,13 +34,19 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.ldap.authentication.BindAuthenticator;
 import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
+import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
+import org.springframework.security.ldap.search.LdapUserSearch;
+import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -50,7 +55,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Data class that holds tha JTW properties.
@@ -65,12 +69,6 @@ public class TokenAuthenticationService {
     private JwtProperty jwtProperty;
 
     @Autowired
-    private UserDetailsService userDetailsService;
-
-    @Autowired
-    private HeimdallLdapAuthoritiesPopulator heimdallLdapAuthoritiesPopulator;
-
-    @Autowired
     private UserService userService;
 
     @Autowired
@@ -80,7 +78,13 @@ public class TokenAuthenticationService {
     private AuthenticationManager authenticationManager;
 
     @Autowired
-    private LdapAuthenticationProvider ldapAuthenticationProvider;
+    private LdapService ldapService;
+
+    @Autowired
+    private AuthenticationManagerBuilder authenticateManagerBuilder;
+
+    @Autowired
+    private LdapAuthoritiesPopulator populator;
 
     private static final String TOKEN_PREFIX = "Bearer ";
 
@@ -96,10 +100,16 @@ public class TokenAuthenticationService {
             authenticate = authenticationManager.authenticate(userFound);
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
-            try {
-                authenticate = ldapAuthenticationProvider.authenticate(userFound);
-            } catch (Exception exception) {
-                log.error(exception.getMessage(), exception);
+
+            Ldap ldapActive = ldapService.getLdapActive();
+
+            if (Objects.nonNull(ldapActive)){
+                try {
+                    authenticateManagerBuilder.authenticationProvider(ldapProvider(ldapActive));
+                    authenticate = ldapProvider(ldapActive).authenticate(userFound);
+                } catch (Exception exception) {
+                    log.error(exception.getMessage(), exception);
+                }
             }
         }
 
@@ -179,5 +189,21 @@ public class TokenAuthenticationService {
         });
 
         return authorities;
+    }
+
+    private LdapAuthenticationProvider ldapProvider(Ldap ldap) {
+
+        LdapContextSource contextSource = new LdapContextSource();
+        contextSource.setUrl(ldap.getUrl());
+        contextSource.setUserDn(ldap.getUserDn());
+        contextSource.setPassword(ldap.getPassword());
+        contextSource.setReferral("follow");
+        contextSource.afterPropertiesSet();
+
+        LdapUserSearch ldapUserSearch = new FilterBasedLdapUserSearch(ldap.getSearchBase(), ldap.getUserSearchFilter(), contextSource);
+
+        BindAuthenticator bindAuthenticator = new BindAuthenticator(contextSource);
+        bindAuthenticator.setUserSearch(ldapUserSearch);
+        return new LdapAuthenticationProvider(bindAuthenticator, populator);
     }
 }

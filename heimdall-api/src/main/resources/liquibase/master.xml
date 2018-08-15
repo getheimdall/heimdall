@@ -33,5 +33,8 @@
     <include file="changelog/20180808111111-insert-privileges-to-middlewares.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20180808111213-add-privileges-middleware-to-role-admin.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20180814190556-add-privileges-to-role-default.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20180815115422-create-table-ldap.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20180815150000-insert-privileges-ldap.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20180815151344-add-privileges-ldap-to-role-admin.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

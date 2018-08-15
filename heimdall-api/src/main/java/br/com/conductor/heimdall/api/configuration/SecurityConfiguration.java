@@ -20,7 +20,6 @@ package br.com.conductor.heimdall.api.configuration;
  * ==========================LICENSE_END===================================
  */
 
-import br.com.conductor.heimdall.api.environment.LdapProperty;
 import br.com.conductor.heimdall.api.filter.JWTAuthenticationFilter;
 import br.com.conductor.heimdall.api.service.TokenAuthenticationService;
 import br.com.conductor.heimdall.core.util.ConstantsPath;
@@ -29,7 +28,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -38,11 +36,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.ldap.authentication.BindAuthenticator;
-import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
-import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
-import org.springframework.security.ldap.search.LdapUserSearch;
-import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
@@ -57,13 +50,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private LdapProperty ldapProps;
-
-    @Autowired
     private UserDetailsService userDetailsService;
-
-    @Autowired
-    private LdapAuthoritiesPopulator populator;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -93,11 +80,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-
-        if (ldapProps.isEnabled()) {
-
-            auth.authenticationProvider(ldapProvider());
-        }
         auth.authenticationProvider(jdbcProvider());
     }
 
@@ -114,26 +96,4 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return authProvider;
     }
 
-    /**
-     * Returns a configured {@link LdapAuthenticationProvider}.
-     *
-     * @return {@link LdapAuthenticationProvider}
-     */
-    @Bean
-    @ConditionalOnProperty("heimdall.security.ldap.enabled")
-    public LdapAuthenticationProvider ldapProvider() {
-
-        LdapContextSource contextSource = new LdapContextSource();
-        contextSource.setUrl(ldapProps.getUrl());
-        contextSource.setUserDn(ldapProps.getUserDn());
-        contextSource.setPassword(ldapProps.getPassword());
-        contextSource.setReferral("follow");
-        contextSource.afterPropertiesSet();
-
-        LdapUserSearch ldapUserSearch = new FilterBasedLdapUserSearch(ldapProps.getSearchBase(), ldapProps.getUserSearchFilter(), contextSource);
-
-        BindAuthenticator bindAuthenticator = new BindAuthenticator(contextSource);
-        bindAuthenticator.setUserSearch(ldapUserSearch);
-        return new LdapAuthenticationProvider(bindAuthenticator, populator);
-    }
 }
