@@ -21,6 +21,14 @@ package br.com.conductor.heimdall.gateway.filter.helper;
  */
 
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Path;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
 
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.json.JSONArray;
@@ -34,6 +42,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
+import br.com.conductor.heimdall.middleware.exception.BeanValidationException;
 import br.com.conductor.heimdall.middleware.spec.Json;
 import br.com.twsoftware.alfred.object.Objeto;
 import lombok.extern.slf4j.Slf4j;
@@ -100,21 +109,46 @@ public class JsonImpl implements Json {
 		try {
 			@SuppressWarnings("unchecked")
 			T obj = (T) mapper().readValue(json, classType);
+			
+			Set<ConstraintViolation<T>> violations = validador().validate(obj);
+
+			if (!violations.isEmpty()) {
+			     String violacoes = parse(violations.stream()
+			               .collect(Collectors.toMap(ConstraintViolation::getPropertyPath, ConstraintViolation::getMessage)));
+     
+			     throw new BeanValidationException("Bean validation error.", violacoes);
+			}
+			
 			return obj;
+		} catch (BeanValidationException e) {
+		     log.error(e.getMessage(), e);
+		     throw e;
 		} catch (Exception e) {
 
 			log.error(e.getMessage(), e);
 			return null;
 		}
 	}
-	
+
 	@Override
 	public <T> T parse(String json, TypeReference<T> type) {
-		try {
-			mapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	     try {
+	          mapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			@SuppressWarnings("unchecked")
 			T obj = (T) mapper().readValue(json, type);
+			
+			Set<ConstraintViolation<T>> violations = validador().validate(obj);
+			
+               if (!violations.isEmpty()) {
+                    Map<Path, String> violacoes = violations.stream().collect(Collectors.toMap(ConstraintViolation::getPropertyPath, ConstraintViolation::getMessage));
+                    
+                    throw new BeanValidationException("Erro na validação do bean.", parse(violacoes));
+               }
+			
 			return obj;
+	     } catch (BeanValidationException e) {
+               log.error(e.getMessage(), e);
+               throw e;
 		} catch (Exception e) {
 
 			log.error(e.getMessage(), e);
@@ -181,4 +215,11 @@ public class JsonImpl implements Json {
 
 		return mapper;
 	}
+	
+	private Validator validador() {
+
+          ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+          Validator validator = factory.getValidator();
+          return validator;
+     }
 }
