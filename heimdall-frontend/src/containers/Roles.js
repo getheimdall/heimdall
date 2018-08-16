@@ -5,6 +5,8 @@ import {Button, Card, Col, Form, Input, notification, Row} from "antd";
 import ListRoles from "../components/roles/ListRoles";
 import FloatButton from "../components/ui/FloatButton";
 import {initLoading, getAllRoles, remove, clearRoles, clearRole} from "../actions/roles";
+import ComponentAuthority from "../components/ComponentAuthority";
+import {privileges} from "../constants/privileges-types";
 
 class Roles extends Component {
 
@@ -75,7 +77,9 @@ class Roles extends Component {
 
                 <Row className="h-row bg-white">
                     <ListRoles dataSource={roles} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading}/>
-                    <FloatButton history={this.props.history} label="Add new ROLE" to="/roles/new"/>
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_ROLE]}>
+                        <FloatButton history={this.props.history} label="Add new ROLE" to="/roles/new"/>
+                    </ComponentAuthority>
                 </Row>
             </div>
         )
