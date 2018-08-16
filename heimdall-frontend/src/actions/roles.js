@@ -18,7 +18,10 @@ export const getAllRoles = (query = {offset: 0, limit: 10}) => dispatch => {
             dispatch(finishLoading())
         })
         .catch(error => {
-            dispatch(sendNotification({type: 'error', message: `${error.message}`}))
+            console.log(error)
+            if (error.response && error.response.status === 400) {
+                dispatch(sendNotification({ type: 'error', message: 'error', description: error.response.data.message }))
+            }
             dispatch(finishLoading())
         })
 }

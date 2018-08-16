@@ -26,7 +26,7 @@ class RoleForm extends Component {
         let privilegesRole = []
         if (this.props.privileges) {
             storagePrivileges = this.props.privileges.map(p => {
-                return {key: p.id, title: p.name}
+                return {key: p.id, title: p.name, disabled: !PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_ROLE, privileges.PRIVILEGE_UPDATE_ROLE])}
             })
         }
         if (this.props.role && this.props.role.privileges) {
@@ -94,9 +94,10 @@ class RoleForm extends Component {
                         <Col sm={24} md={16}>
                             {
                                 !this.props.privileges && this.props.privileges.length === 0 ? <Loading/> :
-                                    <FormItem label="Privileges">
+                                    <FormItem>
                                         <Transfer
                                             showSearch
+                                            titles={['Available privileges', 'Attributed privileges']}
                                             onChange={this.handleChangeTransfer}
                                             filterOption={this.filterOption}
                                             dataSource={this.state.storagePrivileges}

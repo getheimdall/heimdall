@@ -33,7 +33,6 @@ import SingleApp from '../containers/SingleApp';
 import Plans from '../containers/Plans';
 import SinglePlan from '../containers/SinglePlan';
 import AccessTokens from '../containers/AccessTokens';
-// import ApiFlows from '../components/apis/ApiFlows';
 import SingleAccessToken from '../containers/SingleAccessToken';
 import Users from '../containers/Users';
 import SingleUser from '../containers/SingleUser';
@@ -41,6 +40,7 @@ import Traces from "../containers/Traces";
 import SingleTrace from "../containers/SingleTrace";
 import Roles from "../containers/Roles";
 import SingleRole from "../containers/SingleRole";
+import SingleLdap from "../containers/SingleLdap";
 
 const routes = ({history}) => (
     <Switch>
@@ -105,6 +105,8 @@ const routes = ({history}) => (
                   component={Authorization([privileges.PRIVILEGE_READ_ROLE])(FadeIn(SingleRole))}/>
         <AppRoute layout={MainLayout} history={history} exact path="/roles/:id"
                   component={Authorization([privileges.PRIVILEGE_READ_ROLE])(FadeIn(SingleRole))}/>
+        <AppRoute layout={MainLayout} history={history} exact path="/ldap"
+                  component={Authorization([privileges.PRIVILEGE_READ_LDAP])(FadeIn(SingleLdap))}/>
         {/* routes not finded or 404 */}
         <Redirect to="/"/>
         {/* <AppRoute layout={MainLayout} history={history} component={Authorization('TESTE)(FadeIn(Apis))} /> */}

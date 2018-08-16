@@ -71,6 +71,12 @@ class SideBar extends Component {
                         <SidebarLink to="/traces" label="Traces" history={history} icon="sync"/>
                     </Menu.Item>
                     }
+
+                    {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_LDAP]) &&
+                    <Menu.Item key="ldap" className="ldap">
+                        <SidebarLink to="/ldap" label="Settings LDAP" history={history} icon="setting"/>
+                    </Menu.Item>
+                    }
                 </Menu>
             </Sider>
         )
