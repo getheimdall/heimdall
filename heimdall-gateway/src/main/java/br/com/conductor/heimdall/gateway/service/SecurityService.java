@@ -1,11 +1,5 @@
+
 package br.com.conductor.heimdall.gateway.service;
-
-import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
-
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 
 /*-
  * =========================LICENSE_START==================================
@@ -16,9 +10,9 @@ import org.springframework.http.HttpStatus;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,10 +20,6 @@ import org.springframework.http.HttpStatus;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-
-import org.springframework.stereotype.Service;
-
-import com.netflix.zuul.context.RequestContext;
 
 import br.com.conductor.heimdall.core.entity.AccessToken;
 import br.com.conductor.heimdall.core.entity.App;
@@ -39,8 +29,15 @@ import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.util.ConstantsInterceptors;
 import br.com.conductor.heimdall.core.util.DigestUtils;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
-import br.com.conductor.heimdall.middleware.spec.Helper;
 import br.com.twsoftware.alfred.object.Objeto;
+import com.netflix.zuul.context.RequestContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
 
 /**
  * Provides methods to validade AccessToken in interceptor.
@@ -61,12 +58,11 @@ public class SecurityService {
       * Method responsible for validating access_token in interceptor
       * 
       * @param ctx 
-      * @param helper
       * @param apiId
       * @param clientId
       * @param accessToken
       */
-     public void validadeAccessToken(RequestContext ctx, Helper helper, Long apiId, String clientId, String accessToken) {
+     public void validadeAccessToken(RequestContext ctx, Long apiId, String clientId, String accessToken) {
                     
           final String ACCESS_TOKEN = "Access Token";
           
@@ -87,69 +83,66 @@ public class SecurityService {
                               
                               TraceContextHolder.getInstance().getActualTrace().setApp(token.getApp().getName());
                          } else {
-                              
-                              buildResponse(ctx, HttpStatus.UNAUTHORIZED.value(), true, String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, ACCESS_TOKEN));
+
+                              buildResponse(ctx, String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, ACCESS_TOKEN));
                          }
                     } else {
-                         
-                         buildResponse(ctx, HttpStatus.UNAUTHORIZED.value(), true, ConstantsInterceptors.GLOBAL_ACCESS_NOT_ALLOWED_API);
+
+                         buildResponse(ctx, ConstantsInterceptors.GLOBAL_ACCESS_NOT_ALLOWED_API);
                     }
-                    
+
                } else {
-                    
-                    buildResponse(ctx, HttpStatus.UNAUTHORIZED.value(), true, String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, ACCESS_TOKEN));
+
+                    buildResponse(ctx, String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, ACCESS_TOKEN));
                }
           } else {
-               
-               buildResponse(ctx, HttpStatus.UNAUTHORIZED.value(), true, String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, ACCESS_TOKEN));
+
+               buildResponse(ctx, String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, ACCESS_TOKEN));
           }
-          
      }
      
      /**
       * Method responsible for validating client_id in interceptor
-      * 
-      * @param ctx
-      * @param helper
-      * @param apiId
-      * @param clientId
+      *
+      * @param ctx      {@link RequestContext}
+      * @param apiId    The apiId
+      * @param clientId ClientId to be validated
       */
-     public void validadeClientId(RequestContext ctx, Helper helper, Long apiId, String clientId) {
-          
+     public void validadeClientId(RequestContext ctx, Long apiId, String clientId) {
+
           final String CLIENT_ID = "Client Id";
           
           if (Objeto.notBlank(clientId)) {
                
                TraceContextHolder.getInstance().getActualTrace().setClientId(DigestUtils.digestMD5(clientId));
                App app = appRepository.findByClientId(clientId);
-               
-               Plan plan = app.getPlans().stream().filter(p -> apiId.equals(p.getApi().getId())).findFirst().orElse(null);
-               
-               if (Objeto.isBlank(plan)) {
+               if (Objeto.isBlank(app)) {
 
-                    buildResponse(ctx, HttpStatus.UNAUTHORIZED.value(), true, ConstantsInterceptors.GLOBAL_ACCESS_NOT_ALLOWED_API);
-                    
-               } else if (Objeto.isBlank(app)) {
-
-                    buildResponse(ctx, HttpStatus.UNAUTHORIZED.value(), true, String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, CLIENT_ID));
+                    buildResponse(ctx, String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, CLIENT_ID));
                } else {
-                    
-                    TraceContextHolder.getInstance().getActualTrace().setAppDeveloper(app.getDeveloper().getEmail());
+
+                    Plan plan = app.getPlans().stream().filter(p -> apiId.equals(p.getApi().getId())).findFirst().orElse(null);
+                    if (Objeto.isBlank(plan)) {
+
+                         buildResponse(ctx, ConstantsInterceptors.GLOBAL_ACCESS_NOT_ALLOWED_API);
+                    } else {
+
+                         TraceContextHolder.getInstance().getActualTrace().setAppDeveloper(app.getDeveloper().getEmail());
+                    }
                }
           } else {
 
-               buildResponse(ctx, HttpStatus.UNAUTHORIZED.value(), true, String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, CLIENT_ID));
+               buildResponse(ctx, String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, CLIENT_ID));
           }
-          
      }
-     
-     private void buildResponse(RequestContext ctx, Integer status, Boolean interrupt, String message) {
-          
-          ctx.setSendZuulResponse(!interrupt);
-          ctx.put(INTERRUPT, interrupt);
-          ctx.setResponseStatusCode(status);
+
+     private void buildResponse(RequestContext ctx, String message) {
+
+          ctx.setSendZuulResponse(false);
+          ctx.put(INTERRUPT, true);
+          ctx.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
           ctx.setResponseBody(message);
-          
+
      }
 
 }
