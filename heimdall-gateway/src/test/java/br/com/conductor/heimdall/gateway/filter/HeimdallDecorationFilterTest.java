@@ -114,6 +114,7 @@ public class HeimdallDecorationFilterTest {
         Resource res = new Resource();
         res.setId(88L);
         res.setApi(api);
+        api.setName("apiName");
 
         Environment environment = new Environment();
         environment.setInboundURL("http://localhost");
@@ -151,6 +152,7 @@ public class HeimdallDecorationFilterTest {
         Api api = new Api();
         api.setId(10L);
         api.setBasePath("/path");
+        api.setName("apiName");
 
         Resource res = new Resource();
         res.setId(88L);
@@ -223,6 +225,7 @@ public class HeimdallDecorationFilterTest {
         Api api = new Api();
         api.setId(10L);
         api.setBasePath("/v2");
+        api.setName("apiName");
 
         Resource resource = new Resource();
         resource.setId(88L);
@@ -252,6 +255,7 @@ public class HeimdallDecorationFilterTest {
         Api api = new Api();
         api.setId(10L);
         api.setBasePath("/v2");
+        api.setName("apiName");
 
         Resource resource = new Resource();
         resource.setId(88L);

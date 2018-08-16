@@ -1,0 +1,112 @@
+import java.util.*;
+
+import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
+import br.com.conductor.heimdall.core.util.BeanManager;
+import br.com.conductor.heimdall.core.util.Constants;
+import br.com.conductor.heimdall.gateway.service.CacheInterceptorService;
+import br.com.conductor.heimdall.gateway.trace.FilterDetail;
+import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+
+import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
+import com.netflix.zuul.context.RequestContext;
+import com.netflix.zuul.ZuulFilter;
+
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
+
+public class CacheClearInterceptor extends ZuulFilter {
+
+    private static Set<String> pathsAllowed;
+
+    private static Set<String> pathsNotAllowed;
+
+    private static String inboundURL;
+
+    private static String method;
+
+    private static String cacheName;
+
+    private static List<String> headers;
+
+    private static List<String> queryParams;
+
+    private CacheInterceptorService cacheInterceptorService;
+
+    private FilterDetail detail;
+
+    public CacheClearInterceptor() {
+
+        cacheName = "{{cache}}";
+
+        method = "{{method}}";
+
+        headers = Lists.newArrayList();
+        {{#headers}}
+        headers.add("{{.}}");
+        {{/headers}}
+
+        queryParams = Lists.newArrayList();
+        {{#queryParams}}
+        queryParams.add("{{.}}");
+        {{/queryParams}}
+
+        pathsAllowed = Sets.newHashSet();
+        {{#pathsAllowed}}
+        pathsAllowed.add("{{.}}");
+        {{/pathsAllowed}}
+
+        pathsNotAllowed = Sets.newHashSet();
+        {{#pathsNotAllowed}}
+        pathsNotAllowed.add("{{.}}");
+        {{/pathsNotAllowed}}
+
+        inboundURL = "{{inboundURL}}";
+
+        detail = new FilterDetail();
+
+    }
+
+    @Override
+    public boolean shouldFilter() {
+        return InterceptorLifeCycle.{{lifeCycle}}.filter(pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest());
+    }
+
+    @Override
+    public Object run() throws Throwable {
+        long startTime = System.currentTimeMillis();
+        try {
+            process();
+            detail.setStatus(Constants.SUCCESS);
+        } catch (Exception e) {
+            detail.setStatus(Constants.FAILED);
+            throw e;
+        } finally {
+            long endTime = System.currentTimeMillis();
+
+            long duration = (endTime - startTime);
+
+            detail.setName(this.getClass().getSimpleName());
+            detail.setTimeInMillisRun(duration);
+            TraceContextHolder.getInstance().getActualTrace().addFilter(detail);
+        }
+
+        return null;
+    }
+
+    private void process() {
+        cacheInterceptorService = (CacheInterceptorService) BeanManager.getBean(CacheInterceptorService.class);
+
+        cacheInterceptorService.cacheClearInterceptor(cacheName, headers, queryParams);
+        return null;
+    }
+
+    @Override
+    public String filterType() {
+        return POST_TYPE;
+    }
+
+    @Override
+    public int filterOrder() {
+        return {{order}};
+    }
+}
