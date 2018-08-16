@@ -117,7 +117,6 @@ public class InterceptorService {
      * Finds a {@link Interceptor} by its ID.
      *
      * @param id The Id of the {@link Interceptor}
-     * @throws NotFoundException Resource not found
      * @return The {@link Interceptor} found
      */
     @Transactional(readOnly = true)
@@ -146,9 +145,7 @@ public class InterceptorService {
         Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
         Page<Interceptor> page = interceptorRepository.findAll(example, pageable);
 
-        InterceptorPage interceptorPage = new InterceptorPage(PageDTO.build(page));
-
-        return interceptorPage;
+        return new InterceptorPage(PageDTO.build(page));
     }
 
     /**
@@ -164,16 +161,13 @@ public class InterceptorService {
 
         Example<Interceptor> example = Example.of(interceptor, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 
-        List<Interceptor> interceptors = interceptorRepository.findAll(example);
-
-        return interceptors;
+        return interceptorRepository.findAll(example);
     }
 
     /**
      * Saves a {@link Interceptor} to the repository.
      *
      * @param interceptorDTO The {@link InterceptorDTO}
-     * @throws BadRequestException Reference operations invalid
      * @return The {@link Interceptor} saved
      */
     @Transactional
@@ -235,7 +229,6 @@ public class InterceptorService {
      *
      * @param id             The ID of the {@link Interceptor} to be updated
      * @param interceptorDTO The {@link InterceptorDTO}
-     * @throws NotFoundException Resource not found
      * @return The updated {@link Interceptor}
      */
     public Interceptor update(Long id, InterceptorDTO interceptorDTO) {
@@ -260,7 +253,6 @@ public class InterceptorService {
      * Deletes a{@link Interceptor} by its ID.
      *
      * @param id The Id of the {@link Interceptor} to be deleted
-     * @throws NotFoundException Resource not found
      */
     @Transactional
     public void delete(Long id) {
@@ -273,17 +265,7 @@ public class InterceptorService {
 
         if (TypeInterceptor.RATTING == interceptor.getType()) {
 
-            String path = "";
-            if (InterceptorLifeCycle.PLAN == interceptor.getLifeCycle()) {
-                Plan plan = planRepository.findOne(interceptor.getReferenceId());
-                path = plan.getApi().getBasePath();
-            } else if (InterceptorLifeCycle.RESOURCE == interceptor.getLifeCycle()) {
-                Resource res = resourceRepository.findOne(interceptor.getReferenceId());
-                path = res.getApi().getBasePath() + "-" + res.getName();
-            } else {
-                Operation op = operationRepository.findOne(interceptor.getReferenceId());
-                path = op.getResource().getApi().getBasePath() + "-" + op.getResource().getName() + "-" + op.getPath();
-            }
+            String path = createPath(interceptor);
 
             ratelimitRepository.delete(path);
         }
@@ -309,17 +291,7 @@ public class InterceptorService {
             ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(interceptor.getType().name(), TemplateUtils.TEMPLATE_RATTING);
         }
 
-        String path = "";
-        if (InterceptorLifeCycle.PLAN == interceptor.getLifeCycle()) {
-            Plan plan = planRepository.findOne(interceptor.getReferenceId());
-            path = plan.getApi().getBasePath();
-        } else if (InterceptorLifeCycle.RESOURCE == interceptor.getLifeCycle()) {
-            Resource res = resourceRepository.findOne(interceptor.getReferenceId());
-            path = res.getApi().getBasePath() + "-" + res.getName();
-        } else {
-            Operation op = operationRepository.findOne(interceptor.getReferenceId());
-            path = op.getResource().getApi().getBasePath() + "-" + op.getResource().getName() + "-" + op.getPath();
-        }
+        String path = createPath(interceptor);
 
         RateLimit rate = new RateLimit(path, rateLimitDTO.getCalls(), rateLimitDTO.getInterval());
         ratelimitRepository.save(rate);
@@ -381,5 +353,27 @@ public class InterceptorService {
         }
 
         return invalids;
+    }
+
+    /*
+     * Creates the path to be used as key for the RateLimit repository
+     */
+    private String createPath(Interceptor interceptor) {
+
+        if (InterceptorLifeCycle.PLAN == interceptor.getLifeCycle()) {
+
+            Plan plan = planRepository.findOne(interceptor.getReferenceId());
+            return plan.getApi().getBasePath();
+
+        } else if (InterceptorLifeCycle.RESOURCE == interceptor.getLifeCycle()) {
+
+            Resource res = resourceRepository.findOne(interceptor.getReferenceId());
+            return res.getApi().getBasePath() + "-" + res.getName();
+
+        } else {
+
+            Operation op = operationRepository.findOne(interceptor.getReferenceId());
+            return op.getResource().getApi().getBasePath() + "-" + op.getResource().getName() + "-" + op.getPath();
+        }
     }
 }
