@@ -1,5 +1,7 @@
 package br.com.conductor.heimdall.gateway.filter.helper;
 
+import java.util.List;
+
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -30,7 +32,6 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,6 +42,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 
 import br.com.conductor.heimdall.middleware.exception.BeanValidationException;
 import br.com.conductor.heimdall.middleware.spec.Json;
@@ -139,10 +141,12 @@ public class JsonImpl implements Json {
 			
 			Set<ConstraintViolation<T>> violations = validador().validate(obj);
 			
-               if (!violations.isEmpty()) {
-                    Map<Path, String> violacoes = violations.stream().collect(Collectors.toMap(ConstraintViolation::getPropertyPath, ConstraintViolation::getMessage));
-                    
-                    throw new BeanValidationException("Erro na validação do bean.", parse(violacoes));
+			if (!violations.isEmpty()) {
+			     
+                    String violacoes = parse(violations.stream()
+                              .collect(Collectors.toMap(ConstraintViolation::getPropertyPath, ConstraintViolation::getMessage)));
+     
+                    throw new BeanValidationException("Bean validation error.", violacoes);
                }
 			
 			return obj;
@@ -161,7 +165,20 @@ public class JsonImpl implements Json {
 		try {
 			@SuppressWarnings("unchecked")
 			T obj = (T) mapper().readValue(json, TypeFactory.defaultInstance().constructParametricType(parametrized, parameterClasses));
-			return obj;
+			
+			Set<ConstraintViolation<T>> violations = validador().validate(obj);
+               
+			if (!violations.isEmpty()) {
+                    String violacoes = parse(violations.stream()
+                              .collect(Collectors.toMap(ConstraintViolation::getPropertyPath, ConstraintViolation::getMessage)));
+     
+                    throw new BeanValidationException("Bean validation error.", violacoes);
+               }
+               
+               return obj;
+          } catch (BeanValidationException e) {
+               log.error(e.getMessage(), e);
+               throw e;
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return null;
