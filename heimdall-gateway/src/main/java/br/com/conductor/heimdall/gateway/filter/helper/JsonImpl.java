@@ -1,7 +1,5 @@
 package br.com.conductor.heimdall.gateway.filter.helper;
 
-import java.util.List;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -27,7 +25,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.validation.ConstraintViolation;
-import javax.validation.Path;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -115,8 +112,9 @@ public class JsonImpl implements Json {
 			Set<ConstraintViolation<T>> violations = validador().validate(obj);
 
 			if (!violations.isEmpty()) {
+			     
 			     String violacoes = parse(violations.stream()
-			               .collect(Collectors.toMap(ConstraintViolation::getPropertyPath, ConstraintViolation::getMessage)));
+                              .collect(Collectors.toMap(v -> v.getPropertyPath().toString(), ConstraintViolation::getMessage)));
      
 			     throw new BeanValidationException("Bean validation error.", violacoes);
 			}
@@ -143,8 +141,8 @@ public class JsonImpl implements Json {
 			
 			if (!violations.isEmpty()) {
 			     
-                    String violacoes = parse(violations.stream()
-                              .collect(Collectors.toMap(ConstraintViolation::getPropertyPath, ConstraintViolation::getMessage)));
+			     String violacoes = parse(violations.stream()
+                              .collect(Collectors.toMap(v -> v.getPropertyPath().toString(), ConstraintViolation::getMessage)));
      
                     throw new BeanValidationException("Bean validation error.", violacoes);
                }
@@ -169,8 +167,9 @@ public class JsonImpl implements Json {
 			Set<ConstraintViolation<T>> violations = validador().validate(obj);
                
 			if (!violations.isEmpty()) {
+			     
                     String violacoes = parse(violations.stream()
-                              .collect(Collectors.toMap(ConstraintViolation::getPropertyPath, ConstraintViolation::getMessage)));
+                              .collect(Collectors.toMap(v -> v.getPropertyPath().toString(), ConstraintViolation::getMessage)));
      
                     throw new BeanValidationException("Bean validation error.", violacoes);
                }
