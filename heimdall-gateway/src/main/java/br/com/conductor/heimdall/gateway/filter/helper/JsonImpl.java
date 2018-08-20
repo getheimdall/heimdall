@@ -41,6 +41,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
+import br.com.conductor.heimdall.core.dto.BeanValidationErrorDTO;
 import br.com.conductor.heimdall.middleware.exception.BeanValidationException;
 import br.com.conductor.heimdall.middleware.spec.Json;
 import br.com.twsoftware.alfred.object.Objeto;
@@ -113,15 +114,16 @@ public class JsonImpl implements Json {
 
 			if (!violations.isEmpty()) {
 			     
-			     String violacoes = parse(violations.stream()
-                              .collect(Collectors.toMap(v -> v.getPropertyPath().toString(), ConstraintViolation::getMessage)));
-     
+			     String violacoes = parse(violations.stream().map(v -> {
+			          return new BeanValidationErrorDTO(v.getPropertyPath().toString(), v.getMessage());
+			     }).collect(Collectors.toList()));
+			     
 			     throw new BeanValidationException("Bean validation error.", violacoes);
 			}
 			
 			return obj;
 		} catch (BeanValidationException e) {
-		     log.error(e.getMessage(), e);
+		     log.debug(e.getMessage(), e);
 		     throw e;
 		} catch (Exception e) {
 
@@ -140,16 +142,17 @@ public class JsonImpl implements Json {
 			Set<ConstraintViolation<T>> violations = validador().validate(obj);
 			
 			if (!violations.isEmpty()) {
-			     
-			     String violacoes = parse(violations.stream()
-                              .collect(Collectors.toMap(v -> v.getPropertyPath().toString(), ConstraintViolation::getMessage)));
-     
+                    
+                    String violacoes = parse(violations.stream().map(v -> {
+                         return new BeanValidationErrorDTO(v.getPropertyPath().toString(), v.getMessage());
+                    }).collect(Collectors.toList()));
+                    
                     throw new BeanValidationException("Bean validation error.", violacoes);
                }
 			
 			return obj;
 	     } catch (BeanValidationException e) {
-               log.error(e.getMessage(), e);
+               log.debug(e.getMessage(), e);
                throw e;
 		} catch (Exception e) {
 
@@ -167,10 +170,11 @@ public class JsonImpl implements Json {
 			Set<ConstraintViolation<T>> violations = validador().validate(obj);
                
 			if (!violations.isEmpty()) {
-			     
-                    String violacoes = parse(violations.stream()
-                              .collect(Collectors.toMap(v -> v.getPropertyPath().toString(), ConstraintViolation::getMessage)));
-     
+                    
+                    String violacoes = parse(violations.stream().map(v -> {
+                         return new BeanValidationErrorDTO(v.getPropertyPath().toString(), v.getMessage());
+                    }).collect(Collectors.toList()));
+                    
                     throw new BeanValidationException("Bean validation error.", violacoes);
                }
                
