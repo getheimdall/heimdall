@@ -48,11 +48,15 @@ public class HeimdallHandlerMapping extends ZuulHandlerMapping {
      @Override
      protected Object lookupHandler(String urlPath, HttpServletRequest request) throws Exception {
 
-          if (this.dirty) {
-               registerHandler("/**", this.zuul);
-               setDirty(false);
-          }
-          return super.lookupHandler(urlPath, request);
+    	 if (this.dirty) {
+ 			synchronized (this) {
+ 				if (this.dirty) {
+ 					registerHandler("/**", this.zuul);
+ 					setDirty(false);
+ 				}
+ 			}
+ 		}
+        return super.lookupHandler(urlPath, request);
      }
 
      public void setDirty(boolean dirty) {
