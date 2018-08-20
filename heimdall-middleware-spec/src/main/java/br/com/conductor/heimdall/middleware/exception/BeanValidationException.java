@@ -35,8 +35,8 @@ public class BeanValidationException extends RuntimeException {
      
      private String violations;
      
-     public BeanValidationException(String mensagem, String violations) {
-          super(mensagem);
+     public BeanValidationException(String message, String violations) {
+          super(message);
           this.violations = violations;
      }
 }
