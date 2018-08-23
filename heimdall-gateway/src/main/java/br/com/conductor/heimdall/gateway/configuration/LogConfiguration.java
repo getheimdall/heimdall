@@ -1,5 +1,5 @@
-package br.com.conductor.heimdall.gateway.configuration;
 
+package br.com.conductor.heimdall.gateway.configuration;
 
 /*-
  * =========================LICENSE_START==================================
@@ -21,27 +21,28 @@ package br.com.conductor.heimdall.gateway.configuration;
  * ==========================LICENSE_END===================================
  */
 
-import javax.annotation.PostConstruct;
-
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import br.com.conductor.heimdall.core.environment.Property;
 import br.com.conductor.heimdall.gateway.appender.MongoDBAppender;
+import ch.qos.logback.classic.AsyncAppender;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import net.logstash.logback.appender.LogstashTcpSocketAppender;
 import net.logstash.logback.encoder.LogstashEncoder;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import javax.annotation.PostConstruct;
 
 /**
  * Class responsible to configure the logging.
  *
  * @author Thiago Sampaio
  * @author Marcos Filho
+ * @author Marcelo Aguiar Rodrigues
  *
  */
 @Configuration
@@ -57,6 +58,8 @@ public class LogConfiguration {
              LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
              Logger logger = (Logger) LoggerFactory.getLogger("mongo");
              logger.setAdditive(false);
+
+             // Creating custom MongoDBAppender
              Appender<ILoggingEvent> appender;
              if (property.getMongo().getUrl() != null) {
           	   appender = new MongoDBAppender(property.getMongo().getUrl(), property.getMongo().getDataBase(), property.getMongo().getCollection());
@@ -66,7 +69,14 @@ public class LogConfiguration {
              appender.setContext(lc);
              appender.start();
 
-             logger.addAppender(appender);
+             // Creating AsyncAppender
+             Appender<ILoggingEvent> asyncAppender = new AsyncAppender();
+             ((AsyncAppender) asyncAppender).setQueueSize(property.getMongo().getQueueSize().intValue());
+             ((AsyncAppender) asyncAppender).setDiscardingThreshold(property.getMongo().getDiscardingThreshold().intValue());
+             ((AsyncAppender) asyncAppender).addAppender(appender);
+             asyncAppender.start();
+
+             logger.addAppender(asyncAppender);
         }
      }
 
