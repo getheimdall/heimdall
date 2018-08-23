@@ -33,7 +33,8 @@ import static org.springframework.http.HttpStatus.*;
  * 
  * @author Filipe Germano
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
- * 
+ * @author Marcelo Aguiar Rodrigues
+ *
  */
 @Slf4j
 public enum ExceptionMessage {
@@ -104,7 +105,7 @@ public enum ExceptionMessage {
 
     ENVIRONMENT_INBOUND_DNS_PATTERN(BAD_REQUEST.value(), "Environment inbound URL has to follow the pattern http[s]://host.domain[:port] or www.host.domain[:port]", BadRequestException.class),PROVIDER_NOT_FOUND(BAD_REQUEST.value(), "Provider not found", BadRequestException.class),
      
-    PROVIDER_USER_UNAUTHORIZED(UNAUTHORIZED.value(), "User provider unauthorized", UnauthorizedException.class),
+    PROVIDER_USER_UNAUTHORIZED(UNAUTHORIZED.value(), "User provided unauthorized", UnauthorizedException.class),
      
     TOKEN_EXPIRED(UNAUTHORIZED.value(), "Token expired", UnauthorizedException.class),
 
@@ -115,6 +116,8 @@ public enum ExceptionMessage {
     CODE_NOT_FOUND(UNAUTHORIZED.value(), "Code already used to generate token or not defined", UnauthorizedException.class),
 
     GRANT_TYPE_NOT_FOUND(BAD_REQUEST.value(), "grant_type not found", BadRequestException.class),
+
+    WRONG_GRANT_TYPE_INFORMED(BAD_REQUEST.value(), "Wrong grant_type informed", BadRequestException.class),
 
     REFRESH_TOKEN_NOT_FOUND(BAD_REQUEST.value(), "refresh_token not found", BadRequestException.class),
 

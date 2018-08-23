@@ -27,11 +27,13 @@ import java.io.Serializable;
  * This class represents the structure of Token in OAuth implicit.
  *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ * @author Marcelo Aguiar Rodrigues
  */
 @Data
 public class TokenImplicit implements Serializable {
 
     private String accessToken;
     private long expiration;
+    private String token_type;
 
 }
