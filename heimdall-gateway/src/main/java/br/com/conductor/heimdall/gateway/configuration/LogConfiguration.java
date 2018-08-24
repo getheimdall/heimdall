@@ -48,6 +48,9 @@ import javax.annotation.PostConstruct;
 @Configuration
 public class LogConfiguration {
 
+     private static final int DEFAULT_QUEUE_SIZE = 500;
+     private static final int DEFAULT_DISCARDING_THRESHOLD = 0;
+
      @Autowired
      private Property property;
      
@@ -70,9 +73,12 @@ public class LogConfiguration {
              appender.start();
 
              // Creating AsyncAppender
+             int queueSize = (property.getMongo().getQueueSize() != null) ? property.getMongo().getQueueSize().intValue() : DEFAULT_QUEUE_SIZE;
+             int discardingThreshold = (property.getMongo().getDiscardingThreshold() != null) ? property.getMongo().getDiscardingThreshold().intValue() : DEFAULT_DISCARDING_THRESHOLD;
+
              Appender<ILoggingEvent> asyncAppender = new AsyncAppender();
-             ((AsyncAppender) asyncAppender).setQueueSize(property.getMongo().getQueueSize().intValue());
-             ((AsyncAppender) asyncAppender).setDiscardingThreshold(property.getMongo().getDiscardingThreshold().intValue());
+             ((AsyncAppender) asyncAppender).setQueueSize(queueSize);
+             ((AsyncAppender) asyncAppender).setDiscardingThreshold(discardingThreshold);
              ((AsyncAppender) asyncAppender).addAppender(appender);
              asyncAppender.start();
 
