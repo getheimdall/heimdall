@@ -60,6 +60,11 @@ public class HeaderMock implements Header {
     }
 
     @Override
+    public void addAll(Map<String, String> values) {
+        headers.putAll(values);
+    }
+
+    @Override
     public void remove(String name) {
         this.headers.remove(name);
     }

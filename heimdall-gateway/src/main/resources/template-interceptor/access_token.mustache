@@ -107,7 +107,7 @@ public class AccessTokenInterceptor extends HeimdallFilter {
                clientId = request.getParameter(nameClientId);       
           }
 
-          securityService.validadeAccessToken(ctx, helper, getApiId(), clientId, accessToken);       
+          securityService.validadeAccessToken(ctx, getApiId(), clientId, accessToken);
 
      }     
 
