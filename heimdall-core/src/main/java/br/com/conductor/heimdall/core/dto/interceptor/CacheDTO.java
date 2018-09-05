@@ -1,5 +1,5 @@
 
-package br.com.conductor.heimdall.core.util;
+package br.com.conductor.heimdall.core.dto.interceptor;
 
 /*-
  * =========================LICENSE_START==================================
@@ -10,9 +10,9 @@ package br.com.conductor.heimdall.core.util;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,29 +21,24 @@ package br.com.conductor.heimdall.core.util;
  * ==========================LICENSE_END===================================
  */
 
-import org.junit.Ignore;
+import lombok.Data;
+
+import java.util.List;
 
 /**
- * This class holds the cache constants.
+ * Cache Data Transfer Object
  *
- * @author Thiago Sampaio
- *
+ * @author Marcelo Aguiar Rodrigues
  */
-@Ignore
-public class ConstantsCache {
+@Data
+public class CacheDTO {
 
-     public static final String OPERATION_ACTIVE_FROM_ENDPOINT = "OPERATION_ACTIVE_FROM_ENDPOINT";
-     
-     public static final String API_ACTIVE_FROM_ACCESS_TOKEN = "API_ACTIVE_FROM_ACCESS_TOKEN";
-     
-     public static final String ACCESS_TOKENS_ACTIVE_CACHE = "ACCESS_TOKENS_ACTIVE_CACHE";
+    private String cache;
 
-     public static final String APPS_ACTIVE_CACHE = "APPS_ACTIVE_CACHE";
+    private Long timeToLive;
 
-     public static final String APPS_CLIENT_ID = "APPS_CLIENT_ID";
+    private List<String> headers;
 
-     public static final String CACHE_TIME_TO_LIVE = "CACHE_TIME_TO_LIVE";
-
-     public static final String CACHE_BUCKET = "CACHE_BUCKET";
+    private List<String> queryParams;
 
 }

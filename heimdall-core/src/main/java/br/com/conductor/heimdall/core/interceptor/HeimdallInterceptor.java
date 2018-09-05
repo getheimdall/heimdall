@@ -1,3 +1,4 @@
+
 package br.com.conductor.heimdall.core.interceptor;
 
 /*-
@@ -25,11 +26,37 @@ import br.com.conductor.heimdall.core.enums.TypeExecutionPoint;
 
 import java.util.HashMap;
 
+/**
+ * Provides methods that are used for all built-in Heimdall Interceptors.
+ *
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ * @author Marcelo Aguiar Rodrigues
+ */
 public interface HeimdallInterceptor {
 
+    /**
+     * Defines the template file for the interceptor.
+     *
+     * @param typeExecutionPoint {@link TypeExecutionPoint}
+     * @return  The name of the template file
+     */
     String getFile(TypeExecutionPoint typeExecutionPoint);
 
+    /**
+     * Method to parse the content given by the user to be used in the interceptor.
+     *
+     * @param content User provided content
+     * @return  Parsed object
+     */
     Object parseContent(String content);
 
+    /**
+     * Any parameters that should be used by the interceptor can be created here.
+     *
+     * @param objectCustom Custom parameter Object
+     * @param parameters Map of parameters
+     * @param interceptor The {@link Interceptor}
+     * @return
+     */
     HashMap<String, Object> buildParameters(Object objectCustom, HashMap<String, Object> parameters, Interceptor interceptor);
 }

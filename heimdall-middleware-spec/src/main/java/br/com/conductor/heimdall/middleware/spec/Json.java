@@ -58,7 +58,8 @@ public interface Json {
      public <T> String parse(T object);
 
      /**
-      * 
+      * Parses a json string to a generic type
+      *
       * @param json
       * @param classType
       * @return
@@ -66,6 +67,7 @@ public interface Json {
      public <T> T parse(String json, Class<?> classType);
 
      /**
+      * Parses a json string to a parametrized class through a list of parameters classes.
       *
       * @param json
       * @param parametrized
@@ -76,6 +78,8 @@ public interface Json {
      public <T> T parse(String json, Class<?> parametrized, Class<?>... parameterClasses);
 
      /**
+      * Parses a json string to a generic type through TypeReference object.
+      *
       * @param json
       * @param type
       * @return

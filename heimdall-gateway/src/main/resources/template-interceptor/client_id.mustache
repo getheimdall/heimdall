@@ -103,7 +103,7 @@ public class ClientIdInterceptor extends HeimdallFilter {
                clientId = request.getParameter(name);               
           }
           
-          securityService.validadeClientId(ctx, helper, getApiId(), clientId);
+          securityService.validadeClientId(ctx, getApiId(), clientId);
      }
      
 }
