@@ -25,43 +25,30 @@ import lombok.Data;
 public class JsonImplTest {
 
      @InjectMocks
-     private JsonImpl subject;
+     private JsonImpl sujeito;
      
      @Test(expected = BeanValidationException.class)
-     public void notBlankAnnotationShouldWork() {
+     public void validarAnotacaoNotBlank() {
           String json = "{\"name\":\"\"}";
           
           try {
-               subject.parse(json , PersonJsonTest.class);
+               sujeito.parse(json , PersonJsonTest.class);
           } catch (BeanValidationException e) {
-               List<BeanValidationErrorDTO> errors = subject.parse(e.getViolations(), new TypeReference<List<BeanValidationErrorDTO>>() {});
+               List<BeanValidationErrorDTO> errors = sujeito.parse(e.getViolations(), new TypeReference<List<BeanValidationErrorDTO>>() {});
                assertThat(errors, contains(hasProperty("attribute", is("name"))));
                throw e;
           }
      }
      
      @Test(expected = BeanValidationException.class)
-     public void MinAnnotationShouldWork() {
+     public void validarAnotacaoMin() {
           String json = "{\"name\":\"Getu\", \"age\": 9}";
           
           try {
-               subject.parse(json , PersonJsonTest.class);
+               sujeito.parse(json , PersonJsonTest.class);
           } catch (BeanValidationException e) {
-               List<BeanValidationErrorDTO> errors = subject.parse(e.getViolations(), new TypeReference<List<BeanValidationErrorDTO>>() {});
+               List<BeanValidationErrorDTO> errors = sujeito.parse(e.getViolations(), new TypeReference<List<BeanValidationErrorDTO>>() {});
                assertThat(errors, contains(hasProperty("message", is("You have to be older than 18 to drive in Brasil"))));
-               throw e;
-          }
-     }
-     
-     @Test(expected = BeanValidationException.class)
-     public void interpolationWithMessageExpressionsShouldWork() {
-          String json = "{\"name\":\"Getu\", \"age\": 20, \"socialMedia\": 0}";
-          
-          try {
-               subject.parse(json , PersonJsonTest.class);
-          } catch (BeanValidationException e) {
-               List<BeanValidationErrorDTO> errors = subject.parse(e.getViolations(), new TypeReference<List<BeanValidationErrorDTO>>() {});
-               assertThat(errors, contains(hasProperty("message", is("You have to have at least 2 social medias"))));
                throw e;
           }
      }
@@ -73,8 +60,5 @@ public class JsonImplTest {
           
           @Min(value = 18, message = "You have to be older than {value} to drive in Brasil")
           private Integer age;
-          
-          @Min(value = 2, message = "You have to have at least {value} social media${value > 1 ? 's' : ''}")
-          private Integer socialMedia;
      }
 }

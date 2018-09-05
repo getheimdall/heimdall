@@ -114,11 +114,11 @@ public class JsonImpl implements Json {
 
 			if (!violations.isEmpty()) {
 			     
-			     String jsonViolations = parse(violations.stream().map(v -> {
+			     String violacoes = parse(violations.stream().map(v -> {
 			          return new BeanValidationErrorDTO(v.getPropertyPath().toString(), v.getMessage());
 			     }).collect(Collectors.toList()));
 			     
-			     throw new BeanValidationException("Bean validation error.", jsonViolations);
+			     throw new BeanValidationException("Bean validation error.", violacoes);
 			}
 			
 			return obj;
@@ -143,11 +143,11 @@ public class JsonImpl implements Json {
 			
 			if (!violations.isEmpty()) {
                     
-                    String jsonViolations = parse(violations.stream().map(v -> {
+                    String violacoes = parse(violations.stream().map(v -> {
                          return new BeanValidationErrorDTO(v.getPropertyPath().toString(), v.getMessage());
                     }).collect(Collectors.toList()));
                     
-                    throw new BeanValidationException("Bean validation error.", jsonViolations);
+                    throw new BeanValidationException("Bean validation error.", violacoes);
                }
 			
 			return obj;
