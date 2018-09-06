@@ -115,9 +115,8 @@ public class ZuulConfiguration extends ZuulProxyAutoConfiguration {
 
      }
 
-     @Override
-     public HeimdallHandlerMapping zuulHandlerMapping(RouteLocator routes) {
-
+     @Bean
+     public HeimdallHandlerMapping heimdallHandlerMapping() {
           HeimdallHandlerMapping handlerMapping = new HeimdallHandlerMapping(proxyRouteLocator(), zuulController());
           handlerMapping.setErrorController(this.errorController);
           return handlerMapping;

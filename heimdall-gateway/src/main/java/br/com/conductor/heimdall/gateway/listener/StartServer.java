@@ -30,6 +30,7 @@ import br.com.conductor.heimdall.core.repository.InterceptorRepository;
 import br.com.conductor.heimdall.core.repository.MiddlewareRepository;
 import br.com.conductor.heimdall.core.service.FileService;
 import br.com.conductor.heimdall.core.util.Constants;
+import br.com.conductor.heimdall.gateway.configuration.HeimdallHandlerMapping;
 import br.com.conductor.heimdall.gateway.service.InterceptorFileService;
 import br.com.twsoftware.alfred.io.Arquivo;
 import br.com.twsoftware.alfred.object.Objeto;
@@ -80,7 +81,10 @@ public class StartServer implements ServletContextListener {
 
      @Autowired 
      private FileService fileService;
-     
+
+     @Autowired
+     private HeimdallHandlerMapping heimdallHandlerMapping;
+
      @Value("${zuul.filter.root}")
      private String zuulFilterRoot;
 
@@ -93,6 +97,7 @@ public class StartServer implements ServletContextListener {
      public void contextInitialized(ServletContextEvent sce) {
 
           log.info("Initializing Groovy Interceptors");
+          heimdallHandlerMapping.initHandlers();
           initGroovyFilterManager();
 
      }
