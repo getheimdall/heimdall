@@ -69,6 +69,12 @@ public class ApiService {
      @Autowired
      private EnvironmentService environmentService;
 
+     @Autowired
+     private ResourceService resourceService;
+
+     @Autowired
+     private MiddlewareService middlewareService;
+
      /**
       * Finds a {@link Api} by its ID.
       *
@@ -188,6 +194,9 @@ public class ApiService {
 
           Api api = apiRepository.findOne(id);
           HeimdallException.checkThrow(isBlank(api), GLOBAL_RESOURCE_NOT_FOUND);
+
+          resourceService.deleteAllFromApi(id);
+          middlewareService.deleteAll(id);
 
           apiRepository.delete(api);
           amqpRoute.dispatchRoutes();

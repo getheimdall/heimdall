@@ -31,7 +31,6 @@ import java.io.File;
 import java.util.List;
 
 import br.com.conductor.heimdall.core.dto.interceptor.*;
-import br.com.conductor.heimdall.core.enums.TypeOAuth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Example;
@@ -280,6 +279,31 @@ public class InterceptorService {
         amqpInterceptorService.dispatchRemoveInterceptors(new InterceptorFileDTO(interceptor.getId(), pathName));
     }
 
+    /**
+     * Deletes all Interceptors from a Operation
+     *
+     * @param operationId Operation with the attatched Interceptors
+     */
+    @Transactional
+    public void deleteAllfromOperation(Long operationId) {
+        List<Interceptor> interceptors = interceptorRepository.findByOperationId(operationId);
+        interceptors.forEach(interceptor -> this.delete(interceptor.getId()));
+    }
+    /**
+     * Deletes all Interceptors from a Resource
+     *
+     * @param resourceId Resource with the attatched Interceptors
+     */
+    @Transactional
+    public void deleteAllfromResource(Long resourceId) {
+        List<Interceptor> interceptors = interceptorRepository.findByResourceId(resourceId);
+        interceptors.forEach(interceptor -> this.delete(interceptor.getId()));
+    }
+    /**
+     * Creates the ratelimts in Redis.
+     *
+     * @param interceptor Interceptor
+     */
     protected void mountRatelimitInRedis(Interceptor interceptor) {
 
         RateLimitDTO rateLimitDTO = new RateLimitDTO();

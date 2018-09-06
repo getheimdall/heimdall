@@ -270,6 +270,17 @@ public class MiddlewareService {
 
      }
 
+     /**
+      * Deletes all Middlewares from a Api
+      *
+      * @param apiId Api with the Middlewares
+      */
+     @Transactional
+     public void deleteAll(Long apiId) {
+         List<Middleware> middlewares = middlewareRepository.findByApiId(apiId);
+         middlewares.forEach(middleware -> this.delete(apiId, middleware.getId()));
+     }
+
      /*
       * Updates the status of current middleware repository based on the Property settings.
       *

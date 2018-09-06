@@ -31,8 +31,6 @@ import static br.com.twsoftware.alfred.object.Objeto.notBlank;
 import java.util.Arrays;
 import java.util.List;
 
-import br.com.conductor.heimdall.core.entity.Interceptor;
-import br.com.conductor.heimdall.core.repository.InterceptorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -71,9 +69,6 @@ public class OperationService {
 
      @Autowired
      private ResourceRepository resourceRepository;
-
-     @Autowired
-     private InterceptorRepository interceptorRepository;
 
      @Autowired
      private InterceptorService interceptorService;
@@ -237,8 +232,7 @@ public class OperationService {
           HeimdallException.checkThrow(isBlank(operation), GLOBAL_RESOURCE_NOT_FOUND);
 
           // Deletes all interceptors attached to the Operation
-          List<Interceptor> interceptors = interceptorRepository.findByOperationId(operationId);
-          interceptors.forEach(interceptor -> interceptorService.delete(interceptor.getId()));
+          interceptorService.deleteAllfromOperation(operationId);
 
           operationRepository.delete(operation.getId());
           amqpCacheService.dispatchClean(ConstantsCache.OPERATION_ACTIVE_FROM_ENDPOINT, operation.getResource().getApi().getBasePath() + operation.getPath());
@@ -246,7 +240,19 @@ public class OperationService {
           
           amqpRoute.dispatchRoutes();
      }
-     
+
+     /**
+      * Deletes all Operations from a Resource
+      *
+      * @param apiId      Api with the Resource
+      * @param resourceId Resource with the Operations
+      */
+     @Transactional
+     public void deleteAllfromResource(Long apiId, Long resourceId) {
+          List<Operation> operations = operationRepository.findByResourceApiIdAndResourceId(apiId, resourceId);
+          operations.forEach(operation -> this.delete(apiId, resourceId, operation.getId()));
+     }
+
      /*
       * A Operation can not have a single wild card at any point in it.
       * 
