@@ -101,12 +101,14 @@ public class OAuthInterceptorService {
         timeAccessToken = (timeAccessToken <= 0) ? TIME_ACCESS_TOKEN : timeAccessToken;
         timeRefreshToken = (timeRefreshToken <= 0) ? TIME_REFRESH_TOKEN : timeRefreshToken;
 
+        String clientId = helper.call().request().header().get("client_id");
+
         switch (typeOAuth) {
             case GENERATE:
-                runGenerate(oAuthRequest, privateKey, timeAccessToken, timeRefreshToken, body);
+                runGenerate(oAuthRequest, clientId, privateKey, timeAccessToken, timeRefreshToken, body);
                 break;
             case AUTHORIZE:
-                runAuthorize(oAuthRequest, providerId, privateKey, timeAccessToken, body);
+                runAuthorize(oAuthRequest, clientId, providerId, privateKey, timeAccessToken, timeRefreshToken, body);
                 break;
             default:
                 HeimdallException.checkThrow(true, ExceptionMessage.TYPE_OAUTH_NOT_FOUND);
@@ -120,7 +122,7 @@ public class OAuthInterceptorService {
      * @param oAuthRequest {@link OAuthRequest}
      * @param providerId   {@link Provider} id
      */
-    private void runAuthorize(OAuthRequest oAuthRequest, Long providerId, String privateKey, int timeAccessToken, String claimsJson) {
+    private void runAuthorize(OAuthRequest oAuthRequest, String clientId, Long providerId, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsJson) {
 
         HeimdallException.checkThrow(Objeto.isBlank(oAuthRequest.getClientId()), ExceptionMessage.CLIENT_ID_NOT_FOUND);
 
@@ -128,29 +130,31 @@ public class OAuthInterceptorService {
 
         switch (oAuthRequest.getGrantType().toUpperCase()) {
             case GRANT_TYPE_PASSWORD:
-                passwordFlow(provider, oAuthRequest, privateKey, timeAccessToken, claimsJson);
+                passwordFlow(provider, oAuthRequest, clientId, privateKey, timeAccessToken, timeRefreshToken, claimsJson);
                 break;
             case GRANT_TYPE_IMPLICIT:
                 implicitFlow(oAuthRequest, privateKey, timeAccessToken, claimsJson);
                 break;
+            case GRANT_TYPE_REFRESH_TOKEN:
+                refreshFlow(oAuthRequest, clientId, privateKey, timeAccessToken, timeRefreshToken, claimsJson);
+                break;
         }
 
-        HeimdallException.checkThrow(Objeto.isBlank(oAuthRequest.getResponseType()), ExceptionMessage.RESPONSE_TYPE_NOT_FOUND);
-
-        switch (oAuthRequest.getResponseType().toLowerCase()) {
-            case CODE:
-                String codeAuthorize = oAuthService.generateAuthorize(oAuthRequest.getClientId());
-                generateResponseWithSuccess("{\""+CODE+"\": \"" + codeAuthorize + "\"}");
-                break;
-            case TOKEN:
-                TokenImplicit tokenImplicit = oAuthService.generateTokenImplicit(oAuthRequest, privateKey, timeAccessToken, claimsJson);
-                if (Objects.nonNull(tokenImplicit)) {
-                    generateResponseWithSuccess(helper.json().parse(tokenImplicit));
-                }
-                break;
-            default:
-                HeimdallException.checkThrow(true, ExceptionMessage.RESPONSE_TYPE_NOT_FOUND);
-        }
+        // Not in use yet
+//        switch (oAuthRequest.getResponseType().toLowerCase()) {
+//            case CODE:
+//                String codeAuthorize = oAuthService.generateAuthorize(oAuthRequest.getClientId());
+//                generateResponseWithSuccess("{\""+CODE+"\": \"" + codeAuthorize + "\"}");
+//                break;
+//            case TOKEN:
+//                TokenImplicit tokenImplicit = oAuthService.generateTokenImplicit(oAuthRequest, privateKey, timeAccessToken, claimsJson);
+//                if (Objects.nonNull(tokenImplicit)) {
+//                    generateResponseWithSuccess(helper.json().parse(tokenImplicit));
+//                }
+//                break;
+//            default:
+//                HeimdallException.checkThrow(true, ExceptionMessage.RESPONSE_TYPE_NOT_FOUND);
+//        }
     }
 
     /**
@@ -163,8 +167,8 @@ public class OAuthInterceptorService {
      * @param claimsJson       Claims to payload in JSON
      * @throws HeimdallException Code not found, code already used, grant_type not found
      */
-    private void runGenerate(OAuthRequest oAuthRequest, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsJson) throws HeimdallException {
-        TokenOAuth tokenOAuth = oAuthService.generateTokenOAuth(oAuthRequest, privateKey, timeAccessToken, timeRefreshToken, claimsJson);
+    private void runGenerate(OAuthRequest oAuthRequest, String clientId, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsJson) throws HeimdallException {
+        TokenOAuth tokenOAuth = oAuthService.generateTokenOAuth(oAuthRequest, clientId, privateKey, timeAccessToken, timeRefreshToken, claimsJson);
         String tokenOAuthJson = helper.json().parse(tokenOAuth);
         generateResponseWithSuccess(tokenOAuthJson);
     }
@@ -182,27 +186,17 @@ public class OAuthInterceptorService {
         HeimdallException.checkThrow((Objeto.isBlank(authorization) ||
                 !authorization.matches("Bearer .+")), ExceptionMessage.AUTHORIZATION_NOT_FOUND);
 
-        //get token from Header
+
         String token = authorization.replace("Bearer ", "");
-        //validate token
+
         oAuthService.tokenIsValid(token, privateKey);
-        //obtain OAuthAuthorize from token
+
         OAuthAuthorize oAuthAuthorizeFromToken = oAuthService.getOAuthAuthorizeFromToken(token);
-        //obtain request url from Context
-        String requestURL = RequestContext.getCurrentContext().getRequest().getRequestURL().toString();
-        if (StringUtils.endsWith(requestURL, "/")) {
-            requestURL = StringUtils.removeEnd(requestURL.trim(), "/");
-        }
 
-        //validate if token contain a requestUrl in subject operations
-        HeimdallException.checkThrow(!oAuthService.tokenIsValidToResource(token, privateKey, requestURL), ExceptionMessage.TOKEN_INVALID);
-
-        //verify if token is Implicit, case yes, generate new token
         if (oAuthAuthorizeFromToken.getGrantType().equals(GRANT_TYPE_IMPLICIT)) {
             generateTokenImplicit(privateKey, token, oAuthAuthorizeFromToken);
+            oAuthService.delete(oAuthAuthorizeFromToken);
         }
-        //delete token from database
-        oAuthService.delete(oAuthAuthorizeFromToken);
     }
 
 
@@ -317,7 +311,10 @@ public class OAuthInterceptorService {
     }
 
 
-    private void passwordFlow(Provider provider, OAuthRequest oAuthRequest, String privateKey, int timeAccessToken, String claimsJson) {
+    /*
+     * OAuth2.0 Password Flow
+     */
+    private void passwordFlow(Provider provider, OAuthRequest oAuthRequest, String clientId, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsJson) {
         Http http = helper.http().url(provider.getPath());
 
         http = addAllParamsToRequestProvider(http, provider.getProviderParams());
@@ -332,16 +329,33 @@ public class OAuthInterceptorService {
             throw new UnauthorizedException(ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);
         }
 
+        TokenOAuth tokenOAuth = oAuthService.generateTokenOAuth(oAuthRequest, clientId, privateKey, timeAccessToken, timeRefreshToken, claimsJson);
+        if (Objects.nonNull(tokenOAuth)) {
+            tokenOAuth.setToken_type("bearer");
+            generateResponseWithSuccess(helper.json().parse(tokenOAuth));
+        }
+    }
+
+    /*
+     * OAuth2.0 Implicit Flow
+     */
+    private void implicitFlow(OAuthRequest oAuthRequest, String privateKey, int timeAccessToken, String claimsJson) {
         TokenImplicit tokenImplicit = oAuthService.generateTokenImplicit(oAuthRequest, privateKey, timeAccessToken, claimsJson);
         if (Objects.nonNull(tokenImplicit)) {
+            tokenImplicit.setToken_type("bearer");
             generateResponseWithSuccess(helper.json().parse(tokenImplicit));
         }
     }
 
-    private void implicitFlow(OAuthRequest oAuthRequest, String privateKey, int timeAccessToken, String claimsJson) {
-        TokenImplicit tokenImplicit = oAuthService.generateTokenImplicit(oAuthRequest, privateKey, timeAccessToken, claimsJson);
-        if (Objects.nonNull(tokenImplicit)) {
-            generateResponseWithSuccess(helper.json().parse(tokenImplicit));
+    /*
+     * OAuth2.0 Refresh Flow
+     */
+    private void refreshFlow(OAuthRequest oAuthRequest, String clientId, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsJson) {
+        TokenOAuth tokenOAuth = oAuthService.generateTokenOAuth(oAuthRequest, clientId, privateKey, timeAccessToken, timeRefreshToken, claimsJson);
+        if (Objects.nonNull(tokenOAuth)) {
+            tokenOAuth.setToken_type("bearer");
+            generateResponseWithSuccess(helper.json().parse(tokenOAuth));
         }
+
     }
 }

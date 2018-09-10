@@ -64,33 +64,19 @@ public class OAuthService {
      * @return The {@link TokenOAuth}
      * @throws HeimdallException Token expired, code not found, grant_type not found, Code already used
      */
-    public TokenOAuth generateTokenOAuth(OAuthRequest oAuthRequest, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsObject) throws HeimdallException {
-        //verify if grantType exist
+    public TokenOAuth generateTokenOAuth(OAuthRequest oAuthRequest, String clientId, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsObject) throws HeimdallException {
+
         if (Objeto.isBlank(oAuthRequest.getGrantType())) {
             throw new BadRequestException(ExceptionMessage.GRANT_TYPE_NOT_FOUND);
         }
-        //verify type of the grantType
+
         switch (oAuthRequest.getGrantType().toUpperCase()) {
             case GRANT_TYPE_PASSWORD:
-                //verify if code exist
-                if (Objeto.isBlank(oAuthRequest.getCode())) {
-                    throw new BadRequestException(ExceptionMessage.CODE_NOT_FOUND);
-                }
-                //decode code
-                String decodedCode = new String(Base64.getDecoder().decode(oAuthRequest.getCode()));
-                //get clientId from code
-                String clientId = decodedCode.split("::")[1];
-                //get OAuthAuthorize from database by clientId and token
-                OAuthAuthorize foundCode = oAuthAuthorizeRepository.findByClientIdAndTokenAuthorize(clientId, oAuthRequest.getCode());
-                //verify if OAuthAuthorize exist
-                if (Objeto.isBlank(foundCode)) {
-                    throw new BadRequestException(ExceptionMessage.CODE_NOT_FOUND);
-                }
-                //get objects the from body request
+
                 final Map<String, Object> claimsFromJSONObjectBodyRequest = JwtUtils.getClaimsFromJSONObjectBodyRequest(claimsObject);
-                //generate TokenOAuth
+
                 TokenOAuth tokenOAuth = JwtUtils.generateTokenOAuth(privateKey, timeAccessToken, timeRefreshToken, claimsFromJSONObjectBodyRequest);
-                //save accessToken
+
                 saveToken(
                         clientId,
                         tokenOAuth.getAccessToken(),
@@ -98,7 +84,7 @@ public class OAuthService {
                         GRANT_TYPE_PASSWORD,
                         timeAccessToken
                 );
-                //save refreshToken
+
                 saveToken(
                         clientId,
                         tokenOAuth.getRefreshToken(),
@@ -106,9 +92,7 @@ public class OAuthService {
                         GRANT_TYPE_REFRESH_TOKEN,
                         timeRefreshToken
                 );
-                //delete token used
-                this.oAuthAuthorizeRepository.delete(foundCode);
-                //return new tokens
+
                 return tokenOAuth;
             case GRANT_TYPE_REFRESH_TOKEN:
                 if (Objeto.isBlank(oAuthRequest.getRefreshToken())) {
