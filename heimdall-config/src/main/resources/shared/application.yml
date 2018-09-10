@@ -44,12 +44,14 @@ heimdall:
     mongo:
         enabled: false
 #        serverName:
-#        url: mongodb://admin:admin@localhost:27017
+#        url: mongodb://localhost
 #        port: 27017
 #        dataBase: logging
 #        collection: logs
 #        username: admin
 #        password: admin
+#        queueSize: 500
+#        discardingThreshold: 0
     trace:
         printAllTrace: true
         sanitizes:

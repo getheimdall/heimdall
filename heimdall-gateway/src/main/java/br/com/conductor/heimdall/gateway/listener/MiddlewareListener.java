@@ -67,6 +67,7 @@ public class MiddlewareListener {
                if (Objeto.notBlank(middleware)) {
                     
                     log.info("Updating/Creating middleware id: " + middlewareId);
+                    startServer.addApiDirectoryToPath(middleware.getApi());
                     startServer.createMiddlewaresInterceptor(middlewareId);
                     startServer.loadMiddlewareFiles(middlewareId);
                } else {

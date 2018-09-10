@@ -120,7 +120,7 @@ public class Middleware {
              ? Arrays.stream(entries)
                   .filter(e -> filter.accept(directory, e.getName()))
                   .max(Comparator.comparingLong(File::lastModified))
-                  .get()
+                  .orElse(null)
              : null;
 
      }
