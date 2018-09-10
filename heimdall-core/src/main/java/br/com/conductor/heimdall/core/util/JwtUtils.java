@@ -119,7 +119,8 @@ public class JwtUtils {
         }
 
         List<String> list = claimsFromTheToken.get("operations", ArrayList.class);
-        operations.addAll(list);
+        if (list != null && !list.isEmpty())
+            operations.addAll(list);
 
         return operations;
     }
