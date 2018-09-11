@@ -463,25 +463,7 @@ public class CallImpl implements Call {
 
           @Override
           public void setBody(byte[] body) {
-               
-               InputStream stream;
-               try {
-                    if (body != null) {
-
-                         stream = new ByteArrayInputStream(body);
-                    } else {
-                         
-                         stream = new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8));
-                    }
-                    context.setSendZuulResponse(false);
-                    context.setResponseDataStream(stream);
-                    writeResponse(stream, context.getResponse().getOutputStream(), body);
-               } catch (UnsupportedEncodingException e) {
-                   log.error(e.getMessage(), e);
-               } catch (IOException e) {
-                   e.printStackTrace();
-               }
-
+              setBody(body, false);
           }
 
          @Override
