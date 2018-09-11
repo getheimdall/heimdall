@@ -55,6 +55,8 @@ public enum ExceptionMessage {
 
     INTERCEPTOR_INVALID_CONTENT(BAD_REQUEST.value(), "Content for {} interceptor is incorrect. Use the standard: {}", BadRequestException.class),
 
+    INTERCEPTOR_NO_APP_FOUND(BAD_REQUEST.value(), "No App registered to this Api with client_id provided.", BadRequestException.class),
+
     INTERCEPTOR_NOT_EXIST(BAD_REQUEST.value(), "Interceptor defined not exist", BadRequestException.class),
 
     INTERCEPTOR_TEMPLATE_NOT_EXIST(BAD_REQUEST.value(), "Template interceptor not exist", BadRequestException.class),
@@ -79,7 +81,7 @@ public enum ExceptionMessage {
 
     RESOURCE_METHOD_NOT_ACCEPT(BAD_REQUEST.value(), "method not accepted please use: GET, POST, PUT, PATH or DELETE", BadRequestException.class),
 
-    APP_NOT_EXIST(BAD_REQUEST.value(), "App not exist", BadRequestException.class),
+    APP_NOT_EXIST(BAD_REQUEST.value(), "App does not exist", BadRequestException.class),
 
     API_BASEPATH_EXIST(BAD_REQUEST.value(), "The basepath defined exist", BadRequestException.class),
 

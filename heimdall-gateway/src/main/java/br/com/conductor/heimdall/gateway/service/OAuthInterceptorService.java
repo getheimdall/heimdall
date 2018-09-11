@@ -104,10 +104,10 @@ public class OAuthInterceptorService {
         switch (typeOAuth) {
             case GENERATE:
                 runGenerate(oAuthRequest, clientId, privateKey, timeAccessToken, timeRefreshToken, body);
-                break;
+                return;
             case AUTHORIZE:
                 runAuthorize(oAuthRequest, clientId, providerId, privateKey, timeAccessToken, timeRefreshToken, body);
-                break;
+                return;
             default:
                 HeimdallException.checkThrow(true, ExceptionMessage.TYPE_OAUTH_NOT_FOUND);
         }
