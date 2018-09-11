@@ -25,9 +25,12 @@ import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_DEVELOPERS;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Objects;
 
 import javax.validation.Valid;
+import javax.xml.ws.Response;
 
+import br.com.conductor.heimdall.core.dto.request.DeveloperLogin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -66,6 +69,20 @@ public class DeveloperResource {
 
      @Autowired
      private DeveloperService developerService;
+
+     @ResponseBody
+     @ApiOperation(value = "Find Developer by its email and password", response = Developer.class)
+     @PostMapping("/login")
+     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_DEVELOPER)
+     public ResponseEntity login(@RequestBody DeveloperLogin developerLogin) {
+          Developer developer = developerService.login(developerLogin);
+
+          if (Objects.nonNull(developer)) {
+               return ResponseEntity.ok(developer);
+          }
+
+          return ResponseEntity.notFound().build();
+     }
 
      /**
       * Finds a {@link Developer} by its Id.
