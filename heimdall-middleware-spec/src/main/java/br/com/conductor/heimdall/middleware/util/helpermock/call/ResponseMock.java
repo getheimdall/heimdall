@@ -30,6 +30,7 @@ import java.util.Arrays;
  * Mock class created to help unit test the root request class of a middleware.
  *
  * @author Marcelo Aguiar
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 public class ResponseMock implements Response {
 
@@ -63,6 +64,11 @@ public class ResponseMock implements Response {
 
     @Override
     public void setBody(byte[] body) {
+        this.body = Arrays.toString(body);
+    }
+
+    @Override
+    public void setBody(byte[] body, boolean gzip) {
         this.body = Arrays.toString(body);
     }
 }
