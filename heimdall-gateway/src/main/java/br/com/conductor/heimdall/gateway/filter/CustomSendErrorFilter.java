@@ -35,12 +35,12 @@ public class CustomSendErrorFilter extends SendErrorFilter {
 
 			log.warn("Error during filtering", exception);
 
-			request.setAttribute("javax.servlet.error.status_code", exception.nStatusCode);
-			request.setAttribute("javax.servlet.error.exception", exception);
+//			request.setAttribute("javax.servlet.error.status_code", exception.nStatusCode);
+//			request.setAttribute("javax.servlet.error.exception", exception);
 
 			String message = null;
 			if (StringUtils.hasText(exception.errorCause)) {
-				request.setAttribute("javax.servlet.error.message", exception.errorCause);
+//				request.setAttribute("javax.servlet.error.message", exception.errorCause);
 				message = exception.errorCause;
 			}
 
@@ -59,7 +59,7 @@ public class CustomSendErrorFilter extends SendErrorFilter {
 				HeimdallException exceptionHeimdall = new HeimdallException(ExceptionMessage.GLOBAL_ERROR_ZUUL);
 
 				errorAttributes.put("exception", exceptionHeimdall.getClass().getSimpleName());
-				errorAttributes.put("message", exceptionHeimdall.getMessage());
+				errorAttributes.put("message", exception.getMessage());
 			}
 
 			if ((!StringUtils.isEmpty(message) || errorAttributes.get("message") == null)) {
@@ -76,14 +76,13 @@ public class CustomSendErrorFilter extends SendErrorFilter {
 			ctx.setResponseBody(new JSONObject(errorAttributes).toString());
 			ctx.setResponseStatusCode(status);
 
-			System.out.println("gerou response");
-
 		} catch (Exception ex) {
 			ReflectionUtils.rethrowRuntimeException(ex);
 		}
 		return null;
 	}
 
+	
 	public ZuulException findZuulException(Throwable throwable) {
 		if (throwable.getCause() instanceof ZuulRuntimeException) {
 			// this was a failure initiated by one of the local filters

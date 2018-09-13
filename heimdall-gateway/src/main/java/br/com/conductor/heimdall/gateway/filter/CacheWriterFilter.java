@@ -26,6 +26,8 @@ import br.com.conductor.heimdall.gateway.filter.helper.ApiResponseImpl;
 import br.com.conductor.heimdall.gateway.trace.FilterDetail;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.middleware.spec.ApiResponse;
+import lombok.extern.slf4j.Slf4j;
+
 import com.google.common.collect.Maps;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
@@ -50,6 +52,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
  * @author Marcelo Aguiar Rodrigues
  */
 @Component
+@Slf4j
 public class CacheWriterFilter extends ZuulFilter {
 
     private FilterDetail detail = new FilterDetail();
@@ -80,7 +83,7 @@ public class CacheWriterFilter extends ZuulFilter {
             detail.setStatus(Constants.SUCCESS);
         } catch (Exception e) {
             detail.setStatus(Constants.FAILED);
-            throw e;
+            log.error("Error during CacheWriterFilter", e);
         } finally {
             long endTime = System.currentTimeMillis();
 
