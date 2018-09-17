@@ -11,7 +11,18 @@ const PageBreadcrumb = ({pathName}) => {
                 <Breadcrumb.Item key="home"><Link to="/">Home</Link></Breadcrumb.Item>
                 {arr && arr.length > 0
                     ? arr.map((item, i) => {
-                        return (<Breadcrumb.Item key={i} style={{ textTransform: 'capitalize' }} >{item}</Breadcrumb.Item>)
+                        let link = ''
+                        arr.forEach((it, j) => {
+                            if (j <= i) {
+                                link += it + '/'
+                            } else {
+                                return
+                            }
+                        })
+                        console.log(link)
+                        if (link !== "/") {
+                            return (<Breadcrumb.Item key={i} style={{ textTransform: 'capitalize' }} ><Link to={link}>{item}</Link></Breadcrumb.Item>)
+                        }
                     })
                     : null
                 }
