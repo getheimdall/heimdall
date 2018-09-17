@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.core.converter;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -19,10 +17,11 @@ package br.com.conductor.heimdall.core.converter;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.converter;
 
 import br.com.conductor.heimdall.core.dto.persist.AppPersist;
 import br.com.conductor.heimdall.core.entity.App;
-import br.com.twsoftware.alfred.object.Objeto;
+import com.github.thiagonego.alfred.object.Objeto;
 import org.modelmapper.AbstractConverter;
 import org.modelmapper.Converter;
 import org.modelmapper.PropertyMap;
@@ -33,6 +32,7 @@ import java.util.List;
  * Maps a {@link AppPersist} to a {@link App} object.
  *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ *
  */
 public class AppPersistMap extends PropertyMap<AppPersist, App> {
 

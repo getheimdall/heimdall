@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.core.service;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -10,9 +7,9 @@ package br.com.conductor.heimdall.core.service;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,19 +17,7 @@ package br.com.conductor.heimdall.core.service;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
-import static br.com.twsoftware.alfred.object.Objeto.isBlank;
-
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.StringMatcher;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+package br.com.conductor.heimdall.core.service;
 
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.PageDTO;
@@ -43,6 +28,18 @@ import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.PlanRepository;
 import br.com.conductor.heimdall.core.util.Pageable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.ExampleMatcher.StringMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
+import static com.github.thiagonego.alfred.object.Objeto.isBlank;
 
 /**
  * This class provides methos to create, read, update and delete a {@link Plan} resource.
@@ -125,7 +122,6 @@ public class PlanService {
       * @param 	id							The {@link Plan} Id
       * @param 	planDTO						The {@link PlanDTO}
       * @return								The updated {@link Plan}
-      * @throws NotFoundException			Resource not found
       */
      public Plan update(Long id, PlanDTO planDTO) {
 
@@ -142,7 +138,6 @@ public class PlanService {
       * Deletes a {@link Plan} by its Id.
       * 
       * @param 	id						The {@link Plan} Id
-      * @throws NotFoundException		Resource not found
       */
      public void delete(Long id) {
 

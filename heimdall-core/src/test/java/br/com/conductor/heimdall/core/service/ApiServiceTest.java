@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.core.service;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -19,6 +17,7 @@ package br.com.conductor.heimdall.core.service;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.service;
 
 import static org.junit.Assert.assertEquals;
 
@@ -31,7 +30,6 @@ import br.com.conductor.heimdall.core.exception.BadRequestException;
 import br.com.conductor.heimdall.core.repository.ApiRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

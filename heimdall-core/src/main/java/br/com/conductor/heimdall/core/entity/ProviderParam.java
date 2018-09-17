@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.core.entity;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -19,27 +17,18 @@ package br.com.conductor.heimdall.core.entity;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.entity;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.PrePersist;
-import javax.persistence.Table;
-
+import br.com.conductor.heimdall.core.enums.Status;
+import com.github.thiagonego.alfred.object.Objeto;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
-import br.com.conductor.heimdall.core.enums.Status;
-import br.com.twsoftware.alfred.object.Objeto;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import javax.persistence.*;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * This class represents a ProviderParams registered to the system.

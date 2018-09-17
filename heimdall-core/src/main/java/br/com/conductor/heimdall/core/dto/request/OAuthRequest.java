@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.core.dto.request;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -19,18 +17,19 @@ package br.com.conductor.heimdall.core.dto.request;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-
-import java.io.Serializable;
-import java.util.Set;
-import javax.validation.constraints.NotNull;
+package br.com.conductor.heimdall.core.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+
+import java.io.Serializable;
+import java.util.Set;
 
 /**
  * Class is a Data Transfer Object for the OAuthRequest
  *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ *
  */
 @Data
 public class OAuthRequest implements Serializable {

@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.core.service;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -20,6 +17,7 @@ package br.com.conductor.heimdall.core.service;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.service;
 
 import br.com.conductor.heimdall.core.converter.ApiMap;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
@@ -48,8 +46,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
-import static br.com.twsoftware.alfred.object.Objeto.isBlank;
-import static br.com.twsoftware.alfred.object.Objeto.notBlank;
+import static com.github.thiagonego.alfred.object.Objeto.isBlank;
+import static com.github.thiagonego.alfred.object.Objeto.notBlank;
 
 /**
  * This class provides methods to create, read, update and delete the {@link Api} resource.
@@ -74,7 +72,6 @@ public class ApiService {
       *
       * @param 	id						The ID of the {@link Api}
       * @return							The {@link Api}
-      * @throws	NotFoundException		Resource not found
       */
      public Api find(Long id) {
 
@@ -109,7 +106,6 @@ public class ApiService {
       * Generates a list of the {@link Api}'s
       *
       * @param 	apiDTO					{@link ApiDTO}
-      * @param 	pageableDTO				The pageable DTO
       * @return 						The list of {@link Api}'s
       */
      public List<Api> list(ApiDTO apiDTO) {
@@ -128,9 +124,6 @@ public class ApiService {
       *
       * @param 	apiDTO					{@link ApiDTO}
       * @return							The saved {@link Api}
-      * @throws	BadRequestException		The basepath defined exist
-      * @throws     BadRequestException      Api basepath can not contain wild card
-      * @throws     BadRequestException      Basepath can not be empty
       */
      public Api save(ApiDTO apiDTO) {
 
@@ -154,10 +147,6 @@ public class ApiService {
       * @param 	id						The ID of the {@link Api}
       * @param 	apiDTO					{@link ApiDTO}
       * @return							The updated {@link Api}
-      * @throws	NotFoundException		Resource not found
-      * @throws	BadRequestException		The basepath defined exist
-      * @throws     BadRequestException      Api basepath can not contain wild card
-      * @throws     BadRequestException      Basepath can not be empty
       */
      public Api update(Long id, ApiDTO apiDTO) {
 
@@ -182,7 +171,6 @@ public class ApiService {
       * Deletes a {@link Api} by its ID.
       *
       * @param 	id						The ID of the {@link Api}
-      * @throws	NotFoundException		Resource not found
       */
      public void delete(Long id) {
 
@@ -205,10 +193,9 @@ public class ApiService {
         return basepath.contains("*") || basepath.contains("**");
     }
 
-    /**
+    /*
      * Verify in environments if there are equal inbounds
      *
-     * @param environmentsIds {@link List}<{@link ReferenceIdDTO}>
      * @return True if exist, false otherwise
      */
     private boolean validateInboundsEnvironments(List<ReferenceIdDTO> environmentsIds) {

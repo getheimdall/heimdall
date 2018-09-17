@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.core.service;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -10,9 +7,9 @@ package br.com.conductor.heimdall.core.service;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +17,7 @@ package br.com.conductor.heimdall.core.service;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.service;
 
 import br.com.conductor.heimdall.core.dto.PageDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
@@ -84,8 +82,8 @@ public class TraceService {
  	/*
  	 * Method to transform a Page<LogTrace> into a Page<LogTraceDTO>.
  	 * The reason for this is that the id field from the mongo response
- 	 * is a ObjecId, and the response to the Api should be the string
- 	 * representaiton of that object.
+ 	 * is a ObjectId, and the response to the Api should be the string
+ 	 * representation of that object.
  	 */
  	private Page<LogTraceDTO> createPagedResponse(Page<LogTrace> page) {
 

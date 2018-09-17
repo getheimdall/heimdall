@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.core.repository;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -10,9 +7,9 @@ package br.com.conductor.heimdall.core.repository;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,20 +17,19 @@ package br.com.conductor.heimdall.core.repository;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.repository;
 
-import java.util.List;
-
-import javax.persistence.LockModeType;
-
+import br.com.conductor.heimdall.core.entity.App;
+import br.com.conductor.heimdall.core.entity.Plan;
+import br.com.conductor.heimdall.core.util.ConstantsCache;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import br.com.conductor.heimdall.core.entity.App;
-import br.com.conductor.heimdall.core.entity.Plan;
-import br.com.conductor.heimdall.core.util.ConstantsCache;
+import javax.persistence.LockModeType;
+import java.util.List;
 
 /**
  * Provides methods to access a {@link App}.

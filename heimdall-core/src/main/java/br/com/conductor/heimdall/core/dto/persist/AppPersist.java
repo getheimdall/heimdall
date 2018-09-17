@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.core.dto.persist;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -19,17 +17,17 @@ package br.com.conductor.heimdall.core.dto.persist;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-
-import java.io.Serializable;
-import java.util.List;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+package br.com.conductor.heimdall.core.dto.persist;
 
 import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
 import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.enums.Status;
 import lombok.Data;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * Class is a Data Transfer Object for the {@link App}.

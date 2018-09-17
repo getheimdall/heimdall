@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.core.entity;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -19,6 +17,7 @@ package br.com.conductor.heimdall.core.entity;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.entity;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

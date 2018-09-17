@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.core.dto;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -19,17 +17,17 @@ package br.com.conductor.heimdall.core.dto;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.dto;
 
+import br.com.conductor.heimdall.core.entity.Provider;
+import br.com.conductor.heimdall.core.enums.Status;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import javax.validation.constraints.NotNull;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import br.com.conductor.heimdall.core.entity.Provider;
-import br.com.conductor.heimdall.core.enums.Status;
-import lombok.Data;
 
 /**
  * Class is a Data Transfer Object for the {@link Provider}.

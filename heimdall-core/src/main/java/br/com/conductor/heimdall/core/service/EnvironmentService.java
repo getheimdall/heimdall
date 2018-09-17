@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.core.service;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -20,23 +17,7 @@ package br.com.conductor.heimdall.core.service;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ENVIRONMENT_INBOUND_DNS_PATTERN;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ENVIRONMENT_ATTACHED_TO_API;
-import static br.com.twsoftware.alfred.object.Objeto.isBlank;
-import static br.com.twsoftware.alfred.object.Objeto.notBlank;
-
-import java.util.List;
-import java.util.Objects;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.StringMatcher;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+package br.com.conductor.heimdall.core.service;
 
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.EnvironmentDTO;
@@ -48,6 +29,20 @@ import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.EnvironmentRepository;
 import br.com.conductor.heimdall.core.util.Pageable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.ExampleMatcher.StringMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Objects;
+
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
+import static com.github.thiagonego.alfred.object.Objeto.isBlank;
+import static com.github.thiagonego.alfred.object.Objeto.notBlank;
 
 /**
  * This class provides methods to create, read, update and delete the {@link Environment} resource.
@@ -66,7 +61,6 @@ public class EnvironmentService {
      *
      * @param id The id of the {@link Environment}
      * @return The {@link Environment} that was found
-     * @throws NotFoundException Resource not found
      */
     public Environment find(Long id) {
 
@@ -114,7 +108,6 @@ public class EnvironmentService {
      * Saves a {@link Environment} in the repository.
      *
      * @param environmentDTO The {@link EnvironmentDTO}
-     * @throws BadRequestException Inbound URL already exists
      * @return The saved {@link Environment}
      */
     @Transactional
@@ -138,8 +131,6 @@ public class EnvironmentService {
      *
      * @param id             The id of the {@link Environment}
      * @param environmentDTO The {@link EnvironmentDTO}
-     * @throws NotFoundException   Resource not found
-     * @throws BadRequestException Inbound URL already exists
      * @return The updated {@link Environment}
      */
     @Transactional
@@ -168,7 +159,6 @@ public class EnvironmentService {
       * Deletes a {@link Environment} by its ID.
       *
       * @param 	id 						The id of the {@link Environment}
-      * @throws NotFoundException		Resource not found
       */
      @Transactional
      public void delete(Long id) {

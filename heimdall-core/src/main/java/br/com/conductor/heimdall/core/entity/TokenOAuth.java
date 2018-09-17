@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.core.entity;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -19,6 +17,7 @@ package br.com.conductor.heimdall.core.entity;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.entity;
 
 import java.io.Serializable;
 
@@ -28,6 +27,7 @@ import lombok.Data;
  * This class represents the structure of Token.
  *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ *
  */
 @Data
 public class TokenOAuth implements Serializable {

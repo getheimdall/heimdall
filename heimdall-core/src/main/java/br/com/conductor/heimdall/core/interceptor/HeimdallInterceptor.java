@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.core.interceptor;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -20,6 +17,7 @@ package br.com.conductor.heimdall.core.interceptor;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.interceptor;
 
 import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.enums.TypeExecutionPoint;

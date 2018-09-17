@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.core.util;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -19,6 +17,7 @@ package br.com.conductor.heimdall.core.util;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.util;
 
 /**
  * This class holds oAuth constants

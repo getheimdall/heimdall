@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.core.dto;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -19,12 +17,13 @@ package br.com.conductor.heimdall.core.dto;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.dto;
 
-import java.io.Serializable;
-import javax.validation.constraints.NotNull;
-
-import lombok.Data;
 import br.com.conductor.heimdall.core.entity.ProviderParam;
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 /**
  * Class is a Data Transfer Object for the {@link ProviderParam}.

@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.core.dto.page;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -19,18 +17,20 @@ package br.com.conductor.heimdall.core.dto.page;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-
-import java.io.Serializable;
+package br.com.conductor.heimdall.core.dto.page;
 
 import br.com.conductor.heimdall.core.dto.PageDTO;
 import br.com.conductor.heimdall.core.entity.Provider;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serializable;
+
 /**
  * Class that represents a paged {@link Provider} list.
  *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ *
  */
 @Data
 @EqualsAndHashCode(callSuper = false)

@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.core.entity;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -20,13 +17,14 @@ package br.com.conductor.heimdall.core.entity;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.entity;
 
 import br.com.conductor.heimdall.core.enums.Status;
-import br.com.twsoftware.alfred.object.Objeto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.github.thiagonego.alfred.object.Objeto;
 import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -46,6 +44,7 @@ import java.util.List;
  * This class represents a App registered to the system.
  *
  * @author Filipe Germano
+ *
  */
 @Data
 @Table(name = "APPS")

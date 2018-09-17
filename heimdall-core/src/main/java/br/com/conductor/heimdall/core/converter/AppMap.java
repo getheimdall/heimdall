@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.core.converter;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -10,9 +7,9 @@ package br.com.conductor.heimdall.core.converter;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,16 +17,16 @@ package br.com.conductor.heimdall.core.converter;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.converter;
 
-import java.util.List;
-
+import br.com.conductor.heimdall.core.dto.AppDTO;
+import br.com.conductor.heimdall.core.entity.App;
+import com.github.thiagonego.alfred.object.Objeto;
 import org.modelmapper.AbstractConverter;
 import org.modelmapper.Converter;
 import org.modelmapper.PropertyMap;
 
-import br.com.conductor.heimdall.core.dto.AppDTO;
-import br.com.conductor.heimdall.core.entity.App;
-import br.com.twsoftware.alfred.object.Objeto;
+import java.util.List;
 
 /**
  * Maps a {@link AppDTO} to a {@link App} object.

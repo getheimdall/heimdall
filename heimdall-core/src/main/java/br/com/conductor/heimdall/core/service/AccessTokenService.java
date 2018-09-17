@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.core.service;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -20,33 +17,12 @@ package br.com.conductor.heimdall.core.service;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ACCESS_TOKEN_ALREADY_EXISTS;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ACCESS_TOKEN_NOT_DEFINED;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.APP_NOT_EXIST;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.SOME_PLAN_NOT_PRESENT_IN_APP;
-import static br.com.twsoftware.alfred.object.Objeto.isBlank;
-import static br.com.twsoftware.alfred.object.Objeto.notBlank;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.StringMatcher;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.google.common.collect.Lists;
+package br.com.conductor.heimdall.core.service;
 
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.PageDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
+import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
 import br.com.conductor.heimdall.core.dto.integration.AccessTokenDTO;
 import br.com.conductor.heimdall.core.dto.page.AccessTokenPage;
 import br.com.conductor.heimdall.core.dto.persist.AccessTokenPersist;
@@ -60,8 +36,23 @@ import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.repository.PlanRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 import br.com.conductor.heimdall.core.util.Pageable;
-import br.com.twsoftware.alfred.object.Objeto;
+import com.google.common.collect.Lists;
 import net.bytebuddy.utility.RandomString;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.ExampleMatcher.StringMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
+import static com.github.thiagonego.alfred.object.Objeto.isBlank;
+import static com.github.thiagonego.alfred.object.Objeto.notBlank;
 
 /**
  * This class provides methods to create, read, update and delete the {@link AccessToken} resource.
@@ -92,7 +83,6 @@ public class AccessTokenService {
       *
       * @param 	id 						The id of the {@link AccessToken}
       * @return  						The {@link AccessToken} found
-      * @throws NotFoundException 		Resource not found
       */
      @Transactional(readOnly = true)
      public AccessToken find(Long id) {
@@ -149,8 +139,6 @@ public class AccessTokenService {
       *
       * @param 	accessTokenPersist 		{@link AccessTokenPersist}
       * @return 						The {@link AccessToken} that was saved to the repository
-      * @throws BadRequestException		App not exist.
-      * @throws BadRequestException		Token already exists.
       */
      @Transactional
      public AccessToken save(AccessTokenPersist accessTokenPersist) {
@@ -189,8 +177,6 @@ public class AccessTokenService {
       * @param 	id 						The ID of the {@link AccessToken} to be updated
       * @param 	accessTokenPersist 		{@link AccessTokenPersist} The request for {@link AccessToken}
       * @return 						The {@link AccessToken} updated
-      * @throws NotFoundException 		Resource not found
-      * @throws BadRequestException		App not exist
       */
      @Transactional
      public AccessToken update(Long id, AccessTokenPersist accessTokenPersist) {
@@ -214,7 +200,6 @@ public class AccessTokenService {
       * Deletes a {@link AccessToken} by its ID.
       *
       * @param 	id 						The ID of the {@link AccessToken} to be deleted
-      * @throws NotFoundException 		Resource not found
       */
      @Transactional
      public void delete(Long id) {
@@ -232,8 +217,6 @@ public class AccessTokenService {
       *
       * @param reqBody					The {@link AccessTokenDTO}
       * @return							The {@link AccessToken} saved
-      * @throws BadRequestException		Access token not defined
-      * @throws BadRequestException		Token already exists
       */
      @Transactional
      public AccessToken save(AccessTokenDTO reqBody) {
@@ -250,11 +233,10 @@ public class AccessTokenService {
 
           accessToken.setApp(app);
 
-          Plan plan = planRepository.findOne(1l);
-          if (Objeto.notBlank(plan)) {
+          Plan plan = planRepository.findOne(1L);
+          if (notBlank(plan)) {
 
                accessToken.setPlans(Lists.newArrayList(plan));
-//               accessToken.setPlans(Arrays.asList(plan));
           }
 
           accessToken = accessTokenRepository.save(accessToken);

@@ -1,8 +1,3 @@
-
-package br.com.conductor.heimdall.core.dto.page;
-
-import java.io.Serializable;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -22,11 +17,14 @@ import java.io.Serializable;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.dto.page;
 
-import br.com.conductor.heimdall.core.dto.logs.LogTraceDTO;
 import br.com.conductor.heimdall.core.dto.PageDTO;
+import br.com.conductor.heimdall.core.dto.logs.LogTraceDTO;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
 
 /**
  * Class that represents a paged {@link LogTraceDTO} list.
