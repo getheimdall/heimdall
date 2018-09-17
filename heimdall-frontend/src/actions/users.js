@@ -58,6 +58,7 @@ export const update = user => dispatch => {
         .then(data => {
             dispatch(getUser(user.id))
             dispatch(sendNotification({ type: 'success', message: 'User updated' }))
+            dispatch(push('/users'))
             dispatch(finishLoading())
         })
         .catch(error => {
