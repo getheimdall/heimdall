@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.gateway.filter.helper;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -10,9 +7,9 @@ package br.com.conductor.heimdall.gateway.filter.helper;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,10 +17,12 @@ package br.com.conductor.heimdall.gateway.filter.helper;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
- 
-import java.util.List;
-import java.util.Map;
+package br.com.conductor.heimdall.gateway.filter.helper;
 
+import br.com.conductor.heimdall.middleware.spec.Http;
+import br.com.conductor.heimdall.middleware.spec.Json;
+import com.github.thiagonego.alfred.object.Objeto;
+import com.google.common.collect.Lists;
 import org.apache.http.entity.ContentType;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -34,11 +33,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.google.common.collect.Lists;
-
-import br.com.conductor.heimdall.middleware.spec.Http;
-import br.com.conductor.heimdall.middleware.spec.Json;
-import br.com.twsoftware.alfred.object.Objeto;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementation of the {@link Http} interface.
