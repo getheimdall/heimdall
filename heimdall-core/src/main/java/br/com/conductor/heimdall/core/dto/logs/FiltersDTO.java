@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.core.dto.logs;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -20,6 +17,7 @@ package br.com.conductor.heimdall.core.dto.logs;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.dto.logs;
 
 import lombok.Data;
 

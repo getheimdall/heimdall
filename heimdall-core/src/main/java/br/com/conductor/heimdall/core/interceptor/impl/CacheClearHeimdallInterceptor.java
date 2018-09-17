@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.core.interceptor.impl;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -20,6 +17,7 @@ package br.com.conductor.heimdall.core.interceptor.impl;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.interceptor.impl;
 
 import br.com.conductor.heimdall.core.dto.interceptor.CacheDTO;
 import br.com.conductor.heimdall.core.entity.Interceptor;

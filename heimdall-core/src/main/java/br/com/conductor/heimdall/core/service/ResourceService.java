@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.core.service;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -10,9 +7,9 @@ package br.com.conductor.heimdall.core.service;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,25 +17,7 @@ package br.com.conductor.heimdall.core.service;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ONLY_ONE_RESOURCE_PER_API;
-import static br.com.twsoftware.alfred.object.Objeto.isBlank;
-import static br.com.twsoftware.alfred.object.Objeto.notBlank;
-
-import java.util.List;
-
-import br.com.conductor.heimdall.core.entity.Interceptor;
-import br.com.conductor.heimdall.core.entity.Operation;
-import br.com.conductor.heimdall.core.repository.InterceptorRepository;
-import br.com.conductor.heimdall.core.repository.OperationRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.StringMatcher;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+package br.com.conductor.heimdall.core.service;
 
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.converter.ResourceMap;
@@ -47,12 +26,30 @@ import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.ResourceDTO;
 import br.com.conductor.heimdall.core.dto.page.ResourcePage;
 import br.com.conductor.heimdall.core.entity.Api;
+import br.com.conductor.heimdall.core.entity.Interceptor;
+import br.com.conductor.heimdall.core.entity.Operation;
 import br.com.conductor.heimdall.core.entity.Resource;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.ApiRepository;
+import br.com.conductor.heimdall.core.repository.InterceptorRepository;
+import br.com.conductor.heimdall.core.repository.OperationRepository;
 import br.com.conductor.heimdall.core.repository.ResourceRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
 import br.com.conductor.heimdall.core.util.Pageable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.ExampleMatcher.StringMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ONLY_ONE_RESOURCE_PER_API;
+import static com.github.thiagonego.alfred.object.Objeto.isBlank;
+import static com.github.thiagonego.alfred.object.Objeto.notBlank;
 
 /**
  * This class provides methos to create, read, update and delete a {@link Resource} resource.
@@ -92,7 +89,6 @@ public class ResourceService {
       * @param 	apiId						The {@link Api} Id
       * @param 	resourceId					The {@link Resource} Id
       * @return								The {@link Resource} found
-      * @throws NotFoundException			Resource not found
       */
      @Transactional(readOnly = true)
      public Resource find(Long apiId, Long resourceId) {
@@ -110,7 +106,6 @@ public class ResourceService {
       * @param 	resourceDTO					The {@link ResourceDTO}
       * @param 	pageableDTO					The {@link PageableDTO}
       * @return								The paged {@link Resource} list as a {@link ResourcePage} object
-      * @throws NotFoundException			Resource not found
       */
      public ResourcePage list(Long apiId, ResourceDTO resourceDTO, PageableDTO pageableDTO) {
 
@@ -136,7 +131,6 @@ public class ResourceService {
       * @param 	apiId						The {@link Api} Id
       * @param 	resourceDTO					The {@link ResourceDTO}
       * @return								The List of {@link Resource}
-      * @throws NotFoundException			Resource not found
       */
      public List<Resource> list(Long apiId, ResourceDTO resourceDTO) {
           
@@ -159,8 +153,6 @@ public class ResourceService {
       * @param 	apiId						The {@link Api} Id
       * @param 	resourceDTO					The {@link ResourceDTO}
       * @return								The saved {@link Resource}
-      * @throws NotFoundException			Resource not found
-      * @throws BadRequestException			Only one resource per api
       */
      public Resource save(Long apiId, ResourceDTO resourceDTO) {
 
@@ -187,8 +179,6 @@ public class ResourceService {
       * @param 	resourceId					The {@link Resource} Id
       * @param 	resourceDTO					The {@link ResourceDTO}
       * @return								The updated {@link Resource}
-      * @throws NotFoundException			Resource not found
-      * @throws BadRequestException			Only one resource per api
       */
      public Resource update(Long apiId, Long resourceId, ResourceDTO resourceDTO) {
 
@@ -212,7 +202,6 @@ public class ResourceService {
       * 
       * @param 	apiId						The {@link Api} Id
       * @param 	resourceId					The {@link Resource} Id
-      * @throws NotFoundException			Resource not found
       */
      public void delete(Long apiId, Long resourceId) {
 

@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.core.repository;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -20,17 +17,13 @@ package br.com.conductor.heimdall.core.repository;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.repository;
 
-import java.util.List;
-
+import br.com.conductor.heimdall.core.entity.*;
+import br.com.conductor.heimdall.core.enums.TypeInterceptor;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import br.com.conductor.heimdall.core.entity.Api;
-import br.com.conductor.heimdall.core.entity.Interceptor;
-import br.com.conductor.heimdall.core.entity.Operation;
-import br.com.conductor.heimdall.core.entity.Plan;
-import br.com.conductor.heimdall.core.entity.Resource;
-import br.com.conductor.heimdall.core.enums.TypeInterceptor;
+import java.util.List;
 
 /**
  * Provides methods to access a {@link Interceptor}

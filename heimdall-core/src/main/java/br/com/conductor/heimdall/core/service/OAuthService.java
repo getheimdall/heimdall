@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.core.service;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -19,8 +17,8 @@ package br.com.conductor.heimdall.core.service;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.service;
 
-import static br.com.conductor.heimdall.core.util.ConstantsOAuth.*;
 import br.com.conductor.heimdall.core.dto.request.OAuthRequest;
 import br.com.conductor.heimdall.core.dto.response.TokenImplicit;
 import br.com.conductor.heimdall.core.entity.OAuthAuthorize;
@@ -29,7 +27,6 @@ import br.com.conductor.heimdall.core.entity.TokenOAuth;
 import br.com.conductor.heimdall.core.exception.*;
 import br.com.conductor.heimdall.core.repository.OAuthAuthorizeRepository;
 import br.com.conductor.heimdall.core.util.JwtUtils;
-import br.com.twsoftware.alfred.object.Objeto;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +35,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static br.com.conductor.heimdall.core.util.ConstantsOAuth.*;
+import static com.github.thiagonego.alfred.object.Objeto.isBlank;
 
 /**
  * This class provides methods to create and validate the {@link TokenOAuth}
@@ -66,14 +66,14 @@ public class OAuthService {
      */
     public TokenOAuth generateTokenOAuth(OAuthRequest oAuthRequest, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsObject) throws HeimdallException {
         //verify if grantType exist
-        if (Objeto.isBlank(oAuthRequest.getGrantType())) {
+        if (isBlank(oAuthRequest.getGrantType())) {
             throw new BadRequestException(ExceptionMessage.GRANT_TYPE_NOT_FOUND);
         }
         //verify type of the grantType
         switch (oAuthRequest.getGrantType().toUpperCase()) {
             case GRANT_TYPE_PASSWORD:
                 //verify if code exist
-                if (Objeto.isBlank(oAuthRequest.getCode())) {
+                if (isBlank(oAuthRequest.getCode())) {
                     throw new BadRequestException(ExceptionMessage.CODE_NOT_FOUND);
                 }
                 //decode code
@@ -83,7 +83,7 @@ public class OAuthService {
                 //get OAuthAuthorize from database by clientId and token
                 OAuthAuthorize foundCode = oAuthAuthorizeRepository.findByClientIdAndTokenAuthorize(clientId, oAuthRequest.getCode());
                 //verify if OAuthAuthorize exist
-                if (Objeto.isBlank(foundCode)) {
+                if (isBlank(foundCode)) {
                     throw new BadRequestException(ExceptionMessage.CODE_NOT_FOUND);
                 }
                 //get objects the from body request
@@ -111,7 +111,7 @@ public class OAuthService {
                 //return new tokens
                 return tokenOAuth;
             case GRANT_TYPE_REFRESH_TOKEN:
-                if (Objeto.isBlank(oAuthRequest.getRefreshToken())) {
+                if (isBlank(oAuthRequest.getRefreshToken())) {
                     throw new BadRequestException(ExceptionMessage.REFRESH_TOKEN_NOT_FOUND);
                 }
                 //validate token
@@ -229,7 +229,7 @@ public class OAuthService {
      */
     public Provider getProvider(Long providerId) throws ProviderException {
         Provider provider = providerService.findOne(providerId);
-        if (Objeto.isBlank(provider)) {
+        if (isBlank(provider)) {
             throw new ProviderException(ExceptionMessage.PROVIDER_NOT_FOUND);
         }
         return provider;
@@ -245,7 +245,7 @@ public class OAuthService {
 
         OAuthAuthorize found = oAuthAuthorizeRepository.findByClientIdAndExpirationDateIsNull(clientId);
 
-        if (Objeto.isBlank(found)) {
+        if (isBlank(found)) {
             OAuthAuthorize oAuthAuthorize = new OAuthAuthorize(clientId);
             return this.oAuthAuthorizeRepository.save(oAuthAuthorize).getTokenAuthorize();
         }

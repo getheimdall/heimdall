@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.core.service;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -20,18 +17,27 @@ package br.com.conductor.heimdall.core.service;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.service;
 
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.INTERCEPTOR_IGNORED_INVALID;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.INTERCEPTOR_REFERENCE_NOT_FOUND;
-import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
-import static br.com.twsoftware.alfred.object.Objeto.isBlank;
-
-import java.io.File;
-import java.util.List;
-
-import br.com.conductor.heimdall.core.dto.interceptor.*;
-import br.com.conductor.heimdall.core.enums.TypeOAuth;
+import br.com.conductor.heimdall.core.converter.GenericConverter;
+import br.com.conductor.heimdall.core.converter.InterceptorMap;
+import br.com.conductor.heimdall.core.dto.*;
+import br.com.conductor.heimdall.core.dto.interceptor.RateLimitDTO;
+import br.com.conductor.heimdall.core.dto.page.InterceptorPage;
+import br.com.conductor.heimdall.core.entity.*;
+import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
+import br.com.conductor.heimdall.core.enums.Status;
+import br.com.conductor.heimdall.core.enums.TypeInterceptor;
+import br.com.conductor.heimdall.core.exception.ExceptionMessage;
+import br.com.conductor.heimdall.core.exception.HeimdallException;
+import br.com.conductor.heimdall.core.repository.*;
+import br.com.conductor.heimdall.core.service.amqp.AMQPInterceptorService;
+import br.com.conductor.heimdall.core.util.JsonUtils;
+import br.com.conductor.heimdall.core.util.Pageable;
+import br.com.conductor.heimdall.core.util.StringUtils;
+import br.com.conductor.heimdall.core.util.TemplateUtils;
+import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Example;
@@ -42,41 +48,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.Lists;
+import java.io.File;
+import java.util.List;
 
-import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.converter.InterceptorMap;
-import br.com.conductor.heimdall.core.dto.InterceptorDTO;
-import br.com.conductor.heimdall.core.dto.InterceptorFileDTO;
-import br.com.conductor.heimdall.core.dto.PageDTO;
-import br.com.conductor.heimdall.core.dto.PageableDTO;
-import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
-import br.com.conductor.heimdall.core.dto.page.InterceptorPage;
-import br.com.conductor.heimdall.core.entity.Api;
-import br.com.conductor.heimdall.core.entity.Interceptor;
-import br.com.conductor.heimdall.core.entity.Middleware;
-import br.com.conductor.heimdall.core.entity.Operation;
-import br.com.conductor.heimdall.core.entity.Plan;
-import br.com.conductor.heimdall.core.entity.RateLimit;
-import br.com.conductor.heimdall.core.entity.Resource;
-import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
-import br.com.conductor.heimdall.core.enums.Status;
-import br.com.conductor.heimdall.core.enums.TypeInterceptor;
-import br.com.conductor.heimdall.core.exception.ExceptionMessage;
-import br.com.conductor.heimdall.core.exception.HeimdallException;
-import br.com.conductor.heimdall.core.repository.InterceptorRepository;
-import br.com.conductor.heimdall.core.repository.MiddlewareRepository;
-import br.com.conductor.heimdall.core.repository.OperationRepository;
-import br.com.conductor.heimdall.core.repository.PlanRepository;
-import br.com.conductor.heimdall.core.repository.RateLimitRepository;
-import br.com.conductor.heimdall.core.repository.ResourceRepository;
-import br.com.conductor.heimdall.core.service.amqp.AMQPInterceptorService;
-import br.com.conductor.heimdall.core.util.JsonUtils;
-import br.com.conductor.heimdall.core.util.Pageable;
-import br.com.conductor.heimdall.core.util.StringUtils;
-import br.com.conductor.heimdall.core.util.TemplateUtils;
-import br.com.twsoftware.alfred.object.Objeto;
-import lombok.extern.slf4j.Slf4j;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
+import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
+import static com.github.thiagonego.alfred.object.Objeto.isBlank;
+import static com.github.thiagonego.alfred.object.Objeto.notBlank;
 
 /**
  * This class provides methos to create, read, update and delete a {@link Interceptor} resource.<br/>
@@ -180,10 +158,10 @@ public class InterceptorService {
         validateTemplate(interceptor.getType(), interceptor.getContent());
 
         List<Long> ignoredResources = ignoredValidate(interceptorDTO.getIgnoredResources(), resourceRepository);
-        HeimdallException.checkThrow(Objeto.notBlank(ignoredResources), INTERCEPTOR_IGNORED_INVALID, ignoredResources.toString());
+        HeimdallException.checkThrow(notBlank(ignoredResources), INTERCEPTOR_IGNORED_INVALID, ignoredResources.toString());
 
         List<Long> ignoredOperations = ignoredValidate(interceptorDTO.getIgnoredOperations(), operationRepository);
-        HeimdallException.checkThrow(Objeto.notBlank(ignoredOperations), INTERCEPTOR_IGNORED_INVALID, ignoredOperations.toString());
+        HeimdallException.checkThrow(notBlank(ignoredOperations), INTERCEPTOR_IGNORED_INVALID, ignoredOperations.toString());
 
         if (TypeInterceptor.RATTING == interceptor.getType()) {
             mountRatelimitInRedis(interceptor);
@@ -193,14 +171,14 @@ public class InterceptorService {
         if (TypeInterceptor.MIDDLEWARE.equals(interceptor.getType())) {
 
             Operation operation = operationRepository.findOne(interceptor.getReferenceId());
-            if (Objeto.notBlank(operation)) {
+            if (notBlank(operation)) {
                 Api api = operation.getResource().getApi();
 
                 List<Middleware> middlewares = middlewareRepository.findByStatusAndApiId(Status.ACTIVE, api.getId());
                 for (Middleware middleware : middlewares) {
 
                     List<Interceptor> interceptors = middleware.getInterceptors();
-                    if (Objeto.notBlank(interceptors)) {
+                    if (notBlank(interceptors)) {
 
                         interceptors.addAll(Lists.newArrayList(interceptor));
                         middleware.setInterceptors(interceptors);
@@ -341,12 +319,12 @@ public class InterceptorService {
     private List<Long> ignoredValidate(List<ReferenceIdDTO> referenceIdDTOs, JpaRepository<?, Long> repository) {
 
         List<Long> invalids = Lists.newArrayList();
-        if (Objeto.notBlank(referenceIdDTOs)) {
+        if (notBlank(referenceIdDTOs)) {
 
             for (ReferenceIdDTO ignored : referenceIdDTOs) {
 
                 Object o = repository.findOne(ignored.getId());
-                if (Objeto.isBlank(o)) {
+                if (isBlank(o)) {
                     invalids.add(ignored.getId());
                 }
             }

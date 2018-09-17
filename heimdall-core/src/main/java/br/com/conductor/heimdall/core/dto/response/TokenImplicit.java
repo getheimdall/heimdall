@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.core.dto.response;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -19,14 +17,17 @@ package br.com.conductor.heimdall.core.dto.response;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.dto.response;
 
 import lombok.Data;
+
 import java.io.Serializable;
 
 /**
  * This class represents the structure of Token in OAuth implicit.
  *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ *
  */
 @Data
 public class TokenImplicit implements Serializable {

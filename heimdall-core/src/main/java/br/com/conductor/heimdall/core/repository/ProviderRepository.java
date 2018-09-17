@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.core.repository;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -19,9 +17,10 @@ package br.com.conductor.heimdall.core.repository;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
 import br.com.conductor.heimdall.core.entity.Provider;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * Provider Repository.

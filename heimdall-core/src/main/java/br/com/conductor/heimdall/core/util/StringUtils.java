@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.core.util;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -10,9 +7,9 @@ package br.com.conductor.heimdall.core.util;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,10 +17,11 @@ package br.com.conductor.heimdall.core.util;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.util;
 
-import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
-import br.com.twsoftware.alfred.object.Objeto;
+import br.com.conductor.heimdall.core.exception.HeimdallException;
+import com.github.thiagonego.alfred.object.Objeto;
 
 /**
  * This class provides a methods to format {@link String}s to be used by Heimdall. 
@@ -39,7 +37,6 @@ public abstract class StringUtils {
 	 * @param  prefix					The number to be prefixed
 	 * @param  order					The order
 	 * @return							The prefixed order created
-	 * @throws BadRequestException
 	 */
      public static String generateOrder(Integer prefix, Integer order) {
 

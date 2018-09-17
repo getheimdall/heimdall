@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.core.service;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -10,9 +7,9 @@ package br.com.conductor.heimdall.core.service;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,9 +17,10 @@ package br.com.conductor.heimdall.core.service;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.service;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
-import static br.com.twsoftware.alfred.object.Objeto.isBlank;
+import static com.github.thiagonego.alfred.object.Objeto.isBlank;
 
 import java.util.List;
 
@@ -61,7 +59,6 @@ public class DeveloperService {
       * 
       * @param  id 						The ID of the {@link Developer} 
       * @return 						The {@link Developer} found
-      * @throws NotFoundException		Resource not found
       */
      public Developer find(Long id) {
           
@@ -130,7 +127,6 @@ public class DeveloperService {
       * @param  id						The ID of the {@link Developer} to be updated
       * @param  developerDTO 			The {@link DeveloperDTO}
       * @return							The updated {@link Developer}
-      * @throws NotFoundException		Resource not found
       */
      @Transactional
      public Developer update(Long id, DeveloperDTO developerDTO) {
@@ -147,7 +143,6 @@ public class DeveloperService {
      /**
       * Deletes a {@link Developer} by its ID.
       * @param  id						The ID of the {@link Developer} to be deleted
-      * @throws NotFoundException		Resource not found
       */
      @Transactional
      public void delete(Long id) {

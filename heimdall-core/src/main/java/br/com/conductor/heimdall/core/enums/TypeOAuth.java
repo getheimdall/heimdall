@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.core.enums;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -19,6 +17,7 @@ package br.com.conductor.heimdall.core.enums;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

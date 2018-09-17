@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.core.exception;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -19,6 +17,7 @@ package br.com.conductor.heimdall.core.exception;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.exception;
 
 /**
  * This class represents the exceptions related to Provider errors.

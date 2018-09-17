@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.core.dto.interceptor;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -19,6 +17,7 @@ package br.com.conductor.heimdall.core.dto.interceptor;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.dto.interceptor;
 
 import java.io.Serializable;
 
@@ -30,6 +29,7 @@ import javax.validation.constraints.NotNull;
  * Class is a Data Transfer Object for the OAuth.
  *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ *
  */
 @Data
 public class OAuthDTO implements Serializable {

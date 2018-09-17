@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.core.enums;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -20,9 +17,10 @@ package br.com.conductor.heimdall.core.enums;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.enums;
 
 import br.com.conductor.heimdall.core.entity.Interceptor;
-import br.com.twsoftware.alfred.object.Objeto;
+import com.github.thiagonego.alfred.object.Objeto;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;

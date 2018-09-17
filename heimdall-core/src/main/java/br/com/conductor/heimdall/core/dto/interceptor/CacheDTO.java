@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.core.dto.interceptor;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -20,6 +17,7 @@ package br.com.conductor.heimdall.core.dto.interceptor;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.dto.interceptor;
 
 import lombok.Data;
 
@@ -29,6 +27,7 @@ import java.util.List;
  * Cache Data Transfer Object
  *
  * @author Marcelo Aguiar Rodrigues
+ *
  */
 @Data
 public class CacheDTO {

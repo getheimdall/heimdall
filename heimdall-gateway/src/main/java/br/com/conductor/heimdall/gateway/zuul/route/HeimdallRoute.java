@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.gateway.zuul.route;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -10,9 +7,9 @@ package br.com.conductor.heimdall.gateway.zuul.route;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,12 +17,12 @@ package br.com.conductor.heimdall.gateway.zuul.route;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-
-import org.springframework.cloud.netflix.zuul.filters.Route;
+package br.com.conductor.heimdall.gateway.zuul.route;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.cloud.netflix.zuul.filters.Route;
 
 /**
  * Data class that represents a route inside Heimdall.

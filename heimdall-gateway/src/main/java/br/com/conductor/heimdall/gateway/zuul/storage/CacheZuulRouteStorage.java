@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.gateway.zuul.storage;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -10,9 +7,9 @@ package br.com.conductor.heimdall.gateway.zuul.storage;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,15 +17,7 @@ package br.com.conductor.heimdall.gateway.zuul.storage;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-
-import java.util.LinkedList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.netflix.zuul.filters.ZuulProperties.ZuulRoute;
-
-import com.google.common.collect.Sets;
+package br.com.conductor.heimdall.gateway.zuul.storage;
 
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Operation;
@@ -38,8 +27,15 @@ import br.com.conductor.heimdall.core.repository.ApiRepository;
 import br.com.conductor.heimdall.core.repository.ResourceRepository;
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.util.RouteSort;
-import br.com.twsoftware.alfred.object.Objeto;
+import com.github.thiagonego.alfred.object.Objeto;
+import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.netflix.zuul.filters.ZuulProperties.ZuulRoute;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Represents the place that will fill the ZuulRoutes
