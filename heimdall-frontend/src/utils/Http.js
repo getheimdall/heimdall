@@ -1,26 +1,36 @@
 import axios from 'axios'
 
+const baseURL = process.env.REACT_APP_SCHEME + '://' + process.env.REACT_APP_ADDRESS + ':' + process.env.REACT_APP_PORT
+
 const HTTP = axios.create({
-     baseURL: process.env.REACT_APP_SCHEME + '://' + process.env.REACT_APP_ADDRESS + ':' + process.env.REACT_APP_PORT,
+    baseURL: baseURL
 })
 
 const HTTPv1 = axios.create({
-    baseURL: process.env.REACT_APP_SCHEME + '://' + process.env.REACT_APP_ADDRESS + ':' + process.env.REACT_APP_PORT + process.env.REACT_APP_API,
+    baseURL: baseURL + process.env.REACT_APP_API,
     headers: {'Content-Type': 'application/json'}
 })
 
 HTTPv1.interceptors.request.use(req => {
-    if (localStorage.getItem('user')) {
-        req.auth = JSON.parse(localStorage.getItem('user'))
+    if (localStorage.getItem('token')) {
+        const token = localStorage.getItem('token');
+        req.headers.Authorization = `Bearer ${token}`
     }
-     return req
+    return req
 }, error => Promise.reject(error))
 
 HTTPv1.interceptors.response.use(res => {
-    if (res.status === 401) {
-        localStorage.removeItem('user')
-    }
+    const token = res.headers.authorization
+    localStorage.setItem('token', token)
     return res
-}, error => Promise.reject(error))
+}, error => {
+    const response = error.response
+    if (response.status === 401 || response.status === 403 || response.data.message === "Token expired") {
+        localStorage.clear()
+        window.location.pathname = '/login'
+    }
+
+    return Promise.reject(error)
+})
 
 export {HTTP, HTTPv1};

@@ -2,6 +2,8 @@ import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {Button, Card, Icon, Input, message, notification, Pagination, Row, Table, Tag, Tooltip, Upload} from 'antd'
 import {downloadMiddleware, getMiddlewares, initLoading, save} from '../actions/middlewares'
+import ComponentAuthority from "../components/ComponentAuthority";
+import {privileges} from "../constants/privileges-types";
 
 const Dragger = Upload.Dragger
 const Column = Table.Column
@@ -100,27 +102,29 @@ class Middlewares extends Component {
 
         return (
             <div>
-                <Card
-                    title="Upload middleware"
-                    style={{marginBottom: 20}}
-                    className="inside-shadow"
-                >
-                    <Row>
-                        <Input placeholder="version" onChange={(event) => this.handleOnChangeVersion(event)}
-                               addonBefore="Version" value={this.state.version}/>
-                    </Row>
-                    <br/>
-                    <Row>
-                        <Dragger {...propsFileUpload} disabled={this.verifyVersionIsEmpty()}>
-                            <p className="ant-upload-drag-icon">
-                                <Icon type="inbox"/>
-                            </p>
-                            <p className="ant-upload-text">Click or drag middleware to this area to upload</p>
-                            <p className="ant-upload-hint">Support for a single upload. Strictly prohibit from uploading
-                                company data or other band files</p>
-                        </Dragger>
-                    </Row>
-                </Card>
+                <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_MIDDLEWARE]}>
+                    <Card
+                        title="Upload middleware"
+                        style={{marginBottom: 20}}
+                        className="inside-shadow"
+                    >
+                        <Row>
+                            <Input placeholder="version" onChange={(event) => this.handleOnChangeVersion(event)}
+                                   addonBefore="Version" value={this.state.version}/>
+                        </Row>
+                        <br/>
+                        <Row>
+                            <Dragger {...propsFileUpload} disabled={this.verifyVersionIsEmpty()}>
+                                <p className="ant-upload-drag-icon">
+                                    <Icon type="inbox"/>
+                                </p>
+                                <p className="ant-upload-text">Click or drag middleware to this area to upload</p>
+                                <p className="ant-upload-hint">Support for a single upload. Strictly prohibit from uploading
+                                    company data or other band files</p>
+                            </Dragger>
+                        </Row>
+                    </Card>
+                </ComponentAuthority>
                 <Card
                     title="Versions middlewares"
                     style={{marginBottom: 20}}

@@ -68,7 +68,7 @@ class SingleUser extends Component {
                             handleDelete={this.handleDelete}
                             handleSubmit={this.handleSubmit}
                             loading={this.props.loading}
-                            roles={roles}/>
+                            roles={roles ? roles.content : []}/>
                     </Card>
                 </Row>
             </div>

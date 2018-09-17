@@ -5,6 +5,8 @@ import { Row, Form, Col, Input, Select } from 'antd'
 import PropTypes from 'prop-types'
 import { resetOperation, getOperation } from '../../actions/operations';
 import Loading from '../ui/Loading';
+import {PrivilegeUtils} from "../../utils/PrivilegeUtils";
+import {privileges} from "../../constants/privileges-types";
 
 const FormItem = Form.Item
 const Option = Select.Option
@@ -50,7 +52,7 @@ class OperationForm extends Component {
                                     rules: [{ required: true, message: 'Please, input operation path!' }],
                                     initialValue: this.props.operation && this.props.operation.method.toUpperCase()
                                 })(
-                                    <Select>
+                                    <Select disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_OPERATION, privileges.PRIVILEGE_UPDATE_OPERATION])}>
                                         <Option value="GET">GET</Option>
                                         <Option value="POST">POST</Option>
                                         <Option value="PUT">PUT</Option>
@@ -67,7 +69,7 @@ class OperationForm extends Component {
                                     getFieldDecorator('path', {
                                         initialValue: this.props.operation && this.props.operation.path,
                                         rules: [{ required: true, message: 'Please input your api path!' }]
-                                    })(<Input required />)
+                                    })(<Input required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_OPERATION, privileges.PRIVILEGE_UPDATE_OPERATION])}/>)
                                 }
                             </FormItem>
                         </Col>
@@ -76,7 +78,7 @@ class OperationForm extends Component {
                                 {
                                     getFieldDecorator('description', {
                                         initialValue: this.props.operation && this.props.operation.description
-                                    })(<Input required />)
+                                    })(<Input required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_OPERATION, privileges.PRIVILEGE_UPDATE_OPERATION])}/>)
                                 }
                             </FormItem>
                         </Col>

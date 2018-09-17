@@ -11,6 +11,8 @@ import PageHeader from '../components/ui/PageHeader'
 import ListPlans from '../components/plans/ListPlans'
 import Loading from '../components/ui/Loading'
 import FloatButton from '../components/ui/FloatButton'
+import ComponentAuthority from "../components/ComponentAuthority";
+import {privileges} from "../constants/privileges-types";
 
 class Plans extends Component {
 
@@ -85,8 +87,9 @@ class Plans extends Component {
 
                 <Row className="h-row bg-white">
                     <ListPlans dataSource={plans} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading} />
-
-                    <FloatButton history={history} to="/plans/new" label="Add new PLAN" />
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_PLAN]}>
+                        <FloatButton history={history} to="/plans/new" label="Add new PLAN" />
+                    </ComponentAuthority>
                 </Row>
             </div>
         )

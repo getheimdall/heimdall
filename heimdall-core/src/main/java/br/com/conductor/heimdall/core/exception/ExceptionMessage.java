@@ -130,6 +130,8 @@ public enum ExceptionMessage {
 
     API_BASEPATH_MALFORMED(BAD_REQUEST.value(), "Api basepath can not contain a wild card", BadRequestException.class),
 
+    USERNAME_OR_PASSWORD_INCORRECT(BAD_REQUEST.value(), "Username or password incorrect", BadRequestException.class),
+
     CLIENT_ID_ALREADY(BAD_REQUEST.value(), "clientId already used", BadRequestException.class),
 
     CLIENT_ID_NOT_FOUND(BAD_REQUEST.value(), "client_id not found", BadRequestException.class),
@@ -137,6 +139,7 @@ public enum ExceptionMessage {
     AUTHORIZATION_NOT_FOUND(UNAUTHORIZED.value(), "Authorization not found in header", UnauthorizedException.class),
 
     RESPONSE_TYPE_NOT_FOUND(BAD_REQUEST.value(), "response_type not found", BadRequestException.class);
+
 
     @Getter
     private Integer httpCode;

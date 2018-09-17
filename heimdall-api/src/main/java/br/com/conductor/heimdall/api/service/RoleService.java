@@ -174,10 +174,8 @@ public class RoleService {
 
           Role role = roleRepository.findOne(roleId);
           HeimdallException.checkThrow(isBlank(role), GLOBAL_RESOURCE_NOT_FOUND);
-          
-          role = GenericConverter.mapper(roleDTO, Role.class);
-          role = roleRepository.save(role);
-          
-          return role;
+
+          Role roleMapper = GenericConverter.mapper(roleDTO, role);
+          return roleRepository.save(roleMapper);
      }
 }

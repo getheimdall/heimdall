@@ -1,36 +1,41 @@
-import { HTTP } from '../utils/Http'
-import { HTTPv1 } from '../utils/Http'
+import {HTTP, HTTPv1} from '../utils/Http'
+import {JwtUtils} from "../utils/JwtUtils";
 
 const login = (login, password) => {
-    let auth = {
+    let accountCredentials = {
         username: login,
         password: password
     }
 
-    return HTTP.get('/v1/index.html', { auth })
-    .then(res => {
-        localStorage.setItem('user', JSON.stringify(auth))
-        return Promise.resolve(auth)
-    })
-    .catch(error => {
-        console.log('Error: ', error)
-        throw error;
-    })
+    return HTTP.post('/v1/api/login', accountCredentials)
+        .then(res => {
+            const token = res.headers.authorization
+            const user = JwtUtils.decodePayloadAsJson(token).sub
+            localStorage.setItem('token', token)
+            localStorage.setItem('user', user)
+            return Promise.resolve(accountCredentials)
+        })
+        .catch(error => {
+            console.log('Error: ', error)
+            throw error;
+        })
 }
 
 const logout = () => {
-    localStorage.removeItem('user')
+    if (localStorage.getItem('token')) {
+        const headers = {'Authorization': localStorage.getItem('token')}
+        HTTP.get('/v1/api/logout', {headers}).then(res => {
+            localStorage.clear()
+        });
+    }
 }
 
 const getUserLocal = () => {
-    return JSON.parse(localStorage.getItem('user'))
+    return {username: localStorage.getItem('user')};
 }
 
 const isUserLogged = () => {
-    if (localStorage.getItem('user')) {
-        return true
-    }
-    return false
+    return !!localStorage.getItem('token');
 }
 
 const getUsers = (params = {params: {}}) => {

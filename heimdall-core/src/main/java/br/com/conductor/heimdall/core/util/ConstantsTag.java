@@ -30,7 +30,7 @@ package br.com.conductor.heimdall.core.util;
  *
  */
 public class ConstantsTag {
-     
+
      public static final String TAG_APIS = "Apis";
      public static final String TAG_MIDDLEWARES = "Middlewares";
      public static final String TAG_APPS = "Apps";
@@ -50,5 +50,7 @@ public class ConstantsTag {
      public static final String TAG_PRIVILEGES = "Privileges";
      public static final String TAG_PROVIDERS = "Providers";
      public static final String TAG_TRACES = "Traces";
+     public static final String TAG_AUTH = "Auth";
+     public static final String TAG_LDAP = "Ldap";
      
 }
