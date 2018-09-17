@@ -25,7 +25,7 @@ import br.com.conductor.heimdall.middleware.spec.DBMongo;
 import br.com.conductor.heimdall.middleware.spec.Helper;
 import br.com.conductor.heimdall.middleware.spec.Json;
 import br.com.conductor.heimdall.middleware.util.Page;
-import br.com.twsoftware.alfred.object.Objeto;
+import com.github.thiagonego.alfred.object.Objeto;
 import com.google.common.collect.Lists;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
