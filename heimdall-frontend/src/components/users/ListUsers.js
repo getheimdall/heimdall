@@ -40,6 +40,8 @@ class ListUsers extends Component {
                     <Column
                         id="action"
                         key="action"
+                        title="Action"
+                        width={180}
                         render={(text, record) => (
                             <span>
                                 <Tooltip title="Edit">
