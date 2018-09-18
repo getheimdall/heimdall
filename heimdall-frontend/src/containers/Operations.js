@@ -103,8 +103,8 @@ class Operations extends Component {
             <Modal title="Add Operation"
             
                 footer={[
-                    <Button key="back" onClick={this.handleCancel}>Cancel</Button>,
-                    <Button key="submit" type="primary" loading={loading} onClick={this.handleSave}>Save</Button>
+                    <Button id="cancelAddOperation" key="back" onClick={this.handleCancel}>Cancel</Button>,
+                    <Button id="saveOperation" key="submit" type="primary" loading={loading} onClick={this.handleSave}>Save</Button>
                 ]}
                 visible={this.state.visibleModal}
                 onCancel={this.handleCancel}
@@ -116,7 +116,7 @@ class Operations extends Component {
             return (
                 <Row type="flex" justify="center" align="bottom">
                     <Col style={{ marginTop: 20 }}>
-                        You don't have <b>OPERATIONS</b> in this <b>RESOURCE</b>, please <Button type="dashed" onClick={this.showOperationModal()}>Add Operation</Button>
+                        You don't have <b>OPERATIONS</b> in this <b>RESOURCE</b>, please <Button id="addOperationWhenListIsEmpty" type="dashed" onClick={this.showOperationModal()}>Add Operation</Button>
                     </Col>
 
                     {modalOperation}
@@ -128,7 +128,7 @@ class Operations extends Component {
             <div>
                 <Row type="flex" justify="center">
                     <Tooltip title="Add Operation">
-                        <Button type="dashed" icon="plus" onClick={this.showOperationModal()}>Add Operation</Button>
+                        <Button id="addOperation" type="dashed" icon="plus" onClick={this.showOperationModal()}>Add Operation</Button>
                     </Tooltip>
                 </Row>
                 {/* <hr /> */}

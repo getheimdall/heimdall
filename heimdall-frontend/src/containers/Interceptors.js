@@ -358,10 +358,10 @@ class Interceptors extends Component {
                     </Col>
                     <Col md={12}>
                         <Row className="h-row" type="flex" justify="end">
-                            <Button className="card-button" type="danger" disabled={hasNoChanges} onClick={this.discardChanges}>
+                            <Button id="discardInterceptors" className="card-button" type="danger" disabled={hasNoChanges} onClick={this.discardChanges}>
                                 <Icon type="delete" /> Discard
                             </Button>
-                            <Button className="card-button" type="primary" disabled={hasNoChanges} onClick={this.saveChanges}>
+                            <Button id="saveInterceptors" className="card-button" type="primary" disabled={hasNoChanges} onClick={this.saveChanges}>
                                 <Icon type="save" /> Save Changes
                             </Button>
                         </Row>

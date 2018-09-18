@@ -143,10 +143,10 @@ class ApiDefinition extends Component {
 
                 <Row type="flex" justify="end">
                     <Tooltip title="Delete">
-                        <Button className="card-button" type="danger" ghost icon="delete" onClick={this.showDeleteConfirm} size="large" shape="circle" />
+                        <Button id="deleteApi" className="card-button" type="danger" ghost icon="delete" onClick={this.showDeleteConfirm} size="large" shape="circle" />
                     </Tooltip>
                     <Tooltip title="Save">
-                        <Button className="card-button" type="primary" icon="save" onClick={this.onSubmitApi} size="large" shape="circle" />
+                        <Button id="saveApi" className="card-button" type="primary" icon="save" onClick={this.onSubmitApi} size="large" shape="circle" />
                     </Tooltip>
                 </Row>
             </Row>
