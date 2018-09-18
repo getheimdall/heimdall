@@ -35,12 +35,8 @@ public class CustomSendErrorFilter extends SendErrorFilter {
 
 			log.warn("Error during filtering", exception);
 
-//			request.setAttribute("javax.servlet.error.status_code", exception.nStatusCode);
-//			request.setAttribute("javax.servlet.error.exception", exception);
-
 			String message = null;
 			if (StringUtils.hasText(exception.errorCause)) {
-//				request.setAttribute("javax.servlet.error.message", exception.errorCause);
 				message = exception.errorCause;
 			}
 
