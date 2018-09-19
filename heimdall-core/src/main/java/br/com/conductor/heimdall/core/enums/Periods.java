@@ -19,6 +19,12 @@
  */
 package br.com.conductor.heimdall.core.enums;
 
+/**
+ * Periods of time allowed for the metrics.
+ *
+ * @author Marcelo Aguiar Rodrigues
+ *
+ */
 public enum Periods {
     TODAY, YESTERDAY, THIS_WEEK, LAST_WEEK, THIS_MONTH, LAST_MONTH
 }

@@ -22,6 +22,12 @@ package br.com.conductor.heimdall.core.dto.metrics;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
+/**
+ * Data representation of the metrics
+ *
+ * @author Marcelo Aguiar Rodrigues
+ *
+ */
 @Data
 public class Metric {
 
