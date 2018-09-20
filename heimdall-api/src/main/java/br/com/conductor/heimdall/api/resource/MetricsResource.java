@@ -38,7 +38,12 @@ import java.util.List;
 import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_METRICS;
 
 /**
+ * Metrics Resource
+ *
+ * Resource with available metrics extracted from the logs
+ *
  * @author Marcelo Aguiar Rodrigues
+ *
  */
 @io.swagger.annotations.Api(value = PATH_METRICS, produces = MediaType.APPLICATION_JSON_VALUE, tags = {ConstantsTag.TAG_METRICS})
 @RestController
@@ -53,7 +58,7 @@ public class MetricsResource {
 
     @ResponseBody
     @ApiOperation(value = "Apps", responseContainer = "List", response = Metric.class)
-    @GetMapping(value = "/apps-top")
+    @GetMapping(value = "/apps/top")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_METRICS)
     public ResponseEntity<?> appsTop(Integer limit, @RequestParam Periods period) {
 
@@ -66,7 +71,7 @@ public class MetricsResource {
 
     @ResponseBody
     @ApiOperation(value = "Apis", responseContainer = "List", response = Metric.class)
-    @GetMapping(value = "/apis-top")
+    @GetMapping(value = "/apis/top")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_METRICS)
     public ResponseEntity<?> apisTop(Integer limit, @RequestParam Periods period) {
 
@@ -79,7 +84,7 @@ public class MetricsResource {
 
     @ResponseBody
     @ApiOperation(value = "Access Tokens", responseContainer = "List", response = Metric.class)
-    @GetMapping(value = "/access-tokens-top")
+    @GetMapping(value = "/access-tokens/top")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_METRICS)
     public ResponseEntity<?> accessTokenTop(Integer limit, @RequestParam Periods period) {
 
@@ -92,7 +97,7 @@ public class MetricsResource {
 
     @ResponseBody
     @ApiOperation(value = "Result status", responseContainer = "List", response = Metric.class)
-    @GetMapping(value = "/result-status-top")
+    @GetMapping(value = "/result-status/top")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_METRICS)
     public ResponseEntity<?> resultStatusTop(Integer limit, @RequestParam Periods period) {
 
@@ -105,9 +110,9 @@ public class MetricsResource {
 
     @ResponseBody
     @ApiOperation(value = "Lists result status for an App", responseContainer = "List", response = Metric.class)
-    @GetMapping(value = "/apps")
+    @GetMapping(value = "/apps/result-status")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_METRICS)
-    public ResponseEntity<?> apps(@RequestParam String app, @RequestParam Periods period) {
+    public ResponseEntity<?> appsResultStatus(@RequestParam String app, @RequestParam Periods period) {
 
         if (!property.getMongo().getEnabled()) return ResponseEntity.ok(new JSONObject().toString());
 
@@ -118,9 +123,9 @@ public class MetricsResource {
 
     @ResponseBody
     @ApiOperation(value = "Lists result status for an Api", responseContainer = "List", response = Metric.class)
-    @GetMapping(value = "/apis")
+    @GetMapping(value = "/apis/result-status")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_METRICS)
-    public ResponseEntity<?> apis(@RequestParam String apiName, @RequestParam Periods period) {
+    public ResponseEntity<?> apisResultStatus(@RequestParam String apiName, @RequestParam Periods period) {
 
         if (!property.getMongo().getEnabled()) return ResponseEntity.ok(new JSONObject().toString());
 
@@ -131,9 +136,9 @@ public class MetricsResource {
 
     @ResponseBody
     @ApiOperation(value = "Lists result status for an Access Token", responseContainer = "List", response = Metric.class)
-    @GetMapping(value = "/access-tokens")
+    @GetMapping(value = "/access-tokens/result-status")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_METRICS)
-    public ResponseEntity<?> accessTokens(@RequestParam String accessToken, @RequestParam Periods period) {
+    public ResponseEntity<?> accessTokensResultStatus(@RequestParam String accessToken, @RequestParam Periods period) {
 
         if (!property.getMongo().getEnabled()) return ResponseEntity.ok(new JSONObject().toString());
 
@@ -143,8 +148,21 @@ public class MetricsResource {
     }
 
     @ResponseBody
+    @ApiOperation(value = "Lists result status for an Api", responseContainer = "List", response = Metric.class)
+    @GetMapping(value = "/apis/operation")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_METRICS)
+    public ResponseEntity<?> apisOperation(@RequestParam String apiName, @RequestParam Periods period) {
+
+        if (!property.getMongo().getEnabled()) return ResponseEntity.ok(new JSONObject().toString());
+
+        final List<Metric> response = metricsService.findMetricApiPerOperation(apiName, period);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @ResponseBody
     @ApiOperation(value = "Average App response time", responseContainer = "List", response = Metric.class)
-    @GetMapping(value = "/apps-latency")
+    @GetMapping(value = "/apps/latency")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_METRICS)
     public ResponseEntity<?> appsAvgDuration(@RequestParam String app, @RequestParam Periods period) {
 
@@ -157,7 +175,7 @@ public class MetricsResource {
 
     @ResponseBody
     @ApiOperation(value = "Average Api response time", responseContainer = "List", response = Metric.class)
-    @GetMapping(value = "/apis-latency")
+    @GetMapping(value = "/apis/latency")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_METRICS)
     public ResponseEntity<?> apisAvgDuration(@RequestParam String apiName, @RequestParam Periods period) {
 
@@ -170,7 +188,7 @@ public class MetricsResource {
 
     @ResponseBody
     @ApiOperation(value = "Average Access Token response time", responseContainer = "List", response = Metric.class)
-    @GetMapping(value = "/access-tokens-latency")
+    @GetMapping(value = "/access-tokens/latency")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_METRICS)
     public ResponseEntity<?> accessTokensAvgDuration(@RequestParam String accessToken, @RequestParam Periods period) {
 

@@ -103,6 +103,17 @@ public class MetricsService {
     }
 
     /**
+     * Finds a list of sums of result status per Api per period
+     *
+     * @param id     Api name
+     * @param period {@link Periods}
+     * @return list of metrics found
+     */
+    public List<Metric> findMetricApiPerOperation(String id, Periods period) {
+        return this.findMetricXperSumY(id, "trace.apiName", "trace.pattern", period);
+    }
+
+    /**
      * Finds a list of sums of result status per Access Token per period
      *
      * @param id     Access Token
