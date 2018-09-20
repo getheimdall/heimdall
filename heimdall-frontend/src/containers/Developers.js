@@ -71,7 +71,7 @@ class Developers extends Component {
                                 </Col>
                                 <Col sm={24} md={14}>
                                     <Row type="flex" justify="end">
-                                        <Button className="card-button" type="primary" icon="search" onClick={this.onSearchForm}>Search</Button>
+                                        <Button id="searchDeveloper" className="card-button" type="primary" icon="search" onClick={this.onSearchForm}>Search</Button>
                                     </Row>
                                 </Col>
                             </Row>
@@ -83,7 +83,7 @@ class Developers extends Component {
 
                     <ListDevelopers dataSource={developers} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading} />
 
-                    <FloatButton history={history} to="/developers/new" label="Add new Developer" />
+                    <FloatButton idButton="addDeveloper" history={history} to="/developers/new" label="Add new Developer" />
                 </Row>
             </div>
         )

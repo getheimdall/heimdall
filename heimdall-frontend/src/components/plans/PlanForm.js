@@ -118,10 +118,10 @@ class PlanForm extends Component {
 
                 <Row type="flex" justify="end">
                     <Tooltip title="Delete">
-                        <Button className="card-button" type="danger" ghost icon="delete" size="large" shape="circle" disabled={!plan} onClick={plan && this.showDeleteConfirm(plan.id)} loading={loading} />
+                        <Button id="deletePlan" className="card-button" type="danger" ghost icon="delete" size="large" shape="circle" disabled={!plan} onClick={plan && this.showDeleteConfirm(plan.id)} loading={loading} />
                     </Tooltip>
                     <Tooltip title="Save">
-                        <Button className="card-button" type="primary" icon="save" size="large" shape="circle" onClick={this.onSubmitForm} loading={loading} />
+                        <Button id="savePlan" className="card-button" type="primary" icon="save" size="large" shape="circle" onClick={this.onSubmitForm} loading={loading} />
                     </Tooltip>
                 </Row>
             </Row >

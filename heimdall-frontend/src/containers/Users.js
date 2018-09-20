@@ -71,7 +71,7 @@ class Users extends Component {
                                 </Col>
                                 <Col sm={24} md={14}>
                                     <Row type="flex" justify="end">
-                                        <Button className="card-button" type="primary" icon="search" onClick={this.onSearchForm}>Search</Button>
+                                        <Button id="searchUsers" className="card-button" type="primary" icon="search" onClick={this.onSearchForm}>Search</Button>
                                     </Row>
                                 </Col>
                             </Row>
@@ -82,7 +82,7 @@ class Users extends Component {
                 <Row className="h-row bg-white">
                     <ListUsers dataSource={users} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading} />
 
-                    <FloatButton history={history} to="/users/new" label="Add new API" />
+                    <FloatButton idButton="addUser" history={history} to="/users/new" label="Add new User" />
                 </Row>
             </div>
         )

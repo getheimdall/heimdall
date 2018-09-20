@@ -78,8 +78,8 @@ class DnDInterceptorType extends Component {
 
                     <Modal title="Add Interceptor"
                         footer={[
-                            <Button key="back" onClick={this.handleCancel}>Cancel</Button>,
-                            <Button key="submit" type="primary" onClick={this.handleSave}>
+                            <Button id="cancelInterceptorTypeModal" key="back" onClick={this.handleCancel}>Cancel</Button>,
+                            <Button id="saveInterceptorTypeModal" key="submit" type="primary" onClick={this.handleSave}>
                                 Save
                             </Button>
                         ]}
