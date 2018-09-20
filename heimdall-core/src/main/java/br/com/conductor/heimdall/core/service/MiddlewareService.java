@@ -10,9 +10,9 @@ package br.com.conductor.heimdall.core.service;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -66,7 +66,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * This class provides methods to create, read, update and delete the {@link Middleware} resource.
- * 
+ *
  * @author Filipe Germano
  *
  */
@@ -82,19 +82,19 @@ public class MiddlewareService {
 
      @Autowired
      private InterceptorRepository interceptorRepository;
-     
+
      @Autowired
      private Property property;
 
      @Value("${zuul.filter.root}")
-     private String root; 
-     
+     private String root;
+
      @Autowired
      private AMQPMiddlewareService amqpMiddlewareService;
 
      /**
       * Finds a {@link Middleware} by its Id and {@link Api} Id.
-      * 
+      *
       * @param 	apiId 					The {@link Api} Id
       * @param 	middlewareId 			The {@link Middleware} Id
       * @return  						The {@link Middleware} associated with the {@link Api}
@@ -102,70 +102,72 @@ public class MiddlewareService {
       */
      @Transactional(readOnly = true)
      public Middleware find(Long apiId, Long middlewareId) {
-          
-          Middleware middleware = middlewareRepository.findByApiIdAndId(apiId, middlewareId);      
+
+          Middleware middleware = middlewareRepository.findByApiIdAndId(apiId, middlewareId);
           HeimdallException.checkThrow(isBlank(middleware), GLOBAL_RESOURCE_NOT_FOUND);
-          
+
           return middleware;
      }
-     
+
      /**
       * Generates a paged list of the {@link Middleware} associated with a {@link Api}.
-      * 
-      * @param 	apiId 					The ID of the {@link Api} 
+      *
+      * @param 	apiId 					The ID of the {@link Api}
       * @param 	middlewareDTO 			The {@link MiddlewareDTO}
       * @param	pageableDTO 			The {@link PageableDTO}
       * @return  						A paged {@link Middleware} list as a {@link MiddlewarePage} object
-      * @throws NotFoundException 		Resource not found 
+      * @throws NotFoundException 		Resource not found
       */
      @Transactional(readOnly = true)
      public MiddlewarePage list(Long apiId, MiddlewareDTO middlewareDTO, PageableDTO pageableDTO) {
 
           Api api = apiRepository.findOne(apiId);
           HeimdallException.checkThrow(isBlank(api), GLOBAL_RESOURCE_NOT_FOUND);
-          
+
           Middleware middleware = GenericConverter.mapper(middlewareDTO, Middleware.class);
-          middleware.setApi(api);
-          
+          Api apiFind = new Api();
+          apiFind.setId(apiId);
+          middleware.setApi(apiFind);
+
           Example<Middleware> example = Example.of(middleware, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
-          
+
           Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
           Page<Middleware> page = middlewareRepository.findAll(example, pageable);
-          
+
           MiddlewarePage middlewarePage = new MiddlewarePage(PageDTO.build(page));
-          
+
           return middlewarePage;
      }
 
      /**
       * Generates a list of the {@link Middleware} associated with a {@link Api}.
-      * 
-      * @param 	apiId 						The ID of the API 
+      *
+      * @param 	apiId 						The ID of the API
       * @param 	middlewareDTO 				The middleware DTO
       * @return 						 	The list of {@link Middleware}
       * @throws NotFoundException 			Resource not found
       */
      @Transactional(readOnly = true)
      public List<Middleware> list(Long apiId, MiddlewareDTO middlewareDTO) {
-          
+
           Api api = apiRepository.findOne(apiId);
           HeimdallException.checkThrow(isBlank(api), GLOBAL_RESOURCE_NOT_FOUND);
-          
+
           Middleware middleware = GenericConverter.mapper(middlewareDTO, Middleware.class);
           Api apiFind = new Api();
           apiFind.setId(apiId);
           middleware.setApi(apiFind);
-          
+
           Example<Middleware> example = Example.of(middleware, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
-          
+
           List<Middleware> middlewares = middlewareRepository.findAll(example);
-          
+
           return middlewares;
      }
-     
+
      /**
       * Save a new {@link Middleware} for a {@link Api}.
-      * 
+      *
       * @param 	apiId 					The {@link Api} Id
       * @param 	middlewareDTO 			The {@link MiddlewareDTO}
       * @param 	file 					The packaged {@link Middleware} file
@@ -177,46 +179,46 @@ public class MiddlewareService {
       */
      @Transactional
      public Middleware save(Long apiId, MiddlewareDTO middlewareDTO, MultipartFile file) {
-          
-    	  List<Middleware> middlewares = updateMiddlewaresStatus(middlewareRepository.findByApiId(apiId)); 
-    			  
+
+    	  List<Middleware> middlewares = updateMiddlewaresStatus(middlewareRepository.findByApiId(apiId));
+
     	  if (Objeto.notBlank(middlewares))
     		  middlewareRepository.save(middlewares);
-          
+
           Api api = apiRepository.findOne(apiId);
           HeimdallException.checkThrow(isBlank(api), GLOBAL_RESOURCE_NOT_FOUND);
-                    
+
           Middleware resData = middlewareRepository.findByApiIdAndVersion(apiId, middlewareDTO.getVersion());
           HeimdallException.checkThrow(notBlank(resData) && (resData.getApi().getId() == api.getId()), ONLY_ONE_MIDDLEWARE_PER_VERSION_AND_API);
-          
+
           String type = FilenameUtils.getExtension(file.getOriginalFilename());
           HeimdallException.checkThrow(!("jar".equalsIgnoreCase(type)), MIDDLEWARE_UNSUPPORTED_TYPE);
-          
+
           Middleware middleware = GenericConverter.mapper(middlewareDTO, Middleware.class);
           middleware.setApi(api);
           middleware.setPath(root + "/api/" + apiId + "/middleware");
           middleware.setType(type);
           try {
-               
+
                middleware.setFile(file.getBytes());
           } catch (Exception e) {
-               
+
                log.error(e.getMessage(), e);
                HeimdallException.checkThrow(isBlank(api), MIDDLEWARE_INVALID_FILE);
           }
-          
+
           List<Interceptor> interceptors = interceptorRepository.findByTypeAndOperationResourceApiId(TypeInterceptor.MIDDLEWARE, middleware.getApi().getId());
           middleware.setInterceptors(interceptors);
-          middleware = middlewareRepository.save(middleware);          
-          
+          middleware = middlewareRepository.save(middleware);
+
           amqpMiddlewareService.dispatchCreateMiddlewares(middleware.getId());
-          
+
           return middleware;
      }
 
      /**
       * Updates a middleware by Middleware ID and API ID.
-      * 
+      *
       * @param 	apiId 					The ID of the API
       * @param 	middlewareId 			The middleware ID
       * @param	middlewareDTO 			The middleware DTO
@@ -229,29 +231,29 @@ public class MiddlewareService {
 
           Middleware middleware = middlewareRepository.findByApiIdAndId(apiId, middlewareId);
           HeimdallException.checkThrow(isBlank(middleware), GLOBAL_RESOURCE_NOT_FOUND);
-          
+
           Middleware resData = middlewareRepository.findByApiIdAndVersion(apiId, middlewareDTO.getVersion());
           HeimdallException.checkThrow(notBlank(resData) && (resData.getApi().getId() == middleware.getApi().getId()) && (resData.getId() != middleware.getId()), ONLY_ONE_MIDDLEWARE_PER_VERSION_AND_API);
-          
+
           middleware = GenericConverter.mapper(middlewareDTO, middleware);
-          
+
           Boolean deleteDeprecated = property.getMiddlewares().getDeleteDeprecated();
-          
+
           if (middleware.getStatus().equals(Status.DEPRECATED))
         	  if (Objeto.notBlank(deleteDeprecated) && deleteDeprecated)
         		  middleware.setFile(null);
-          
+
           middleware = middlewareRepository.save(middleware);
-          
+
           amqpMiddlewareService.dispatchCreateMiddlewares(middlewareId);
-          
+
           return middleware;
      }
-     
+
      /**
       * Deletes a middleware by API ID and middleware ID
-      * 
-      * @param 	apiId					The ID of the API 
+      *
+      * @param 	apiId					The ID of the API
       * @param 	middlewareId			The middleware ID
       * @throws NotFoundException		Resource not found
       * @throws BadRequestException		Middleware still contains interceptors associated
@@ -262,24 +264,24 @@ public class MiddlewareService {
           Middleware middleware = middlewareRepository.findByApiIdAndId(apiId, middlewareId);
           HeimdallException.checkThrow(isBlank(middleware), GLOBAL_RESOURCE_NOT_FOUND);
           HeimdallException.checkThrow((Objeto.notBlank(middleware.getInterceptors()) && middleware.getInterceptors().size() > 0), ExceptionMessage.MIDDLEWARE_CONTAINS_INTERCEOPTORS);
-               
+
           amqpMiddlewareService.dispatchRemoveMiddlewares(middleware.getPath());
           middlewareRepository.delete(middleware.getId());
-          
+
      }
-     
+
      /*
       * Updates the status of current middleware repository based on the Property settings.
-      * 
+      *
       * ACTIVE -> changes status to INACTIVE
-      * 
+      *
       * INACTIVE -> deprecated if number exceeds property allowInactive,
       * 			if deleteDeprecated is true, deletes the middleware file from database
-      * 
+      *
       * DEPRECATED -> do not change status
       */
 	 private List<Middleware> updateMiddlewaresStatus(List<Middleware> list) {
-		
+
 		if (Objeto.notBlank(list)) {
 			Map<Status, List<Middleware>> middlewareMap = list.stream()
 					.collect(Collectors.groupingBy(Middleware::getStatus));
@@ -305,12 +307,12 @@ public class MiddlewareService {
 			} else {
 				middlewareMap.get(Status.ACTIVE).forEach(m -> m.setStatus(Status.INACTIVE));
 			}
-		
+
 			return list;
-		} 
-		
+		}
+
 		return null;
-		
+
 	}
 
 }

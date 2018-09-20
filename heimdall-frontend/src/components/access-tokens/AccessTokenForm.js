@@ -151,11 +151,11 @@ class AccessTokenForm extends Component {
                     <Tooltip title="Delete">
                         <Button className="card-button" type="danger" ghost icon="delete" size="large" shape="circle"
                                 disabled={!accessToken} onClick={accessToken && this.showDeleteConfirm(accessToken.id)}
-                                loading={loading}/>
+                                loading={loading} id="deleteAccessToken"/>
                     </Tooltip>
                     <Tooltip title="Save">
                         <Button className="card-button" type="primary" icon="save" size="large" shape="circle"
-                                onClick={this.onSubmitForm} loading={loading}/>
+                                onClick={this.onSubmitForm} loading={loading} id="saveAccessToken"/>
                     </Tooltip>
                 </Row>
             </Row>

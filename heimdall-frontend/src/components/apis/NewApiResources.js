@@ -108,17 +108,17 @@ class NewApiResource extends Component {
                                 <Button.Group size="large">
                                     <Tooltip title="Save">
                                         <Button type="primary" icon="save" size="large" 
-                                            onClick={this.onSubmitResource}
+                                            onClick={this.onSubmitResource} id="saveApiResource"
                                         />
                                     </Tooltip>
                                     <Tooltip title="Cancel">
-                                        <Button type="primary" icon="close" size="large" onClick={this.handleAddResource} />
+                                        <Button id="cancelApiResource" type="primary" icon="close" size="large" onClick={this.handleAddResource} />
                                     </Tooltip>
                                 </Button.Group>
                             )
                             : (
                                 <Tooltip title="Add resource">
-                                    <Button type="primary" icon="plus" shape="circle" size="large" onClick={this.handleAddResource} />
+                                    <Button id="addResource" type="primary" icon="plus" shape="circle" size="large" onClick={this.handleAddResource} />
                                 </Tooltip>
                             )
                         }

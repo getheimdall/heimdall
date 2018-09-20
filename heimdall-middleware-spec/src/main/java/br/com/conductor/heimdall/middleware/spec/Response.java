@@ -25,6 +25,7 @@ package br.com.conductor.heimdall.middleware.spec;
  * This interface provides methods to control a response.
  *
  * @author Filipe Germano
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
 public interface Response {
@@ -34,39 +35,47 @@ public interface Response {
 	  * 
 	  * @return			The header of a response
 	  */
-     public Header header();
+     Header header();
      
      /**
       * Gets the status code of a response.
       * 
       * @return			The status code of a response.
       */
-     public Integer getStatus();
+     Integer getStatus();
      
      /**
       * Sets the status code of a response.
       * @param status	The the status code of a response
       */
-     public void setStatus(Integer status);
+     void setStatus(Integer status);
      
      /**
       * Gets the body of a response.
       * 
       * @return			The body of a response.
       */
-     public String getBody();
+     String getBody();
      
      /**
       * Sets the body of a response.
       * 
       * @param body		The String representation of body of a response
       */
-     public void setBody(String body);
+     void setBody(String body);
      
      /**
       * Sets the body of a response.
       * 
       * @param body		The byte array representation of body of a response
       */
-     public void setBody(byte[] body);
+     void setBody(byte[] body);
+
+    /**
+     * Sets the body of a response.
+     *
+     * @param body		The byte array representation of body of a response
+     * @param gzip      Gzip the response
+     */
+     void setBody(byte[] body, boolean gzip);
 }

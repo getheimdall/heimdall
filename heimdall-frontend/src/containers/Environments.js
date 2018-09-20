@@ -40,7 +40,7 @@ class Environments extends Component {
                     <ListEnvironments environments={environments} handleDelete={this.handleDelete} />
                     {loading && <Loading />}
 
-                    <FloatButton history={history} to="/environments/new" label="Add new Environment" />
+                    <FloatButton idButton="addEnvironment" history={history} to="/environments/new" label="Add new Environment" />
                 </Row>
             </div>
         )

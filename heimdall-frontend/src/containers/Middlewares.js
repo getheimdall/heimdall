@@ -111,7 +111,7 @@ class Middlewares extends Component {
                     </Row>
                     <br/>
                     <Row>
-                        <Dragger {...propsFileUpload} disabled={this.verifyVersionIsEmpty()}>
+                        <Dragger id="dragMiddleware" {...propsFileUpload} disabled={this.verifyVersionIsEmpty()}>
                             <p className="ant-upload-drag-icon">
                                 <Icon type="inbox"/>
                             </p>
