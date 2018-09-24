@@ -85,7 +85,7 @@ public interface Helper {
 	/**
 	 * Gets a Xml.
 	 * 
-	 * @return The Json
+	 * @return The Xml
 	 */
 	public Xml xml();
 
