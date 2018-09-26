@@ -12,7 +12,6 @@
 			INSERT INTO PRIVILEGES (NAME) VALUES ('CREATE_TRACES');
 			INSERT INTO PRIVILEGES (NAME) VALUES ('UPDATE_TRACES');
 			INSERT INTO PRIVILEGES (NAME) VALUES ('DELETE_TRACES');
-			INSERT INTO roles_privileges (role_id, privilege_id) SELECT r.id, p.id FROM privileges p, roles r WHERE r.id = 1 and p.id NOT IN (SELECT roles_privileges.privilege_id FROM roles_privileges)
 		</sql>
 	</changeSet>
 </databaseChangeLog>
