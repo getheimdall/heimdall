@@ -56,7 +56,7 @@ public class LogResponse extends ZuulFilter {
     @Override
     public int filterOrder() {
 
-        return 110;
+        return 102;
     }
 
     @Override
