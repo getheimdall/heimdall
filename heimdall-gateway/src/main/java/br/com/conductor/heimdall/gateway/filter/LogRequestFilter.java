@@ -20,7 +20,7 @@
 package br.com.conductor.heimdall.gateway.filter;
 
 import br.com.conductor.heimdall.core.util.Constants;
-import br.com.conductor.heimdall.core.util.ContentTypeUtils;
+import br.com.conductor.heimdall.core.util.DigestUtils;
 import br.com.conductor.heimdall.core.util.UrlUtil;
 import br.com.conductor.heimdall.gateway.filter.helper.HelperImpl;
 import br.com.conductor.heimdall.gateway.trace.FilterDetail;
@@ -28,41 +28,38 @@ import br.com.conductor.heimdall.gateway.trace.RequestResponseParser;
 import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.middleware.spec.Helper;
-import br.com.twsoftware.alfred.object.Objeto;
-import com.netflix.util.Pair;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StreamUtils;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.Collection;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 
+/**
+ * Logs the request to the trace
+ *
+ * @author Marcelo Aguiar Rodrigues
+ */
 @Component
-public class LogResponse extends ZuulFilter {
+public class LogRequestFilter extends ZuulFilter {
 
     private FilterDetail detail = new FilterDetail();
 
     @Override
     public int filterOrder() {
 
-        return 102;
+        return 99;
     }
 
     @Override
     public String filterType() {
 
-        return POST_TYPE;
+        return PRE_TYPE;
     }
 
     @Override
@@ -92,53 +89,41 @@ public class LogResponse extends ZuulFilter {
         return null;
     }
 
-    private void execute() throws Throwable {
+    private void execute() {
         Helper helper = new HelperImpl();
 
         RequestContext ctx = RequestContext.getCurrentContext();
-
+        HttpServletRequest request = ctx.getRequest();
 
         RequestResponseParser r = new RequestResponseParser();
-        r.setUri(UrlUtil.getCurrentUrl(ctx.getRequest()));
+        r.setHeaders(getRequestHeadersInfo(request));
+        r.setBody(helper.call().request().getBody());
+        r.setUri(UrlUtil.getCurrentUrl(request));
 
-        Map<String, String> headers = getResponseHeaders(ctx);
-        r.setHeaders(headers);
-
-        String content = headers.get(HttpHeaders.CONTENT_TYPE);
-
-        // if the content type is not defined by api server then permit to read the body. Prevent NPE
-        if (Objeto.isBlank(content)) content = "";
-
-        String[] types = content.split(";");
-
-        if (!ContentTypeUtils.belongsToBlackList(types)) {
-            InputStream stream = ctx.getResponseDataStream();
-            String body;
-
-            body = StreamUtils.copyToString(stream, Charset.forName("UTF-8"));
-
-            if (body.isEmpty())
-                body = helper.call().response().getBody();
-
-            r.setBody(body);
-            ctx.setResponseDataStream(new ByteArrayInputStream(body.getBytes("UTF-8")));
-        }
-        TraceContextHolder.getInstance().getActualTrace().setResponse(r);
+        TraceContextHolder.getInstance().getActualTrace().setRequest(r);
     }
 
-    private Map<String, String> getResponseHeaders(RequestContext context) {
-        final HttpServletResponse response = context.getResponse();
+    private Map<String, String> getRequestHeadersInfo(HttpServletRequest request) {
 
-        final Collection<String> headerNames = response.getHeaderNames();
-        final List<Pair<String, String>> originResponseHeaders = context.getOriginResponseHeaders();
+        HashMap<String, String> map = new HashMap<>();
+        Enumeration<String> headerNames = request.getHeaderNames();
+        while (headerNames.hasMoreElements()) {
 
-        Map<String, String> headers = new HashMap<>();
+            String key = headerNames.nextElement();
 
-        originResponseHeaders.forEach(pair -> headers.put(pair.first(), pair.second()));
+            String value;
+            if ("access_token".equals(key) || "client_id".equals(key)) {
 
-        headerNames.forEach(s -> headers.put(s, response.getHeader(s)));
+                value = DigestUtils.digestMD5(request.getHeader(key));
+            } else {
 
-        return headers;
+                value = request.getHeader(key);
+            }
+
+            map.put(key, value);
+        }
+
+        return map;
     }
 
 }
