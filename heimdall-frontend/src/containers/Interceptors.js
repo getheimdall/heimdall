@@ -40,19 +40,32 @@ class Interceptors extends Component {
     filterByLifeCycle = (interceptors) => {
         if (this.state.operationSelected) {
             return interceptors.filter(interceptor => {
-                return interceptor.lifeCycle === "OPERATION" || interceptor.lifeCycle === "RESOURCE" || interceptor.lifeCycle === "PLANS"
+                return (interceptor.referenceId === this.state.operationId && interceptor.lifeCycle === 'OPERATION') ||
+                (interceptor.referenceId === this.state.resourceId && interceptor.lifeCycle === 'RESOURCE') ||
+                (!this.state.planSelected && interceptor.lifeCycle === 'PLAN') ||
+                (this.state.planSelected && interceptor.lifeCycle === 'PLAN' && interceptor.referenceId === this.state.planId)
             })
         }
 
         if (this.state.resourceSelected) {
+            const { operations } = this.props
+            let operationsIds = []
+            if (operations) {
+                operationsIds = operations.map(op => op.id)
+            }
             return interceptors.filter(interceptor => {
-                return interceptor.lifeCycle === "RESOURCE" || interceptor.lifeCycle === "PLANS"
+                return (interceptor.referenceId === this.state.resourceId && interceptor.lifeCycle === 'RESOURCE')||
+                    (operationsIds.includes(interceptor.referenceId) && interceptor.lifeCycle === 'OPERATION') ||
+                    (!this.state.planSelected && interceptor.lifeCycle === 'PLAN') ||
+                    (this.state.planSelected && interceptor.lifeCycle === 'PLAN' && interceptor.referenceId === this.state.planId)
             })
         }
 
         if (this.state.planSelected) {
             return interceptors.filter(interceptor => {
-                return interceptor.lifeCycle === "PLANS"
+                return (interceptor.lifeCycle === 'RESOURCE') ||
+                    (interceptor.lifeCycle === 'OPERATION') ||
+                    (interceptor.referenceId === this.state.planId && interceptor.lifeCycle === 'PLAN')
             })
         }
         return interceptors
@@ -227,11 +240,15 @@ class Interceptors extends Component {
 
     discardChanges = () => {
         this.setState({...this.state, candidatesToDelete: [], candidatesToSave: [], candidatesToUpdate: []})
+        this.updateAllParams()
     }
 
     saveChanges = () => {
         const totalInterceptors = this.state.candidatesToSave.length + this.state.candidatesToUpdate.length + this.state.candidatesToDelete.length
         this.props.dispatch(receiveQueue(totalInterceptors))
+        if (this.state.candidatesToSave.length > 0 || this.state.candidatesToUpdate.length > 0 || this.state.candidatesToDelete.length > 0){
+            this.props.dispatch(initLoading())
+        }
 
         if (this.state.candidatesToSave.length > 0) this.props.dispatch(saveAll(this.state.candidatesToSave))
         if (this.state.candidatesToUpdate.length > 0) this.props.dispatch(updateAll(this.state.candidatesToUpdate))
