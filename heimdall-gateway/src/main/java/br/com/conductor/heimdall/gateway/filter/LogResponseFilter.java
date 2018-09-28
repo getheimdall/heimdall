@@ -132,14 +132,10 @@ public class LogResponseFilter extends ZuulFilter {
     }
 
     private Map<String, String> getResponseHeaders(RequestContext context) {
-        final HttpServletResponse response = context.getResponse();
-
-        final Collection<String> headerNames = response.getHeaderNames();
-        final List<Pair<String, String>> originResponseHeaders = context.getOriginResponseHeaders();
-
         Map<String, String> headers = new HashMap<>();
 
-        originResponseHeaders.forEach(pair -> headers.put(pair.first(), pair.second()));
+        final HttpServletResponse response = context.getResponse();
+        final Collection<String> headerNames = response.getHeaderNames();
 
         headerNames.forEach(s -> headers.put(s, response.getHeader(s)));
 
