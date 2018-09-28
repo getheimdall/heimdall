@@ -104,13 +104,13 @@ public class JsonImpl implements Json {
 		}
 	}
 
-	public <T> T parse(String json, Class<?> classType) {
+	public <T> T parse(String json, Class<?> classType) throws BeanValidationException {
 
 		try {
 			@SuppressWarnings("unchecked")
 			T obj = (T) mapper().readValue(json, classType);
 			
-			Set<ConstraintViolation<T>> violations = validador().validate(obj);
+			Set<ConstraintViolation<T>> violations = validator().validate(obj);
 
 			if (!violations.isEmpty()) {
 			     
@@ -133,13 +133,13 @@ public class JsonImpl implements Json {
 	}
 
 	@Override
-	public <T> T parse(String json, TypeReference<T> type) {
+	public <T> T parse(String json, TypeReference<T> type) throws BeanValidationException {
 	     try {
 	          mapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			@SuppressWarnings("unchecked")
 			T obj = (T) mapper().readValue(json, type);
 			
-			Set<ConstraintViolation<T>> violations = validador().validate(obj);
+			Set<ConstraintViolation<T>> violations = validator().validate(obj);
 			
 			if (!violations.isEmpty()) {
                     
@@ -162,12 +162,12 @@ public class JsonImpl implements Json {
 	}
 
 
-	public <T> T parse(String json, Class<?> parametrized, Class<?>... parameterClasses) {
+	public <T> T parse(String json, Class<?> parametrized, Class<?>... parameterClasses) throws BeanValidationException {
 		try {
 			@SuppressWarnings("unchecked")
 			T obj = (T) mapper().readValue(json, TypeFactory.defaultInstance().constructParametricType(parametrized, parameterClasses));
 			
-			Set<ConstraintViolation<T>> violations = validador().validate(obj);
+			Set<ConstraintViolation<T>> violations = validator().validate(obj);
                
 			if (!violations.isEmpty()) {
                     
@@ -236,7 +236,7 @@ public class JsonImpl implements Json {
 		return mapper;
 	}
 	
-	private Validator validador() {
+	private Validator validator() {
 
           ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
           Validator validator = factory.getValidator();

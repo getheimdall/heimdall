@@ -24,8 +24,12 @@ import lombok.Getter;
 
 /**
  * This class represents errors related to beans validations
+ * <br/>
+ * You can use javax annotations to validate your bean. 
  * 
  * @author <a href="https://github.com/jscamara">Jonathan Camara</a>
+ * 
+ * @see <a href="https://jcp.org/en/jsr/detail?id=380">JSR 380<a/>
  *
  */
 @Getter
