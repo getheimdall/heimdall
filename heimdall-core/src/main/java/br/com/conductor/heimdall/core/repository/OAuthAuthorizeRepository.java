@@ -32,7 +32,5 @@ public interface OAuthAuthorizeRepository extends JpaRepository<OAuthAuthorize, 
 
     OAuthAuthorize findByClientIdAndExpirationDateIsNull(String clientId);
 
-    OAuthAuthorize findByClientIdAndTokenAuthorize(String clientId, String tokenAuthorize);
-
     OAuthAuthorize findByTokenAuthorize(String tokenAuthorize);
 }
