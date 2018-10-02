@@ -21,17 +21,27 @@ package br.com.conductor.heimdall.core.service;
  * ==========================LICENSE_END===================================
  */
 
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.INTERCEPTOR_IGNORED_INVALID;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.INTERCEPTOR_REFERENCE_NOT_FOUND;
-import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
-import static br.com.twsoftware.alfred.object.Objeto.isBlank;
-
-import java.io.File;
-import java.util.List;
-
-import br.com.conductor.heimdall.core.dto.interceptor.*;
-import br.com.conductor.heimdall.core.enums.TypeOAuth;
+import br.com.conductor.heimdall.core.converter.GenericConverter;
+import br.com.conductor.heimdall.core.converter.InterceptorMap;
+import br.com.conductor.heimdall.core.dto.*;
+import br.com.conductor.heimdall.core.dto.interceptor.OAuthDTO;
+import br.com.conductor.heimdall.core.dto.interceptor.RateLimitDTO;
+import br.com.conductor.heimdall.core.dto.page.InterceptorPage;
+import br.com.conductor.heimdall.core.entity.*;
+import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
+import br.com.conductor.heimdall.core.enums.Status;
+import br.com.conductor.heimdall.core.enums.TypeInterceptor;
+import br.com.conductor.heimdall.core.exception.ExceptionMessage;
+import br.com.conductor.heimdall.core.exception.HeimdallException;
+import br.com.conductor.heimdall.core.repository.*;
+import br.com.conductor.heimdall.core.service.amqp.AMQPInterceptorService;
+import br.com.conductor.heimdall.core.util.JsonUtils;
+import br.com.conductor.heimdall.core.util.Pageable;
+import br.com.conductor.heimdall.core.util.StringUtils;
+import br.com.conductor.heimdall.core.util.TemplateUtils;
+import br.com.twsoftware.alfred.object.Objeto;
+import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Example;
@@ -42,41 +52,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.Lists;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.converter.InterceptorMap;
-import br.com.conductor.heimdall.core.dto.InterceptorDTO;
-import br.com.conductor.heimdall.core.dto.InterceptorFileDTO;
-import br.com.conductor.heimdall.core.dto.PageDTO;
-import br.com.conductor.heimdall.core.dto.PageableDTO;
-import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
-import br.com.conductor.heimdall.core.dto.page.InterceptorPage;
-import br.com.conductor.heimdall.core.entity.Api;
-import br.com.conductor.heimdall.core.entity.Interceptor;
-import br.com.conductor.heimdall.core.entity.Middleware;
-import br.com.conductor.heimdall.core.entity.Operation;
-import br.com.conductor.heimdall.core.entity.Plan;
-import br.com.conductor.heimdall.core.entity.RateLimit;
-import br.com.conductor.heimdall.core.entity.Resource;
-import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
-import br.com.conductor.heimdall.core.enums.Status;
-import br.com.conductor.heimdall.core.enums.TypeInterceptor;
-import br.com.conductor.heimdall.core.exception.ExceptionMessage;
-import br.com.conductor.heimdall.core.exception.HeimdallException;
-import br.com.conductor.heimdall.core.repository.InterceptorRepository;
-import br.com.conductor.heimdall.core.repository.MiddlewareRepository;
-import br.com.conductor.heimdall.core.repository.OperationRepository;
-import br.com.conductor.heimdall.core.repository.PlanRepository;
-import br.com.conductor.heimdall.core.repository.RateLimitRepository;
-import br.com.conductor.heimdall.core.repository.ResourceRepository;
-import br.com.conductor.heimdall.core.service.amqp.AMQPInterceptorService;
-import br.com.conductor.heimdall.core.util.JsonUtils;
-import br.com.conductor.heimdall.core.util.Pageable;
-import br.com.conductor.heimdall.core.util.StringUtils;
-import br.com.conductor.heimdall.core.util.TemplateUtils;
-import br.com.twsoftware.alfred.object.Objeto;
-import lombok.extern.slf4j.Slf4j;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
+import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
+import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 
 /**
  * This class provides methos to create, read, update and delete a {@link Interceptor} resource.<br/>
@@ -106,6 +90,9 @@ public class InterceptorService {
 
     @Autowired
     private RateLimitRepository ratelimitRepository;
+
+    @Autowired
+    private AppRepository appRepository;
 
     @Autowired
     private AMQPInterceptorService amqpInterceptorService;
@@ -189,7 +176,12 @@ public class InterceptorService {
             mountRatelimitInRedis(interceptor);
         }
 
+        if (TypeInterceptor.OAUTH == interceptor.getType()) {
+            checkAppAndClientId(interceptor);
+        }
+
         interceptor = interceptorRepository.save(interceptor);
+
         if (TypeInterceptor.MIDDLEWARE.equals(interceptor.getType())) {
 
             Operation operation = operationRepository.findOne(interceptor.getReferenceId());
@@ -243,6 +235,10 @@ public class InterceptorService {
 
         if (TypeInterceptor.RATTING == interceptor.getType()) {
             mountRatelimitInRedis(interceptor);
+        }
+
+        if (TypeInterceptor.OAUTH == interceptor.getType()) {
+            checkAppAndClientId(interceptor);
         }
 
         interceptor = interceptorRepository.save(interceptor);
@@ -376,6 +372,34 @@ public class InterceptorService {
 
             Operation op = operationRepository.findOne(interceptor.getReferenceId());
             return op.getResource().getApi().getBasePath() + "-" + op.getResource().getName() + "-" + op.getPath();
+        }
+    }
+
+    /*
+     * When adding a OAuth Interceptor a privateKey is expected.
+     * This privateKey must be the ClientId from an App that is related to the Api via a Plan,
+     * if not throws an Exception.
+     */
+    private void checkAppAndClientId(Interceptor interceptor) {
+        try {
+            String content = interceptor.getContent();
+            OAuthDTO oAuthDTO = JsonUtils.convertJsonToObject(content, OAuthDTO.class);
+
+            final String privateKey = oAuthDTO.getPrivateKey();
+            App app = appRepository.findByClientId(privateKey);
+
+            HeimdallException.checkThrow(app == null, APP_NOT_EXIST);
+
+            final List<Plan> appPlans = app.getPlans();
+            final List<Plan> apiPlans = interceptor.getApi().getPlans();
+
+            Set<Plan> common = new HashSet<>(appPlans);
+            common.retainAll(apiPlans);
+
+            HeimdallException.checkThrow(common.size() == 0, INTERCEPTOR_NO_APP_FOUND);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+            ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(TypeInterceptor.OAUTH.name(), TemplateUtils.TEMPLATE_OAUTH);
         }
     }
 }

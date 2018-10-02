@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import com.netflix.zuul.context.RequestContext;
 import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
+import br.com.conductor.heimdall.core.enums.TypeOAuth;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.util.BeanManager;
 import br.com.conductor.heimdall.gateway.filter.helper.*;
@@ -14,6 +15,7 @@ import br.com.conductor.heimdall.gateway.service.OAuthInterceptorService;
 import br.com.conductor.heimdall.middleware.spec.*;
 import br.com.conductor.heimdall.middleware.spec.Helper;
 import br.com.conductor.heimdall.middleware.spec.Http;
+
 
 public class OAuthInterceptor extends HeimdallFilter {
 
@@ -85,7 +87,7 @@ public class OAuthInterceptor extends HeimdallFilter {
         oAuthInterceptorService = (OAuthInterceptorService) BeanManager.getBean(OAuthInterceptorService.class);
 
         try {
-            oAuthInterceptorService.executeInterceptor("{{typeOAuth}}", privateKey, timeAccessToken, timeRefreshToken, providerId, helper);
+            oAuthInterceptorService.executeInterceptor(TypeOAuth.{{typeOAuth}}, privateKey, timeAccessToken, timeRefreshToken, providerId, helper);
         } catch( HeimdallException ex ){
             generateResponse( ex.getMsgEnum().getMessage(), ex.getMsgEnum().getHttpCode());
         }
