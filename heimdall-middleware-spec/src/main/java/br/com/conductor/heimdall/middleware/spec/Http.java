@@ -110,6 +110,14 @@ public interface Http {
       * @return			A ApiResponse object
       */
      public ApiResponse sendDelete();
+     
+     /**
+     Sends a PATCH request to the Api and receives a {@link ApiResponse}.
+     * 
+     * @return			A ApiResponse object
+     * @author José Roberto <zeroberto>
+     */
+    public ApiResponse sendPatch();
 
     /**
      * Set RestTemplate custom object

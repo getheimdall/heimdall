@@ -29,6 +29,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -73,6 +74,7 @@ public class HttpImpl implements Http {
 		this.enableHandler = enableHandler;
 	}
 
+	@Override
 	public HttpImpl header(String name, String value) {
 
 		if (Objeto.notBlank(value)) {
@@ -83,6 +85,7 @@ public class HttpImpl implements Http {
 		return this;
 	}
 
+	@Override
 	public HttpImpl header(Map<String, String> params) {
 
 		params.forEach((key, value) -> {
@@ -93,6 +96,7 @@ public class HttpImpl implements Http {
 		return this;
 	}
 
+	@Override
 	public HttpImpl url(String url) {
 
 		uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(url);
@@ -100,6 +104,7 @@ public class HttpImpl implements Http {
 		return this;
 	}
 
+	@Override
 	public HttpImpl queryParam(String name, String value) {
 
 		if (Objeto.notBlank(value)) {
@@ -110,6 +115,7 @@ public class HttpImpl implements Http {
 		return this;
 	}
 
+	@Override
 	public HttpImpl body(Map<String, Object> params) {
 
 		if (headers.containsKey("Content-Type")
@@ -127,6 +133,7 @@ public class HttpImpl implements Http {
 		return this;
 	}
 
+	@Override
 	public HttpImpl body(String params) {
 
 		body = json.parse(params);
@@ -135,6 +142,7 @@ public class HttpImpl implements Http {
 
 	}
 
+	@Override
 	public ApiResponseImpl sendGet() {
 
 		ResponseEntity<String> entity;
@@ -156,6 +164,7 @@ public class HttpImpl implements Http {
 		return apiResponse;
 	}
 
+	@Override
 	public ApiResponseImpl sendPost() {
 
 		ResponseEntity<String> entity;
@@ -190,6 +199,7 @@ public class HttpImpl implements Http {
 		return apiResponse;
 	}
 
+	@Override
 	public ApiResponseImpl sendPut() {
 
 		ResponseEntity<String> entity;
@@ -220,6 +230,7 @@ public class HttpImpl implements Http {
 		return apiResponse;
 	}
 
+	@Override
 	public ApiResponseImpl sendDelete() {
 
 		ResponseEntity<String> entity;
@@ -240,21 +251,54 @@ public class HttpImpl implements Http {
 		return apiResponse;
 	}
 
-	private RestTemplate rest() {
-		if (this.restTemplate == null) {
+	@Override
+	public ApiResponseImpl sendPatch() {
 
-			this.restTemplate = new RestTemplate();
+		ResponseEntity<String> entity;
+
+		if (headers.isEmpty()) {
+			requestBody = new HttpEntity<>(body);
+			entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PATCH, requestBody,
+					String.class);
+		} else {
+			if (Objeto.notBlank(formData)) {
+				HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
+				entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PATCH, request,
+						String.class);
+			} else {
+				requestBody = new HttpEntity<>(body, headers);
+				entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PATCH, requestBody,
+						String.class);
+			}
 		}
 
-		if (enableHandler) {
-			this.restTemplate.setErrorHandler(new HeimdallResponseErrorHandler());			
-		}
-		return this.restTemplate;
+		ApiResponseImpl apiResponse = new ApiResponseImpl();
+		apiResponse.setHeaders(entity.getHeaders().toSingleValueMap());
+		apiResponse.setBody(entity.getBody());
+		apiResponse.setStatus(entity.getStatusCodeValue());
+
+		return apiResponse;
 	}
 
+	@Override
 	public RestTemplate clientProvider(RestTemplate restTemplate) {
 
 		this.restTemplate = restTemplate;
+		return this.restTemplate;
+	}
+
+	private RestTemplate rest() {
+		if (this.restTemplate == null) {
+			// Create a RestTemplate from an HttpComponentsClientHttpRequestFactory. This is
+			// required because the HttpURLConnection JDK does not support some Http
+			// methods, such as the PATCH method.
+			// For more details see the link https://jira.spring.io/browse/SPR-15347.
+			this.restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
+		}
+
+		if (enableHandler) {
+			this.restTemplate.setErrorHandler(new HeimdallResponseErrorHandler());
+		}
 		return this.restTemplate;
 	}
 
