@@ -9,22 +9,22 @@ import InterceptorForm from './InterceptorForm'
 const interceptorSpec = {
     beginDrag(props) {
         return {
-            name: props.name
+            name: props.name,
+            operationId: props.operationId,
+            resourceId: props.resourceId,
+            planId: props.planId,
+            environmentId: props.environmentId,
         }
     },
     endDrag(props, monitor, component) {
-        // const dragItem = monitor.getItem()
         const dropResult = monitor.getDropResult()
         const didDrop = monitor.didDrop()
         if (didDrop) {
-            component.setState({ ...component.state, showModal: true, executionPoint: dropResult.executionPoint })
+            component.setState({ ...component.state, showModal: true, executionPoint: dropResult.executionPoint, order: dropResult.sizeInterceptors })
         }
     },
-    canDrag(props, monitor) {
-        if (props.canAddInterceptor) {
-            return true
-        }
-        return false
+    canDrag(props) {
+        return !!props.canAddInterceptor;
     }
 }
 
@@ -37,7 +37,7 @@ let collect = (connect, monitor) => {
 
 class DnDInterceptorType extends Component {
 
-    state = { showModal: false, executionPoint: '' }
+    state = { showModal: false, executionPoint: '', order: 0 }
 
     handleSave = (e) => {
         this.interceptorForm.onSubmitForm()
@@ -95,6 +95,7 @@ class DnDInterceptorType extends Component {
                             operationId={this.props.operationId !== 0 && this.props.operationId}
                             executionPoint={this.state.executionPoint}
                             type={type}
+                            order={this.state.order}
                             handleForm={this.props.handleForm}
                             closeModal={this.closeModal}
                         />

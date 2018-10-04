@@ -163,8 +163,8 @@ class InterceptorForm extends Component {
                             <FormItem label="Order">
                                 {
                                     getFieldDecorator('order', {
-                                        initialValue: interceptor ? interceptor.order : 0
-                                    })(<InputNumber min={0} max={99} />)
+                                        initialValue: interceptor && interceptor.order ? interceptor.order : this.props.order
+                                    })(<InputNumber min={0} max={99} disabled/>)
                                 }
                             </FormItem>
                         </Col>
@@ -190,7 +190,8 @@ class InterceptorForm extends Component {
 InterceptorForm.propTypes = {
     fetching: PropTypes.bool,
     loading: PropTypes.bool,
-    plans: PropTypes.array.isRequired
+    plans: PropTypes.array.isRequired,
+    order: PropTypes.number,
 }
 
 InterceptorForm.defaultProps = {
