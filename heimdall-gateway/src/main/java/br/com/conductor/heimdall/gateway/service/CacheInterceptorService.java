@@ -31,7 +31,9 @@ import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static br.com.conductor.heimdall.core.util.ConstantsCache.CACHE_BUCKET;
 import static br.com.conductor.heimdall.core.util.ConstantsCache.CACHE_TIME_TO_LIVE;
@@ -79,22 +81,15 @@ public class CacheInterceptorService {
     /**
      * Clears a cache if it exists
      *
-     * @param cacheName   Cache name provided
-     * @param headers     List of headers that when present signal that the request should be cached
-     * @param queryParams List of queryParams that when present signal that the request should be cached
+     * @param cacheName Cache name provided
      */
-    public void cacheClearInterceptor(String cacheName, List<String> headers, List<String> queryParams) {
+    public void cacheClearInterceptor(String cacheName) {
 
         RedissonClient redisson = (RedissonClient) BeanManager.getBean(RedissonClient.class);
 
         RequestContext context = RequestContext.getCurrentContext();
 
-        if (shouldCache(context, headers, queryParams)) {
-            RBucket<ApiResponse> rBucket = redisson.getBucket(createCacheKey(context, cacheName, headers, queryParams));
-            if (rBucket.get() != null) {
-                rBucket.delete();
-            }
-        }
+        redisson.getKeys().deleteByPattern(createDeleteCacheKey(context, cacheName));
     }
 
     /*
@@ -126,9 +121,25 @@ public class CacheInterceptorService {
                 "headers" + headersBuilder.toString();
     }
 
+    private String createDeleteCacheKey(RequestContext context, String cacheName) {
+
+        String apiId = (String) context.get("api-id");
+        String apiName = (String) context.get("api-name");
+
+        return apiId + "-" + apiName + ":" +
+                cacheName + ":" +
+                context.getRequest().getRequestURL().toString() + "*";
+    }
+
     private boolean shouldCache(RequestContext context, List<String> headers, List<String> queryParams) {
-        return Collections.list(context.getRequest().getHeaderNames()).containsAll(headers) &&
-                Lists.newArrayList(context.getRequestQueryParams().keySet()).containsAll(queryParams);
+
+        Map<String, List<String>> requestQueryParams = (context.getRequestQueryParams() != null) ? context.getRequestQueryParams() : new HashMap<>();
+
+        boolean queries = Lists.newArrayList(requestQueryParams.keySet()).containsAll(queryParams);
+
+        boolean header = (context.getRequest().getHeaderNames() != null) && Collections.list(context.getRequest().getHeaderNames()).containsAll(headers);
+
+        return header && queries;
     }
 
 }

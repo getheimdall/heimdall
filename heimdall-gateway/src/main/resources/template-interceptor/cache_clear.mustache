@@ -26,10 +26,6 @@ public class CacheClearInterceptor extends ZuulFilter {
 
     private static String cacheName;
 
-    private static List<String> headers;
-
-    private static List<String> queryParams;
-
     private CacheInterceptorService cacheInterceptorService;
 
     private FilterDetail detail;
@@ -39,16 +35,6 @@ public class CacheClearInterceptor extends ZuulFilter {
         cacheName = "{{cache}}";
 
         method = "{{method}}";
-
-        headers = Lists.newArrayList();
-        {{#headers}}
-        headers.add("{{.}}");
-        {{/headers}}
-
-        queryParams = Lists.newArrayList();
-        {{#queryParams}}
-        queryParams.add("{{.}}");
-        {{/queryParams}}
 
         pathsAllowed = Sets.newHashSet();
         {{#pathsAllowed}}
@@ -96,7 +82,7 @@ public class CacheClearInterceptor extends ZuulFilter {
     private void process() {
         cacheInterceptorService = (CacheInterceptorService) BeanManager.getBean(CacheInterceptorService.class);
 
-        cacheInterceptorService.cacheClearInterceptor(cacheName, headers, queryParams);
+        cacheInterceptorService.cacheClearInterceptor(cacheName);
         return null;
     }
 
