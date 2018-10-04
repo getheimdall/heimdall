@@ -7,7 +7,8 @@ const Logo = ({history, collapsed}) => (
             height: 66,
             padding: '0 20px',
             lineHeight: '58px',
-            textAlign: 'center'
+            textAlign: 'center',
+            width: !collapsed ? '200px' : '80px'
         }}
         onClick={() => history.push('/')}
     >
