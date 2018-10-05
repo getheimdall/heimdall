@@ -121,16 +121,19 @@ public class CacheInterceptorService {
                 "headers" + headersBuilder.toString();
     }
 
+    /*
+     * Creates a cache key to delete the cache
+     */
     private String createDeleteCacheKey(RequestContext context, String cacheName) {
 
-        String apiId = (String) context.get("api-id");
-        String apiName = (String) context.get("api-name");
-
-        return apiId + "-" + apiName + ":" +
-                cacheName + ":" +
-                context.getRequest().getRequestURL().toString() + "*";
+        return context.get("api-id") + "-" +
+                context.get("api-name") + ":" +
+                cacheName + ":*";
     }
 
+    /*
+     * Defines if the cache should be written
+     */
     private boolean shouldCache(RequestContext context, List<String> headers, List<String> queryParams) {
 
         Map<String, List<String>> requestQueryParams = (context.getRequestQueryParams() != null) ? context.getRequestQueryParams() : new HashMap<>();
