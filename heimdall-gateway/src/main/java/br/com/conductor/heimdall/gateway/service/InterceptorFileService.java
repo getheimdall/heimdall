@@ -108,6 +108,8 @@ public class InterceptorFileService {
      */
     private HashMap<String, Object> buildParametersFile(Interceptor interceptor, File file) {
 
+        Long INVALID_REFERENCE_ID = -1L;
+
         if (Objeto.notBlank(file)) {
 
             HashMap<String, Object> parameters = new HashMap<>();
@@ -119,6 +121,12 @@ public class InterceptorFileService {
             parameters.put("name", StringUtils.concatCamelCase(interceptor.getLifeCycle().name(), interceptor.getType().name(), interceptor.getExecutionPoint().getFilterType(), interceptor.getId().toString()));
             parameters.put("zuulFilterRoot", zuulFilterRoot);
             parameters.put("path", createPath(interceptor));
+
+            if (interceptor.getPlan() != null)
+                parameters.put("referenceId", interceptor.getPlan().getId());
+            else
+                parameters.put("referenceId", INVALID_REFERENCE_ID);
+
             if (Objeto.notBlank(interceptor.getOperation())) {
 
                 parameters.put("method", interceptor.getOperation().getMethod().name());
