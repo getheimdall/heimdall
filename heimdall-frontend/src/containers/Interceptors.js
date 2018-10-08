@@ -24,9 +24,11 @@ class Interceptors extends Component {
 
     state = {
         environmentId: 0,
+        apiId: 0,
         planId: 0,
         resourceId: 0,
         operationId: 0,
+        apiSelected: true,
         planSelected: false,
         resourceSelected: false,
         operationSelected: false,
@@ -82,12 +84,14 @@ class Interceptors extends Component {
     }
 
     componentDidMount() {
-        const query = {'api.id': this.props.api.id, offset: 0}
+        const { id }  = this.props.api
+        const query = {'api.id': id, offset: 0}
+        this.setState({ ...this.state, apiId: id })
         this.props.dispatch(initLoading())
         this.props.dispatch(getAllInterceptors(query))
         this.props.dispatch(getAllInterceptorsTypes())
         this.props.dispatch(getAllPlans(query))
-        this.props.dispatch(getAllResourcesByApi(this.props.api.id))
+        this.props.dispatch(getAllResourcesByApi(id))
     }
 
     componentWillUnmount() {
@@ -265,6 +269,7 @@ class Interceptors extends Component {
         if (this.props.interceptors) {
             allInterceptors = interceptors.content
             allInterceptors = this.filterByLifeCycle(allInterceptors)
+            allInterceptors.concat(interceptors.content.filter(interceptor => interceptor.lifeCycle === 'API'))
 
             if (this.state.candidatesToSave.length > 0) {
                 allInterceptors = allInterceptors.concat(this.state.candidatesToSave)
@@ -323,7 +328,7 @@ class Interceptors extends Component {
 
         const hasNoChanges = this.state.candidatesToSave.length === 0 && this.state.candidatesToUpdate.length === 0 && this.state.candidatesToDelete.length === 0
         const canAddInterceptor =
-            (this.state.planSelected || this.state.resourceSelected || this.state.operationSelected)
+            (this.state.apiSelected || this.state.planSelected || this.state.resourceSelected || this.state.operationSelected)
             && (interceptorsPreFiltered && interceptorsPostFiltered)
             && (this.props.plans || !this.props.resources)
 
@@ -390,6 +395,7 @@ class Interceptors extends Component {
                               <Progress type="circle" percent={this.state.progress} width={30} status="active"
                                         style={{marginRight: 10}}/>}
                               <Tag color="#989898">Can Drag</Tag>
+                              <Tag color="#ffa613">API</Tag>
                               <Tag color="#c3cc93">Plan</Tag>
                               <Tag color="#8edce0">Resource</Tag>
                               <Tag color="#607d8b">Operation</Tag>
@@ -404,6 +410,7 @@ class Interceptors extends Component {
                                                     icon='code-o'
                                                     canAddInterceptor={canAddInterceptor}
                                                     color={canAddInterceptor && '#989898'}
+                                                    apiId={this.state.apiId !== 0 && this.state.apiId}
                                                     environmentId={this.state.environmentId !== 0 && this.state.environmentId}
                                                     planId={this.state.planId !== 0 && this.state.planId}
                                                     resourceId={this.state.resourceId !== 0 && this.state.resourceId}

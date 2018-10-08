@@ -90,6 +90,7 @@ class DnDInterceptorType extends Component {
                             onRef={ref => (this.interceptorForm = ref)}
                             interceptor={interceptor}
                             environmentId={this.props.environmentId !== 0 && this.props.environmentId}
+                            apiId={this.props.apiId !== 0 && this.props.apiId}
                             planId={this.props.planId !== 0 && this.props.planId}
                             resourceId={this.props.resourceId !== 0 && this.props.resourceId}
                             operationId={this.props.operationId !== 0 && this.props.operationId}

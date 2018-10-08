@@ -12,8 +12,9 @@ const ClientInterceptorsSpec = {
     drop(props, monitor) {
         let lifeCycle = ''
         const item = monitor.getItem()
-
-        if (item.operationId) {
+        if (item.apiId) {
+            lifeCycle = 'API'
+        } else if (item.operationId) {
             lifeCycle = 'OPERATION'
         } else if (item.resourceId) {
             lifeCycle = 'RESOURCE'
@@ -75,7 +76,9 @@ class DropClientInterceptors extends Component {
                     {!this.props.interceptors && <Loading />}
                     {this.props.interceptors && this.props.interceptors.map((interceptor, index) => {
                         let color
-                        if (interceptor.lifeCycle === 'PLAN') {
+                        if (interceptor.lifeCycle === 'API') {
+                            color = '#ffa613'
+                        } else if (interceptor.lifeCycle === 'PLAN') {
                             color = '#c3cc93'
                         } else if (interceptor.lifeCycle === 'RESOURCE') {
                             color = '#8edce0'

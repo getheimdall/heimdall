@@ -37,6 +37,19 @@ export const getTemplate = (type) => {
 
 export const interceptorSort = (first, second) => {
 
+    if (first.lifeCycle === 'API' && second.lifeCycle !== 'API') {
+        return -1
+    }
+
+    if (first.lifeCycle !== 'API' && second.lifeCycle === 'API') {
+        return 1
+    }
+
+    if (first.lifeCycle === 'API' && second.lifeCycle === 'API') {
+        if (first.order < second.order) return -1
+        if (first.order > second.order) return 1
+    }
+
     if (first.lifeCycle === 'PLAN' && second.lifeCycle !== 'PLAN') {
         return -1
     }
