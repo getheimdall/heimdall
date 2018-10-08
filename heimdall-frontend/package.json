@@ -11,6 +11,9 @@
     "cross-fetch": "^1.1.1",
     "css-animation": "^1.4.1",
     "dotenv": "^5.0.1",
+    "i18next": "^11.9.0",
+    "i18next-browser-languagedetector": "^2.2.3",
+    "less": "2.7.3",
     "moment": "^2.22.1",
     "nprogress": "^0.2.0",
     "prop-types": "^15.6.1",
@@ -33,7 +36,7 @@
     "redux": "^3.7.2",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
-    "less": "2.7.3"
+    "react-i18next": "latest"
   },
   "scripts": {
     "start": "react-app-rewired start",

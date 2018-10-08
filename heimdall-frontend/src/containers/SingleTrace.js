@@ -1,16 +1,15 @@
 //3rd's
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-
-// actions
-import { getTracer } from '../actions/traces';
-
+import ReactJson from 'react-json-view'
 //components
 import { Card, Row, notification, Form, Col, Tag } from 'antd'
-import PageHeader from '../components/ui/PageHeader'
-import ReactJson from 'react-json-view'
-import Loading from '../components/ui/Loading'
 
+// actions
+import i18n from "../i18n/i18n"
+import { getTracer } from '../actions/traces'
+import Loading from '../components/ui/Loading'
+import PageHeader from '../components/ui/PageHeader'
 //utils
 import ColorUtils from '../utils/ColorUtils'
 
@@ -35,7 +34,7 @@ class SingleTrace extends Component {
     }
 
     render() {
-        const title = "View trace"
+        const title = i18n.t('view_trace')
         const { trace } = this.props
 
         if (this.state.loadEntity && !trace) return <Loading />
@@ -60,7 +59,7 @@ class SingleTrace extends Component {
 
         return (
             <div>
-                <PageHeader title="Traces" icon="sync" />
+                <PageHeader title={i18n.t('trace')} icon="sync" />
                 <Row className="h-row bg-white">
                     <Card className="heimdall-card-extra"  title={title} extra={extraCard}>
                         <Form>

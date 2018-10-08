@@ -1,25 +1,21 @@
 //3rd's
 import React, {Component} from 'react'
-import {push} from 'connected-react-router';
+import {push} from 'connected-react-router'
 import {connect} from 'react-redux'
-
-// actions
-import {getApp, initLoading, clearApp, clearApps, update, save, remove} from '../actions/apps';
-import {
-    developerSource,
-    getDeveloperSourceByEmail,
-    clearDeveloperSource,
-    fetchingDeveloper
-} from '../actions/developers';
-import {getAllPlans, clearPlans} from '../actions/plans'
-
+import moment from 'moment'
 //components
 import {Card, Row} from 'antd'
-import PageHeader from '../components/ui/PageHeader'
+
+// actions
+import i18n from "../i18n/i18n"
+import {isEmpty} from '../utils/CommonUtils'
 import Loading from '../components/ui/Loading'
 import AppForm from '../components/apps/AppForm'
-import {isEmpty} from '../utils/CommonUtils'
-import moment from 'moment'
+import PageHeader from '../components/ui/PageHeader'
+import {getAllPlans, clearPlans} from '../actions/plans'
+import {getApp, initLoading, clearApp, clearApps, update, save, remove} from '../actions/apps'
+import {developerSource, getDeveloperSourceByEmail, clearDeveloperSource, fetchingDeveloper} from '../actions/developers'
+
 
 class SingleApp extends Component {
 
@@ -79,14 +75,14 @@ class SingleApp extends Component {
         const {app} = this.props
 
         if (this.state.loadEntity && !app) return <Loading/>
-        const title = app ? 'Edit' : 'Add'
+        const title = app ? i18n.t('edit') : i18n.t('add')
         const {developerSource} = this.props
 
         return (
             <div>
-                <PageHeader title="Apps" icon="appstore"/>
+                <PageHeader title={i18n.t('apps')} icon="appstore"/>
                 <Row className="h-row bg-white">
-                    <Card style={{width: '100%'}} title={title + ' App'}>
+                    <Card style={{width: '100%'}} title={title + ' ' + i18n.t('app')}>
                         <AppForm app={app}
                                  plans={this.props.plans}
                                  handleDelete={this.handleDelete}

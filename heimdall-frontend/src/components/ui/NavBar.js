@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-
+import { withI18n } from 'react-i18next'
 import { Menu, Icon, Row, Col, notification } from 'antd'
+
 import { logout, getUser } from '../../actions/auth'
 import { clearCaches, initLoading } from '../../actions/cache'
 
@@ -23,7 +24,17 @@ class NavBar extends Component {
     }
 
     handleClick = (e) => {
-        switch (e.key) {
+        const key = e.key
+        const { i18n } = this.props
+
+        if (key.indexOf('changeLang') === 0) {
+            const lgn = key.split(':')[1]
+            i18n.changeLanguage(lgn)
+            this.props.handleForceUpdate()
+            this.forceUpdate()
+        }
+
+        switch (key) {
             case 'logout':
                 this.props.logout()
                 break;
@@ -41,25 +52,35 @@ class NavBar extends Component {
     }
 
     render() {
+        const { i18n, t } = this.props
         return (
             <Row type="flex" justify="start">
                 <Col sm={24} md={24}>
                     <Menu id="top-bar-menu" mode="horizontal" theme="light" style={{ lineHeight: '62px' }} onClick={this.handleClick}>
                         <SubMenu title={<span><Icon type="info-circle-o" /></span>}>
-                            <MenuItemGroup title="Heimdall Project">
-                                <Menu.Item key="heimdall:2">Clear Cache</Menu.Item>
+                            <MenuItemGroup title={t('heimdall_project')}>
+                                <Menu.Item key="heimdall:2">{t('clear_cache')}</Menu.Item>
                                 {/* <Menu.Item key="heimdall:2">About</Menu.Item> */}
-                                <Menu.Item key="heimdall:4">License</Menu.Item>
+                                <Menu.Item key="heimdall:4">{t('license')}</Menu.Item>
                             </MenuItemGroup>
-                            <MenuItemGroup title="Developers">
+                            <MenuItemGroup title={t('developers')}>
                                 {/* <Menu.Item key="setting:3">API Reference</Menu.Item> */}
-                                <Menu.Item key="setting:4">Developer webpage</Menu.Item>
+                                <Menu.Item key="setting:4">{t('developer_web_page')}</Menu.Item>
                             </MenuItemGroup>
                         </SubMenu>
-
+                        <SubMenu title={<span><Icon type="flag" /></span>}>
+                            {
+                                i18n.languages.map(lng => {
+                                    if (lng === i18n.language) {
+                                        return <Menu.Item disabled key={`changeLang:${lng}`}>{lng}</Menu.Item>
+                                    }
+                                    return <Menu.Item key={`changeLang:${lng}`}>{lng}</Menu.Item>
+                                })
+                            }
+                        </SubMenu>
                         <SubMenu title={<span><Icon type="user" /> {this.props.user.username} </span>}>
                             {/* <Menu.Item key="heimdall:1">Edit profile</Menu.Item> */}
-                            <Menu.Item key="logout">Logout</Menu.Item>
+                            <Menu.Item key="logout">{t('sing_out')}</Menu.Item>
                         </SubMenu>
                     </Menu>
                 </Col>
@@ -84,4 +105,4 @@ const mapDispatchToProps = (dispatch) => {
     }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(NavBar)
+export default connect(mapStateToProps, mapDispatchToProps)(withI18n()(NavBar))

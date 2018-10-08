@@ -45,7 +45,7 @@ class DropClientInterceptors extends Component {
             <div>
                 <Row id="drop-client-interceptors" className="draggable-pane" style={style}>
                     <Row type="flex" justify="center">
-                        <sup className="ant-scroll-number ant-badge-count" style={{backgroundColor: 'grey', width: 100}}>{description}</sup>
+                        <sup className="ant-scroll-number ant-badge-count" style={{backgroundColor: 'grey', width: 100, textTransform: 'uppercase'}}>{description}</sup>
                     </Row>
                     {!this.props.interceptors && <Loading />}
                     {this.props.interceptors && this.props.interceptors.map((interceptor, index) => {

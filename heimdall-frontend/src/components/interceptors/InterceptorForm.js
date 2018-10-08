@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-
 import { Row, Form, Input, InputNumber, Col, Select } from 'antd'
+
+import i18n from "../../i18n/i18n"
 import { getTemplate } from '../../utils/InterceptorUtils'
 
 const FormItem = Form.Item
@@ -95,7 +96,7 @@ class InterceptorForm extends Component {
 
                     <Row gutter={24}>
                         <Col sm={24} md={12} >
-                            <FormItem label="Type">
+                            <FormItem label={i18n.t('type')}>
                                 {
                                     getFieldDecorator('type', {
                                         initialValue: type,
@@ -111,7 +112,7 @@ class InterceptorForm extends Component {
                             </FormItem>
                         </Col>
                         <Col sm={24} md={12} >
-                            <FormItem label="Execution Point">
+                            <FormItem label={i18n.t('execution_point')}>
                                 {
                                     getFieldDecorator('executionPoint', {
                                         initialValue: executionPoint,
@@ -123,19 +124,19 @@ class InterceptorForm extends Component {
                             </FormItem>
                         </Col>
                         <Col sm={24} md={24} >
-                            <FormItem label="Name">
+                            <FormItem label={i18n.t('name')}>
                                 {
                                     getFieldDecorator('name', {
                                         initialValue: interceptor && interceptor.name,
                                         rules: [
-                                            { required: true, message: 'Please define the name!' }
+                                            { required: true, message: i18n.t('please_define_name') }
                                         ]
                                     })(<Input required />)
                                 }
                             </FormItem>
                         </Col>
                         <Col sm={24} md={24} >
-                            <FormItem label="Description">
+                            <FormItem label={i18n.t('description')}>
                                 {
                                     getFieldDecorator('description', {
                                         initialValue: interceptor && interceptor.description
@@ -144,23 +145,23 @@ class InterceptorForm extends Component {
                             </FormItem>
                         </Col>
                         <Col sm={24} md={18}>
-                            <FormItem label="Life Cycle">
+                            <FormItem label={i18n.t('life_cycle')}>
                                 {
                                     getFieldDecorator('lifeCycle', {
                                         initialValue: interceptor ? interceptor.lifeCycle : lifeCycleInitial,
                                         rules: [
-                                            { required: true, message: 'Please select the life cycle!' }
+                                            { required: true, message: i18n.t('please_select_life_cycle') }
                                         ]
                                     })(<Select onChange={this.handleLifeCycle}>
-                                        {planId && <Select.Option value="PLAN">PLAN</Select.Option>}
-                                        {resourceId && <Select.Option value="RESOURCE">RESOURCE</Select.Option>}
-                                        {operationId && <Select.Option value="OPERATION">OPERATION</Select.Option>}
+                                        {planId && <Select.Option value="PLAN">{i18n.t('plan')}</Select.Option>}
+                                        {resourceId && <Select.Option value="RESOURCE">{i18n.t('resource')}</Select.Option>}
+                                        {operationId && <Select.Option value="OPERATION">{i18n.t('operation')}</Select.Option>}
                                     </Select>)
                                 }
                             </FormItem>
                         </Col>
                         <Col sm={24} md={6} >
-                            <FormItem label="Order">
+                            <FormItem label={i18n.t('order')}>
                                 {
                                     getFieldDecorator('order', {
                                         initialValue: interceptor ? interceptor.order : 0
@@ -169,12 +170,12 @@ class InterceptorForm extends Component {
                             </FormItem>
                         </Col>
                         {type !== 'LOG' && <Col sm={24} md={24} >
-                            <FormItem label="Content">
+                            <FormItem label={i18n.t('content')}>
                                 {
                                     getFieldDecorator('content', {
                                         initialValue: interceptor ? interceptor.content : this.formatContent(type),
                                         rules: [
-                                            { required: true, message: 'Please select the execution point!' }
+                                            { required: true, message: i18n.t('please_input_content') }
                                         ]
                                     })(<TextArea rows={6} required />)
                                 }

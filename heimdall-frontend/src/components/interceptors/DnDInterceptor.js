@@ -1,9 +1,10 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { DragSource } from 'react-dnd'
-import ItemTypes from '../../constants/items-types'
-
 import { Button, Badge, Modal, Tooltip, Icon } from 'antd'
+
+import i18n from "../../i18n/i18n"
+import ItemTypes from '../../constants/items-types'
 import InterceptorForm from './InterceptorForm'
 
 const interceptorSpec = {
@@ -64,7 +65,7 @@ class DnDInterceptor extends Component {
         return (
             connectDragSource(
                 <div className="draggable-interceptor">
-                    <Tooltip title='Drag out to remove'>
+                    <Tooltip title={i18n.t('drag_out_to_remove')}>
                         <Badge count={interceptor && interceptor.order} showZero style={{ background: '#ada56e3b', color: '#000' }}>
                             <div className="ant-btn ant-btn-circle ant-btn-lg ant-btn-icon-only" style={style}>
                                 <Icon type={icon} />
@@ -73,11 +74,11 @@ class DnDInterceptor extends Component {
                     </Tooltip>
                     <span>{type}</span>
 
-                    <Modal title="Add Resource"
+                    <Modal title={i18n.t('edit_interceptor')}
                         footer={[
-                            <Button id="cancelInterceptorModal" key="back" onClick={this.handleCancel}>Cancel</Button>,
+                            <Button id="cancelInterceptorModal" key="back" onClick={this.handleCancel}>{i18n.t('cancel')}</Button>,
                             <Button id="saveInterceptorModal" key="submit" type="primary" onClick={this.handleSave}>
-                                Save
+                                {i18n.t('save')}
                             </Button>
                         ]}
                         visible={this.state.showModal}

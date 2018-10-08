@@ -1,6 +1,8 @@
+import { push } from 'connected-react-router'
+
+import i18n from "../i18n/i18n"
 import { UserConstants } from '../constants/actions-types'
 import { userService } from '../services'
-import { push } from 'connected-react-router';
 
 export const initLoading = () => dispatch => {
     dispatch({ type: UserConstants.USER_LOADING })
@@ -40,14 +42,14 @@ export const sendNotification = notification => dispatch => {
 export const save = user => dispatch => {
     userService.save(user)
         .then(data => {
-            dispatch(sendNotification({ type: 'success', message: 'User saved' }))
+            dispatch(sendNotification({ type: 'success', message: i18n.t('user_saved') }))
             dispatch(push('/users'))
             dispatch(finishLoading())
         })
         .catch(error => {
             console.log(error)
             if (error.response && error.response.status === 400) {
-                dispatch(sendNotification({ type: 'error', message: 'error', description: error.response.data.message }))
+                dispatch(sendNotification({ type: 'error', message: i18n.t('error'), description: error.response.data.message }))
             }
             dispatch(finishLoading())
         })
@@ -57,13 +59,13 @@ export const update = user => dispatch => {
     userService.update(user)
         .then(data => {
             dispatch(getUser(user.id))
-            dispatch(sendNotification({ type: 'success', message: 'User updated' }))
+            dispatch(sendNotification({ type: 'success', message: i18n.t('user_updated') }))
             dispatch(finishLoading())
         })
         .catch(error => {
             console.log(error)
             if (error.response && error.response.status === 400) {
-                dispatch(sendNotification({ type: 'error', message: 'error', description: error.response.data.message }))
+                dispatch(sendNotification({ type: 'error', message: i18n.t('error'), description: error.response.data.message }))
             }
             dispatch(finishLoading())
         })
@@ -73,7 +75,7 @@ export const remove = userId => dispatch => {
     userService.remove(userId)
         .then(data => {
             dispatch(getAllUsers())
-            dispatch(sendNotification({ type: 'success', message: 'User removed' }))
+            dispatch(sendNotification({ type: 'success', message: i18n.t('user_removed') }))
         })
 }
 

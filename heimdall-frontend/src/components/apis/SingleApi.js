@@ -1,17 +1,16 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
-import { getApiById, updateApi, deleteApi, resetApiAction } from '../../actions/apis'
-import { getAllEnvironments, clearEnvironments } from '../../actions/environments'
-
-import PageHeader from '../ui/PageHeader' // best way?
 import { Card, Row, Tabs, Button, Icon } from 'antd'
 
+import { getApiById, updateApi, deleteApi, resetApiAction } from '../../actions/apis'
+import { getAllEnvironments, clearEnvironments } from '../../actions/environments'
+import PageHeader from '../ui/PageHeader' // best way?
+import i18n from "../../i18n/i18n"
 import ApiDefinition from './ApiDefinition'
 import Resources from '../../containers/Resources'
 import Interceptors from '../../containers/Interceptors'
 import Middlewares from '../../containers/Middlewares'
-
 import Loading from '../ui/Loading'
 
 const TabPane = Tabs.TabPane;
@@ -51,20 +50,20 @@ class SingleApi extends Component {
 
         return (
             <div className="joy">
-                <PageHeader title="APIs" icon="api" />
+                <PageHeader title={i18n.t('apis')} icon="api" />
                 <Row>
                     <Card style={{ width: '100%' }} title={api.name}>
                         <Tabs defaultActiveKey="1" className="resource-tour">
-                            <TabPane tab="Definitions" key="1">
+                            <TabPane tab={i18n.t('definitions')} key="1">
                                 <ApiDefinition api={api} environments={this.props.environments} history={this.props.history} submit={this.props.updateApi} deleteApi={this.props.deleteApi} />
                             </TabPane>
-                            <TabPane tab={<div role="tab" className="ant-tabs-tab resource">Resources</div>} key="2" >
+                            <TabPane tab={<div role="tab" className="ant-tabs-tab resource">{i18n.t('resources')}</div>} key="2" >
                                 <Resources api={api} />
                             </TabPane>
-                            <TabPane tab={<div role="tab" className="ant-tabs-tab interceptors">Interceptors</div>} key="3">
+                            <TabPane tab={<div role="tab" className="ant-tabs-tab interceptors">{i18n.t('interceptors')}</div>} key="3">
                                 <Interceptors api={api} />
                             </TabPane>
-                            <TabPane tab={<div role="tab" className="ant-tabs-tab middlewares">Middlewares</div>} key="4">
+                            <TabPane tab={<div role="tab" className="ant-tabs-tab middlewares">{i18n.t('middlewares')}</div>} key="4">
                                 <Middlewares api={api} />
                             </TabPane>
                         </Tabs>
@@ -72,7 +71,7 @@ class SingleApi extends Component {
                 </Row>
                 <Row className="h-row">
                     <Button type="primary" onClick={() => this.props.history.push('/apis')} >
-                        <Icon type="left" /> Back to APIs
+                        <Icon type="left" /> {i18n.t('back_to_apis')}
                     </Button>
                 </Row>
             </div>
