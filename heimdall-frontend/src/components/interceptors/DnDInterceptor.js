@@ -169,12 +169,12 @@ class DnDInterceptor extends Component {
             <div>
                 {
                     interceptor && interceptor.description &&
-                    (<span><b>Description: </b> {interceptor.description}<br/></span>)
+                    (<span><b>{i18n.t('description')}: </b> {interceptor.description}<br/></span>)
                 }
 
                 {
                     interceptor && interceptor.lifeCycle &&
-                    (<span><b>Life Cycle: </b> {interceptor.lifeCycle}<br/></span>)
+                    (<span><b>{i18n.t('life_cycle')}: </b> {interceptor.lifeCycle}<br/></span>)
                 }
                 <br/>
             </div>
@@ -190,37 +190,41 @@ class DnDInterceptor extends Component {
 
         return (
             connectDragSource(
-                <div className="draggable-interceptor">
-                    <Popover content={clickContent} title={interceptor && `Name: ${interceptor.name}`}
-                                    trigger="click"
-                                    visible={this.state.clicked} onVisibleChange={this.handleClickChange}>
-                            <div className="ant-btn ant-btn-circle ant-btn-lg ant-btn-icon-only" style={style}>
-                                <Icon type={icon}/>
-                            </div>
-                    </Popover>
-                    <span>{type}</span>
+                connectDropTarget(
+                    <div className="draggable-interceptor" style={styledIsOver}>
+                        <Popover content={clickContent} title={interceptor && `${i18n.t('name')}: ${interceptor.name}`}
+                                     trigger="click"
+                                     visible={this.state.clicked} onVisibleChange={this.handleClickChange}>
+                                <div className="ant-btn ant-btn-circle ant-btn-lg ant-btn-icon-only" style={style}>
+                                    <Icon type={icon}/>
+                                </div>
+                        </Popover>
+                        <span>{type}</span>
 
-                    <Modal title={i18n.t('edit_interceptor')}
-                        footer={[
-                            <Button id="cancelInterceptorModal" key="back" onClick={this.handleCancel}>{i18n.t('cancel')}</Button>,
-                            <Button id="saveInterceptorModal" key="submit" type="primary" onClick={this.handleSave}>
-                                {i18n.t('save')}
-                            </Button>
-                        ]}
-                        visible={this.state.showModal}
-                        onCancel={this.handleCancel}
-                        destroyOnClose >
-                        <InterceptorForm
-                            onRef={ref => (this.interceptorForm = ref)}
-                            interceptor={interceptor}
-                            type={type}
-                            order={interceptor.order}
-                            executionPoint={this.state.executionPoint}
-                            handleForm={this.props.handleForm}
-                            closeModal={this.closeModal}
-                        />
-                    </Modal>
-                </div>
+                        <Modal title={i18n.t('edit_interceptor')}
+                               footer={[
+                                   <Button id="cancelInterceptorModal" key="back"
+                                           onClick={this.handleCancel}>{i18n.t('cancel')}</Button>,
+                                   <Button id="saveInterceptorModal" key="submit" type="primary"
+                                           onClick={this.handleSave}>
+                                       {i18n.t('save')}
+                                   </Button>
+                               ]}
+                               visible={this.state.showModal}
+                               onCancel={this.handleCancel}
+                               destroyOnClose>
+                            <InterceptorForm
+                                onRef={ref => (this.interceptorForm = ref)}
+                                interceptor={interceptor}
+                                type={type}
+                                order={interceptor.order}
+                                executionPoint={interceptor.executionPoint}
+                                handleForm={this.props.handleForm}
+                                closeModal={this.closeModal}
+                            />
+                        </Modal>
+                    </div>
+                )
             )
         )
     }
