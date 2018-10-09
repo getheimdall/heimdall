@@ -30,6 +30,6 @@ package br.com.conductor.heimdall.core.enums;
  */
 public enum InterceptorLifeCycle {
 
-    PLAN, RESOURCE, OPERATION
+    API, PLAN, RESOURCE, OPERATION
 
 }

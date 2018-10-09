@@ -32,6 +32,8 @@ public class LifeCycleService {
 
 
         switch (interceptorLifeCycle) {
+            case API:
+                return true;
             case PLAN:
                 return validatePlan(pathsAllowed, pathsNotAllowed, inboundURL, req, referenceId);
             case OPERATION:
