@@ -251,7 +251,6 @@ class Interceptors extends Component {
         if (this.state.candidatesToSave.length > 0 || this.state.candidatesToUpdate.length > 0 || this.state.candidatesToDelete.length > 0){
             this.props.dispatch(initLoading())
         }
-        console.log(this.state.candidatesToSave)
         if (this.state.candidatesToSave.length > 0) this.props.dispatch(saveAll(this.state.candidatesToSave))
         if (this.state.candidatesToUpdate.length > 0) this.props.dispatch(updateAll(this.state.candidatesToUpdate))
         if (this.state.candidatesToDelete.length > 0) this.props.dispatch(removeAll(this.state.candidatesToDelete))
