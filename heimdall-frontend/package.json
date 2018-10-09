@@ -14,6 +14,7 @@
     "i18next": "^11.9.0",
     "i18next-browser-languagedetector": "^2.2.3",
     "less": "2.7.3",
+    "lodash.flow": "^3.5.0",
     "moment": "^2.22.1",
     "nprogress": "^0.2.0",
     "prop-types": "^15.6.1",

@@ -6,11 +6,25 @@ import { Row } from 'antd'
 
 import DnDInterceptor from './DnDInterceptor'
 import Loading from '../ui/Loading';
+import {changeOrder} from "../../utils/OrderInterceptorsUtisl";
 
 const ClientInterceptorsSpec = {
-    drop(props) {
+    drop(props, monitor) {
+        let lifeCycle = ''
+        const item = monitor.getItem()
+
+        if (item.operationId) {
+            lifeCycle = 'OPERATION'
+        } else if (item.resourceId) {
+            lifeCycle = 'RESOURCE'
+        } else if (item.planId) {
+            lifeCycle = 'PLAN'
+        } else {
+            lifeCycle = 'ENVIRONMENT'
+        }
         return {
-            executionPoint: props.executionPoint
+            executionPoint: props.executionPoint,
+            sizeInterceptors: props.interceptors.filter(i => i.lifeCycle === lifeCycle).length
         }
     }
 }
@@ -24,6 +38,17 @@ let collect = (connect, monitor) => {
 }
 
 class DropClientInterceptors extends Component {
+
+    moveInterceptors = (dragIndex, newIndex, lifeCycleDrag, referenceDrag) => {
+        const { interceptors } = this.props
+        if (interceptors){
+            let newOrderInterceptors = changeOrder(dragIndex, newIndex, interceptors.filter(i => i.lifeCycle === lifeCycleDrag && i.referenceId === referenceDrag))
+
+            newOrderInterceptors.forEach(interceptor => {
+                this.props.handleForm(interceptor)
+            })
+        }
+    }
 
     render() {
         const { canDrop, isOver, connectDropTarget, description } = this.props;
@@ -63,6 +88,8 @@ class DropClientInterceptors extends Component {
                             icon='code-o'
                             color={color}
                             interceptor={interceptor}
+                            order={interceptor.order ? interceptor.order : this.props.interceptors.length}
+                            moveInterceptors={this.moveInterceptors}
                             handleForm={this.props.handleForm}
                             handleDelete={this.props.handleDelete}
                         />

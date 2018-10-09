@@ -231,6 +231,8 @@ public class InterceptorService {
 
         interceptor = validateLifeCycle(interceptor);
 
+        validateTemplate(interceptor.getType(), interceptor.getContent());
+
         if (TypeInterceptor.RATTING == interceptor.getType()) {
             mountRatelimitInRedis(interceptor);
         }
