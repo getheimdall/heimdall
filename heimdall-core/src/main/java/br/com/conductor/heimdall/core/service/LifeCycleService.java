@@ -1,3 +1,22 @@
+/*-
+ * =========================LICENSE_START==================================
+ * heimdall-core
+ * ========================================================================
+ * Copyright (C) 2018 Conductor Tecnologia SA
+ * ========================================================================
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ==========================LICENSE_END===================================
+ */
 package br.com.conductor.heimdall.core.service;
 
 import br.com.conductor.heimdall.core.entity.App;
@@ -14,6 +33,11 @@ import org.springframework.util.PathMatcher;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Set;
 
+/**
+ * Provides the validation for each of the Interceptor Life Cycles.
+ *
+ * @author Marcelo Aguiar Rodrigues
+ */
 @Service
 public class LifeCycleService {
 
@@ -33,7 +57,7 @@ public class LifeCycleService {
 
         switch (interceptorLifeCycle) {
             case API:
-                return true;
+                return validateApi(pathsAllowed, pathsNotAllowed, inboundURL, req);
             case PLAN:
                 return validatePlan(pathsAllowed, pathsNotAllowed, inboundURL, req, referenceId);
             case OPERATION:
@@ -44,6 +68,27 @@ public class LifeCycleService {
                 return false;
         }
 
+    }
+
+    private boolean validateApi(Set<String> pathsAllowed, Set<String> pathsNotAllowed, String inboundURL, HttpServletRequest req) {
+        if ((inboundURL != null && !inboundURL.isEmpty()) &&
+                !isHostValidToInboundURL(req, inboundURL)) {
+            return false;
+        }
+
+        if (listContainURI(req.getRequestURI(), pathsNotAllowed)) {
+            return false;
+        }
+
+        if (pathsAllowed != null) {
+
+            for (String path : pathsAllowed) {
+
+                if (req.getRequestURI().contains(path)) return true;
+            }
+        }
+
+        return false;
     }
 
     private boolean validatePlan(Set<String> pathsAllowed, Set<String> pathsNotAllowed, String inboundURL, HttpServletRequest req, Long referenceId) {
