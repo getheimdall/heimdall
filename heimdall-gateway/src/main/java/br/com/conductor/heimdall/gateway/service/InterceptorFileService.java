@@ -122,8 +122,8 @@ public class InterceptorFileService {
             parameters.put("zuulFilterRoot", zuulFilterRoot);
             parameters.put("path", createPath(interceptor));
 
-            if (interceptor.getPlan() != null)
-                parameters.put("referenceId", interceptor.getPlan().getId());
+            if (interceptor.getReferenceId() != null)
+                parameters.put("referenceId", interceptor.getReferenceId());
             else
                 parameters.put("referenceId", INVALID_REFERENCE_ID);
 
