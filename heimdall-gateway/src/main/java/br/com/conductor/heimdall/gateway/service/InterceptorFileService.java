@@ -207,14 +207,17 @@ public class InterceptorFileService {
 
         Integer prefixOrder = 0;
         switch (lifeCycle) {
-            case PLAN:
+            case API:
                 prefixOrder = 1;
                 break;
-            case RESOURCE:
+            case PLAN:
                 prefixOrder = 2;
                 break;
-            case OPERATION:
+            case RESOURCE:
                 prefixOrder = 3;
+                break;
+            case OPERATION:
+                prefixOrder = 4;
                 break;
             default:
                 break;
@@ -303,6 +306,9 @@ public class InterceptorFileService {
                     InterceptorLifeCycle lifeCycle = interceptor.getLifeCycle();
                     List<Interceptor> interceptors = Lists.newArrayList();
                     switch (lifeCycle) {
+                        case API:
+                            interceptors = interceptorRepository.findByTypeAndApiId(TypeInterceptor.CLIENT_ID, interceptor.getApi().getId());
+                            break;
                         case PLAN:
                             interceptors = interceptorRepository.findByTypeAndPlanId(TypeInterceptor.CLIENT_ID, interceptor.getPlan().getId());
                             break;
