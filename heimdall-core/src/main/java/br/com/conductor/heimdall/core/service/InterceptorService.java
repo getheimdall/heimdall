@@ -315,6 +315,7 @@ public class InterceptorService {
                 interceptor.setOperation(null);
                 interceptor.setPlan(null);
                 interceptor.setApi(api);
+                break;
             case PLAN:
                 Plan plan = planRepository.findOne(interceptor.getReferenceId());
                 HeimdallException.checkThrow(isBlank(plan), INTERCEPTOR_REFERENCE_NOT_FOUND);

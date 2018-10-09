@@ -181,6 +181,7 @@ class Interceptors extends Component {
     }
 
     handleSelectChange = (type) => (value) => {
+        const { planSelected, resourceSelected, operationSelected } = this.state
         switch (type) {
             case 'ENV':
                 //dispatch ENV interceptors
@@ -189,22 +190,17 @@ class Interceptors extends Component {
             case 'PLAN':
                 //dispatch PLAN interceptors
                 if (value === 0) {
+                    const apiSelectedResult = !operationSelected && !resourceSelected
                     this.setState({
                         ...this.state,
                         planSelected: false,
                         planId: value,
-                        resourceSelected: false,
-                        resourceId: 0,
-                        operationSelected: false,
-                        operationId: 0
+                        apiSelected: apiSelectedResult
                     })
                 } else {
                     this.setState({
                         ...this.state, planSelected: true, planId: value,
-                        resourceSelected: false,
-                        resourceId: 0,
-                        operationSelected: false,
-                        operationId: 0
+                        apiSelected: false
                     })
                 }
                 break;
@@ -212,17 +208,19 @@ class Interceptors extends Component {
                 //dispatch RESOURCES interceptors
                 this.props.dispatch(clearOperations())
                 if (value === 0) {
+                    const apiSelectedResult = !planSelected
                     this.setState({
                         ...this.state,
                         resourceSelected: false,
                         resourceId: value,
                         operationSelected: false,
-                        operationId: 0
+                        operationId: 0,
+                        apiSelected: apiSelectedResult
                     })
                 } else {
                     this.setState({
                         ...this.state, resourceSelected: true, resourceId: value, operationSelected: false,
-                        operationId: 0
+                        operationId: 0, apiSelected: false
                     })
                     this.props.dispatch(getAllOperations(this.props.api.id, value))
                 }
@@ -253,7 +251,7 @@ class Interceptors extends Component {
         if (this.state.candidatesToSave.length > 0 || this.state.candidatesToUpdate.length > 0 || this.state.candidatesToDelete.length > 0){
             this.props.dispatch(initLoading())
         }
-
+        console.log(this.state.candidatesToSave)
         if (this.state.candidatesToSave.length > 0) this.props.dispatch(saveAll(this.state.candidatesToSave))
         if (this.state.candidatesToUpdate.length > 0) this.props.dispatch(updateAll(this.state.candidatesToUpdate))
         if (this.state.candidatesToDelete.length > 0) this.props.dispatch(removeAll(this.state.candidatesToDelete))
