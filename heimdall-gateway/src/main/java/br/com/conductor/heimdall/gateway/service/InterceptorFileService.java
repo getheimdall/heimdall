@@ -108,6 +108,8 @@ public class InterceptorFileService {
      */
     private HashMap<String, Object> buildParametersFile(Interceptor interceptor, File file) {
 
+        Long INVALID_REFERENCE_ID = -1L;
+
         if (Objeto.notBlank(file)) {
 
             HashMap<String, Object> parameters = new HashMap<>();
@@ -119,6 +121,12 @@ public class InterceptorFileService {
             parameters.put("name", StringUtils.concatCamelCase(interceptor.getLifeCycle().name(), interceptor.getType().name(), interceptor.getExecutionPoint().getFilterType(), interceptor.getId().toString()));
             parameters.put("zuulFilterRoot", zuulFilterRoot);
             parameters.put("path", createPath(interceptor));
+
+            if (interceptor.getReferenceId() != null)
+                parameters.put("referenceId", interceptor.getReferenceId());
+            else
+                parameters.put("referenceId", INVALID_REFERENCE_ID);
+
             if (Objeto.notBlank(interceptor.getOperation())) {
 
                 parameters.put("method", interceptor.getOperation().getMethod().name());
@@ -223,6 +231,9 @@ public class InterceptorFileService {
 
         Set<String> patterns = Sets.newHashSet();
         switch (interceptor.getLifeCycle()) {
+            case API:
+                patterns = Sets.newHashSet(interceptor.getApi().getBasePath());
+                break;
             case PLAN:
                 patterns = Sets.newHashSet(interceptor.getPlan().getApi().getBasePath());
                 break;
@@ -358,19 +369,29 @@ public class InterceptorFileService {
      */
     private String createPath(Interceptor interceptor) {
 
-        if (InterceptorLifeCycle.PLAN == interceptor.getLifeCycle()) {
+        String path =  "";
 
-            return interceptor.getPlan().getApi().getBasePath();
+        switch (interceptor.getLifeCycle()) {
+            case API: {
+                path = interceptor.getApi().getBasePath();
+                break;
+            }
+            case PLAN: {
+                path = interceptor.getPlan().getApi().getBasePath();
+                break;
+            }
 
-        } else if (InterceptorLifeCycle.RESOURCE == interceptor.getLifeCycle()) {
-
-            return interceptor.getResource().getApi().getBasePath() + "-" + interceptor.getResource().getName();
-
-        } else {
-
-            return interceptor.getOperation().getResource().getApi().getBasePath() + "-" +
-                    interceptor.getOperation().getResource().getName() + "-" +
-                    interceptor.getOperation().getPath();
+            case RESOURCE: {
+                path = interceptor.getResource().getApi().getBasePath() + "-" + interceptor.getResource().getName();
+                break;
+            }
+            case OPERATION: {
+                path = interceptor.getOperation().getResource().getApi().getBasePath() + "-" +
+                        interceptor.getOperation().getResource().getName() + "-" +
+                        interceptor.getOperation().getPath();
+                break;
+            }
         }
+        return path;
     }
 }
