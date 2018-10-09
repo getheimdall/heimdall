@@ -19,12 +19,13 @@ heimdall:
 
 zuul:
     #servletPath: /
+    ignoredPatterns: /manager/**
     include-debug-header: false
     debug: 
         parameter: debug
-        request: true
+        request: false
     filter: 
-        interval: 5
+        interval: 8
     host: 
         socket-timeout-millis: 40000
         connect-timeout-millis: 40000        

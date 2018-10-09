@@ -33,7 +33,6 @@ const getEnvironment = (idEnvironment) => {
 }
 
 const save = (environment) => {
-    console.log(JSON.stringify(environment))
     return HTTPv1.post('/environments', JSON.stringify(environment))
     .then(res => Promise.resolve(res.data))
     .catch(error => {

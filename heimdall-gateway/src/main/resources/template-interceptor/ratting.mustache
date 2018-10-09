@@ -79,7 +79,7 @@ public class RateLimitInterceptor extends HeimdallFilter {
           redisson = (RedissonClient) BeanManager.getBean(RedissonClient.class);
           RequestContext ctx = RequestContext.getCurrentContext();
           
-          RLock lock = redisson.getLock({{name}});
+          RLock lock = redisson.getLock("{{name}}");
           lock.lock();
 
           RateLimit rate = repository.find("{{path}}");

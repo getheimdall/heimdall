@@ -21,23 +21,24 @@ package br.com.conductor.heimdall.gateway.configuration;
  * ==========================LICENSE_END===================================
  */
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.cloud.netflix.zuul.web.ZuulController;
 import org.springframework.cloud.netflix.zuul.web.ZuulHandlerMapping;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
- * Extends {@link ZuulHandlerMapping} to add a dirty checking.
+ * Extends {@link ZuulHandlerMapping} to register the routes at the application start.
  *
  * @author Marcos Filho
+ * @author Marcelo Aguiar Rodrigues
  *
  */
 public class HeimdallHandlerMapping extends ZuulHandlerMapping {
 
-     private volatile boolean dirty = true;
-
      private final ZuulController zuul;
+
+     private volatile boolean dirty = true;
 
      public HeimdallHandlerMapping(RouteLocator routeLocator, ZuulController zuul) {
 
@@ -49,8 +50,12 @@ public class HeimdallHandlerMapping extends ZuulHandlerMapping {
      protected Object lookupHandler(String urlPath, HttpServletRequest request) throws Exception {
 
           if (this.dirty) {
-               registerHandler("/**", this.zuul);
-               setDirty(false);
+               synchronized (this) {
+                    if (this.dirty) {
+                         registerHandler("/**", this.zuul);
+                         setDirty(false);
+                    }
+               }
           }
           return super.lookupHandler(urlPath, request);
      }
@@ -59,6 +64,10 @@ public class HeimdallHandlerMapping extends ZuulHandlerMapping {
 
           this.dirty = dirty;
           super.setDirty(false);
+     }
+
+     public void initHandlers() {
+         registerHandler("/**", this.zuul);
      }
 
 }

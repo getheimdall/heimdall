@@ -1,6 +1,26 @@
 
 package br.com.conductor.heimdall.gateway.filter;
 
+/*-
+ * =========================LICENSE_START==================================
+ * heimdall-gateway
+ * ========================================================================
+ * Copyright (C) 2018 Conductor Tecnologia SA
+ * ========================================================================
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ==========================LICENSE_END===================================
+ */
+
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Environment;
 import br.com.conductor.heimdall.core.entity.Operation;
@@ -33,8 +53,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.REQUEST_URI_KEY;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -95,6 +114,7 @@ public class HeimdallDecorationFilterTest {
         Resource res = new Resource();
         res.setId(88L);
         res.setApi(api);
+        api.setName("apiName");
 
         Environment environment = new Environment();
         environment.setInboundURL("http://localhost");
@@ -132,6 +152,7 @@ public class HeimdallDecorationFilterTest {
         Api api = new Api();
         api.setId(10L);
         api.setBasePath("/path");
+        api.setName("apiName");
 
         Resource res = new Resource();
         res.setId(88L);
@@ -162,7 +183,7 @@ public class HeimdallDecorationFilterTest {
         this.filter.run();
 
         assertEquals("/api/foo", this.ctx.get(REQUEST_URI_KEY));
-        assertEquals(true, this.ctx.sendZuulResponse());
+        assertTrue(this.ctx.sendZuulResponse());
     }
 
     @Test
@@ -189,7 +210,7 @@ public class HeimdallDecorationFilterTest {
 
         this.filter.run();
 
-        assertEquals(false, this.ctx.sendZuulResponse());
+        assertFalse(this.ctx.sendZuulResponse());
         assertEquals(HttpStatus.METHOD_NOT_ALLOWED.value(), this.ctx.getResponseStatusCode());
         assertEquals(HttpStatus.METHOD_NOT_ALLOWED.getReasonPhrase(), this.ctx.getResponseBody());
     }
@@ -204,6 +225,7 @@ public class HeimdallDecorationFilterTest {
         Api api = new Api();
         api.setId(10L);
         api.setBasePath("/v2");
+        api.setName("apiName");
 
         Resource resource = new Resource();
         resource.setId(88L);
@@ -233,6 +255,7 @@ public class HeimdallDecorationFilterTest {
         Api api = new Api();
         api.setId(10L);
         api.setBasePath("/v2");
+        api.setName("apiName");
 
         Resource resource = new Resource();
         resource.setId(88L);

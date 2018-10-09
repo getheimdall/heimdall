@@ -17,7 +17,6 @@ class NewApiOverview extends Component {
     onSubmitOverview() {
         this.props.form.validateFieldsAndScroll((err, payload) => {
             if (!err) {
-                console.log(payload)
                 if (payload.environments) {
                     payload.environments = payload.environments.map((env) => ({ id: env }))
                 }

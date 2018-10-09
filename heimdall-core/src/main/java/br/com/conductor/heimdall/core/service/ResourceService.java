@@ -28,6 +28,10 @@ import static br.com.twsoftware.alfred.object.Objeto.notBlank;
 
 import java.util.List;
 
+import br.com.conductor.heimdall.core.entity.Interceptor;
+import br.com.conductor.heimdall.core.entity.Operation;
+import br.com.conductor.heimdall.core.repository.InterceptorRepository;
+import br.com.conductor.heimdall.core.repository.OperationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -54,6 +58,7 @@ import br.com.conductor.heimdall.core.util.Pageable;
  * This class provides methos to create, read, update and delete a {@link Resource} resource.
  * 
  * @author Filipe Germano
+ * @author Marcelo Aguiar Rodrigues
  *
  */
 @Service
@@ -64,6 +69,18 @@ public class ResourceService {
 
      @Autowired
      private ApiRepository apiRepository;
+
+     @Autowired
+     private OperationRepository operationRepository;
+
+     @Autowired
+     private InterceptorRepository interceptorRepository;
+
+     @Autowired
+     private OperationService operationService;
+
+     @Autowired
+     private InterceptorService interceptorService;
      
      @Autowired
      private AMQPRouteService amqpRoute;
@@ -201,6 +218,14 @@ public class ResourceService {
 
           Resource resource = resourceRepository.findByApiIdAndId(apiId, resourceId);
           HeimdallException.checkThrow(isBlank(resource), GLOBAL_RESOURCE_NOT_FOUND);
+
+          // Deletes all operations attached to the Resource
+          List<Operation> operations = operationRepository.findByResourceId(resourceId);
+          operations.forEach(operation -> operationService.delete(apiId, resourceId, operation.getId()));
+
+          // Deletes all interceptors attached to the Resource
+          List<Interceptor> interceptors = interceptorRepository.findByResourceId(resourceId);
+          interceptors.forEach(interceptor -> interceptorService.delete(interceptor.getId()));
           
           resourceRepository.delete(resource.getId());
           

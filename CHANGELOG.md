@@ -1,8 +1,41 @@
 # Heimdall Changelog
 
-### v1.4.1
-
+### v1.6.5-stable 
 * **Bugfix**
+
+   * Fixing the middleware registration when a new middleware are added to a new api [Pull Request #120](https://github.com/getheimdall/heimdall/pull/120)
+   * Updating changelogs
+
+### v1.6.3-stable 
+* **Bugfix**
+
+    * Changing the mongo appender to async, sync appender generating problems when the mongo off [Pull Request #117](https://github.com/getheimdall/heimdall/pull/117)
+    * Removing cloud config health check 
+
+### v1.6.1-stable
+* **Bugfix**
+	
+    * Rollback the spring cloud dependency to tracking some possible thread leak from middlewares;
+
+### v1.6.0-stable
+
+* **Feature**
+
+    * Adding cache interceptor [Pull Request #109](https://github.com/getheimdall/heimdall/pull/109);
+* **Bugfix**	
+
+    * Fix middleware listing when using paging [Pull Request #108](https://github.com/getheimdall/heimdall/pull/108); 
+    * Fix rate limit interceptor, wasn't working correctly [Pull Request #111](https://github.com/getheimdall/heimdall/pull/111);
+    * Fix client id interceptor validation [Pull Request #110](https://github.com/getheimdall/heimdall/pull/110); 
+
+### v1.5.0-stable
+
+* **Feature**
+
+    * Adding feature to download Middleware file [Pull Request #105](https://github.com/getheimdall/heimdall/pull/105)
+    
+* **Bugfix**
+
     * The class path loader when adding a new middleware had some issues that in some circumstances could cause the new middleware to not be loaded. [Pull Request #96](https://github.com/getheimdall/heimdall/pull/96)
 
 ### v1.4.0-stable
