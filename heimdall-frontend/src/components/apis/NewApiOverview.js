@@ -74,8 +74,8 @@ class NewApiOverview extends Component {
                                 <FormItem label={i18n.t('base_path')}>
                                     {
                                         getFieldDecorator('basePath', {
-                                            rules: [{ required: true, message: i18n.t('please_input_your_api_base_path') }]
-                                        })(<Input placeholder={'/' + i18n.t('base_path')} />)
+                                            rules: [{ required: true, message: 'Please input your api base path!' }]
+                                        })(<Input addonBefore={"/"} placeholder={i18n.t('base_path')} />)
                                     }
                                 </FormItem>
                             </Col>

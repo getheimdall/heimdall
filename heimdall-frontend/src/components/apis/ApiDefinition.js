@@ -106,9 +106,9 @@ class ApiDefinition extends Component {
                                     <FormItem label={i18n.t('base_path')}>
                                         {
                                             getFieldDecorator('basePath', {
-                                                initialValue: api.basePath,
+                                                initialValue: api.basePath.replace("/", ""),
                                                 rules: [{ required: true, message: i18n.t('please_input_your_api_base_path') }]
-                                            })(<Input />)
+                                            })(<Input addonBefore={"/"}/>)
                                         }
                                     </FormItem>
                                 </Col>

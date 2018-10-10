@@ -69,7 +69,7 @@ class OperationForm extends Component {
                                     getFieldDecorator('path', {
                                         initialValue: this.props.operation && this.props.operation.path,
                                         rules: [{ required: true, message: i18n.t('please_input_operation_path') }]
-                                    })(<Input required />)
+                                    })(<Input addonBefore={this.props.apiBasepath + "/"} required />)
                                 }
                             </FormItem>
                         </Col>
@@ -91,7 +91,8 @@ class OperationForm extends Component {
 
 OperationForm.propTypes = {
     idApi: PropTypes.number.isRequired,
-    idResource: PropTypes.number.isRequired
+    idResource: PropTypes.number.isRequired,
+    apiBasepath: PropTypes.number.isRequired
 }
 
 const mapStateToProps = state => {

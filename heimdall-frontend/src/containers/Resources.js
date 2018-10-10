@@ -134,7 +134,7 @@ class Resources extends Component {
                                     </ButtonGroup>
                                 </Row>
                             } extraWidth={10}>
-                                <Operations idResource={resource.id} idApi={api.id} />
+                                <Operations idResource={resource.id} idApi={api.id} apiBasepath={api.basePath} />
                             </HeimdallPanel>
                         )
                     })}
