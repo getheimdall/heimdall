@@ -109,7 +109,7 @@ class Operations extends Component {
                 visible={this.state.visibleModal}
                 onCancel={this.handleCancel}
                 destroyOnClose >
-                <OperationForm onRef={ref => (this.operationForm = ref)} onSubmit={this.submitPayload} operationId={this.state.operationSelected} idApi={this.props.idApi} idResource={this.props.idResource} />
+                <OperationForm onRef={ref => (this.operationForm = ref)} onSubmit={this.submitPayload} operationId={this.state.operationSelected} idApi={this.props.idApi} idResource={this.props.idResource} apiBasepath={this.props.apiBasepath}/>
             </Modal>
 
         if (operations && operations.length === 0) {
@@ -186,7 +186,8 @@ class Operations extends Component {
 
 Operations.propType = {
     idApi: PropTypes.number.isRequired,
-    idResource: PropTypes.number.isRequired
+    idResource: PropTypes.number.isRequired,
+    apiBasepath: PropTypes.number.isRequired
 }
 
 const mapStateToProps = state => {
