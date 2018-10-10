@@ -1,5 +1,5 @@
 
-package br.com.conductor.heimdall.core.util;
+package br.com.conductor.heimdall.core.interceptor.impl;
 
 /*-
  * =========================LICENSE_START==================================
@@ -10,9 +10,9 @@ package br.com.conductor.heimdall.core.util;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,21 +21,31 @@ package br.com.conductor.heimdall.core.util;
  * ==========================LICENSE_END===================================
  */
 
+import br.com.conductor.heimdall.core.entity.Interceptor;
+import br.com.conductor.heimdall.core.enums.TypeExecutionPoint;
+import br.com.conductor.heimdall.core.interceptor.HeimdallInterceptor;
+
+import java.util.HashMap;
+
 /**
- * This class holds the global interceptor constants.
+ * Implementation of the HeimdallInterceptor to type Identifier.
  *
- * @author Filipe Germano
- * @author Marcos Filho
  * @author Marcelo Aguiar Rodrigues
  *
  */
-public class ConstantsInterceptors {
+public class IdentifierHeimdallInterceptor implements HeimdallInterceptor {
+    @Override
+    public String getFile(TypeExecutionPoint typeExecutionPoint) {
+        return "identifier.mustache";
+    }
 
-     public static final String GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND = "Could not find a required %s or it is not valid";
+    @Override
+    public Object parseContent(String content) {
+        return "";
+    }
 
-     public static final String GLOBAL_MOCK_INTERCEPTOR_LOCALIZED = "Localized mock interceptor";
-     
-     public static final String GLOBAL_ACCESS_NOT_ALLOWED_API = "Access not allowed for this API";
-
-     public static final String IDENTIFIER_ID = "identifier_id";
+    @Override
+    public HashMap<String, Object> buildParameters(Object objectCustom, HashMap<String, Object> parameters, Interceptor interceptor) {
+        return parameters;
+    }
 }
