@@ -47,7 +47,6 @@ public class CacheService {
       */
      public List<String> list() {
           
-//          List<String> cacheNames = Lists.newArrayList(cacheManager.getCacheNames());
           List<String> cacheNames = new ArrayList<>(cacheManager.getCacheNames());
           
           return cacheNames;

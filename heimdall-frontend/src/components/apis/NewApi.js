@@ -87,8 +87,8 @@ class NewApi extends Component {
 
                 <Row className="h-row">
                     <div className="steps-action">
-                        <Button ghost type="primary" style={{ marginRight: 8 }} onClick={() => history.goBack()} >Cancel</Button>
-                        <Button type="primary" onClick={() => this.validateSubmition(this.state.current)}>Save</Button>
+                        <Button id="cancelNewApi" ghost type="primary" style={{ marginRight: 8 }} onClick={() => history.goBack()} >Cancel</Button>
+                        <Button id="saveApi" type="primary" onClick={() => this.validateSubmition(this.state.current)}>Save</Button>
                     </div>
                 </Row>
             </div>

@@ -21,27 +21,35 @@ package br.com.conductor.heimdall.core.trace;
  * ==========================LICENSE_END===================================
  */
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Data class that represents the Filter detais.
+ * Data class that represents the Filter details.
  *
  * @author Thiago Sampaio
  *
  */
 @Data
 public class FilterDetail {
+
      private String name;
+
      private long timeInMillisRun;
+
      private long timeInMillisShould;
+
      private String status;
+
      @Setter(value=AccessLevel.NONE)
      @Getter(AccessLevel.NONE)
      private long totalTimeInMillis;
-     
+
+     @JsonInclude(JsonInclude.Include.NON_NULL)
+     private StackTrace stackTrace;
 
      /**
       * Returns the total time in milliseconds.

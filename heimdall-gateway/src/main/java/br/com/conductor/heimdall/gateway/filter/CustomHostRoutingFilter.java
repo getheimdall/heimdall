@@ -26,8 +26,6 @@ import java.net.URL;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.http.HttpHost;
-import org.springframework.cloud.commons.httpclient.ApacheHttpClientConnectionManagerFactory;
-import org.springframework.cloud.commons.httpclient.ApacheHttpClientFactory;
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
 import org.springframework.cloud.netflix.zuul.filters.route.SimpleHostRoutingFilter;
@@ -57,10 +55,8 @@ public class CustomHostRoutingFilter extends SimpleHostRoutingFilter {
       * @param helper		{@link ProxyRequestHelper}
       * @param properties	{@link ZuulProperties}
       */
-     public CustomHostRoutingFilter(ProxyRequestHelper helper, ZuulProperties properties,
-                                    ApacheHttpClientConnectionManagerFactory connectionManagerFactory,
-                                    ApacheHttpClientFactory httpClientFactory) {
-          super(helper, properties, connectionManagerFactory, httpClientFactory);
+     public CustomHostRoutingFilter(ProxyRequestHelper helper, ZuulProperties properties) {
+          super(helper, properties);
           this.helper = helper;
      }
      

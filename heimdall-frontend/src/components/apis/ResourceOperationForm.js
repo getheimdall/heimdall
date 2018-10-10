@@ -86,11 +86,11 @@ const ResourceOperationForm = ({
 
                     <Col sm={24}>
                         <Button.Group size="small">
-                            <Button type="primary" onClick={validateForm}>
+                            <Button id="saveResourceOperation" type="primary" onClick={validateForm}>
                                 <Icon type="save" /> Save operation
                             </Button>
                             <Tooltip title="Cancel">
-                                <Button type="primary" icon="close" ghost onClick={toggleForm} />
+                                <Button id="cancelResourceOperation" type="primary" icon="close" ghost onClick={toggleForm} />
                             </Tooltip>
                         </Button.Group>
                     </Col>

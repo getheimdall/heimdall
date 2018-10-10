@@ -1,3 +1,4 @@
+
 package br.com.conductor.heimdall.gateway.service;
 
 /*-
@@ -21,7 +22,7 @@ package br.com.conductor.heimdall.gateway.service;
  */
 
 import br.com.conductor.heimdall.core.dto.InterceptorFileDTO;
-import br.com.conductor.heimdall.core.dto.interceptor.*;
+import br.com.conductor.heimdall.core.dto.interceptor.AccessTokenClientIdDTO;
 import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.entity.Operation;
 import br.com.conductor.heimdall.core.entity.Resource;
@@ -56,7 +57,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
-import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_ROOT;
 
 /**
  * Provides methods to create and remove the {@link Interceptor} files.
@@ -82,7 +82,6 @@ public class InterceptorFileService {
      * Creates a {@link Interceptor} from its Id.
      *
      * @param id The {@link Interceptor} Id
-     * @throws BadRequestException
      */
     @Transactional(readOnly = true)
     public void createFileInterceptor(Long id) {
@@ -109,9 +108,11 @@ public class InterceptorFileService {
      */
     private HashMap<String, Object> buildParametersFile(Interceptor interceptor, File file) {
 
+        Long INVALID_REFERENCE_ID = -1L;
+
         if (Objeto.notBlank(file)) {
 
-            HashMap<String, Object> parameters = new HashMap<String, Object>();
+            HashMap<String, Object> parameters = new HashMap<>();
             parameters.put("order", StringUtils.generateOrder(definePrefixOrder(interceptor.getLifeCycle()), interceptor.getOrder()));
             parameters.put("executionPoint", interceptor.getExecutionPoint().getFilterType());
             parameters.put("pathsAllowed", pathsAllowed(interceptor));
@@ -119,6 +120,13 @@ public class InterceptorFileService {
             parameters.put("lifeCycle", interceptor.getLifeCycle().name());
             parameters.put("name", StringUtils.concatCamelCase(interceptor.getLifeCycle().name(), interceptor.getType().name(), interceptor.getExecutionPoint().getFilterType(), interceptor.getId().toString()));
             parameters.put("zuulFilterRoot", zuulFilterRoot);
+            parameters.put("path", createPath(interceptor));
+
+            if (interceptor.getReferenceId() != null)
+                parameters.put("referenceId", interceptor.getReferenceId());
+            else
+                parameters.put("referenceId", INVALID_REFERENCE_ID);
+
             if (Objeto.notBlank(interceptor.getOperation())) {
 
                 parameters.put("method", interceptor.getOperation().getMethod().name());
@@ -199,14 +207,17 @@ public class InterceptorFileService {
 
         Integer prefixOrder = 0;
         switch (lifeCycle) {
-            case PLAN:
+            case API:
                 prefixOrder = 1;
                 break;
-            case RESOURCE:
+            case PLAN:
                 prefixOrder = 2;
                 break;
-            case OPERATION:
+            case RESOURCE:
                 prefixOrder = 3;
+                break;
+            case OPERATION:
+                prefixOrder = 4;
                 break;
             default:
                 break;
@@ -223,6 +234,9 @@ public class InterceptorFileService {
 
         Set<String> patterns = Sets.newHashSet();
         switch (interceptor.getLifeCycle()) {
+            case API:
+                patterns = Sets.newHashSet(interceptor.getApi().getBasePath());
+                break;
             case PLAN:
                 patterns = Sets.newHashSet(interceptor.getPlan().getApi().getBasePath());
                 break;
@@ -264,7 +278,6 @@ public class InterceptorFileService {
                         pathsNotAllowed.add(resource.getApi().getBasePath() + operation.getPath());
                     }
                 }
-
             }
         }
 
@@ -293,6 +306,9 @@ public class InterceptorFileService {
                     InterceptorLifeCycle lifeCycle = interceptor.getLifeCycle();
                     List<Interceptor> interceptors = Lists.newArrayList();
                     switch (lifeCycle) {
+                        case API:
+                            interceptors = interceptorRepository.findByTypeAndApiId(TypeInterceptor.CLIENT_ID, interceptor.getApi().getId());
+                            break;
                         case PLAN:
                             interceptors = interceptorRepository.findByTypeAndPlanId(TypeInterceptor.CLIENT_ID, interceptor.getPlan().getId());
                             break;
@@ -306,10 +322,10 @@ public class InterceptorFileService {
                             break;
                     }
 
-                    for (Interceptor interc : interceptors) {
+                    for (Interceptor i : interceptors) {
 
                         try {
-                            AccessTokenClientIdDTO clientIdDTO = JsonUtils.convertJsonToObject(interc.getContent(), AccessTokenClientIdDTO.class);
+                            AccessTokenClientIdDTO clientIdDTO = JsonUtils.convertJsonToObject(i.getContent(), AccessTokenClientIdDTO.class);
                             if (Objeto.notBlank(clientIdDTO) && Objeto.notBlank(clientIdDTO.getName())) {
 
                                 parameters.put("client_id", clientIdDTO.getName());
@@ -322,7 +338,6 @@ public class InterceptorFileService {
                         }
                     }
                 }
-
             }
 
             parameters = interceptor.getType().getHeimdallInterceptor().buildParameters(objectCustom, parameters, interceptor);
@@ -337,7 +352,7 @@ public class InterceptorFileService {
             String codeInterceptor = GenerateMustache.generateTemplate(template, parameters);
             String fileName = StringUtils.concatCamelCase(interceptor.getLifeCycle().name(), interceptor.getType().name(), interceptor.getExecutionPoint().getFilterType(), interceptor.getId().toString()) + ".groovy";
 
-            String pathName = null;
+            String pathName;
             if (TypeInterceptor.MIDDLEWARE.equals(interceptor.getType())) {
 
                 pathName = String.join(File.separator, zuulFilterRoot, MIDDLEWARE_API_ROOT, interceptor.getOperation().getResource().getApi().getId().toString(), fileName);
@@ -355,4 +370,34 @@ public class InterceptorFileService {
 
     }
 
+    /*
+     * Creates the path to be used as key for the RateLimit repository
+     */
+    private String createPath(Interceptor interceptor) {
+
+        String path =  "";
+
+        switch (interceptor.getLifeCycle()) {
+            case API: {
+                path = interceptor.getApi().getBasePath();
+                break;
+            }
+            case PLAN: {
+                path = interceptor.getPlan().getApi().getBasePath();
+                break;
+            }
+
+            case RESOURCE: {
+                path = interceptor.getResource().getApi().getBasePath() + "-" + interceptor.getResource().getName();
+                break;
+            }
+            case OPERATION: {
+                path = interceptor.getOperation().getResource().getApi().getBasePath() + "-" +
+                        interceptor.getOperation().getResource().getName() + "-" +
+                        interceptor.getOperation().getPath();
+                break;
+            }
+        }
+        return path;
+    }
 }

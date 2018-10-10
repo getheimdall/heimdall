@@ -24,6 +24,8 @@ package br.com.conductor.heimdall.middleware.util.helpermock;
 import br.com.conductor.heimdall.middleware.spec.ApiResponse;
 import br.com.conductor.heimdall.middleware.spec.Http;
 import br.com.conductor.heimdall.middleware.spec.Json;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -117,6 +119,16 @@ public class HttpMockImpl implements Http {
     @Override
     public ApiResponse sendDelete() {
         return this.sendGet();
+    }
+
+    /**
+     * Method responsible for testing request calls using the HTTP PATCH verb.
+     */
+    @Override
+    public ApiResponse sendPatch() {
+        ApiResponse response = new ApiResponseMockImpl();
+        response.setStatus(HttpStatus.NO_CONTENT.value());
+        return response;
     }
 
     @Override

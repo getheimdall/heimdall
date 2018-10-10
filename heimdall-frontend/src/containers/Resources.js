@@ -94,10 +94,10 @@ class Resources extends Component {
         const modalResource =
             <Modal title="Add Resource"
                 footer={[
-                    <Button key="back" onClick={this.handleCancel}>Cancel</Button>,
-                    <Button key="submit" type="primary" loading={loading} onClick={this.handleSave}>
+                    <Button id="cancelAddResource" key="back" onClick={this.handleCancel}>Cancel</Button>,
+                    <Button id="saveResource" key="submit" type="primary" loading={loading} onClick={this.handleSave}>
                         Save
-                        </Button>
+                    </Button>
                 ]}
                 visible={this.props.visibleModal}
                 onCancel={this.handleCancel}
@@ -109,7 +109,7 @@ class Resources extends Component {
             return (
                 <Row type="flex" justify="center" align="bottom">
                     <Col style={{ marginTop: 20 }}>
-                        You don't have resources in this <b>API</b>, please <Button type="dashed" className="add-tour" onClick={this.addResourceModal}>Add Resource</Button>
+                        You don't have resources in this <b>API</b>, please <Button id="addResourceWhenListIsEmpty" type="dashed" className="add-tour" onClick={this.addResourceModal}>Add Resource</Button>
                     </Col>
 
                     {modalResource}
@@ -134,7 +134,7 @@ class Resources extends Component {
                                     </ButtonGroup>
                                 </Row>
                             } extraWidth={10}>
-                                <Operations idResource={resource.id} idApi={api.id} />
+                                <Operations idResource={resource.id} idApi={api.id} apiBasepath={api.basePath} />
                             </HeimdallPanel>
                         )
                     })}
@@ -142,7 +142,7 @@ class Resources extends Component {
                 <br />
                 <Row type="flex" justify="end">
                     <Tooltip title="Add Resource">
-                        <Button className="card-button add-tour" type="primary" icon="plus" onClick={this.addResourceModal} size="large" shape="circle" />
+                        <Button id="addResource" className="card-button add-tour" type="primary" icon="plus" onClick={this.addResourceModal} size="large" shape="circle" />
                     </Tooltip>
                 </Row>
 

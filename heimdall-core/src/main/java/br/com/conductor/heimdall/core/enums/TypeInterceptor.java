@@ -31,12 +31,12 @@ import lombok.Getter;
  *
  * @author Filipe Germano
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ * @author Marcelo Aguiar Rodrigues
  *
  */
 @Getter
 public enum TypeInterceptor {
 
-	LOG(new LogHeimdallInterceptor()),
 	MOCK(new MockHeimdallInterceptor()),
 	RATTING(new RattingHeimdallInterceptor()),
 	ACCESS_TOKEN(new AccessTokenHeimdallInterceptor()),
@@ -45,7 +45,9 @@ public enum TypeInterceptor {
 	MIDDLEWARE(new MiddlewareHeimdallInterceptor()),
 	OAUTH(new OAuthHeimdallInterceptor()),
 	BLACKLIST(new BlacklistHeimdallInterceptor()),
-	WHITELIST(new WhitelistHeimdallInterceptor());
+	WHITELIST(new WhitelistHeimdallInterceptor()),
+	CACHE(new CacheHeimdallInterceptor()),
+	CACHE_CLEAR(new CacheClearHeimdallInterceptor());
 
 	private HeimdallInterceptor heimdallInterceptor;
 
