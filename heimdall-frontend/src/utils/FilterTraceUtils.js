@@ -8,7 +8,7 @@ const getFilters = () => {
             operationSelected: "",
             firstValue: "",
             secondValue: "",
-            label: 'Method'
+            label: "Method"
         },
         {
             name: "trace.url",
@@ -28,7 +28,7 @@ const getFilters = () => {
             operationSelected: "",
             firstValue: "",
             secondValue: "",
-            label: "Status response"
+            label: "Response status"
         },
         {
             name: "trace.durationMillis",
@@ -38,7 +38,7 @@ const getFilters = () => {
             operationSelected: "",
             firstValue: "",
             secondValue: "",
-            label: "Request time duration"
+            label: "Request duration time"
         },
         {
             name: "trace.insertedOnDate",
@@ -48,7 +48,7 @@ const getFilters = () => {
             operationSelected: "",
             firstValue: "",
             secondValue: "",
-            label: "Date of trace"
+            label: "Date"
         },
         {
             name: "trace.apiId",
@@ -98,7 +98,7 @@ const getFilters = () => {
             operationSelected: "",
             firstValue: "",
             secondValue: "",
-            label: "Address that send request"
+            label: "Received from"
         },
         {
             name: "trace.clientId",
@@ -148,7 +148,7 @@ const getFilters = () => {
             operationSelected: "",
             firstValue: "",
             secondValue: "",
-            label: "Pattern of the request"
+            label: "Request pattern"
         },
         {
             name: "trace.profile",

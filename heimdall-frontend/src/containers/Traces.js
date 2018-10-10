@@ -224,7 +224,7 @@ class Traces extends Component {
                             )}
                             <br/>
                             <div style={{width: "100%", textAlign: "left"}}>
-                                <Button type="primary" onClick={() => this.sendFilters()} icon="search">Apply
+                                <Button id="searchTraces" type="primary" onClick={() => this.sendFilters()} icon="search">Apply
                                     filters</Button>
                             </div>
                         </Form>

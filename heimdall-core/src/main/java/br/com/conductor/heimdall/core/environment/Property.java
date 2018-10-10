@@ -31,6 +31,7 @@ import lombok.Data;
  * This class represents the environment.
  * 
  * @author Filipe Germano
+ * @author Marcelo Aguiar Rodrigues
  *
  */
 @Data
@@ -150,6 +151,8 @@ public class Property {
           private String collection;
           private String username;
           private String password;
+          private Long queueSize;
+          private Long discardingThreshold;
           
      }
 

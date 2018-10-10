@@ -178,6 +178,9 @@ public class Interceptor implements Serializable {
      private void initValuesLoad() {
           
           switch (lifeCycle) {
+               case API:
+                    referenceId = api.getId();
+                    break;
                case PLAN:
                     referenceId = plan.getId();
                     break;

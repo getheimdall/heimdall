@@ -10,9 +10,9 @@ package br.com.conductor.heimdall.gateway.filter.helper;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,6 +31,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -40,6 +41,10 @@ import java.util.List;
 import java.util.Map;
 
 import static br.com.conductor.heimdall.core.util.ConstantsInterceptors.IDENTIFIER_ID;
+import br.com.conductor.heimdall.gateway.filter.helper.http.HeimdallResponseErrorHandler;
+import br.com.conductor.heimdall.middleware.spec.Http;
+import br.com.conductor.heimdall.middleware.spec.Json;
+import br.com.twsoftware.alfred.object.Objeto;
 
 /**
  * Implementation of the {@link Http} interface.
@@ -50,105 +55,147 @@ import static br.com.conductor.heimdall.core.util.ConstantsInterceptors.IDENTIFI
  */
 public class HttpImpl implements Http {
 
-     private Json json = new JsonImpl();
+	private Json json = new JsonImpl();
 
-     private HttpHeaders headers = new HttpHeaders();
+	private HttpHeaders headers = new HttpHeaders();
 
-     private UriComponentsBuilder uriComponentsBuilder;
+	private UriComponentsBuilder uriComponentsBuilder;
 
-     private HttpEntity<String> requestBody;
+	private HttpEntity<String> requestBody;
 
-     private String body;
+	private String body;
 
-     private MultiValueMap<String, String> formData;
+	private MultiValueMap<String, String> formData;
 
-     private RestTemplate restTemplate;
+	private RestTemplate restTemplate;
 
-     public HttpImpl header(String name, String value) {
+	private boolean enableHandler;
 
-          if (Objeto.notBlank(value)) {
-               
-               headers.add(name, value);
-          }
+	public HttpImpl() {
+		this.enableHandler = false;
+	}
+
+	public HttpImpl(boolean enableHandler) {
+		this.enableHandler = enableHandler;
+	}
+
+	@Override
+	public HttpImpl header(String name, String value) {
+
+		if (Objeto.notBlank(value)) {
+
+			headers.add(name, value);
+		}
+
+		return this;
+	}
+
+	@Override
+	public HttpImpl header(Map<String, String> params) {
+
+		params.forEach((key, value) -> {
+			if (value != null)
+				headers.add(key, value);
+		});
+
+		return this;
+	}
+
+	@Override
+	public HttpImpl url(String url) {
+
+		uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(url);
+
+		return this;
+	}
+
+	@Override
+	public HttpImpl queryParam(String name, String value) {
+
+		if (Objeto.notBlank(value)) {
+
+			uriComponentsBuilder.queryParam(name, value);
+		}
+
+		return this;
+	}
+
+	@Override
+	public HttpImpl body(Map<String, Object> params) {
+
+		if (headers.containsKey("Content-Type")
+				&& headers.get("Content-Type").get(0).equals(ContentType.APPLICATION_FORM_URLENCODED.getMimeType())) {
+			formData = new LinkedMultiValueMap<>();
+			params.forEach((key, value) -> {
+				List<String> values = Lists.newArrayList(value.toString());
+				formData.put(key, values);
+			});
+		} else {
+
+			body = json.parse(params);
+		}
+
+		return this;
+	}
+
+	@Override
+	public HttpImpl body(String params) {
+
+		body = json.parse(params);
+
+		return this;
+
+	}
+
+	@Override
+	public ApiResponseImpl sendGet() {
+
+		ResponseEntity<String> entity;
+
+		if (headers.isEmpty()) {
+
+			entity = rest().getForEntity(uriComponentsBuilder.build().encode().toUri(), String.class);
+		} else {
+
+			entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.GET,
+					new HttpEntity<>(headers), String.class);
+		}
+
+		ApiResponseImpl apiResponse = new ApiResponseImpl();
+		apiResponse.setHeaders(entity.getHeaders().toSingleValueMap());
+		apiResponse.setBody(entity.getBody());
+		apiResponse.setStatus(entity.getStatusCodeValue());
+          body = json.parse(params);
 
           return this;
+
      }
 
-     public HttpImpl header(Map<String, String> params) {
-
-          params.forEach((key, value) -> {
-               if (value != null)
-                    headers.add(key, value);
-          });
-
-          return this;
-     }
-
-     public HttpImpl url(String url) {
-
-          uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(url);
-
-          return this;
-     }
-
-     public HttpImpl queryParam(String name, String value) {
-
-          if (Objeto.notBlank(value)) {
-               
-               uriComponentsBuilder.queryParam(name, value);
-          }
-
-          return this;
-     }
-
-     public HttpImpl body(Map<String, Object> params) {
-
-          if (headers.containsKey("Content-Type") && headers.get("Content-Type").get(0).equals(ContentType.APPLICATION_FORM_URLENCODED.getMimeType())) {
-               formData = new LinkedMultiValueMap<>();
-               params.forEach((key, value) -> {
-                    List<String> values = Lists.newArrayList(value.toString());
-                    formData.put(key, values);
-               });
-          } else {
-               
-               body = json.parse(params);          
-          }
-          
-          return this;
-     }
-
-     public HttpImpl body(String params) {
-
-          body = json.parse(params);          
-          
-          return this;
-          
-     }
-     
      public ApiResponseImpl sendGet() {
 
           setUIDFromInterceptor();
           ResponseEntity<String> entity;
-          
+
           if (headers.isEmpty()) {
-               
+
                entity = rest().getForEntity(uriComponentsBuilder.build().encode().toUri(), String.class);
           } else {
-               
-               entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.GET, new HttpEntity<>(headers),  String.class);                    
+
+               entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.GET, new HttpEntity<>(headers),  String.class);
           }
-          
+
           ApiResponseImpl apiResponse = new ApiResponseImpl();
           apiResponse.setHeaders(entity.getHeaders().toSingleValueMap());
           apiResponse.setBody(entity.getBody());
           apiResponse.setStatus(entity.getStatusCodeValue());
 
-          return apiResponse;
-     }
+		return apiResponse;
+	}
 
-     public ApiResponseImpl sendPost() {
+	@Override
+	public ApiResponseImpl sendPost() {
 
-          setUIDFromInterceptor();
+		setUIDFromInterceptor();
           ResponseEntity<String> entity;
           if (headers.isEmpty()) {
                
@@ -175,12 +222,13 @@ public class HttpImpl implements Http {
           
           apiResponse.setStatus(entity.getStatusCodeValue());
 
-          return apiResponse;
-     }
+		return apiResponse;
+	}
 
-     public ApiResponseImpl sendPut() {
+	@Override
+	public ApiResponseImpl sendPut() {
 
-          setUIDFromInterceptor();
+		setUIDFromInterceptor();
           ResponseEntity<String> entity;
           if (headers.isEmpty()) {
                
@@ -203,18 +251,21 @@ public class HttpImpl implements Http {
           apiResponse.setBody(entity.getBody());
           apiResponse.setStatus(entity.getStatusCodeValue());
 
-          return apiResponse;
-     }
+		return apiResponse;
+	}
 
+	@Override
 	public ApiResponseImpl sendDelete() {
 
         setUIDFromInterceptor();
         ResponseEntity<String> entity;
 
 		if (headers.isEmpty()) {
-			entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.DELETE, null, String.class);
+			entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.DELETE, null,
+					String.class);
 		} else {
-			entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.DELETE, new HttpEntity<>(headers), String.class);
+			entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.DELETE,
+					new HttpEntity<>(headers), String.class);
 		}
 
 		ApiResponseImpl apiResponse = new ApiResponseImpl();
@@ -241,15 +292,51 @@ public class HttpImpl implements Http {
 
                this.restTemplate = new RestTemplate();
           }
+	@Override
+	public ApiResponseImpl sendPatch() {
 
-          return this.restTemplate;
-     }
+		ResponseEntity<String> entity;
 
-     public RestTemplate clientProvider(RestTemplate restTemplate) {
+		if (headers.isEmpty()) {
+			requestBody = new HttpEntity<>(body);
+			entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PATCH, requestBody,
+					String.class);
+		} else {
+			if (Objeto.notBlank(formData)) {
+				HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
+				entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PATCH, request,
+						String.class);
+			} else {
+				requestBody = new HttpEntity<>(body, headers);
+				entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PATCH, requestBody,
+						String.class);
+			}
+		}
 
-          this.restTemplate = restTemplate;
-          return this.restTemplate;
-     }
+		ApiResponseImpl apiResponse = new ApiResponseImpl();
+		apiResponse.setHeaders(entity.getHeaders().toSingleValueMap());
+		apiResponse.setBody(entity.getBody());
+		apiResponse.setStatus(entity.getStatusCodeValue());
 
+		return apiResponse;
+	}
+
+	@Override
+	public RestTemplate clientProvider(RestTemplate restTemplate) {
+
+		this.restTemplate = restTemplate;
+		return this.restTemplate;
+	}
+
+	private RestTemplate rest() {
+		if (this.restTemplate == null) {
+			this.restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
+		}
+
+		if (enableHandler) {
+			this.restTemplate.setErrorHandler(new HeimdallResponseErrorHandler());
+		}
+		return this.restTemplate;
+	}
 
 }

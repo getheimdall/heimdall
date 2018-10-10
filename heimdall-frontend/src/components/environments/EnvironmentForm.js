@@ -165,7 +165,7 @@ class EnvironmentForm extends Component {
                                     this.state.variables.length === 0 ?
                                         <Row type="flex" justify="center" align="bottom">
                                             <Col style={{ marginTop: 20 }}>
-                                                You don't have variables in this <b>Environment</b>, please <Button type="dashed" className="add-tour" onClick={this.initVariables}>Add Variable</Button>
+                                                You don't have variables in this <b>Environment</b>, please <Button id="addEnvironmentsVariable" type="dashed" className="add-tour" onClick={this.initVariables}>Add Variable</Button>
                                             </Col>
                                         </Row>
                                         :
@@ -190,10 +190,10 @@ class EnvironmentForm extends Component {
 
                 <Row type="flex" justify="end">
                     <Tooltip title="Delete">
-                        <Button className="card-button" type="danger" ghost icon="delete" size="large" shape="circle" disabled={!environment} onClick={environment && this.showDeleteConfirm(environment.id)} loading={loading} />
+                        <Button id="deleteEnvironment" className="card-button" type="danger" ghost icon="delete" size="large" shape="circle" disabled={!environment} onClick={environment && this.showDeleteConfirm(environment.id)} loading={loading} />
                     </Tooltip>
                     <Tooltip title="Save">
-                        <Button className="card-button" type="primary" icon="save" size="large" shape="circle" onClick={this.onSubmitForm} loading={loading} />
+                        <Button id="saveEnvironment" className="card-button" type="primary" icon="save" size="large" shape="circle" onClick={this.onSubmitForm} loading={loading} />
                     </Tooltip>
                 </Row>
             </Row>
