@@ -21,6 +21,7 @@ package br.com.conductor.heimdall.gateway.filter.helper;
  * ==========================LICENSE_END===================================
  */
 
+import br.com.conductor.heimdall.gateway.filter.helper.http.HeimdallResponseErrorHandler;
 import br.com.conductor.heimdall.middleware.spec.Http;
 import br.com.conductor.heimdall.middleware.spec.Json;
 import br.com.twsoftware.alfred.object.Objeto;
@@ -41,244 +42,263 @@ import java.util.List;
 import java.util.Map;
 
 import static br.com.conductor.heimdall.core.util.ConstantsInterceptors.IDENTIFIER_ID;
-import br.com.conductor.heimdall.gateway.filter.helper.http.HeimdallResponseErrorHandler;
-import br.com.conductor.heimdall.middleware.spec.Http;
-import br.com.conductor.heimdall.middleware.spec.Json;
-import br.com.twsoftware.alfred.object.Objeto;
 
 /**
  * Implementation of the {@link Http} interface.
  *
  * @author Filipe Germano
  * @author Marcelo Aguiar Rodrigues
- *
  */
 public class HttpImpl implements Http {
 
-	private Json json = new JsonImpl();
+    private Json json = new JsonImpl();
 
-	private HttpHeaders headers = new HttpHeaders();
+    private HttpHeaders headers = new HttpHeaders();
 
-	private UriComponentsBuilder uriComponentsBuilder;
+    private UriComponentsBuilder uriComponentsBuilder;
 
-	private HttpEntity<String> requestBody;
+    private HttpEntity<String> requestBody;
 
-	private String body;
+    private String body;
 
-	private MultiValueMap<String, String> formData;
+    private MultiValueMap<String, String> formData;
 
-	private RestTemplate restTemplate;
+    private RestTemplate restTemplate;
 
-	private boolean enableHandler;
+    private boolean enableHandler;
 
-	public HttpImpl() {
-		this.enableHandler = false;
-	}
+    public HttpImpl() {
+        this.enableHandler = false;
+    }
 
-	public HttpImpl(boolean enableHandler) {
-		this.enableHandler = enableHandler;
-	}
+    public HttpImpl(boolean enableHandler) {
+        this.enableHandler = enableHandler;
+    }
 
-	@Override
-	public HttpImpl header(String name, String value) {
+    @Override
+    public HttpImpl header(String name, String value) {
 
-		if (Objeto.notBlank(value)) {
+        if (Objeto.notBlank(value)) {
 
-			headers.add(name, value);
-		}
+            headers.add(name, value);
+        }
 
-		return this;
-	}
+        return this;
+    }
 
-	@Override
-	public HttpImpl header(Map<String, String> params) {
+    @Override
+    public HttpImpl header(Map<String, String> params) {
 
-		params.forEach((key, value) -> {
-			if (value != null)
-				headers.add(key, value);
-		});
+        params.forEach((key, value) -> {
+            if (value != null)
+                headers.add(key, value);
+        });
 
-		return this;
-	}
+        return this;
+    }
 
-	@Override
-	public HttpImpl url(String url) {
+    @Override
+    public HttpImpl url(String url) {
 
-		uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(url);
+        uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(url);
 
-		return this;
-	}
+        return this;
+    }
 
-	@Override
-	public HttpImpl queryParam(String name, String value) {
+    @Override
+    public HttpImpl queryParam(String name, String value) {
 
-		if (Objeto.notBlank(value)) {
+        if (Objeto.notBlank(value)) {
 
-			uriComponentsBuilder.queryParam(name, value);
-		}
+            uriComponentsBuilder.queryParam(name, value);
+        }
 
-		return this;
-	}
+        return this;
+    }
 
-	@Override
-	public HttpImpl body(Map<String, Object> params) {
+    @Override
+    public HttpImpl body(Map<String, Object> params) {
 
-		if (headers.containsKey("Content-Type")
-				&& headers.get("Content-Type").get(0).equals(ContentType.APPLICATION_FORM_URLENCODED.getMimeType())) {
-			formData = new LinkedMultiValueMap<>();
-			params.forEach((key, value) -> {
-				List<String> values = Lists.newArrayList(value.toString());
-				formData.put(key, values);
-			});
-		} else {
+        if (headers.containsKey("Content-Type")
+                && headers.get("Content-Type").get(0).equals(ContentType.APPLICATION_FORM_URLENCODED.getMimeType())) {
+            formData = new LinkedMultiValueMap<>();
+            params.forEach((key, value) -> {
+                List<String> values = Lists.newArrayList(value.toString());
+                formData.put(key, values);
+            });
+        } else {
 
-			body = json.parse(params);
-		}
+            body = json.parse(params);
+        }
 
-		return this;
-	}
+        return this;
+    }
 
-	@Override
-	public HttpImpl body(String params) {
+    @Override
+    public HttpImpl body(String params) {
 
-		body = json.parse(params);
+        body = json.parse(params);
 
-		return this;
+        return this;
 
-	}
+    }
 
-	@Override
-	public ApiResponseImpl sendGet() {
-
-		ResponseEntity<String> entity;
-
-		if (headers.isEmpty()) {
-
-			entity = rest().getForEntity(uriComponentsBuilder.build().encode().toUri(), String.class);
-		} else {
-
-			entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.GET,
-					new HttpEntity<>(headers), String.class);
-		}
-
-		ApiResponseImpl apiResponse = new ApiResponseImpl();
-		apiResponse.setHeaders(entity.getHeaders().toSingleValueMap());
-		apiResponse.setBody(entity.getBody());
-		apiResponse.setStatus(entity.getStatusCodeValue());
-          body = json.parse(params);
-
-          return this;
-
-     }
-
-     public ApiResponseImpl sendGet() {
-
-          setUIDFromInterceptor();
-          ResponseEntity<String> entity;
-
-          if (headers.isEmpty()) {
-
-               entity = rest().getForEntity(uriComponentsBuilder.build().encode().toUri(), String.class);
-          } else {
-
-               entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.GET, new HttpEntity<>(headers),  String.class);
-          }
-
-          ApiResponseImpl apiResponse = new ApiResponseImpl();
-          apiResponse.setHeaders(entity.getHeaders().toSingleValueMap());
-          apiResponse.setBody(entity.getBody());
-          apiResponse.setStatus(entity.getStatusCodeValue());
-
-		return apiResponse;
-	}
-
-	@Override
-	public ApiResponseImpl sendPost() {
-
-		setUIDFromInterceptor();
-          ResponseEntity<String> entity;
-          if (headers.isEmpty()) {
-               
-               requestBody = new HttpEntity<>(body);
-               entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.POST, requestBody, String.class);
-          } else {
-               
-               if (Objeto.notBlank(formData)) {
-                    
-                    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
-                    entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.POST, request, String.class);
-               } else {
-                    
-                    requestBody = new HttpEntity<>(body, headers);
-                    entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.POST, requestBody, String.class);
-               }
-               
-               requestBody = new HttpEntity<>(body, headers);
-          }
-          ApiResponseImpl apiResponse = new ApiResponseImpl();
-          apiResponse.setHeaders(entity.getHeaders().toSingleValueMap());
-          
-          apiResponse.setBody(entity.getBody());
-          
-          apiResponse.setStatus(entity.getStatusCodeValue());
-
-		return apiResponse;
-	}
-
-	@Override
-	public ApiResponseImpl sendPut() {
-
-		setUIDFromInterceptor();
-          ResponseEntity<String> entity;
-          if (headers.isEmpty()) {
-               
-               requestBody = new HttpEntity<>(body);
-               entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PUT, requestBody, String.class);
-          } else {
-               
-               if (Objeto.notBlank(formData)) {
-                    
-                    HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
-                    entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PUT, request, String.class);
-               } else {
-                    
-                    requestBody = new HttpEntity<>(body, headers);
-                    entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PUT, requestBody, String.class);
-               }
-          }
-          ApiResponseImpl apiResponse = new ApiResponseImpl();
-          apiResponse.setHeaders(entity.getHeaders().toSingleValueMap());
-          apiResponse.setBody(entity.getBody());
-          apiResponse.setStatus(entity.getStatusCodeValue());
-
-		return apiResponse;
-	}
-
-	@Override
-	public ApiResponseImpl sendDelete() {
+    @Override
+    public ApiResponseImpl sendGet() {
 
         setUIDFromInterceptor();
         ResponseEntity<String> entity;
 
-		if (headers.isEmpty()) {
-			entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.DELETE, null,
-					String.class);
-		} else {
-			entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.DELETE,
-					new HttpEntity<>(headers), String.class);
-		}
+        if (headers.isEmpty()) {
 
-		ApiResponseImpl apiResponse = new ApiResponseImpl();
-		apiResponse.setHeaders(entity.getHeaders().toSingleValueMap());
-		apiResponse.setBody(entity.getBody());
-		apiResponse.setStatus(entity.getStatusCodeValue());
+            entity = rest().getForEntity(uriComponentsBuilder.build().encode().toUri(), String.class);
+        } else {
 
-		return apiResponse;
-	}
+            entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.GET, new HttpEntity<>(headers), String.class);
+        }
 
-	/*
-	 * Forwards the Identifier from the IdentifierInterceptor if it is set
-	 */
+        ApiResponseImpl apiResponse = new ApiResponseImpl();
+        apiResponse.setHeaders(entity.getHeaders().toSingleValueMap());
+        apiResponse.setBody(entity.getBody());
+        apiResponse.setStatus(entity.getStatusCodeValue());
+
+        return apiResponse;
+    }
+
+    @Override
+    public ApiResponseImpl sendPost() {
+
+        setUIDFromInterceptor();
+        ResponseEntity<String> entity;
+        if (headers.isEmpty()) {
+
+            requestBody = new HttpEntity<>(body);
+            entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.POST, requestBody, String.class);
+        } else {
+
+            if (Objeto.notBlank(formData)) {
+
+                HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
+                entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.POST, request, String.class);
+            } else {
+
+                requestBody = new HttpEntity<>(body, headers);
+                entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.POST, requestBody, String.class);
+            }
+
+            requestBody = new HttpEntity<>(body, headers);
+        }
+        ApiResponseImpl apiResponse = new ApiResponseImpl();
+        apiResponse.setHeaders(entity.getHeaders().toSingleValueMap());
+
+        apiResponse.setBody(entity.getBody());
+
+        apiResponse.setStatus(entity.getStatusCodeValue());
+
+        return apiResponse;
+    }
+
+    @Override
+    public ApiResponseImpl sendPut() {
+
+        setUIDFromInterceptor();
+        ResponseEntity<String> entity;
+        if (headers.isEmpty()) {
+
+            requestBody = new HttpEntity<>(body);
+            entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PUT, requestBody, String.class);
+        } else {
+
+            if (Objeto.notBlank(formData)) {
+
+                HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
+                entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PUT, request, String.class);
+            } else {
+
+                requestBody = new HttpEntity<>(body, headers);
+                entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PUT, requestBody, String.class);
+            }
+        }
+        ApiResponseImpl apiResponse = new ApiResponseImpl();
+        apiResponse.setHeaders(entity.getHeaders().toSingleValueMap());
+        apiResponse.setBody(entity.getBody());
+        apiResponse.setStatus(entity.getStatusCodeValue());
+
+        return apiResponse;
+    }
+
+    @Override
+    public ApiResponseImpl sendDelete() {
+
+        setUIDFromInterceptor();
+        ResponseEntity<String> entity;
+
+        if (headers.isEmpty()) {
+            entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.DELETE, null,
+                    String.class);
+        } else {
+            entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.DELETE,
+                    new HttpEntity<>(headers), String.class);
+        }
+
+        ApiResponseImpl apiResponse = new ApiResponseImpl();
+        apiResponse.setHeaders(entity.getHeaders().toSingleValueMap());
+        apiResponse.setBody(entity.getBody());
+        apiResponse.setStatus(entity.getStatusCodeValue());
+
+        return apiResponse;
+    }
+
+    @Override
+    public ApiResponseImpl sendPatch() {
+
+        ResponseEntity<String> entity;
+
+        if (headers.isEmpty()) {
+            requestBody = new HttpEntity<>(body);
+            entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PATCH, requestBody,
+                    String.class);
+        } else {
+            if (Objeto.notBlank(formData)) {
+                HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
+                entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PATCH, request,
+                        String.class);
+            } else {
+                requestBody = new HttpEntity<>(body, headers);
+                entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PATCH, requestBody,
+                        String.class);
+            }
+        }
+
+        ApiResponseImpl apiResponse = new ApiResponseImpl();
+        apiResponse.setHeaders(entity.getHeaders().toSingleValueMap());
+        apiResponse.setBody(entity.getBody());
+        apiResponse.setStatus(entity.getStatusCodeValue());
+
+        return apiResponse;
+    }
+
+    @Override
+    public RestTemplate clientProvider(RestTemplate restTemplate) {
+
+        this.restTemplate = restTemplate;
+        return this.restTemplate;
+    }
+
+    private RestTemplate rest() {
+        if (this.restTemplate == null) {
+            this.restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
+        }
+
+        if (enableHandler) {
+            this.restTemplate.setErrorHandler(new HeimdallResponseErrorHandler());
+        }
+        return this.restTemplate;
+    }
+
+    /*
+     * Forwards the Identifier from the IdentifierInterceptor if it is set
+     */
     private void setUIDFromInterceptor() {
         RequestContext context = RequestContext.getCurrentContext();
 
@@ -286,57 +306,5 @@ public class HttpImpl implements Http {
             headers.add(IDENTIFIER_ID, context.getZuulRequestHeaders().get(IDENTIFIER_ID));
         }
     }
-
-     private RestTemplate rest() {
-          if (this.restTemplate == null) {
-
-               this.restTemplate = new RestTemplate();
-          }
-	@Override
-	public ApiResponseImpl sendPatch() {
-
-		ResponseEntity<String> entity;
-
-		if (headers.isEmpty()) {
-			requestBody = new HttpEntity<>(body);
-			entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PATCH, requestBody,
-					String.class);
-		} else {
-			if (Objeto.notBlank(formData)) {
-				HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
-				entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PATCH, request,
-						String.class);
-			} else {
-				requestBody = new HttpEntity<>(body, headers);
-				entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PATCH, requestBody,
-						String.class);
-			}
-		}
-
-		ApiResponseImpl apiResponse = new ApiResponseImpl();
-		apiResponse.setHeaders(entity.getHeaders().toSingleValueMap());
-		apiResponse.setBody(entity.getBody());
-		apiResponse.setStatus(entity.getStatusCodeValue());
-
-		return apiResponse;
-	}
-
-	@Override
-	public RestTemplate clientProvider(RestTemplate restTemplate) {
-
-		this.restTemplate = restTemplate;
-		return this.restTemplate;
-	}
-
-	private RestTemplate rest() {
-		if (this.restTemplate == null) {
-			this.restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
-		}
-
-		if (enableHandler) {
-			this.restTemplate.setErrorHandler(new HeimdallResponseErrorHandler());
-		}
-		return this.restTemplate;
-	}
 
 }
