@@ -39,6 +39,12 @@ class ApiDefinition extends Component {
 
         confirm({
             title: 'Are you sure?',
+            content: (
+                <div>
+                    <p>Deleting an Api will also delete any Resources, Operations, Interceptors or Middlewares attached to this Api.</p>
+                    <p>This operation can not be reverted.</p>
+                </div>
+            ),
             okText: 'Yes',
             okType: 'danger',
             cancelText: 'No',
