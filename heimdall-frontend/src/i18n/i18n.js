@@ -9,28 +9,21 @@ i18next
     .use(LanguageDetector)
     .use(reactI18nextModule)
     .init({
-    // we init with resources
-    resources: {
-        "en": en,
-        "pt-BR": ptBR
-    },
-    fallbackLng: ['en', 'pt-BR'],
-    debug: true,
-
-    // have a common namespace used around the full app
-    ns: ["translations"],
-    defaultNS: "translations",
-
-    keySeparator: false, // we use content as keys
-
-    interpolation: {
-        escapeValue: false, // not needed for react!!
-        formatSeparator: ","
-    },
-
-    react: {
-        wait: false,
-    }
-})
+        resources: {
+            "en": en,
+            "pt_BR": ptBR
+        },
+        fallbackLng: ['en', 'pt_BR'],
+        debug: true,
+        ns: ["translations"],
+        defaultNS: "translations",
+        keySeparator: false,
+        interpolation: {
+            formatSeparator: ","
+        },
+        react: {
+            wait: false,
+        }
+    })
 
 export default i18next

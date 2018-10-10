@@ -34,10 +34,6 @@ class MainLayout extends Component {
 		this.setState({...this.state, keepTour: check})
 	}
 
-	handleForceUpdate = () => {
-		this.setState({ ...this.state })
-	}
-
 	render() {
 		const { Header, Content, Footer } = Layout
 		const { history } = this.props
@@ -48,7 +44,7 @@ class MainLayout extends Component {
 				<SideBar history={history} collapse={true} />
 				<Layout>
 					<Header className="h-header">
-						<NavBar history={history} handleForceUpdate={this.handleForceUpdate}/>
+						<NavBar history={history} />
 					</Header>
 					<Content>
 						<Row>

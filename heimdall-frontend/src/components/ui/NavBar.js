@@ -6,6 +6,7 @@ import { Menu, Icon, Row, Col, notification } from 'antd'
 
 import { logout, getUser } from '../../actions/auth'
 import { clearCaches, initLoading } from '../../actions/cache'
+import languages from '../../constants/languages'
 
 const SubMenu = Menu.SubMenu
 const MenuItemGroup = Menu.ItemGroup
@@ -30,8 +31,7 @@ class NavBar extends Component {
         if (key.indexOf('changeLang') === 0) {
             const lgn = key.split(':')[1]
             i18n.changeLanguage(lgn)
-            this.props.handleForceUpdate()
-            this.forceUpdate()
+            this.props.history.go(0)
         }
 
         switch (key) {
@@ -53,6 +53,7 @@ class NavBar extends Component {
 
     render() {
         const { i18n, t } = this.props
+        console.log(languages)
         return (
             <Row type="flex" justify="start">
                 <Col sm={24} md={24}>
@@ -68,13 +69,23 @@ class NavBar extends Component {
                                 <Menu.Item key="setting:4">{t('developer_web_page')}</Menu.Item>
                             </MenuItemGroup>
                         </SubMenu>
-                        <SubMenu title={<span><Icon type="flag" /></span>}>
-                            {
-                                i18n.languages.map(lng => {
-                                    if (lng === i18n.language) {
-                                        return <Menu.Item disabled key={`changeLang:${lng}`}>{lng}</Menu.Item>
+                        <SubMenu title={<span><Icon type="global" /></span>}>
+                            {/* {
+                                languages.map(lng => {
+                                    if (lng.key === i18n.language) {
+                                        return <Menu.Item disabled key={`changeLang:${lng.key}`}>{lng.label}</Menu.Item>
                                     }
                                     return <Menu.Item key={`changeLang:${lng}`}>{lng}</Menu.Item>
+                                })
+                            } */}
+                            {
+                                languages.map(lng => {
+                                    return (
+                                        <Menu.Item key={`changeLang:${lng.key}`} className="heimdall-flags" disabled={lng.key === i18n.language}>
+                                            <img width={32} height={32} src={lng.img} />
+                                            <label>{lng.label}</label>
+                                        </Menu.Item>
+                                    )
                                 })
                             }
                         </SubMenu>

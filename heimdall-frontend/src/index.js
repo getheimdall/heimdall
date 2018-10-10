@@ -44,7 +44,7 @@ const render = () => {
   ReactDOM.render(
     <Provider store={store}>
       <LocaleProvider locale={en_US}>
-      <I18nextProvider i18n={i18n}>
+          <I18nextProvider i18n={i18n}>
             <App history={history} />
           </I18nextProvider>
       </LocaleProvider>
