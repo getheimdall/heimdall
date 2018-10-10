@@ -233,6 +233,13 @@ class Interceptors extends Component {
         this.updateAllParams()
     }
 
+    handleFilterOperation = (input, option) => {
+        console.log(input)
+        console.log(option)
+        return option.props.children[2].toLowerCase().indexOf(input.toLowerCase()) >= 0
+        // return 0
+    }
+
     updateAllParams = () => {
         const query = {'api.id': this.props.api.id, offset: 0}
         this.props.dispatch(initLoading())
@@ -373,7 +380,7 @@ class Interceptors extends Component {
 
                             <Col sm={24} md={6}>
                                 <Form.Item label="Operations">
-                                    <Select value={this.state.operationId} onChange={this.handleSelectChange('OP')} disabled={!this.props.operations}>
+                                    <Select showSearch value={this.state.operationId} onChange={this.handleSelectChange('OP')} disabled={!this.props.operations} filterOption={this.handleFilterOperation}>
                                         <Option value={0}>All</Option>
                                         {this.props.operations && this.props.operations.map((op, index) => (
                                             <Option key={index} value={op.id}><Tag color={ColorUtils.getColorMethod(op.method)}>{op.method}</Tag> {op.path}</Option>
