@@ -1,3 +1,5 @@
+import { isNumber } from 'util'
+
 function verifyIfExistOrderDuplicate(interceptorsOrder) {
 
     const orders = new Set(interceptorsOrder)
@@ -30,9 +32,21 @@ export function changeOrder(orderDrag, newOrder, interceptors) {
     if (orderIsWrong(allInterceptors)){
         updateOrder(allInterceptors)
     }
-    const orders = allInterceptors.map(i => i.id)
-    const newIndexInterceptor = orders.findIndex(element => element === newOrder)
-    const indexInterceptor = orders.findIndex(element => element === orderDrag)
+
+    let newIndexInterceptor = 0
+    let indexInterceptor = 0
+
+    if (isNumber(newOrder)) {
+        newIndexInterceptor = allInterceptors.findIndex(element => element.id === newOrder)
+    } else {
+        newIndexInterceptor = allInterceptors.findIndex(element => element.uuid === newOrder)
+    }
+    
+    if (isNumber(orderDrag)) {
+        indexInterceptor = allInterceptors.findIndex(element => element.id === orderDrag)
+    } else {
+        indexInterceptor = allInterceptors.findIndex(element => element.uuid === orderDrag)
+    }
 
     let changedInterceptors = []
 
