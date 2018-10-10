@@ -89,6 +89,9 @@ public class InterceptorService {
     private MiddlewareRepository middlewareRepository;
 
     @Autowired
+    private ApiRepository apiRepository;
+
+    @Autowired
     private RateLimitRepository ratelimitRepository;
 
     @Autowired
@@ -305,6 +308,14 @@ public class InterceptorService {
     private Interceptor validateLifeCycle(Interceptor interceptor) {
 
         switch (interceptor.getLifeCycle()) {
+            case API:
+                Api api = apiRepository.findOne(interceptor.getReferenceId());
+                HeimdallException.checkThrow(isBlank(api), INTERCEPTOR_REFERENCE_NOT_FOUND);
+                interceptor.setResource(null);
+                interceptor.setOperation(null);
+                interceptor.setPlan(null);
+                interceptor.setApi(api);
+                break;
             case PLAN:
                 Plan plan = planRepository.findOne(interceptor.getReferenceId());
                 HeimdallException.checkThrow(isBlank(plan), INTERCEPTOR_REFERENCE_NOT_FOUND);
@@ -358,21 +369,32 @@ public class InterceptorService {
      */
     private String createPath(Interceptor interceptor) {
 
-        if (InterceptorLifeCycle.PLAN == interceptor.getLifeCycle()) {
+        String path = "";
 
-            Plan plan = planRepository.findOne(interceptor.getReferenceId());
-            return plan.getApi().getBasePath();
-
-        } else if (InterceptorLifeCycle.RESOURCE == interceptor.getLifeCycle()) {
-
-            Resource res = resourceRepository.findOne(interceptor.getReferenceId());
-            return res.getApi().getBasePath() + "-" + res.getName();
-
-        } else {
-
-            Operation op = operationRepository.findOne(interceptor.getReferenceId());
-            return op.getResource().getApi().getBasePath() + "-" + op.getResource().getName() + "-" + op.getPath();
+        switch (interceptor.getLifeCycle()) {
+            case API: {
+                Api api = apiRepository.findOne(interceptor.getReferenceId());
+                path = api.getBasePath();
+                break;
+            }
+            case PLAN: {
+                Plan plan = planRepository.findOne(interceptor.getReferenceId());
+                path = plan.getApi().getBasePath();
+                break;
+            }
+            case RESOURCE: {
+                Resource res = resourceRepository.findOne(interceptor.getReferenceId());
+                path = res.getApi().getBasePath() + "-" + res.getName();
+                break;
+            }
+            case OPERATION: {
+                Operation op = operationRepository.findOne(interceptor.getReferenceId());
+                path = op.getResource().getApi().getBasePath() + "-" + op.getResource().getName() + "-" + op.getPath();
+                break;
+            }
         }
+
+        return path;
     }
 
     /*

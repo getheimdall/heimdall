@@ -17,6 +17,7 @@ const interceptorSpec = {
             lifeCycle: props.interceptor.lifeCycle,
             referenceId: props.interceptor.referenceId,
             id: props.interceptor.id,
+            uuid: props.interceptor.uuid
         }
     },
     endDrag(props, monitor, component) {
@@ -45,17 +46,20 @@ const interceptorTarget = {
         }
 
         const idHover = props.interceptor.id
-        const orderHover = props.interceptor.order
         const lifeCycleHover = props.interceptor.lifeCycle
         const referenceIdHover = props.interceptor.referenceId
+        const uuidHover = props.interceptor.uuid
 
         const idDrag = monitor.getItem().id
-        const orderDrag = monitor.getItem().order
         const lifeCycleDrag = monitor.getItem().lifeCycle
         const referenceDrag = monitor.getItem().referenceId
+        const uuidDrag = monitor.getItem().uuid
 
-        if (idHover !== idDrag && lifeCycleHover ===  lifeCycleDrag && referenceIdHover === referenceDrag) {
-            props.moveInterceptors(idDrag, idHover, lifeCycleDrag, referenceDrag)
+        const dragReference = idDrag ? idDrag : uuidDrag
+        const hoverReference = idHover ? idHover : uuidHover
+
+        if ((idHover !== idDrag || uuidHover !== uuidDrag ) && lifeCycleHover ===  lifeCycleDrag && referenceIdHover === referenceDrag) {
+            props.moveInterceptors(dragReference, hoverReference, lifeCycleDrag, referenceDrag)
         }
     },
     canDrop(props, monitor) {
@@ -68,6 +72,10 @@ const interceptorTarget = {
         const lifeCycleDrag = monitor.getItem().lifeCycle
         const referenceDrag = monitor.getItem().referenceId
         const executionPointDrag = monitor.getItem().executionPoint
+
+        if (!idDrag) {
+            return lifeCycleDrag === lifeCycleHover && executionPointDrag === executionPointHover
+        }
 
         return idHover !== idDrag && lifeCycleHover ===  lifeCycleDrag && referenceIdHover === referenceDrag && executionPointDrag === executionPointHover
     }

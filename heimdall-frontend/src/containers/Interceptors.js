@@ -23,9 +23,11 @@ class Interceptors extends Component {
 
     state = {
         environmentId: 0,
+        apiId: 0,
         planId: 0,
         resourceId: 0,
         operationId: 0,
+        apiSelected: true,
         planSelected: false,
         resourceSelected: false,
         operationSelected: false,
@@ -81,12 +83,14 @@ class Interceptors extends Component {
     }
 
     componentDidMount() {
-        const query = {'api.id': this.props.api.id, offset: 0}
+        const { id }  = this.props.api
+        const query = {'api.id': id, offset: 0}
+        this.setState({ ...this.state, apiId: id })
         this.props.dispatch(initLoading())
         this.props.dispatch(getAllInterceptors(query))
         this.props.dispatch(getAllInterceptorsTypes())
         this.props.dispatch(getAllPlans(query))
-        this.props.dispatch(getAllResourcesByApi(this.props.api.id))
+        this.props.dispatch(getAllResourcesByApi(id))
     }
 
     componentWillUnmount() {
@@ -176,6 +180,7 @@ class Interceptors extends Component {
     }
 
     handleSelectChange = (type) => (value) => {
+        const { planSelected, resourceSelected, operationSelected } = this.state
         switch (type) {
             case 'ENV':
                 //dispatch ENV interceptors
@@ -184,22 +189,17 @@ class Interceptors extends Component {
             case 'PLAN':
                 //dispatch PLAN interceptors
                 if (value === 0) {
+                    const apiSelectedResult = !operationSelected && !resourceSelected
                     this.setState({
                         ...this.state,
                         planSelected: false,
                         planId: value,
-                        resourceSelected: false,
-                        resourceId: 0,
-                        operationSelected: false,
-                        operationId: 0
+                        apiSelected: apiSelectedResult
                     })
                 } else {
                     this.setState({
                         ...this.state, planSelected: true, planId: value,
-                        resourceSelected: false,
-                        resourceId: 0,
-                        operationSelected: false,
-                        operationId: 0
+                        apiSelected: false
                     })
                 }
                 break;
@@ -207,17 +207,19 @@ class Interceptors extends Component {
                 //dispatch RESOURCES interceptors
                 this.props.dispatch(clearOperations())
                 if (value === 0) {
+                    const apiSelectedResult = !planSelected
                     this.setState({
                         ...this.state,
                         resourceSelected: false,
                         resourceId: value,
                         operationSelected: false,
-                        operationId: 0
+                        operationId: 0,
+                        apiSelected: apiSelectedResult
                     })
                 } else {
                     this.setState({
                         ...this.state, resourceSelected: true, resourceId: value, operationSelected: false,
-                        operationId: 0
+                        operationId: 0, apiSelected: false
                     })
                     this.props.dispatch(getAllOperations(this.props.api.id, value))
                 }
@@ -248,7 +250,6 @@ class Interceptors extends Component {
         if (this.state.candidatesToSave.length > 0 || this.state.candidatesToUpdate.length > 0 || this.state.candidatesToDelete.length > 0){
             this.props.dispatch(initLoading())
         }
-
         if (this.state.candidatesToSave.length > 0) this.props.dispatch(saveAll(this.state.candidatesToSave))
         if (this.state.candidatesToUpdate.length > 0) this.props.dispatch(updateAll(this.state.candidatesToUpdate))
         if (this.state.candidatesToDelete.length > 0) this.props.dispatch(removeAll(this.state.candidatesToDelete))
@@ -264,6 +265,7 @@ class Interceptors extends Component {
         if (this.props.interceptors) {
             allInterceptors = interceptors.content
             allInterceptors = this.filterByLifeCycle(allInterceptors)
+            allInterceptors.concat(interceptors.content.filter(interceptor => interceptor.lifeCycle === 'API'))
 
             if (this.state.candidatesToSave.length > 0) {
                 allInterceptors = allInterceptors.concat(this.state.candidatesToSave)
@@ -322,7 +324,7 @@ class Interceptors extends Component {
 
         const hasNoChanges = this.state.candidatesToSave.length === 0 && this.state.candidatesToUpdate.length === 0 && this.state.candidatesToDelete.length === 0
         const canAddInterceptor =
-            (this.state.planSelected || this.state.resourceSelected || this.state.operationSelected)
+            (this.state.apiSelected || this.state.planSelected || this.state.resourceSelected || this.state.operationSelected)
             && (interceptorsPreFiltered && interceptorsPostFiltered)
             && (this.props.plans || !this.props.resources)
 
@@ -389,6 +391,7 @@ class Interceptors extends Component {
                               <Progress type="circle" percent={this.state.progress} width={30} status="active"
                                         style={{marginRight: 10}}/>}
                               <Tag color="#989898">{i18n.t('can_drag')}</Tag>
+                              <Tag color="#ffa613">{i18n.t('api')}</Tag>
                               <Tag color="#c3cc93">{i18n.t('plan')}</Tag>
                               <Tag color="#8edce0">{i18n.t('resource')}</Tag>
                               <Tag color="#607d8b">{i18n.t('operation')}</Tag>
@@ -403,6 +406,7 @@ class Interceptors extends Component {
                                                     icon='code-o'
                                                     canAddInterceptor={canAddInterceptor}
                                                     color={canAddInterceptor && '#989898'}
+                                                    apiId={this.state.apiId !== 0 && this.state.apiId}
                                                     environmentId={this.state.environmentId !== 0 && this.state.environmentId}
                                                     planId={this.state.planId !== 0 && this.state.planId}
                                                     resourceId={this.state.resourceId !== 0 && this.state.resourceId}

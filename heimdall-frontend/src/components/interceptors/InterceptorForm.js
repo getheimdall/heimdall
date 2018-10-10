@@ -36,7 +36,9 @@ class InterceptorForm extends Component {
 
     handleLifeCycle = (value) => {
         let referenceValue = 0;
-        if (value === 'PLAN') {
+        if (value === 'API') {
+            referenceValue = this.props.apiId
+        } else if (value === 'PLAN') {
             referenceValue = this.props.planId
         } else if (value === 'RESOURCE') {
             referenceValue = this.props.resourceId
@@ -55,8 +57,9 @@ class InterceptorForm extends Component {
 
     render() {
         const { getFieldDecorator } = this.props.form
-
+        
         const {
+            apiId,
             interceptor,
             planId,
             resourceId,
@@ -69,6 +72,11 @@ class InterceptorForm extends Component {
 
         let lifeCycleInitial
         let referenceId
+
+        if (apiId) {
+            lifeCycleInitial = 'API'
+            referenceId = apiId
+        }
 
         if (planId) {
             lifeCycleInitial = 'PLAN'
@@ -101,7 +109,6 @@ class InterceptorForm extends Component {
                                     getFieldDecorator('type', {
                                         initialValue: type,
                                     })(<Select disabled>
-                                        <Select.Option value="LOG">LOG</Select.Option>
                                         <Select.Option value="MOCK">MOCK</Select.Option>
                                         <Select.Option value="RATTING">RATTING</Select.Option>
                                         <Select.Option value="ACCESS_TOKEN">ACCESS TOKEN</Select.Option>
@@ -153,6 +160,7 @@ class InterceptorForm extends Component {
                                             { required: true, message: i18n.t('please_select_life_cycle') }
                                         ]
                                     })(<Select onChange={this.handleLifeCycle}>
+                                        {apiId && <Select.Option value="API">{i18n.t('api')}</Select.Option>}
                                         {planId && <Select.Option value="PLAN">{i18n.t('plan')}</Select.Option>}
                                         {resourceId && <Select.Option value="RESOURCE">{i18n.t('resource')}</Select.Option>}
                                         {operationId && <Select.Option value="OPERATION">{i18n.t('operation')}</Select.Option>}
