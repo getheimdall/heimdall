@@ -39,6 +39,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -131,7 +132,9 @@ public class MiddlewareService {
 
           Example<Middleware> example = Example.of(middleware, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 
-          Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+          Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "creationDate"));
+
+          Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit(), sort);
           Page<Middleware> page = middlewareRepository.findAll(example, pageable);
 
           MiddlewarePage middlewarePage = new MiddlewarePage(PageDTO.build(page));

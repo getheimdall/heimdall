@@ -307,7 +307,7 @@ class SingleResource extends Component {
                                 </div>
                             ) : (
                                 <Col sm={12} style={{textAlign:'right', marginBottom: 30}} >
-                                    <Button type="primary" ghost onClick={this.toggleOperationForm}>
+                                    <Button id="addOperation" type="primary" ghost onClick={this.toggleOperationForm}>
                                         <Icon type="plus" /> Add operation
                                     </Button>
                                 </Col>

@@ -1,6 +1,7 @@
 import java.util.*;
 
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
+import br.com.conductor.heimdall.core.service.LifeCycleService;
 import br.com.conductor.heimdall.core.util.BeanManager;
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.service.CacheInterceptorService;
@@ -26,9 +27,7 @@ public class CacheClearInterceptor extends ZuulFilter {
 
     private static String cacheName;
 
-    private static List<String> headers;
-
-    private static List<String> queryParams;
+    private static Long referenceId;
 
     private CacheInterceptorService cacheInterceptorService;
 
@@ -39,16 +38,6 @@ public class CacheClearInterceptor extends ZuulFilter {
         cacheName = "{{cache}}";
 
         method = "{{method}}";
-
-        headers = Lists.newArrayList();
-        {{#headers}}
-        headers.add("{{.}}");
-        {{/headers}}
-
-        queryParams = Lists.newArrayList();
-        {{#queryParams}}
-        queryParams.add("{{.}}");
-        {{/queryParams}}
 
         pathsAllowed = Sets.newHashSet();
         {{#pathsAllowed}}
@@ -64,11 +53,14 @@ public class CacheClearInterceptor extends ZuulFilter {
 
         detail = new FilterDetail();
 
+        referenceId = {{referenceId}};
+
     }
 
     @Override
     public boolean shouldFilter() {
-        return InterceptorLifeCycle.{{lifeCycle}}.filter(pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest());
+        LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest(), referenceId);
     }
 
     @Override
@@ -96,7 +88,7 @@ public class CacheClearInterceptor extends ZuulFilter {
     private void process() {
         cacheInterceptorService = (CacheInterceptorService) BeanManager.getBean(CacheInterceptorService.class);
 
-        cacheInterceptorService.cacheClearInterceptor(cacheName, headers, queryParams);
+        cacheInterceptorService.cacheClearInterceptor(cacheName);
         return null;
     }
 

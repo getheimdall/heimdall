@@ -18,6 +18,8 @@ import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.entity.RateLimit;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.enums.Interval;
+import br.com.conductor.heimdall.core.service.LifeCycleService;
+import br.com.conductor.heimdall.core.util.BeanManager;
 import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
 import br.com.conductor.heimdall.gateway.filter.helper.*;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
@@ -36,6 +38,8 @@ public class RateLimitInterceptor extends HeimdallFilter {
      private static String inboundURL;
 
      private static String method;
+
+     private static Long referenceId;
 
      private PathMatcher pathMatcher = new AntPathMatcher();
 
@@ -60,12 +64,16 @@ public class RateLimitInterceptor extends HeimdallFilter {
           inboundURL = "{{inboundURL}}";
 
           this.helper = new HelperImpl();
-     }
+
+          referenceId = {{referenceId}};
+
+        }
 
      @Override
      public boolean should() {
 
-          return InterceptorLifeCycle.{{lifeCycle}}.filter(pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest());
+        LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest(), referenceId);
      }
      
      @Override

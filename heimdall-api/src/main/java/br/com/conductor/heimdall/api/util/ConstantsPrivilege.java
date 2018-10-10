@@ -107,6 +107,7 @@ public class ConstantsPrivilege {
      public static final String PRIVILEGE_CREATE_TRACES = "hasAuthority('CREATE_TRACES')";
      public static final String PRIVILEGE_UPDATE_TRACES = "hasAuthority('UPDATE_TRACES')";
      public static final String PRIVILEGE_DELETE_TRACES = "hasAuthority('DELETE_TRACES')";
-     
-     
+
+     public static final String PRIVILEGE_READ_METRICS = "hasAuthority('READ_METRICS')";
+
 }
