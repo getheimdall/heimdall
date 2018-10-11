@@ -234,10 +234,13 @@ class Interceptors extends Component {
     }
 
     handleFilterOperation = (input, option) => {
-        console.log(input)
-        console.log(option)
-        return option.props.children[2].toLowerCase().indexOf(input.toLowerCase()) >= 0
-        // return 0
+        const path = option.props.children[2]
+        try {
+            const reg = new RegExp(input, 'i')
+            return path.match(reg) !== null
+        } catch (e) {
+            return true
+        }
     }
 
     updateAllParams = () => {

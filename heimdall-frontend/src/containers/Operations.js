@@ -102,13 +102,12 @@ class Operations extends Component {
     filterOperationsByPath = (e) => {
         const value = e.target.value
         const { operations } = this.state
-        const reg = new RegExp(value, 'i')
-        if (reg.test('nameHeimdall')) {
+        try {
+            const reg = new RegExp(value, 'i')
             this.setState({ ...this.state, operationsFiltered: operations.filter(o => o.path.match(reg) !== null)})
-        } else {
+        } catch (e) {
             this.setState({ ...this.state, operationsFiltered: operations })
         }
-        
     }
 
     render() {
