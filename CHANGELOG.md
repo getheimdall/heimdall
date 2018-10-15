@@ -1,5 +1,35 @@
 # Heimdall Changelog
 
+### v1.7.0-stable
+* **BreakChange**
+   * Log interceptor as ZuulFilter (now log are embedded and will be registered in all request's, and interceptors logs will be deleted) [Pull Request #130](https://github.com/getheimdall/heimdall/pull/130);
+
+* **Feature**
+
+   * Adding id's on frontend component's to improve tests [Pull Request #127](https://github.com/getheimdall/heimdall/pull/127);
+   * Adding metrics resource, All metrics will be extracted from the logs that Heimdall saves on mongoDB. [Pull Request #128](https://github.com/getheimdall/heimdall/pull/128);
+   * Optional disable 4xx error handler in http client on Heimdall-spec [Pull Request #129](https://github.com/getheimdall/heimdall/pull/129);
+   * Adding stack trace per filter [Pull Request #131](https://github.com/getheimdall/heimdall/pull/131);
+   * Improve the interceptor's UX on frontend [Pull Request #132](https://github.com/getheimdall/heimdall/pull/132);
+   * Adding HTTP PATCH method support to spec [Pull Request #135](https://github.com/getheimdall/heimdall/pull/135);
+   * Improve algorithm to cache interceptor delete with more precision [Pull Request #136](https://github.com/getheimdall/heimdall/pull/136);
+   * Added Api level to Interceptors [Pull Request #136](https://github.com/getheimdall/heimdall/pull/137);
+
+* **Bugfix**
+
+   * Fixed bug dropdown menus fixed when scrolling page [Pull Request #133](https://github.com/getheimdall/heimdall/pull/133);
+   * Middleware file response not working [Pull Request #123](https://github.com/getheimdall/heimdall/pull/123);
+
+### v1.6.6-stable 
+* **Feature**
+
+   * Adding bean validation do middleware [Pull Request #115](https://github.com/getheimdall/heimdall/pull/115);
+   * The error request will not be dispatched to Spring error controller, the response will write in the same request [Pull Request #126](https://github.com/getheimdall/heimdall/pull/126);
+
+* **Bugfix**
+
+   * Middleware file response not working [Pull Request #123](https://github.com/getheimdall/heimdall/pull/123);
+
 ### v1.6.5-stable 
 * **Bugfix**
 
