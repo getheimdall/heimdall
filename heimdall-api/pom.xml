@@ -13,6 +13,7 @@
 	<properties>
 		<uri.config>http://localhost:8888</uri.config>
 		<api.application.name>application-api</api.application.name>
+		<docker.baseImage>java:openjdk-8-jdk-alpine</docker.baseImage>
 		<docker.imageName>getheimdall/heimdall-api</docker.imageName>
 		<docker.serverId>docker-hub</docker.serverId>
 		<docker.registryUrl>https://hub.docker.com/</docker.registryUrl>
@@ -107,7 +108,7 @@
 				<artifactId>docker-maven-plugin</artifactId>
 				<version>0.4.1</version>
 				<configuration>
-					<baseImage>java:openjdk-8-jdk-alpine</baseImage>
+					<baseImage>${docker.baseImage}</baseImage>
 					<imageName>${docker.imageName}</imageName>
 					<entryPoint>["java", "-Xmx1024m", "-Xms500m", "-jar", "/${project.build.finalName}.jar"]</entryPoint>
 					<forceTags>true</forceTags>
