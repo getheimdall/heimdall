@@ -23,7 +23,9 @@ import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.enums.HttpMethod;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
+import br.com.conductor.heimdall.core.enums.Status;
 import br.com.conductor.heimdall.core.repository.AppRepository;
+import br.com.conductor.heimdall.core.repository.PlanRepository;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,6 +45,9 @@ public class LifeCycleService {
 
     @Autowired
     private AppRepository appRepository;
+
+    @Autowired
+    private PlanRepository planRepository;
 
     private static PathMatcher pathMatcher = new AntPathMatcher();
 
@@ -93,6 +98,11 @@ public class LifeCycleService {
 
     private boolean validatePlan(Set<String> pathsAllowed, Set<String> pathsNotAllowed, String inboundURL, HttpServletRequest req, Long referenceId) {
 
+        final Plan plan1 = planRepository.findOne(referenceId);
+        if (plan1 != null)
+            if (!Status.ACTIVE.equals(plan1.getStatus()))
+                return false;
+
         if ((inboundURL != null && !inboundURL.isEmpty()) &&
                 !isHostValidToInboundURL(req, inboundURL)) {
             return false;
@@ -118,7 +128,7 @@ public class LifeCycleService {
 
             for (String path : pathsAllowed) {
 
-                if (req.getRequestURI().contains(path)) return true;
+                if (pathMatcher.match(req.getRequestURI(), path)) return true;
             }
         }
 
