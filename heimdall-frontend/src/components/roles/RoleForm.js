@@ -42,8 +42,8 @@ class RoleForm extends Component {
                 payload.privileges = this.state.privilegesRole.map(p => {
                     return {id: p}
                 })
-                console.log(payload)
-                // this.props.handleSubmit(payload)
+                // console.log(payload)
+                this.props.handleSubmit(payload)
             }
         });
     }

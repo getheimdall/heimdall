@@ -1,12 +1,11 @@
 import React, { Component } from 'react'
 import {connect} from 'react-redux'
 
-import PageHeader from "../components/ui/PageHeader";
+import PageHeader from "../components/ui/PageHeader"
 
 import {Card, notification, Row} from 'antd'
-import LdapForm from "../components/ldap/LdapForm";
-import {getLdap, initLoading, updateLdap} from "../actions/ldap";
-import Loading from "../components/ui/Loading";
+import LdapForm from "../components/ldap/LdapForm"
+import {getLdap, initLoading, updateLdap} from "../actions/ldap"
 
 class SingleLdap extends Component {
 
@@ -31,8 +30,6 @@ class SingleLdap extends Component {
     render () {
 
         const { ldap } = this.props
-
-        if (!ldap) return <Loading/>
 
         return (
             <div>
