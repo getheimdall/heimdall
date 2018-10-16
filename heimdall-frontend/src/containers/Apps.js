@@ -61,7 +61,7 @@ class Apps extends Component {
                 <Row className="search-box">
                     <Card>
                         <Form>
-                            <Row gutter={24}>
+                            <Row gutter={24} type="flex" justify="start">
                                 <Col sm={24} md={5}>
                                     {getFieldDecorator('name')(<Input.Search onSearch={this.onSearchForm} placeholder="name" />)}
                                 </Col>
@@ -70,11 +70,6 @@ class Apps extends Component {
                                 </Col>
                                 <Col sm={24} md={5}>
                                     {getFieldDecorator('clientId')(<Input.Search onSearch={this.onSearchForm} placeholder="clientId" />)}
-                                </Col>
-                                <Col sm={24} md={9}>
-                                    <Row type="flex" justify="end">
-                                        <Button id="searchApps" className="card-button" type="primary" icon="search" onClick={this.onSearchForm}>Search</Button>
-                                    </Row>
                                 </Col>
                             </Row>
                         </Form>

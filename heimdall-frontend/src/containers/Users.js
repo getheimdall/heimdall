@@ -58,21 +58,15 @@ class Users extends Component {
         return (
             <div>
                 <PageHeader title="Users" icon="user" />
-
                 <Row className="search-box">
                     <Card>
                         <Form>
-                            <Row gutter={24}>
+                            <Row gutter={24} type="flex" justify="start">
                                 <Col sm={24} md={5}>
                                     {getFieldDecorator('userName')(<Input.Search onSearch={this.onSearchForm} placeholder="username" />)}
                                 </Col>
                                 <Col sm={24} md={5}>
                                     {getFieldDecorator('email')(<Input.Search onSearch={this.onSearchForm} placeholder="email" />)}
-                                </Col>
-                                <Col sm={24} md={14}>
-                                    <Row type="flex" justify="end">
-                                        <Button id="searchUsers" className="card-button" type="primary" icon="search" onClick={this.onSearchForm}>Search</Button>
-                                    </Row>
                                 </Col>
                             </Row>
                         </Form>
