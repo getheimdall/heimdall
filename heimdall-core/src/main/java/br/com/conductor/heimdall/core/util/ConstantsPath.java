@@ -81,4 +81,6 @@ public class ConstantsPath {
 
      public static final String PATH_LDAP = PATH_API + "/ldap";
 
+     public static final String PATH_METRICS = PATH_API + "/metrics";
+
 }

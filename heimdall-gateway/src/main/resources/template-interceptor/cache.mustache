@@ -2,6 +2,7 @@ import java.util.*;
 
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.util.BeanManager;
+import br.com.conductor.heimdall.core.service.LifeCycleService;
 import br.com.conductor.heimdall.gateway.filter.helper.HelperImpl;
 import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
 import br.com.conductor.heimdall.gateway.service.CacheInterceptorService;
@@ -25,6 +26,8 @@ public class CacheInterceptor extends HeimdallFilter {
     private static String method;
 
     private static String cacheName;
+
+    private static Long referenceId;
 
     private static List<String> headers;
 
@@ -67,11 +70,15 @@ public class CacheInterceptor extends HeimdallFilter {
         inboundURL = "{{inboundURL}}";
 
         this.helper = new HelperImpl();
+
+        referenceId = {{referenceId}};
+
     }
 
     @Override
     public boolean should() {
-        return InterceptorLifeCycle.{{lifeCycle}}.filter(pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest());
+        LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest(), referenceId);
     }
 
     @Override

@@ -64,9 +64,10 @@ class Index extends Component {
                 </Row>
 
                 {listApi}
+
                 <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_API]}>
                     <Tooltip placement="left" title="Add new API">
-                        <Button style={{position: 'fixed', bottom: '30px', right: '30px', zIndex: 9}}
+                        <Button id="addApi" style={{position: 'fixed', bottom: '30px', right: '30px', zIndex: 9}}
                                 className="floatButton" type="primary" icon="plus"
                                 onClick={() => history.push("/apis/new")}
                                 size="large" shape="circle"/>

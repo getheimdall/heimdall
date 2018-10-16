@@ -34,6 +34,7 @@ import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.ApiRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
 import br.com.conductor.heimdall.core.util.Pageable;
+import br.com.conductor.heimdall.core.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -74,7 +75,6 @@ public class ApiService {
       *
       * @param 	id						The ID of the {@link Api}
       * @return							The {@link Api}
-      * @throws	NotFoundException		Resource not found
       */
      public Api find(Long id) {
 
@@ -109,7 +109,6 @@ public class ApiService {
       * Generates a list of the {@link Api}'s
       *
       * @param 	apiDTO					{@link ApiDTO}
-      * @param 	pageableDTO				The pageable DTO
       * @return 						The list of {@link Api}'s
       */
      public List<Api> list(ApiDTO apiDTO) {
@@ -128,9 +127,6 @@ public class ApiService {
       *
       * @param 	apiDTO					{@link ApiDTO}
       * @return							The saved {@link Api}
-      * @throws	BadRequestException		The basepath defined exist
-      * @throws     BadRequestException      Api basepath can not contain wild card
-      * @throws     BadRequestException      Basepath can not be empty
       */
      public Api save(ApiDTO apiDTO) {
 
@@ -141,6 +137,7 @@ public class ApiService {
           HeimdallException.checkThrow(validateInboundsEnvironments(apiDTO.getEnvironments()), API_CANT_ENVIRONMENT_INBOUND_URL_EQUALS);
 
           Api api = GenericConverter.mapperWithMapping(apiDTO, Api.class, new ApiMap());
+          api.setBasePath(StringUtils.removeMultipleSlashes(api.getBasePath()));
 
           api = apiRepository.save(api);
 
@@ -154,10 +151,6 @@ public class ApiService {
       * @param 	id						The ID of the {@link Api}
       * @param 	apiDTO					{@link ApiDTO}
       * @return							The updated {@link Api}
-      * @throws	NotFoundException		Resource not found
-      * @throws	BadRequestException		The basepath defined exist
-      * @throws     BadRequestException      Api basepath can not contain wild card
-      * @throws     BadRequestException      Basepath can not be empty
       */
      public Api update(Long id, ApiDTO apiDTO) {
 
@@ -171,10 +164,11 @@ public class ApiService {
           HeimdallException.checkThrow(validateInboundsEnvironments(apiDTO.getEnvironments()), API_CANT_ENVIRONMENT_INBOUND_URL_EQUALS);
 
           api = GenericConverter.mapperWithMapping(apiDTO, api, new ApiMap());
+          api.setBasePath(StringUtils.removeMultipleSlashes(api.getBasePath()));
+
           api = apiRepository.save(api);
 
           amqpRoute.dispatchRoutes();
-
           return api;
      }
 
@@ -182,7 +176,6 @@ public class ApiService {
       * Deletes a {@link Api} by its ID.
       *
       * @param 	id						The ID of the {@link Api}
-      * @throws	NotFoundException		Resource not found
       */
      public void delete(Long id) {
 

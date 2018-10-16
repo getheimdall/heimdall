@@ -37,7 +37,6 @@ import lombok.Getter;
 @Getter
 public enum TypeInterceptor {
 
-	LOG(new LogHeimdallInterceptor()),
 	MOCK(new MockHeimdallInterceptor()),
 	RATTING(new RattingHeimdallInterceptor()),
 	ACCESS_TOKEN(new AccessTokenHeimdallInterceptor()),

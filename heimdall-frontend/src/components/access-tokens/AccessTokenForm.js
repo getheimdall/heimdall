@@ -148,14 +148,14 @@ class AccessTokenForm extends Component {
                                     shape="circle"
                                     disabled={!accessToken}
                                     onClick={accessToken && this.showDeleteConfirm(accessToken.id)}
-                                    loading={loading}/>
+                                    loading={loading} id="deleteAccessToken"/>
                         </Tooltip>
                     </ComponentAuthority>
                     <ComponentAuthority
                         privilegesAllowed={[privileges.PRIVILEGE_CREATE_ACCESSTOKEN, privileges.PRIVILEGE_UPDATE_ACCESSTOKEN]}>
                         <Tooltip title="Save">
                             <Button className="card-button" type="primary" icon="save" size="large" shape="circle"
-                                    onClick={this.onSubmitForm} loading={loading}/>
+                                    onClick={this.onSubmitForm} loading={loading} id="saveAccessToken"/>
                         </Tooltip>
                     </ComponentAuthority>
                 </Row>

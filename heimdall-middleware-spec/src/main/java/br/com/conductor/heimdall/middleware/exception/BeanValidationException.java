@@ -1,9 +1,8 @@
-
-package br.com.conductor.heimdall.core.enums;
+package br.com.conductor.heimdall.middleware.exception;
 
 /*-
  * =========================LICENSE_START==================================
- * heimdall-core
+ * heimdall-middleware-spec
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
@@ -21,30 +20,27 @@ package br.com.conductor.heimdall.core.enums;
  * ==========================LICENSE_END===================================
  */
 
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-
-import br.com.conductor.heimdall.core.entity.Interceptor;
+import lombok.Getter;
 
 /**
- * Provides method to validate the path of a {@link Interceptor}.
- *
- * @author Filipe Germano
+ * This class represents errors related to beans validations
+ * <br/>
+ * You can use javax annotations to validate your bean. 
+ * 
+ * @author <a href="https://github.com/jscamara">Jonathan Camara</a>
+ * 
+ * @see <a href="https://jcp.org/en/jsr/detail?id=380">JSR 380<a/>
  *
  */
-public interface Should {
-     
-	/**
-	 * Validates if a inbound {@link Interceptor} URL is valid.
-	 * 
-	 * @param path				The Set that represents the path
-	 * @param pathsAllowed		The Set of allowed paths
-	 * @param inboundURL		The inbound URL
-	 * @param method			The HTTP method
-	 * @param req				The {@link HttpServletRequest}
-	 * @return					True if the inbound URL is valid, false otherwise
-	 */
-     public boolean filter(Set<String> path, Set<String> pathsAllowed, String inboundURL, String method, HttpServletRequest req);
+@Getter
+public class BeanValidationException extends RuntimeException {
 
+     private static final long serialVersionUID = -3415601794675335171L;
+     
+     private String violations;
+     
+     public BeanValidationException(String message, String violations) {
+          super(message);
+          this.violations = violations;
+     }
 }

@@ -42,7 +42,7 @@ class Environments extends Component {
                     <ListEnvironments environments={environments} handleDelete={this.handleDelete} />
                     {loading && <Loading />}
                     <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_ENVIRONMENT]}>
-                        <FloatButton history={history} to="/environments/new" label="Add new Environment" />
+                        <FloatButton idButton="addEnvironment" history={history} to="/environments/new" label="Add new Environment" />
                     </ComponentAuthority>
                 </Row>
             </div>

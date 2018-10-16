@@ -145,12 +145,12 @@ class UserForm extends Component {
                 <Row type="flex" justify="end">
                     <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_USER]}>
                         <Tooltip title="Delete">
-                            <Button className="card-button" type="danger" ghost icon="delete" size="large" shape="circle" disabled={!user} onClick={user && this.showDeleteConfirm(user.id)} loading={loading} />
+                            <Button id="deleteUser" className="card-button" type="danger" ghost icon="delete" size="large" shape="circle" disabled={!user} onClick={user && this.showDeleteConfirm(user.id)} loading={loading} />
                         </Tooltip>
                     </ComponentAuthority>
                     <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_USER, privileges.PRIVILEGE_UPDATE_USER]}>
                         <Tooltip title="Save">
-                            <Button className="card-button" type="primary" icon="save" size="large" shape="circle" onClick={this.onSubmitForm} loading={loading} disabled={!roles} />
+                            <Button id="saveUser" className="card-button" type="primary" icon="save" size="large" shape="circle" onClick={this.onSubmitForm} loading={loading} disabled={!roles} />
                         </Tooltip>
                     </ComponentAuthority>
                 </Row>
