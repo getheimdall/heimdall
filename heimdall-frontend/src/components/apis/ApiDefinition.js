@@ -109,7 +109,7 @@ class ApiDefinition extends Component {
                                             getFieldDecorator('basePath', {
                                                 initialValue: api.basePath,
                                                 rules: [{required: true, message: 'Please input your api base path!'}]
-                                            })(<Input disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_API])}/>)
+                                            })(<Input addonBefore={"/"} disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_API])}/>)
                                         }
                                     </FormItem>
                                 </Col>
@@ -147,13 +147,13 @@ class ApiDefinition extends Component {
                 <Row type="flex" justify="end">
                     <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_API]}>
                         <Tooltip title="Delete">
-                            <Button className="card-button" type="danger" ghost icon="delete"
+                            <Button id="deleteApi" className="card-button" type="danger" ghost icon="delete"
                                     onClick={this.showDeleteConfirm} size="large" shape="circle"/>
                         </Tooltip>
                     </ComponentAuthority>
                     <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_UPDATE_API]}>
                         <Tooltip title="Save">
-                            <Button className="card-button" type="primary" icon="save" onClick={this.onSubmitApi}
+                            <Button id="saveApi" className="card-button" type="primary" icon="save" onClick={this.onSubmitApi}
                                     size="large" shape="circle"/>
                         </Tooltip>
                     </ComponentAuthority>

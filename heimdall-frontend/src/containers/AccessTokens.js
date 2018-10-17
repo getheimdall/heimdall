@@ -70,8 +70,7 @@ class AccessTokens extends Component {
                                 </Col>
                                 <Col sm={24} md={19}>
                                     <Row type="flex" justify="end">
-                                        <Button className="card-button" type="primary" icon="search"
-                                                onClick={this.onSearchForm}>Search</Button>
+                                        <Button id="searchAccessToken" className="card-button" type="primary" icon="search" onClick={this.onSearchForm}>Search</Button>
                                     </Row>
                                 </Col>
                             </Row>
@@ -81,7 +80,7 @@ class AccessTokens extends Component {
                 <Row className="h-row bg-white">
                     <ListAccessTokens dataSource={accessTokens} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading}/>
                     <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_ACCESSTOKEN]}>
-                        <FloatButton history={history} to="/tokens/new" label="Add new Access Token"/>
+                        <FloatButton idButton="addAccessToken" history={history} to="/tokens/new" label="Add new Access Token"/>
                     </ComponentAuthority>
                 </Row>
             </div>

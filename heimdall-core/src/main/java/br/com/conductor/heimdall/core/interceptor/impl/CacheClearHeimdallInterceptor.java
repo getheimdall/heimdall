@@ -62,8 +62,6 @@ public class CacheClearHeimdallInterceptor implements HeimdallInterceptor {
         CacheDTO cacheDTO = (CacheDTO) objectCustom;
 
         parameters.put("cache", cacheDTO.getCache());
-        parameters.put("headers", cacheDTO.getHeaders());
-        parameters.put("queryParams", cacheDTO.getQueryParams());
 
         return parameters;
     }

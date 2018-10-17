@@ -192,14 +192,14 @@ class AppForm extends Component {
                 <Row type="flex" justify="end">
                     <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_APP]}>
                         <Tooltip title="Delete">
-                            <Button className="card-button" type="danger" ghost icon="delete" size="large"
+                            <Button id="deleteApp" className="card-button" type="danger" ghost icon="delete" size="large"
                                     shape="circle"
                                     disabled={!app} onClick={app && this.showDeleteConfirm(app.id)} loading={loading}/>
                         </Tooltip>
                     </ComponentAuthority>
                     <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_APP]}>
                         <Tooltip title="Save">
-                            <Button className="card-button" type="primary" icon="save" size="large" shape="circle"
+                            <Button  id="saveApp" className="card-button" type="primary" icon="save" size="large" shape="circle"
                                     onClick={this.onSubmitForm} loading={loading}/>
                         </Tooltip>
                     </ComponentAuthority>

@@ -3,7 +3,7 @@ export const TEMPLATE_MOCK = "{\"body\": \"{'name': 'Mock Example'}\", \"status\
 export const TEMPLATE_RATTING = "{\"calls\":20,\"interval\":\"MINUTES\"}";
 export const TEMPLATE_IPS = "{\"ips\": [ \"127.0.0.0\", \"127.0.0.1\" ]}";
 export const TEMPLATE_CACHE = "{\"cache\":\"cache-name\", \"timeToLive\": 10000, \"headers\": [\"header1\", \"header2\"], \"queryParams\": [\"queryParam1\", \"queryParam2\"]}";
-export const TEMPLATE_CACHE_CLEAR = "{\"cache\":\"cache-name\", \"headers\": [\"header1\", \"header2\"], \"queryParams\": [\"queryParam1\", \"queryParam2\"]}";
+export const TEMPLATE_CACHE_CLEAR = "{\"cache\":\"cache-name\"}";
 
 export const getTemplate = (type) => {
     if (type === 'ACCESS_TOKEN') {
@@ -36,6 +36,19 @@ export const getTemplate = (type) => {
 }
 
 export const interceptorSort = (first, second) => {
+
+    if (first.lifeCycle === 'API' && second.lifeCycle !== 'API') {
+        return -1
+    }
+
+    if (first.lifeCycle !== 'API' && second.lifeCycle === 'API') {
+        return 1
+    }
+
+    if (first.lifeCycle === 'API' && second.lifeCycle === 'API') {
+        if (first.order < second.order) return -1
+        if (first.order > second.order) return 1
+    }
 
     if (first.lifeCycle === 'PLAN' && second.lifeCycle !== 'PLAN') {
         return -1

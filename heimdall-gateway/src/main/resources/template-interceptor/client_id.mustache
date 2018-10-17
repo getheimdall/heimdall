@@ -15,6 +15,7 @@ import br.com.conductor.heimdall.gateway.filter.helper.*;
 import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.enums.Location;
+import br.com.conductor.heimdall.core.service.LifeCycleService;
 import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
 import br.com.conductor.heimdall.gateway.service.SecurityService;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
@@ -36,6 +37,8 @@ public class ClientIdInterceptor extends HeimdallFilter {
 
      private static String method;
 
+     private static Long referenceId;
+
      private Helper helper;
 
      public ClientIdInterceptor() {
@@ -55,6 +58,7 @@ public class ClientIdInterceptor extends HeimdallFilter {
           inboundURL = "{{inboundURL}}";
 
           this.helper = new HelperImpl();
+          referenceId = {{referenceId}};
 
      }
 
@@ -73,7 +77,8 @@ public class ClientIdInterceptor extends HeimdallFilter {
      @Override
      public boolean should() {
 
-          return InterceptorLifeCycle.{{lifeCycle}}.filter(pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest());
+        LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest(), referenceId);
      }
      
      @Override

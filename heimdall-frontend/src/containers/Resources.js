@@ -97,33 +97,31 @@ class Resources extends Component {
         const modalResource =
             <Modal title="Add Resource"
                    footer={[
-                       <Button key="back" onClick={this.handleCancel}>Cancel</Button>,
+                       <Button id="cancelAddResource" key="back" onClick={this.handleCancel}>Cancel</Button>,
                        <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_UPDATE_RESOURCE]}>
-                           <Button key="submit" type="primary" loading={loading} onClick={this.handleSave}>
+                           <Button id="saveResource" key="submit" type="primary" loading={loading} onClick={this.handleSave}>
                                Save
                            </Button>
                        </ComponentAuthority>
                    ]}
                    visible={this.props.visibleModal}
                    onCancel={this.handleCancel}
-                   destroyOnClose>
-                <ResourceForm onRef={ref => (this.addResource = ref)} resourceId={this.state.resourceSelected}
-                              idApi={api.id}/>
+                   destroyOnClose >
+                <ResourceForm onRef={ref => (this.addResource = ref)} resourceId={this.state.resourceSelected} idApi={api.id} />
             </Modal>
 
         if (resources && resources.length === 0) {
             return (
                 <Row type="flex" justify="center" align="bottom">
                     { PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_RESOURCE]) &&
-                    <Col style={{marginTop: 20}}>
-                        You don't have resources in this <b>API</b>, please <Button type="dashed" className="add-tour"
-                                                                                    onClick={this.addResourceModal}>Add Resource</Button>
-                    </Col>
+                        <Col style={{marginTop: 20}}>
+                            You don't have resources in this <b>API</b>, please <Button id="addResourceWhenListIsEmpty" type="dashed" className="add-tour" onClick={this.addResourceModal}>Add Resource</Button>
+                        </Col>
                     }
                     { !PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_RESOURCE]) &&
-                    <Col style={{marginTop: 20}}>
-                        You don't have resources in this <b>API</b>
-                    </Col>
+                        <Col style={{marginTop: 20}}>
+                            You don't have resources in this <b>API</b>
+                        </Col>
                     }
                     {modalResource}
                 </Row>
@@ -152,7 +150,7 @@ class Resources extends Component {
                                     </ButtonGroup>
                                 </Row>
                             } extraWidth={10}>
-                                <Operations idResource={resource.id} idApi={api.id}/>
+                                <Operations idResource={resource.id} idApi={api.id} apiBasepath={api.basePath} />
                             </HeimdallPanel>
                         )
                     })}
@@ -161,8 +159,7 @@ class Resources extends Component {
                 <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_RESOURCE]}>
                     <Row type="flex" justify="end">
                         <Tooltip title="Add Resource">
-                            <Button className="card-button add-tour" type="primary" icon="plus"
-                                    onClick={this.addResourceModal} size="large" shape="circle"/>
+                            <Button id="addResource" className="card-button add-tour" type="primary" icon="plus" onClick={this.addResourceModal} size="large" shape="circle" />
                         </Tooltip>
                     </Row>
 

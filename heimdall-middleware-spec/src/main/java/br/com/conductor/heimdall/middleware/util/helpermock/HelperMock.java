@@ -71,4 +71,9 @@ public class HelperMock implements Helper {
     public Xml xml() {
         return new XmlMockImpl();
     }
+
+	@Override
+	public void httpHandler(boolean useHandler) {
+		
+	}
 }

@@ -75,7 +75,7 @@ class Apps extends Component {
                                 </Col>
                                 <Col sm={24} md={9}>
                                     <Row type="flex" justify="end">
-                                        <Button className="card-button" type="primary" icon="search" onClick={this.onSearchForm}>Search</Button>
+                                        <Button id="searchApps" className="card-button" type="primary" icon="search" onClick={this.onSearchForm}>Search</Button>
                                     </Row>
                                 </Col>
                             </Row>
@@ -85,8 +85,9 @@ class Apps extends Component {
 
                 <Row className="h-row bg-white">
                     <ListApps dataSource={apps} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading} />
+
                     <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_APP]}>
-                        <FloatButton history={history} to="/apps/new" label="Add new App" />
+                        <FloatButton idButton="addApp" history={history} to="/apps/new" label="Add new App" />
                     </ComponentAuthority>
                 </Row>
             </div>
