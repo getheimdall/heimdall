@@ -42,6 +42,7 @@ class SingleUser extends Component {
         if (formObject.id) {
             this.props.dispatch(clearUser())
             this.props.dispatch(update(formObject))
+            this.props.dispatch(getUser(formObject.id))
         } else {
             this.props.dispatch(save(formObject))
         }
