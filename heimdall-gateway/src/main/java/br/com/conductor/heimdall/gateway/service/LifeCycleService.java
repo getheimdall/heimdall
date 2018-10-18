@@ -17,13 +17,18 @@
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-package br.com.conductor.heimdall.core.service;
+package br.com.conductor.heimdall.gateway.service;
 
 import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.enums.HttpMethod;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
+import br.com.conductor.heimdall.core.enums.Location;
+import br.com.conductor.heimdall.core.enums.Status;
 import br.com.conductor.heimdall.core.repository.AppRepository;
+import br.com.conductor.heimdall.core.repository.PlanRepository;
+import br.com.conductor.heimdall.core.util.BeanManager;
+import com.netflix.zuul.context.RequestContext;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,6 +48,9 @@ public class LifeCycleService {
 
     @Autowired
     private AppRepository appRepository;
+
+    @Autowired
+    private PlanRepository planRepository;
 
     private static PathMatcher pathMatcher = new AntPathMatcher();
 
@@ -84,7 +92,7 @@ public class LifeCycleService {
 
             for (String path : pathsAllowed) {
 
-                if (req.getRequestURI().contains(path)) return true;
+                if (pathMatcher.match(req.getRequestURI(), path)) return true;
             }
         }
 
@@ -92,6 +100,11 @@ public class LifeCycleService {
     }
 
     private boolean validatePlan(Set<String> pathsAllowed, Set<String> pathsNotAllowed, String inboundURL, HttpServletRequest req, Long referenceId) {
+
+        final Plan plan1 = planRepository.findOne(referenceId);
+        if (plan1 != null)
+            if (!Status.ACTIVE.equals(plan1.getStatus()))
+                return false;
 
         if ((inboundURL != null && !inboundURL.isEmpty()) &&
                 !isHostValidToInboundURL(req, inboundURL)) {
@@ -118,31 +131,11 @@ public class LifeCycleService {
 
             for (String path : pathsAllowed) {
 
-                if (req.getRequestURI().contains(path)) return true;
+                if (pathMatcher.match(req.getRequestURI(), path)) return true;
             }
         }
 
         return false;
-    }
-
-    private boolean validateOperation(Set<String> pathsAllowed, Set<String> pathsNotAllowed, String inboundURL, String method, HttpServletRequest req) {
-
-        if (!isMethodValidToRequest(req, method)) {
-
-            return false;
-        }
-
-        if ((inboundURL != null && !inboundURL.isEmpty()) && !isHostValidToInboundURL(req, inboundURL)) {
-
-            return false;
-        }
-
-        if (listContainURI(req.getRequestURI(), pathsNotAllowed)) {
-            return false;
-        }
-
-        return listContainURI(req.getRequestURI(), pathsAllowed);
-
     }
 
     private boolean validateResource(Set<String> pathsAllowed, Set<String> pathsNotAllowed, String inboundURL, HttpServletRequest req) {
@@ -183,6 +176,76 @@ public class LifeCycleService {
                 }
             }
         }
+
+        return false;
+    }
+
+    private boolean validateOperation(Set<String> pathsAllowed, Set<String> pathsNotAllowed, String inboundURL, String method, HttpServletRequest req) {
+
+        if (!isMethodValidToRequest(req, method)) {
+
+            return false;
+        }
+
+        if ((inboundURL != null && !inboundURL.isEmpty()) && !isHostValidToInboundURL(req, inboundURL)) {
+
+            return false;
+        }
+
+        if (listContainURI(req.getRequestURI(), pathsNotAllowed)) {
+            return false;
+        }
+
+        return listContainURI(req.getRequestURI(), pathsAllowed);
+
+    }
+
+    public boolean validateClientId(HttpServletRequest req,
+                                    Long apiId,
+                                    Location location,
+                                    String name) {
+
+        String clientId;
+        if (Location.HEADER.equals(location))
+            clientId = req.getHeader(name);
+        else
+            clientId = req.getParameter(name);
+
+        SecurityService securityService = (SecurityService) BeanManager.getBean(SecurityService.class);
+        RequestContext requestContext = RequestContext.getCurrentContext();
+
+        final Long currentApiId = Long.parseLong((String) requestContext.get("api-id"));
+
+        if (apiId.equals(currentApiId))
+            securityService.validadeClientId(requestContext, currentApiId, clientId);
+
+        return false;
+    }
+
+    public boolean validateAccessToken(HttpServletRequest req,
+                                    Long apiId,
+                                    Location location,
+                                    String name) {
+
+        String clientId;
+        if (Location.HEADER.equals(location))
+            clientId = req.getHeader("client_id");
+        else
+            clientId = req.getParameter("client_id");
+
+        String accessToken;
+        if (Location.HEADER.equals(location))
+            accessToken = req.getHeader(name);
+        else
+            accessToken = req.getParameter(name);
+
+        SecurityService securityService = (SecurityService) BeanManager.getBean(SecurityService.class);
+        RequestContext requestContext = RequestContext.getCurrentContext();
+
+        final Long currentApiId = Long.parseLong((String) requestContext.get("api-id"));
+
+        if (apiId.equals(currentApiId))
+            securityService.validadeAccessToken(requestContext, currentApiId, clientId, accessToken);
 
         return false;
     }
