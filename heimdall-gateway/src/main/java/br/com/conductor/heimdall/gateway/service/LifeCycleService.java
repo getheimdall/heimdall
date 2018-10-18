@@ -229,9 +229,9 @@ public class LifeCycleService {
 
         String clientId;
         if (Location.HEADER.equals(location))
-            clientId = req.getHeader(name);
+            clientId = req.getHeader("client_id");
         else
-            clientId = req.getParameter(name);
+            clientId = req.getParameter("client_id");
 
         String accessToken;
         if (Location.HEADER.equals(location))
