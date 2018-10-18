@@ -6,6 +6,7 @@ import { operationService } from '../services'
 import { List, Avatar, Button, Row, Col, Tooltip, Modal, notification } from 'antd';
 import Loading from '../components/ui/Loading'
 import OperationForm from '../components/operations/OperationForm';
+import FloatSearch from './../components/ui/FloatSearch';
 
 const ButtonGroup = Button.Group;
 
@@ -13,7 +14,7 @@ class Operations extends Component {
 
     constructor(props) {
         super(props)
-        this.state = { operations: null, operationSelected: 0, visibleModal: false }
+        this.state = { operations: null, operationSelected: 0, visibleModal: false, operationsFiltered: null, visibleSearch: false }
     }
 
     componentDidMount() {
@@ -43,9 +44,8 @@ class Operations extends Component {
         this.setState({ ...this.state, operations: null });
         operationService.getOperationsByResource(this.props.idApi, this.props.idResource)
             .then(data => {
-                this.setState({ ...this.state, operations: data });
+                this.setState({ ...this.state, operations: data, operationsFiltered: data});
             })
-
     }
 
     saveOperation = (idApi, idResource, operation) => {
@@ -94,8 +94,24 @@ class Operations extends Component {
         this.removeOperation(this.props.idApi, this.props.idResource, operationId)
     }
 
+    toggleSearch = () => {
+        const { visibleSearch } = this.state
+        this.setState({ ...this.state, visibleSearch: !visibleSearch })
+    }
+
+    filterOperationsByPath = (e) => {
+        const value = e.target.value
+        const { operations } = this.state
+        try {
+            const reg = new RegExp(value, 'i')
+            this.setState({ ...this.state, operationsFiltered: operations.filter(o => o.path.match(reg) !== null)})
+        } catch (e) {
+            this.setState({ ...this.state, operationsFiltered: operations })
+        }
+    }
+
     render() {
-        const { operations } = this.state;
+        const { operations, operationsFiltered, visibleSearch } = this.state;
         const { loading } = this.props
         if (!operations) return <Loading />
 
@@ -125,17 +141,25 @@ class Operations extends Component {
         }
 
         return (
-            <div>
+            <div style={{ position: 'relative' }}>
+                { visibleSearch && <FloatSearch callbackKeyUp={this.filterOperationsByPath} handleClose={this.toggleSearch}/>}
                 <Row type="flex" justify="center">
-                    <Tooltip title="Add Operation">
-                        <Button id="addOperation" type="dashed" icon="plus" onClick={this.showOperationModal()}>Add Operation</Button>
-                    </Tooltip>
+                    <Col style={{margin: 5}}>
+                        <Tooltip title="Add Operation">
+                            <Button id="addOperation" type="dashed" icon="plus" onClick={this.showOperationModal()}>Add Operation</Button>
+                        </Tooltip>
+                    </Col>
+                    <Col style={{margin: 5}}>
+                        <Tooltip title="Search operations">
+                            <Button id="searchOperations" type="dashed" icon="search" onClick={this.toggleSearch}>Search Operations</Button>
+                        </Tooltip>
+                    </Col>
                 </Row>
                 {/* <hr /> */}
                 <List
                     className="demo-loadmore-list"
                     itemLayout="horizontal"
-                    dataSource={operations}
+                    dataSource={operationsFiltered}
                     renderItem={operation => {
                         let color;
                         if (operation.method === 'GET') {
