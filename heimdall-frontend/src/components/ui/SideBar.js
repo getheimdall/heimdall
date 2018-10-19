@@ -56,6 +56,10 @@ class SideBar extends Component {
                         <Menu.Item key="traces" className="traces">
                             <SidebarLink to="/traces" label="Traces" history={history} icon="sync" />
                         </Menu.Item>
+
+                        <Menu.Item key="analytics" className="analytics">
+                            <SidebarLink to="/analytics" label="Analytics" history={history} icon="area-chart" />
+                        </Menu.Item>
                     </Menu>
                 </Affix>
             </Sider>
