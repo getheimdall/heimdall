@@ -9,6 +9,10 @@ export const finishLoading = () => dispatch => {
     dispatch({ type: AnalyticsConstants.ANALYTICS_LOADING_FINISH })
 }
 
+export const sendNotification = notification => dispatch => {
+    dispatch({ type: AnalyticsConstants.ANALYTICS_NOTIFICATION, notification })
+}
+
 export const getTopApps = (limit, period) => dispatch => {
     analyticsService.getAppsTop(limit, period)
         .then(data => {

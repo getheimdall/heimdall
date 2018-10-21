@@ -1,17 +1,17 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import {Button, Card, Col, Form, Row, InputNumber, Select} from 'antd'
+import {Button, Card, Col, Form, Row, InputNumber, Select, notification} from 'antd'
 
 import Chart from "../components/ui/Chart"
 import PageHeader from "../components/ui/PageHeader"
 import Loading from "../components/ui/Loading"
-import { getTopAccessTokens, getTopApis, getTopApps, getTopResultStatus } from "../actions/analytics"
+import { getTopAccessTokens, getTopApis, getTopApps, getTopResultStatus, sendNotification} from "../actions/analytics"
 
 class Analytics extends React.Component {
 
     state = {
         limit: 5,
-        period: "LAST_MONTH",
+        period: "THIS_MONTH",
         topApps: [],
         topApis: [],
         topResultStatus: [],
@@ -32,6 +32,13 @@ class Analytics extends React.Component {
         }
     }
 
+    componentWillReceiveProps(newProps) {
+        if (newProps.notification && newProps.notification !== this.props.notification) {
+            const { type, message, description } = newProps.notification
+            notification[type]({ message, description })
+        }
+    }
+
     onSearchForm = () => {
         this.props.form.validateFieldsAndScroll((err, payload) => {
             if (!err) {
@@ -49,6 +56,7 @@ class Analytics extends React.Component {
             this.props.dispatch(getTopApis(limit, period))
             this.props.dispatch(getTopAccessTokens(limit, period))
             this.props.dispatch(getTopResultStatus(limit, period))
+            this.props.dispatch(sendNotification({ type: 'success', message: 'Metrics update!' }))
     }
 
     render() {
@@ -99,16 +107,16 @@ class Analytics extends React.Component {
                     <Card>
                         <Row gutter={24}>
                             <Col sm={24} md={12}>
-                                <Chart metrics={topApps} title="Top Apps"/>
+                                <Chart metrics={topApps} title="Top Apps" color="#5183F7"/>
                             </Col>
                             <Col sm={24} md={12}>
-                                <Chart metrics={topApis} title="Top APIs"/>
+                                <Chart metrics={topApis} title="Top APIs" color="#D9535A"/>
                             </Col>
                             <Col sm={24} md={12}>
-                                <Chart metrics={topAccessTokens} title="Top Access Tokens"/>
+                                <Chart metrics={topAccessTokens} title="Top Access Tokens" color="#2F4554"/>
                             </Col>
                             <Col sm={24} md={12}>
-                                <Chart metrics={topResultStatus} title="Top Result Status"/>
+                                <Chart metrics={topResultStatus} title="Top Result Status" color="#C3BFD9"/>
                             </Col>
                         </Row>
                     </Card>
@@ -127,6 +135,7 @@ const mapStateToProps = state => {
         topAccessTokens: state.analytics.topAccessTokens,
         topResultStatus: state.analytics.topResultStatus,
         loading: state.analytics.loading,
+        notification: state.analytics.notification
     }
 }
 

@@ -2,7 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import ReactEcharts from 'echarts-for-react'
 
-import ColorUtils from "../../utils/ColorUtils"
 import Loading from "./Loading"
 
 class Chart extends React.Component {
@@ -12,7 +11,7 @@ class Chart extends React.Component {
     }
 
     componentDidMount() {
-        this.setState({...this.state, color: ColorUtils.getRandomColor()})
+        this.setState({...this.state, color: this.props.color})
     }
 
     getOption = () => {
@@ -21,7 +20,8 @@ class Chart extends React.Component {
         let dataMetrics = []
         let dataMetricsValues = []
 
-        if (metrics) {
+        if (metrics && Array.isArray(metrics)) {
+
             dataMetrics = metrics.map(metric => {
                 return metric.metric
             })

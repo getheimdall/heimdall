@@ -14,6 +14,8 @@ export default (state = {}, action) => {
             return { ...state, topAccessTokens: action.topAccessTokens }
         case AnalyticsConstants.ANALYTICS_TOP_RESULT_STATUS:
             return { ...state, topResultStatus: action.topResultStatus }
+        case AnalyticsConstants.ANALYTICS_NOTIFICATION:
+            return { ...state, notification: action.notification }
         default:
             return state
     }
