@@ -194,9 +194,11 @@ public class MongoLogConnector implements Serializable {
          switch(date) {
              case TODAY: {
                  query.field(insertedOnDate).containsIgnoreCase(LocalDate.now().format(DateTimeFormatter.ISO_DATE));
+                 break;
              }
              case YESTERDAY: {
                  query.field(insertedOnDate).containsIgnoreCase(LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_DATE));
+                 break;
              }
              case THIS_WEEK: {
                  Map<String, LocalDate> week = CalendarUtils.firstAndLastDaysOfWeek(LocalDate.now());

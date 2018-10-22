@@ -37,6 +37,7 @@ import Users from '../containers/Users';
 import SingleUser from '../containers/SingleUser';
 import Traces from "../containers/Traces";
 import SingleTrace from "../containers/SingleTrace";
+import Analytics from '../containers/Analytics';
 
 const routes = ({ history }) => (
     <Switch>
@@ -69,6 +70,7 @@ const routes = ({ history }) => (
         <AppRoute layout={MainLayout} history={history} exact path="/users/:id" component={Authorization()(FadeIn(SingleUser))} />
         <AppRoute layout={MainLayout} history={history} exact path="/traces" component={Authorization()(FadeIn(Traces))} />
         <AppRoute layout={MainLayout} history={history} exact path="/traces/:id" component={Authorization()(FadeIn(SingleTrace))} />
+        <AppRoute layout={MainLayout} history={history} exact path="/analytics" component={Authorization()(FadeIn(Analytics))} />
 
         {/* routes not finded or 404 */}
         <Redirect to="/" />

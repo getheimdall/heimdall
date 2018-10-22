@@ -11,6 +11,8 @@
     "cross-fetch": "^1.1.1",
     "css-animation": "^1.4.1",
     "dotenv": "^5.0.1",
+    "echarts": "^4.2.0-rc.2",
+    "echarts-for-react": "^2.0.15-beta.0",
     "less": "2.7.3",
     "lodash.flow": "^3.5.0",
     "moment": "^2.22.1",

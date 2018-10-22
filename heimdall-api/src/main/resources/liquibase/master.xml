@@ -27,8 +27,9 @@
     <include file="changelog/DATA_USERS_1.xml" relativeToChangelogFile="true"/>
     <include file="changelog/DATA_USERS_ROLES_1.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20180521092430-insert-privileges-to-provider.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20180521101715-add-privileges-provider-to-role-admin.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20180918144230-insert-privileges-for-logtraces.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20180918144310-insert-privileges-for-metrics.xml" relativeToChangelogFile="true"/>
-    <include file="changelog/20180521101715-add-privileges-provider-to-role-admin.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20181018114923-add-privileges-metrics-to-role-admin.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
