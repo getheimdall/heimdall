@@ -7,6 +7,8 @@ import {
     Tooltip,
     Icon,
 } from 'antd'
+import SwaggerIcon from "../icons/SwaggerIcon"
+import {Link} from "react-router-dom";
 
 class ListApis extends Component {
 
@@ -30,7 +32,12 @@ class ListApis extends Component {
                                         </div>
                                     }
                                     actions={[
-                                        <Tooltip title="View" onClick={this.redirect('/apis/' + api.id)}><Icon type="search" /></Tooltip>
+                                        <Tooltip title="View" onClick={this.redirect('/apis/' + api.id)}><Icon type="search" /></Tooltip>,
+                                        <Tooltip title="Swagger-Editor">
+                                            <Link to={`/apis/${api.id}/swagger-editor`}>
+                                                <SwaggerIcon width={24} height={24}/>
+                                            </Link>
+                                        </Tooltip>
                                     ]}
                                 >
                                     <div className="heimdall-card-body" onClick={this.redirect('/apis/' + api.id)}>

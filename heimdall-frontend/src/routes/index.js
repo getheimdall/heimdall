@@ -37,6 +37,7 @@ import Users from '../containers/Users';
 import SingleUser from '../containers/SingleUser';
 import Traces from "../containers/Traces";
 import SingleTrace from "../containers/SingleTrace";
+import SingleApiSwaggerEditor from "../components/apis/SingleApiSwaggerEditor"
 
 const routes = ({ history }) => (
     <Switch>
@@ -44,6 +45,7 @@ const routes = ({ history }) => (
         <AppRoute layout={MainLayout} history={history} exact path="/apis" component={Authorization()(FadeIn(Apis))} />
         <AppRoute layout={MainLayout} history={history} exact path="/apis/new" component={Authorization()(FadeIn(NewApi))} />
         <AppRoute layout={MainLayout} history={history} exact path="/apis/:id" component={Authorization()(FadeIn(SingleApi))} />
+        <AppRoute layout={MainLayout} history={history} exact path="/apis/:id/swagger-editor" component={Authorization()(FadeIn(SingleApiSwaggerEditor))} />
         <AppRoute layout={MainLayout} history={history} path="/apis/:id/api" component={Authorization()(FadeIn(SingleListApis))} />
         <AppRoute layout={MainLayout} history={history} path="/apis/:id/monitor" component={Authorization()(FadeIn(Monitors))} />
         <AppRoute layout={MainLayout} history={history} path="/apis/:id/interceptors" component={Authorization()(FadeIn(ApiInterceptors))} />
