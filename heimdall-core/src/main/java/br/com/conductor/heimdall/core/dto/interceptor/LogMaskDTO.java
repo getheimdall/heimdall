@@ -1,18 +1,15 @@
-
-package br.com.conductor.heimdall.gateway.trace;
-
 /*-
  * =========================LICENSE_START==================================
- * heimdall-gateway
+ * heimdall-core
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,29 +17,25 @@ package br.com.conductor.heimdall.gateway.trace;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.dto.interceptor;
 
-import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import lombok.Data;
 
+import java.util.List;
 /**
- * Data class a that represents a Request Response parser.
+ * Class is a Data Transfer Object for the LogMask Interceptor.
  *
- * @author Thiago Sampaio
  * @author Marcelo Aguiar Rodrigues
  */
 @Data
-public class RequestResponseParser {
+public class LogMaskDTO {
 
-     @JsonInclude(Include.NON_NULL)
-     private String uri;
+    private Boolean uri = false;
 
-     @JsonInclude(Include.NON_NULL)
-     private Map<String, String> headers;
+    private Boolean body = false;
 
-     @JsonInclude(Include.NON_NULL)
-     private String body;
+    private Boolean headers = false;
+
+    private List<String> ignoredHeaders = null;
 
 }
