@@ -29,6 +29,8 @@ import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.middleware.spec.Helper;
 import br.com.twsoftware.alfred.object.Objeto;
+import lombok.Cleanup;
+
 import com.netflix.util.Pair;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
@@ -45,6 +47,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
 
@@ -117,15 +120,21 @@ public class LogResponseFilter extends ZuulFilter {
         String[] types = content.split(";");
 
         if (!ContentTypeUtils.belongsToBlackList(types)) {
+        	@Cleanup
             InputStream stream = ctx.getResponseDataStream();
             String body;
 
             body = StreamUtils.copyToString(stream, Charset.forName("UTF-8"));
 
-            if (body.isEmpty())
-                body = helper.call().response().getBody();
+            if (body.isEmpty() && helper.call().response().getBody() != null) {
+            	
+            	body = helper.call().response().getBody();            	
+            }
 
-            r.setBody(body);
+            if (Objects.nonNull(body) && !body.isEmpty()) {
+            	
+            	r.setBody(body);
+            }
             ctx.setResponseDataStream(new ByteArrayInputStream(body.getBytes("UTF-8")));
         }
         TraceContextHolder.getInstance().getActualTrace().setResponse(r);
