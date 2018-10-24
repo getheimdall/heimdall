@@ -125,7 +125,7 @@ public class LogResponseFilter extends ZuulFilter {
             InputStream stream = ctx.getResponseDataStream();
             String body;
 
-            body = StreamUtils.copyToString(stream, Charset.forName("UTF-8"));
+            body = StreamUtils.copyToString(stream, StandardCharsets.UTF_8);
 
             if (body.isEmpty() && helper.call().response().getBody() != null) {
             	
