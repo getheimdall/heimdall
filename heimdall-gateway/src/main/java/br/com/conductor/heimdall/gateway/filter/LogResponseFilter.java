@@ -24,6 +24,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -135,7 +136,7 @@ public class LogResponseFilter extends ZuulFilter {
             	
             	r.setBody(body);
             }
-            ctx.setResponseDataStream(new ByteArrayInputStream(body.getBytes("UTF-8")));
+            ctx.setResponseDataStream(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)));
         }
         TraceContextHolder.getInstance().getActualTrace().setResponse(r);
     }
