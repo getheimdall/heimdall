@@ -36,6 +36,8 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
 
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -118,22 +120,32 @@ public class LifeCycleService {
         if (req.getHeader("client_id") != null) {
             final App app = appRepository.findByClientId(req.getHeader("client_id"));
 
+            if (Objects.isNull(app)) return false;
+
             final Plan plan = app.getPlans()
                     .stream()
                     .filter(p -> p.getId().equals(referenceId))
                     .findFirst()
                     .orElse(null);
 
-            if (plan == null) return false;
-        }
+            if (Objects.isNull(plan)) return false;
+            
+            final String uri = req.getRequestURI();
+            
+            if (pathsAllowed != null) {
 
-        if (pathsAllowed != null) {
+                for (String path : pathsAllowed) {
 
-            for (String path : pathsAllowed) {
-
-                if (pathMatcher.match(req.getRequestURI(), path)) return true;
+                    String mutableUri = uri;
+                    if ((uri != null && !uri.isEmpty()) && StringUtils.endsWith(uri, "/")) {
+                        mutableUri = StringUtils.removeEnd(uri.trim(), "/");
+                    }
+                    
+                    if (mutableUri.contains(path)) return true;
+                }
             }
         }
+
 
         return false;
     }
@@ -162,7 +174,7 @@ public class LifeCycleService {
             }
         }
 
-        if (pathsNotAllowed != null) {
+        if (pathsAllowed != null) {
 
             for (String path : pathsAllowed) {
 
@@ -217,15 +229,12 @@ public class LifeCycleService {
         final Long currentApiId = Long.parseLong((String) requestContext.get("api-id"));
 
         if (apiId.equals(currentApiId))
-            securityService.validadeClientId(requestContext, currentApiId, clientId);
+            securityService.validateClientId(requestContext, currentApiId, clientId);
 
         return false;
     }
 
-    public boolean validateAccessToken(HttpServletRequest req,
-                                    Long apiId,
-                                    Location location,
-                                    String name) {
+	public boolean validateAccessToken(HttpServletRequest req, Long apiId, Location location, String name) {
 
         String clientId;
         if (Location.HEADER.equals(location))
