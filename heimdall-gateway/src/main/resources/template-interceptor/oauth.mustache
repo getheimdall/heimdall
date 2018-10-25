@@ -1,116 +1,98 @@
-import java.util.*;
-import com.netflix.zuul.ZuulFilter;
-import com.google.common.collect.Sets;
-import com.netflix.zuul.context.RequestContext;
-import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.enums.TypeOAuth;
-import br.com.conductor.heimdall.core.exception.HeimdallException;
-import br.com.conductor.heimdall.gateway.service.LifeCycleService;
 import br.com.conductor.heimdall.core.util.BeanManager;
-import br.com.conductor.heimdall.gateway.filter.helper.*;
+import br.com.conductor.heimdall.gateway.filter.helper.Helper;
 import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
 import br.com.conductor.heimdall.gateway.filter.helper.HelperImpl;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import br.com.conductor.heimdall.gateway.service.LifeCycleService;
 import br.com.conductor.heimdall.gateway.service.OAuthInterceptorService;
-import br.com.conductor.heimdall.middleware.spec.*;
 import br.com.conductor.heimdall.middleware.spec.Helper;
-import br.com.conductor.heimdall.middleware.spec.Http;
 
+import com.netflix.zuul.context.RequestContext;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class OAuthInterceptor extends HeimdallFilter {
 
-     private static Set<String> pathsAllowed;
+    private static Set<String> pathsAllowed;
 
-     private static Set<String> pathsNotAllowed;
+    private static Set<String> pathsNotAllowed;
 
-     private static String inboundURL;
+    private static String inboundURL;
 
-     private static String method;
+    private static String method;
 
-     private static Long referenceId;
+    private static Long referenceId;
 
-     private Helper helper;
+    private Helper helper;
 
-     private Long providerId = {{providerId}};
+    private Long providerId;
 
-     private int timeAccessToken = {{timeAccessToken}};
+    private int timeAccessToken;
 
-     private int timeRefreshToken = {{timeRefreshToken}};
+    private int timeRefreshToken;
 
-     private String privateKey = "{{privateKey}}";
+    private String privateKey;
 
-     private OAuthInterceptorService oAuthInterceptorService;
+    public OAuthInterceptor() {
 
-     public OAuthInterceptor() {
+        pathsAllowed = new HashSet<>();
+        {{#pathsAllowed}}
+        pathsAllowed.add("{{.}}");
+        {{/pathsAllowed}}
 
-          pathsAllowed = Sets.newHashSet();
-     {{#pathsAllowed}}
-          pathsAllowed.add("{{.}}");
-     {{/pathsAllowed}}
+        pathsNotAllowed = new HashSet<>();
+        {{#pathsNotAllowed}}
+        pathsNotAllowed.add("{{.}}");
+        {{/pathsNotAllowed}}
 
-          pathsNotAllowed = Sets.newHashSet();
-     {{#pathsNotAllowed}}
-          pathsNotAllowed.add("{{.}}");
-     {{/pathsNotAllowed}}
+        inboundURL = "{{inboundURL}}";
 
-          inboundURL = "{{inboundURL}}";
-          method = "{{method}}";
+        method = "{{method}}";
 
-          this.helper = new HelperImpl();
+        referenceId = {{referenceId}};
 
-          referenceId = {{referenceId}};
+        providerId = {{providerId}};
 
-     }
+        timeAccessToken = {{timeAccessToken}};
 
-     @Override
-     public int filterOrder() {
+        timeRefreshToken = {{timeRefreshToken}};
 
-          return {{order}};
-     }
+        privateKey = "{{privateKey}}";
 
-     @Override
-     public String filterType() {
+        this.helper = new HelperImpl();
+    }
 
-          return "{{executionPoint}}";
-     }
+    @Override
+    public int filterOrder() {
 
-     @Override
-     public boolean should() {
+        return {{order}};
+    }
+
+    @Override
+    public String filterType() {
+
+        return "{{executionPoint}}";
+    }
+
+    @Override
+    public String getName() {
+        return "{{name}}"
+    }
+
+    @Override
+    public boolean should() {
 
         LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
         return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest(), referenceId);
-     }
+    }
 
-     @Override
-     public String getName() {
-     	return "{{name}}"
-     }
+    @Override
+    public void execute() throws Throwable {
 
-     @Override
-     public void execute() throws Throwable {
+        OAuthInterceptorService oAuthInterceptorService = (OAuthInterceptorService) BeanManager.getBean(OAuthInterceptorService.class);
+        oAuthInterceptorService.execute(TypeOAuth.{{typeOAuth}}, privateKey, timeAccessToken, timeRefreshToken, providerId, helper);
+    }
 
-        oAuthInterceptorService = (OAuthInterceptorService) BeanManager.getBean(OAuthInterceptorService.class);
-
-        try {
-            oAuthInterceptorService.executeInterceptor(TypeOAuth.{{typeOAuth}}, privateKey, timeAccessToken, timeRefreshToken, providerId, helper);
-        } catch( HeimdallException ex ){
-            generateResponse( ex.getMsgEnum().getMessage(), ex.getMsgEnum().getHttpCode());
-        }
-        return null;
-     }
-
-     /**
-     * Method that sends a Response
-     *
-     * @param message    Response message
-     * @param httpStatus {@link HttpStatus} of the response
-     */
-     private void generateResponse(String message, int httpStatus) {
-         message = "{ \"error\" : \"" + message + "\" }";
-         TraceContextHolder.getInstance().getActualTrace().trace(message);
-         this.helper.call().response().setStatus(httpStatus);
-         this.helper.call().response().header().add("Content-Type", "application/json");
-         this.helper.call().response().setBody(message);
-     }
 }

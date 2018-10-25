@@ -72,6 +72,29 @@ public class OAuthInterceptorService {
 
     private Helper helper;
 
+    public void execute(TypeOAuth typeOAuth, String privateKey, int timeAccessToken, int timeRefreshToken, Long providerId, Helper helper) {
+
+        try {
+            executeInterceptor(typeOAuth, privateKey, timeAccessToken, timeRefreshToken, providerId, helper);
+        } catch( HeimdallException ex ){
+            generateResponse( ex.getMsgEnum().getMessage(), ex.getMsgEnum().getHttpCode());
+        }
+    }
+
+    /**
+     * Method that sends a Response
+     *
+     * @param message    Response message
+     * @param httpStatus {@link HttpStatus} of the response
+     */
+    private void generateResponse(String message, int httpStatus) {
+        message = "{ \"error\" : \"" + message + "\" }";
+        TraceContextHolder.getInstance().getActualTrace().trace(message);
+        this.helper.call().response().setStatus(httpStatus);
+        this.helper.call().response().header().add("Content-Type", "application/json");
+        this.helper.call().response().setBody(message);
+    }
+
     /**
      * Method to validate Interceptor OAuth and execute the operation correct, accord the type of the OAuth.
      *
