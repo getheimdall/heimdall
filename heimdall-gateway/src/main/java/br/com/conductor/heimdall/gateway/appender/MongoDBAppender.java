@@ -31,6 +31,8 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -106,7 +108,7 @@ public class MongoDBAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
 	@Override
 	protected void append(ILoggingEvent e) {
 		Map<String, Object> objLog = new HashMap<>();
-		objLog.put("ts", new Date(e.getTimeStamp()));
+		objLog.put("ts", new Date(LocalDateTime.now().toInstant(ZoneOffset.UTC).toEpochMilli()));
 		objLog.put("trace", BasicDBObject.parse(e.getFormattedMessage()));
 		objLog.put("level", e.getLevel().toString());
 		objLog.put("logger", e.getLoggerName());
