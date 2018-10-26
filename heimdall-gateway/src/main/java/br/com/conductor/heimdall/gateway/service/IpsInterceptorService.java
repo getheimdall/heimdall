@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.gateway.service;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -19,6 +17,7 @@ package br.com.conductor.heimdall.gateway.service;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.service;
 
 import com.netflix.zuul.context.RequestContext;
 import org.springframework.http.HttpStatus;
@@ -48,9 +47,16 @@ public class IpsInterceptorService {
     public void executeWhiteList(Set<String> whitelist) throws Throwable {
 
         RequestContext ctx = RequestContext.getCurrentContext();
+        Set<String> requestIps = getIpFromRequest(ctx.getRequest());
+        Set<String> common = new HashSet<>();
 
-        if (!verifyIpInList(ctx.getRequest(), whitelist)){
-            ctx.getResponse().sendError(HttpStatus.UNAUTHORIZED.value(), "IP unauthorized");
+        requestIps.forEach(s -> {
+            if (!whitelist.contains(s))
+                common.add(s);
+        });
+
+        if (!common.isEmpty()) {
+            ctx.getResponse().sendError(HttpStatus.UNAUTHORIZED.value(), "Unauthorized ip list: " + common.toString());
         }
     }
 
@@ -63,22 +69,17 @@ public class IpsInterceptorService {
     public void executeBlackList(Set<String> blacklist) throws Throwable {
 
         RequestContext ctx = RequestContext.getCurrentContext();
+        Set<String> requestIps = getIpFromRequest(ctx.getRequest());
+        Set<String> common = new HashSet<>();
 
-        if (verifyIpInList(ctx.getRequest(), blacklist)){
-            ctx.getResponse().sendError(HttpStatus.UNAUTHORIZED.value(), "IP unauthorized");
+        requestIps.forEach(s -> {
+            if (blacklist.contains(s))
+                common.add(s);
+        });
+
+        if (!common.isEmpty()) {
+            ctx.getResponse().sendError(HttpStatus.UNAUTHORIZED.value(), "Unauthorized ip list: " + common.toString());
         }
-    }
-
-    /**
-     * Method that verifies if Ips from the interceptor Blacklist or Whitelist contains any IP from request
-     *
-     * @param req {@link HttpServletRequest}
-     * @param ips {@link Set}<{@link String}>
-     * @return True if contains, false otherwise
-     */
-    public boolean verifyIpInList(HttpServletRequest req, Set<String> ips) {
-        Set<String> ipsFromRequest = getIpFromRequest(req);
-        return containsInList(ipsFromRequest, ips);
     }
 
     /**
@@ -105,16 +106,4 @@ public class IpsInterceptorService {
 
         return ipsFromRequest;
     }
-
-    /**
-     * Matches the reference list of ips with the request list.
-     *
-     * @param ipsReceived {@link Set}<{@link String}>
-     * @param ipsCompare  {@link Set}<{@link String}>
-     * @return Returns true if there is any match, false otherwise
-     */
-    private boolean containsInList(Set<String> ipsReceived, Set<String> ipsCompare) {
-        return ipsCompare.stream().anyMatch(ipsReceived::contains);
-    }
-
 }
