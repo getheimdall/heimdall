@@ -22,6 +22,7 @@ package br.com.conductor.heimdall.gateway.service;
  */
 
 import br.com.conductor.heimdall.core.util.BeanManager;
+import br.com.conductor.heimdall.gateway.filter.helper.HelperImpl;
 import br.com.conductor.heimdall.middleware.spec.ApiResponse;
 import br.com.conductor.heimdall.middleware.spec.Helper;
 import com.netflix.zuul.context.RequestContext;
@@ -52,11 +53,12 @@ public class CacheInterceptorService {
      *
      * @param cacheName   Cache name provided
      * @param timeToLive  How much time the cache will live (0 or less to live forever)
-     * @param helper      {@link Helper}
      * @param headers     List of headers that when present signal that the request should be cached
      * @param queryParams List of queryParams that when present signal that the request should be cached
      */
-    public void cacheInterceptor(String cacheName, Long timeToLive, Helper helper, List<String> headers, List<String> queryParams) {
+    public void cacheInterceptor(String cacheName, Long timeToLive, List<String> headers, List<String> queryParams) {
+
+        Helper helper = new HelperImpl();
 
         RedissonClient redisson = (RedissonClient) BeanManager.getBean(RedissonClient.class);
 
