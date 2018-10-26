@@ -20,7 +20,6 @@
 package br.com.conductor.heimdall.gateway.service;
 
 import br.com.conductor.heimdall.core.entity.RateLimit;
-import br.com.conductor.heimdall.core.enums.Interval;
 import br.com.conductor.heimdall.core.repository.RateLimitRepository;
 import br.com.conductor.heimdall.core.util.BeanManager;
 import com.netflix.zuul.context.RequestContext;
@@ -80,14 +79,20 @@ public class RattingInterceptorService {
     /*
      * Checks if the limiting time has ended
      */
-    private boolean hasIntervalEnded(RateLimit rate) {
+    public boolean hasIntervalEnded(RateLimit rate) {
 
-        if (rate.getInterval() == Interval.SECONDS) {
-            return Duration.between(LocalDateTime.now(), rate.getLastRequest()).getSeconds() != 0;
-        } else if (rate.getInterval() == Interval.MINUTES) {
-            return Duration.between(LocalDateTime.now(), rate.getLastRequest()).toMinutes() != 0;
-        } else {
-            return Duration.between(LocalDateTime.now(), rate.getLastRequest()).toHours() != 0;
+        switch (rate.getInterval()) {
+            case SECONDS:
+                return Duration.between(LocalDateTime.now(), rate.getLastRequest()).getSeconds() > 0;
+
+            case MINUTES:
+                return Duration.between(LocalDateTime.now(), rate.getLastRequest()).toMinutes() > 0;
+
+            case HOURS:
+                return Duration.between(LocalDateTime.now(), rate.getLastRequest()).toHours() > 0;
+
+            default:
+                return false;
         }
     }
 
