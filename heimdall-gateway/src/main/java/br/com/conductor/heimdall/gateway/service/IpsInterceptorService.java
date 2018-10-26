@@ -34,12 +34,17 @@ import java.util.Set;
  * Provides methods to validate request with blacklist and whitelist interceptors.
  *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ * @author Marcelo Aguiar Rodrigues
  */
 @Service
 public class IpsInterceptorService {
 
-    private final String X_FORWARDED_FOR = "X-FORWARDED-FOR";
-
+    /**
+     * Checks if the request ip is in the whitelist
+     *
+     * @param whitelist Set of allowed ids
+     * @throws Throwable
+     */
     public void executeWhiteList(Set<String> whitelist) throws Throwable {
 
         RequestContext ctx = RequestContext.getCurrentContext();
@@ -49,6 +54,12 @@ public class IpsInterceptorService {
         }
     }
 
+    /**
+     * Checks if the request ip is in the blacklist
+     *
+     * @param blacklist Set of blocked ids
+     * @throws Throwable
+     */
     public void executeBlackList(Set<String> blacklist) throws Throwable {
 
         RequestContext ctx = RequestContext.getCurrentContext();
@@ -63,7 +74,7 @@ public class IpsInterceptorService {
      *
      * @param req {@link HttpServletRequest}
      * @param ips {@link Set}<{@link String}>
-     * @return True if contains or false otherwise
+     * @return True if contains, false otherwise
      */
     public boolean verifyIpInList(HttpServletRequest req, Set<String> ips) {
         Set<String> ipsFromRequest = getIpFromRequest(req);
@@ -82,13 +93,14 @@ public class IpsInterceptorService {
 
         if (Objects.nonNull(req)) {
 
-            if (Objects.nonNull(req.getHeader(X_FORWARDED_FOR))){
-                Arrays.stream(req.getHeader(X_FORWARDED_FOR).split(","))
+            final String x_FORWARDED_FOR = "X-FORWARDED-FOR";
+
+            if (Objects.nonNull(req.getHeader(x_FORWARDED_FOR))){
+                Arrays.stream(req.getHeader(x_FORWARDED_FOR).split(","))
                         .forEach(ip -> ipsFromRequest.add(ip.trim()));
             }
 
             ipsFromRequest.add(req.getRemoteAddr());
-
         }
 
         return ipsFromRequest;

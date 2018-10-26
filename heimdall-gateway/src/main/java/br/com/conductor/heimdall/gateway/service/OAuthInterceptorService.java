@@ -72,6 +72,16 @@ public class OAuthInterceptorService {
 
     private Helper helper;
 
+    /**
+     * Runs the service for the OAuth
+     *
+     * @param typeOAuth        type of the OAuth
+     * @param privateKey       privateKey used in Token
+     * @param timeAccessToken  time to expire accessToken
+     * @param timeRefreshToken time to expire refreshToken
+     * @param providerId       {@link Provider} id
+     * @param helper           {@link Helper}
+     */
     public void execute(TypeOAuth typeOAuth, String privateKey, int timeAccessToken, int timeRefreshToken, Long providerId, Helper helper) {
 
         try {

@@ -1,3 +1,22 @@
+/*-
+ * =========================LICENSE_START==================================
+ * heimdall-gateway
+ * ========================================================================
+ * Copyright (C) 2018 Conductor Tecnologia SA
+ * ========================================================================
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ==========================LICENSE_END===================================
+ */
 package br.com.conductor.heimdall.gateway.service;
 
 import br.com.conductor.heimdall.core.entity.RateLimit;
@@ -13,9 +32,20 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
+/**
+ * Rate limit interceptor provides a limit to the number of requests
+ *
+ * @author Marcelo Aguiar Rodrigues
+ */
 @Service
 public class RattingInterceptorService {
 
+    /**
+     * Limits the number of requests to a specific path
+     *
+     * @param name RLock name
+     * @param path rate limit key
+     */
     public void execute(String name, String path) {
         RateLimitRepository repository = (RateLimitRepository) BeanManager.getBean(RateLimitRepository.class);
         RedissonClient redisson = (RedissonClient) BeanManager.getBean(RedissonClient.class);
@@ -29,8 +59,7 @@ public class RattingInterceptorService {
             rate.setLastRequest(LocalDateTime.now());
         }
 
-
-        if (isIntervalEnded(rate)) {
+        if (hasIntervalEnded(rate)) {
             rate.reset();
             rate.decreaseRemaining();
             repository.save(rate);
@@ -48,7 +77,10 @@ public class RattingInterceptorService {
         lock.unlock();
     }
 
-    private boolean isIntervalEnded(RateLimit rate) {
+    /*
+     * Checks if the limiting time has ended
+     */
+    private boolean hasIntervalEnded(RateLimit rate) {
 
         if (rate.getInterval() == Interval.SECONDS) {
             return Duration.between(LocalDateTime.now(), rate.getLastRequest()).getSeconds() != 0;
