@@ -30,6 +30,7 @@ import br.com.conductor.heimdall.core.service.ApiService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
 import br.com.twsoftware.alfred.object.Objeto;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.models.Swagger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -40,7 +41,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
-import java.util.Map;
 
 import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_APIS;
 
@@ -54,6 +54,7 @@ import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_APIS;
 @io.swagger.annotations.Api(value = PATH_APIS, produces = MediaType.APPLICATION_JSON_VALUE, tags = { ConstantsTag.TAG_APIS })
 @RestController
 @RequestMapping(value = PATH_APIS)
+
 public class ApiResource {
 
      @Autowired
@@ -72,8 +73,24 @@ public class ApiResource {
      public ResponseEntity<?> findById(@PathVariable("apiId") Long id) {
 
           Api api = apiService.find(id);
-
           return ResponseEntity.ok(api);
+     }
+
+     /**
+      * Get {@link Swagger} by {@link Api} its Id.
+      *
+      * @param id					The Api Id
+      * @return						{@link ResponseEntity}
+      */
+     @ResponseBody
+     @ApiOperation(value = "Get SwaggerJson by Api Id", response = Api.class)
+     @GetMapping(value = "/{apiId}/swagger")
+     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_API)
+     public ResponseEntity<?> getSwaggerByApiId(@PathVariable("apiId") Long id) {
+
+          Swagger swagger = apiService.findSwaggerByApi(id);
+
+          return ResponseEntity.ok(swagger);
      }
 
      /**

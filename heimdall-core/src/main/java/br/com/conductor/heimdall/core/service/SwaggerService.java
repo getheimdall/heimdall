@@ -22,9 +22,11 @@ package br.com.conductor.heimdall.core.service;
 
 import br.com.conductor.heimdall.core.dto.ResourceDTO;
 import br.com.conductor.heimdall.core.entity.Api;
+import br.com.conductor.heimdall.core.entity.Environment;
 import br.com.conductor.heimdall.core.entity.Operation;
 import br.com.conductor.heimdall.core.entity.Resource;
 import br.com.conductor.heimdall.core.enums.HttpMethod;
+import io.swagger.models.Info;
 import io.swagger.models.Path;
 import io.swagger.models.Swagger;
 import io.swagger.models.Tag;
@@ -33,10 +35,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class provides methods to import and export Swagger.
@@ -52,6 +52,23 @@ public class SwaggerService {
 
     @Autowired
     private OperationService operationService;
+
+    public Swagger exportApiToSwaggerJSON(Api api) {
+        Swagger swagger = new Swagger();
+
+        swagger.setSwagger("2.0");
+        swagger.setBasePath(api.getBasePath());
+
+        swagger.setInfo(getInfoByApi(api));
+        Optional<Environment> optionalEnvironment = api.getEnvironments().stream().findFirst();
+        optionalEnvironment.ifPresent(environment -> swagger.setHost(environment.getInboundURL()));
+        swagger.setTags(getTagsByApi(api));
+        swagger.setPaths(getPathsByApi(api));
+        swagger.setDefinitions(new HashMap<>());
+        swagger.setConsumes(new ArrayList<>());
+
+        return swagger;
+    }
 
     public Api importApiFromSwaggerJSON(Api api, String swaggerAsString, boolean override) throws IOException {
 
@@ -171,5 +188,50 @@ public class SwaggerService {
                 operations.add(operation);
             }
         });
+    }
+
+    private Info getInfoByApi(Api api) {
+        Info info = new Info();
+        info.setTitle(api.getName());
+        info.setDescription(api.getDescription());
+        info.setVersion(api.getVersion());
+
+        return info;
+    }
+
+    private List<Tag> getTagsByApi(Api api) {
+        return api.getResources().stream()
+                .map(resource -> new Tag().name(resource.getName()).description(resource.getDescription()))
+                .collect(Collectors.toList());
+    }
+
+    private Map<String, Path> getPathsByApi(Api api) {
+
+        Map<String, Path> pathMap = new HashMap<>();
+
+        api.getResources().forEach(resource -> {
+            resource.getOperations().forEach(operation -> {
+                String pathOperation = operation.getPath();
+                if (Objects.isNull(pathMap.get(pathOperation))) {
+                    pathMap.put(pathOperation, new Path());
+                }
+
+                Path path = pathMap.get(pathOperation);
+
+                io.swagger.models.Operation operationSwagger = new io.swagger.models.Operation();
+                operationSwagger.setOperationId(operation.getDescription().trim().concat(operation.getMethod().name()));
+                operationSwagger.setConsumes(new ArrayList<>());
+                operationSwagger.setTags(Collections.singletonList(resource.getName()));
+                operationSwagger.setSummary(operation.getDescription());
+                operationSwagger.setDeprecated(false);
+                operationSwagger.setParameters(new ArrayList<>());
+                operationSwagger.setProduces(new ArrayList<>());
+                operationSwagger.setResponses(new HashMap<>());
+
+                path.set(operation.getMethod().name().toLowerCase(), operationSwagger);
+            });
+        });
+
+        return pathMap;
     }
 }

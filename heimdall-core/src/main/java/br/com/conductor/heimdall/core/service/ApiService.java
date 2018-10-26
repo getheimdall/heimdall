@@ -23,19 +23,18 @@ package br.com.conductor.heimdall.core.service;
 
 import br.com.conductor.heimdall.core.converter.ApiMap;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.dto.ApiDTO;
-import br.com.conductor.heimdall.core.dto.PageDTO;
-import br.com.conductor.heimdall.core.dto.PageableDTO;
-import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
+import br.com.conductor.heimdall.core.dto.*;
 import br.com.conductor.heimdall.core.dto.page.ApiPage;
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Environment;
 import br.com.conductor.heimdall.core.entity.Operation;
+import br.com.conductor.heimdall.core.entity.Resource;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.ApiRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
 import br.com.conductor.heimdall.core.util.Pageable;
 import br.com.conductor.heimdall.core.util.StringUtils;
+import io.swagger.models.Swagger;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
@@ -44,6 +43,7 @@ import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.*;
@@ -81,9 +81,6 @@ public class ApiService {
     @Autowired
     private SwaggerService swaggerService;
 
-    @Autowired
-    private OperationService operationService;
-
     /**
      * Finds a {@link Api} by its ID.
      *
@@ -96,6 +93,21 @@ public class ApiService {
         HeimdallException.checkThrow(isBlank(api), GLOBAL_RESOURCE_NOT_FOUND);
 
         return api;
+    }
+
+    /**
+     * Get Swagger from {@link Api} by its ID.
+     *
+     * @param id The ID of the {@link Api}
+     * @return The {@link Api}
+     */
+    public Swagger findSwaggerByApi(Long id) {
+
+        Api api = apiRepository.findOne(id);
+        List<Resource> resources = resourceService.list(api.getId(), new ResourceDTO());
+        api.setResources(resources);
+
+        return swaggerService.exportApiToSwaggerJSON(api);
     }
 
     /**
@@ -205,7 +217,7 @@ public class ApiService {
         }
 
         api = apiRepository.save(api);
-        
+
         amqpRoute.dispatchRoutes();
         return api;
     }
