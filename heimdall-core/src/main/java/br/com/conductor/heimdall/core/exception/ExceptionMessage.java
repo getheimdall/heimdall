@@ -47,6 +47,8 @@ public enum ExceptionMessage {
 
     GLOBAL_JSON_INVALID_FORMAT(BAD_REQUEST.value(), "Json invalid format", BadRequestException.class),
 
+    GLOBAL_SWAGGER_JSON_INVALID_FORMAT(BAD_REQUEST.value(), "SwaggerJson invalid format", BadRequestException.class),
+
     GLOBAL_TIMEOUT(REQUEST_TIMEOUT.value(), REQUEST_TIMEOUT.getReasonPhrase(), TimeoutException.class),
 
     ACCESS_TOKEN_ALREADY_EXISTS(BAD_REQUEST.value(), "Token already exists", BadRequestException.class),

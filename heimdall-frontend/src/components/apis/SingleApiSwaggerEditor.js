@@ -1,5 +1,5 @@
 import React from 'react'
-import {Row, Col, Card} from 'antd'
+import {Row, Col, Card, Button} from 'antd'
 import AceEditor from 'react-ace'
 import SwaggerUI from 'swagger-ui'
 import 'swagger-ui/dist/swagger-ui.css'
@@ -28,8 +28,8 @@ class SingleApiSwaggerEditor extends React.Component {
             "host": "localhost:9090",
             "basePath": "/",
             "tags": [],
-            "paths": [],
-            "definitions": []
+            "paths": {},
+            "definitions": {}
         }
     }
 
@@ -125,7 +125,9 @@ class SingleApiSwaggerEditor extends React.Component {
                 <PageHeader title="Swagger Editor" IconComponent={SwaggerIcon}/>
                 <Row gutter={2}>
                     <Col sm={24} md={12}>
-                        <Card title="Editor" style={{margin: '0 14px', height: 700}}>
+                        <Card title="Editor" style={{margin: '0 14px', height: 700}} extra={
+                            <Button size="small">Save</Button>
+                        }>
                             {
                                 !api && <Loading/>
                             }

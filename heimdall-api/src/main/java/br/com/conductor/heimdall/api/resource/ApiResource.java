@@ -21,30 +21,6 @@ package br.com.conductor.heimdall.api.resource;
  * ==========================LICENSE_END===================================
  */
 
-import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_APIS;
-
-import java.net.URI;
-import java.util.List;
-
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
-
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
 import br.com.conductor.heimdall.core.dto.ApiDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
@@ -54,6 +30,19 @@ import br.com.conductor.heimdall.core.service.ApiService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
 import br.com.twsoftware.alfred.object.Objeto;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.Valid;
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+
+import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_APIS;
 
 /**
  * Uses a {@link ApiService} to provide methods to create, read, update and delete a {@link Api}.
@@ -183,4 +172,11 @@ public class ApiResource {
           return ResponseEntity.noContent().build();
      }
 
+     @ApiOperation(value = "Update API by Swagger JSON")
+     @PutMapping("/{apiId}/swagger")
+     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_API)
+     public ResponseEntity<?> updateApiBySwaggerJSON(@PathVariable("apiId") Long id, @RequestBody String swagger, boolean override) {
+          Api api = apiService.updateBySwagger(id, swagger, override);
+          return ResponseEntity.ok(api);
+     }
 }
