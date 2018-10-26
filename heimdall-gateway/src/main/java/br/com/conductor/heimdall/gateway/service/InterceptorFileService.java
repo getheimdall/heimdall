@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.gateway.service;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -20,6 +17,7 @@ package br.com.conductor.heimdall.gateway.service;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.service;
 
 import br.com.conductor.heimdall.core.dto.InterceptorFileDTO;
 import br.com.conductor.heimdall.core.dto.interceptor.AccessTokenClientIdDTO;
@@ -144,8 +142,8 @@ public class InterceptorFileService {
         } else {
 
             String[] message = {ExceptionMessage.INTERCEPTOR_TEMPLATE_NOT_EXIST.getMessage(), interceptor.getId().toString(), interceptor.getType().name(), interceptor.getExecutionPoint().name()};
-            String erro = StringUtils.join(", ", message);
-            log.error(erro);
+            String error = StringUtils.join(", ", message);
+            log.error(error);
 
             return null;
         }
