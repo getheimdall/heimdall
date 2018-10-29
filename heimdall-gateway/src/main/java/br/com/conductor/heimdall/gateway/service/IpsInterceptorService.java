@@ -48,15 +48,9 @@ public class IpsInterceptorService {
 
         RequestContext ctx = RequestContext.getCurrentContext();
         Set<String> requestIps = getIpFromRequest(ctx.getRequest());
-        Set<String> common = new HashSet<>();
 
-        requestIps.forEach(s -> {
-            if (!whitelist.contains(s))
-                common.add(s);
-        });
-
-        if (!common.isEmpty()) {
-            ctx.getResponse().sendError(HttpStatus.UNAUTHORIZED.value(), "Unauthorized ip list: " + common.toString());
+        if (requestIps.stream().noneMatch(whitelist::contains)) {
+            ctx.getResponse().sendError(HttpStatus.UNAUTHORIZED.value(), "Unauthorized ip");
         }
     }
 
@@ -70,15 +64,9 @@ public class IpsInterceptorService {
 
         RequestContext ctx = RequestContext.getCurrentContext();
         Set<String> requestIps = getIpFromRequest(ctx.getRequest());
-        Set<String> common = new HashSet<>();
 
-        requestIps.forEach(s -> {
-            if (blacklist.contains(s))
-                common.add(s);
-        });
-
-        if (!common.isEmpty()) {
-            ctx.getResponse().sendError(HttpStatus.UNAUTHORIZED.value(), "Unauthorized ip list: " + common.toString());
+        if (requestIps.stream().anyMatch(blacklist::contains)) {
+            ctx.getResponse().sendError(HttpStatus.UNAUTHORIZED.value(), "Unauthorized ip");
         }
     }
 
