@@ -52,6 +52,7 @@ heimdall:
 #        password: admin
 #        queueSize: 500
 #        discardingThreshold: 0
+#        zoneId: America/Sao_Paulo
     trace:
         printAllTrace: true
         sanitizes:
