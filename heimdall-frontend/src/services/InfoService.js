@@ -1,9 +1,15 @@
 import { HTTP } from '../utils/Http'
 
 const getVersion = () => {
+   return getManagerInfo().then(data => {
+       return data.app.version;
+   })
+}
+
+const getManagerInfo = () => {
     return HTTP.get('/manager/info')
         .then(result => {
-            return Promise.resolve(result.data.app.version)
+            return Promise.resolve(result.data)
         })
         .catch(error => {
             console.log(error)
@@ -13,4 +19,5 @@ const getVersion = () => {
 
 export const infoService = {
     getVersion,
+    getManagerInfo
 }

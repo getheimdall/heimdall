@@ -1,11 +1,23 @@
 import React, { Component } from 'react'
-import Logo from './Logo'
 import { Layout, Menu, Affix } from 'antd'
+
+import Logo from './Logo'
 import SidebarLink from './SidebarLink'
+import {infoService} from "../../services/InfoService"
 
 const { Sider } = Layout
 
 class SideBar extends Component {
+
+    state = {
+        traces: false
+    }
+
+    componentDidMount() {
+        infoService.getManagerInfo().then(data => {
+            this.setState({ ...this.state, traces: data.traces })
+        })
+    }
 
     constructor(props) {
         super(props)
@@ -19,6 +31,7 @@ class SideBar extends Component {
 
     render() {
         const { history } = this.props;
+        const { traces } = this.state;
 
         return (
             <Sider collapsible collapsed={this.state.collapsed} onCollapse={this.onCollapse}>
@@ -53,9 +66,12 @@ class SideBar extends Component {
                             <SidebarLink to="/users" label="Users" history={history} icon="user" />
                         </Menu.Item>
 
-                        <Menu.Item key="traces" className="traces">
-                            <SidebarLink to="/traces" label="Traces" history={history} icon="sync" />
-                        </Menu.Item>
+                        {
+                            traces &&
+                            <Menu.Item key="traces" className="traces">
+                                <SidebarLink to="/traces" label="Traces" history={history} icon="sync" />
+                            </Menu.Item>
+                        }
                     </Menu>
                 </Affix>
             </Sider>

@@ -7,7 +7,7 @@ import { infoService } from './../../services/InfoService'
 
 class MainLayout extends Component {
 
-	state = { steps: [], keepTour: true, version: '1.5.14' }
+	state = { steps: [], keepTour: true, version: '1.9.1' }
 
 	componentDidMount() {
 		infoService.getVersion().then(version => {
