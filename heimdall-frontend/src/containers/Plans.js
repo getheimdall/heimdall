@@ -66,17 +66,12 @@ class Plans extends Component {
                 <Row className="search-box">
                     <Card>
                         <Form>
-                            <Row gutter={24}>
+                            <Row gutter={24} type="flex" justify="start">
                                 <Col sm={24} md={5}>
                                     {getFieldDecorator('name')(<Input.Search onSearch={this.onSearchForm} placeholder="name" />)}
                                 </Col>
                                 <Col sm={24} md={5}>
                                     {getFieldDecorator('description')(<Input.Search onSearch={this.onSearchForm} placeholder="description" />)}
-                                </Col>
-                                <Col sm={24} md={14}>
-                                    <Row type="flex" justify="end">
-                                        <Button id="searchPlans" className="card-button" type="primary" icon="search" onClick={this.onSearchForm}>Search</Button>
-                                    </Row>
                                 </Col>
                             </Row>
                         </Form>
