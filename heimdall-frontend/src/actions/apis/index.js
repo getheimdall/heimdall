@@ -1,13 +1,20 @@
+import { push } from 'connected-react-router'
+
 import { ApiConstants } from '../../constants/actions-types'
-
 import { apiService } from '../../services'
-import { push } from 'connected-react-router';
-
 
 const receiveApis = apis => ({
     type: ApiConstants.RECEIVE_APIS,
     apis
 })
+
+export const initLoading = () => dispatch => {
+    dispatch({ type: ApiConstants.API_LOADING })
+}
+
+export const finishLoading = () => dispatch => {
+    dispatch({ type: ApiConstants.API_LOADING_FINISH })
+}
 
 // Get async apis list
 export const getAllApis = () => dispatch => {
@@ -116,4 +123,33 @@ export const getApiSourceByName = name => dispatch => {
             dispatch(apiSource(data))
             dispatch(finishFetchingApi())
         })
+}
+
+export const getSwaggerByApi = apiId => dispatch => {
+    apiService.getSwagger(apiId)
+        .then(data => {
+            dispatch({ type: ApiConstants.GET_SWAGGER_API, swagger: data })
+        })
+        .catch(error => {
+            if (error.response && error.response.status === 400) {
+                dispatch(sendNotification({ type: 'error', message: 'error', description: error.response.data.message }))
+            }
+        })
+}
+
+export const updateApiWithSwagger = (apiId, swagger, override) => dispatch => {
+    apiService.updateBySwagger(apiId, swagger, override)
+        .then(data => {
+            dispatch({ type: ApiConstants.SAVE_SWAGGER_API, api: data })
+            dispatch(push('/apis/'+ apiId))
+        })
+        .catch(error => {
+            if (error.response && error.response.status === 400) {
+                dispatch(sendNotification({ type: 'error', message: 'error', description: error.response.data.message }))
+            }
+        })
+}
+
+export const clearSwaggerApi = () => dispatch => {
+    dispatch({ type: ApiConstants.CLEAR_SWAGGER_API })
 }

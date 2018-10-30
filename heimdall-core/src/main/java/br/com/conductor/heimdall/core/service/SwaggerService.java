@@ -75,6 +75,7 @@ public class SwaggerService {
         List<Resource> resources;
 
         if (override) {
+            resourceService.deleteAllFromApi(api.getId());
             resources = new ArrayList<>();
         } else {
             resources = resourceService.list(api.getId(), new ResourceDTO());
@@ -149,14 +150,13 @@ public class SwaggerService {
         return resource;
     }
 
-    private boolean operationNotExist(io.swagger.models.Operation operation, HttpMethod method, String path, List<Operation> operations) {
-        return operations.stream().noneMatch(op -> op.getDescription().equalsIgnoreCase(operation.getSummary()) && op.getMethod() == method && op.getPath().equalsIgnoreCase(path));
+    private boolean operationNotExist(HttpMethod method, String path, List<Operation> operations) {
+        return operations.stream().noneMatch(op -> op.getMethod() == method && op.getPath().equalsIgnoreCase(path));
     }
 
     private Operation findOperationByOperationSwaggerOrCreate(io.swagger.models.Operation operation, HttpMethod method, String path, List<Operation> operations) {
-        return operations.stream().filter(op -> op.getDescription().equalsIgnoreCase(operation.getSummary()) && op.getMethod() == method && op.getPath().equalsIgnoreCase(path))
-                .findFirst()
-                .orElse(createOperationByOperationSwagger(path, method, operation));
+        return operations.stream().filter(op -> op.getMethod() == method && op.getPath().equalsIgnoreCase(path))
+                .findFirst().orElse(createOperationByOperationSwagger(path, method, operation));
     }
 
     private Operation createOperationByOperationSwagger(String path, HttpMethod method, io.swagger.models.Operation operation) {
@@ -179,11 +179,14 @@ public class SwaggerService {
             }
 
             List<Operation> operations = resource.getOperations();
-            String path = valuePath.replace(basePath, "");
+            if (Objects.isNull(operations)) {
+                operations = new ArrayList<>();
+            }
 
+            String path = valuePath.replace(basePath, "");
             Operation operation = findOperationByOperationSwaggerOrCreate(verb, method, path, operations);
 
-            if (operationNotExist(verb, method, path, operations)) {
+            if (operationNotExist(method, path, operations)) {
                 operation = operationService.save(apiId, resource.getId(), operation);
                 operations.add(operation);
             }
@@ -219,10 +222,12 @@ public class SwaggerService {
                 Path path = pathMap.get(pathOperation);
 
                 io.swagger.models.Operation operationSwagger = new io.swagger.models.Operation();
-                operationSwagger.setOperationId(operation.getDescription().trim().concat(operation.getMethod().name()));
+                if (operation.getDescription() != null) {
+                    operationSwagger.setOperationId(operation.getDescription().trim().concat(operation.getMethod().name()));
+                    operationSwagger.setSummary(operation.getDescription());
+                }
                 operationSwagger.setConsumes(new ArrayList<>());
                 operationSwagger.setTags(Collections.singletonList(resource.getName()));
-                operationSwagger.setSummary(operation.getDescription());
                 operationSwagger.setDeprecated(false);
                 operationSwagger.setParameters(new ArrayList<>());
                 operationSwagger.setProduces(new ArrayList<>());

@@ -1,124 +1,157 @@
 import React from 'react'
-import {Row, Col, Card, Button} from 'antd'
+import {Row, Col, Card, Button, Switch, Modal, notification} from 'antd'
 import AceEditor from 'react-ace'
 import SwaggerUI from 'swagger-ui'
 import 'swagger-ui/dist/swagger-ui.css'
 import {connect} from 'react-redux'
 import {bindActionCreators} from "redux"
 
-import Loading from "../ui/Loading"
 import PageHeader from "../ui/PageHeader"
 import SwaggerIcon from "../icons/SwaggerIcon"
-import {getApiById, updateApi, deleteApi, resetApiAction} from '../../actions/apis'
+import {
+    getApiById,
+    updateApi,
+    deleteApi,
+    resetApiAction,
+    getSwaggerByApi,
+    clearSwaggerApi,
+    updateApiWithSwagger, sendNotification, initLoading, finishLoading
+} from '../../actions/apis'
+import Loading from "../ui/Loading"
 import {getAllEnvironments, clearEnvironments} from '../../actions/environments'
 
 import 'brace/theme/monokai'
 import 'brace/mode/json'
 
+const confirm = Modal.confirm
+
 class SingleApiSwaggerEditor extends React.Component {
 
     state = {
-        swagger: {
-            "swagger": "2.0",
-            "info": {
-                "description": "API Gateway for managing APIs",
-                "version": "1",
-                "title": "Heimdall API Gateway"
-            },
-            "host": "localhost:9090",
-            "basePath": "/",
-            "tags": [],
-            "paths": {},
-            "definitions": {}
-        }
+        swagger: "",
+        apiId: 0,
+        override: false
     }
 
     componentDidMount() {
 
-        let idApi = this.props.match.params.id
-        if (idApi) {
-            this.props.getApiById(idApi)
-            this.props.getAllEnvironments()
-        }
-
+        let apiId = this.props.match.params.id
         const {swagger} = this.state
 
-        const swaggerByApi = this.changeValuesByApi(swagger)
-        this.updateSwaggerUI(swaggerByApi)
+        if (apiId) {
+            this.props.getApiSwaggerById(apiId)
+            this.props.getAllEnvironments()
+            this.setState({...this.state, apiId: apiId})
+        }
 
+        this.updateSwaggerUI(swagger)
     }
 
     componentWillUpdate(nextProps, nextState) {
         if (nextState.swagger !== this.state.swagger) {
             const {swagger} = nextState
-            const swaggerByApi = this.changeValuesByApi(swagger)
-            this.updateSwaggerUI(swaggerByApi)
+            this.updateSwaggerUI(swagger)
         }
     }
 
     componentWillReceiveProps(nextProps) {
-        if (nextProps.api !== this.props.api) {
-            const { swagger } = this.state
-            const swaggerByApi = this.changeValuesByApi(swagger, nextProps)
-            this.setState({ ...this.state, swagger: swaggerByApi })
+
+        const swaggerProps = this.props.swagger
+        const swaggerNextProps = nextProps.swagger
+
+        if (swaggerNextProps !== swaggerProps) {
+            this.setState({...this.state, swagger: JSON.stringify(swaggerNextProps, null, '\t')})
+        }
+
+        if (nextProps.notification && nextProps.notification !== this.props.notification) {
+            const { type, message, description } = nextProps.notification
+            notification[type]({ message, description })
         }
     }
 
     componentWillUnmount() {
         this.props.clearEnvironments()
         this.props.resetApiAction()
+        this.props.clearSwagger()
     }
 
     updateSwaggerUI = swagger => {
-        if (swagger) {
-            SwaggerUI({
-                dom_id: '#swaggerUI',
-                spec: swagger
-            })
-        }
-    }
 
-    changeValuesByApi = (swagger, nextProps)=> {
+        let swaggerRender = {}
 
-        let api = {}
-
-        if (nextProps && nextProps.api) {
-            api = nextProps.api
-        } else {
-            api = this.props.api
+        if (swagger && this.swaggerIsValid(swagger)) {
+            swaggerRender = JSON.parse(swagger)
         }
 
-        let swaggerWrapped = JSON.parse(JSON.stringify(swagger))
+        SwaggerUI({
+            dom_id: '#swaggerUI',
+            spec: swaggerRender
+        })
 
-        if (api) {
-            if (!swaggerWrapped.info) {
-                swaggerWrapped.info = {}
-            }
-            swaggerWrapped.info.description = api.description
-            swaggerWrapped.info.title = api.name
-            swaggerWrapped.info.version = api.version
-            swaggerWrapped.host = api.environments[0].inboundURL
-            swaggerWrapped.basePath = api.basePath
-        }
-        return swaggerWrapped
+        this.props.dispatch(finishLoading())
     }
 
     handleOnChangeSwaggerEditor = swaggerEdit => {
-        try {
-            this.setState({...this.state, swagger: JSON.parse(swaggerEdit)})
-        } catch (e) {
+        if (swaggerEdit !== this.state.swagger) {
+            this.props.dispatch(initLoading())
+            this.setState({...this.state, swagger: swaggerEdit })
         }
     }
 
-    render() {
-        const {api} = this.props
-        const {swagger} = this.state
-        let swaggerToEdit = ''
-        if (swagger) {
-            swaggerToEdit = JSON.stringify(this.changeValuesByApi(swagger), null, '\t')
+    handleOnChangeOverride = value => {
+
+        const updateOverride = this.updateOverride
+
+        if (value) {
+            confirm({
+                title: 'Confirm action',
+                content: 'You will override all API resources and operations and adding those of Swagger!',
+                onOk() {
+                     updateOverride(true)
+                },
+            })
+        } else {
+            this.setState({ ...this.state, override: false })
+        }
+    }
+
+    updateOverride = override => {
+        this.setState({ ...this.state, override })
+    }
+
+    swaggerIsValid = swagger => {
+        try {
+            JSON.parse(swagger)
+            return true
+        } catch (e) {
+            return false
+        }
+    }
+
+    handleSaveSwagger = () => {
+        const { apiId, swagger, override } = this.state
+        const { updateApiWithSwagger } = this.props
+
+        if (this.swaggerIsValid(swagger)){
+            confirm({
+                title: 'Confirm action',
+                content: 'You are sure?',
+                onOk() {
+                    updateApiWithSwagger(apiId, JSON.parse(swagger), override)
+                }
+            })
+        } else {
+            this.props.dispatch(sendNotification({ type: 'error', message: 'Error', description: 'Swagger Json not valid!' }))
         }
 
-        const display = api ? 'block' : 'none'
+    }
+
+    render() {
+
+        const { loading } = this.props
+        const {swagger} = this.state
+
+        const display = !loading ? 'block' : 'none'
 
         return (
             <Row>
@@ -126,30 +159,31 @@ class SingleApiSwaggerEditor extends React.Component {
                 <Row gutter={2}>
                     <Col sm={24} md={12}>
                         <Card title="Editor" style={{margin: '0 14px', height: 700}} extra={
-                            <Button size="small">Save</Button>
+                            <Row gutter={8}>
+                                <Col sm={12} md={12}>
+                                    <Switch checkedChildren="Override" unCheckedChildren="Override" onChange={this.handleOnChangeOverride} checked={this.state.override}/>
+                                </Col>
+                                <Col sm={12} md={12}>
+                                    <Button size="small" onClick={this.handleSaveSwagger}>Save</Button>
+                                </Col>
+                            </Row>
                         }>
-                            {
-                                !api && <Loading/>
-                            }
-                            {
-                                api &&
-                                (
-                                    <AceEditor
-                                        theme="monokai"
-                                        mode="json"
-                                        onChange={this.handleOnChangeSwaggerEditor}
-                                        value={swaggerToEdit}
-                                        debounceChangePeriod={1500}
-                                        editorProps={{$blockScrolling: 'Infinity'}}
-                                        width="100%" height="600px"/>
-                                )
-                            }
+
+                            <AceEditor
+                                theme="monokai"
+                                mode="json"
+                                onChange={this.handleOnChangeSwaggerEditor}
+                                value={swagger}
+                                debounceChangePeriod={2500}
+                                editorProps={{$blockScrolling: 'Infinity'}}
+                                width="100%" height="600px"/>
+
                         </Card>
                     </Col>
                     <Col sm={24} md={12}>
                         <Card title="Preview Swagger" style={{margin: '0 14px', height: 700, overflowY: 'auto'}}>
-                            { !api && <Loading />}
-                            <div id="swaggerUI" style={{width: '100%', height: 700, display: display }}/>
+                            { loading && <Loading />}
+                            <div id="swaggerUI" style={{width: '100%', height: 700, display: display}}/>
                         </Card>
                     </Col>
                 </Row>
@@ -161,18 +195,24 @@ class SingleApiSwaggerEditor extends React.Component {
 const mapStateToProps = (state) => {
     return {
         api: state.apis.api,
-        environments: state.environments.environments
+        swagger: state.apis.swagger,
+        notification: state.apis.notification,
+        environments: state.environments.environments,
+        loading: state.apis.loading,
     }
 }
 
 const mapDispatchToProps = (dispatch) => {
     return {
         getApiById: bindActionCreators(getApiById, dispatch),
+        getApiSwaggerById: bindActionCreators(getSwaggerByApi, dispatch),
         updateApi: bindActionCreators(updateApi, dispatch),
         resetApiAction: bindActionCreators(resetApiAction, dispatch),
         getAllEnvironments: bindActionCreators(getAllEnvironments, dispatch),
         clearEnvironments: bindActionCreators(clearEnvironments, dispatch),
         deleteApi: bindActionCreators(deleteApi, dispatch),
+        clearSwagger: bindActionCreators(clearSwaggerApi, dispatch),
+        updateApiWithSwagger: bindActionCreators(updateApiWithSwagger, dispatch)
     }
 }
 
