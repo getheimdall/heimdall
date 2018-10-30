@@ -2,7 +2,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 //components
-import { Row, Button, Input, Col, Card, Form, notification } from 'antd'
+import { Row, Input, Col, Card, Form, notification } from 'antd'
 //actions
 import Loading from '../components/ui/Loading'
 import PageHeader from '../components/ui/PageHeader'
@@ -58,21 +58,15 @@ class Users extends Component {
         return (
             <div>
                 <PageHeader title={i18n.t('users')} icon="user" />
-
                 <Row className="search-box">
                     <Card>
                         <Form>
-                            <Row gutter={24}>
+                            <Row gutter={24} type="flex" justify="start">
                                 <Col sm={24} md={5}>
                                     {getFieldDecorator('userName')(<Input.Search onSearch={this.onSearchForm} placeholder={i18n.t('username')} />)}
                                 </Col>
                                 <Col sm={24} md={5}>
                                     {getFieldDecorator('email')(<Input.Search onSearch={this.onSearchForm} placeholder={i18n.t('email')} />)}
-                                </Col>
-                                <Col sm={24} md={14}>
-                                    <Row type="flex" justify="end">
-                                        <Button id="searchUsers" className="card-button" type="primary" icon="search" onClick={this.onSearchForm}>{i18n.t('search')}</Button>
-                                    </Row>
                                 </Col>
                             </Row>
                         </Form>

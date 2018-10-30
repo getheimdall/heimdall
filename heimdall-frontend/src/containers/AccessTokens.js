@@ -2,7 +2,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 //components
-import { Row, Button, Form, Card, Input, Col, notification } from 'antd'
+import { Row, Form, Card, Input, Col, notification } from 'antd'
 //actions
 import { getAllAccessTokens, initLoading, remove } from '../actions/access-tokens'
 
@@ -61,14 +61,9 @@ class AccessTokens extends Component {
                 <Row className="search-box">
                     <Card>
                         <Form>
-                            <Row gutter={24}>
+                            <Row gutter={24} type="flex" justify="start">
                                 <Col sm={24} md={5}>
                                     {getFieldDecorator('code')(<Input.Search onSearch={this.onSearchForm} placeholder={i18n.t('token')} />)}
-                                </Col>
-                                <Col sm={24} md={19}>
-                                    <Row type="flex" justify="end">
-                                        <Button id="searchAccessToken" className="card-button" type="primary" icon="search" onClick={this.onSearchForm}>{i18n.t('search')}</Button>
-                                    </Row>
                                 </Col>
                             </Row>
                         </Form>

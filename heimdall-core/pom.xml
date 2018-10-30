@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>br.com.conductor.heimdall</groupId>
 		<artifactId>heimdall</artifactId>
-		<version>1.6.7-SNAPSHOT</version>
+		<version>1.9.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>heimdall-core</artifactId>
@@ -146,6 +146,10 @@
         		</exclusion>
         	</exclusions>
         </dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-actuator</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

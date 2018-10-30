@@ -4,10 +4,21 @@ import { Layout, Menu, Affix } from 'antd'
 import Logo from './Logo'
 import i18n from "../../i18n/i18n"
 import SidebarLink from './SidebarLink'
+import {infoService} from "../../services/InfoService"
 
 const { Sider } = Layout
 
 class SideBar extends Component {
+
+    state = {
+        traces: false
+    }
+
+    componentDidMount() {
+        infoService.getManagerInfo().then(data => {
+            this.setState({ ...this.state, traces: data.traces })
+        })
+    }
 
     constructor(props) {
         super(props)
@@ -21,6 +32,7 @@ class SideBar extends Component {
 
     render() {
         const { history } = this.props;
+        const { traces } = this.state;
 
         return (
             <Sider collapsible collapsed={this.state.collapsed} onCollapse={this.onCollapse} >
@@ -54,10 +66,12 @@ class SideBar extends Component {
                         <Menu.Item key="users" className="users">
                             <SidebarLink to="/users" label={i18n.t('users')} history={history} icon="user" />
                         </Menu.Item>
-
-                        <Menu.Item key="traces" className="traces">
-                            <SidebarLink to="/traces" label={i18n.t('traces')} history={history} icon="sync" />
-                        </Menu.Item>
+                        {
+                            traces &&
+                            <Menu.Item key="traces" className="traces">
+                                <SidebarLink to="/traces" label={i18n.t('traces')} history={history} icon="sync" />
+                            </Menu.Item>
+                        }
                     </Menu>
                 </Affix>
             </Sider>

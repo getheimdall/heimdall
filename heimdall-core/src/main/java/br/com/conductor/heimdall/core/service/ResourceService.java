@@ -28,10 +28,6 @@ import static br.com.twsoftware.alfred.object.Objeto.notBlank;
 
 import java.util.List;
 
-import br.com.conductor.heimdall.core.entity.Interceptor;
-import br.com.conductor.heimdall.core.entity.Operation;
-import br.com.conductor.heimdall.core.repository.InterceptorRepository;
-import br.com.conductor.heimdall.core.repository.OperationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -69,12 +65,6 @@ public class ResourceService {
 
      @Autowired
      private ApiRepository apiRepository;
-
-     @Autowired
-     private OperationRepository operationRepository;
-
-     @Autowired
-     private InterceptorRepository interceptorRepository;
 
      @Autowired
      private OperationService operationService;
@@ -220,16 +210,23 @@ public class ResourceService {
           HeimdallException.checkThrow(isBlank(resource), GLOBAL_RESOURCE_NOT_FOUND);
 
           // Deletes all operations attached to the Resource
-          List<Operation> operations = operationRepository.findByResourceId(resourceId);
-          operations.forEach(operation -> operationService.delete(apiId, resourceId, operation.getId()));
+          operationService.deleteAllfromResource(apiId, resourceId);
 
           // Deletes all interceptors attached to the Resource
-          List<Interceptor> interceptors = interceptorRepository.findByResourceId(resourceId);
-          interceptors.forEach(interceptor -> interceptorService.delete(interceptor.getId()));
+          interceptorService.deleteAllfromResource(resourceId);
           
           resourceRepository.delete(resource.getId());
           
           amqpRoute.dispatchRoutes();
      }
 
+     /**
+      * Deletes all Resources from a Api
+      *
+      * @param apiId Api with the Resources
+      */
+     public void deleteAllFromApi(Long apiId) {
+          List<Resource> resources = resourceRepository.findByApiId(apiId);
+          resources.forEach(resource -> this.delete(apiId, resource.getId()));
+     }
 }

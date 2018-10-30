@@ -1,5 +1,4 @@
-
-package br.com.conductor.heimdall.core.util;
+package br.com.conductor.heimdall.core.environment;
 
 /*-
  * =========================LICENSE_START==================================
@@ -10,9 +9,9 @@ package br.com.conductor.heimdall.core.util;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,21 +20,25 @@ package br.com.conductor.heimdall.core.util;
  * ==========================LICENSE_END===================================
  */
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.info.Info;
+import org.springframework.boot.actuate.info.InfoContributor;
+import org.springframework.stereotype.Component;
+
 /**
- * This class holds the global interceptor constants.
+ * This class represents the custom information to manager/info.
  *
- * @author Filipe Germano
- * @author Marcos Filho
- * @author Marcelo Aguiar Rodrigues
- *
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
-public class ConstantsInterceptors {
+@Component
+public class CustomInformationInfo implements InfoContributor {
 
-     public static final String GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND = "Could not find a required %s or it is not valid";
+    @Autowired
+    Property property;
 
-     public static final String GLOBAL_MOCK_INTERCEPTOR_LOCALIZED = "Localized mock interceptor";
-     
-     public static final String GLOBAL_ACCESS_NOT_ALLOWED_API = "Access not allowed for this API";
-
-     public static final String IDENTIFIER_ID = "identifier_id";
+    @Override
+    public void contribute(Info.Builder builder) {
+        builder.withDetail("traces", !property.getTrace().isPrintAllTrace() && property.getMongo().getEnabled());
+        builder.withDetail("analytics", property.getMongo().getEnabled());
+    }
 }

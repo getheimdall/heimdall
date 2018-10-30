@@ -15,7 +15,7 @@ import br.com.conductor.heimdall.gateway.filter.helper.*;
 import br.com.conductor.heimdall.core.entity.AccessToken;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.enums.Location;
-import br.com.conductor.heimdall.core.service.LifeCycleService;
+import br.com.conductor.heimdall.gateway.service.LifeCycleService;
 import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
 import br.com.conductor.heimdall.gateway.service.SecurityService;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
@@ -79,7 +79,10 @@ public class AccessTokenInterceptor extends HeimdallFilter {
      public boolean should() {
 
         LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
-        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest(), referenceId);
+        return lifeCycleService.validateAccessToken(RequestContext.getCurrentContext().getRequest(),
+                                                        getApiId(),
+                                                        Location.valueOf("{{location}}"),
+                                                        "{{name}}");
      }
      
      @Override
