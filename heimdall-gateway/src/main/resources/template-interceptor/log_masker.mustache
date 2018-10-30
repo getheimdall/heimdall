@@ -1,0 +1,79 @@
+import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
+import br.com.conductor.heimdall.core.util.BeanManager;
+import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
+import br.com.conductor.heimdall.gateway.service.LifeCycleService;
+import br.com.conductor.heimdall.gateway.service.LogMaskerService;
+import br.com.conductor.heimdall.gateway.trace.RequestResponseParser;
+import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import com.netflix.zuul.context.RequestContext;
+
+import java.util.*;
+
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
+
+public class LogIgnoreInterceptor extends HeimdallFilter {
+
+    private static Set<String> pathsAllowed;
+
+    private static Set<String> pathsNotAllowed;
+
+    private static String inboundURL;
+
+    private static String method;
+
+    private static Long referenceId;
+
+    public LogIgnoreInterceptor() {
+
+        method = "{{method}}";
+
+        pathsAllowed = new HashSet<>();
+        {{#pathsAllowed}}
+        pathsAllowed.add("{{.}}");
+        {{/pathsAllowed}}
+
+        pathsNotAllowed = new HashSet<>();
+        {{#pathsNotAllowed}}
+        pathsNotAllowed.add("{{.}}");
+        {{/pathsNotAllowed }}
+
+        inboundURL = "{{inboundURL}}";
+
+        referenceId = {{referenceId}};
+
+    }
+
+    @Override
+    public String filterType() {
+        return "{{executionPoint}}";
+    }
+
+    @Override
+    public int filterOrder() {
+        return {{order}};
+    }
+
+    @Override
+    public String getName() {
+        return "{{name}}";
+    }
+
+    @Override
+    public boolean should() {
+        LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest(), referenceId);
+    }
+
+    @Override
+    public void execute() throws Throwable {
+
+        List<String> ignoredHeaders = new ArrayList<>();
+        {{#ignoredHeaders}}
+        ignoredHeaders.add("{{.}}");
+        {{/ignoredHeaders}}
+        LogMaskerService logMaskerService = (LogMaskerService) BeanManager.getBean(LogMaskerService.class);
+
+        logMaskerService.execute(filterType(), {{body}}, {{uri}}, {{headers}}, ignoredHeaders);
+    }
+}

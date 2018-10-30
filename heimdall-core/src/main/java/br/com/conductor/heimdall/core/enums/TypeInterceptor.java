@@ -48,7 +48,8 @@ public enum TypeInterceptor {
 	WHITELIST(new WhitelistHeimdallInterceptor()),
 	CACHE(new CacheHeimdallInterceptor()),
 	CACHE_CLEAR(new CacheClearHeimdallInterceptor()),
-	IDENTIFIER(new IdentifierHeimdallInterceptor());
+	IDENTIFIER(new IdentifierHeimdallInterceptor()),
+	LOG_MASKER(new LogMaskerHeimdallInterceptor());
 
 	private HeimdallInterceptor heimdallInterceptor;
 
