@@ -151,8 +151,8 @@ class Operations extends Component {
                         </Tooltip>
                     </Col>
                     <Col style={{margin: 5}}>
-                        <Tooltip title="Search operations">
-                            <Button id="searchOperations" type="dashed" icon="search" onClick={this.toggleSearch}>Search Operations</Button>
+                        <Tooltip title={i18n.t('search_operations')}>
+                            <Button id="searchOperations" type="dashed" icon="search" onClick={this.toggleSearch}>{i18n.t('search_operations')}</Button>
                         </Tooltip>
                     </Col>
                 </Row>

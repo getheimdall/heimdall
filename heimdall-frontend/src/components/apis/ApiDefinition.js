@@ -44,8 +44,8 @@ class ApiDefinition extends Component {
             okText: i18n.t('yes'),
             content: (
                 <div>
-                    <p>Deleting an Api will also delete any Resources, Operations, Interceptors or Middlewares attached to this Api.</p>
-                    <p>This operation can not be reverted.</p>
+                    <p>{ i18n.t('deleting_an_api_delete_resources_operations_interceptors_middlewares') }</p>
+                    <p>{ i18n.t('this_operation_can_not_be_reverted') }</p>
                 </div>
             ),
             okType: 'danger',

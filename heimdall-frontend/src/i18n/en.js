@@ -1,3 +1,5 @@
+import React from "react";
+
 export default {
     translations: {
         'insert_username': 'Please input your username!',
@@ -217,5 +219,8 @@ export default {
         'invalid_parameter': 'Invalid parameter!',
         'resource_not_found': 'Resource not found!',
         'operation_not_found': 'Operation not found!',
+        'deleting_an_api_delete_resources_operations_interceptors_middlewares': 'Deleting an Api will also delete any Resources, Operations, Interceptors or Middlewares attached to this Api.',
+        'this_operation_can_not_be_reverted': 'This operation can not be reverted.',
+        'search_operations': 'Search operations',
     }
 }
