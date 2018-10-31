@@ -19,9 +19,10 @@
  */
 package br.com.conductor.heimdall.gateway.service;
 
+import static br.com.conductor.heimdall.gateway.util.ConstantsContext.*;
+
 import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.entity.Plan;
-import br.com.conductor.heimdall.core.enums.HttpMethod;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.enums.Location;
 import br.com.conductor.heimdall.core.enums.Status;
@@ -65,40 +66,30 @@ public class LifeCycleService {
                           Long referenceId) {
 
 
+        if (referenceId == null) return false;
+
+        RequestContext context = RequestContext.getCurrentContext();
+
         switch (interceptorLifeCycle) {
             case API:
-                return validateApi(pathsAllowed, pathsNotAllowed, inboundURL, req);
+                Long apiId = (Long) context.get(API_ID);
+                return referenceId.equals(apiId);
+
             case PLAN:
                 return validatePlan(pathsAllowed, pathsNotAllowed, inboundURL, req, referenceId);
-            case OPERATION:
-                return validateOperation(pathsAllowed, pathsNotAllowed, inboundURL, method, req);
+
             case RESOURCE:
-                return validateResource(pathsAllowed, pathsNotAllowed, inboundURL, req);
+                Long resourceId = (Long) context.get(RESOURCE_ID);
+                return referenceId.equals(resourceId);
+
+            case OPERATION:
+                Long operationId = (Long) context.get(OPERATION_ID);
+                return referenceId.equals(operationId);
+
             default:
                 return false;
         }
 
-    }
-
-    private boolean validateApi(Set<String> pathsAllowed, Set<String> pathsNotAllowed, String inboundURL, HttpServletRequest req) {
-        if ((inboundURL != null && !inboundURL.isEmpty()) &&
-                !isHostValidToInboundURL(req, inboundURL)) {
-            return false;
-        }
-
-        if (listContainURI(req.getRequestURI(), pathsNotAllowed)) {
-            return false;
-        }
-
-        if (pathsAllowed != null) {
-
-            for (String path : pathsAllowed) {
-
-                if (pathMatcher.match(req.getRequestURI(), path)) return true;
-            }
-        }
-
-        return false;
     }
 
     private boolean validatePlan(Set<String> pathsAllowed, Set<String> pathsNotAllowed, String inboundURL, HttpServletRequest req, Long referenceId) {
@@ -108,17 +99,12 @@ public class LifeCycleService {
             if (!Status.ACTIVE.equals(plan1.getStatus()))
                 return false;
 
-        if ((inboundURL != null && !inboundURL.isEmpty()) &&
-                !isHostValidToInboundURL(req, inboundURL)) {
-            return false;
-        }
-
         if (listContainURI(req.getRequestURI(), pathsNotAllowed)) {
             return false;
         }
 
-        if (req.getHeader("client_id") != null) {
-            final App app = appRepository.findByClientId(req.getHeader("client_id"));
+        if (req.getHeader(CLIENT_ID) != null) {
+            final App app = appRepository.findByClientId(req.getHeader(CLIENT_ID));
 
             if (Objects.isNull(app)) return false;
 
@@ -150,68 +136,6 @@ public class LifeCycleService {
         return false;
     }
 
-    private boolean validateResource(Set<String> pathsAllowed, Set<String> pathsNotAllowed, String inboundURL, HttpServletRequest req) {
-
-        if ((inboundURL != null && !inboundURL.isEmpty()) && !isHostValidToInboundURL(req, inboundURL)) {
-            return false;
-        }
-
-        final String uri = req.getRequestURI();
-
-        if (pathsNotAllowed != null) {
-
-            for (String path : pathsNotAllowed) {
-
-                String mutableUri = uri;
-                if ((uri != null && !uri.isEmpty()) && StringUtils.endsWith(uri, "/")) {
-
-                    mutableUri = StringUtils.removeEnd(uri.trim(), "/");
-                }
-
-                if (pathMatcher.match(path, mutableUri)) {
-                    return false;
-                }
-            }
-        }
-
-        if (pathsAllowed != null) {
-
-            for (String path : pathsAllowed) {
-
-                String mutableUri = uri;
-                if ((uri != null && !uri.isEmpty()) && StringUtils.endsWith(uri, "/")) {
-                    mutableUri = StringUtils.removeEnd(uri.trim(), "/");
-                }
-
-                if (pathMatcher.match(path, mutableUri)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private boolean validateOperation(Set<String> pathsAllowed, Set<String> pathsNotAllowed, String inboundURL, String method, HttpServletRequest req) {
-
-        if (!isMethodValidToRequest(req, method)) {
-
-            return false;
-        }
-
-        if ((inboundURL != null && !inboundURL.isEmpty()) && !isHostValidToInboundURL(req, inboundURL)) {
-
-            return false;
-        }
-
-        if (listContainURI(req.getRequestURI(), pathsNotAllowed)) {
-            return false;
-        }
-
-        return listContainURI(req.getRequestURI(), pathsAllowed);
-
-    }
-
     public boolean validateClientId(HttpServletRequest req,
                                     Long apiId,
                                     Location location,
@@ -226,7 +150,7 @@ public class LifeCycleService {
         SecurityService securityService = (SecurityService) BeanManager.getBean(SecurityService.class);
         RequestContext requestContext = RequestContext.getCurrentContext();
 
-        final Long currentApiId = Long.parseLong((String) requestContext.get("api-id"));
+        final Long currentApiId = (Long) requestContext.get(API_ID);
 
         if (apiId.equals(currentApiId))
             securityService.validateClientId(requestContext, currentApiId, clientId);
@@ -238,9 +162,9 @@ public class LifeCycleService {
 
         String clientId;
         if (Location.HEADER.equals(location))
-            clientId = req.getHeader("client_id");
+            clientId = req.getHeader(CLIENT_ID);
         else
-            clientId = req.getParameter("client_id");
+            clientId = req.getParameter(CLIENT_ID);
 
         String accessToken;
         if (Location.HEADER.equals(location))
@@ -251,41 +175,10 @@ public class LifeCycleService {
         SecurityService securityService = (SecurityService) BeanManager.getBean(SecurityService.class);
         RequestContext requestContext = RequestContext.getCurrentContext();
 
-        final Long currentApiId = Long.parseLong((String) requestContext.get("api-id"));
+        final Long currentApiId = (Long) requestContext.get(API_ID);
 
         if (apiId.equals(currentApiId))
             securityService.validadeAccessToken(requestContext, currentApiId, clientId, accessToken);
-
-        return false;
-    }
-
-    private static boolean isHostValidToInboundURL(HttpServletRequest req, String inboundURL) {
-
-        String host = req.getHeader("Host");
-        if (host != null && host.isEmpty()) {
-
-            host = req.getHeader("host");
-        }
-
-        if (host != null && !host.isEmpty()) {
-
-            return (inboundURL != null && !inboundURL.isEmpty()) && inboundURL.toLowerCase().contains(host.toLowerCase());
-        } else {
-
-            return (inboundURL != null && !inboundURL.isEmpty()) && req.getRequestURL().toString().toLowerCase().contains(inboundURL.toLowerCase());
-        }
-    }
-
-    private static boolean isMethodValidToRequest(HttpServletRequest req, String method) {
-
-        if (method != null && !method.isEmpty()) {
-
-            if (method.equals(HttpMethod.ALL.name())) {
-                return true;
-            }
-
-            return req.getMethod().toLowerCase().equals(method.trim().toLowerCase());
-        }
 
         return false;
     }
