@@ -72,8 +72,15 @@ export const update = accessToken => dispatch => {
 export const remove = (accessTokenId, offset) => dispatch => {
     accessTokenService.remove(accessTokenId)
         .then(data => {
-            dispatch(getAllAccessTokens(offset))
+            dispatch(getAllAccessTokens({offset: offset, limit: 10}))
             dispatch(sendNotification({ type: 'success', message: 'Access Token removed' }))
+        })
+        .catch(error => {
+            console.log(error)
+            if (error.response && error.response.status === 400) {
+                dispatch(sendNotification({ type: 'error', message: 'Error', description: error.response.data.message }))
+            }
+            dispatch(finishLoading())
         })
 }
 
