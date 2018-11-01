@@ -28,13 +28,10 @@ import br.com.conductor.heimdall.core.enums.Location;
 import br.com.conductor.heimdall.core.enums.Status;
 import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.repository.PlanRepository;
-import br.com.conductor.heimdall.core.util.BeanManager;
 import com.netflix.zuul.context.RequestContext;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.AntPathMatcher;
-import org.springframework.util.PathMatcher;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -55,7 +52,8 @@ public class LifeCycleService {
     @Autowired
     private PlanRepository planRepository;
 
-    private static PathMatcher pathMatcher = new AntPathMatcher();
+    @Autowired
+    private SecurityService securityService;
 
     public boolean should(InterceptorLifeCycle interceptorLifeCycle,
                           Set<String> pathsAllowed,
@@ -76,7 +74,7 @@ public class LifeCycleService {
                 return referenceId.equals(apiId);
 
             case PLAN:
-                return validatePlan(pathsAllowed, pathsNotAllowed, inboundURL, req, referenceId);
+                return validatePlan(pathsAllowed, pathsNotAllowed, req, referenceId);
 
             case RESOURCE:
                 Long resourceId = (Long) context.get(RESOURCE_ID);
@@ -92,12 +90,11 @@ public class LifeCycleService {
 
     }
 
-    private boolean validatePlan(Set<String> pathsAllowed, Set<String> pathsNotAllowed, String inboundURL, HttpServletRequest req, Long referenceId) {
+    private boolean validatePlan(Set<String> pathsAllowed, Set<String> pathsNotAllowed, HttpServletRequest req, Long referenceId) {
 
-        final Plan plan1 = planRepository.findOne(referenceId);
-        if (plan1 != null)
-            if (!Status.ACTIVE.equals(plan1.getStatus()))
-                return false;
+        final Plan activePlan = planRepository.findOne(referenceId);
+        if (activePlan == null || !Status.ACTIVE.equals(activePlan.getStatus()))
+            return false;
 
         if (listContainURI(req.getRequestURI(), pathsNotAllowed)) {
             return false;
@@ -108,30 +105,11 @@ public class LifeCycleService {
 
             if (Objects.isNull(app)) return false;
 
-            final Plan plan = app.getPlans()
-                    .stream()
-                    .filter(p -> p.getId().equals(referenceId))
-                    .findFirst()
-                    .orElse(null);
+            if (app.getPlans().stream()
+                    .noneMatch(plan -> plan.getId().equals(referenceId))) return false;
 
-            if (Objects.isNull(plan)) return false;
-            
-            final String uri = req.getRequestURI();
-            
-            if (pathsAllowed != null) {
-
-                for (String path : pathsAllowed) {
-
-                    String mutableUri = uri;
-                    if ((uri != null && !uri.isEmpty()) && StringUtils.endsWith(uri, "/")) {
-                        mutableUri = StringUtils.removeEnd(uri.trim(), "/");
-                    }
-                    
-                    if (mutableUri.contains(path)) return true;
-                }
-            }
+            return listContainURI(req.getRequestURI(), pathsAllowed);
         }
-
 
         return false;
     }
@@ -147,13 +125,14 @@ public class LifeCycleService {
         else
             clientId = req.getParameter(name);
 
-        SecurityService securityService = (SecurityService) BeanManager.getBean(SecurityService.class);
         RequestContext requestContext = RequestContext.getCurrentContext();
 
         final Long currentApiId = (Long) requestContext.get(API_ID);
 
-        if (apiId.equals(currentApiId))
+        if (apiId.equals(currentApiId)) {
             securityService.validateClientId(requestContext, currentApiId, clientId);
+            return true;
+        }
 
         return false;
     }
@@ -172,31 +151,27 @@ public class LifeCycleService {
         else
             accessToken = req.getParameter(name);
 
-        SecurityService securityService = (SecurityService) BeanManager.getBean(SecurityService.class);
         RequestContext requestContext = RequestContext.getCurrentContext();
 
         final Long currentApiId = (Long) requestContext.get(API_ID);
 
-        if (apiId.equals(currentApiId))
+        if (apiId.equals(currentApiId)) {
             securityService.validadeAccessToken(requestContext, currentApiId, clientId, accessToken);
+            return true;
+        }
 
         return false;
     }
 
     private boolean listContainURI(String uri, Set<String> paths) {
-        if (paths != null) {
 
-            if ((uri != null && !uri.isEmpty()) && StringUtils.endsWith(uri, "/")) {
+        if (paths != null && uri != null) {
 
-                uri = StringUtils.removeEnd(uri.trim(), "/");
-            }
+            uri = StringUtils.removeEnd(uri.trim(), "/");
 
             for (String path : paths) {
-
-                if (pathMatcher.match(path, uri)) {
-
+                if (uri.contains(path))
                     return true;
-                }
             }
         }
 
