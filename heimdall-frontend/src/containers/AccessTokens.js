@@ -65,6 +65,9 @@ class AccessTokens extends Component {
                                 <Col sm={24} md={5}>
                                     {getFieldDecorator('code')(<Input.Search onSearch={this.onSearchForm} placeholder="Token" />)}
                                 </Col>
+                                <Col sm={24} md={5}>
+                                    {getFieldDecorator('app.name')(<Input.Search onSearch={this.onSearchForm} placeholder="App name" />)}
+                                </Col>
                             </Row>
                         </Form>
                     </Card>
