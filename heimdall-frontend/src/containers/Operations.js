@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { operationService } from '../services'
+import { List, Avatar, Button, Row, Col, Tooltip, Modal, notification } from 'antd'
 
-import { List, Avatar, Button, Row, Col, Tooltip, Modal, notification } from 'antd';
+import i18n from '../i18n/i18n'
+import { operationService } from '../services'
 import Loading from '../components/ui/Loading'
-import OperationForm from '../components/operations/OperationForm';
-import FloatSearch from './../components/ui/FloatSearch';
+import FloatSearch from './../components/ui/FloatSearch'
+import OperationForm from '../components/operations/OperationForm'
 
 const ButtonGroup = Button.Group;
 
@@ -70,7 +71,7 @@ class Operations extends Component {
             })
             .catch(error => {
                 if (error.response && error.response.status === 400) {
-                    notification['error']({ message: 'Error', description: error.response.data.message })
+                    notification['error']({ message: i18n.t('error'), description: error.response.data.message })
                 }
                 this.reloadOperations()
             })
@@ -116,11 +117,11 @@ class Operations extends Component {
         if (!operations) return <Loading />
 
         const modalOperation =
-            <Modal title="Add Operation"
+            <Modal title={i18n.t('add_operation')}
             
                 footer={[
-                    <Button id="cancelAddOperation" key="back" onClick={this.handleCancel}>Cancel</Button>,
-                    <Button id="saveOperation" key="submit" type="primary" loading={loading} onClick={this.handleSave}>Save</Button>
+                    <Button id="cancelAddOperation" key="back" onClick={this.handleCancel}>{i18n.t('cancel')}</Button>,
+                    <Button id="saveOperation" key="submit" type="primary" loading={loading} onClick={this.handleSave}>{i18n.t('save')}</Button>
                 ]}
                 visible={this.state.visibleModal}
                 onCancel={this.handleCancel}
@@ -132,7 +133,7 @@ class Operations extends Component {
             return (
                 <Row type="flex" justify="center" align="bottom">
                     <Col style={{ marginTop: 20 }}>
-                        You don't have <b>OPERATIONS</b> in this <b>RESOURCE</b>, please <Button id="addOperationWhenListIsEmpty" type="dashed" onClick={this.showOperationModal()}>Add Operation</Button>
+                        {i18n.t('you_do_not_have')} <b style={{textTransform: 'uppercase'}}>{i18n.t('operations')}</b> {i18n.t('in_this')} <b style={{textTransform: 'uppercase'}}>{i18n.t('resource')}</b>! <Button id="addOperationWhenListIsEmpty" type="dashed" onClick={this.showOperationModal()}>{i18n.t('add_operation')}</Button>
                     </Col>
 
                     {modalOperation}
@@ -145,13 +146,13 @@ class Operations extends Component {
                 { visibleSearch && <FloatSearch callbackKeyUp={this.filterOperationsByPath} handleClose={this.toggleSearch}/>}
                 <Row type="flex" justify="center">
                     <Col style={{margin: 5}}>
-                        <Tooltip title="Add Operation">
-                            <Button id="addOperation" type="dashed" icon="plus" onClick={this.showOperationModal()}>Add Operation</Button>
+                        <Tooltip title={i18n.t('add_operation')}>
+                            <Button id="addOperation" type="dashed" icon="plus" onClick={this.showOperationModal()}>{i18n.t('add_operation')}</Button>
                         </Tooltip>
                     </Col>
                     <Col style={{margin: 5}}>
-                        <Tooltip title="Search operations">
-                            <Button id="searchOperations" type="dashed" icon="search" onClick={this.toggleSearch}>Search Operations</Button>
+                        <Tooltip title={i18n.t('search_operations')}>
+                            <Button id="searchOperations" type="dashed" icon="search" onClick={this.toggleSearch}>{i18n.t('search_operations')}</Button>
                         </Tooltip>
                     </Col>
                 </Row>
@@ -189,10 +190,10 @@ class Operations extends Component {
                                 />
                                 <Row type="flex" justify="center">
                                     <ButtonGroup>
-                                        <Tooltip title="Update">
+                                        <Tooltip title={i18n.t('edit')}>
                                             <Button type="primary" icon="edit" onClick={this.showOperationModal(operation.id)} />
                                         </Tooltip>
-                                        <Tooltip title="Delete">
+                                        <Tooltip title={i18n.t('delete')}>
                                             <Button type="danger" icon="delete" onClick={this.remove(operation.id)} />
                                         </Tooltip>
                                     </ButtonGroup>

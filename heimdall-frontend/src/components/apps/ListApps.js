@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
-
 import { Modal, Row, Table, Divider, Tag, Tooltip, Button, Pagination } from 'antd';
+
+import i18n from "../../i18n/i18n"
 
 const confirm = Modal.confirm;
 const { Column } = Table;
@@ -11,10 +12,10 @@ class ListApps extends Component {
 
     showDeleteConfirm = (appId) => (e) => {
         confirm({
-            title: 'Are you sure?',
-            okText: 'Yes',
+            title: i18n.t('are_you_sure'),
+            okText: i18n.t('yes'),
             okType: 'danger',
-            cancelText: 'No',
+            cancelText: i18n.t('no'),
             onOk: () => {
                 this.props.handleDelete(appId)
             }
@@ -27,28 +28,29 @@ class ListApps extends Component {
         return (
             <div>
                 <Table dataSource={dataSource.content} rowKey={record => record.id} loading={loading} scroll={{x: 990}} pagination={false}>
-                    <Column title="ID" dataIndex="id" id="id" width={90} />
-                    <Column title="Name" dataIndex="name" id="name" />
-                    <Column title="Description" dataIndex="description" id="name" />
-                    <Column title="Client Id" dataIndex="clientId" id="clientId" width={150} />
-                    <Column title="Developer" dataIndex="developer.name" id="developer" />
-                    <Column title="Status" id="status" key="status" render={(record) => (
-                        <span>
-                            {record.status === 'ACTIVE' && <Tag color="green">{record.status}</Tag>}
-                            {record.status === 'INACTIVE' && <Tag color="red">{record.status}</Tag>}
+                    <Column title={i18n.t('id')} dataIndex="id" id="id" width={90} />
+                    <Column title={i18n.t('name')} dataIndex="name" id="name" />
+                    <Column title={i18n.t('description')} dataIndex="description" id="name" />
+                    <Column title={i18n.t('client_id')} dataIndex="clientId" id="clientId" width={150} />
+                    <Column title={i18n.t('developer')} dataIndex="developer.name" id="developer" />
+                    <Column title={i18n.t('status')} id="status" key="status" render={(record) => (
+                        <span style={{textTransform: 'uppercase'}}>
+                            {record.status === 'ACTIVE' && <Tag color="green">{i18n.t('active')}</Tag>}
+                            {record.status === 'INACTIVE' && <Tag color="red">{i18n.t('inactive')}</Tag>}
                         </span>
                     )} />
                     <Column
+                        title={i18n.t('action')}
                         id="action"
                         key="action"
                         width={200}
                         render={(text, record) => (
                             <span>
-                                <Tooltip title="Edit">
+                                <Tooltip title={i18n.t('edit')}>
                                     <Link to={"/apps/" + record.id}><Button type="primary" icon="edit" /></Link>
                                 </Tooltip>
                                 <Divider type="vertical" />
-                                <Tooltip title="Delete">
+                                <Tooltip title={i18n.t('delete')}>
                                     <Button type="danger" icon="delete" onClick={this.showDeleteConfirm(record.id)} />
                                 </Tooltip>
                             </span>
