@@ -29,9 +29,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.BsonDateTime;
 import org.bson.Document;
 
-import java.util.Date;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,6 +51,9 @@ public class MongoDBAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
 	private MongoClient mongoClient;
 	private MongoCollection<Document> collection;
 
+    @Setter
+    @Getter
+	private String zoneId;
 	@Setter
 	@Getter
 	private String url;
@@ -65,17 +70,19 @@ public class MongoDBAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
 	@Getter
 	private String uri;
 
-	public MongoDBAppender(String url, Long port, String dataBase, String collectionName) {
+	public MongoDBAppender(String url, Long port, String dataBase, String collectionName, String zoneId) {
 		this.url = url;
 		this.port = port;
 		this.dataBase = dataBase;
 		this.collectionName = collectionName;
+		this.zoneId = zoneId;
 	}
 
-	public MongoDBAppender(String uri, String dataBase, String collectionName) {
+	public MongoDBAppender(String uri, String dataBase, String collectionName, String zoneId) {
 		this.uri = uri;
 		this.dataBase = dataBase;
 		this.collectionName = collectionName;
+        this.zoneId = zoneId;
 	}
 
 	@Override
@@ -105,8 +112,13 @@ public class MongoDBAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
 
 	@Override
 	protected void append(ILoggingEvent e) {
+        ZoneId zoneId = ZoneId.of(this.zoneId);
+
+        // Offset in milliseconds based on the informed Zone
+        long offset = zoneId.getRules().getOffset(Instant.now()).getTotalSeconds() * 1000;
+
 		Map<String, Object> objLog = new HashMap<>();
-		objLog.put("ts", new Date(e.getTimeStamp()));
+		objLog.put("ts", new BsonDateTime(e.getTimeStamp() + offset));
 		objLog.put("trace", BasicDBObject.parse(e.getFormattedMessage()));
 		objLog.put("level", e.getLevel().toString());
 		objLog.put("logger", e.getLoggerName());

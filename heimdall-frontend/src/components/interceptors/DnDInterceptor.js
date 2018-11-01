@@ -1,10 +1,11 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {DragSource, DropTarget} from 'react-dnd'
-import ItemTypes from '../../constants/items-types'
 import flow from 'lodash.flow'
+import PropTypes from 'prop-types'
+import React, {Component} from 'react'
+import {DragSource, DropTarget} from 'react-dnd'
+import { Button, Modal, Icon, Popover} from 'antd'
 
-import {Button, Modal, Icon, Popover} from 'antd'
+import i18n from "../../i18n/i18n"
+import ItemTypes from '../../constants/items-types'
 import InterceptorForm from './InterceptorForm'
 
 const interceptorSpec = {
@@ -176,12 +177,12 @@ class DnDInterceptor extends Component {
             <div>
                 {
                     interceptor && interceptor.description &&
-                    (<span><b>Description: </b> {interceptor.description}<br/></span>)
+                    (<span><b>{i18n.t('description')}: </b> {interceptor.description}<br/></span>)
                 }
 
                 {
                     interceptor && interceptor.lifeCycle &&
-                    (<span><b>Life Cycle: </b> {interceptor.lifeCycle}<br/></span>)
+                    (<span><b>{i18n.t('life_cycle')}: </b> {interceptor.lifeCycle}<br/></span>)
                 }
                 <br/>
             </div>
@@ -199,7 +200,7 @@ class DnDInterceptor extends Component {
             connectDragSource(
                 connectDropTarget(
                     <div className="draggable-interceptor" style={styledIsOver}>
-                        <Popover content={clickContent} title={interceptor && `Name: ${interceptor.name}`}
+                        <Popover content={clickContent} title={interceptor && `${i18n.t('name')}: ${interceptor.name}`}
                                      trigger="click"
                                      visible={this.state.clicked} onVisibleChange={this.handleClickChange}>
                                 <div className="ant-btn ant-btn-circle ant-btn-lg ant-btn-icon-only" style={style}>
@@ -208,13 +209,13 @@ class DnDInterceptor extends Component {
                         </Popover>
                         <span>{type}</span>
 
-                        <Modal title="Edit Interceptor"
+                        <Modal title={i18n.t('edit_interceptor')}
                                footer={[
                                    <Button id="cancelInterceptorModal" key="back"
-                                           onClick={this.handleCancel}>Cancel</Button>,
+                                           onClick={this.handleCancel}>{i18n.t('cancel')}</Button>,
                                    <Button id="saveInterceptorModal" key="submit" type="primary"
                                            onClick={this.handleSave}>
-                                       Save
+                                       {i18n.t('save')}
                                    </Button>
                                ]}
                                visible={this.state.showModal}

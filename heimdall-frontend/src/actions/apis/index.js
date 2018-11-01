@@ -1,7 +1,8 @@
-import { ApiConstants } from '../../constants/actions-types'
-
-import { apiService } from '../../services'
 import { push } from 'connected-react-router';
+
+import i18n from "../../i18n/i18n"
+import { ApiConstants } from '../../constants/actions-types'
+import { apiService } from '../../services'
 
 
 const receiveApis = apis => ({
@@ -15,7 +16,7 @@ export const getAllApis = () => dispatch => {
         .then(data => dispatch(receiveApis(data)))
         .catch(error => {
             if (error.response && error.response.status === 400) {
-                dispatch(sendNotification({ type: 'error', message: 'error', description: error.response.data.message }))
+                dispatch(sendNotification({ type: 'error', message: i18n.t('error'), description: error.response.data.message }))
             }
         })
 }
@@ -31,7 +32,7 @@ export const getApiById = (id) => dispatch => {
         .then(data => dispatch(receiveApi(data)))
         .catch(error => {
             if (error.response && error.response.status === 400) {
-                dispatch(sendNotification({ type: 'error', message: 'error', description: error.response.data.message }))
+                dispatch(sendNotification({ type: 'error', message: i18n.t('error'), description: error.response.data.message }))
             }
             dispatch(push('/apis'))
         })
@@ -44,7 +45,7 @@ export const updateApi = (api) => dispatch => {
     dispatch(resetApiAction())
     apiService.updateApi(api)
         .then(data => {
-            dispatch(sendNotification({ type: 'success', message: 'Api updated' }))
+            dispatch(sendNotification({ type: 'success', message: i18n.t('api_updated') }))
             dispatch(updateApiAction(data))
             // dispatch(push('/apis/' + api.id))
         })
@@ -64,13 +65,13 @@ const saveApiAction = api => ({ type: ApiConstants.SAVE_API, api })
 export const saveApi = api => dispatch => {
     apiService.saveApi(api)
         .then(data => {
-            dispatch(sendNotification({ type: 'success', message: 'Api saved' }))
+            dispatch(sendNotification({ type: 'success', message: i18n.t('api_saved') }))
             dispatch(saveApiAction(data))
             dispatch(push('/apis'))
         })
         .catch(error => {
             if (error.response && error.response.status === 400) {
-                dispatch(sendNotification({ type: 'error', message: 'error', description: error.response.data.message }))
+                dispatch(sendNotification({ type: 'error', message: i18n.t('error'), description: error.response.data.message }))
             }
         })
 }
@@ -82,13 +83,13 @@ const deleteApiAction = id => ({
 export const deleteApi = id => dispatch => {
     apiService.deleteApi(id)
         .then(data => {
-            dispatch(sendNotification({ type: 'success', message: 'Api removed' }))
+            dispatch(sendNotification({ type: 'success', message: i18n.t('api_removed') }))
             dispatch(deleteApiAction(data))
             dispatch(push('/apis'))
         })
         .catch(error => {
             if (error.response && error.response.status === 400) {
-                dispatch(sendNotification({ type: 'error', message: 'error', description: error.response.data.message }))
+                dispatch(sendNotification({ type: 'error', message:  i18n.t('error'), description: error.response.data.message }))
             }
         })
 }

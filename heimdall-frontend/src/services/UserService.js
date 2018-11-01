@@ -1,3 +1,4 @@
+import i18n from "../i18n/i18n"
 import { HTTP } from '../utils/Http'
 import { HTTPv1 } from '../utils/Http'
 
@@ -49,7 +50,7 @@ const getUsers = (params = {params: {}}) => {
 
 const getUser = (userId) => {
     if (isNaN(userId)) {
-        return Promise.reject(new Error('Invalid parameter'))
+        return Promise.reject(new Error(i18n.t('invalid_parameter')))
     }
 
     return HTTPv1.get('/users/' + userId)

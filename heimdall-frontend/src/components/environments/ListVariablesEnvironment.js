@@ -1,14 +1,16 @@
 import React from 'react'
 import { Table, Input, Row, Popconfirm, Tooltip, Button, Form} from 'antd'
 
+import i18n from "../../i18n/i18n"
+
 const FormItem = Form.Item
 const ButtonGroup = Button.Group;
 const columns = [{
-    title: 'Key',
+    title: i18n.t('key'),
     dataIndex: 'k',
     width: '47%'
 },{
-    title: 'Value',
+    title: i18n.t('value'),
     dataIndex: 'v',
     width: '47%'
 },{
@@ -20,14 +22,14 @@ const PrepareButtonsOperation = (key, buttonAdd, add, remove) => {
     return (
         <FormItem>
             <ButtonGroup>
-                <Tooltip title="Delete">
-                    <Popconfirm title="Sure to delete?" onConfirm={() => remove(key)}>
+                <Tooltip title={i18n.t('delete')}>
+                    <Popconfirm title={i18n.t('are_you_sure')} onConfirm={() => remove(key)}>
                         <Button type="danger" icon="delete"/>
                     </Popconfirm>
                 </Tooltip>
 
                 { buttonAdd ? 
-                    <Tooltip title="New">
+                    <Tooltip title={i18n.t('new')}>
                         <Button type="primary" icon="plus" onClick={() => add()} />
                     </Tooltip>
                     : ''
@@ -45,7 +47,7 @@ const PrepareInput = (elementId, val, form) => {
                 initialValue: val, 
                 rules: [{ 
                     required: true, 
-                    message: 'Please input value!' }
+                    message: i18n.t('please_input_value') }
                 ]}
                 )(<Input />) }
         </FormItem>
