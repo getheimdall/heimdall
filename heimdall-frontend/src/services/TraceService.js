@@ -1,9 +1,10 @@
-import {HTTPv1} from "../utils/Http";
-import {EnumFilters} from "../utils/EnumFiltersUtils";
+import i18n from "../i18n/i18n"
+import {HTTPv1} from "../utils/Http"
+import {EnumFilters} from "../utils/EnumFiltersUtils"
 
 const getTrace = (traceId) => {
     if (!traceId) {
-        return Promise.reject(new Error('Invalid parameter'))
+        return Promise.reject(new Error(i18n.t('invalid_parameter')))
     }
 
     return HTTPv1.get('/traces/' + traceId)

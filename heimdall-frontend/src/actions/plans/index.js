@@ -1,6 +1,8 @@
+import { push } from 'connected-react-router'
+
+import i18n from "../../i18n/i18n"
 import { PlanConstants } from '../../constants/actions-types'
 import { planService } from '../../services'
-import { push } from 'connected-react-router';
 
 export const initLoading = () => dispatch => {
     dispatch({ type: PlanConstants.PLAN_LOADING })
@@ -40,14 +42,14 @@ export const sendNotification = notification => dispatch => {
 export const save = plan => dispatch => {
     planService.save(plan)
         .then(data => {
-            dispatch(sendNotification({ type: 'success', message: 'Plan saved' }))
+            dispatch(sendNotification({ type: 'success', message:  i18n.t('plan_saved') }))
             dispatch(push('/plans'))
             dispatch(finishLoading())
         })
         .catch(error => {
             console.log(error)
             if (error.response && error.response.status === 400) {
-                dispatch(sendNotification({ type: 'error', message: 'error', description: error.response.data.message }))
+                dispatch(sendNotification({ type: 'error', message: i18n.t('error'), description: error.response.data.message }))
             }
             dispatch(finishLoading())
         })
@@ -57,13 +59,13 @@ export const update = plan => dispatch => {
     planService.update(plan)
         .then(data => {
             dispatch(getPlan(plan.id))
-            dispatch(sendNotification({ type: 'success', message: 'Plan updated' }))
+            dispatch(sendNotification({ type: 'success', message: i18n.t('plan_updated') }))
             dispatch(finishLoading())
         })
         .catch(error => {
             console.log(error)
             if (error.response && error.response.status === 400) {
-                dispatch(sendNotification({ type: 'error', message: 'error', description: error.response.data.message }))
+                dispatch(sendNotification({ type: 'error', message: i18n.t('error'), description: error.response.data.message }))
             }
             dispatch(finishLoading())
         })
@@ -73,7 +75,7 @@ export const remove = planId => dispatch => {
     planService.remove(planId)
         .then(data => {
             dispatch(getAllPlans())
-            dispatch(sendNotification({ type: 'success', message: 'Plan removed' }))
+            dispatch(sendNotification({ type: 'success', message: i18n.t('plan_removed') }))
         })
 }
 

@@ -1,7 +1,8 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-
 import {Row, Form, Input, Col, Switch, Tooltip, Button, Modal, AutoComplete, Spin, Icon, Checkbox} from 'antd'
+
+import i18n from "../../i18n/i18n"
 // import Loading from '../ui/Loading';
 
 const FormItem = Form.Item
@@ -36,10 +37,10 @@ class AccessTokenForm extends Component {
 
     showDeleteConfirm = (accessTokenId) => (e) => {
         confirm({
-            title: 'Are you sure?',
-            okText: 'Yes',
+            title: i18n.t('are_you_sure'),
+            okText: i18n.t('yes'),
             okType: 'danger',
-            cancelText: 'No',
+            cancelText: i18n.t('no'),
             onOk: () => {
                 this.props.handleDelete(accessTokenId)
             }
@@ -53,7 +54,7 @@ class AccessTokenForm extends Component {
             callback();
             return
         }
-        callback('You need select an app!');
+        callback(i18n.t('you_need_select_app'));
     }
 
     render() {
@@ -71,19 +72,19 @@ class AccessTokenForm extends Component {
                     {accessToken && getFieldDecorator('id', {initialValue: accessToken.id})(<Input type='hidden'/>)}
                     <Row gutter={24}>
                         <Col sm={24} md={24}>
-                            <FormItem label="Token">
+                            <FormItem label={i18n.t('token')}>
                                 {
                                     getFieldDecorator('code', {
                                         initialValue: accessToken && accessToken.code,
                                         rules: [
-                                            {min: 6, message: 'Min of 5 Characters to token!'}
+                                            {min: 6, message: i18n.t('min_6_characters_to_token')}
                                         ]
                                     })(<Input/>)
                                 }
                             </FormItem>
                         </Col>
                         <Col sm={24} md={24}>
-                            <FormItem label="App">
+                            <FormItem label={i18n.t('app')}>
                                 {
                                     getFieldDecorator('app.id', {
                                         initialValue: accessToken && accessToken.app.id.toString(),
@@ -108,7 +109,7 @@ class AccessTokenForm extends Component {
                             </FormItem>
                         </Col>
                         <Col sm={24} md={12}>
-                            <FormItem label="Status">
+                            <FormItem label={i18n.t('status')}>
                                 {
                                     getFieldDecorator('status', {
                                         initialValue: accessToken ? accessToken.status === 'ACTIVE' : true,
@@ -120,7 +121,7 @@ class AccessTokenForm extends Component {
                         <Col sm={24} md={12}>
                             { plans && plans.length === 0 && <span>You need select a app</span>}
                             { plans && plans.length > 0 &&
-                            <FormItem label="Plans">
+                            <FormItem label={i18n.t('plans')}>
                                 {
                                     getFieldDecorator('plans', {
                                         initialValue: accessToken && accessToken.plans.map(plan => plan.id)
@@ -148,12 +149,12 @@ class AccessTokenForm extends Component {
                 </Form>
 
                 <Row type="flex" justify="end">
-                    <Tooltip title="Delete">
+                    <Tooltip title={i18n.t('delete')}>
                         <Button className="card-button" type="danger" ghost icon="delete" size="large" shape="circle"
                                 disabled={!accessToken} onClick={accessToken && this.showDeleteConfirm(accessToken.id)}
                                 loading={loading} id="deleteAccessToken"/>
                     </Tooltip>
-                    <Tooltip title="Save">
+                    <Tooltip title={i18n.t('save')}>
                         <Button className="card-button" type="primary" icon="save" size="large" shape="circle"
                                 onClick={this.onSubmitForm} loading={loading} id="saveAccessToken"/>
                     </Tooltip>
