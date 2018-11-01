@@ -5,9 +5,9 @@ import { List, Avatar, Button, Row, Col, Tooltip, Modal, notification } from 'an
 
 import i18n from '../i18n/i18n'
 import { operationService } from '../services'
-import Loading from '../components/ui/Loading'
 import FloatSearch from './../components/ui/FloatSearch'
 import OperationForm from '../components/operations/OperationForm'
+import ListOperationSkeleton from "../components/skeletons/ListOperationsSkeleton";
 
 const ButtonGroup = Button.Group;
 
@@ -114,7 +114,7 @@ class Operations extends Component {
     render() {
         const { operations, operationsFiltered, visibleSearch } = this.state;
         const { loading } = this.props
-        if (!operations) return <Loading />
+        if (!operations) return <ListOperationSkeleton />
 
         const modalOperation =
             <Modal title={i18n.t('add_operation')}

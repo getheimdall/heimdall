@@ -7,12 +7,12 @@ import moment from 'moment'
 import { Card, Row } from 'antd'
 // actions
 import i18n from "../i18n/i18n"
-import Loading from '../components/ui/Loading'
 import { isEmpty } from '../utils/CommonUtils'
 import PlanForm from '../components/plans/PlanForm'
 import PageHeader from '../components/ui/PageHeader'
 import { apiSource, getApiSourceByName, clearApiSource, fetchingApi } from '../actions/apis'
 import { getPlan, initLoading, clearPlan, clearPlans, update, save, remove } from '../actions/plans'
+import SinglePlanSkeleton from "../components/skeletons/SinglePlanSkeleton";
 
 class SinglePlan extends Component {
 
@@ -69,7 +69,7 @@ class SinglePlan extends Component {
     render() {
         const { plan } = this.props
 
-        if (this.state.loadEntity && !plan) return <Loading />
+        if (this.state.loadEntity && !plan) return <SinglePlanSkeleton />
         const title = plan ? i18n.t('edit') : i18n.t('add')
         const { apiSource } = this.props
 

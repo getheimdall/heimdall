@@ -1,5 +1,3 @@
-import React from "react";
-
 export default {
     translations: {
         'insert_username': 'Please input your username!',

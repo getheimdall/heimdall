@@ -6,10 +6,10 @@ import {Row, Col, Button, Tooltip, Modal, notification} from 'antd'
 
 import i18n from "../i18n/i18n"
 import Operations from './Operations'
-import Loading from '../components/ui/Loading'
 import HeimdallCollapse from '../components/collapse'
 import ResourceForm from '../components/resources/ResourceForm'
 import { getAllResourcesByApi, clearResources, toggleModal, remove } from '../actions/resources'
+import ListResourcesSkeleton from "../components/skeletons/ListResourcesSkeleton";
 
 const HeimdallPanel = HeimdallCollapse.Panel;
 const ButtonGroup = Button.Group;
@@ -89,7 +89,7 @@ class Resources extends Component {
         const { api } = this.props
         const { resources } = this.props
         const { loading } = this.props
-        if (!resources) return <Loading />
+        if (!resources) return <ListResourcesSkeleton />
 
         const modalResource =
             <Modal title={i18n.t('add_resource')}

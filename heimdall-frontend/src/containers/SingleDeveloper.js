@@ -6,10 +6,10 @@ import { connect } from 'react-redux'
 import { Card, Row } from 'antd'
 // actions
 import i18n from "../i18n/i18n"
-import Loading from '../components/ui/Loading'
 import PageHeader from '../components/ui/PageHeader'
 import DeveloperForm from '../components/developers/DeveloperForm'
 import { getDeveloper, initLoading, clearDeveloper, clearDevelopers, update, save, remove } from '../actions/developers'
+import SingleDeveloperSkeleton from "../components/skeletons/SingleDeveloperSkeleton";
 
 class SingleDeveloper extends Component {
 
@@ -46,7 +46,7 @@ class SingleDeveloper extends Component {
     render() {
         const { developer } = this.props
 
-        if (this.state.loadDev && !developer) return <Loading />
+        if (this.state.loadDev && !developer) return <SingleDeveloperSkeleton />
         const title = developer ? i18n.t('edit') : i18n.t('add')
 
         return (

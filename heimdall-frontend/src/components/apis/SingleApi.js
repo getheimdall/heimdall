@@ -11,7 +11,7 @@ import ApiDefinition from './ApiDefinition'
 import Resources from '../../containers/Resources'
 import Interceptors from '../../containers/Interceptors'
 import Middlewares from '../../containers/Middlewares'
-import Loading from '../ui/Loading'
+import SingleApiSkeleton from "../skeletons/SingleApiSkeleton"
 
 const TabPane = Tabs.TabPane;
 
@@ -44,7 +44,7 @@ class SingleApi extends Component {
     }
 
     render() {
-        if (!this.props.api || !this.props.environments) return <Loading />
+        if (!this.props.api || !this.props.environments) return <SingleApiSkeleton />
 
         const { api } = this.props
 

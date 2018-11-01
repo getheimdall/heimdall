@@ -8,12 +8,12 @@ import { Card, Row, notification } from 'antd'
 // actions
 import i18n from "../i18n/i18n"
 import { isEmpty } from '../utils/CommonUtils'
-import Loading from '../components/ui/Loading'
 import PageHeader from '../components/ui/PageHeader'
 import { getAllPlans, clearPlans } from '../actions/plans'
 import AccessTokenForm from '../components/access-tokens/AccessTokenForm'
 import { appSource, getAppSourceByName, clearAppSource, fetchingApp } from '../actions/apps'
 import { getAccessToken, initLoading, clearAccessToken, clearAccessTokens, update, save, remove } from '../actions/access-tokens'
+import SingleAccessTokenSkeleton from "../components/skeletons/SingleAccessTokenSkeleton";
 
 
 class SingleAccessToken extends Component {
@@ -78,7 +78,7 @@ class SingleAccessToken extends Component {
     render() {
         const { accessToken } = this.props
 
-        if (this.state.loadEntity && !accessToken) return <Loading />
+        if (this.state.loadEntity && !accessToken) return <SingleAccessTokenSkeleton />
         const title = accessToken ? i18n.t('edit') : i18n.t('add')
         const { appSource } = this.props
 
