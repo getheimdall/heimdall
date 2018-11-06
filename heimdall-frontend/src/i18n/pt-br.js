@@ -220,5 +220,6 @@ export default {
         'deleting_an_api_delete_resources_operations_interceptors_middlewares': 'Deletando uma api também estará removendo os Recursos, Operações, Interceptadores ou Middlewares associados a essa API.',
         'this_operation_can_not_be_reverted': 'Esta operação não pode ser revertida.',
         'search_operations': 'Buscar operações',
+        'app_name': 'Nome do app'
     }
 }

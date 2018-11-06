@@ -10,20 +10,7 @@ const HTTPv1 = axios.create({
 })
 
 axios.defaults.paramsSerializer = params => {
-    const keys = Object.keys(params)
-
-    let result = ''
-
-    keys.forEach((key, index) => {
-        if (params[key] || params[key] === 0) {
-            if (index !== 0) {
-                result += "&"
-            }
-            result += `${key}=${encodeURI(params[key])}`
-        }
-    })
-
-    return result
+    return serializerParams(params)
 }
 
 HTTPv1.interceptors.request.use(req => {
@@ -39,5 +26,22 @@ HTTPv1.interceptors.response.use(res => {
     }
     return res
 }, error => Promise.reject(error))
+
+function serializerParams(params, keyConcat) {
+
+    return Object.entries(params)
+        .filter(([key, value]) => value !== undefined && value !== null)
+        .map(([key, value]) => {
+            let result = ''
+            if (keyConcat) {
+                result = keyConcat + '.'
+            }
+            if (typeof value === 'object') {
+                return result.concat(serializerParams(value, key))
+            } else {
+                return result.concat(`${key}=${value}`)
+            }
+        }).join('&')
+}
 
 export {HTTP, HTTPv1};
