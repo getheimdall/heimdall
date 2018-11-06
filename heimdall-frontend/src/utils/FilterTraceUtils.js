@@ -1,3 +1,24 @@
+import qs from 'qs'
+import {EnumFilters} from "./EnumFiltersUtils"
+
+const completeFilters = filters => {
+
+    if (filters) {
+        const filtersResult = JSON.parse(JSON.stringify(filters))
+
+        filtersResult.forEach(filter => {
+            const filterEqual = getFilters().find(f => f.name === filter.name)
+            filter.operations = filterEqual.operations
+            filter.possibleValues = filterEqual.possibleValues
+            filter.label = filterEqual.label
+        })
+
+        return filtersResult
+    }
+
+    return filters
+}
+
 const getFilters = () => {
     return [
         {
@@ -248,8 +269,61 @@ const getPossibleValues = (field) => {
     }
 }
 
+const filtersToURLSearch = filters => {
+    return qs.stringify(filters)
+}
+
+const URLSearchToFilters = urlSearch => {
+    const filtersObject = qs.parse(urlSearch)
+    return Object.keys(filtersObject).map(key => filtersObject[key])
+}
+
+const updateOperationSelectedToEnum = (filters) => {
+
+    let filtersToSend = [];
+
+    if (filters) {
+        filters.forEach((f) => {
+            let filter = {};
+            filter['operationSelected'] = EnumFilters[f.operationSelected]
+            filter['firstValue'] = f.firstValue
+            filter['secondValue'] = f.secondValue
+            filter['name'] = f.name
+            filter['type'] = f.type
+
+            filtersToSend.push(filter)
+        })
+    }
+
+    return filtersToSend;
+}
+
+const reduceFilterToURL = filters => {
+    let filtersToSend = [];
+
+    if (filters) {
+        filters.forEach((f) => {
+            let filter = {};
+            filter['operationSelected'] = f.operationSelected
+            filter['firstValue'] = f.firstValue
+            filter['secondValue'] = f.secondValue
+            filter['name'] = f.name
+            filter['type'] = f.type
+
+            filtersToSend.push(filter)
+        })
+    }
+
+    return filtersToSend;
+}
+
 export default {
     getFilters,
     getOperations,
-    getPossibleValues
+    getPossibleValues,
+    filtersToURLSearch,
+    URLSearchToFilters,
+    updateOperationSelectedToEnum,
+    completeFilters,
+    reduceFilterToURL
 }

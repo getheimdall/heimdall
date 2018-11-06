@@ -21,7 +21,7 @@ class ListTraces extends Component {
                     <Column title={i18n.t('method')} dataIndex="trace.method" id="method"/>
                     <Column title={i18n.t('status')} id="trace.resultStatus" key="status" render={(record) => (
                         <span>
-                            <Tag color={ColorUtils.getColorStatus(record.trace.resultStatus)}>{record.trace.resultStatus === 'ACTIVE' ? i18n.t('active') : i18n.t('inactive')}</Tag>
+                            <Tag color={ColorUtils.getColorStatus(record.trace.resultStatus)}>{record.trace.resultStatus}</Tag>
                         </span>
                     )} />
                     <Column title={i18n.t('duration')} dataIndex="trace.durationMillis" id="duration"/>

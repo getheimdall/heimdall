@@ -1,6 +1,6 @@
 import i18n from "../i18n/i18n"
 import {HTTPv1} from "../utils/Http"
-import {EnumFilters} from "../utils/EnumFiltersUtils"
+import FilterTraceUtils from "../utils/FilterTraceUtils"
 
 const getTrace = (traceId) => {
     if (!traceId) {
@@ -23,7 +23,7 @@ const getTrace = (traceId) => {
 const getTraces = (params = {params: {}}) => {
     const offset = params.params.offset
     const limit = params.params.limit
-    const filtersSelected = updateOperationSelectedToEnum(params.params.filtersSelected)
+    const filtersSelected = FilterTraceUtils.updateOperationSelectedToEnum(params.params.filtersSelected)
     return HTTPv1.post(`/traces?offset=${offset}&limit=${limit}`, filtersSelected)
         .then(res => {
             return Promise.resolve(res.data)
@@ -35,24 +35,6 @@ const getTraces = (params = {params: {}}) => {
             }
             throw error;
         })
-}
-
-const updateOperationSelectedToEnum = (filters) => {
-
-    let filtersToSend = [];
-
-    filters.forEach((f) => {
-        let filter = {};
-        filter['operationSelected'] = EnumFilters[f.operationSelected]
-        filter['firstValue'] = f.firstValue
-        filter['secondValue'] = f.secondValue
-        filter['name'] = f.name
-        filter['type'] = f.type
-
-        filtersToSend.push(filter)
-    })
-
-    return filtersToSend;
 }
 
 export const traceService = {

@@ -4,12 +4,12 @@ import {connect} from 'react-redux'
 //components
 import {Card, Col, Form, notification, Row, Select, Input, Button, DatePicker, TimePicker} from 'antd'
 //actions
+import i18n from "../i18n/i18n"
 import Loading from '../components/ui/Loading'
 import PageHeader from '../components/ui/PageHeader'
 import ListTraces from '../components/traces/ListTraces'
 import FilterTraceUtils from "../utils/FilterTraceUtils"
 import {getAllTraces, initLoading} from "../actions/traces"
-import i18n from "../i18n/i18n";
 
 const {Option} = Select
 
@@ -22,12 +22,25 @@ class Traces extends Component {
         searchQuery: {},
         filters: FilterTraceUtils.getFilters(),
         filtersSelected: [],
-        filterOrder: 0
+        filterOrder: 0,
+        search: false
     }
 
     componentDidMount() {
-        this.props.dispatch(initLoading())
-        this.props.dispatch(getAllTraces({offset: 0, limit: 10, filtersSelected: this.state.filtersSelected}))
+        const urlSearch = this.props.history.location.search.replace('?', '')
+        const filters = FilterTraceUtils.URLSearchToFilters(urlSearch)
+        if (filters) {
+            const filtersComplete = FilterTraceUtils.completeFilters(filters)
+            this.setState({ ...this.state, filtersSelected: filtersComplete, search: true })
+        }
+    }
+
+    componentWillUpdate(nextProps, nextState) {
+        if (nextState.search) {
+            this.props.dispatch(initLoading())
+            this.props.dispatch(getAllTraces({offset: 0, limit: 10, filtersSelected: nextState.filtersSelected }))
+            this.setState({ ...nextState, search: false })
+        }
     }
 
     componentWillReceiveProps(newProps) {
@@ -44,8 +57,9 @@ class Traces extends Component {
     }
 
     sendFilters = () => {
-        this.props.dispatch(initLoading())
-        this.props.dispatch(getAllTraces({offset: 0, limit: 10, filtersSelected: this.state.filtersSelected}))
+        const { filtersSelected } = this.state
+        const urlSearch = FilterTraceUtils.filtersToURLSearch(FilterTraceUtils.reduceFilterToURL(filtersSelected))
+        this.props.history.push(`?${urlSearch}`, this.state)
     }
 
     updateFiltersSelected = (element) => {
@@ -57,7 +71,7 @@ class Traces extends Component {
         const newFiltersSelected = filtersSelected.filter((e) => e.name !== element.name)
         newFiltersSelected.push(element)
         newFiltersSelected.sort(this.orderFiltersSelected)
-        this.setState({...this.state, filtersSelected: newFiltersSelected, filterOrder: orderFilter})
+        this.setState({...this.state, filtersSelected: newFiltersSelected, filterOrder: orderFilter, search: false })
     }
 
     removeFromFiltersSelected = (element) => {
