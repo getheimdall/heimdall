@@ -32,8 +32,6 @@ import br.com.conductor.heimdall.core.util.ConstantsTag;
 import br.com.twsoftware.alfred.object.Objeto;
 import com.google.common.net.HttpHeaders;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
@@ -43,11 +41,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.io.*;
 import java.net.URI;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_MIDDLEWARES;
 
@@ -188,33 +183,6 @@ public class MiddlewareResource {
                   .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + middleware.getName() + "-" +  middleware.getVersion() + "." + middleware.getType())
                   .header("filename", middleware.getName() + "-" +  middleware.getVersion() + "." + middleware.getType())
                   .body(resource);
-     }
-
-     private byte[] zipFiles(Middleware middleware) {
-
-          try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-               BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);
-               ZipOutputStream zipOutputStream = new ZipOutputStream(bufferedOutputStream)) {
-
-               String fileName = middleware.getName() + "." + middleware.getType();
-               zipOutputStream.putNextEntry(new ZipEntry(fileName));
-
-               File file = new File(middleware.getPath() + File.separator + "downloaded" + File.separator + fileName);
-               FileUtils.writeByteArrayToFile(file, middleware.getFile());
-               FileInputStream fileInputStream = new FileInputStream(file);
-
-               IOUtils.copy(fileInputStream, zipOutputStream);
-
-               fileInputStream.close();
-               zipOutputStream.closeEntry();
-
-               zipOutputStream.finish();
-               zipOutputStream.flush();
-               return byteArrayOutputStream.toByteArray();
-
-          } catch (IOException ignored) { }
-
-          return new byte[0];
      }
 
 }
