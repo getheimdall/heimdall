@@ -53,7 +53,6 @@ class NavBar extends Component {
 
     render() {
         const { i18n, t } = this.props
-        console.log(languages)
         return (
             <Row type="flex" justify="start">
                 <Col sm={24} md={24}>
@@ -70,19 +69,11 @@ class NavBar extends Component {
                             </MenuItemGroup>
                         </SubMenu>
                         <SubMenu title={<span><Icon type="global" /></span>}>
-                            {/* {
-                                languages.map(lng => {
-                                    if (lng.key === i18n.language) {
-                                        return <Menu.Item disabled key={`changeLang:${lng.key}`}>{lng.label}</Menu.Item>
-                                    }
-                                    return <Menu.Item key={`changeLang:${lng}`}>{lng}</Menu.Item>
-                                })
-                            } */}
                             {
                                 languages.map(lng => {
                                     return (
                                         <Menu.Item key={`changeLang:${lng.key}`} className="heimdall-flags" disabled={lng.key === i18n.language}>
-                                            <img width={32} height={32} src={lng.img} />
+                                            <img width={32} height={32} src={lng.img} alt={lng.label}/>
                                             <label>{lng.label}</label>
                                         </Menu.Item>
                                     )
