@@ -44,14 +44,14 @@ export const getMiddleware = (id, apiId) => dispatch => {
         })
 }
 
-export const downloadMiddleware = (id, apiId, apiName, versionMiddleware) => dispatch => {
+export const downloadMiddleware = (id, apiId) => dispatch => {
     middlewareService.downloadMiddleware(id, apiId)
-        .then(data => {
-            FileUtils.fileDownload(data, `${apiName}-${versionMiddleware}.jar`, FileUtils.JAR_FILE)
+        .then(response => {
+            FileUtils.fileDownload(response.data, response.headers['filename'])
             dispatch({ type: MiddlewaresConstants.MIDDLEWARE_DOWNLOAD})
             dispatch(finishLoading())
         })
-        .catch(error => {
+        .catch(() => {
             dispatch(sendNotification({ type: "error", message: i18n.t('failed_download_file') }))
         })
 }
