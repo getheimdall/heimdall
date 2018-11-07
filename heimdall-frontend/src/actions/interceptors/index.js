@@ -1,7 +1,9 @@
+import { push } from 'connected-react-router'
+
+import i18n from "../../i18n/i18n"
 import { InterceptorConstants } from '../../constants/actions-types'
 import { QueueConstants } from '../../constants/actions-types'
 import { interceptorService } from '../../services'
-import { push } from 'connected-react-router';
 
 export const initLoading = () => dispatch => {
     dispatch({ type: InterceptorConstants.INTERCEPTOR_LOADING })
@@ -62,13 +64,13 @@ export const errorQueue = () => dispatch => {
 export const save = interceptor => dispatch => {
     interceptorService.save(interceptor)
         .then(data => {
-            dispatch(sendNotification({ type: 'success', message: 'Interceptor saved' }))
+            dispatch(sendNotification({ type: 'success', message: i18n.t('interceptor_saved') }))
             dispatch(push('/interceptors'))
             dispatch(finishLoading())
         })
         .catch(error => {
             if (error.response && error.response.status === 400) {
-                dispatch(sendNotification({ type: 'error', message: 'error', description: error.response.data.message }))
+                dispatch(sendNotification({ type: 'error', message: i18n.t('error'), description: error.response.data.message }))
             }
             dispatch(finishLoading())
         })
@@ -81,7 +83,7 @@ export const saveAll = interceptors => dispatch => {
             .catch(error => {
                 dispatch(errorQueue())
                 if (error.response && error.response.status === 400) {
-                    dispatch(sendNotification({ type: 'error', message: 'error', description: error.response.data.message }))
+                    dispatch(sendNotification({ type: 'error', message: i18n.t('error'), description: error.response.data.message }))
                 }
             })
     })
@@ -91,12 +93,12 @@ export const update = interceptor => dispatch => {
     interceptorService.update(interceptor)
         .then(data => {
             dispatch(getInterceptor(interceptor.id))
-            dispatch(sendNotification({ type: 'success', message: 'Interceptor updated' }))
+            dispatch(sendNotification({ type: 'success', message: i18n.t('interceptor_updated') }))
             dispatch(finishLoading())
         })
         .catch(error => {
             if (error.response && error.response.status === 400) {
-                dispatch(sendNotification({ type: 'error', message: 'error', description: error.response.data.message }))
+                dispatch(sendNotification({ type: 'error', message: i18n.t('error'), description: error.response.data.message }))
             }
             dispatch(finishLoading())
         })
@@ -109,7 +111,7 @@ export const updateAll = interceptors => dispatch => {
             .catch(error => {
                 dispatch(errorQueue())
                 if (error.response && error.response.status === 400) {
-                    dispatch(sendNotification({ type: 'error', message: 'error', description: error.response.data.message }))
+                    dispatch(sendNotification({ type: 'error', message: i18n.t('error'), description: error.response.data.message }))
                 }
             })
     })
@@ -119,7 +121,7 @@ export const remove = interceptorId => dispatch => {
     interceptorService.remove(interceptorId)
         .then(data => {
             dispatch(getAllInterceptors())
-            dispatch(sendNotification({ type: 'success', message: 'Interceptor removed' }))
+            dispatch(sendNotification({ type: 'success', message: i18n.t('interceptor_removed') }))
         })
 }
 
@@ -130,7 +132,7 @@ export const removeAll = interceptors => dispatch => {
             .catch(error => {
                 dispatch(errorQueue())
                 if (error.response && error.response.status === 400) {
-                    dispatch(sendNotification({ type: 'error', message: 'error', description: error.response.data.message }))
+                    dispatch(sendNotification({ type: 'error', message: i18n.t('error'), description: error.response.data.message }))
                 }
             })
     })

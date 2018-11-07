@@ -41,7 +41,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -178,9 +177,12 @@ public class MiddlewareResource {
 
           Middleware middleware = middlewareService.find(apiId, middlewareId);
           ByteArrayResource resource = new ByteArrayResource(middleware.getFile());
+
           return ResponseEntity.ok()
                   .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                  .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + middleware.getName() + "-" +  middleware.getVersion() + ".jar")
+                  .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + middleware.getName() + "-" +  middleware.getVersion() + "." + middleware.getType())
+                  .header("filename", middleware.getName() + "-" +  middleware.getVersion() + "." + middleware.getType())
                   .body(resource);
      }
+
 }

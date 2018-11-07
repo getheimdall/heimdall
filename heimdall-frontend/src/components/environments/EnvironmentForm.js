@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-
 import { Row, Form, Input, Col, Switch, Tooltip, Button, Modal } from 'antd'
+
 import ListVariablesEnvironment from './ListVariablesEnvironment'
+import i18n from "../../i18n/i18n"
 
 const FormItem = Form.Item
 const confirm = Modal.confirm
@@ -53,10 +54,10 @@ class EnvironmentForm extends Component {
 
     showDeleteConfirm = (environmentId) => (e) => {
         confirm({
-            title: 'Are you sure?',
-            okText: 'Yes',
+            title: i18n.t('are_you_sure'),
+            okText: i18n.t('yes'),
             okType: 'danger',
-            cancelText: 'No',
+            cancelText: i18n.t('no'),
             onOk: () => {
                 this.props.handleDelete(environmentId)
             }
@@ -117,42 +118,42 @@ class EnvironmentForm extends Component {
                     {environment && getFieldDecorator('id', { initialValue: environment.id })(<Input type='hidden' />)}
                     <Row gutter={24}>
                         <Col sm={24} md={12} >
-                            <FormItem label="Name">
+                            <FormItem label={i18n.t('name')}>
                                 {
                                     getFieldDecorator('name', {
                                         initialValue: environment && environment.name,
-                                        rules: [{ required: true, message: 'Please input your environment name!' }]
+                                        rules: [{ required: true, message: i18n.t('please_input_your_environment_name') }]
                                     })(<Input required />)
                                 }
                             </FormItem>
                         </Col>
                         <Col sm={24} md={12}>
-                            <FormItem label="Inbound URL">
+                            <FormItem label={i18n.t('inbound_url')}>
                                 {
                                     getFieldDecorator('inboundURL', {
                                         initialValue: environment && environment.inboundURL,
-                                        rules: [{ required: true, message: 'Please input your environment inbound!' }]
+                                        rules: [{ required: true, message: i18n.t('please_input_your_environment_inbound') }]
                                     })(<Input required />)
                                 }
                             </FormItem>
                         </Col>
                         <Col sm={24} md={12}>
-                            <FormItem label="Description">
+                            <FormItem label={i18n.t('description')}>
                                 {
                                     getFieldDecorator('description', {
                                         initialValue: environment && environment.description,
-                                        rules: [{ required: true, message: 'Please input your environment description!' }]
+                                        rules: [{ required: true, message: i18n.t('please_input_your_environment_description') }]
                                     })(<Input required />)
                                 }
                             </FormItem>
                         </Col>
 
                         <Col sm={24} md={12}>
-                            <FormItem label="Outbound URL">
+                            <FormItem label={i18n.t('outbound_url')}>
                                 {
                                     getFieldDecorator('outboundURL', {
                                         initialValue: environment && environment.outboundURL,
-                                        rules: [{ required: true, message: 'Please input your environment outbound!' }]
+                                        rules: [{ required: true, message: i18n.t('please_input_your_environment_outbound') }]
                                     })(<Input required />)
                                 }
                             </FormItem>
@@ -160,12 +161,12 @@ class EnvironmentForm extends Component {
 
                         <Col sm={24} md={24}>
                             <fieldset>
-                                <legend><div className="ant-card-head-title">Variables</div></legend>
+                                <legend><div className="ant-card-head-title">{i18n.t('variables')}</div></legend>
                                 {
                                     this.state.variables.length === 0 ?
                                         <Row type="flex" justify="center" align="bottom">
                                             <Col style={{ marginTop: 20 }}>
-                                                You don't have variables in this <b>Environment</b>, please <Button id="addEnvironmentsVariable" type="dashed" className="add-tour" onClick={this.initVariables}>Add Variable</Button>
+                                                {i18n.t('you_do_not_have_variables_in_this')} <b>{i18n.t('environment')}</b>! <Button id="addEnvironmentsVariable" type="dashed" className="add-tour" onClick={this.initVariables}>{i18n.t('add_variable')}</Button>
                                             </Col>
                                         </Row>
                                         :
@@ -175,7 +176,7 @@ class EnvironmentForm extends Component {
                         </Col>
 
                         <Col sm={24} md={24}>
-                            <FormItem label="Status">
+                            <FormItem label={i18n.t('status')}>
                                 {
                                     getFieldDecorator('status', {
                                         initialValue: environment ? environment.status === 'ACTIVE' : true,
@@ -189,10 +190,10 @@ class EnvironmentForm extends Component {
                 </Form>
 
                 <Row type="flex" justify="end">
-                    <Tooltip title="Delete">
+                    <Tooltip title={i18n.t('delete')}>
                         <Button id="deleteEnvironment" className="card-button" type="danger" ghost icon="delete" size="large" shape="circle" disabled={!environment} onClick={environment && this.showDeleteConfirm(environment.id)} loading={loading} />
                     </Tooltip>
-                    <Tooltip title="Save">
+                    <Tooltip title={i18n.t('save')}>
                         <Button id="saveEnvironment" className="card-button" type="primary" icon="save" size="large" shape="circle" onClick={this.onSubmitForm} loading={loading} />
                     </Tooltip>
                 </Row>

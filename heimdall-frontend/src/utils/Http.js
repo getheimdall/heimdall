@@ -9,6 +9,10 @@ const HTTPv1 = axios.create({
     headers: {'Content-Type': 'application/json'}
 })
 
+axios.defaults.paramsSerializer = params => {
+    return serializerParams(params)
+}
+
 HTTPv1.interceptors.request.use(req => {
     if (localStorage.getItem('user')) {
         req.auth = JSON.parse(localStorage.getItem('user'))
@@ -22,5 +26,22 @@ HTTPv1.interceptors.response.use(res => {
     }
     return res
 }, error => Promise.reject(error))
+
+function serializerParams(params, keyConcat) {
+
+    return Object.entries(params)
+        .filter(([key, value]) => value !== undefined && value !== null)
+        .map(([key, value]) => {
+            let result = ''
+            if (keyConcat) {
+                result = keyConcat + '.'
+            }
+            if (typeof value === 'object') {
+                return result.concat(serializerParams(value, key))
+            } else {
+                return result.concat(`${key}=${value}`)
+            }
+        }).join('&')
+}
 
 export {HTTP, HTTPv1};
