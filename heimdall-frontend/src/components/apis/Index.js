@@ -3,10 +3,9 @@ import { connect } from 'react-redux'
 import { Row, Col, Form, Input, Button, Tooltip, notification } from 'antd'
 
 import i18n from "../../i18n/i18n"
-import { getAllApis } from '../../actions/apis'
+import { getAllApis, initLoading } from '../../actions/apis'
 import ListApis from './ListApis'
 import PageHeader from '../ui/PageHeader'
-import Loading from '../ui/Loading'
 // import FloatButton from '../ui/FloatButton'
 
 const FormItem = Form.Item
@@ -26,6 +25,7 @@ class Index extends Component {
     }
 
     componentDidMount() {
+        this.props.dispatch(initLoading())
         this.props.dispatch(getAllApis())
         this.setState({
             iconLoading: false
@@ -37,16 +37,15 @@ class Index extends Component {
     }
 
     render() {
-        const { apis } = this.props
+        const { apis, loading } = this.props
         const { history } = this.props
+        let filteredApis = [ {}, {}, {}, {}, {} ]
 
-        let listApi = null
-        if (!apis) {
-            listApi = <Loading />
-        } else {
-            const filteredApis = apis.filter(item => item.name.toUpperCase().includes(this.state.searchBy.toUpperCase()))
-            listApi = <ListApis apis={filteredApis} history={history} />
+        if (!loading && apis) {
+           filteredApis = apis.filter(item => item.name.toUpperCase().includes(this.state.searchBy.toUpperCase()))
         }
+        const listApi = <ListApis apis={filteredApis} history={history} loading={this.props.loading}/>
+
         return (
             <div>
                 <PageHeader title={i18n.t('apis')} icon="api" />
@@ -76,6 +75,7 @@ const mapStateToProps = (state) => {
     return {
         apis: state.apis.allApis,
         notification: state.apis.notification,
+        loading: state.apis.loading,
     }
 }
 

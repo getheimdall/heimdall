@@ -6,6 +6,7 @@ import {
     Card,
     Tooltip,
     Icon,
+    Skeleton
 } from 'antd'
 
 import i18n from "../../i18n/i18n"
@@ -17,7 +18,7 @@ class ListApis extends Component {
     }
 
     render() {
-        const { apis } = this.props
+        const { apis, loading } = this.props
         return (
             <Row className="h-row api_list" gutter={20}>
                 {apis && apis.length > 0
@@ -28,7 +29,9 @@ class ListApis extends Component {
                                     className="heimdall-card"
                                     title={
                                         <div style={{paddingLeft: 24, paddingRight: 24, paddingTop: 16, paddingBottom: 16, cursor: 'pointer'}} onClick={this.redirect('/apis/' + api.id)}>
-                                            <span>{api.name}</span>
+                                            <Skeleton title={10} active paragraph={{ rows: 0 }} loading={loading}>
+                                                <span>{api.name}</span>
+                                            </Skeleton>
                                         </div>
                                     }
                                     actions={[
@@ -36,7 +39,9 @@ class ListApis extends Component {
                                     ]}
                                 >
                                     <div className="heimdall-card-body" onClick={this.redirect('/apis/' + api.id)}>
-                                        <span className="api_description">{api.description}</span>
+                                        <Skeleton active paragraph={{ rows: 2 }} title={0} loading={loading}>
+                                            <span className="api_description">{api.description}</span>
+                                        </Skeleton>
                                     </div>
                                 </Card>
                             </Col>

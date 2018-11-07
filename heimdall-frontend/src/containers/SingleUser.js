@@ -6,11 +6,11 @@ import { push } from 'connected-react-router'
 import { Card, Row, notification } from 'antd'
 // actions
 import i18n from "../i18n/i18n"
-import Loading from '../components/ui/Loading'
 import { getAllRoles } from '../actions/roles'
 import PageHeader from '../components/ui/PageHeader'
 import UserForm from '../components/users/UserForm'
 import { getUser, initLoading, clearUser, clearUsers, update, save, remove } from '../actions/users'
+import SingleUserSkeleton from "../components/skeletons/SingleUserSkeleton";
 
 class SingleUser extends Component {
 
@@ -55,7 +55,7 @@ class SingleUser extends Component {
     render() {
         const { user, roles } = this.props
 
-        if (this.state.loadEntity && !user) return <Loading />
+        if (this.state.loadEntity && !user) return <SingleUserSkeleton />
         const title = user ? i18n.t('edit') : i18n.t('add')
 
         return (

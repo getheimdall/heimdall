@@ -9,12 +9,12 @@ import {Card, Row} from 'antd'
 // actions
 import i18n from "../i18n/i18n"
 import {isEmpty} from '../utils/CommonUtils'
-import Loading from '../components/ui/Loading'
 import AppForm from '../components/apps/AppForm'
 import PageHeader from '../components/ui/PageHeader'
 import {getAllPlans, clearPlans} from '../actions/plans'
 import {getApp, initLoading, clearApp, clearApps, update, save, remove} from '../actions/apps'
 import {developerSource, getDeveloperSourceByEmail, clearDeveloperSource, fetchingDeveloper} from '../actions/developers'
+import SingleAppSkeleton from "../components/skeletons/SingleAppSkeleton";
 
 
 class SingleApp extends Component {
@@ -74,7 +74,7 @@ class SingleApp extends Component {
     render() {
         const {app} = this.props
 
-        if (this.state.loadEntity && !app) return <Loading/>
+        if (this.state.loadEntity && !app) return <SingleAppSkeleton/>
         const title = app ? i18n.t('edit') : i18n.t('add')
         const {developerSource} = this.props
 

@@ -10,10 +10,21 @@ const receiveApis = apis => ({
     apis
 })
 
+export const initLoading = () => dispatch => {
+    dispatch({ type: ApiConstants.API_LOADING })
+}
+
+export const finishLoading = () => dispatch => {
+    dispatch({ type: ApiConstants.API_LOADING_FINISH })
+}
+
 // Get async apis list
 export const getAllApis = () => dispatch => {
     apiService.getApis()
-        .then(data => dispatch(receiveApis(data)))
+        .then(data => {
+            dispatch(receiveApis(data))
+            dispatch(finishLoading())
+        })
         .catch(error => {
             if (error.response && error.response.status === 400) {
                 dispatch(sendNotification({ type: 'error', message: i18n.t('error'), description: error.response.data.message }))
@@ -29,7 +40,10 @@ const receiveApi = api => ({ type: ApiConstants.RECEIVE_API, api })
 
 export const getApiById = (id) => dispatch => {
     apiService.getApiById(id)
-        .then(data => dispatch(receiveApi(data)))
+        .then(data => {
+            dispatch(receiveApi(data))
+            dispatch(finishLoading())
+        })
         .catch(error => {
             if (error.response && error.response.status === 400) {
                 dispatch(sendNotification({ type: 'error', message: i18n.t('error'), description: error.response.data.message }))
