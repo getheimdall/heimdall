@@ -10,6 +10,7 @@ import PageHeader from '../components/ui/PageHeader'
 import ListTraces from '../components/traces/ListTraces'
 import FilterTraceUtils from "../utils/FilterTraceUtils"
 import {getAllTraces, initLoading} from "../actions/traces"
+import moment from 'moment'
 
 const {Option} = Select
 
@@ -32,6 +33,8 @@ class Traces extends Component {
         if (filters) {
             const filtersComplete = FilterTraceUtils.completeFilters(filters)
             this.setState({ ...this.state, filtersSelected: filtersComplete, search: true })
+        } else {
+            this.setState({ ...this.state, filtersSelected: [], search: true })
         }
     }
 
@@ -59,7 +62,7 @@ class Traces extends Component {
     sendFilters = () => {
         const { filtersSelected } = this.state
         const urlSearch = FilterTraceUtils.filtersToURLSearch(FilterTraceUtils.reduceFilterToURL(filtersSelected))
-        this.props.history.push(`?${urlSearch}`, this.state)
+        this.props.history.push(`?${urlSearch}`)
     }
 
     updateFiltersSelected = (element) => {
@@ -167,7 +170,6 @@ class Traces extends Component {
                                             const options = element.operations.map((operation) => {
                                                 return <Option key={operation}>{operation}</Option>
                                             })
-
                                             return (
                                                 <Row key={element.name} gutter={16} justify="left"
                                                      className="heimdall-select-filters">
@@ -190,6 +192,7 @@ class Traces extends Component {
                                                             {
                                                                 element.type === "date" &&
                                                                 <DatePicker
+                                                                    defaultValue={element.firstValue && element.firstValue.length > 0 && moment(element.firstValue, formatDate)}
                                                                     showTime={timeInput} format={formatDate}
                                                                     onChange={this.handleChangeValueFilter(element)}
                                                                     style={{width: "100%"}}/>
@@ -220,6 +223,7 @@ class Traces extends Component {
                                                             {
                                                                 element.type === "date" ?
                                                                     <DatePicker
+                                                                        defaultValue={element.secondValue && element.secondValue.length > 0 && moment(element.secondValue, formatDate)}
                                                                         showTime={timeInput} format={formatDate}
                                                                         onChange={this.handleChangeValue2Filter(element)}
                                                                         style={{width: "100%"}}/>

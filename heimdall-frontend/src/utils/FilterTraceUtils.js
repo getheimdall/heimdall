@@ -223,8 +223,6 @@ const getOperations = (type) => {
             ]
         case "date":
             return [
-                "equals",
-                "not equals",
                 "between",
                 "less than",
                 "greater than",
@@ -237,6 +235,7 @@ const getOperations = (type) => {
                 "this month",
                 "last month",
                 "this year",
+                "not equals",
                 "none",
                 "all"
             ]
@@ -270,12 +269,31 @@ const getPossibleValues = (field) => {
 }
 
 const filtersToURLSearch = filters => {
+    filters.forEach(filter => {
+        if (filter.type === 'date') {
+            filter.firstValue = (new Date(filter.firstValue).getTime() / 1000).toFixed(0)
+            if (filter.operationSelected === 'between') {
+                filter.secondValue = (new Date(filter.secondValue).getTime() / 1000).toFixed(0)
+            }
+        }
+    })
     return qs.stringify(filters)
 }
 
 const URLSearchToFilters = urlSearch => {
     const filtersObject = qs.parse(urlSearch)
-    return Object.keys(filtersObject).map(key => filtersObject[key])
+    const result = Object.keys(filtersObject).map(key => filtersObject[key])
+
+    result.forEach(filter => {
+        if (filter.type === 'date') {
+            filter.firstValue = new Date(filter.firstValue * 1000).toISOString()
+            if (filter.operationSelected === 'between') {
+                filter.secondValue = new Date(filter.secondValue * 1000).toISOString()
+            }
+        }
+    })
+
+    return result
 }
 
 const updateOperationSelectedToEnum = (filters) => {
