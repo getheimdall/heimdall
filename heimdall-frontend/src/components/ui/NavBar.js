@@ -82,7 +82,7 @@ class NavBar extends Component {
                                 languages.map(lng => {
                                     return (
                                         <Menu.Item key={`changeLang:${lng.key}`} className="heimdall-flags" disabled={lng.key === i18n.language}>
-                                            <img width={32} height={32} src={lng.img} />
+                                            <img width={32} height={32} src={lng.img} alt={lng.label}/>
                                             <label>{lng.label}</label>
                                         </Menu.Item>
                                     )
