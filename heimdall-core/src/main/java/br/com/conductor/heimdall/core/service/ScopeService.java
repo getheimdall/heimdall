@@ -20,7 +20,6 @@
 package br.com.conductor.heimdall.core.service;
 
 import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.converter.ResourceMap;
 import br.com.conductor.heimdall.core.dto.ScopeDTO;
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Scope;
@@ -31,6 +30,8 @@ import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Objects;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ONLY_ONE_RESOURCE_PER_API;
@@ -61,7 +62,7 @@ public class ScopeService {
         HeimdallException.checkThrow(api == null, GLOBAL_RESOURCE_NOT_FOUND);
 
         Scope scopeData = scopeRepository.findByApiIdAndName(apiId, scopeDTO.getName());
-        HeimdallException.checkThrow(scopeData != null && (scopeData.getApi().getId() == api.getId()), ONLY_ONE_RESOURCE_PER_API);
+        HeimdallException.checkThrow(scopeData != null && (Objects.equals(scopeData.getApi().getId(), api.getId())), ONLY_ONE_RESOURCE_PER_API);
 
         Scope scope = GenericConverter.mapper(scopeDTO, Scope.class);
         scope.setApi(api);
@@ -71,6 +72,16 @@ public class ScopeService {
         amqpRoute.dispatchRoutes();
 
         return scope;
+    }
+
+    public void delete(Long apiId, Long resourceId) {
+
+        Scope scope = scopeRepository.findByApiIdAndId(apiId, resourceId);
+        HeimdallException.checkThrow(scope == null, GLOBAL_RESOURCE_NOT_FOUND);
+
+        scopeRepository.delete(scope.getId());
+
+        amqpRoute.dispatchRoutes();
     }
 
 }
