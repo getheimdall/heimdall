@@ -41,22 +41,10 @@ public class AMQPRouteService {
 
      /**
       * Dispatch a message to refresh zuul routes
-      * 
-      * @param apiId
-      * @param resourceId
       */
      public void dispatchRoutes() {
 
           rabbitTemplate.convertAndSend(RabbitConstants.EXCHANGE_FANOUT_HEIMDALL_ROUTES, "", "");
      }
 
-     /**
-      * Dispatch a message to refresh all zuul routes
-      * 
-      */
-     public void dispatchAllRoutes() {
-
-          rabbitTemplate.convertAndSend(RabbitConstants.EXCHANGE_FANOUT_HEIMDALL_ROUTES, "", "");
-
-     }
 }
