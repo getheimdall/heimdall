@@ -22,22 +22,11 @@ package br.com.conductor.heimdall.core.entity;
  */
 
 import java.io.Serializable;
+import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -88,6 +77,13 @@ public class Operation implements Serializable {
      @JoinColumn(name = "RESOURCE_ID", nullable = false)
      @JsonManagedReference
      private Resource resource;
+
+     @JsonIgnore
+     @ManyToMany
+     @JoinTable(name = "SCOPES_OPERATIONS",
+             joinColumns = @JoinColumn(name = "OPERATION_ID", referencedColumnName = "ID"),
+             inverseJoinColumns = @JoinColumn(name = "SCOPE_ID", referencedColumnName = "ID"))
+     private List<Scope> scopes;
 
      /**
       * Adjust the path to not permit the save or update with "/" or spaces in the end of path.
