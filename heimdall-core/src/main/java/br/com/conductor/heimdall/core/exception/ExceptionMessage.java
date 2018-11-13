@@ -67,7 +67,7 @@ public enum ExceptionMessage {
 
     MIDDLEWARE_UNSUPPORTED_TYPE(BAD_REQUEST.value(), "File type differs from .jar not supported", BadRequestException.class),
 
-    MIDDLEWARE_CONTAINS_INTERCEOPTORS(BAD_REQUEST.value(), "Middleware still contains interceptors associated", BadRequestException.class),
+    MIDDLEWARE_CONTAINS_INTERCEPTORS(BAD_REQUEST.value(), "Middleware still contains interceptors associated", BadRequestException.class),
 
     MIDDLEWARE_INVALID_FILE(BAD_REQUEST.value(), "Invalid file", BadRequestException.class),
 
@@ -141,7 +141,11 @@ public enum ExceptionMessage {
 
     AUTHORIZATION_NOT_FOUND(UNAUTHORIZED.value(), "Authorization not found in header", UnauthorizedException.class),
 
-    RESPONSE_TYPE_NOT_FOUND(BAD_REQUEST.value(), "response_type not found", BadRequestException.class);
+    RESPONSE_TYPE_NOT_FOUND(BAD_REQUEST.value(), "response_type not found", BadRequestException.class),
+
+    CORS_INTERCEPTOR_NOT_API_LIFE_CYCLE(BAD_REQUEST.value(), "The CORS Interceptor must of Lifecycle type API", BadRequestException.class),
+
+    CORS_INTERCEPTOR_ALREADY_ASSIGNED_TO_THIS_API(BAD_REQUEST.value(), "A CORS Interceptor already assigned to this API", BadRequestException.class);
 
     @Getter
     private Integer httpCode;

@@ -53,7 +53,6 @@ class NavBar extends Component {
 
     render() {
         const { i18n, t } = this.props
-        console.log(languages)
         return (
             <Row type="flex" justify="start">
                 <Col sm={24} md={24}>

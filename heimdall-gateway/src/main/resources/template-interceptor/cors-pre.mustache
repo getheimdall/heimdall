@@ -2,7 +2,7 @@ import br.com.conductor.heimdall.gateway.service.CORSInterceptorService;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.util.BeanManager;
 import br.com.conductor.heimdall.gateway.service.LifeCycleService;
-import com.netflix.zuul.ZuulFilter;
+import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
 import com.netflix.zuul.context.RequestContext;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,53 +10,55 @@ import java.util.*;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 
-public class CorsPreInterceptor extends ZuulFilter {
+public class CorsPreInterceptor extends HeimdallFilter {
 
     private static Set<String> pathsAllowed;
     private static Set<String> pathsNotAllowed;
-    private static String inboundURL = {{inboundURL}};
+    private static String inboundURL = "{{inboundURL}}";
     private static Long referenceId = {{referenceId}};
-    private HttpServletRequest request;
 
     private static Map<String, String> cors;
 
-    public CorsFilterPre() {
-        request = RequestContext.getCurrentContext().getRequest();
+    public CorsPreInterceptor() {
         cors = new HashMap<>();
         pathsAllowed = new HashSet<>();
         pathsNotAllowed = new HashSet<>();
         
         {{#pathsAllowed}}
-            pathsAllowed.add({{.}})
+        pathsAllowed.add("{{.}}");
         {{/pathsAllowed}}
         
         {{#pathsNotAllowed}}
-            pathsNotAllowed.add({{.}})
+        pathsNotAllowed.add("{{.}}");
         {{/pathsNotAllowed}}
 
         {{#cors}}
-            cors.put({{key}}, {{value}})
+        cors.put("{{key}}", "{{value}}");
         {{/cors}}
     }
 
     @Override
-    public boolean shouldFilter() {
+    public boolean should() {
+        RequestContext ctx = RequestContext.getCurrentContext();
         LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
-        return lifeCycleService.should(InterceptorLifeCycle.API, pathsAllowed, pathsNotAllowed, inboundURL, request.getMethod(), request, referenceId);
+        return lifeCycleService.should(InterceptorLifeCycle.API, pathsAllowed, pathsNotAllowed, inboundURL, ctx.getRequest().getMethod(), ctx.getRequest(), referenceId);
     }
 
     @Override
-    public Object run() {
+    public void execute() throws Throwable {
         
         CORSInterceptorService corsService = (CORSInterceptorService) BeanManager.getBean(CORSInterceptorService.class)
-        corsService.executeCorsPreFilter(request, cors);
+        corsService.executeCorsPreFilter(RequestContext.getCurrentContext(), cors);
+    }
 
-        return null;
+    @Override
+    public String getName() {
+        return "{{name}}"
     }
 
     @Override
     public int filterOrder() {
-        return {{order}};
+        return 20;
     }
 
     @Override

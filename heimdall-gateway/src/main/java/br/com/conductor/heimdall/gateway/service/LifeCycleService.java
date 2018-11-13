@@ -67,7 +67,11 @@ public class LifeCycleService {
 
         switch (interceptorLifeCycle) {
             case API:
-                return validateApi(pathsAllowed, pathsNotAllowed, inboundURL, req);
+
+                RequestContext context = RequestContext.getCurrentContext();
+                Long apiId = (Long) context.get("api-id");
+                return referenceId.equals(apiId);
+//            return validateApi(pathsAllowed, pathsNotAllowed, inboundURL, req);
             case PLAN:
                 return validatePlan(pathsAllowed, pathsNotAllowed, inboundURL, req, referenceId);
             case OPERATION:

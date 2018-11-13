@@ -101,7 +101,7 @@ public class ApiService {
 
           Api api = GenericConverter.mapper(apiDTO, Api.class);
 
-          Example<Api> example = Example.of(api, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+          Example<Api> example = Example.of(api, ExampleMatcher.matching().withIgnorePaths("cors").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 
           Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
           Page<Api> page = apiRepository.findAll(example, pageable);
@@ -121,7 +121,7 @@ public class ApiService {
 
           Api api = GenericConverter.mapper(apiDTO, Api.class);
 
-          Example<Api> example = Example.of(api, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+          Example<Api> example = Example.of(api, ExampleMatcher.matching().withIgnorePaths("cors").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 
           List<Api> apis = apiRepository.findAll(example);
 

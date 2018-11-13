@@ -37,7 +37,7 @@ public class CORSHeimdallInterceptor implements HeimdallInterceptor {
     public HashMap<String, Object> buildParameters(Object objectCustom, HashMap<String, Object> parameters, Interceptor interceptor) {
 
         Map<String, String> cors = (Map<String, String>) objectCustom;
-        parameters.put("cors", cors);
+        parameters.put("cors", cors.entrySet());
 
         return parameters;
     }

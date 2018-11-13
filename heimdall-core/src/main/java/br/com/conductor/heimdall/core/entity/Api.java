@@ -99,6 +99,9 @@ public class Api implements Serializable {
      @Column(name = "BASE_PATH", length = 80, nullable = false, unique = true)
      private String basePath;
 
+     @Column(name = "CORS", nullable = false)
+     private boolean cors;
+
      @Column(name = "CREATION_DATE", nullable = false)
      @DateTimeFormat(iso = ISO.DATE_TIME)
      @JsonDeserialize(using = LocalDateTimeDeserializer.class)

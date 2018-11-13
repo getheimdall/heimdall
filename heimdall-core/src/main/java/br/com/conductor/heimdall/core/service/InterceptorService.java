@@ -40,6 +40,7 @@ import br.com.conductor.heimdall.core.util.Pageable;
 import br.com.conductor.heimdall.core.util.StringUtils;
 import br.com.conductor.heimdall.core.util.TemplateUtils;
 import br.com.twsoftware.alfred.object.Objeto;
+import ch.qos.logback.core.spi.LifeCycle;
 import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,7 +131,7 @@ public class InterceptorService {
 
         Interceptor interceptor = GenericConverter.mapper(interceptorDTO, Interceptor.class);
 
-        Example<Interceptor> example = Example.of(interceptor, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+        Example<Interceptor> example = Example.of(interceptor, ExampleMatcher.matching().withIgnorePaths("api.cors").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 
         Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
         Page<Interceptor> page = interceptorRepository.findAll(example, pageable);
@@ -149,7 +150,7 @@ public class InterceptorService {
 
         Interceptor interceptor = GenericConverter.mapper(interceptorDTO, Interceptor.class);
 
-        Example<Interceptor> example = Example.of(interceptor, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+        Example<Interceptor> example = Example.of(interceptor, ExampleMatcher.matching().withIgnorePaths("api.cors").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 
         return interceptorRepository.findAll(example);
     }
@@ -169,6 +170,10 @@ public class InterceptorService {
 
         validateTemplate(interceptor.getType(), interceptor.getContent());
 
+        if (TypeInterceptor.CORS.equals(interceptor.getType())) {
+            validateFilterCors(interceptor);
+        }
+
         List<Long> ignoredResources = ignoredValidate(interceptorDTO.getIgnoredResources(), resourceRepository);
         HeimdallException.checkThrow(Objeto.notBlank(ignoredResources), INTERCEPTOR_IGNORED_INVALID, ignoredResources.toString());
 
@@ -184,6 +189,11 @@ public class InterceptorService {
         }
 
         interceptor = interceptorRepository.save(interceptor);
+
+        if (TypeInterceptor.CORS.equals(interceptor.getType())) {
+            interceptor.getApi().setCors(true);
+            interceptor.setApi(apiRepository.save(interceptor.getApi()));
+        }
 
         if (TypeInterceptor.MIDDLEWARE.equals(interceptor.getType())) {
 
@@ -232,6 +242,10 @@ public class InterceptorService {
         HeimdallException.checkThrow(isBlank(interceptor), GLOBAL_RESOURCE_NOT_FOUND);
         interceptor = GenericConverter.mapperWithMapping(interceptorDTO, interceptor, new InterceptorMap());
 
+        if (TypeInterceptor.CORS.equals(interceptor.getType())) {
+            HeimdallException.checkThrow(interceptor.getLifeCycle() != InterceptorLifeCycle.API, ExceptionMessage.CORS_INTERCEPTOR_NOT_API_LIFE_CYCLE);
+        }
+
         interceptor = validateLifeCycle(interceptor);
 
         validateTemplate(interceptor.getType(), interceptor.getContent());
@@ -278,6 +292,12 @@ public class InterceptorService {
         }
 
         interceptorRepository.delete(interceptor);
+
+        if (TypeInterceptor.CORS.equals(interceptor.getType())) {
+            interceptor.getApi().setCors(false);
+            apiRepository.save(interceptor.getApi());
+        }
+
         amqpInterceptorService.dispatchRemoveInterceptors(new InterceptorFileDTO(interceptor.getId(), pathName));
     }
 
@@ -370,6 +390,11 @@ public class InterceptorService {
         }
 
         return interceptor;
+    }
+
+    private void validateFilterCors(Interceptor interceptor) {
+        HeimdallException.checkThrow(interceptor.getLifeCycle() != InterceptorLifeCycle.API, ExceptionMessage.CORS_INTERCEPTOR_NOT_API_LIFE_CYCLE);
+        HeimdallException.checkThrow(interceptor.getApi().isCors(), ExceptionMessage.CORS_INTERCEPTOR_ALREADY_ASSIGNED_TO_THIS_API);
     }
 
     private List<Long> ignoredValidate(List<ReferenceIdDTO> referenceIdDTOs, JpaRepository<?, Long> repository) {

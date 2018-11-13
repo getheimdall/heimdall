@@ -41,6 +41,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -278,8 +279,18 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                     auxMatch = true;
                     List<Operation> operations = operationRepository.findByEndPoint(pattern);
                     Operation operation = null;
+
                     if (Objeto.notBlank(operations)) {
-                        operation = operations.stream().filter(o -> o.getMethod().equals(HttpMethod.ALL) || method.equals(o.getMethod().name().toUpperCase())).findFirst().orElse(null);
+                        if (method.equals(HttpMethod.OPTIONS.name())) {
+                            Optional<Operation> first = operations.stream().findFirst();
+                            if (first.isPresent() && first.get().getResource().getApi().isCors()) {
+                                operation = first.get();
+                            }
+                        }
+
+                        if (Objects.isNull(operation)) {
+                            operation = operations.stream().filter(o -> o.getMethod().equals(HttpMethod.ALL) || method.equals(o.getMethod().name().toUpperCase())).findFirst().orElse(null);
+                        }
                     }
 
                     if (Objeto.notBlank(operation)) {
@@ -288,7 +299,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                         String basePath = operation.getResource().getApi().getBasePath();
                         requestURI = org.apache.commons.lang.StringUtils.removeStart(requestURI, basePath);
                         ctx.put("pattern", org.apache.commons.lang.StringUtils.removeStart(pattern, basePath));
-                        ctx.put("api-id", operation.getResource().getApi().getId().toString());
+                        ctx.put("api-id", operation.getResource().getApi().getId());
                         ctx.put("api-name", operation.getResource().getApi().getName());
 
                         List<Environment> environments = operation.getResource().getApi().getEnvironments();

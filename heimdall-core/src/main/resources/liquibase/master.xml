@@ -28,5 +28,6 @@
     <include file="changelog/20180718175848-update-column-token-in-oauth-authorizes.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20180719142230-add_columns-grantType-expirationDate-expirationTime-in-oauth-authorizes.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20181008152933-delete-rows-log-interceptors.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20181112120123-add-column-cors-enabled-in-api.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

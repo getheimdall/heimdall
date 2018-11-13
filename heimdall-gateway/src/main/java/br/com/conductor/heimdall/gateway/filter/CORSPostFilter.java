@@ -1,4 +1,4 @@
-package br.com.conductor.heimdall.gateway.filter.helper;
+package br.com.conductor.heimdall.gateway.filter;
 
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.service.CORSInterceptorService;
@@ -14,11 +14,12 @@ import java.util.Map;
 import java.util.Objects;
 
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SEND_RESPONSE_FILTER_ORDER;
 
 @Component
 @Slf4j
 public class CORSPostFilter extends ZuulFilter {
+
+    private final int SEND_CORS_RESPONSE_FILTER_ORDER = 999;
 
     @Autowired
     private CORSInterceptorService corsInterceptorService;
@@ -32,7 +33,7 @@ public class CORSPostFilter extends ZuulFilter {
 
     @Override
     public int filterOrder() {
-        return SEND_RESPONSE_FILTER_ORDER;
+        return SEND_CORS_RESPONSE_FILTER_ORDER;
     }
 
     @Override
