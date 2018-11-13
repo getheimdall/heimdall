@@ -30,5 +30,5 @@
     <include file="changelog/20180918144230-insert-privileges-for-logtraces.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20180918144310-insert-privileges-for-metrics.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20180521101715-add-privileges-provider-to-role-admin.xml" relativeToChangelogFile="true"/>
-
+    <include file="changelog/20181112145330-insert-privileges-for-scopes.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
