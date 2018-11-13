@@ -25,8 +25,6 @@ import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.ScopeDTO;
 import br.com.conductor.heimdall.core.dto.page.ScopePage;
 import br.com.conductor.heimdall.core.entity.Api;
-import br.com.conductor.heimdall.core.entity.Operation;
-import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.entity.Scope;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.ApiRepository;
@@ -41,9 +39,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 
@@ -115,6 +111,13 @@ public class ScopeService {
         return scopeRepository.findAll(example);
     }
 
+    /**
+     * Saves a {@link Scope} to the repository
+     *
+     * @param apiId Api Id
+     * @param scope {@link Scope}
+     * @return Scope saved
+     */
     @Transactional
     public Scope save(final Long apiId, Scope scope) {
 
@@ -143,9 +146,15 @@ public class ScopeService {
         return scope;
     }
 
-    public void delete(final Long apiId, final Long resourceId) {
+    /**
+     * Deletes a {@link Scope} from the repository.
+     *
+     * @param apiId Api Id
+     * @param scopeId Scope Id
+     */
+    public void delete(final Long apiId, final Long scopeId) {
 
-        Scope scope = scopeRepository.findByApiIdAndId(apiId, resourceId);
+        Scope scope = scopeRepository.findByApiIdAndId(apiId, scopeId);
         HeimdallException.checkThrow(scope == null, GLOBAL_RESOURCE_NOT_FOUND);
 
         scopeRepository.delete(scope.getId());
@@ -154,18 +163,15 @@ public class ScopeService {
     /**
      * Updates a {@link Scope} by its Id and {@link Api} Id
      *
-     * @param apiId    The {@link Api} Id
-     * @param scopeId  The {@link Scope} Id
-     * @param scope The {@link Scope}
+     * @param apiId   The {@link Api} Id
+     * @param scopeId The {@link Scope} Id
+     * @param scope   The {@link Scope}
      * @return The updated {@link Scope}
      */
     public Scope update(final Long apiId, final Long scopeId, Scope scope) {
 
-        Scope scopeByApiIdAndId = scopeRepository.findByApiIdAndId(apiId, scopeId);
-        HeimdallException.checkThrow(scopeByApiIdAndId == null, GLOBAL_RESOURCE_NOT_FOUND);
-
-        Scope scopeByApiIdAndName = scopeRepository.findByApiIdAndName(apiId, scope.getName());
-        HeimdallException.checkThrow(scopeByApiIdAndName != null, ONLY_ONE_RESOURCE_PER_API);
+        Scope scopeByApiIdAndNameAndId = scopeRepository.findByApiIdAndNameAndId(apiId, scope.getName(), scopeId);
+        HeimdallException.checkThrow(scopeByApiIdAndNameAndId == null, GLOBAL_RESOURCE_NOT_FOUND);
 
         scope = scopeRepository.save(scope);
 

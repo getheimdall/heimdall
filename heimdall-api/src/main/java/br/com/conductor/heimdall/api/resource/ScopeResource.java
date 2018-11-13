@@ -123,7 +123,7 @@ public class ScopeResource {
     @ApiOperation(value = "Update Scope")
     @PutMapping(value = "/{scopeId}")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_SCOPE)
-    public ResponseEntity<?> update(@PathVariable("apiId") Long apiId, @PathVariable("scopeId") Long scopeId, @RequestBody ScopeDTO scopeDTO) {
+    public ResponseEntity<?> update(@PathVariable("apiId") Long apiId, @PathVariable("scopeId") Long scopeId, @RequestBody @Valid ScopeDTO scopeDTO) {
 
         Scope scope = GenericConverter.mapper(scopeDTO, Scope.class);
 
