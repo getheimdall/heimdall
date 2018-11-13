@@ -110,4 +110,9 @@ public class ConstantsPrivilege {
 
      public static final String PRIVILEGE_READ_METRICS = "hasAuthority('READ_METRICS')";
 
+     public static final String PRIVILEGE_READ_SCOPE = "hasAuthority('READ_SCOPE')";
+     public static final String PRIVILEGE_CREATE_SCOPE = "hasAuthority('CREATE_SCOPE')";
+     public static final String PRIVILEGE_UPDATE_SCOPE = "hasAuthority('UPDATE_SCOPE')";
+     public static final String PRIVILEGE_DELETE_SCOPE = "hasAuthority('DELETE_SCOPE')";
+
 }

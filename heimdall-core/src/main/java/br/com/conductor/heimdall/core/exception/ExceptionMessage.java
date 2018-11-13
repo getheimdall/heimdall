@@ -141,7 +141,15 @@ public enum ExceptionMessage {
 
     AUTHORIZATION_NOT_FOUND(UNAUTHORIZED.value(), "Authorization not found in header", UnauthorizedException.class),
 
-    RESPONSE_TYPE_NOT_FOUND(BAD_REQUEST.value(), "response_type not found", BadRequestException.class);
+    RESPONSE_TYPE_NOT_FOUND(BAD_REQUEST.value(), "response_type not found", BadRequestException.class),
+
+    SCOPE_INVALID_OPERATION(BAD_REQUEST.value(), "Operation with id '{}' does not exist", BadRequestException.class),
+
+    SCOPE_INVALID_PLAN(BAD_REQUEST.value(), "Plan id with '{}' does not exist", BadRequestException.class),
+
+    SCOPE_INVALID_NAME(BAD_REQUEST.value(), "A Scope with the provided name already exists", BadRequestException.class),
+
+    ;
 
     @Getter
     private Integer httpCode;

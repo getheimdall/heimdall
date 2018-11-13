@@ -19,7 +19,6 @@
  */
 package br.com.conductor.heimdall.core.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,6 +26,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -63,12 +64,18 @@ public class Scope implements Serializable {
     @JoinColumn(name = "API_ID", nullable = false)
     private Api api;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = { CascadeType.REMOVE }, orphanRemoval = true, mappedBy = "scope")
-    @JsonBackReference
+    @ManyToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @JoinTable(name = "SCOPES_OPERATIONS",
+            joinColumns = @JoinColumn(name = "SCOPE_ID", referencedColumnName = "ID"),
+            inverseJoinColumns = @JoinColumn(name = "OPERATION_ID", referencedColumnName = "ID"))
     private List<Operation> operations;
 
-//    @OneToMany(fetch = FetchType.EAGER, cascade = { CascadeType.REMOVE }, orphanRemoval = true, mappedBy = "scope")
-//    @JsonBackReference
-//    private List<Plan> plans;
+    @ManyToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @JoinTable(name = "SCOPES_PLANS",
+            joinColumns = @JoinColumn(name = "SCOPE_ID", referencedColumnName = "ID"),
+            inverseJoinColumns = @JoinColumn(name = "PLAN_ID", referencedColumnName = "ID"))
+    private List<Plan> plans;
 
 }

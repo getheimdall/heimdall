@@ -17,27 +17,40 @@
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-package br.com.conductor.heimdall.core.dto;
+package br.com.conductor.heimdall.core.dto.page;
 
+import br.com.conductor.heimdall.core.dto.PageDTO;
+import br.com.conductor.heimdall.core.entity.Scope;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.List;
 
+/**
+ * Class that represents a paged {@link Scope} list.
+ *
+ * @author Filipe Germano
+ */
 @Data
-public class ScopeDTO implements Serializable {
+@EqualsAndHashCode(callSuper=false)
+public class ScopePage extends PageDTO<Scope> implements Serializable {
 
-    @NotNull
-    @Size(max = 180)
-    private String name;
+    private static final long serialVersionUID = -6720212738880571229L;
 
-    @Size(max = 200)
-    private String description;
-
-    private List<ReferenceIdDTO> operations;
-
-    private List<ReferenceIdDTO> plans;
-
+    public ScopePage(PageDTO<Scope> p){
+        super(p.getNumber(),
+                p.size,
+                p.totalPages,
+                p.numberOfElements,
+                p.totalElements,
+                p.firstPage,
+                p.hasPreviousPage,
+                p.hasNextPage,
+                p.hasContent,
+                p.first,
+                p.last,
+                p.nextPage,
+                p.previousPage,
+                p.content);
+    }
 }

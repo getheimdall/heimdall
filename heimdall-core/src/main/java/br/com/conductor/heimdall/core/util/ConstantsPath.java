@@ -77,4 +77,6 @@ public class ConstantsPath {
 
      public static final String PATH_METRICS = PATH_API + "/metrics";
 
+     public static final String PATH_SCOPES = PATH_APIS + "/{apiId}" + "/scopes";
+
 }
