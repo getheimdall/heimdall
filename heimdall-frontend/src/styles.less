@@ -2,6 +2,8 @@ body {
     background: -moz-linear-gradient(top, rgba(242,245,246,0.5) 0%, rgba(242,245,246,0.5) 1%, rgba(227,234,237,0.62) 47%, rgba(200,215,220,0.76) 100%);
     background: -webkit-linear-gradient(top, rgba(242,245,246,0.5) 0%,rgba(242,245,246,0.5) 1%,rgba(227,234,237,0.62) 47%,rgba(200,215,220,0.76) 100%);
     background: linear-gradient(to bottom, rgba(242,245,246,0.5) 0%,rgba(242,245,246,0.5) 1%,rgba(227,234,237,0.62) 47%,rgba(200,215,220,0.76) 100%);
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#80f2f5f6', endColorstr='#c2c8d7dc',GradientType=0 );
 }
 
@@ -33,7 +35,6 @@ body {
 .logo {
     position: relative;
     cursor: pointer;
-    border-bottom: 1px solid #a0a7af;
     
     > span {
         color: #f1f1f1;
@@ -410,6 +411,14 @@ body {
 
     button {
         margin: 5px;
+    }
+}
+
+.heimdall-flags {
+    cursor: pointer;
+
+    label {
+        margin-left: 5px
     }
 }
 

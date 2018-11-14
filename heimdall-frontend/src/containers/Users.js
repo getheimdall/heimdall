@@ -1,16 +1,16 @@
 //3rd's
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-
-//actions
-import { getAllUsers, initLoading, remove } from '../actions/users'
-
 //components
-import { Row, Button, Input, Col, Card, Form, notification } from 'antd'
+import { Row, Input, Col, Card, Form, notification } from 'antd'
+//actions
+import Loading from '../components/ui/Loading'
 import PageHeader from '../components/ui/PageHeader'
 import ListUsers from '../components/users/ListUsers'
-import Loading from '../components/ui/Loading'
 import FloatButton from '../components/ui/FloatButton'
+import { getAllUsers, initLoading, remove } from '../actions/users'
+import i18n from "../i18n/i18n";
+
 
 class Users extends Component {
 
@@ -57,22 +57,16 @@ class Users extends Component {
 
         return (
             <div>
-                <PageHeader title="Users" icon="user" />
-
+                <PageHeader title={i18n.t('users')} icon="user" />
                 <Row className="search-box">
                     <Card>
                         <Form>
-                            <Row gutter={24}>
+                            <Row gutter={24} type="flex" justify="start">
                                 <Col sm={24} md={5}>
-                                    {getFieldDecorator('userName')(<Input.Search onSearch={this.onSearchForm} placeholder="username" />)}
+                                    {getFieldDecorator('userName')(<Input.Search onSearch={this.onSearchForm} placeholder={i18n.t('username')} />)}
                                 </Col>
                                 <Col sm={24} md={5}>
-                                    {getFieldDecorator('email')(<Input.Search onSearch={this.onSearchForm} placeholder="email" />)}
-                                </Col>
-                                <Col sm={24} md={14}>
-                                    <Row type="flex" justify="end">
-                                        <Button id="searchUsers" className="card-button" type="primary" icon="search" onClick={this.onSearchForm}>Search</Button>
-                                    </Row>
+                                    {getFieldDecorator('email')(<Input.Search onSearch={this.onSearchForm} placeholder={i18n.t('email')} />)}
                                 </Col>
                             </Row>
                         </Form>
@@ -82,7 +76,7 @@ class Users extends Component {
                 <Row className="h-row bg-white">
                     <ListUsers dataSource={users} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading} />
 
-                    <FloatButton idButton="addUser" history={history} to="/users/new" label="Add new User" />
+                    <FloatButton idButton="addUser" history={history} to="/users/new" label={i18n.t('add_new_user')} />
                 </Row>
             </div>
         )

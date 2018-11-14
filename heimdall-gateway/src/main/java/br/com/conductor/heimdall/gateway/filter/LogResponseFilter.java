@@ -19,6 +19,27 @@
  */
 package br.com.conductor.heimdall.gateway.filter;
 
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.springframework.http.HttpHeaders;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StreamUtils;
+
+import com.netflix.zuul.ZuulFilter;
+import com.netflix.zuul.context.RequestContext;
+
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.core.util.ContentTypeUtils;
 import br.com.conductor.heimdall.core.util.UrlUtil;
@@ -29,24 +50,7 @@ import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.middleware.spec.Helper;
 import br.com.twsoftware.alfred.object.Objeto;
-import com.netflix.util.Pair;
-import com.netflix.zuul.ZuulFilter;
-import com.netflix.zuul.context.RequestContext;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.springframework.http.HttpHeaders;
-import org.springframework.stereotype.Component;
-import org.springframework.util.StreamUtils;
-
-import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
+import lombok.Cleanup;
 
 /**
  * Logs the response to the trace
@@ -117,16 +121,22 @@ public class LogResponseFilter extends ZuulFilter {
         String[] types = content.split(";");
 
         if (!ContentTypeUtils.belongsToBlackList(types)) {
+        	@Cleanup
             InputStream stream = ctx.getResponseDataStream();
             String body;
 
-            body = StreamUtils.copyToString(stream, Charset.forName("UTF-8"));
+            body = StreamUtils.copyToString(stream, StandardCharsets.UTF_8);
 
-            if (body.isEmpty())
-                body = helper.call().response().getBody();
+            if (body.isEmpty() && helper.call().response().getBody() != null) {
+            	
+            	body = helper.call().response().getBody();            	
+            }
 
-            r.setBody(body);
-            ctx.setResponseDataStream(new ByteArrayInputStream(body.getBytes("UTF-8")));
+            if (Objects.nonNull(body) && !body.isEmpty()) {
+            	
+            	r.setBody(body);
+            }
+            ctx.setResponseDataStream(new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)));
         }
         TraceContextHolder.getInstance().getActualTrace().setResponse(r);
     }
@@ -135,9 +145,12 @@ public class LogResponseFilter extends ZuulFilter {
         Map<String, String> headers = new HashMap<>();
 
         final HttpServletResponse response = context.getResponse();
+        
+        context.getZuulResponseHeaders().stream().forEach(pair -> headers.put(pair.first(), pair.second()));
+        
         final Collection<String> headerNames = response.getHeaderNames();
 
-        headerNames.forEach(s -> headers.put(s, response.getHeader(s)));
+        headerNames.forEach(s -> headers.putIfAbsent(s, response.getHeader(s)));       
 
         return headers;
     }

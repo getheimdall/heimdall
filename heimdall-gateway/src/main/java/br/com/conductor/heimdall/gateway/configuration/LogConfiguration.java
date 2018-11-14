@@ -64,9 +64,9 @@ public class LogConfiguration {
              // Creating custom MongoDBAppender
              Appender<ILoggingEvent> appender;
              if (property.getMongo().getUrl() != null) {
-          	   appender = new MongoDBAppender(property.getMongo().getUrl(), property.getMongo().getDataBase(), property.getMongo().getCollection());
+          	   appender = new MongoDBAppender(property.getMongo().getUrl(), property.getMongo().getDataBase(), property.getMongo().getCollection(), property.getMongo().getZoneId());
              } else {
-          	   appender = new MongoDBAppender(property.getMongo().getServerName(), property.getMongo().getPort(), property.getMongo().getDataBase(), property.getMongo().getCollection());            	   
+          	   appender = new MongoDBAppender(property.getMongo().getServerName(), property.getMongo().getPort(), property.getMongo().getDataBase(), property.getMongo().getCollection(), property.getMongo().getZoneId());
              }
              appender.setContext(lc);
              appender.start();
@@ -74,12 +74,12 @@ public class LogConfiguration {
              // Creating AsyncAppender
              int queueSize = (property.getMongo().getQueueSize() != null) ? property.getMongo().getQueueSize().intValue() : DEFAULT_QUEUE_SIZE;
 
-             Appender<ILoggingEvent> asyncAppender = new AsyncAppender();
-             ((AsyncAppender) asyncAppender).setQueueSize(queueSize);
+             AsyncAppender asyncAppender = new AsyncAppender();
+             asyncAppender.setQueueSize(queueSize);
              if (property.getMongo().getDiscardingThreshold() != null) {            	 
-            	 ((AsyncAppender) asyncAppender).setDiscardingThreshold(property.getMongo().getDiscardingThreshold().intValue());
+            	 asyncAppender.setDiscardingThreshold(property.getMongo().getDiscardingThreshold().intValue());
              }
-             ((AsyncAppender) asyncAppender).addAppender(appender);
+             asyncAppender.addAppender(appender);
              asyncAppender.start();
 
              logger.addAppender(asyncAppender);
