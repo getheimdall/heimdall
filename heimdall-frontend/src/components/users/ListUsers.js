@@ -42,6 +42,8 @@ class ListUsers extends Component {
                         title={i18n.t('action')}
                         id="action"
                         key="action"
+                        title="Action"
+                        width={180}
                         render={(text, record) => (
                             <span>
                                 <Tooltip title={i18n.t('edit')}>
