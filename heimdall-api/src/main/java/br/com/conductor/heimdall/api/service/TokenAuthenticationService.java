@@ -20,6 +20,9 @@ package br.com.conductor.heimdall.api.service;
  * ==========================LICENSE_END===================================
  */
 
+import br.com.conductor.heimdall.api.entity.Ldap;
+import br.com.conductor.heimdall.api.entity.Role;
+import br.com.conductor.heimdall.api.entity.User;
 import br.com.conductor.heimdall.api.enums.CredentialStateEnum;
 import br.com.conductor.heimdall.api.environment.JwtProperty;
 import br.com.conductor.heimdall.api.security.AccountCredentials;
@@ -31,11 +34,19 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.ldap.authentication.BindAuthenticator;
+import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
+import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
+import org.springframework.security.ldap.search.LdapUserSearch;
+import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -43,9 +54,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Collections;
-import java.util.Date;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Data class that holds tha JTW properties.
@@ -60,7 +69,7 @@ public class TokenAuthenticationService {
     private JwtProperty jwtProperty;
 
     @Autowired
-    private UserDetailsService userDetailsService;
+    private UserService userService;
 
     @Autowired
     private CredentialStateService credentialStateService;
@@ -68,18 +77,43 @@ public class TokenAuthenticationService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private LdapService ldapService;
+
+    @Autowired
+    private AuthenticationManagerBuilder authenticateManagerBuilder;
+
+    @Autowired
+    private LdapAuthoritiesPopulator populator;
+
     private static final String TOKEN_PREFIX = "Bearer ";
 
     private static final String HEIMDALL_AUTHORIZATION_NAME = "Authorization";
 
     public void login(AccountCredentials accountCredentials, HttpServletResponse response) {
-        Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+        UsernamePasswordAuthenticationToken userFound = new UsernamePasswordAuthenticationToken(
                 accountCredentials.getUsername(),
                 accountCredentials.getPassword(),
-                Collections.emptyList()
-        ));
+                Collections.emptyList());
+        Authentication authenticate = null;
+        try {
+            authenticate = authenticationManager.authenticate(userFound);
+        } catch (Exception ex) {
+            log.error(ex.getMessage(), ex);
 
-        if (authenticate != null) {
+            Ldap ldapActive = ldapService.getLdapActive();
+
+            if (Objects.nonNull(ldapActive)){
+                try {
+                    authenticateManagerBuilder.authenticationProvider(ldapProvider(ldapActive));
+                    authenticate = ldapProvider(ldapActive).authenticate(userFound);
+                } catch (Exception exception) {
+                    log.error(exception.getMessage(), exception);
+                }
+            }
+        }
+
+        if (Objects.nonNull(authenticate)){
             addAuthentication(response, accountCredentials.getUsername(), null);
             response.setStatus(200);
             try {
@@ -92,7 +126,7 @@ public class TokenAuthenticationService {
         }
     }
 
-    public void addAuthentication(HttpServletResponse response, String username, String jti) {
+    private void addAuthentication(HttpServletResponse response, String username, String jti) {
         LocalDateTime now = LocalDateTime.now();
         final LocalDateTime expirationDate = now.plusSeconds(jwtProperty.getExpirationTime());
 
@@ -132,9 +166,9 @@ public class TokenAuthenticationService {
 
                 if (user != null) {
                     if (!credentialStateService.verifyIfTokenIsRevokeOrLogout(claims.getId())) {
-                        UserDetails userDetails = userDetailsService.loadUserByUsername(user);
-                        addAuthentication(response, userDetails.getUsername(), claims.getId());
-                        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                        User userFound = userService.findByUsername(user);
+                        addAuthentication(response, user, claims.getId());
+                        return new UsernamePasswordAuthenticationToken(userFound.getUserName(), userFound.getPassword(), getAuthoritiesByRoles(userFound.getRoles()));
                     }
                     return null;
                 }
@@ -147,4 +181,29 @@ public class TokenAuthenticationService {
         return null;
     }
 
+    private Collection<? extends GrantedAuthority> getAuthoritiesByRoles(Set<Role> roles) {
+        Set<GrantedAuthority> authorities = new HashSet<>();
+
+        roles.forEach(role -> {
+            role.getPrivileges().forEach(privilege -> authorities.add(new SimpleGrantedAuthority(privilege.getName())));
+        });
+
+        return authorities;
+    }
+
+    private LdapAuthenticationProvider ldapProvider(Ldap ldap) {
+
+        LdapContextSource contextSource = new LdapContextSource();
+        contextSource.setUrl(ldap.getUrl());
+        contextSource.setUserDn(ldap.getUserDn());
+        contextSource.setPassword(ldap.getPassword());
+        contextSource.setReferral("follow");
+        contextSource.afterPropertiesSet();
+
+        LdapUserSearch ldapUserSearch = new FilterBasedLdapUserSearch(ldap.getSearchBase(), ldap.getUserSearchFilter(), contextSource);
+
+        BindAuthenticator bindAuthenticator = new BindAuthenticator(contextSource);
+        bindAuthenticator.setUserSearch(ldapUserSearch);
+        return new LdapAuthenticationProvider(bindAuthenticator, populator);
+    }
 }

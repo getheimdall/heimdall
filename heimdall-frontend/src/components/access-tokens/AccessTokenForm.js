@@ -3,7 +3,9 @@ import PropTypes from 'prop-types'
 import {Row, Form, Input, Col, Switch, Tooltip, Button, Modal, AutoComplete, Spin, Icon, Checkbox} from 'antd'
 
 import i18n from "../../i18n/i18n"
-// import Loading from '../ui/Loading';
+import ComponentAuthority from "../ComponentAuthority"
+import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
+import {privileges} from "../../constants/privileges-types"
 
 const FormItem = Form.Item
 const confirm = Modal.confirm
@@ -79,7 +81,8 @@ class AccessTokenForm extends Component {
                                         rules: [
                                             {min: 6, message: i18n.t('min_6_characters_to_token')}
                                         ]
-                                    })(<Input/>)
+                                    })(<Input
+                                        disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_ACCESSTOKEN, privileges.PRIVILEGE_UPDATE_ACCESSTOKEN])}/>)
                                 }
                             </FormItem>
                         </Col>
@@ -98,6 +101,7 @@ class AccessTokenForm extends Component {
                                         ]
                                     })(
                                         <AutoComplete
+                                            disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_ACCESSTOKEN, privileges.PRIVILEGE_UPDATE_ACCESSTOKEN])}
                                             notFoundContent={fetching ? < Spin size="small"/> : null}
                                             filterOption={false}
                                             dataSource={appAutocompleteSource}
@@ -114,12 +118,13 @@ class AccessTokenForm extends Component {
                                     getFieldDecorator('status', {
                                         initialValue: accessToken ? accessToken.status === 'ACTIVE' : true,
                                         valuePropName: 'checked'
-                                    })(<Switch required/>)
+                                    })(<Switch required
+                                               disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_ACCESSTOKEN, privileges.PRIVILEGE_UPDATE_ACCESSTOKEN])}/>)
                                 }
                             </FormItem>
                         </Col>
                         <Col sm={24} md={12}>
-                            { plans && plans.length === 0 && <span>You need select a app</span>}
+                            { plans && plans.length === 0 && <span>{i18n.t('you_need_select_app')}</span>}
                             { plans && plans.length > 0 &&
                             <FormItem label={i18n.t('plans')}>
                                 {
@@ -127,37 +132,33 @@ class AccessTokenForm extends Component {
                                         initialValue: accessToken && accessToken.plans.map(plan => plan.id)
                                     })(<Checkbox.Group className='checkbox-conductor'>
                                         {plans && plans.map((plan, index) => {
-                                            return <Checkbox key={index} value={plan.id}>{plan.name}</Checkbox>
+                                            return <Checkbox key={index} value={plan.id}
+                                                             disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_ACCESSTOKEN, privileges.PRIVILEGE_UPDATE_ACCESSTOKEN])}>{plan.name}</Checkbox>
                                         })}
                                     </Checkbox.Group>)
                                 }
                             </FormItem>}
-                            {/*{ this.props.plans && this.props.plans.content.length === 0 ? <Loading/> :*/}
-                                {/*<FormItem label="Plans">*/}
-                                    {/*{*/}
-                                        {/*getFieldDecorator('plans', {*/}
-                                            {/*initialValue: accessToken && accessToken.plans.map(plan => plan.id)*/}
-                                        {/*})(<Checkbox.Group className='checkbox-conductor'>*/}
-                                            {/*{this.props.plans && this.props.plans.content.map((plan, index) => {*/}
-                                                {/*return <Checkbox key={index} value={plan.id}>{plan.name}</Checkbox>*/}
-                                            {/*})}*/}
-                                        {/*</Checkbox.Group>)*/}
-                                    {/*}*/}
-                                {/*</FormItem>}*/}
                         </Col>
                     </Row>
                 </Form>
 
                 <Row type="flex" justify="end">
-                    <Tooltip title={i18n.t('delete')}>
-                        <Button className="card-button" type="danger" ghost icon="delete" size="large" shape="circle"
-                                disabled={!accessToken} onClick={accessToken && this.showDeleteConfirm(accessToken.id)}
-                                loading={loading} id="deleteAccessToken"/>
-                    </Tooltip>
-                    <Tooltip title={i18n.t('save')}>
-                        <Button className="card-button" type="primary" icon="save" size="large" shape="circle"
-                                onClick={this.onSubmitForm} loading={loading} id="saveAccessToken"/>
-                    </Tooltip>
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_ACCESSTOKEN]}>
+                        <Tooltip title={i18n.t('delete')}>
+                            <Button className="card-button" type="danger" ghost icon="delete" size="large"
+                                    shape="circle"
+                                    disabled={!accessToken}
+                                    onClick={accessToken && this.showDeleteConfirm(accessToken.id)}
+                                    loading={loading} id="deleteAccessToken"/>
+                        </Tooltip>
+                    </ComponentAuthority>
+                    <ComponentAuthority
+                        privilegesAllowed={[privileges.PRIVILEGE_CREATE_ACCESSTOKEN, privileges.PRIVILEGE_UPDATE_ACCESSTOKEN]}>
+                        <Tooltip title={i18n.t('save')}>
+                            <Button className="card-button" type="primary" icon="save" size="large" shape="circle"
+                                    onClick={this.onSubmitForm} loading={loading} id="saveAccessToken"/>
+                        </Tooltip>
+                    </ComponentAuthority>
                 </Row>
             </Row>
         )

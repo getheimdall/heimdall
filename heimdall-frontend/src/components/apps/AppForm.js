@@ -5,6 +5,9 @@ import {Row, Form, Input, Col, Switch, Tooltip, Button, Modal, AutoComplete, Spi
 import i18n from "../../i18n/i18n"
 import Loading from '../ui/Loading'
 import ColorUtils from "../../utils/ColorUtils"
+import ComponentAuthority from "../ComponentAuthority"
+import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
+import {privileges} from "../../constants/privileges-types"
 
 const FormItem = Form.Item
 const confirm = Modal.confirm
@@ -59,9 +62,9 @@ class AppForm extends Component {
             return <Option key={dev.id}>{dev.email}</Option>
         })
 
-        let data = []
+        let accessTokens = []
         if (app) {
-            data = app.accessTokens
+            accessTokens = app.accessTokens
         }
 
         return (
@@ -78,7 +81,8 @@ class AppForm extends Component {
                                             {required: true, message: i18n.t('please_input_app_name')},
                                             {min: 5, message: i18n.t('min_5_characters_to_name')}
                                         ]
-                                    })(<Input required/>)
+                                    })(<Input required
+                                              disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_APP, privileges.PRIVILEGE_UPDATE_APP])}/>)
                                 }
                             </FormItem>
                         </Col>
@@ -92,23 +96,25 @@ class AppForm extends Component {
                                             {required: true, message: i18n.t('please_input_app_description')},
                                             {min: 5, message: i18n.t('min_5_characters_to_description')}
                                         ]
-                                    })(<Input required/>)
+                                    })(<Input required
+                                              disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_APP, privileges.PRIVILEGE_UPDATE_APP])}/>)
                                 }
                             </FormItem>
                         </Col>
-                        {  !app &&
-                            <Col sm={24} md={24}>
-                                <FormItem label={i18n.t('client_id')}>
-                                    {
-                                        getFieldDecorator('clientId', {
-                                            initialValue: app && app.clientId,
-                                            rules: [
-                                                {min: 6, message: i18n.t('min_6_characters_to_client_id')}
-                                            ]
-                                        })(<Input/>)
-                                    }
-                                </FormItem>
-                            </Col>
+                        {!app &&
+                        <Col sm={24} md={24}>
+                            <FormItem label=label={i18n.t('client_id')}>
+                                {
+                                    getFieldDecorator('clientId', {
+                                        initialValue: app && app.clientId,
+                                        rules: [
+                                            {min: 6, message: i18n.t('min_6_characters_to_client_id')}
+                                        ]
+                                    })(<Input
+                                        disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_APP, privileges.PRIVILEGE_UPDATE_APP])}/>)
+                                }
+                            </FormItem>
+                        </Col>
                         }
                         <Col sm={24} md={24}>
                             <FormItem label={i18n.t('developer')}>
@@ -126,6 +132,7 @@ class AppForm extends Component {
                                         ]
                                     })(
                                         <AutoComplete
+                                            disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_APP, privileges.PRIVILEGE_UPDATE_APP])}
                                             notFoundContent={fetching ? < Spin size="small"/> : null}
                                             filterOption={false}
                                             onSearch={this.props.handleSearch}>
@@ -140,7 +147,8 @@ class AppForm extends Component {
                                     getFieldDecorator('status', {
                                         initialValue: app ? app.status === 'ACTIVE' : true,
                                         valuePropName: 'checked'
-                                    })(<Switch required/>)
+                                    })(<Switch required
+                                               disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_APP, privileges.PRIVILEGE_UPDATE_APP])}/>)
                                 }
                             </FormItem>
                         </Col>
@@ -152,7 +160,8 @@ class AppForm extends Component {
                                             initialValue: app && app.plans.map(plan => plan.id)
                                         })(<Checkbox.Group className='checkbox-conductor'>
                                             {this.props.plans && this.props.plans.content.map((plan, index) => {
-                                                return <Checkbox key={index} value={plan.id}>{plan.name}</Checkbox>
+                                                return <Checkbox key={index} value={plan.id}
+                                                                 disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_APP, privileges.PRIVILEGE_UPDATE_APP])}>{plan.name}</Checkbox>
                                             })}
                                         </Checkbox.Group>)
                                     }
@@ -160,7 +169,7 @@ class AppForm extends Component {
                         </Col>
                     </Row>
                 </Form>
-                {data && data.length > 0 &&
+                {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_ACCESSTOKEN]) && accessTokens && accessTokens.length > 0 &&
                 (
                     <div>
                         <fieldset>
@@ -168,9 +177,9 @@ class AppForm extends Component {
                                 <div className="ant-card-head-title">{i18n.t('access_tokens')}</div>
                             </legend>
 
-                            <Table dataSource={data} pagination={false} rowKey={record => record.id}>
+                            <Table dataSource={accessTokens} pagination={false} rowKey={record => record.id}>
                                 <Column title={i18n.t('status')} id="status" key="status" render={(record) => (
-                                    <span style={{textTransform: 'uppercase'}}>
+                                    <span>
                                         <Tag color={ColorUtils.getColorActivate(record.status)}>{record.status === 'ACTIVE' ? i18n.t('active') : i18n.t('inactive')}</Tag>
                                     </span>
                                 )}/>
@@ -182,14 +191,19 @@ class AppForm extends Component {
                 )
                 }
                 <Row type="flex" justify="end">
-                    <Tooltip title={i18n.t('delete')}>
-                        <Button id="deleteApp" className="card-button" type="danger" ghost icon="delete" size="large" shape="circle"
-                                disabled={!app} onClick={app && this.showDeleteConfirm(app.id)} loading={loading}/>
-                    </Tooltip>
-                    <Tooltip title={i18n.t('save')}>
-                        <Button id="saveApp" className="card-button" type="primary" icon="save" size="large" shape="circle"
-                                onClick={this.onSubmitForm} loading={loading}/>
-                    </Tooltip>
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_APP]}>
+                        <Tooltip title={i18n.t('delete')}>
+                            <Button id="deleteApp" className="card-button" type="danger" ghost icon="delete" size="large"
+                                    shape="circle"
+                                    disabled={!app} onClick={app && this.showDeleteConfirm(app.id)} loading={loading}/>
+                        </Tooltip>
+                    </ComponentAuthority>
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_APP]}>
+                        <Tooltip title={i18n.t('save')}>
+                            <Button  id="saveApp" className="card-button" type="primary" icon="save" size="large" shape="circle"
+                                    onClick={this.onSubmitForm} loading={loading}/>
+                        </Tooltip>
+                    </ComponentAuthority>
                 </Row>
             </Row>
         )

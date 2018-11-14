@@ -3,7 +3,9 @@ import PropTypes from 'prop-types'
 import { Row, Form, Input, InputNumber, Col, Select } from 'antd'
 
 import i18n from "../../i18n/i18n"
+import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
 import { getTemplate } from '../../utils/InterceptorUtils'
+import {privileges} from "../../constants/privileges-types"
 
 const FormItem = Form.Item
 const { TextArea } = Input
@@ -138,7 +140,7 @@ class InterceptorForm extends Component {
                                         rules: [
                                             { required: true, message: i18n.t('please_define_name') }
                                         ]
-                                    })(<Input required />)
+                                    })(<Input required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR])}/>)
                                 }
                             </FormItem>
                         </Col>
@@ -147,7 +149,7 @@ class InterceptorForm extends Component {
                                 {
                                     getFieldDecorator('description', {
                                         initialValue: interceptor && interceptor.description
-                                    })(<Input />)
+                                    })(<Input disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR])}/>)
                                 }
                             </FormItem>
                         </Col>
@@ -159,11 +161,11 @@ class InterceptorForm extends Component {
                                         rules: [
                                             { required: true, message: i18n.t('please_select_life_cycle') }
                                         ]
-                                    })(<Select onChange={this.handleLifeCycle}>
-                                        {apiId && <Select.Option value="API">{i18n.t('api')}</Select.Option>}
-                                        {planId && <Select.Option value="PLAN">{i18n.t('plan')}</Select.Option>}
-                                        {resourceId && <Select.Option value="RESOURCE">{i18n.t('resource')}</Select.Option>}
-                                        {operationId && <Select.Option value="OPERATION">{i18n.t('operation')}</Select.Option>}
+                                    })(<Select onChange={this.handleLifeCycle} disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR])}>
+                                    {apiId && <Select.Option value="API">{i18n.t('api')}</Select.Option>}
+                                    {planId && <Select.Option value="PLAN">{i18n.t('plan')}</Select.Option>}
+                                    {resourceId && <Select.Option value="RESOURCE">{i18n.t('resource')}</Select.Option>}
+                                    {operationId && <Select.Option value="OPERATION">{i18n.t('operation')}</Select.Option>}
                                     </Select>)
                                 }
                             </FormItem>
@@ -173,7 +175,7 @@ class InterceptorForm extends Component {
                                 {
                                     getFieldDecorator('order', {
                                         initialValue: interceptor && interceptor.order ? interceptor.order : this.props.order
-                                    })(<InputNumber min={0} max={99} disabled/>)
+                                    })(<InputNumber min={0} max={99} disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR])}/>)
                                 }
                             </FormItem>
                         </Col>
@@ -185,7 +187,7 @@ class InterceptorForm extends Component {
                                         rules: [
                                             { required: true, message: i18n.t('please_input_content') }
                                         ]
-                                    })(<TextArea rows={6} required />)
+                                    })(<TextArea rows={6} required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR])}/>)
                                 }
                             </FormItem>
                         </Col>}
