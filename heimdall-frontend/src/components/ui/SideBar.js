@@ -78,7 +78,7 @@ class SideBar extends Component {
 
                         {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_ROLE]) &&
                             <Menu.Item key="roles" className="roles">
-                                <SidebarLink to="/roles" label="Roles" history={history} icon="solution"/>
+                                <SidebarLink to="/roles" label={i18n.t('roles')} history={history} icon="solution"/>
                             </Menu.Item>
                         }
 
@@ -96,7 +96,7 @@ class SideBar extends Component {
 
                         {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_LDAP]) &&
                             <Menu.Item key="ldap" className="ldap">
-                                <SidebarLink to="/ldap" label="Settings LDAP" history={history} icon="setting"/>
+                                <SidebarLink to="/ldap" label={i18n.t('settings_ldap')} history={history} icon="setting"/>
                             </Menu.Item>
                         }
                     </Menu>

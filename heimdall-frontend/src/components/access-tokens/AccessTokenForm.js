@@ -124,7 +124,7 @@ class AccessTokenForm extends Component {
                             </FormItem>
                         </Col>
                         <Col sm={24} md={12}>
-                            { plans && plans.length === 0 && <span>You need select a app</span>}
+                            { plans && plans.length === 0 && <span>{i18n.t('you_need_select_app')}</span>}
                             { plans && plans.length > 0 &&
                             <FormItem label={i18n.t('plans')}>
                                 {
