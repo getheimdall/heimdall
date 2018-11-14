@@ -115,7 +115,7 @@ public class SecurityServiceTest {
 
         Mockito.when(appRepository.findByClientId(clientId)).thenReturn(app);
 
-        securityService.validadeClientId(this.ctx, api1.getId(), clientId);
+        securityService.validateClientId(this.ctx, api1.getId(), clientId);
 
         // Internal Server Error is expected because the request has no finished at this
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), this.ctx.getResponseStatusCode());
@@ -126,7 +126,7 @@ public class SecurityServiceTest {
 
         Mockito.when(appRepository.findByClientId(clientId)).thenReturn(app);
 
-        securityService.validadeClientId(this.ctx, api2.getId(), clientId);
+        securityService.validateClientId(this.ctx, api2.getId(), clientId);
 
         // Internal Server Error is expected because the request has no finished at this
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), this.ctx.getResponseStatusCode());
@@ -135,7 +135,7 @@ public class SecurityServiceTest {
     @Test
     public void clientIdNullTest() {
 
-        securityService.validadeClientId(this.ctx, 10L, null);
+        securityService.validateClientId(this.ctx, 10L, null);
 
         assertEquals(HttpStatus.UNAUTHORIZED.value(), this.ctx.getResponseStatusCode());
         assertTrue((Boolean) this.ctx.get(INTERRUPT));
@@ -145,7 +145,7 @@ public class SecurityServiceTest {
     @Test
     public void apiIdNullTest() {
 
-        securityService.validadeClientId(this.ctx, null, clientId);
+        securityService.validateClientId(this.ctx, null, clientId);
 
         assertEquals(HttpStatus.UNAUTHORIZED.value(), this.ctx.getResponseStatusCode());
         assertTrue((Boolean) this.ctx.get(INTERRUPT));
@@ -158,7 +158,7 @@ public class SecurityServiceTest {
 
         Mockito.when(appRepository.findByClientId(clientId)).thenReturn(app);
 
-        securityService.validadeClientId(this.ctx, api1.getId(), someOtherClientId);
+        securityService.validateClientId(this.ctx, api1.getId(), someOtherClientId);
 
         assertEquals(HttpStatus.UNAUTHORIZED.value(), this.ctx.getResponseStatusCode());
         assertTrue((Boolean) this.ctx.get(INTERRUPT));
@@ -174,7 +174,7 @@ public class SecurityServiceTest {
 
         Mockito.when(appRepository.findByClientId(clientId)).thenReturn(app);
 
-        securityService.validadeClientId(this.ctx, api.getId(), clientId);
+        securityService.validateClientId(this.ctx, api.getId(), clientId);
 
         assertEquals(HttpStatus.UNAUTHORIZED.value(), this.ctx.getResponseStatusCode());
         assertTrue((Boolean) this.ctx.get(INTERRUPT));
@@ -192,7 +192,7 @@ public class SecurityServiceTest {
 
         Mockito.when(appRepository.findByClientId(clientId)).thenReturn(app);
 
-        securityService.validadeClientId(this.ctx, api.getId(), clientId);
+        securityService.validateClientId(this.ctx, api.getId(), clientId);
 
         assertEquals(HttpStatus.UNAUTHORIZED.value(), this.ctx.getResponseStatusCode());
         assertTrue((Boolean) this.ctx.get(INTERRUPT));

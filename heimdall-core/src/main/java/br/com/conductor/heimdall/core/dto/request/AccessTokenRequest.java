@@ -21,21 +21,21 @@ package br.com.conductor.heimdall.core.dto.request;
  * ==========================LICENSE_END===================================
  */
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
+import br.com.conductor.heimdall.core.dto.integration.ReferenceAppDTO;
 import br.com.conductor.heimdall.core.entity.AccessToken;
 import br.com.conductor.heimdall.core.enums.Status;
 import lombok.Data;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * Class that represents a request for a {@link AccessToken}.
  *
  * @author Filipe Germano
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
 @Data
@@ -47,7 +47,7 @@ public class AccessTokenRequest implements Serializable {
      private String code;
 
      @NotNull
-     private ReferenceIdDTO app;
+     private ReferenceAppDTO app;
      
      private LocalDateTime expiredDate;
 

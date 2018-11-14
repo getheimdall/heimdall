@@ -217,20 +217,22 @@ public enum ExceptionMessage {
      */
     public void raise(String... dynamicText) {
 
+        String messageDefault = this.defaultMessage;
+
         if (dynamicText != null && dynamicText.length > 0) {
 
             Integer count = 0;
-            String baseMessage = this.defaultMessage;
+            String baseMessage = messageDefault;
             while (baseMessage.contains("{}")) {
 
                 if (dynamicText.length == 1) {
 
-                    this.message = this.defaultMessage.replace("{}", dynamicText[count]);
+                    this.message = messageDefault.replace("{}", dynamicText[count]);
                     baseMessage = this.message;
                 } else {
 
-                    this.defaultMessage = this.defaultMessage.replaceFirst("\\{\\}", dynamicText[count]);
-                    this.message = this.defaultMessage;
+                    messageDefault = messageDefault.replaceFirst("\\{\\}", dynamicText[count]);
+                    this.message = messageDefault;
                     baseMessage = this.message;
 
                 }
@@ -239,6 +241,7 @@ public enum ExceptionMessage {
         }
         raise();
     }
+
 
     /**
      * Method responsible for validation of error codes with code 400.

@@ -153,6 +153,7 @@ public class Property {
           private String password;
           private Long queueSize;
           private Long discardingThreshold;
+          private String zoneId;
           
      }
 

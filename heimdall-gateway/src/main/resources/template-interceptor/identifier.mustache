@@ -1,0 +1,78 @@
+import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
+import br.com.conductor.heimdall.gateway.service.LifeCycleService;
+import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
+import br.com.conductor.heimdall.gateway.filter.helper.HelperImpl;
+import br.com.conductor.heimdall.middleware.spec.Helper;
+import com.netflix.zuul.context.RequestContext;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+
+import static br.com.conductor.heimdall.core.util.ConstantsInterceptors.IDENTIFIER_ID;
+
+public class UniqueID extends HeimdallFilter {
+
+    private static Set<String> pathsAllowed;
+
+    private static Set<String> pathsNotAllowed;
+
+    private static String inboundURL;
+
+    private static String method;
+
+    private static Long referenceId;
+
+    private Helper helper;
+
+    public UniqueID() {
+
+        method = "{{method}}";
+
+        pathsAllowed = new HashSet<>();
+        {{#pathsAllowed}}
+        pathsAllowed.add("{{.}}");
+        {{/pathsAllowed}}
+
+        pathsNotAllowed = new HashSet<>();
+        {{#pathsNotAllowed}}
+        pathsNotAllowed.add("{{.}}");
+        {{/pathsNotAllowed}}
+
+        inboundURL = "{{inboundURL}}";
+
+        referenceId = {{referenceId}};
+
+        this.helper = new HelperImpl();
+    }
+
+    @Override
+    public boolean should() {
+
+        LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest(), referenceId);
+    }
+
+    @Override
+    public void execute() throws Throwable {
+        String uid = UUID.randomUUID().toString();
+
+        RequestContext context = RequestContext.getCurrentContext();
+        context.addZuulRequestHeader(IDENTIFIER_ID, uid);
+    }
+
+    @Override
+    public String getName() {
+        return "{{name}}";
+    }
+
+    @Override
+    public String filterType() {
+        return "{{executionPoint}}";
+    }
+
+    @Override
+    public int filterOrder() {
+        return {{order}};
+    }
+}

@@ -1,26 +1,25 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { DragDropContext } from 'react-dnd';
-import HTML5Backend from 'react-dnd-html5-backend';
-
-import DropClientInterceptors from '../components/interceptors/DropClientInterceptors'
-import { interceptorSort } from '../utils/InterceptorUtils'
-import UUID from '../utils/UUID'
-
-import { getAllInterceptors, initLoading, getAllInterceptorsTypes, clearInterceptors, clearInterceptorsTypes, saveAll, updateAll, removeAll } from '../actions/interceptors';
-import { getAllPlans, clearPlans } from '../actions/plans';
-import { receiveQueue, clearQueue } from '../actions/queues'
-
+import { DragDropContext } from 'react-dnd'
+import HTML5Backend from 'react-dnd-html5-backend'
 import { Row, Col, Form, Select, Icon, Card, Button, notification, Progress, Tag, Alert, Badge } from 'antd'
-import Loading from '../components/ui/Loading';
-import { getAllResourcesByApi, clearResources } from '../actions/resources';
-import { getAllOperations, clearOperations } from '../actions/operations';
-import DnDInterceptorType from '../components/interceptors/DnDInterceptorType';
-import ColorUtils from "../utils/ColorUtils";
-import ComponentAuthority from "../components/ComponentAuthority";
-import {privileges} from "../constants/privileges-types";
-import {PrivilegeUtils} from "../utils/PrivilegeUtils";
-import {countInterceptorsByCycle} from "../utils/BadgeUtils";
+
+import i18n from "../i18n/i18n"
+import UUID from '../utils/UUID'
+import ColorUtils from "../utils/ColorUtils"
+import Loading from '../components/ui/Loading'
+import {PrivilegeUtils} from "../utils/PrivilegeUtils"
+import {privileges} from "../constants/privileges-types"
+import { getAllPlans, clearPlans } from '../actions/plans'
+import { interceptorSort } from '../utils/InterceptorUtils'
+import { receiveQueue, clearQueue } from '../actions/queues'
+import {countInterceptorsByCycle} from "../utils/BadgeUtils"
+import ComponentAuthority from "../components/ComponentAuthority"
+import { getAllOperations, clearOperations } from '../actions/operations'
+import { getAllResourcesByApi, clearResources } from '../actions/resources'
+import DnDInterceptorType from '../components/interceptors/DnDInterceptorType'
+import DropClientInterceptors from '../components/interceptors/DropClientInterceptors'
+import { getAllInterceptors, initLoading, getAllInterceptorsTypes, clearInterceptors, clearInterceptorsTypes, saveAll, updateAll, removeAll } from '../actions/interceptors'
 
 const Option = Select.Option
 
@@ -120,7 +119,7 @@ class Interceptors extends Component {
 
         if (newProps.queueCount === 0 && showProgress) {
             notification.info({
-                message: 'Interceptors processed'
+                message: i18n.t('interceptors_processed')
             })
             this.setState({showProgress: false, progress: 0})
         }
@@ -235,6 +234,16 @@ class Interceptors extends Component {
                 this.setState({...this.state, operationSelected: test, operationId: value})
         }
         this.updateAllParams()
+    }
+
+    handleFilterOperation = (input, option) => {
+        const path = option.props.children[2]
+        try {
+            const reg = new RegExp(input, 'i')
+            return path.match(reg) !== null
+        } catch (e) {
+            return true
+        }
     }
 
     updateAllParams = () => {
@@ -357,10 +366,10 @@ class Interceptors extends Component {
 
         return (
             <div>
-                <Alert message="Select any option to enable the interceptors" type="info" closable
+                <Alert message={i18n.t('select_any_option_to_enable_the_interceptors')} type="info" closable
                        style={{marginBottom: 10}} showIcon/>
                 <Card
-                    title="Choose your Interceptors"
+                    title={i18n.t('choose_your_interceptors')}
                     style={{marginBottom: 20}}
                     className="inside-shadow"
                     extra={
@@ -370,9 +379,9 @@ class Interceptors extends Component {
                     <Form>
                         <Row gutter={20} type="flex" justify="space-between" align="middle">
                             <Col sm={24} md={6}>
-                                <Form.Item label="Environments">
+                                <Form.Item label={i18n.t('environments')}>
                                     <Select defaultValue={0} onChange={this.handleSelectChange('ENV')}>
-                                        <Option value={0}>All</Option>
+                                        <Option value={0}>{i18n.t('all')}</Option>
                                         {api && api.environments.map((env, index) => (
                                             <Option key={index} value={env.id}>{env.name}</Option>
                                         ))}
@@ -380,9 +389,9 @@ class Interceptors extends Component {
                                 </Form.Item>
                             </Col>
                             <Col sm={24} md={6}>
-                                <Form.Item label="Plans">
+                                <Form.Item label={i18n.t('plans')}>
                                     <Select defaultValue={0} onChange={this.handleSelectChange('PLAN')} disabled={!this.props.plans} className="heimdall-select-filter-complete">
-                                        <Option value={0}>All</Option>
+                                        <Option value={0}>{i18n.t('all')}</Option>
                                         {this.props.plans && this.props.plans.content.map((plan, index) => (
                                             <Option key={index} value={plan.id}>{plan.name}
                                                 <Badge title="Numbers of interceptors" className="heimdall-badge-interceptors-count" count={countInterceptorsByCycle(interceptors && interceptors.content, 'PLAN', plan.id)}/>
@@ -392,9 +401,9 @@ class Interceptors extends Component {
                                 </Form.Item>
                             </Col>
                             <Col sm={24} md={6}>
-                                <Form.Item label="Resources">
+                                <Form.Item label={i18n.t('resources')}>
                                     <Select defaultValue={0} onChange={this.handleSelectChange('RES')} disabled={!this.props.resources} className="heimdall-select-filter-complete">
-                                        <Option value={0}>All</Option>
+                                        <Option value={0}>{i18n.t('all')}</Option>
                                         {this.props.resources && this.props.resources.map((res, index) => (
                                             <Option key={index} value={res.id}>
                                                 <Badge title="Numbers of interceptors" className="heimdall-badge-interceptors-count" count={countInterceptorsByCycle(interceptors && interceptors.content, 'RESOURCE', res.id)}/>
@@ -405,9 +414,9 @@ class Interceptors extends Component {
                             </Col>
 
                             <Col sm={24} md={6}>
-                                <Form.Item label="Operations">
-                                    <Select defaultValue={0} onChange={this.handleSelectChange('OP')} disabled={!this.props.operations} className="heimdall-select-filter-complete">
-                                        <Option value={0}>All</Option>
+                                <Form.Item label={i18n.t('operations')}>
+                                    <Select showSearch value={this.state.operationId} onChange={this.handleSelectChange('OP')} disabled={!this.props.operations} className="heimdall-select-filter-complete" filterOption={this.handleFilterOperation}>
+                                        <Option value={0}>{i18n.t('all')}</Option>
                                         {this.props.operations && this.props.operations.map((op, index) => (
                                             <Option key={index} value={op.id}>
                                                 <Badge title="Numbers of interceptors" className="heimdall-badge-interceptors-count" count={countInterceptorsByCycle(interceptors && interceptors.content, 'OPERATION', op.id)}/>
@@ -421,17 +430,17 @@ class Interceptors extends Component {
                     </Form>
                 </Card>
 
-                <Card title="Interceptors"
+                <Card title={i18n.t('interceptors')}
                       extra={
                           <Row type="flex" justify="center">
                               {this.state.showProgress &&
                               <Progress type="circle" percent={this.state.progress} width={30} status="active"
                                         style={{marginRight: 10}}/>}
-                              <Tag color="#989898">Can Drag</Tag>
-                              <Tag color="#ffa613">API</Tag>
-                              <Tag color="#c3cc93">Plan</Tag>
-                              <Tag color="#8edce0">Resource</Tag>
-                              <Tag color="#607d8b">Operation</Tag>
+                              <Tag color="#989898">{i18n.t('can_drag')}</Tag>
+                              <Tag color="#ffa613">{i18n.t('api')}</Tag>
+                              <Tag color="#c3cc93">{i18n.t('plan')}</Tag>
+                              <Tag color="#8edce0">{i18n.t('resource')}</Tag>
+                              <Tag color="#607d8b">{i18n.t('operation')}</Tag>
                           </Row>}
                 >
                     <div>
@@ -452,11 +461,11 @@ class Interceptors extends Component {
                                 />
                             ))}
                         </Row>
-                        <DropClientInterceptors interceptors={interceptorsPreFiltered} description="REQUEST"
+                        <DropClientInterceptors interceptors={interceptorsPreFiltered} description={i18n.t('request')}
                                                 loading={this.props.loading} executionPoint={'FIRST'}
                                                 handleForm={this.handleForm} handleDelete={this.handleDelete}/>
                         <br/>
-                        <DropClientInterceptors interceptors={interceptorsPostFiltered} description="RESPONSE"
+                        <DropClientInterceptors interceptors={interceptorsPostFiltered} description={i18n.t('response')}
                                                 loading={this.props.loading} executionPoint={'SECOND'}
                                                 handleForm={this.handleForm} handleDelete={this.handleDelete}/>
                     </div>
@@ -470,11 +479,11 @@ class Interceptors extends Component {
                     <Col md={12}>
                         <Row className="h-row" type="flex" justify="end">
                             <Button id="discardInterceptors" className="card-button" type="danger" disabled={hasNoChanges} onClick={this.discardChanges}>
-                                <Icon type="delete" /> Discard
+                                <Icon type="delete" /> {i18n.t('discard')}
                             </Button>
                             <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_INTERCEPTOR]}>
                                 <Button id="saveInterceptors" className="card-button" type="primary" disabled={hasNoChanges} onClick={this.saveChanges}>
-                                    <Icon type="save" /> Save Changes
+                                    <Icon type="save" /> {i18n.t('save_changes')}
                                 </Button>
                             </ComponentAuthority>
                         </Row>

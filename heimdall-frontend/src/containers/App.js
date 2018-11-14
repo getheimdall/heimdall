@@ -4,6 +4,7 @@ import { ConnectedRouter } from 'connected-react-router'
 import Routes from '../routes'
 
 class App extends Component {
+
 	render() {
 		const { history } = this.props
 

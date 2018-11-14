@@ -1,12 +1,13 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-
 import {Row, Form, Input, Col, Switch, Tooltip, Button, Modal, AutoComplete, Spin, Checkbox, Tag, Table} from 'antd'
-import Loading from '../ui/Loading';
-import ColorUtils from "../../utils/ColorUtils";
-import {PrivilegeUtils} from "../../utils/PrivilegeUtils";
-import {privileges} from "../../constants/privileges-types";
-import ComponentAuthority from "../ComponentAuthority";
+
+import i18n from "../../i18n/i18n"
+import Loading from '../ui/Loading'
+import ColorUtils from "../../utils/ColorUtils"
+import ComponentAuthority from "../ComponentAuthority"
+import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
+import {privileges} from "../../constants/privileges-types"
 
 const FormItem = Form.Item
 const confirm = Modal.confirm
@@ -32,10 +33,10 @@ class AppForm extends Component {
 
     showDeleteConfirm = (appId) => (e) => {
         confirm({
-            title: 'Are you sure?',
-            okText: 'Yes',
+            title: i18n.t('are_you_sure'),
+            okText: i18n.t('yes'),
             okType: 'danger',
-            cancelText: 'No',
+            cancelText: i18n.t('no'),
             onOk: () => {
                 this.props.handleDelete(appId)
             }
@@ -47,7 +48,7 @@ class AppForm extends Component {
             callback();
             return
         }
-        callback('You need select a developer');
+        callback(i18n.t('you_need_select_developer'));
     }
 
     render() {
@@ -72,13 +73,13 @@ class AppForm extends Component {
                     {app && getFieldDecorator('id', {initialValue: app.id})(<Input type='hidden'/>)}
                     <Row gutter={24}>
                         <Col sm={24} md={24}>
-                            <FormItem label="Name">
+                            <FormItem label={i18n.t('name')}>
                                 {
                                     getFieldDecorator('name', {
                                         initialValue: app && app.name,
                                         rules: [
-                                            {required: true, message: 'Please input an app name!'},
-                                            {min: 5, message: 'Min of 5 Characters to name!'}
+                                            {required: true, message: i18n.t('please_input_app_name')},
+                                            {min: 5, message: i18n.t('min_5_characters_to_name')}
                                         ]
                                     })(<Input required
                                               disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_APP, privileges.PRIVILEGE_UPDATE_APP])}/>)
@@ -86,14 +87,14 @@ class AppForm extends Component {
                             </FormItem>
                         </Col>
                         <Col sm={24} md={24}>
-                            <FormItem label="Description">
+                            <FormItem label={i18n.t('description')}>
                                 {
                                     getFieldDecorator('description', {
                                         initialValue: app && app.description,
                                         type: 'number',
                                         rules: [
-                                            {required: true, message: 'Please input an app description!'},
-                                            {min: 5, message: 'Min of 5 Characters to description!'}
+                                            {required: true, message: i18n.t('please_input_app_description')},
+                                            {min: 5, message: i18n.t('min_5_characters_to_description')}
                                         ]
                                     })(<Input required
                                               disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_APP, privileges.PRIVILEGE_UPDATE_APP])}/>)
@@ -102,12 +103,12 @@ class AppForm extends Component {
                         </Col>
                         {!app &&
                         <Col sm={24} md={24}>
-                            <FormItem label="Client ID">
+                            <FormItem label=label={i18n.t('client_id')}>
                                 {
                                     getFieldDecorator('clientId', {
                                         initialValue: app && app.clientId,
                                         rules: [
-                                            {min: 6, message: 'Min of 6 Characters to clientId!'}
+                                            {min: 6, message: i18n.t('min_6_characters_to_client_id')}
                                         ]
                                     })(<Input
                                         disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_APP, privileges.PRIVILEGE_UPDATE_APP])}/>)
@@ -116,13 +117,13 @@ class AppForm extends Component {
                         </Col>
                         }
                         <Col sm={24} md={24}>
-                            <FormItem label="Developer">
+                            <FormItem label={i18n.t('developer')}>
                                 {
                                     getFieldDecorator('developer.id', {
                                         initialValue: app && app.developer.id.toString(),
                                         validateTrigger: 'onSelect',
                                         rules: [
-                                            {required: true, message: 'Please input a name of developer!'},
+                                            {required: true, message: i18n.t('please_input_email_developer')},
                                             {
                                                 validator: this.checkDeveloper,
                                                 transform: (value) => Number(value),
@@ -153,7 +154,7 @@ class AppForm extends Component {
                         </Col>
                         <Col sm={24} md={12}>
                             {this.props.plans && this.props.plans.content.length === 0 ? <Loading/> :
-                                <FormItem label="Plans">
+                                <FormItem label={i18n.t('plans')}>
                                     {
                                         getFieldDecorator('plans', {
                                             initialValue: app && app.plans.map(plan => plan.id)
@@ -173,16 +174,16 @@ class AppForm extends Component {
                     <div>
                         <fieldset>
                             <legend>
-                                <div className="ant-card-head-title">Access Tokens</div>
+                                <div className="ant-card-head-title">{i18n.t('access_tokens')}</div>
                             </legend>
 
                             <Table dataSource={accessTokens} pagination={false} rowKey={record => record.id}>
-                                <Column title="Status" id="status" key="status" render={(record) => (
+                                <Column title={i18n.t('status')} id="status" key="status" render={(record) => (
                                     <span>
-                                        <Tag color={ColorUtils.getColorActivate(record.status)}>{record.status}</Tag>
+                                        <Tag color={ColorUtils.getColorActivate(record.status)}>{record.status === 'ACTIVE' ? i18n.t('active') : i18n.t('inactive')}</Tag>
                                     </span>
                                 )}/>
-                                <Column title="Token" id="token" dataIndex="code"/>
+                                <Column title={i18n.t('token')} id="token" dataIndex="code"/>
                             </Table>
                         </fieldset>
                         <br/><br/>
@@ -191,14 +192,14 @@ class AppForm extends Component {
                 }
                 <Row type="flex" justify="end">
                     <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_APP]}>
-                        <Tooltip title="Delete">
+                        <Tooltip title={i18n.t('delete')}>
                             <Button id="deleteApp" className="card-button" type="danger" ghost icon="delete" size="large"
                                     shape="circle"
                                     disabled={!app} onClick={app && this.showDeleteConfirm(app.id)} loading={loading}/>
                         </Tooltip>
                     </ComponentAuthority>
                     <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_APP]}>
-                        <Tooltip title="Save">
+                        <Tooltip title={i18n.t('save')}>
                             <Button  id="saveApp" className="card-button" type="primary" icon="save" size="large" shape="circle"
                                     onClick={this.onSubmitForm} loading={loading}/>
                         </Tooltip>

@@ -1,12 +1,13 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { DragSource } from 'react-dnd'
-import ItemTypes from '../../constants/items-types'
-
 import { Button, Badge, Modal, Icon } from 'antd'
+
+import i18n from "../../i18n/i18n"
 import InterceptorForm from './InterceptorForm'
-import ComponentAuthority from "../ComponentAuthority";
-import {privileges} from "../../constants/privileges-types";
+import ItemTypes from '../../constants/items-types'
+import ComponentAuthority from "../ComponentAuthority"
+import {privileges} from "../../constants/privileges-types"
 
 const interceptorSpec = {
     beginDrag(props) {
@@ -78,12 +79,12 @@ class DnDInterceptorType extends Component {
                     </Badge>
                     <span>{type}</span>
 
-                    <Modal title="Add Interceptor"
+                    <Modal title={i18n.t('add_interceptor')}
                         footer={[
-                            <Button id="cancelInterceptorTypeModal" key="back" onClick={this.handleCancel}>Cancel</Button>,
+                            <Button id="cancelInterceptorTypeModal" key="back" onClick={this.handleCancel}>{i18n.t('cancel')}</Button>,
                             <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_INTERCEPTOR, privileges.PRIVILEGE_UPDATE_INTERCEPTOR]}>
                                 <Button id="saveInterceptorTypeModal" key="submit" type="primary" onClick={this.handleSave}>
-                                    Save
+                                    {i18n.t('save')}
                                 </Button>
                             </ComponentAuthority>
                         ]}

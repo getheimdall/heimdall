@@ -1,14 +1,14 @@
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
 import { Row, Card } from 'antd'
+import { connect } from 'react-redux'
+import React, { Component } from 'react'
+import {notification} from "antd/lib/index"
+import { push } from 'connected-react-router'
 
-import { getEnvironment, clearEnvironment, save, update, remove, clearEnvironments, initLoading } from '../actions/environments';
-
+import i18n from "../i18n/i18n"
+import Loading from '../components/ui/Loading'
 import PageHeader from '../components/ui/PageHeader'
-import Loading from '../components/ui/Loading';
-import EnvironmentForm from '../components/environments/EnvironmentForm';
-import { push } from 'connected-react-router';
-import {notification} from "antd/lib/index";
+import EnvironmentForm from '../components/environments/EnvironmentForm'
+import { getEnvironment, clearEnvironment, save, update, remove, clearEnvironments, initLoading } from '../actions/environments'
 
 class SingleEnvironment extends Component {
 
@@ -53,13 +53,13 @@ class SingleEnvironment extends Component {
         const { environment } = this.props
 
         if (this.state.loadUser && !environment) return <Loading />
-        const title = environment ? 'Edit' : 'Add'
+        const title = environment ? i18n.t('edit') : i18n.t('add')
 
         return (
             <div>
-                <PageHeader title="Environments" icon="codepen" />
+                <PageHeader title={i18n.t('environments')} icon="codepen" />
                 <Row className="h-row bg-white">
-                    <Card style={{ width: '100%' }} title={title + ' Environment'}>
+                    <Card style={{ width: '100%' }} title={title + ' ' + i18n.t('environment')}>
                         <EnvironmentForm environment={environment} handleDelete={this.handleDelete} handleSubmit={this.handleSubmit} loading={this.props.loading} />
                     </Card>
                 </Row>

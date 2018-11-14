@@ -5,14 +5,16 @@
 	<parent>
 		<groupId>br.com.conductor.heimdall</groupId>
 		<artifactId>heimdall</artifactId>
-		<version>1.6.7-SNAPSHOT</version>
+		<version>1.9.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>heimdall-api</artifactId>
+	<name>heimdall-api</name>
 	<packaging>jar</packaging>
 
 	<properties>
 		<uri.config>http://localhost:8888</uri.config>
 		<api.application.name>application-api</api.application.name>
+		<docker.baseImage>java:openjdk-8-jdk-alpine</docker.baseImage>
 		<docker.imageName>getheimdall/heimdall-api</docker.imageName>
 		<docker.serverId>docker-hub</docker.serverId>
 		<docker.registryUrl>https://hub.docker.com/</docker.registryUrl>
@@ -77,15 +79,10 @@
 			<version>0.6</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.powermock</groupId>
-			<artifactId>powermock-api-mockito</artifactId>
-			<version>1.7.1</version>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 
 	<build>
+		<finalName>heimdall-api</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -107,7 +104,7 @@
 				<artifactId>docker-maven-plugin</artifactId>
 				<version>0.4.1</version>
 				<configuration>
-					<baseImage>java:openjdk-8-jdk-alpine</baseImage>
+					<baseImage>${docker.baseImage}</baseImage>
 					<imageName>${docker.imageName}</imageName>
 					<entryPoint>["java", "-Xmx1024m", "-Xms500m", "-jar", "/${project.build.finalName}.jar"]</entryPoint>
 					<forceTags>true</forceTags>
