@@ -50,8 +50,8 @@
 ### v1.6.0-stable
 
 * **Feature**
-
     * Adding cache interceptor [Pull Request #109](https://github.com/getheimdall/heimdall/pull/109);
+    
 * **Bugfix**	
 
     * Fix middleware listing when using paging [Pull Request #108](https://github.com/getheimdall/heimdall/pull/108); 
