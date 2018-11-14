@@ -1,3 +1,4 @@
+import i18n from "../i18n/i18n"
 import { HTTPv1 } from '../utils/Http'
 
 const getApis = (params = {params: {}}) => {
@@ -17,7 +18,7 @@ const getApis = (params = {params: {}}) => {
 const getApiById = (id) => {
 
     if (isNaN(id)) {
-        return Promise.reject(new Error('Invalid parameter'))
+        return Promise.reject(new Error(i18n.t('invalid_parameter')))
     }
 
     return HTTPv1.get('/apis/' + id)
@@ -28,7 +29,7 @@ const getApiById = (id) => {
     .catch(error => {
         console.log('Error: ', error)
         if (error.response && error.response.status === 404) {
-            return Promise.reject(new Error('Resource not finded'));
+            return Promise.reject(new Error(i18n.t('resource_not_found')));
         }
         throw error;
     })
@@ -48,7 +49,7 @@ const updateApi = (api) => {
     .catch(error => {
         console.log('Error: ', error)
         if (error.response && error.response.status === 404) {
-            return Promise.reject(new Error('Resource not finded'));
+            return Promise.reject(new Error(i18n.t('resource_not_found')));
         }
         throw error;
     })
@@ -65,7 +66,7 @@ const saveApi = (api) => {
     .catch(error => {
         console.log('Error: ', error)
         if (error.response && error.response.status === 404) {
-            return Promise.reject(new Error('Resource not finded'));
+            return Promise.reject(new Error(i18n.t('resource_not_found')));
         }
         throw error;
     })
@@ -73,7 +74,7 @@ const saveApi = (api) => {
 
 const deleteApi = id => {
     if (isNaN(id)) {
-        return Promise.reject(new Error('Invalid parameter'))
+        return Promise.reject(new Error(i18n.t('invalid_parameter')))
     }
 
     return HTTPv1.delete('/apis/' + id)
@@ -84,7 +85,7 @@ const deleteApi = id => {
     .catch(error => {
         console.log('Error: ', error)
         if (error.response && error.response.status === 404) {
-            return Promise.reject(new Error('Resource not finded'));
+            return Promise.reject(new Error(i18n.t('resource_not_found')));
         }
         throw error;
     })

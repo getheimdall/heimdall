@@ -1,8 +1,10 @@
-import {AuthConstants} from '../../constants/actions-types'
+import { notification } from 'antd'
+import {push} from 'connected-react-router'
+
+import i18n from "../../i18n/i18n"
 import {userService} from '../../services'
-import {notification} from 'antd'
-import {push} from 'connected-react-router';
-import {privilegeService} from "../../services/PrivilegeService";
+import { AuthConstants } from '../../constants/actions-types'
+import {privilegeService} from "../../services/PrivilegeService"
 
 const loginFailed = message => ({
     type: AuthConstants.LOGIN_FAILED,
@@ -31,7 +33,7 @@ export const login = (login, password) => dispatch => {
     dispatch(initLoading())
     userService.login(login, password)
     .then(data => {
-        notification['success']({ message: 'Welcome to Heimdall' })
+        notification['success']({ message: i18n.t('welcome_heimdall') })
         dispatch(loginSuccessful(data))
         privilegeService.getPrivilegesByUsername(login)
             .then(data => {
@@ -44,8 +46,8 @@ export const login = (login, password) => dispatch => {
                 dispatch(finishLoading())
             })
     }).catch(error => {
-        notification['error']({ message: 'Login or password incorrect' })
-        dispatch(loginFailed('Login or password incorrect'))
+        notification['error']({ message: i18n.t('username_password_incorrect') })
+        dispatch(loginFailed(i18n.t('username_password_incorrect')))
         dispatch(push('/login'))
         dispatch(finishLoading())
     })

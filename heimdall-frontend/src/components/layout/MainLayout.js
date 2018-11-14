@@ -3,10 +3,21 @@ import { Layout, Row, Col } from 'antd'
 
 import NavBar from '../ui/NavBar'
 import SideBar from '../ui/SideBar'
+import { infoService } from './../../services/InfoService'
 
 class MainLayout extends Component {
 
-	state = { steps: [], keepTour: true }
+	state = { steps: [], keepTour: true, version: '1.9.1' }
+
+	componentDidMount() {
+		infoService.getVersion().then(version => {
+			if (version) {
+				version = version.replace('-SNAPSHOT', '')
+				version = version.replace('-RELEASE', '')
+				this.setState({ ...this.state, version: version})
+			}
+		})
+	}
 
 	addSteps = (steps) => {
 		let newSteps = steps;
@@ -37,6 +48,7 @@ class MainLayout extends Component {
 	render() {
 		const { Header, Content, Footer } = Layout
 		const { history } = this.props
+		const { version } = this.state
 		// const version = process.env.REACT_APP_VERSION
 
 		return (
@@ -56,7 +68,7 @@ class MainLayout extends Component {
 					<Footer>
 						<a href="http://www.conductor.com.br">Conductor Tecnologia</a>
 						<br/>
-						{/*<span>Version: {version}</span>*/}
+						<span>Version: {version}</span>
 					</Footer>
 				</Layout>
 			</Layout>

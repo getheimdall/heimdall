@@ -1,10 +1,11 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-
 import {Row, Form, Input, Col, Switch, Tooltip, Button, Modal, AutoComplete, Spin, Icon, Checkbox} from 'antd'
-import ComponentAuthority from "../ComponentAuthority";
-import {privileges} from "../../constants/privileges-types";
-import {PrivilegeUtils} from "../../utils/PrivilegeUtils";
+
+import i18n from "../../i18n/i18n"
+import ComponentAuthority from "../ComponentAuthority"
+import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
+import {privileges} from "../../constants/privileges-types"
 
 const FormItem = Form.Item
 const confirm = Modal.confirm
@@ -38,10 +39,10 @@ class AccessTokenForm extends Component {
 
     showDeleteConfirm = (accessTokenId) => (e) => {
         confirm({
-            title: 'Are you sure?',
-            okText: 'Yes',
+            title: i18n.t('are_you_sure'),
+            okText: i18n.t('yes'),
             okType: 'danger',
-            cancelText: 'No',
+            cancelText: i18n.t('no'),
             onOk: () => {
                 this.props.handleDelete(accessTokenId)
             }
@@ -55,7 +56,7 @@ class AccessTokenForm extends Component {
             callback();
             return
         }
-        callback('You need select an app!');
+        callback(i18n.t('you_need_select_app'));
     }
 
     render() {
@@ -73,12 +74,12 @@ class AccessTokenForm extends Component {
                     {accessToken && getFieldDecorator('id', {initialValue: accessToken.id})(<Input type='hidden'/>)}
                     <Row gutter={24}>
                         <Col sm={24} md={24}>
-                            <FormItem label="Token">
+                            <FormItem label={i18n.t('token')}>
                                 {
                                     getFieldDecorator('code', {
                                         initialValue: accessToken && accessToken.code,
                                         rules: [
-                                            {min: 6, message: 'Min of 5 Characters to token!'}
+                                            {min: 6, message: i18n.t('min_6_characters_to_token')}
                                         ]
                                     })(<Input
                                         disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_ACCESSTOKEN, privileges.PRIVILEGE_UPDATE_ACCESSTOKEN])}/>)
@@ -86,7 +87,7 @@ class AccessTokenForm extends Component {
                             </FormItem>
                         </Col>
                         <Col sm={24} md={24}>
-                            <FormItem label="App">
+                            <FormItem label={i18n.t('app')}>
                                 {
                                     getFieldDecorator('app.id', {
                                         initialValue: accessToken && accessToken.app.id.toString(),
@@ -112,7 +113,7 @@ class AccessTokenForm extends Component {
                             </FormItem>
                         </Col>
                         <Col sm={24} md={12}>
-                            <FormItem label="Status">
+                            <FormItem label={i18n.t('status')}>
                                 {
                                     getFieldDecorator('status', {
                                         initialValue: accessToken ? accessToken.status === 'ACTIVE' : true,
@@ -123,9 +124,9 @@ class AccessTokenForm extends Component {
                             </FormItem>
                         </Col>
                         <Col sm={24} md={12}>
-                            {plans && plans.length === 0 && <span>You need select a app</span>}
-                            {plans && plans.length > 0 &&
-                            <FormItem label="Plans">
+                            { plans && plans.length === 0 && <span>You need select a app</span>}
+                            { plans && plans.length > 0 &&
+                            <FormItem label={i18n.t('plans')}>
                                 {
                                     getFieldDecorator('plans', {
                                         initialValue: accessToken && accessToken.plans.map(plan => plan.id)
@@ -143,7 +144,7 @@ class AccessTokenForm extends Component {
 
                 <Row type="flex" justify="end">
                     <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_ACCESSTOKEN]}>
-                        <Tooltip title="Delete">
+                        <Tooltip title={i18n.t('delete')}>
                             <Button className="card-button" type="danger" ghost icon="delete" size="large"
                                     shape="circle"
                                     disabled={!accessToken}
@@ -153,7 +154,7 @@ class AccessTokenForm extends Component {
                     </ComponentAuthority>
                     <ComponentAuthority
                         privilegesAllowed={[privileges.PRIVILEGE_CREATE_ACCESSTOKEN, privileges.PRIVILEGE_UPDATE_ACCESSTOKEN]}>
-                        <Tooltip title="Save">
+                        <Tooltip title={i18n.t('save')}>
                             <Button className="card-button" type="primary" icon="save" size="large" shape="circle"
                                     onClick={this.onSubmitForm} loading={loading} id="saveAccessToken"/>
                         </Tooltip>

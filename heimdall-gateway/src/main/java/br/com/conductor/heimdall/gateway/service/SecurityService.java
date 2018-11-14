@@ -36,6 +36,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
 
@@ -108,25 +109,26 @@ public class SecurityService {
       * @param apiId    The apiId
       * @param clientId ClientId to be validated
       */
-     public void validadeClientId(RequestContext ctx, Long apiId, String clientId) {
+     public void validateClientId(RequestContext ctx, Long apiId, String clientId) {
 
           final String CLIENT_ID = "Client Id";
           
-          if (Objeto.notBlank(clientId)) {
+          if (Objects.nonNull(clientId)) {
                
                TraceContextHolder.getInstance().getActualTrace().setClientId(DigestUtils.digestMD5(clientId));
                App app = appRepository.findByClientId(clientId);
-               if (Objeto.isBlank(app)) {
+               if (Objects.isNull(app)) {
 
                     buildResponse(ctx, String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, CLIENT_ID));
                } else {
 
                     Plan plan = app.getPlans().stream().filter(p -> apiId.equals(p.getApi().getId())).findFirst().orElse(null);
-                    if (Objeto.isBlank(plan)) {
+                    if (Objects.isNull(plan)) {
 
                          buildResponse(ctx, ConstantsInterceptors.GLOBAL_ACCESS_NOT_ALLOWED_API);
                     } else {
 
+                    	 TraceContextHolder.getInstance().getActualTrace().setApp(app.getName());
                          TraceContextHolder.getInstance().getActualTrace().setAppDeveloper(app.getDeveloper().getEmail());
                     }
                }

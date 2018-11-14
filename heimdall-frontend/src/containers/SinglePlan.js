@@ -1,19 +1,18 @@
 //3rd's
 import React, { Component } from 'react'
-import { push } from 'connected-react-router';
+import { push } from 'connected-react-router'
 import { connect } from 'react-redux'
-
-// actions
-import { getPlan, initLoading, clearPlan, clearPlans, update, save, remove } from '../actions/plans';
-import { apiSource, getApiSourceByName, clearApiSource, fetchingApi } from '../actions/apis';
-
+import moment from 'moment'
 //components
 import { Card, Row } from 'antd'
-import PageHeader from '../components/ui/PageHeader'
+// actions
+import i18n from "../i18n/i18n"
 import Loading from '../components/ui/Loading'
-import PlanForm from '../components/plans/PlanForm';
-import { isEmpty } from '../utils/CommonUtils';
-import moment from 'moment'
+import { isEmpty } from '../utils/CommonUtils'
+import PlanForm from '../components/plans/PlanForm'
+import PageHeader from '../components/ui/PageHeader'
+import { apiSource, getApiSourceByName, clearApiSource, fetchingApi } from '../actions/apis'
+import { getPlan, initLoading, clearPlan, clearPlans, update, save, remove } from '../actions/plans'
 
 class SinglePlan extends Component {
 
@@ -71,14 +70,14 @@ class SinglePlan extends Component {
         const { plan } = this.props
 
         if (this.state.loadEntity && !plan) return <Loading />
-        const title = plan ? 'Edit' : 'Add'
+        const title = plan ? i18n.t('edit') : i18n.t('add')
         const { apiSource } = this.props
 
         return (
             <div>
-                <PageHeader title="Plans" icon="profile" />
+                <PageHeader title={i18n.t('plans')} icon="profile" />
                 <Row className="h-row bg-white">
-                    <Card style={{ width: '100%' }} title={title + ' Plan'}>
+                    <Card style={{ width: '100%' }} title={title + ' ' + i18n.t('plan')}>
                         <PlanForm plan={plan}
                             handleDelete={this.handleDelete}
                             handleSubmit={this.handleSubmit}
