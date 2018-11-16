@@ -75,7 +75,7 @@ heimdall:
     security:
         enabled: true
         ldap:
-            enabled: true
+            enabled: false
             url: ldap://your.domain:port
             searchBase: searchBase
             userDn: user@domain
