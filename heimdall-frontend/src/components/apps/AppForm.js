@@ -103,7 +103,7 @@ class AppForm extends Component {
                         </Col>
                         {!app &&
                         <Col sm={24} md={24}>
-                            <FormItem label=label={i18n.t('client_id')}>
+                            <FormItem label={i18n.t('client_id')}>
                                 {
                                     getFieldDecorator('clientId', {
                                         initialValue: app && app.clientId,

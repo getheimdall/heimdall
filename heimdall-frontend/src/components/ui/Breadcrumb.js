@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 
 const PageBreadcrumb = ({pathName}) => {
     let arr = pathName.split('/')
+    arr = arr.filter(item => item !== "")
     return (
         <Row className="h-breadcrumb">
             <Breadcrumb style={{ textAlign: 'right' }}>
@@ -14,15 +15,13 @@ const PageBreadcrumb = ({pathName}) => {
                         let link = ''
                         arr.forEach((it, j) => {
                             if (j <= i) {
-                                link += it + '/'
+                                link += '/' + it
                             } else {
                                 return
                             }
                         })
-                        console.log(link)
-                        if (link !== "/") {
-                            return (<Breadcrumb.Item key={i} style={{ textTransform: 'capitalize' }} ><Link to={link}>{item}</Link></Breadcrumb.Item>)
-                        }
+
+                        return (<Breadcrumb.Item key={i} style={{ textTransform: 'capitalize' }} ><Link to={link}>{item}</Link></Breadcrumb.Item>)
                     })
                     : null
                 }

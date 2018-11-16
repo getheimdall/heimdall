@@ -4,7 +4,6 @@ import {Link} from 'react-router-dom'
 import { Modal, Row, Table, Divider, Tag, Tooltip, Button, Pagination } from 'antd'
 
 import i18n from "../../i18n/i18n"
-import { Link } from 'react-router-dom'
 import ComponentAuthority from "../ComponentAuthority"
 import { privileges }from "../../constants/privileges-types"
 
