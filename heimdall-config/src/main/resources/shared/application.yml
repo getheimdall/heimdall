@@ -76,10 +76,10 @@ heimdall:
         enabled: true
         ldap:
             enabled: true
-            url: ldap://conductor.tecnologia:389
-            searchBase: DC=conductor,DC=tecnologia
-            userDn: sgr.admin@conductor.tecnologia
-            password: ThanaWr6
+            url: ldap://your.domain:port
+            searchBase: searchBase
+            userDn: user@domain
+            password: pass
             userSearchFilter: sAMAccountName={0}
         jwt:
             expiration-time: 600
