@@ -1,8 +1,8 @@
 import i18n from "../i18n/i18n"
 import { HTTPv1 } from '../utils/Http'
 
-const getRoles = () => {
-    return HTTPv1.get('/roles')
+const getRoles = (params = {params: {}}) => {
+    return HTTPv1.get('/roles', params)
         .then(res => {
             return Promise.resolve(res.data)
         })
@@ -46,7 +46,7 @@ const save = (role) => {
 }
 
 const update = (role) => {
-    return HTTPv1.put('/roles/' + role.id, JSON.stringify(role))
+    return HTTPv1.put(`/roles/${role.id}`, JSON.stringify(role))
         .then(res => Promise.resolve(res.data))
         .catch(error => {
             console.log('Error: ', error)

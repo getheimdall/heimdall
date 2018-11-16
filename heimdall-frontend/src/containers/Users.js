@@ -4,13 +4,14 @@ import { connect } from 'react-redux'
 //components
 import { Row, Input, Col, Card, Form, notification } from 'antd'
 //actions
+import i18n from "../i18n/i18n"
 import Loading from '../components/ui/Loading'
 import PageHeader from '../components/ui/PageHeader'
 import ListUsers from '../components/users/ListUsers'
 import FloatButton from '../components/ui/FloatButton'
+import {privileges} from "../constants/privileges-types"
+import ComponentAuthority from "../components/ComponentAuthority"
 import { getAllUsers, initLoading, remove } from '../actions/users'
-import i18n from "../i18n/i18n";
-
 
 class Users extends Component {
 
@@ -75,8 +76,9 @@ class Users extends Component {
 
                 <Row className="h-row bg-white">
                     <ListUsers dataSource={users} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading} />
-
-                    <FloatButton idButton="addUser" history={history} to="/users/new" label={i18n.t('add_new_user')} />
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_USER]}>
+                        <FloatButton idButton="addUser" history={history} to="/users/new" label={i18n.t('add_new_user')} />
+                    </ComponentAuthority>
                 </Row>
             </div>
         )

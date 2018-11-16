@@ -137,6 +137,10 @@ public enum ExceptionMessage {
 
     USERNAME_OR_PASSWORD_INCORRECT(BAD_REQUEST.value(), "Username or password incorrect", BadRequestException.class),
 
+    USERNAME_ALREADY_EXIST(BAD_REQUEST.value(), "Username already exist!", BadRequestException.class),
+
+    EMAIL_ALREADY_EXIST(BAD_REQUEST.value(), "Email already exist!", BadRequestException.class),
+
     CLIENT_ID_ALREADY(BAD_REQUEST.value(), "clientId already used", BadRequestException.class),
 
     CLIENT_ID_NOT_FOUND(BAD_REQUEST.value(), "client_id not found", BadRequestException.class),
