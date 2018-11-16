@@ -2,7 +2,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 //components
-import {Row, Button, Form, Card, Input, Col, notification} from 'antd'
+import {Row, Form, Card, Input, Col, notification} from 'antd'
 //actions
 import {getAllAccessTokens, initLoading, remove} from '../actions/access-tokens'
 

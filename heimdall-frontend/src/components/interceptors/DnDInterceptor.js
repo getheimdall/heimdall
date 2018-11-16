@@ -211,7 +211,7 @@ class DnDInterceptor extends Component {
                         </Popover>
                         <span>{type}</span>
 
-                        <Modal {i18n.t('edit_interceptor')}
+                        <Modal title={i18n.t('edit_interceptor')}
                             footer={[
                                 <Button id="cancelInterceptorModal" key="back" onClick={this.handleCancel}>{i18n.t('cancel')}</Button>,
                                 <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_INTERCEPTOR, privileges.PRIVILEGE_UPDATE_INTERCEPTOR]}>

@@ -42,7 +42,6 @@ class ListUsers extends Component {
                         title={i18n.t('action')}
                         id="action"
                         key="action"
-                        title="Action"
                         width={180}
                         render={(text, record) => (
                             <span>
@@ -51,7 +50,7 @@ class ListUsers extends Component {
                                 </Tooltip>
                                 <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_USER]}>
                                     <Divider type="vertical" />
-                                    <Tooltip {i18n.t('delete')}>
+                                    <Tooltip title={i18n.t('delete')}>
                                         <Button type="danger" icon="delete" onClick={this.showDeleteConfirm(record.id)} />
                                     </Tooltip>
                                 </ComponentAuthority>
