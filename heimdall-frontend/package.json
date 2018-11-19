@@ -42,7 +42,7 @@
   },
   "scripts": {
     "start": "react-app-rewired start",
-    "build:hmlg": "dotenv -e .env.hmlg react-app-rewired build && rm build/static/**/*.map",
+    "build:hmlg": "dotenv -e .env.hmlg react-app-rewired build",
     "build": "dotenv -e .env.production react-app-rewired build && rm build/static/**/*.map",
     "test": "react-app-rewired test --env=jsdom",
     "eject": "react-scripts eject"
