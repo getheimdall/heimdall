@@ -86,7 +86,7 @@ class NavBar extends Component {
                         </SubMenu>
                         <SubMenu title={<span><Icon type="user" /> {this.props.user.username} </span>}>
                             {/* <Menu.Item key="heimdall:1">Edit profile</Menu.Item> */}
-                            <Menu.Item key="logout">{t('sing_out')}</Menu.Item>
+                            <Menu.Item key="logout">{t('sign_out')}</Menu.Item>
                         </SubMenu>
                     </Menu>
                 </Col>

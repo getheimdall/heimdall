@@ -52,7 +52,7 @@ class LoginForm extends Component {
                 </Row> */}
                 <Col>
                     <Button id="login" style={{ width: '100%', background: 'transparent', border: '1px solid #D9B217' }} type="primary" htmlType="submit" className="login-form-button" loading={this.props.loading}>
-                        { i18n.t('sing_in') }
+                        { i18n.t('sign_in') }
                     </Button>
                 </Col>
             </Form>
