@@ -41,6 +41,7 @@ class SingleUser extends Component {
         if (formObject.id) {
             this.props.dispatch(clearUser())
             this.props.dispatch(update(formObject))
+            this.props.dispatch(getUser(formObject.id))
         } else {
             this.props.dispatch(save(formObject))
         }
@@ -67,7 +68,7 @@ class SingleUser extends Component {
                             handleDelete={this.handleDelete}
                             handleSubmit={this.handleSubmit}
                             loading={this.props.loading}
-                            roles={roles}/>
+                            roles={roles ? roles.content : []}/>
                     </Card>
                 </Row>
             </div>

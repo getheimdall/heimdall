@@ -1,5 +1,3 @@
-import React from "react";
-
 export default {
     translations: {
         'insert_username': 'Please input your username!',
@@ -222,6 +220,7 @@ export default {
         'deleting_an_api_delete_resources_operations_interceptors_middlewares': 'Deleting an Api will also delete any Resources, Operations, Interceptors or Middlewares attached to this Api.',
         'this_operation_can_not_be_reverted': 'This operation can not be reverted.',
         'search_operations': 'Search operations',
-        'app_name': 'App name'
+        'app_name': 'App name',
+        'settings_ldap': 'Settings LDAP'
     }
 }

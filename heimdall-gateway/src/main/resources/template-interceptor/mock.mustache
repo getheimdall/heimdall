@@ -1,106 +1,75 @@
-import java.util.*;
+import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
+import br.com.conductor.heimdall.core.util.BeanManager;
+import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
+import br.com.conductor.heimdall.gateway.service.LifeCycleService;
+import br.com.conductor.heimdall.gateway.service.MockInterceptorService;
 
-import org.springframework.util.ReflectionUtils;
-
-import com.google.common.collect.Sets;
 import com.netflix.zuul.context.RequestContext;
 
-import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
-import br.com.conductor.heimdall.gateway.service.LifeCycleService;
-import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
-import br.com.conductor.heimdall.gateway.filter.helper.*;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
-import br.com.conductor.heimdall.core.util.ConstantsInterceptors;
-import br.com.conductor.heimdall.core.util.BeanManager;
-import br.com.conductor.heimdall.middleware.spec.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public class MockInterceptor extends HeimdallFilter {
 
-     private static Set<String> pathsAllowed;
+    private static Set<String> pathsAllowed;
 
-     private static Set<String> pathsNotAllowed;
+    private static Set<String> pathsNotAllowed;
 
-     private static String inboundURL;
+    private static String inboundURL;
 
-     private static String method;
+    private static String method;
 
-     private static Long referenceId;
+    private static Long referenceId;
 
-     private Helper helper;
+    public MockInterceptor() {
 
-     public MockInterceptor() {
+        method = "{{method}}";
 
-          method = "{{method}}";
+        pathsAllowed = new HashSet<>();
+        {{#pathsAllowed}}
+        pathsAllowed.add("{{.}}");
+        {{/pathsAllowed}}
 
-          pathsAllowed = Sets.newHashSet();
-     {{#pathsAllowed}}
-          pathsAllowed.add("{{.}}");
-     {{/pathsAllowed}}      
+        pathsNotAllowed = new HashSet<>();
+        {{#pathsNotAllowed}}
+        pathsNotAllowed.add("{{.}}");
+        {{/pathsNotAllowed}}
 
-          pathsNotAllowed = Sets.newHashSet();
-     {{#pathsNotAllowed}}
-          pathsNotAllowed.add("{{.}}");
-     {{/pathsNotAllowed}}           
-
-          inboundURL = "{{inboundURL}}";
-
-          this.helper = new HelperImpl();
+        inboundURL = "{{inboundURL}}";
 
         referenceId = {{referenceId}};
 
-     }
+    }
 
-     @Override
-     public int filterOrder() {
+    @Override
+    public int filterOrder() {
 
-          return {{order}};
-     }
+        return {{order}};
+    }
 
-     @Override
-     public String filterType() {
+    @Override
+    public String filterType() {
 
-          return "{{executionPoint}}";
-     }
+        return "{{executionPoint}}";
+    }
 
-     @Override
-     public boolean should() {
+    @Override
+    public String getName() {
+        return "{{name}}"
+    }
 
-        LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
-        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest(), referenceId);
-     }
-     
-     @Override
-     public String getName() {
-     	return "{{name}}"
-     }
+    @Override
+    public boolean should() {
 
-     @Override
-     public void execute() throws Throwable {
-          
-          RequestContext ctx = RequestContext.getCurrentContext();
+       LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
+       return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest(), referenceId);
+    }
 
-          String status = "{{status}}";     
+    @Override
+    public void execute() throws Throwable {
 
-          boolean jsonValid = helper.json().isJson("{{{body}}}");          
-
-          String body = "";
-          if (jsonValid) {
-               body = helper.json().parse("{{{body}}}");
-
-               helper.call().response().header().add("Content-Type", "application/json");
-          } else {
-
-               body = "{{{body}}}";
-
-               helper.call().response().header().add("Content-Type", "text/plain");
-          }
-          
-          helper.call().response().setBody(body);
-               
-          ctx.setSendZuulResponse(false);
-          ctx.setResponseStatusCode(Integer.valueOf(status));
-
-          TraceContextHolder.getInstance().getActualTrace().trace(ConstantsInterceptors.GLOBAL_MOCK_INTERCEPTOR_LOCALIZED, body);
-     }
+        MockInterceptorService mockInterceptorService = (MockInterceptorService) BeanManager.getBean(MockInterceptorService.class);
+        mockInterceptorService.execute({{status}}, "{{{body}}}");
+    }
 
 }

@@ -11,6 +11,8 @@ import Loading from '../components/ui/Loading'
 import ListApps from '../components/apps/ListApps'
 import PageHeader from '../components/ui/PageHeader'
 import FloatButton from '../components/ui/FloatButton'
+import {privileges} from "../constants/privileges-types"
+import ComponentAuthority from "../components/ComponentAuthority"
 
 class Apps extends Component {
 
@@ -79,7 +81,9 @@ class Apps extends Component {
                 <Row className="h-row bg-white">
                     <ListApps dataSource={apps} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading} />
 
-                    <FloatButton idButton="addApp" history={history} to="/apps/new" label={i18n.t('add_new_app')} />
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_APP]}>
+                        <FloatButton idButton="addApp" history={history} to="/apps/new" label={i18n.t('add_new_app')} />
+                    </ComponentAuthority>
                 </Row>
             </div>
         )

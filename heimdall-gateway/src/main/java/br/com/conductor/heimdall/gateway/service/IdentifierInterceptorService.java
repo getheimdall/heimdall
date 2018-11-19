@@ -1,18 +1,15 @@
-
-package br.com.conductor.heimdall.api.environment;
-
 /*-
  * =========================LICENSE_START==================================
- * heimdall-api
+ * heimdall-gateway
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,30 +17,30 @@ package br.com.conductor.heimdall.api.environment;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.service;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
+import com.netflix.zuul.context.RequestContext;
+import org.springframework.stereotype.Service;
 
-import lombok.Data;
+import java.util.UUID;
+
+import static br.com.conductor.heimdall.core.util.ConstantsInterceptors.IDENTIFIER_ID;
 
 /**
- * Data class that holds tha Ldap properties.
+ * Identifier interceptor adds a unique ID to the request headers
  *
- * @author Marcos Filho
- *
+ * @author Marcelo Aguiar Rodrigues
  */
-@Data
-@ConfigurationProperties(prefix = "heimdall.security.ldap", ignoreUnknownFields = true)
-public class LdapProperty {
+@Service
+public class IdentifierInterceptorService {
 
-     private boolean enabled;
+    /**
+     * Adds a unique ID to the request headers
+     */
+    public void execute() {
+        String uid = UUID.randomUUID().toString();
 
-     private String url;
-
-     private String searchBase;
-
-     private String userDn;
-
-     private String password;
-
-     private String userSearchFilter;
+        RequestContext context = RequestContext.getCurrentContext();
+        context.addZuulRequestHeader(IDENTIFIER_ID, uid);
+    }
 }

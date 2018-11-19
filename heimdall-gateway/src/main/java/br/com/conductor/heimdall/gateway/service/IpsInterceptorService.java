@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.gateway.service;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -19,7 +17,10 @@ package br.com.conductor.heimdall.gateway.service;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.service;
 
+import com.netflix.zuul.context.RequestContext;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,22 +33,41 @@ import java.util.Set;
  * Provides methods to validate request with blacklist and whitelist interceptors.
  *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ * @author Marcelo Aguiar Rodrigues
  */
 @Service
 public class IpsInterceptorService {
 
-    private final String X_FORWARDED_FOR = "X-FORWARDED-FOR";
+    /**
+     * Checks if the request ip is in the whitelist
+     *
+     * @param whitelist Set of allowed ids
+     * @throws Throwable
+     */
+    public void executeWhiteList(Set<String> whitelist) throws Throwable {
+
+        RequestContext ctx = RequestContext.getCurrentContext();
+        Set<String> requestIps = getIpFromRequest(ctx.getRequest());
+
+        if (requestIps.stream().noneMatch(whitelist::contains)) {
+            ctx.getResponse().sendError(HttpStatus.UNAUTHORIZED.value(), "Unauthorized ip");
+        }
+    }
 
     /**
-     * Method that verifies if Ips from the interceptor Blacklist or Whitelist contains any IP from request
+     * Checks if the request ip is in the blacklist
      *
-     * @param req {@link HttpServletRequest}
-     * @param ips {@link Set}<{@link String}>
-     * @return True if contains or false otherwise
+     * @param blacklist Set of blocked ids
+     * @throws Throwable
      */
-    public boolean verifyIpInList(HttpServletRequest req, Set<String> ips) {
-        Set<String> ipsFromRequest = getIpFromRequest(req);
-        return containsInList(ipsFromRequest, ips);
+    public void executeBlackList(Set<String> blacklist) throws Throwable {
+
+        RequestContext ctx = RequestContext.getCurrentContext();
+        Set<String> requestIps = getIpFromRequest(ctx.getRequest());
+
+        if (requestIps.stream().anyMatch(blacklist::contains)) {
+            ctx.getResponse().sendError(HttpStatus.UNAUTHORIZED.value(), "Unauthorized ip");
+        }
     }
 
     /**
@@ -62,27 +82,16 @@ public class IpsInterceptorService {
 
         if (Objects.nonNull(req)) {
 
-            if (Objects.nonNull(req.getHeader(X_FORWARDED_FOR))){
-                Arrays.stream(req.getHeader(X_FORWARDED_FOR).split(","))
+            final String x_FORWARDED_FOR = "X-FORWARDED-FOR";
+
+            if (Objects.nonNull(req.getHeader(x_FORWARDED_FOR))){
+                Arrays.stream(req.getHeader(x_FORWARDED_FOR).split(","))
                         .forEach(ip -> ipsFromRequest.add(ip.trim()));
             }
 
             ipsFromRequest.add(req.getRemoteAddr());
-
         }
 
         return ipsFromRequest;
     }
-
-    /**
-     * Matches the reference list of ips with the request list.
-     *
-     * @param ipsReceived {@link Set}<{@link String}>
-     * @param ipsCompare  {@link Set}<{@link String}>
-     * @return Returns true if there is any match, false otherwise
-     */
-    private boolean containsInList(Set<String> ipsReceived, Set<String> ipsCompare) {
-        return ipsCompare.stream().anyMatch(ipsReceived::contains);
-    }
-
 }

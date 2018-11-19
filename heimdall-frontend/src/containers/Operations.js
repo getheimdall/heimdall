@@ -6,7 +6,10 @@ import { List, Avatar, Button, Row, Col, Tooltip, Modal, notification } from 'an
 import i18n from '../i18n/i18n'
 import { operationService } from '../services'
 import Loading from '../components/ui/Loading'
+import {PrivilegeUtils} from "../utils/PrivilegeUtils"
+import {privileges} from "../constants/privileges-types"
 import FloatSearch from './../components/ui/FloatSearch'
+import ComponentAuthority from "../components/ComponentAuthority"
 import OperationForm from '../components/operations/OperationForm'
 
 const ButtonGroup = Button.Group;
@@ -118,10 +121,11 @@ class Operations extends Component {
 
         const modalOperation =
             <Modal title={i18n.t('add_operation')}
-            
                 footer={[
                     <Button id="cancelAddOperation" key="back" onClick={this.handleCancel}>{i18n.t('cancel')}</Button>,
-                    <Button id="saveOperation" key="submit" type="primary" loading={loading} onClick={this.handleSave}>{i18n.t('save')}</Button>
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_OPERATION, privileges.PRIVILEGE_UPDATE_OPERATION]}>
+                        <Button id="saveOperation" key="submit" type="primary" loading={loading} onClick={this.handleSave}>{i18n.t('save')}</Button>
+                    </ComponentAuthority>
                 ]}
                 visible={this.state.visibleModal}
                 onCancel={this.handleCancel}
@@ -132,9 +136,16 @@ class Operations extends Component {
         if (operations && operations.length === 0) {
             return (
                 <Row type="flex" justify="center" align="bottom">
+                    {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_OPERATION]) &&
+                        <Col style={{ marginTop: 20 }}>
+                            You don't have <b>OPERATIONS</b> in this <b>RESOURCE</b>, please <Button type="dashed" onClick={this.showOperationModal()}>Add Operation</Button>
+                        </Col>
+                    }
+                    {!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_OPERATION]) &&
                     <Col style={{ marginTop: 20 }}>
                         {i18n.t('you_do_not_have')} <b style={{textTransform: 'uppercase'}}>{i18n.t('operations')}</b> {i18n.t('in_this')} <b style={{textTransform: 'uppercase'}}>{i18n.t('resource')}</b>! <Button id="addOperationWhenListIsEmpty" type="dashed" onClick={this.showOperationModal()}>{i18n.t('add_operation')}</Button>
                     </Col>
+                    }
 
                     {modalOperation}
                 </Row>
@@ -144,18 +155,20 @@ class Operations extends Component {
         return (
             <div style={{ position: 'relative' }}>
                 { visibleSearch && <FloatSearch callbackKeyUp={this.filterOperationsByPath} handleClose={this.toggleSearch}/>}
-                <Row type="flex" justify="center">
-                    <Col style={{margin: 5}}>
-                        <Tooltip title={i18n.t('add_operation')}>
-                            <Button id="addOperation" type="dashed" icon="plus" onClick={this.showOperationModal()}>{i18n.t('add_operation')}</Button>
-                        </Tooltip>
-                    </Col>
-                    <Col style={{margin: 5}}>
-                        <Tooltip title={i18n.t('search_operations')}>
-                            <Button id="searchOperations" type="dashed" icon="search" onClick={this.toggleSearch}>{i18n.t('search_operations')}</Button>
-                        </Tooltip>
-                    </Col>
-                </Row>
+                <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_OPERATION]}>
+                    <Row type="flex" justify="center">
+                        <Col style={{margin: 5}}>
+                            <Tooltip title={i18n.t('add_operation')}>
+                                <Button id="addOperation" type="dashed" icon="plus" onClick={this.showOperationModal()}>{i18n.t('add_operation')}</Button>
+                            </Tooltip>
+                        </Col>
+                        <Col style={{margin: 5}}>
+                            <Tooltip title={i18n.t('search_operations')}>
+                                <Button id="searchOperations" type="dashed" icon="search" onClick={this.toggleSearch}>{i18n.t('search_operations')}</Button>
+                            </Tooltip>
+                        </Col>
+                    </Row>
+                </ComponentAuthority>
                 {/* <hr /> */}
                 <List
                     className="demo-loadmore-list"
@@ -193,9 +206,11 @@ class Operations extends Component {
                                         <Tooltip title={i18n.t('edit')}>
                                             <Button type="primary" icon="edit" onClick={this.showOperationModal(operation.id)} />
                                         </Tooltip>
-                                        <Tooltip title={i18n.t('delete')}>
-                                            <Button type="danger" icon="delete" onClick={this.remove(operation.id)} />
-                                        </Tooltip>
+                                        <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_OPERATION]}>
+                                            <Tooltip title={i18n.t('delete')}>
+                                                <Button type="danger" icon="delete" onClick={this.remove(operation.id)} />
+                                            </Tooltip>
+                                        </ComponentAuthority>
                                     </ButtonGroup>
                                 </Row>
                             </List.Item>

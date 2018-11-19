@@ -1,12 +1,14 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import { Link } from 'react-router-dom'
+import {Link} from 'react-router-dom'
 import { Modal, Row, Table, Divider, Tag, Tooltip, Button, Pagination } from 'antd'
 
 import i18n from "../../i18n/i18n"
+import ComponentAuthority from "../ComponentAuthority"
+import { privileges }from "../../constants/privileges-types"
 
 const confirm = Modal.confirm;
-const { Column } = Table;
+const {Column} = Table;
 
 class ListAccessTokens extends Component {
 
@@ -23,20 +25,21 @@ class ListAccessTokens extends Component {
     }
 
     render() {
-        const { dataSource } = this.props
-        const { loading } = this.props
+        const {dataSource} = this.props
+        const {loading} = this.props
         return (
             <div>
-                <Table dataSource={dataSource.content} rowKey={record => record.id} scroll={{x:1155}} loading={loading} pagination={false}>
-                    <Column title={i18n.t('id')} dataIndex="id" id="id" width={200} />
-                    <Column title={i18n.t('status')} id="status" key="status" width={200} render={(record) => (
-                        <span style={{textTransform: 'uppercase'}}>
+                <Table dataSource={dataSource.content} rowKey={record => record.id} scroll={{x: 1155}} loading={loading}
+                       pagination={false}>
+                    <Column title={i18n.t('id')} dataIndex="id" id="id" width={200}/>
+                    <Column title="Status" id="status" key="status" width={200} render={(record) => (
+                        <span>
                             {record.status === 'ACTIVE' && <Tag color="green">{i18n.t('active')}</Tag>}
                             {record.status === 'INACTIVE' && <Tag color="red">{i18n.t('inactive')}</Tag>}
                         </span>
-                    )} />
-                    <Column title={i18n.t('token')} dataIndex="code" id="code" width={400} />
-                    <Column title={i18n.t('app')} dataIndex="app.name" id="name" />
+                    )}/>
+                    <Column title={i18n.t('token')} dataIndex="code" id="code" width={400}/>
+                    <Column title={i18n.t('app')} dataIndex="app.name" id="name"/>
                     <Column
                         title={i18n.t('action')}
                         id="action"
@@ -44,19 +47,21 @@ class ListAccessTokens extends Component {
                         align="right"
                         render={(text, record) => (
                             <span>
-                                <Tooltip title={i18n.t('edit')  }>
-                                    <Link to={"/tokens/" + record.id}><Button type="primary" icon="edit" /></Link>
+                                <Tooltip title={i18n.t('edit')}>
+                                    <Link to={"/tokens/" + record.id}><Button type="primary" icon="edit"/></Link>
                                 </Tooltip>
-                                <Divider type="vertical" />
-                                <Tooltip title={i18n.t('delete')}>
-                                    <Button type="danger" icon="delete" onClick={this.showDeleteConfirm(record.id)} />
-                                </Tooltip>
+                                <Divider type="vertical"/>
+                                <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_ACCESSTOKEN]}>
+                                    <Tooltip title={i18n.t('delete')}>
+                                        <Button type="danger" icon="delete" onClick={this.showDeleteConfirm(record.id)} />
+                                    </Tooltip>
+                                </ComponentAuthority>
                             </span>
                         )}
                     />
                 </Table>
                 <Row type="flex" justify="center" className="h-row">
-                    <Pagination total={dataSource.totalElements} onChange={this.props.handlePagination} />
+                    <Pagination total={dataSource.totalElements} onChange={this.props.handlePagination}/>
                 </Row>
             </div>
         )

@@ -35,8 +35,8 @@ body {
 .logo {
     position: relative;
     cursor: pointer;
-    
-    > span {
+
+    span {
         color: #f1f1f1;
         font-weight: 700;
         display: inline-block;
@@ -80,7 +80,7 @@ body {
     opacity: 0.01;
     transform: translateY(10px)
 }
-  
+
 .fade-appear.fade-appear-active {
     transform: translateY(0);
     opacity: 1;
@@ -115,7 +115,7 @@ body {
     opacity: 0.01;
     transform: scale(0.9);
 }
-  
+
 .appear-appear.appear-appear-active {
     opacity: 1;
     transition: transform .1s ease-in, opacity .3s linear;
@@ -126,7 +126,7 @@ body {
     opacity: 0.01;
     transform: translateX(20px);
 }
-  
+
 .appearRight-appear.appearRight-appear-active {
     opacity: 1;
     transition: transform .2s ease-in, opacity .2s linear;
@@ -152,7 +152,7 @@ body {
     &:active {
         cursor: move;
     }
-    
+
     span {
         display: inline-block;
         width: 100%;
@@ -371,7 +371,7 @@ body {
 }
 
 .heimdall-logo-form {
-    position: absolute; 
+    position: absolute;
     z-index: 99;
     width: 100%;
     top: 0px;
@@ -464,12 +464,35 @@ body {
     }
 }
 
+.heimdall-select-filter-complete {
+  .ant-select-selection__rendered{
+    .ant-select-selection-selected-value {
+      width: 99%;
+    }
+  }
+}
+
+.heimdall-badge-interceptors-count {
+  float: right;
+  margin-top: 6px;
+  .ant-badge-count {
+    height: 15px;
+    min-width: 22px;
+    line-height: 15px;
+    padding: 0 0;
+    font-size: 10px;
+    background-color: #fff;
+    color: #0a183d;
+    box-shadow: 0 0 0 1px #0a183d inset
+  }
+}
+
 @media screen and (max-width: 400px) {
     .no-mobile-padding {
         padding-left: 0;
         padding-right: 0;
     }
-    
+
     .footer-bottom {
         position: relative;
         left:0px;
@@ -487,7 +510,7 @@ body {
      }
 }
 
-@media (min-width: 641px) { 
+@media (min-width: 641px) {
     .login-cardbox {
         width: 400px;
         border-radius: 6px;
