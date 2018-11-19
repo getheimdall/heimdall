@@ -1,18 +1,17 @@
-import java.util.*;
-
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.util.BeanManager;
-import br.com.conductor.heimdall.gateway.filter.helper.HelperImpl;
 import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
+import br.com.conductor.heimdall.gateway.service.LifeCycleService;
 import br.com.conductor.heimdall.gateway.service.CacheInterceptorService;
-import br.com.conductor.heimdall.middleware.spec.Helper;
 
-import com.google.common.collect.Sets;
-import com.google.common.collect.Lists;
 import com.netflix.zuul.context.RequestContext;
 
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.List;
+import java.util.ArrayList;
 
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 
 public class CacheInterceptor extends HeimdallFilter {
 
@@ -26,15 +25,13 @@ public class CacheInterceptor extends HeimdallFilter {
 
     private static String cacheName;
 
+    private static Long referenceId;
+
     private static List<String> headers;
 
     private static List<String> queryParams;
 
-    private CacheInterceptorService cacheInterceptorService;
-
     private static Long timeToLive;
-
-    private Helper helper;
 
     public CacheInterceptor() {
 
@@ -44,42 +41,29 @@ public class CacheInterceptor extends HeimdallFilter {
 
         method = "{{method}}";
 
-        headers = Lists.newArrayList();
+        headers = new ArrayList<>();
         {{#headers}}
         headers.add("{{.}}");
         {{/headers}}
 
-        queryParams = Lists.newArrayList();
+        queryParams = new ArrayList<>();
         {{#queryParams}}
         queryParams.add("{{.}}");
         {{/queryParams}}
 
-        pathsAllowed = Sets.newHashSet();
+        pathsAllowed = new HashSet<>();
         {{#pathsAllowed}}
         pathsAllowed.add("{{.}}");
         {{/pathsAllowed}}
 
-        pathsNotAllowed = Sets.newHashSet();
+        pathsNotAllowed = new HashSet<>();
         {{#pathsNotAllowed}}
         pathsNotAllowed.add("{{.}}");
         {{/pathsNotAllowed}}
 
         inboundURL = "{{inboundURL}}";
 
-        this.helper = new HelperImpl();
-    }
-
-    @Override
-    public boolean should() {
-        return InterceptorLifeCycle.{{lifeCycle}}.filter(pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest());
-    }
-
-    @Override
-    public void execute() throws Throwable {
-
-        cacheInterceptorService = (CacheInterceptorService) BeanManager.getBean(CacheInterceptorService.class);
-
-        cacheInterceptorService.cacheInterceptor(cacheName, timeToLive, helper, headers, queryParams);
+        referenceId = {{referenceId}};
     }
 
     @Override
@@ -95,5 +79,19 @@ public class CacheInterceptor extends HeimdallFilter {
     @Override
     public int filterOrder() {
         return {{order}};
+    }
+
+    @Override
+    public boolean should() {
+
+        LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest(), referenceId);
+    }
+
+    @Override
+    public void execute() throws Throwable {
+
+        CacheInterceptorService cacheInterceptorService = (CacheInterceptorService) BeanManager.getBean(CacheInterceptorService.class);
+        cacheInterceptorService.cacheInterceptor(cacheName, timeToLive, headers, queryParams);
     }
 }

@@ -41,6 +41,14 @@ import br.com.conductor.heimdall.core.enums.TypeInterceptor;
 public interface InterceptorRepository extends JpaRepository<Interceptor, Long> {
 
     /**
+     * Finds a List of Interceptors by Interceptor type and {@link Api} Id.
+     * @param type  The type of Interceptor
+     * @param apiId The Api Id.
+     * @return The List of Interceptor associated
+     */
+    List<Interceptor> findByTypeAndApiId(TypeInterceptor type, Long apiId);
+
+    /**
      * Finds a List of Interceptors by Interceptor type and {@link Plan} Id.
      *
      * @param type   The type of Interceptor

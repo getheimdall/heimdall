@@ -1,3 +1,4 @@
+
 package br.com.conductor.heimdall.core.interceptor.impl;
 
 /*-
@@ -27,25 +28,20 @@ import br.com.conductor.heimdall.core.interceptor.HeimdallInterceptor;
 import java.util.HashMap;
 
 /**
- * Implementation of the HeimdallInterceptor to type Log.
+ * Implementation of the HeimdallInterceptor to type Identifier.
  *
- * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ * @author Marcelo Aguiar Rodrigues
+ *
  */
-public class LogHeimdallInterceptor implements HeimdallInterceptor {
-
+public class IdentifierHeimdallInterceptor implements HeimdallInterceptor {
     @Override
     public String getFile(TypeExecutionPoint typeExecutionPoint) {
-
-        if (typeExecutionPoint.equals(TypeExecutionPoint.FIRST)) {
-            return "request_log.mustache";
-        }
-
-        return "response_log.mustache";
+        return "identifier.mustache";
     }
 
     @Override
     public Object parseContent(String content) {
-        return content;
+        return "";
     }
 
     @Override

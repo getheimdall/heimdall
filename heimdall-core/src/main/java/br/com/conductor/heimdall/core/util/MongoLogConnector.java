@@ -327,7 +327,7 @@ public class MongoLogConnector implements Serializable {
          List<LogTrace> list;
          Long totalElements = query.count();
 
-         query = query.order("-trace.insertedOnDate");
+         query = query.order("-ts");
 
          page = page == null ? PAGE : page;
          limit = limit == null || limit > LIMIT ? LIMIT : limit;

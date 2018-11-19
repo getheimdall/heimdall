@@ -23,21 +23,26 @@ package br.com.conductor.heimdall.gateway.trace;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import lombok.Data;
 
 /**
  * Data class a that represents a Request Response parser.
  *
  * @author Thiago Sampaio
- *
+ * @author Marcelo Aguiar Rodrigues
  */
 @Data
 public class RequestResponseParser {
 
+     @JsonInclude(Include.NON_NULL)
      private String uri;
 
+     @JsonInclude(Include.NON_NULL)
      private Map<String, String> headers;
 
+     @JsonInclude(Include.NON_NULL)
      private String body;
 
 }

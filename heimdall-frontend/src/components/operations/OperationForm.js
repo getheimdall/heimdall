@@ -1,10 +1,14 @@
 import React, { Component } from 'react'
-import { bindActionCreators } from 'redux'
-import { connect } from 'react-redux'
-import { Row, Form, Col, Input, Select } from 'antd'
 import PropTypes from 'prop-types'
-import { resetOperation, getOperation } from '../../actions/operations';
-import Loading from '../ui/Loading';
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import { Row, Form, Col, Input, Select } from 'antd'
+
+import i18n from "../../i18n/i18n"
+import Loading from '../ui/Loading'
+import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
+import {privileges} from "../../constants/privileges-types"
+import { resetOperation, getOperation } from '../../actions/operations'
 
 const FormItem = Form.Item
 const Option = Select.Option
@@ -45,12 +49,12 @@ class OperationForm extends Component {
                     {this.props.operation && getFieldDecorator('id', { initialValue: this.props.operation.id })(<Input type='hidden' />)}
                     <Row>
                         <Col sm={24}>
-                            <FormItem label="Method">
+                            <FormItem label={i18n.t('method')}>
                                 {getFieldDecorator('method', {
-                                    rules: [{ required: true, message: 'Please, input operation path!' }],
+                                    rules: [{ required: true, message: i18n.t('please_input_operation_method') }],
                                     initialValue: this.props.operation && this.props.operation.method.toUpperCase()
                                 })(
-                                    <Select>
+                                    <Select disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_OPERATION, privileges.PRIVILEGE_UPDATE_OPERATION])}>
                                         <Option value="GET">GET</Option>
                                         <Option value="POST">POST</Option>
                                         <Option value="PUT">PUT</Option>
@@ -62,21 +66,22 @@ class OperationForm extends Component {
                             </FormItem>
                         </Col>
                         <Col sm={24}>
-                            <FormItem label="Path">
+                            <FormItem label={i18n.t('path')}>
                                 {
                                     getFieldDecorator('path', {
                                         initialValue: this.props.operation && this.props.operation.path,
-                                        rules: [{ required: true, message: 'Please input your api path!' }]
-                                    })(<Input required />)
+                                        rules: [{ required: true, message: i18n.t('please_input_operation_path') }]
+                                    })(<Input addonBefore={this.props.apiBasepath + "/"} required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_OPERATION, privileges.PRIVILEGE_UPDATE_OPERATION])}/>)
+
                                 }
                             </FormItem>
                         </Col>
                         <Col sm={24}>
-                            <FormItem label="Description">
+                            <FormItem label={i18n.t('description')}>
                                 {
                                     getFieldDecorator('description', {
                                         initialValue: this.props.operation && this.props.operation.description
-                                    })(<Input required />)
+                                    })(<Input required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_OPERATION, privileges.PRIVILEGE_UPDATE_OPERATION])}/>)
                                 }
                             </FormItem>
                         </Col>
@@ -89,7 +94,8 @@ class OperationForm extends Component {
 
 OperationForm.propTypes = {
     idApi: PropTypes.number.isRequired,
-    idResource: PropTypes.number.isRequired
+    idResource: PropTypes.number.isRequired,
+    apiBasepath: PropTypes.number.isRequired
 }
 
 const mapStateToProps = state => {

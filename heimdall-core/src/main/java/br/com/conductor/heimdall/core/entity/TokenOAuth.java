@@ -36,6 +36,7 @@ public class TokenOAuth implements Serializable {
 
     private String accessToken;
     private String refreshToken;
+    private String token_type;
     private long expiration;
 
 }

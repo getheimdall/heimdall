@@ -6,11 +6,26 @@ import { Row } from 'antd'
 
 import DnDInterceptor from './DnDInterceptor'
 import Loading from '../ui/Loading';
+import {changeOrder} from "../../utils/OrderInterceptorsUtisl";
 
 const ClientInterceptorsSpec = {
-    drop(props) {
+    drop(props, monitor) {
+        let lifeCycle = ''
+        const item = monitor.getItem()
+        if (item.apiId) {
+            lifeCycle = 'API'
+        } else if (item.operationId) {
+            lifeCycle = 'OPERATION'
+        } else if (item.resourceId) {
+            lifeCycle = 'RESOURCE'
+        } else if (item.planId) {
+            lifeCycle = 'PLAN'
+        } else {
+            lifeCycle = 'ENVIRONMENT'
+        }
         return {
-            executionPoint: props.executionPoint
+            executionPoint: props.executionPoint,
+            sizeInterceptors: props.interceptors.filter(i => i.lifeCycle === lifeCycle).length
         }
     }
 }
@@ -24,6 +39,17 @@ let collect = (connect, monitor) => {
 }
 
 class DropClientInterceptors extends Component {
+
+    moveInterceptors = (dragIndex, newIndex, lifeCycleDrag, referenceDrag) => {
+        const { interceptors } = this.props
+        if (interceptors){
+            let newOrderInterceptors = changeOrder(dragIndex, newIndex, interceptors.filter(i => i.lifeCycle === lifeCycleDrag && i.referenceId === referenceDrag))
+
+            newOrderInterceptors.forEach(interceptor => {
+                this.props.handleForm(interceptor)
+            })
+        }
+    }
 
     render() {
         const { canDrop, isOver, connectDropTarget, description } = this.props;
@@ -45,12 +71,14 @@ class DropClientInterceptors extends Component {
             <div>
                 <Row id="drop-client-interceptors" className="draggable-pane" style={style}>
                     <Row type="flex" justify="center">
-                        <sup className="ant-scroll-number ant-badge-count" style={{backgroundColor: 'grey', width: 100}}>{description}</sup>
+                        <sup className="ant-scroll-number ant-badge-count" style={{backgroundColor: 'grey', width: 100, textTransform: 'uppercase'}}>{description}</sup>
                     </Row>
                     {!this.props.interceptors && <Loading />}
                     {this.props.interceptors && this.props.interceptors.map((interceptor, index) => {
                         let color
-                        if (interceptor.lifeCycle === 'PLAN') {
+                        if (interceptor.lifeCycle === 'API') {
+                            color = '#ffa613'
+                        } else if (interceptor.lifeCycle === 'PLAN') {
                             color = '#c3cc93'
                         } else if (interceptor.lifeCycle === 'RESOURCE') {
                             color = '#8edce0'
@@ -63,6 +91,8 @@ class DropClientInterceptors extends Component {
                             icon='code-o'
                             color={color}
                             interceptor={interceptor}
+                            order={interceptor.order ? interceptor.order : this.props.interceptors.length}
+                            moveInterceptors={this.moveInterceptors}
                             handleForm={this.props.handleForm}
                             handleDelete={this.props.handleDelete}
                         />

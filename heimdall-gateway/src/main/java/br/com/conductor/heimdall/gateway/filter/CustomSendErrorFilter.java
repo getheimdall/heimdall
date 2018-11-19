@@ -59,7 +59,6 @@ public class CustomSendErrorFilter extends SendErrorFilter {
 			}
 
 			if ((!StringUtils.isEmpty(message) || errorAttributes.get("message") == null)) {
-				System.out.println("tem message" + message);
 				errorAttributes.put("message", StringUtils.isEmpty(message) ? "No message available" : message);
 			}
 

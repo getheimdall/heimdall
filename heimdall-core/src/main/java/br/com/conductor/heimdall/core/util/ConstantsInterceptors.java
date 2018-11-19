@@ -26,6 +26,7 @@ package br.com.conductor.heimdall.core.util;
  *
  * @author Filipe Germano
  * @author Marcos Filho
+ * @author Marcelo Aguiar Rodrigues
  *
  */
 public class ConstantsInterceptors {
@@ -35,5 +36,6 @@ public class ConstantsInterceptors {
      public static final String GLOBAL_MOCK_INTERCEPTOR_LOCALIZED = "Localized mock interceptor";
      
      public static final String GLOBAL_ACCESS_NOT_ALLOWED_API = "Access not allowed for this API";
-     
+
+     public static final String IDENTIFIER_ID = "identifier_id";
 }

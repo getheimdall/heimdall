@@ -157,6 +157,10 @@ public class Interceptor implements Serializable {
           creationDate = LocalDateTime.now();
           
           switch (lifeCycle) {
+               case API:
+                    api = new Api();
+                    api.setId(referenceId);
+                    break;
                case PLAN:
                     plan = new Plan();
                     plan.setId(referenceId);
@@ -178,6 +182,9 @@ public class Interceptor implements Serializable {
      private void initValuesLoad() {
           
           switch (lifeCycle) {
+               case API:
+                    referenceId = api.getId();
+                    break;
                case PLAN:
                     referenceId = plan.getId();
                     break;

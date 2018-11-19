@@ -4,6 +4,8 @@ import com.google.common.collect.Sets;
 import com.netflix.zuul.context.RequestContext;
 
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
+import br.com.conductor.heimdall.gateway.service.LifeCycleService;
+import br.com.conductor.heimdall.core.util.BeanManager;
 import br.com.conductor.heimdall.gateway.filter.helper.*;
 import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
@@ -18,7 +20,9 @@ public class CustomInterceptor extends HeimdallFilter {
      private static String inboundURL;
 
      private static String method;
-     
+
+     private static Long referenceId;
+
      private Helper helper;
 
      public CustomInterceptor() {
@@ -39,6 +43,7 @@ public class CustomInterceptor extends HeimdallFilter {
 
           this.helper = new HelperImpl();
 
+          referenceId = {{referenceId}};
      }
 
      @Override
@@ -56,7 +61,8 @@ public class CustomInterceptor extends HeimdallFilter {
      @Override
      public boolean should() {
 
-          return InterceptorLifeCycle.{{lifeCycle}}.filter(pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest());
+        LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest(), referenceId);
      }
      
      @Override

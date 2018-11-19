@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import br.com.conductor.heimdall.core.enums.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -66,7 +67,7 @@ public class CustomUserDetailsService implements UserDetailsService {
      @Override
      public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
 
-          final CredentialSecurity credential = repository.findCredentialByUserNameAndType(username, TypeUser.DATABASE);
+          final CredentialSecurity credential = repository.findCredentialByUserNameAndTypeAndStatus(username, TypeUser.DATABASE, Status.ACTIVE);
           final Set<Privilege> privileges = privRepository.findPrivilegesByUserNameAndType(username, TypeUser.DATABASE);
           
           return new org.springframework.security.core.userdetails.User(credential.getUserName(), credential.getPassword(), getAuthoritiesFromPrivileges(privileges));

@@ -1,18 +1,17 @@
-
-package br.com.conductor.heimdall.api.environment;
+package br.com.conductor.heimdall.core.dto.integration;
 
 /*-
  * =========================LICENSE_START==================================
- * heimdall-api
+ * heimdall-core
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,29 +20,23 @@ package br.com.conductor.heimdall.api.environment;
  * ==========================LICENSE_END===================================
  */
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 /**
- * Data class that holds tha Ldap properties.
+ * Class is a Data Transfer Object for the reference App.
  *
- * @author Marcos Filho
- *
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Data
-@ConfigurationProperties(prefix = "heimdall.security.ldap", ignoreUnknownFields = true)
-public class LdapProperty {
+@AllArgsConstructor
+@NoArgsConstructor
+public class ReferenceAppDTO implements Serializable {
 
-     private boolean enabled;
+    private Long id;
 
-     private String url;
-
-     private String searchBase;
-
-     private String userDn;
-
-     private String password;
-
-     private String userSearchFilter;
+    private String name;
 }

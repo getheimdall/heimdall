@@ -1,13 +1,9 @@
-const APPLICATION_OCTET_STREAM = 'application/octet-stream'
-const JAR_FILE = 'application/jar'
+const fileDownload = (data, filename) => {
 
-const fileDownload = (file, filename, mime) => {
-
-    const blobFile = new Blob([file], {type: mime})
-    if (typeof window.navigator.msSaveBlob !== 'undefined'){
-        window.navigator.msSaveOrOpenBlob(blobFile, filename)
+    if (typeof window.navigator.msSaveBlob !== 'undefined') {
+        window.navigator.msSaveOrOpenBlob(data, filename)
     } else {
-        const url = window.URL.createObjectURL(blobFile);
+        const url = window.URL.createObjectURL(data);
         const tempLink = document.createElement('a');
         tempLink.style.display = 'none';
         tempLink.href = url;
@@ -22,10 +18,8 @@ const fileDownload = (file, filename, mime) => {
         document.body.removeChild(tempLink);
         window.URL.revokeObjectURL(url);
     }
-}
+};
 
 export const FileUtils = {
-    fileDownload,
-    APPLICATION_OCTET_STREAM,
-    JAR_FILE
-}
+    fileDownload
+};
