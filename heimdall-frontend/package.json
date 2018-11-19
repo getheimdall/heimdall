@@ -16,6 +16,7 @@
     "less": "2.7.3",
     "lodash.flow": "^3.5.0",
     "moment": "^2.22.1",
+    "npm": "^6.4.1",
     "nprogress": "^0.2.0",
     "prop-types": "^15.6.1",
     "rc-animate": "^2.4.4",
@@ -25,6 +26,7 @@
     "react-dnd": "^2.6.0",
     "react-dnd-html5-backend": "^2.6.0",
     "react-dom": "^16.3.2",
+    "react-i18next": "latest",
     "react-joyride": "^1.11.4",
     "react-json-view": "^1.17.1",
     "react-particles-js": "^2.1.2",
@@ -36,8 +38,7 @@
     "recharts": "^1.0.0-beta.10",
     "redux": "^3.7.2",
     "redux-logger": "^3.0.6",
-    "redux-thunk": "^2.2.0",
-    "react-i18next": "latest"
+    "redux-thunk": "^2.2.0"
   },
   "scripts": {
     "start": "react-app-rewired start",
