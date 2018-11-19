@@ -10,9 +10,9 @@ package br.com.conductor.heimdall.core.entity;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -45,7 +46,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * This class represents a Operation registered to the system.
- * 
+ *
  * @author Filipe Germano
  *
  */
@@ -82,10 +83,11 @@ public class Operation implements Serializable {
      private Resource resource;
 
      @JsonIgnore
-     @ManyToMany
+     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
      @JoinTable(name = "SCOPES_OPERATIONS",
              joinColumns = @JoinColumn(name = "OPERATION_ID", referencedColumnName = "ID"),
              inverseJoinColumns = @JoinColumn(name = "SCOPE_ID", referencedColumnName = "ID"))
+     @JsonIgnoreProperties({"operations"})
      private List<Scope> scopes;
 
      /**

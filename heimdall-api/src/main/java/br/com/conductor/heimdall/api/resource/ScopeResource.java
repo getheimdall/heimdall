@@ -102,8 +102,8 @@ public class ScopeResource {
 
         if (pageableDTO.getLimit() != null && pageableDTO.getOffset() != null) {
 
-            ScopePage resourcePage = scopeService.list(apiId, scopeDTO, pageableDTO);
-            return ResponseEntity.ok(resourcePage);
+            ScopePage scopePage = scopeService.list(apiId, scopeDTO, pageableDTO);
+            return ResponseEntity.ok(scopePage);
         } else {
 
             List<Scope> resources = scopeService.list(apiId, scopeDTO);
