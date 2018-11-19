@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.gateway.service;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -19,6 +17,7 @@ package br.com.conductor.heimdall.gateway.service;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.service;
 
 import static br.com.conductor.heimdall.core.util.ConstantsOAuth.*;
 import br.com.conductor.heimdall.core.dto.request.OAuthRequest;
@@ -71,6 +70,39 @@ public class OAuthInterceptorService {
     private OAuthService oAuthService;
 
     private Helper helper;
+
+    /**
+     * Runs the service for the OAuth
+     *
+     * @param typeOAuth        type of the OAuth
+     * @param privateKey       privateKey used in Token
+     * @param timeAccessToken  time to expire accessToken
+     * @param timeRefreshToken time to expire refreshToken
+     * @param providerId       {@link Provider} id
+     * @param helper           {@link Helper}
+     */
+    public void execute(TypeOAuth typeOAuth, String privateKey, int timeAccessToken, int timeRefreshToken, Long providerId, Helper helper) {
+
+        try {
+            executeInterceptor(typeOAuth, privateKey, timeAccessToken, timeRefreshToken, providerId, helper);
+        } catch( HeimdallException ex ){
+            generateResponse( ex.getMsgEnum().getMessage(), ex.getMsgEnum().getHttpCode());
+        }
+    }
+
+    /**
+     * Method that sends a Response
+     *
+     * @param message    Response message
+     * @param httpStatus {@link HttpStatus} of the response
+     */
+    private void generateResponse(String message, int httpStatus) {
+        message = "{ \"error\" : \"" + message + "\" }";
+        TraceContextHolder.getInstance().getActualTrace().trace(message);
+        this.helper.call().response().setStatus(httpStatus);
+        this.helper.call().response().header().add("Content-Type", "application/json");
+        this.helper.call().response().setBody(message);
+    }
 
     /**
      * Method to validate Interceptor OAuth and execute the operation correct, accord the type of the OAuth.

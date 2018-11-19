@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.gateway.service;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -20,6 +17,7 @@ package br.com.conductor.heimdall.gateway.service;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.service;
 
 import br.com.conductor.heimdall.core.entity.AccessToken;
 import br.com.conductor.heimdall.core.entity.App;
@@ -48,40 +46,40 @@ import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
  */
 @Service
 public class SecurityService {
-     
+
      @Autowired
      private AccessTokenRepository accessTokenRepository;
 
      @Autowired
      private AppRepository appRepository;
-     
+
      /**
       * Method responsible for validating access_token in interceptor
-      * 
-      * @param ctx 
-      * @param apiId
-      * @param clientId
-      * @param accessToken
+      *
+      * @param ctx         RequestContext
+      * @param apiId       Api reference id
+      * @param clientId    user client_id
+      * @param accessToken access token
       */
      public void validadeAccessToken(RequestContext ctx, Long apiId, String clientId, String accessToken) {
-                    
+
           final String ACCESS_TOKEN = "Access Token";
-          
+
           TraceContextHolder.getInstance().getActualTrace().setAccessToken(DigestUtils.digestMD5(accessToken));
-          
+
           if (Objeto.notBlank(accessToken) && Objeto.notBlank(clientId)) {
-                    
-               AccessToken token = accessTokenRepository.findAccessTokenActive(accessToken);               
+
+               AccessToken token = accessTokenRepository.findAccessTokenActive(accessToken);
                if (Objeto.notBlank(token)) {
-                    
+
                     List<Plan> plans = token.getApp().getPlans();
                     Plan plan = plans.stream().filter(p -> apiId.equals(p.getApi().getId())).findFirst().orElse(null);
                     if (Objeto.notBlank(plan)) {
-                         
+
                          String cId = token.getApp().getClientId();
-                         
+
                          if (Objeto.notBlank(cId) && clientId.equals(cId)) {
-                              
+
                               TraceContextHolder.getInstance().getActualTrace().setApp(token.getApp().getName());
                          } else {
 
@@ -101,7 +99,7 @@ public class SecurityService {
                buildResponse(ctx, String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, ACCESS_TOKEN));
           }
      }
-     
+
      /**
       * Method responsible for validating client_id in interceptor
       *
@@ -112,9 +110,9 @@ public class SecurityService {
      public void validateClientId(RequestContext ctx, Long apiId, String clientId) {
 
           final String CLIENT_ID = "Client Id";
-          
+
           if (Objects.nonNull(clientId)) {
-               
+
                TraceContextHolder.getInstance().getActualTrace().setClientId(DigestUtils.digestMD5(clientId));
                App app = appRepository.findByClientId(clientId);
                if (Objects.isNull(app)) {
