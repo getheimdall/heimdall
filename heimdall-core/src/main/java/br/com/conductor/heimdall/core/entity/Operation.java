@@ -22,7 +22,10 @@ package br.com.conductor.heimdall.core.entity;
  */
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.*;
 
@@ -95,5 +98,9 @@ public class Operation implements Serializable {
           if (this.path.endsWith(ConstantsPath.PATH_ROOT)) {
                this.path = StringUtils.removeEnd(path, ConstantsPath.PATH_ROOT);
           }
+     }
+
+     public Set<Long> getScopesIds() {
+          return this.scopes != null ? this.scopes.stream().map(Scope::getId).collect(Collectors.toSet()) : Collections.EMPTY_SET;
      }
 }

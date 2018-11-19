@@ -31,7 +31,10 @@ import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * TODO
@@ -78,4 +81,7 @@ public class Scope implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "PLAN_ID", referencedColumnName = "ID"))
     private List<Plan> plans;
 
+    public Set<Long> getOperationsIds() {
+        return this.operations != null ? this.operations.stream().map(Operation::getId).collect(Collectors.toSet()) : Collections.EMPTY_SET;
+    }
 }
