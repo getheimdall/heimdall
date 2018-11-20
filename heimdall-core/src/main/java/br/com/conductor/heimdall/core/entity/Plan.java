@@ -37,6 +37,8 @@ import br.com.conductor.heimdall.core.enums.Status;
 import br.com.twsoftware.alfred.object.Objeto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 /**
  * This class represents a Plan registered to the system.
@@ -78,10 +80,12 @@ public class Plan implements Serializable {
      private Status status;
 
      @JsonIgnore
-     @ManyToMany
+     @ManyToMany(cascade = CascadeType.ALL)
+     @LazyCollection(LazyCollectionOption.FALSE)
      @JoinTable(name = "SCOPES_PLANS",
              joinColumns = @JoinColumn(name = "PLAN_ID", referencedColumnName = "ID"),
              inverseJoinColumns = @JoinColumn(name = "SCOPE_ID", referencedColumnName = "ID"))
+     @JsonIgnoreProperties({"plans"})
      private List<Scope> scopes;
 
      @PrePersist

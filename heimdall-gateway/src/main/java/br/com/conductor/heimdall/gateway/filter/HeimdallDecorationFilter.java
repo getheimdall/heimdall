@@ -293,7 +293,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                         ctx.put(API_ID, operation.getResource().getApi().getId());
                         ctx.put(RESOURCE_ID, operation.getResource().getId());
                         ctx.put(OPERATION_ID, operation.getId());
-                        ctx.put("scopes", operation.getScopesIds());
+                        ctx.put(SCOPES, operation.getScopesIds());
 
                         List<Environment> environments = operation.getResource().getApi().getEnvironments();
 
