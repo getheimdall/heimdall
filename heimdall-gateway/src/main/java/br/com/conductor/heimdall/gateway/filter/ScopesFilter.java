@@ -27,7 +27,6 @@ import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -43,7 +42,6 @@ import static br.com.conductor.heimdall.gateway.util.ConstantsContext.CLIENT_ID;
 import static br.com.conductor.heimdall.gateway.util.ConstantsContext.OPERATION_ID;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 
-@Slf4j
 @Component
 public class ScopesFilter extends ZuulFilter {
 
@@ -89,12 +87,13 @@ public class ScopesFilter extends ZuulFilter {
     }
 
     private void process() {
-        RequestContext context = RequestContext.getCurrentContext();
+        final RequestContext context = RequestContext.getCurrentContext();
 
         final String client_id = context.getRequest().getHeader(CLIENT_ID);
-        final HttpServletRequest req = context.getRequest();
 
         if (client_id != null) {
+            final HttpServletRequest req = context.getRequest();
+
             final Set<Long> allowedOperations = new HashSet<>();
             final App app = appRepository.findByClientId(req.getHeader(CLIENT_ID));
 
