@@ -39,7 +39,7 @@ public class ConstantsTag {
      public static final String TAG_PLANS = "Plans";
      public static final String TAG_RESOURCES = "Resources";
      public static final String TAG_OPERATIONS = "Operations";
-     public static final String TAG_ACCESS_TOKENS = "AcessTokens";
+     public static final String TAG_ACCESS_TOKENS = "AccessTokens";
      public static final String TAG_INTERCEPTORS = "Interceptors";
      public static final String TAG_INTERCEPTORS_PLANS = "Plans Interceptors";
      public static final String TAG_INTERCEPTORS_RESOURCES = "Resources Interceptors";
