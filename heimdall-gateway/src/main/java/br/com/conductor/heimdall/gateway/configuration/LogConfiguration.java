@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.gateway.configuration;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -10,9 +7,9 @@ package br.com.conductor.heimdall.gateway.configuration;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +17,7 @@ package br.com.conductor.heimdall.gateway.configuration;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.configuration;
 
 import br.com.conductor.heimdall.core.environment.Property;
 import br.com.conductor.heimdall.gateway.appender.MongoDBAppender;
@@ -36,6 +34,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
+import java.time.ZoneId;
 
 /**
  * Class responsible to configure the logging.
@@ -50,6 +49,8 @@ public class LogConfiguration {
 
      private static final int DEFAULT_QUEUE_SIZE = 500;
 
+     private static final String DEFAULT_ZONE_ID = ZoneId.systemDefault().getId();
+
      @Autowired
      private Property property;
      
@@ -61,12 +62,14 @@ public class LogConfiguration {
              Logger logger = (Logger) LoggerFactory.getLogger("mongo");
              logger.setAdditive(false);
 
+             String zoneId = property.getMongo().getZoneId() != null ? property.getMongo().getZoneId() : DEFAULT_ZONE_ID;
+
              // Creating custom MongoDBAppender
              Appender<ILoggingEvent> appender;
              if (property.getMongo().getUrl() != null) {
-          	   appender = new MongoDBAppender(property.getMongo().getUrl(), property.getMongo().getDataBase(), property.getMongo().getCollection(), property.getMongo().getZoneId());
+          	     appender = new MongoDBAppender(property.getMongo().getUrl(), property.getMongo().getDataBase(), property.getMongo().getCollection(), zoneId);
              } else {
-          	   appender = new MongoDBAppender(property.getMongo().getServerName(), property.getMongo().getPort(), property.getMongo().getDataBase(), property.getMongo().getCollection(), property.getMongo().getZoneId());
+          	     appender = new MongoDBAppender(property.getMongo().getServerName(), property.getMongo().getPort(), property.getMongo().getDataBase(), property.getMongo().getCollection(), zoneId);
              }
              appender.setContext(lc);
              appender.start();
