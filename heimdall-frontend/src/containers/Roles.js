@@ -78,7 +78,7 @@ class Roles extends Component {
                 <Row className="h-row bg-white">
                     <ListRoles dataSource={roles} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading}/>
                     <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_ROLE]}>
-                        <FloatButton history={this.props.history} label="Add new ROLE" to="/roles/new"/>
+                        <FloatButton idButton="role-id" history={this.props.history} label="Add new ROLE" to="/roles/new"/>
                     </ComponentAuthority>
                 </Row>
             </div>
