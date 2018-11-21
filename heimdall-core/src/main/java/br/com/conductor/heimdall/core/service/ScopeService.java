@@ -25,6 +25,8 @@ import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.ScopeDTO;
 import br.com.conductor.heimdall.core.dto.page.ScopePage;
 import br.com.conductor.heimdall.core.entity.Api;
+import br.com.conductor.heimdall.core.entity.Operation;
+import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.entity.Scope;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.ApiRepository;
@@ -127,17 +129,30 @@ public class ScopeService {
         final Scope scopeData = scopeRepository.findByApiIdAndName(apiId, scope.getName());
         HeimdallException.checkThrow(scopeData != null, SCOPE_INVALID_NAME);
 
-        scope.getOperations().forEach(operation -> HeimdallException.checkThrow(
-                operationRepository.findOne(operation.getId()) == null,
-                SCOPE_INVALID_OPERATION,
-                operation.getId().toString())
-        );
+        scope.getOperations().forEach(op -> {
+            Operation operation = operationRepository.findOne(op.getId());
 
-        scope.getPlans().forEach(plan -> HeimdallException.checkThrow(
-                planRepository.findOne(plan.getId()) == null,
-                SCOPE_INVALID_PLAN,
-                plan.getId().toString())
-        );
+            HeimdallException.checkThrow(
+                    operation == null,
+                    SCOPE_INVALID_OPERATION, op.getId().toString());
+
+            HeimdallException.checkThrow(
+                    !operation.getResource().getApi().getId().equals(apiId),
+                    SCOPE_OPERATION_NOT_IN_API, operation.getId().toString(), apiId.toString());
+        });
+
+        scope.getPlans().forEach(p -> {
+            Plan plan = planRepository.findOne(p.getId());
+
+            HeimdallException.checkThrow(
+                    plan == null,
+                    SCOPE_INVALID_PLAN, p.getId().toString());
+
+            HeimdallException.checkThrow(
+                    !plan.getApi().getId().equals(apiId),
+                    SCOPE_PLAN_NOT_IN_API, plan.getId().toString(), apiId.toString()
+            );
+        });
 
         scope.setApi(api);
 

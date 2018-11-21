@@ -153,6 +153,10 @@ public enum ExceptionMessage {
 
     SCOPE_INVALID_PLAN(BAD_REQUEST.value(), "Plan id with '{}' does not exist", BadRequestException.class),
 
+    SCOPE_OPERATION_NOT_IN_API(BAD_REQUEST.value(), "Operation '{}' not in Api '{}'", BadRequestException.class),
+
+    SCOPE_PLAN_NOT_IN_API(BAD_REQUEST.value(), "Plan '{}' not in Api '{}'", BadRequestException.class),
+
     SCOPE_INVALID_NAME(BAD_REQUEST.value(), "A Scope with the provided name already exists", BadRequestException.class),
 
     ;
@@ -229,7 +233,7 @@ public enum ExceptionMessage {
 
         if (dynamicText != null && dynamicText.length > 0) {
 
-            Integer count = 0;
+            int count = 0;
             String baseMessage = messageDefault;
             while (baseMessage.contains("{}")) {
 
