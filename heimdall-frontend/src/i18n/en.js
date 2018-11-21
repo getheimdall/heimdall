@@ -221,6 +221,11 @@ export default {
         'this_operation_can_not_be_reverted': 'This operation can not be reverted.',
         'search_operations': 'Search operations',
         'app_name': 'App name',
-        'settings_ldap': 'Settings LDAP'
+        'settings_ldap': 'Settings LDAP',
+        'scopes': 'Scopes',
+        'scope': 'Scope',
+        'add_scope': 'Add Scope',
+        'available_operations': 'Available Operations',
+        'attributed_operations': 'Attributed Operations'
     }
 }

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Link } from 'react-router-dom'
+import i18n from "../../i18n/i18n"
 
 import { Modal, Row, Table, Divider, Tooltip, Button, Pagination } from 'antd';
 import ComponentAuthority from "../policy/ComponentAuthority";
@@ -9,16 +9,16 @@ import {privileges} from "../../constants/privileges-types";
 const confirm = Modal.confirm;
 const { Column } = Table;
 
-class ListRoles extends Component {
+class ListScopes extends Component {
 
-    showDeleteConfirm = (roleId) => (e) => {
+    showDeleteConfirm = (id) => (e) => {
         confirm({
-            title: 'Are you sure?',
-            okText: 'Yes',
+            title: i18n.t('are_you_sure'),
+            okText: i18n.t('yes'),
             okType: 'danger',
-            cancelText: 'No',
+            cancelText: i18n.t('no'),
             onOk: () => {
-                this.props.handleDelete(roleId)
+                this.props.handleDelete(id)
             }
         });
     }
@@ -28,20 +28,21 @@ class ListRoles extends Component {
         return (
             <div>
                 <Table dataSource={dataSource.content} rowKey={record => record.id} loading={loading} pagination={false}>
-                    <Column title="ID" dataIndex="id" id="id" />
-                    <Column title="Name" dataIndex="name" id="name" />
+                    <Column title={i18n.t('id')} dataIndex="id" id="id" />
+                    <Column title={i18n.t('name')} dataIndex="name" id="name" />
+                    <Column title={i18n.t('description')} dataIndex="description" id="description" />
                     <Column
                         id="action"
                         key="action"
                         align="right"
                         render={(text, record) => (
                             <span>
-                                <Tooltip title="Edit">
-                                    <Link to={"/roles/" + record.id}><Button type="primary" icon="edit" /></Link>
+                                <Tooltip title={i18n.t('edit')}>
+                                    <Button type="primary" icon="edit" onClick={this.props.handleEdit(record.id)} />
                                 </Tooltip>
-                                <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_ROLE]}>
+                                <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_SCOPE]}>
                                     <Divider type="vertical" />
-                                    <Tooltip title="Delete">
+                                    <Tooltip title={i18n.t('delete')}>
                                         <Button type="danger" icon="delete" onClick={this.showDeleteConfirm(record.id)} />
                                     </Tooltip>
                                 </ComponentAuthority>
@@ -57,15 +58,15 @@ class ListRoles extends Component {
     }
 }
 
-ListRoles.propTypes = {
+ListScopes.propTypes = {
     dataSource: PropTypes.object.isRequired,
     handleDelete: PropTypes.func.isRequired,
     handlePagination: PropTypes.func.isRequired
 }
 
 //used to prototype the table component
-ListRoles.defaultProps = {
+ListScopes.defaultProps = {
     dataSource:{}
 }
 
-export default ListRoles
+export default ListScopes

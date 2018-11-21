@@ -19,20 +19,33 @@
  */
 package br.com.conductor.heimdall.core.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
-
-import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 /**
  * TODO
@@ -40,7 +53,7 @@ import java.util.stream.Collectors;
  * @author Marcelo Aguiar Rodrigues
  */
 @Data
-@Table(name = "SCOPES", uniqueConstraints = { @UniqueConstraint(columnNames = { "API_ID", "NAME" }) })
+@Table(name = "SCOPES")
 @Entity
 @DynamicUpdate
 @DynamicInsert
@@ -49,7 +62,12 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class Scope implements Serializable {
 
-    @Id
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7495733828659838366L;
+
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ID")
     private Long id;
@@ -73,10 +91,7 @@ public class Scope implements Serializable {
     private Set<Operation> operations;
 
     @JsonIgnore
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "SCOPES_PLANS",
-            joinColumns = @JoinColumn(name = "SCOPE_ID", referencedColumnName = "ID"),
-            inverseJoinColumns = @JoinColumn(name = "PLAN_ID", referencedColumnName = "ID"))
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy="scopes")
     private Set<Plan> plans;
 
     @JsonIgnore

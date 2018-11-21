@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 
 import {Button, Col, Form, Input, Modal, Row, Tooltip, Transfer} from 'antd'
-import ComponentAuthority from "../ComponentAuthority";
+import ComponentAuthority from "../policy/ComponentAuthority";
 import {PrivilegeUtils} from "../../utils/PrivilegeUtils";
 import {privileges} from "../../constants/privileges-types";
 import Loading from "../ui/Loading";

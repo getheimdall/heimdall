@@ -84,10 +84,7 @@ public class Operation implements Serializable {
      private Resource resource;
 
      @JsonIgnore
-     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-     @JoinTable(name = "SCOPES_OPERATIONS",
-             joinColumns = @JoinColumn(name = "OPERATION_ID", referencedColumnName = "ID"),
-             inverseJoinColumns = @JoinColumn(name = "SCOPE_ID", referencedColumnName = "ID"))
+     @ManyToMany(fetch = FetchType.EAGER, mappedBy="operations")
      private List<Scope> scopes;
 
      /**

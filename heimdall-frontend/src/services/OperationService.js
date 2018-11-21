@@ -20,6 +20,22 @@ const getOperationsByResource = (idApi, idResource) => {
         })
 }
 
+const getOperationsByApi = (idApi) => {
+    if (isNaN(idApi)) {
+        return Promise.reject(new Error(i18n.t('invalid_parameter')))
+    }
+
+    return HTTPv1.get('/apis/' + idApi + '/operations')
+        .then(res => Promise.resolve(res.data))
+        .catch(error => {
+            console.log('Error: ', error)
+            if (error.response && error.response.status === 404) {
+                return Promise.reject(new Error(i18n.t('operation_not_found')));
+            }
+            throw error;
+        })
+}
+
 const getOperation = (idApi, idResource, idOperation) => {
     if (isNaN(idApi) || isNaN(idResource) || isNaN(idOperation)) {
         return Promise.reject(new Error(i18n.t('invalid_parameter')))
@@ -86,6 +102,7 @@ const update = (idApi, idResource, operation) => {
 
 export const operationService = {
     getOperationsByResource,
+    getOperationsByApi,
     getOperation,
     save,
     remove,

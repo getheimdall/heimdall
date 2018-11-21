@@ -8,9 +8,9 @@ import i18n from "../i18n/i18n"
 import Loading from '../components/ui/Loading'
 import PageHeader from '../components/ui/PageHeader'
 import ListPlans from '../components/plans/ListPlans'
-import FloatButton from '../components/ui/FloatButton'
+import RouteButton from '../components/ui/RouteButton'
 import {privileges} from "../constants/privileges-types"
-import ComponentAuthority from "../components/ComponentAuthority"
+import ComponentAuthority from "../components/policy/ComponentAuthority"
 import { getAllPlans, initLoading, remove, clearPlans } from '../actions/plans'
 
 class Plans extends Component {
@@ -83,7 +83,7 @@ class Plans extends Component {
                 <Row className="h-row bg-white">
                     <ListPlans dataSource={plans} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading} />
                     <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_PLAN]}>
-                        <FloatButton idButton="addPlan" history={history} to="/plans/new" label={i18n.t('add_new_plan')} />
+                        <RouteButton idButton="addPlan" history={history} to="/plans/new" label={i18n.t('add_new_plan')} />
                     </ComponentAuthority>
                 </Row>
             </div>
