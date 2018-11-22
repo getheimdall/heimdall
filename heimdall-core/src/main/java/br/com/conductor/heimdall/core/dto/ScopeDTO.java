@@ -38,6 +38,4 @@ public class ScopeDTO implements Serializable {
 
     private List<ReferenceIdDTO> operations;
 
-    private List<ReferenceIdDTO> plans;
-
 }

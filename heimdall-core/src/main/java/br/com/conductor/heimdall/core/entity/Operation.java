@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -58,6 +58,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(of = { "id" })
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Operation implements Serializable {
 
      private static final long serialVersionUID = -7728017075091653564L;
@@ -87,7 +88,6 @@ public class Operation implements Serializable {
      @JoinTable(name = "SCOPES_OPERATIONS",
              joinColumns = @JoinColumn(name = "OPERATION_ID", referencedColumnName = "ID"),
              inverseJoinColumns = @JoinColumn(name = "SCOPE_ID", referencedColumnName = "ID"))
-     @JsonIgnoreProperties({"operations"})
      private List<Scope> scopes;
 
      /**
@@ -102,6 +102,7 @@ public class Operation implements Serializable {
           }
      }
 
+     @JsonIgnore
      public Set<Long> getScopesIds() {
           return this.scopes != null ? this.scopes.stream().map(Scope::getId).collect(Collectors.toSet()) : Collections.EMPTY_SET;
      }

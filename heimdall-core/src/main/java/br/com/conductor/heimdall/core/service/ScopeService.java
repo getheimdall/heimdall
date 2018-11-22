@@ -26,12 +26,9 @@ import br.com.conductor.heimdall.core.dto.ScopeDTO;
 import br.com.conductor.heimdall.core.dto.page.ScopePage;
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Operation;
-import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.entity.Scope;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
-import br.com.conductor.heimdall.core.repository.ApiRepository;
 import br.com.conductor.heimdall.core.repository.OperationRepository;
-import br.com.conductor.heimdall.core.repository.PlanRepository;
 import br.com.conductor.heimdall.core.repository.ScopeRepository;
 import br.com.conductor.heimdall.core.util.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,13 +49,10 @@ public class ScopeService {
     private ScopeRepository scopeRepository;
 
     @Autowired
-    private ApiRepository apiRepository;
+    private ApiService apiService;
 
     @Autowired
     private OperationRepository operationRepository;
-
-    @Autowired
-    private PlanRepository planRepository;
 
     @Transactional(readOnly = true)
     public Scope find(final Long apiId, final Long scopeId) {
@@ -79,8 +73,7 @@ public class ScopeService {
      */
     public ScopePage list(final Long apiId, final ScopeDTO scopeDTO, final PageableDTO pageableDTO) {
 
-        Api api = apiRepository.findOne(apiId);
-        HeimdallException.checkThrow(api == null, GLOBAL_RESOURCE_NOT_FOUND);
+        Api api = apiService.find(apiId);
 
         Scope scope = GenericConverter.mapper(scopeDTO, Scope.class);
         scope.setApi(api);
@@ -102,8 +95,7 @@ public class ScopeService {
      */
     public List<Scope> list(final Long apiId, final ScopeDTO scopeDTO) {
 
-        Api api = apiRepository.findOne(apiId);
-        HeimdallException.checkThrow(api == null, GLOBAL_RESOURCE_NOT_FOUND);
+        Api api = apiService.find(apiId);
 
         Scope scope = GenericConverter.mapper(scopeDTO, Scope.class);
         scope.setApi(api);
@@ -123,8 +115,7 @@ public class ScopeService {
     @Transactional
     public Scope save(final Long apiId, Scope scope) {
 
-        final Api api = apiRepository.findOne(apiId);
-        HeimdallException.checkThrow(api == null, GLOBAL_RESOURCE_NOT_FOUND);
+        final Api api = apiService.find(apiId);
 
         final Scope scopeData = scopeRepository.findByApiIdAndName(apiId, scope.getName());
         HeimdallException.checkThrow(scopeData != null, SCOPE_INVALID_NAME);
@@ -139,19 +130,6 @@ public class ScopeService {
             HeimdallException.checkThrow(
                     !operation.getResource().getApi().getId().equals(apiId),
                     SCOPE_OPERATION_NOT_IN_API, operation.getId().toString(), apiId.toString());
-        });
-
-        scope.getPlans().forEach(p -> {
-            Plan plan = planRepository.findOne(p.getId());
-
-            HeimdallException.checkThrow(
-                    plan == null,
-                    SCOPE_INVALID_PLAN, p.getId().toString());
-
-            HeimdallException.checkThrow(
-                    !plan.getApi().getId().equals(apiId),
-                    SCOPE_PLAN_NOT_IN_API, plan.getId().toString(), apiId.toString()
-            );
         });
 
         scope.setApi(api);
@@ -172,7 +150,7 @@ public class ScopeService {
         Scope scope = scopeRepository.findByApiIdAndId(apiId, scopeId);
         HeimdallException.checkThrow(scope == null, GLOBAL_RESOURCE_NOT_FOUND);
 
-        scopeRepository.delete(scope.getId());
+        scopeRepository.delete(scope);
     }
 
     /**
@@ -185,8 +163,12 @@ public class ScopeService {
      */
     public Scope update(final Long apiId, final Long scopeId, Scope scope) {
 
-        Scope scopeByApiIdAndNameAndId = scopeRepository.findByApiIdAndNameAndId(apiId, scope.getName(), scopeId);
-        HeimdallException.checkThrow(scopeByApiIdAndNameAndId == null, GLOBAL_RESOURCE_NOT_FOUND);
+        Api api = apiService.find(apiId);
+
+        this.find(apiId, scopeId);
+
+        scope.setApi(api);
+        scope.setId(scopeId);
 
         scope = scopeRepository.save(scope);
 

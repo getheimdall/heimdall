@@ -28,11 +28,12 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.OPERATIO
 import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 import static br.com.twsoftware.alfred.object.Objeto.notBlank;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import br.com.conductor.heimdall.core.entity.Interceptor;
-import br.com.conductor.heimdall.core.repository.InterceptorRepository;
+import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -75,6 +76,9 @@ public class OperationService {
 
      @Autowired
      private InterceptorService interceptorService;
+
+     @Autowired
+     private ApiService apiService;
 
      @Autowired
      private AMQPRouteService amqpRoute;
@@ -145,6 +149,28 @@ public class OperationService {
           Example<Operation> example = Example.of(operation, ExampleMatcher.matching().withIgnorePaths("resource.api").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 
           return operationRepository.findAll(example);
+     }
+
+     /**
+      * Lists all {@link Operation} from one {@link Api}
+      *
+      * @param apiId The {@link Api} Id
+      * @return The complete list of all {@link Operation} from the {@link Api}
+      */
+     public List<Operation> list(final Long apiId) {
+          final Api api = apiService.find(apiId);
+
+          final List<Operation> operations = new ArrayList<>();
+
+          final OperationDTO operationDTO = new OperationDTO();
+
+          api.getResources().forEach(resource -> operations.addAll(this.list(apiId, resource.getId(), operationDTO)));
+
+          if (!operations.isEmpty()) {
+               return operations.stream().map(op -> new Operation(op.getId(), op.getMethod(), op.getPath(), null, null, null)).collect(Collectors.toList());
+          }
+
+          return new ArrayList<>();
      }
      
      /**

@@ -20,19 +20,17 @@
 package br.com.conductor.heimdall.core.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -67,20 +65,21 @@ public class Scope implements Serializable {
     @JoinColumn(name = "API_ID", nullable = false)
     private Api api;
 
-    @ManyToMany
-    @LazyCollection(LazyCollectionOption.FALSE)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "SCOPES_OPERATIONS",
             joinColumns = @JoinColumn(name = "SCOPE_ID", referencedColumnName = "ID"),
             inverseJoinColumns = @JoinColumn(name = "OPERATION_ID", referencedColumnName = "ID"))
-    private List<Operation> operations;
+    @JsonIgnoreProperties({"resource"})
+    private Set<Operation> operations;
 
-    @ManyToMany
-    @LazyCollection(LazyCollectionOption.FALSE)
+    @JsonIgnore
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "SCOPES_PLANS",
             joinColumns = @JoinColumn(name = "SCOPE_ID", referencedColumnName = "ID"),
             inverseJoinColumns = @JoinColumn(name = "PLAN_ID", referencedColumnName = "ID"))
-    private List<Plan> plans;
+    private Set<Plan> plans;
 
+    @JsonIgnore
     public Set<Long> getOperationsIds() {
         return this.operations != null ? this.operations.stream().map(Operation::getId).collect(Collectors.toSet()) : Collections.EMPTY_SET;
     }
