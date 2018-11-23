@@ -1,12 +1,14 @@
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
+import React, {Component} from 'react'
+import {connect} from 'react-redux'
 import { Row, Col, Form, Input, Button, Tooltip, notification } from 'antd'
 
-import i18n from "../../i18n/i18n"
-import { getAllApis } from '../../actions/apis'
 import ListApis from './ListApis'
-import PageHeader from '../ui/PageHeader'
+import i18n from "../../i18n/i18n"
 import Loading from '../ui/Loading'
+import PageHeader from '../ui/PageHeader'
+import { getAllApis } from '../../actions/apis'
+import ComponentAuthority from "../ComponentAuthority"
+import { privileges } from '../../constants/privileges-types'
 // import FloatButton from '../ui/FloatButton'
 
 const FormItem = Form.Item
@@ -14,14 +16,14 @@ const FormItem = Form.Item
 class Index extends Component {
     constructor(props) {
         super(props)
-        this.state = { searchBy: '' }
+        this.state = {searchBy: ''}
         this.searchApi = this.searchApi.bind(this)
     }
 
     componentWillReceiveProps(newProps) {
         if (newProps.notification && newProps.notification !== this.props.notification) {
-            const { type, message, description } = newProps.notification
-            notification[type]({ message, description })
+            const {type, message, description} = newProps.notification
+            notification[type]({message, description})
         }
     }
 
@@ -33,23 +35,23 @@ class Index extends Component {
     }
 
     searchApi(evt) {
-        this.setState({ ...this.state, searchBy: evt.target.value })
+        this.setState({...this.state, searchBy: evt.target.value})
     }
 
     render() {
-        const { apis } = this.props
-        const { history } = this.props
+        const {apis} = this.props
+        const {history} = this.props
 
         let listApi = null
         if (!apis) {
-            listApi = <Loading />
+            listApi = <Loading/>
         } else {
             const filteredApis = apis.filter(item => item.name.toUpperCase().includes(this.state.searchBy.toUpperCase()))
-            listApi = <ListApis apis={filteredApis} history={history} />
+            listApi = <ListApis apis={filteredApis} history={history}/>
         }
         return (
             <div>
-                <PageHeader title={i18n.t('apis')} icon="api" />
+                <PageHeader title={i18n.t('apis')} icon="api"/>
                 <Row className="h-row bg-white search-api">
                     <Form layout="inline" id="api-search-form">
                         <Row gutter={20} type="flex" justify="space-between" align="bottom">
@@ -64,9 +66,11 @@ class Index extends Component {
 
                 {listApi}
 
-                <Tooltip placement="left" title={i18n.t('add_new_api')}>
-                    <Button id="addApi" style={{ position: 'fixed', bottom: '30px', right: '30px', zIndex: 9 }} className="floatButton" type="primary" icon="plus" onClick={() => history.push("/apis/new")} size="large" shape="circle" />
-                </Tooltip>
+                <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_API]}>
+                    <Tooltip placement="left" title={i18n.t('add_new_api')}>
+                        <Button id="addApi" style={{ position: 'fixed', bottom: '30px', right: '30px', zIndex: 9 }} className="floatButton" type="primary" icon="plus" onClick={() => history.push("/apis/new")} size="large" shape="circle" />
+                    </Tooltip>
+                </ComponentAuthority>
             </div>
         )
     }

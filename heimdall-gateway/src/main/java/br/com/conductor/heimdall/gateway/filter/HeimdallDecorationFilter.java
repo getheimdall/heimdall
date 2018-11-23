@@ -22,6 +22,7 @@ package br.com.conductor.heimdall.gateway.filter;
  */
 
 import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
+import static br.com.conductor.heimdall.gateway.util.ConstantsContext.*;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.FORWARD_LOCATION_PREFIX;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.FORWARD_TO_KEY;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.HTTPS_PORT;
@@ -74,13 +75,13 @@ import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.gateway.util.RequestHelper;
 import br.com.conductor.heimdall.gateway.zuul.route.HeimdallRoute;
 import br.com.conductor.heimdall.gateway.zuul.route.ProxyRouteLocator;
-import br.com.twsoftware.alfred.object.Objeto;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * Extends the {@link PreDecorationFilter}.
  *
  * @author Marcos Filho
+ * @author Marcelo Aguiar Rodrigues
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Slf4j
@@ -170,12 +171,12 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
         final String method = ctx.getRequest().getMethod().toUpperCase();
         HeimdallRoute heimdallRoute = getMatchingHeimdallRoute(requestURI, method, ctx);
 
-        if (ctx.getRequest().getHeader("access_token") != null) {
-            TraceContextHolder.getInstance().getActualTrace().setAccessToken(ctx.getRequest().getHeader("access_token"));
+        if (ctx.getRequest().getHeader(ACCESS_TOKEN) != null) {
+            TraceContextHolder.getInstance().getActualTrace().setAccessToken(ctx.getRequest().getHeader(ACCESS_TOKEN));
         }
 
-        if (ctx.getRequest().getHeader("client_id") != null) {
-            TraceContextHolder.getInstance().getActualTrace().setClientId(ctx.getRequest().getHeader("client_id"));
+        if (ctx.getRequest().getHeader(CLIENT_ID) != null) {
+            TraceContextHolder.getInstance().getActualTrace().setClientId(ctx.getRequest().getHeader(ACCESS_TOKEN));
         }
         if (heimdallRoute != null) {
 
@@ -272,15 +273,14 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
 
         boolean auxMatch = false;
         for (Entry<String, ZuulRoute> entry : routeLocator.getAtomicRoutes().get().entrySet()) {
-            if (Objeto.notBlank(entry.getKey())) {
+            if (entry.getKey() != null) {
                 String pattern = entry.getKey();
                 if (this.pathMatcher.match(pattern, requestURI)) {
 
                     auxMatch = true;
                     List<Operation> operations = operationRepository.findByEndPoint(pattern);
                     Operation operation = null;
-
-                    if (Objeto.notBlank(operations)) {
+                    if (Objects.nonNull(operations) && !operations.isEmpty()) {
                         if (method.equals(HttpMethod.OPTIONS.name())) {
                             Optional<Operation> first = operations.stream().findFirst();
                             if (first.isPresent() && first.get().getResource().getApi().isCors()) {
@@ -293,30 +293,27 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                         }
                     }
 
-                    if (Objeto.notBlank(operation)) {
+                    if (operation != null) {
                         ZuulRoute zuulRoute = entry.getValue();
 
                         String basePath = operation.getResource().getApi().getBasePath();
                         requestURI = org.apache.commons.lang.StringUtils.removeStart(requestURI, basePath);
-                        ctx.put("pattern", org.apache.commons.lang.StringUtils.removeStart(pattern, basePath));
-                        ctx.put("api-id", operation.getResource().getApi().getId());
-                        ctx.put("api-name", operation.getResource().getApi().getName());
+                        ctx.put(PATTERN, org.apache.commons.lang.StringUtils.removeStart(pattern, basePath));
+                        ctx.put(API_NAME, operation.getResource().getApi().getName());
+                        ctx.put(API_ID, operation.getResource().getApi().getId());
+                        ctx.put(RESOURCE_ID, operation.getResource().getId());
+                        ctx.put(OPERATION_ID, operation.getId());
 
                         List<Environment> environments = operation.getResource().getApi().getEnvironments();
 
                         String location = null;
-                        if (Objeto.notBlank(environments)) {
+                        if (environments != null) {
 
                             String host = ctx.getRequest().getHeader("Host");
-                            if (Objeto.isBlank(host)) {
-
-                                host = ctx.getRequest().getHeader("host");
-                            }
 
                             Optional<Environment> environment;
-                            if (Objeto.notBlank(host)) {
-                                String tempHost = host;
-                                environment = environments.stream().filter(e -> e.getInboundURL().toLowerCase().contains(tempHost.toLowerCase())).findFirst();
+                            if (host != null && !host.isEmpty()) {
+                                environment = environments.stream().filter(e -> e.getInboundURL().toLowerCase().contains(host.toLowerCase())).findFirst();
                             } else {
                                 environment = environments.stream().filter(e -> ctx.getRequest().getRequestURL().toString().toLowerCase().contains(e.getInboundURL().toLowerCase())).findFirst();
                             }

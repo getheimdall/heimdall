@@ -4,8 +4,8 @@ export default {
         'insert_password': 'Por favor, insira a senha!',
         'username': 'Nome de usuário',
         'password': 'Senha',
-        'sing_in': 'Entrar',
-        'sing_out': 'Sair',
+        'sign_in': 'Entrar',
+        'sign_out': 'Sair',
         'username_password_incorrect': 'Nome de usuário ou senha incorretos!',
         'welcome_heimdall': 'Bem vindo ao Heimdall',
         'apis': 'APIs',
@@ -220,6 +220,7 @@ export default {
         'deleting_an_api_delete_resources_operations_interceptors_middlewares': 'Deletando uma api também estará removendo os Recursos, Operações, Interceptadores ou Middlewares associados a essa API.',
         'this_operation_can_not_be_reverted': 'Esta operação não pode ser revertida.',
         'search_operations': 'Buscar operações',
-        'app_name': 'Nome do app'
+        'app_name': 'Nome do app',
+        'settings_ldap': 'Configurações do LDAP'
     }
 }

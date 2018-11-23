@@ -21,6 +21,7 @@ package br.com.conductor.heimdall.api.repository;
  * ==========================LICENSE_END===================================
  */
 
+import br.com.conductor.heimdall.core.enums.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -61,7 +62,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
       * @param type			{@link TypeUser}
       * @return				{@link CredentialSecurity}
       */
-     @Query(value = "SELECT userName as userName, password as password FROM User WHERE userName = ?1 and type = ?2")
-     CredentialSecurity findCredentialByUserNameAndType(String username, TypeUser type);
+     @Query(value = "SELECT userName as userName, password as password FROM User WHERE userName = ?1 and type = ?2 and status =?3 ")
+     CredentialSecurity findCredentialByUserNameAndTypeAndStatus(String username, TypeUser type, Status status);
      
 }

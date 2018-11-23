@@ -135,6 +135,12 @@ public enum ExceptionMessage {
 
     API_BASEPATH_MALFORMED(BAD_REQUEST.value(), "Api basepath can not contain a wild card", BadRequestException.class),
 
+    USERNAME_OR_PASSWORD_INCORRECT(BAD_REQUEST.value(), "Username or password incorrect", BadRequestException.class),
+
+    USERNAME_ALREADY_EXIST(BAD_REQUEST.value(), "Username already exist!", BadRequestException.class),
+
+    EMAIL_ALREADY_EXIST(BAD_REQUEST.value(), "Email already exist!", BadRequestException.class),
+
     CLIENT_ID_ALREADY(BAD_REQUEST.value(), "clientId already used", BadRequestException.class),
 
     CLIENT_ID_NOT_FOUND(BAD_REQUEST.value(), "client_id not found", BadRequestException.class),
@@ -146,6 +152,7 @@ public enum ExceptionMessage {
     CORS_INTERCEPTOR_NOT_API_LIFE_CYCLE(BAD_REQUEST.value(), "The CORS Interceptor must of Lifecycle type API", BadRequestException.class),
 
     CORS_INTERCEPTOR_ALREADY_ASSIGNED_TO_THIS_API(BAD_REQUEST.value(), "A CORS Interceptor already assigned to this API", BadRequestException.class);
+
 
     @Getter
     private Integer httpCode;

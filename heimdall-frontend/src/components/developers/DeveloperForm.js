@@ -3,6 +3,9 @@ import PropTypes from 'prop-types'
 import { Row, Form, Input, Col, Switch, Tooltip, Button, Modal } from 'antd'
 
 import i18n from "../../i18n/i18n"
+import ComponentAuthority from "../ComponentAuthority"
+import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
+import { privileges } from '../../constants/privileges-types'
 
 const FormItem = Form.Item
 const confirm = Modal.confirm;
@@ -48,7 +51,7 @@ class DeveloperForm extends Component {
                                     getFieldDecorator('name', {
                                         initialValue: developer && developer.name,
                                         rules: [{ required: true, message: i18n.t('please_input_your_name') }]
-                                    })(<Input required />)
+                                    })(<Input required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_DEVELOPER, privileges.PRIVILEGE_UPDATE_DEVELOPER])}/>)
                                 }
                             </FormItem>
                         </Col>
@@ -58,7 +61,7 @@ class DeveloperForm extends Component {
                                     getFieldDecorator('email', {
                                         initialValue: developer && developer.email,
                                         rules: [{ required: true, type: 'email', message: i18n.t('please_input_valid_email') }]
-                                    })(<Input required />)
+                                    })(<Input required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_DEVELOPER, privileges.PRIVILEGE_UPDATE_DEVELOPER])}/>)
                                 }
                             </FormItem>
                         </Col>
@@ -68,7 +71,7 @@ class DeveloperForm extends Component {
                                     getFieldDecorator('status', {
                                         initialValue: developer ? developer.status === 'ACTIVE' : true,
                                         valuePropName: 'checked'
-                                    })(<Switch required />)
+                                    })(<Switch required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_DEVELOPER, privileges.PRIVILEGE_UPDATE_DEVELOPER])}/>)
                                 }
                             </FormItem>
                         </Col>
@@ -76,12 +79,16 @@ class DeveloperForm extends Component {
                 </Form>
 
                 <Row type="flex" justify="end">
-                    <Tooltip title={i18n.t('delete')}>
-                        <Button id="deleteDeveloper" className="card-button" type="danger" ghost icon="delete" size="large" shape="circle" disabled={!developer} onClick={developer && this.showDeleteConfirm(developer.id)} loading={loading} />
-                    </Tooltip>
-                    <Tooltip title={i18n.t('save')}>
-                        <Button id="saveDeveloper" className="card-button" type="primary" icon="save" size="large" shape="circle" onClick={this.onSubmitForm} loading={loading} />
-                    </Tooltip>
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_DEVELOPER]}>
+                        <Tooltip title={i18n.t('delete')}>
+                            <Button id="deleteDeveloper" className="card-button" type="danger" ghost icon="delete" size="large" shape="circle" disabled={!developer} onClick={developer && this.showDeleteConfirm(developer.id)} loading={loading} />
+                        </Tooltip>
+                    </ComponentAuthority>
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_DEVELOPER, privileges.PRIVILEGE_UPDATE_DEVELOPER]}>
+                        <Tooltip title={i18n.t('save')}>
+                            <Button id="saveDeveloper" className="card-button" type="primary" icon="save" size="large" shape="circle" onClick={this.onSubmitForm} loading={loading} />
+                        </Tooltip>
+                    </ComponentAuthority>
                 </Row>
             </Row>
         )

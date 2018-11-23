@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom'
 import { Modal, Table, Divider, Tag, Tooltip, Button, Row, Pagination } from 'antd'
 
 import i18n from "../../i18n/i18n"
+import ComponentAuthority from "../ComponentAuthority"
+import {privileges} from "../../constants/privileges-types"
 
 const confirm = Modal.confirm;
 const { Column } = Table;
@@ -40,15 +42,18 @@ class ListUsers extends Component {
                         title={i18n.t('action')}
                         id="action"
                         key="action"
+                        width={180}
                         render={(text, record) => (
                             <span>
                                 <Tooltip title={i18n.t('edit')}>
                                     <Link to={"/users/" + record.id}><Button type="primary" icon="edit" /></Link>
                                 </Tooltip>
-                                <Divider type="vertical" />
-                                <Tooltip title={i18n.t('delete')}>
-                                    <Button type="danger" icon="delete" onClick={this.showDeleteConfirm(record.id)} />
-                                </Tooltip>
+                                <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_USER]}>
+                                    <Divider type="vertical" />
+                                    <Tooltip title={i18n.t('delete')}>
+                                        <Button type="danger" icon="delete" onClick={this.showDeleteConfirm(record.id)} />
+                                    </Tooltip>
+                                </ComponentAuthority>
                             </span>
                         )}
                     />

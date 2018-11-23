@@ -5,8 +5,10 @@ import {DragSource, DropTarget} from 'react-dnd'
 import { Button, Modal, Icon, Popover} from 'antd'
 
 import i18n from "../../i18n/i18n"
-import ItemTypes from '../../constants/items-types'
 import InterceptorForm from './InterceptorForm'
+import ItemTypes from '../../constants/items-types'
+import ComponentAuthority from "../ComponentAuthority"
+import {privileges} from "../../constants/privileges-types"
 
 const interceptorSpec = {
     beginDrag(props) {
@@ -199,28 +201,28 @@ class DnDInterceptor extends Component {
         return (
             connectDragSource(
                 connectDropTarget(
-                    <div className="draggable-interceptor" style={styledIsOver}>
+                    <div className="draggable-interceptor"  style={styledIsOver}>
                         <Popover content={clickContent} title={interceptor && `${i18n.t('name')}: ${interceptor.name}`}
-                                     trigger="click"
-                                     visible={this.state.clicked} onVisibleChange={this.handleClickChange}>
-                                <div className="ant-btn ant-btn-circle ant-btn-lg ant-btn-icon-only" style={style}>
-                                    <Icon type={icon}/>
-                                </div>
+                                 trigger="click"
+                                 visible={this.state.clicked} onVisibleChange={this.handleClickChange}>
+                            <div className="ant-btn ant-btn-circle ant-btn-lg ant-btn-icon-only" style={style}>
+                                <Icon type={icon}/>
+                            </div>
                         </Popover>
                         <span>{type}</span>
 
                         <Modal title={i18n.t('edit_interceptor')}
-                               footer={[
-                                   <Button id="cancelInterceptorModal" key="back"
-                                           onClick={this.handleCancel}>{i18n.t('cancel')}</Button>,
-                                   <Button id="saveInterceptorModal" key="submit" type="primary"
-                                           onClick={this.handleSave}>
-                                       {i18n.t('save')}
-                                   </Button>
-                               ]}
-                               visible={this.state.showModal}
-                               onCancel={this.handleCancel}
-                               destroyOnClose>
+                            footer={[
+                                <Button id="cancelInterceptorModal" key="back" onClick={this.handleCancel}>{i18n.t('cancel')}</Button>,
+                                <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_INTERCEPTOR, privileges.PRIVILEGE_UPDATE_INTERCEPTOR]}>
+                                    <Button id="saveInterceptorModal" key="submit" type="primary" onClick={this.handleSave}>
+                                        {i18n.t('save')}
+                                    </Button>
+                                </ComponentAuthority>
+                            ]}
+                            visible={this.state.showModal}
+                            onCancel={this.handleCancel}
+                            destroyOnClose >
                             <InterceptorForm
                                 onRef={ref => (this.interceptorForm = ref)}
                                 interceptor={interceptor}

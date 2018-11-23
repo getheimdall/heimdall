@@ -60,6 +60,7 @@ export const update = user => dispatch => {
         .then(data => {
             dispatch(getUser(user.id))
             dispatch(sendNotification({ type: 'success', message: i18n.t('user_updated') }))
+            dispatch(push('/users'))
             dispatch(finishLoading())
         })
         .catch(error => {

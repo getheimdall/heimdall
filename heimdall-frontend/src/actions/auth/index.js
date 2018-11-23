@@ -1,9 +1,10 @@
 import { notification } from 'antd'
-import { push } from 'connected-react-router';
+import {push} from 'connected-react-router'
 
-import i18n from "../../i18n/i18n";
+import i18n from "../../i18n/i18n"
+import {userService} from '../../services'
 import { AuthConstants } from '../../constants/actions-types'
-import { userService } from '../../services'
+import {privilegeService} from "../../services/PrivilegeService"
 
 const loginFailed = message => ({
     type: AuthConstants.LOGIN_FAILED,
@@ -34,8 +35,16 @@ export const login = (login, password) => dispatch => {
     .then(data => {
         notification['success']({ message: i18n.t('welcome_heimdall') })
         dispatch(loginSuccessful(data))
-        dispatch(push('/'))
-        dispatch(finishLoading())
+        privilegeService.getPrivilegesByUsername(login)
+            .then(data => {
+                dispatch(push('/'))
+                dispatch(finishLoading())
+            })
+            .catch(error => {
+                notification['error']({ message: 'Failed to get privileges this user' })
+                dispatch(push('/login'))
+                dispatch(finishLoading())
+            })
     }).catch(error => {
         notification['error']({ message: i18n.t('username_password_incorrect') })
         dispatch(loginFailed(i18n.t('username_password_incorrect')))

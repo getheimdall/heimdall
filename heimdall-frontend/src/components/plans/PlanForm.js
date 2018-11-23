@@ -3,6 +3,9 @@ import PropTypes from 'prop-types'
 import { Row, Form, Input, Col, Switch, Tooltip, Button, Modal, AutoComplete, Spin, Icon } from 'antd'
 
 import i18n from "../../i18n/i18n"
+import ComponentAuthority from "../ComponentAuthority"
+import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
+import {privileges} from "../../constants/privileges-types"
 
 const FormItem = Form.Item
 const confirm = Modal.confirm
@@ -65,7 +68,7 @@ class PlanForm extends Component {
                                             { required: true, message: i18n.t('please_input_plan_name') },
                                             { min: 5, message: i18n.t('min_5_characters_to_name') }
                                         ]
-                                    })(<Input required />)
+                                    })(<Input required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_PLAN, privileges.PRIVILEGE_UPDATE_PLAN])}/>)
                                 }
                             </FormItem>
                         </Col>
@@ -78,7 +81,7 @@ class PlanForm extends Component {
                                             { required: true, message: i18n.t('please_input_plan_description') },
                                             { min: 5, message: i18n.t('min_5_characters_to_description') }
                                         ]
-                                    })(<Input required />)
+                                    })(<Input required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_PLAN, privileges.PRIVILEGE_UPDATE_PLAN])}/>)
                                 }
                             </FormItem>
                         </Col>
@@ -93,6 +96,7 @@ class PlanForm extends Component {
                                         ]
                                     })(
                                         <AutoComplete
+                                            disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_PLAN, privileges.PRIVILEGE_UPDATE_PLAN])}
                                             notFoundContent={fetching ? < Spin size="small" /> : null}
                                             filterOption={false}
                                             dataSource={apiAutocompleteSource}
@@ -110,7 +114,7 @@ class PlanForm extends Component {
                                     getFieldDecorator('status', {
                                         initialValue: plan ? plan.status === 'ACTIVE' : true,
                                         valuePropName: 'checked'
-                                    })(<Switch required />)
+                                    })(<Switch required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_PLAN, privileges.PRIVILEGE_UPDATE_PLAN])}/>)
                                 }
                             </FormItem>
                         </Col>
@@ -118,12 +122,16 @@ class PlanForm extends Component {
                 </Form>
 
                 <Row type="flex" justify="end">
-                    <Tooltip title={i18n.t('delete')}>
-                        <Button id="deletePlan" className="card-button" type="danger" ghost icon="delete" size="large" shape="circle" disabled={!plan} onClick={plan && this.showDeleteConfirm(plan.id)} loading={loading} />
-                    </Tooltip>
-                    <Tooltip title={i18n.t('save')}>
-                        <Button id="savePlan" className="card-button" type="primary" icon="save" size="large" shape="circle" onClick={this.onSubmitForm} loading={loading} />
-                    </Tooltip>
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_PLAN]}>
+                        <Tooltip title={i18n.t('delete')}>
+                            <Button id="deletePlan" className="card-button" type="danger" ghost icon="delete" size="large" shape="circle" disabled={!plan} onClick={plan && this.showDeleteConfirm(plan.id)} loading={loading} />
+                        </Tooltip>
+                    </ComponentAuthority>
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_PLAN, privileges.PRIVILEGE_UPDATE_PLAN]}>
+                        <Tooltip title={i18n.t('save')}>
+                            <Button className="card-button" type="primary" icon="save" size="large" shape="circle" onClick={this.onSubmitForm} loading={loading} />
+                        </Tooltip>
+                    </ComponentAuthority>
                 </Row>
             </Row >
         )
