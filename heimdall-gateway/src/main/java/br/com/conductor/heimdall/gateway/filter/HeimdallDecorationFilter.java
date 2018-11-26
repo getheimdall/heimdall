@@ -159,6 +159,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
     protected void process() {
 
         RequestContext ctx = RequestContext.getCurrentContext();
+        ctx.set(SCOPES_RUN, true);
         final String requestURI = getPathWithoutStripSuffix(ctx.getRequest());
 
         if (pathMatcher.match(ConstantsPath.PATH_MANAGER_PATTERN, requestURI) || "/error".equals(requestURI)) {
@@ -180,6 +181,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
 
             if (heimdallRoute.isMethodNotAllowed()) {
                 ctx.setSendZuulResponse(false);
+                ctx.set(SCOPES_RUN, false);
                 ctx.setResponseStatusCode(HttpStatus.METHOD_NOT_ALLOWED.value());
                 ctx.setResponseBody(HttpStatus.METHOD_NOT_ALLOWED.getReasonPhrase());
                 return;
@@ -188,6 +190,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
             if (heimdallRoute.getRoute() == null || heimdallRoute.getRoute().getLocation() == null) {
                 log.warn("Environment not configured for this location: {} and inbound: {}", ctx.getRequest().getRequestURL(), requestURI);
                 ctx.setSendZuulResponse(false);
+                ctx.set(SCOPES_RUN, false);
                 ctx.setResponseStatusCode(HttpStatus.FORBIDDEN.value());
                 ctx.setResponseBody("Environment not configured for this inbound");
                 ctx.getResponse().setContentType(MediaType.TEXT_PLAIN_VALUE);
@@ -238,6 +241,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
         } else {
             log.warn("No route found for uri: " + requestURI);
             ctx.setSendZuulResponse(false);
+            ctx.set(SCOPES_RUN, false);
             ctx.setResponseStatusCode(HttpStatus.NOT_FOUND.value());
             ctx.setResponseBody(HttpStatus.NOT_FOUND.getReasonPhrase());
             ctx.getResponse().setContentType(MediaType.TEXT_PLAIN_VALUE);
