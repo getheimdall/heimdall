@@ -25,7 +25,10 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_R
 import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 
 import java.util.List;
+import java.util.Set;
 
+import br.com.conductor.heimdall.api.dto.UserEditDTO;
+import br.com.conductor.heimdall.api.entity.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -80,6 +83,13 @@ public class UserService {
           user = userRepository.save(user);
           
           return user;
+     }
+
+     public User findByUsername(String username) {
+          User userFound = userRepository.findByUserName(username);
+          Set<Role> roles = roleRepository.findRolesByUserId(userFound.getId());
+          userFound.setRoles(roles);
+          return userFound;
      }
      
      /**
@@ -163,13 +173,12 @@ public class UserService {
       * @throws NotFoundException
       */
      @Transactional
-     public User update(Long userId, UserDTO userDTO) {
+     public User update(Long userId, UserEditDTO userDTO) {
 
           User user = userRepository.findOne(userId);
           HeimdallException.checkThrow(isBlank(user), GLOBAL_RESOURCE_NOT_FOUND);
           
           user = GenericConverter.mapper(userDTO, user);
-          user.setPassword(passwordEncoder.encode(user.getPassword()));
           user = userRepository.save(user);
           
           return user;

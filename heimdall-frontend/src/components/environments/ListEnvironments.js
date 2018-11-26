@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom'
 import { List, Avatar, Tag, Tooltip, Button, Modal, Row, Col } from 'antd'
 
 import i18n from "../../i18n/i18n"
+import ComponentAuthority from "../ComponentAuthority"
+import {privileges} from "../../constants/privileges-types"
 
 const confirm = Modal.confirm;
 
@@ -34,9 +36,12 @@ class ListEnvironments extends Component {
                             <Tooltip title={i18n.t('edit')}>
                                 <Link to={"/environments/"+env.id}><Button type="primary" icon="edit" /></Link>
                             </Tooltip>,
-                            <Tooltip title={i18n.t('delete')}>
-                                <Button type="danger" icon="delete" onClick={this.showDeleteConfirm(env.id)} />
-                            </Tooltip>]}>
+                            <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_ENVIRONMENT]}>
+                                <Tooltip title={i18n.t('delete')}>
+                                    <Button type="danger" icon="delete" onClick={this.showDeleteConfirm(env.id)} />
+                                </Tooltip>
+                            </ComponentAuthority>
+                        ]}>
                             <List.Item.Meta
                                 avatar={<Avatar icon="codepen" />}
                                 title={env.name}

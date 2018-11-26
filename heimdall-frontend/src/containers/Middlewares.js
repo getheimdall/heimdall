@@ -2,8 +2,10 @@ import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {Button, Card, Icon, Input, message, notification, Pagination, Row, Table, Tag, Tooltip, Upload} from 'antd'
 
-import {downloadMiddleware, getMiddlewares, initLoading, save} from '../actions/middlewares'
 import i18n from "../i18n/i18n"
+import {privileges} from "../constants/privileges-types"
+import ComponentAuthority from "../components/ComponentAuthority"
+import {downloadMiddleware, getMiddlewares, initLoading, save} from '../actions/middlewares'
 
 const Dragger = Upload.Dragger
 const Column = Table.Column
@@ -81,10 +83,9 @@ class Middlewares extends Component {
         this.setState({...this.state, version: event.target.value})
     }
 
-    handleFileDownload = (middlewareId, version) => {
-        const apiName = this.props.api.name;
+    handleFileDownload = (middlewareId) => {
         this.props.dispatch(initLoading())
-        this.props.dispatch(downloadMiddleware(middlewareId, this.props.api.id, apiName, version))
+        this.props.dispatch(downloadMiddleware(middlewareId, this.props.api.id))
     }
 
     verifyVersionIsEmpty = () => {
@@ -106,26 +107,28 @@ class Middlewares extends Component {
 
         return (
             <div>
-                <Card
-                    title={i18n.t('upload_middleware')}
-                    style={{marginBottom: 20}}
-                    className="inside-shadow"
-                >
-                    <Row>
-                        <Input placeholder={i18n.t('version')} onChange={(event) => this.handleOnChangeVersion(event)}
-                               addonBefore={i18n.t('version')} value={this.state.version}/>
-                    </Row>
-                    <br/>
-                    <Row>
-                        <Dragger id="dragMiddleware" {...propsFileUpload} disabled={this.verifyVersionIsEmpty()}>
-                            <p className="ant-upload-drag-icon">
-                                <Icon type="inbox"/>
-                            </p>
-                            <p className="ant-upload-text">{i18n.t('click_or_drag_middleware_to_this_area_to_upload')}</p>
-                            <p className="ant-upload-hint">{i18n.t('support_for_single_upload_at_time')}</p>
-                        </Dragger>
-                    </Row>
-                </Card>
+                <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_MIDDLEWARE]}>
+                    <Card
+                        title={i18n.t('upload_middleware')}
+                        style={{marginBottom: 20}}
+                        className="inside-shadow"
+                    >
+                        <Row>
+                            <Input placeholder={i18n.t('version')} onChange={(event) => this.handleOnChangeVersion(event)}
+                                   addonBefore={i18n.t('version')} value={this.state.version}/>
+                        </Row>
+                        <br/>
+                        <Row>
+                            <Dragger id="dragMiddleware" {...propsFileUpload} disabled={this.verifyVersionIsEmpty()}>
+                                <p className="ant-upload-drag-icon">
+                                    <Icon type="inbox"/>
+                                </p>
+                                <p className="ant-upload-text">{i18n.t('click_or_drag_middleware_to_this_area_to_upload')}</p>
+                                <p className="ant-upload-hint">{i18n.t('support_for_single_upload_at_time')}</p>
+                            </Dragger>
+                        </Row>
+                    </Card>
+                </ComponentAuthority>
                 <Card
                     title={i18n.t('version_middleware')}
                     style={{marginBottom: 20}}
@@ -148,7 +151,7 @@ class Middlewares extends Component {
                                 <Column title={i18n.t('created_on')} dataIndex="creationDate"/>
                                 <Column title={i18n.t('download')} render={(record) => (
                                     <Tooltip title={i18n.t('download_this_file')}>
-                                        <Button className="card-button add-tour" type="primary" icon="download" onClick={() => this.handleFileDownload(record.id, record.version)} size="large" shape="circle" />
+                                        <Button className="card-button add-tour" type="primary" icon="download" onClick={() => this.handleFileDownload(record.id)} size="large" shape="circle" />
                                     </Tooltip>
                                 )}/>
                             </Table>

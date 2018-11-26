@@ -108,6 +108,10 @@ public class ConstantsPrivilege {
      public static final String PRIVILEGE_UPDATE_TRACES = "hasAuthority('UPDATE_TRACES')";
      public static final String PRIVILEGE_DELETE_TRACES = "hasAuthority('DELETE_TRACES')";
 
+
+     public static final String PRIVILEGE_READ_LDAP = "hasAuthority('READ_LDAP')";
+     public static final String PRIVILEGE_UPDATE_LDAP = "hasAuthority('UPDATE_LDAP')";
+
      public static final String PRIVILEGE_READ_METRICS = "hasAuthority('READ_METRICS')";
 
 }

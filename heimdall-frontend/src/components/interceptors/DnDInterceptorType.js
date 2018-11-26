@@ -3,9 +3,11 @@ import PropTypes from 'prop-types'
 import { DragSource } from 'react-dnd'
 import { Button, Badge, Modal, Icon } from 'antd'
 
-import i18n from "../../i18n/i18n";
-import ItemTypes from '../../constants/items-types'
+import i18n from "../../i18n/i18n"
 import InterceptorForm from './InterceptorForm'
+import ItemTypes from '../../constants/items-types'
+import ComponentAuthority from "../ComponentAuthority"
+import {privileges} from "../../constants/privileges-types"
 
 const interceptorSpec = {
     beginDrag(props) {
@@ -80,9 +82,11 @@ class DnDInterceptorType extends Component {
                     <Modal title={i18n.t('add_interceptor')}
                         footer={[
                             <Button id="cancelInterceptorTypeModal" key="back" onClick={this.handleCancel}>{i18n.t('cancel')}</Button>,
-                            <Button id="saveInterceptorTypeModal" key="submit" type="primary" onClick={this.handleSave}>
-                                {i18n.t('save')}
-                            </Button>
+                            <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_INTERCEPTOR, privileges.PRIVILEGE_UPDATE_INTERCEPTOR]}>
+                                <Button id="saveInterceptorTypeModal" key="submit" type="primary" onClick={this.handleSave}>
+                                    {i18n.t('save')}
+                                </Button>
+                            </ComponentAuthority>
                         ]}
                         visible={this.state.showModal}
                         onCancel={this.handleCancel}

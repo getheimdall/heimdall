@@ -4,9 +4,11 @@ import { bindActionCreators } from 'redux'
 import { withI18n } from 'react-i18next'
 import { Menu, Icon, Row, Col, notification } from 'antd'
 
-import { logout, getUser } from '../../actions/auth'
-import { clearCaches, initLoading } from '../../actions/cache'
 import languages from '../../constants/languages'
+import { logout, getUser } from '../../actions/auth'
+import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
+import {privileges} from "../../constants/privileges-types"
+import { clearCaches, initLoading } from '../../actions/cache'
 
 const SubMenu = Menu.SubMenu
 const MenuItemGroup = Menu.ItemGroup
@@ -59,7 +61,9 @@ class NavBar extends Component {
                     <Menu id="top-bar-menu" mode="horizontal" theme="light" style={{ lineHeight: '62px' }} onClick={this.handleClick}>
                         <SubMenu title={<span><Icon type="info-circle-o" /></span>}>
                             <MenuItemGroup title={t('heimdall_project')}>
+                                {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_DELETE_CACHES]) &&
                                 <Menu.Item key="heimdall:2">{t('clear_cache')}</Menu.Item>
+                                }
                                 {/* <Menu.Item key="heimdall:2">About</Menu.Item> */}
                                 <Menu.Item key="heimdall:4">{t('license')}</Menu.Item>
                             </MenuItemGroup>
@@ -82,7 +86,7 @@ class NavBar extends Component {
                         </SubMenu>
                         <SubMenu title={<span><Icon type="user" /> {this.props.user.username} </span>}>
                             {/* <Menu.Item key="heimdall:1">Edit profile</Menu.Item> */}
-                            <Menu.Item key="logout">{t('sing_out')}</Menu.Item>
+                            <Menu.Item key="logout">{t('sign_out')}</Menu.Item>
                         </SubMenu>
                     </Menu>
                 </Col>

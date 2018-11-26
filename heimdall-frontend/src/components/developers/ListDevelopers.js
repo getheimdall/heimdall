@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom'
 import { Modal, Row, Table, Divider, Tag, Tooltip, Button, Pagination } from 'antd'
 
 import i18n from "../../i18n/i18n"
+import ComponentAuthority from "../ComponentAuthority"
+import {privileges} from "../../constants/privileges-types"
 
 const confirm = Modal.confirm;
 const { Column } = Table;
@@ -46,10 +48,12 @@ class ListDevelopers extends Component {
                                 <Tooltip title={i18n.t('edit')}>
                                     <Link to={"/developers/" + record.id}><Button type="primary" icon="edit" /></Link>
                                 </Tooltip>
-                                <Divider type="vertical" />
-                                <Tooltip title={i18n.t('delete')}>
-                                    <Button type="danger" icon="delete" onClick={this.showDeleteConfirm(record.id)} />
-                                </Tooltip>
+                                <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_DEVELOPER]}>
+                                    <Divider type="vertical" />
+                                    <Tooltip title={i18n.t('delete')}>
+                                        <Button type="danger" icon="delete" onClick={this.showDeleteConfirm(record.id)} />
+                                    </Tooltip>
+                                </ComponentAuthority>
                             </span>
                         )}
                     />

@@ -4,8 +4,8 @@ export default {
         'insert_password': 'Please input your password!',
         'username': 'Username',
         'password': 'Password',
-        'sing_in': 'Sing In',
-        'sing_out': 'Sing Out',
+        'sign_in': 'Sign In',
+        'sign_out': 'Sign Out',
         'username_password_incorrect': 'Username or password incorrect',
         'welcome_heimdall': 'Welcome to Heimdall',
         'apis': 'APIs',
@@ -220,5 +220,7 @@ export default {
         'deleting_an_api_delete_resources_operations_interceptors_middlewares': 'Deleting an Api will also delete any Resources, Operations, Interceptors or Middlewares attached to this Api.',
         'this_operation_can_not_be_reverted': 'This operation can not be reverted.',
         'search_operations': 'Search operations',
+        'app_name': 'App name',
+        'settings_ldap': 'Settings LDAP'
     }
 }

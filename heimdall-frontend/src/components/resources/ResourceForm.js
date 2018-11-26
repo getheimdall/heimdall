@@ -7,6 +7,8 @@ import { connect } from 'react-redux'
 import i18n from "../../i18n/i18n"
 import Loading from '../ui/Loading'
 import { isEmpty } from '../../utils/CommonUtils'
+import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
+import {privileges} from "../../constants/privileges-types"
 import { toggleModal, resetResource, getResource, save, update } from '../../actions/resources'
 
 const FormItem = Form.Item
@@ -30,7 +32,6 @@ class ResourceForm extends Component {
     onSubmitResource() {
         this.props.form.validateFieldsAndScroll((err, payload) => {
             if (!err) {
-
                 // this.props.onSubmit(payload)
                 if (this.props.resourceId === 0) {
                     this.props.save(this.props.idApi, payload)
@@ -59,7 +60,7 @@ class ResourceForm extends Component {
                                     getFieldDecorator('name', {
                                         initialValue: this.props.resource ? this.props.resource.name : '',
                                         rules: [{ required: true, message: i18n.t('please_input_api_name') }]
-                                    })(<Input required />)
+                                    })(<Input required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_RESOURCE, privileges.PRIVILEGE_UPDATE_RESOURCE])}/>)
                                 }
                             </FormItem>
                         </Col>
@@ -68,7 +69,7 @@ class ResourceForm extends Component {
                                 {
                                     getFieldDecorator('description', {
                                         initialValue: this.props.resource ? this.props.resource.description : ''
-                                    })(<Input required />)
+                                    })(<Input required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_RESOURCE, privileges.PRIVILEGE_UPDATE_RESOURCE])}/>)
                                 }
                             </FormItem>
                         </Col>
