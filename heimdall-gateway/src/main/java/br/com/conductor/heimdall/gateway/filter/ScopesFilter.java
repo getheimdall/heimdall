@@ -113,8 +113,8 @@ public class ScopesFilter extends ZuulFilter {
 
             if (!allowedOperations.contains(operation)) {
                 context.setSendZuulResponse(false);
-                context.setResponseStatusCode(HttpStatus.NOT_FOUND.value());
-                context.setResponseBody(HttpStatus.NOT_FOUND.getReasonPhrase());
+                context.setResponseStatusCode(HttpStatus.FORBIDDEN.value());
+                context.setResponseBody(HttpStatus.FORBIDDEN.getReasonPhrase());
                 context.getResponse().setContentType(MediaType.TEXT_PLAIN_VALUE);
             }
         }
