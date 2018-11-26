@@ -41,7 +41,6 @@ class ScopeForm extends Component {
 
         operationService.getOperationsByApi(this.props.idApi, this.props.idResource)
             .then(data => {
-                console.log(data)
                 transferDataSource = data.map(p => {
                     return {
                         key: p.id,
@@ -74,8 +73,6 @@ class ScopeForm extends Component {
                 payload.operations = this.state.transferSelected.map(p => {
                     return { id: p }
                 })
-
-                console.log(payload)
 
                 this.props.onSubmit(payload)
             }
