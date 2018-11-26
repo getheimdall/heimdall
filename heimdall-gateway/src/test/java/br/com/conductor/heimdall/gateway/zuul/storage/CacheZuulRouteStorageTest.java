@@ -4,10 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -56,7 +53,7 @@ public class CacheZuulRouteStorageTest {
           Environment environment = new Environment();
           environment.setInboundURL("dns.production.com.br");
           environment.setOutboundURL("dns.production.com.br");
-          Api api = new Api(10L, "foo", "v1", "fooDescription", "/foo", LocalDateTime.now(), new LinkedList<Resource>(), Status.ACTIVE, null, null, environments, null, null);
+          Api api = new Api(10L, "foo", "v1", "fooDescription", "/foo", LocalDateTime.now(), new HashSet<>(), Status.ACTIVE, null, null, environments, null, null);
           
           List<Resource> res = new LinkedList<>();
           
@@ -71,7 +68,7 @@ public class CacheZuulRouteStorageTest {
           resource.getOperations().addAll(Arrays.asList(opDelete, opGet, opPost));
           
           res.add(resource);
-          api.setResources(res);
+          api.setResources(new HashSet<>(res));
           apis.add(api);
           
           Mockito.when(repository.findByStatus(Status.ACTIVE)).thenReturn(apis);

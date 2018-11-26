@@ -176,7 +176,7 @@ export default {
         'operation': 'Operation',
         'please_input_operation_method': 'Please, input operation method!',
         'please_input_operation_path': 'Please, input operation path!',
-        'you_need_select_api': 'You need an API!',
+        'you_need_select_api': 'You need select an API!',
         'please_input_plan_name': 'Please, input an plan name!',
         'please_input_plan_description': 'Please, input an plan description!',
         'please_input_api_name': 'Please, input api name!',
@@ -226,6 +226,8 @@ export default {
         'scope': 'Scope',
         'add_scope': 'Add Scope',
         'available_operations': 'Available Operations',
-        'attributed_operations': 'Attributed Operations'
+        'attributed_operations': 'Attributed Operations',
+        'available_scopes': 'Available Scopes',
+        'attributed_scopes': 'Attributed Scopes'
     }
 }

@@ -57,7 +57,6 @@ class Plans extends Component {
     render() {
         const { getFieldDecorator } = this.props.form
         const { plans, loading, history } = this.props
-        console.log(this.props)
 
         if (!plans) return <Loading />
 
