@@ -120,6 +120,9 @@ public class ScopeService {
         final Scope scopeData = scopeRepository.findByApiIdAndName(apiId, scope.getName());
         HeimdallException.checkThrow(scopeData != null, SCOPE_INVALID_NAME);
 
+        HeimdallException.checkThrow(scope.getOperations() == null || scope.getOperations().isEmpty(),
+                SCOPE_NO_OPERATION_FOUND);
+
         scope.getOperations().forEach(op -> {
             Operation operation = operationRepository.findOne(op.getId());
 
