@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.core.entity;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -20,10 +17,10 @@ package br.com.conductor.heimdall.core.entity;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.entity;
 
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -85,7 +82,7 @@ public class Operation implements Serializable {
 
      @JsonIgnore
      @ManyToMany(fetch = FetchType.EAGER, mappedBy="operations")
-     private List<Scope> scopes;
+     private Set<Scope> scopes;
 
      /**
       * Adjust the path to not permit the save or update with "/" or spaces in the end of path.
@@ -102,5 +99,10 @@ public class Operation implements Serializable {
      @JsonIgnore
      public Set<Long> getScopesIds() {
           return this.scopes != null ? this.scopes.stream().map(Scope::getId).collect(Collectors.toSet()) : Collections.EMPTY_SET;
+     }
+
+     @PreRemove
+     private void removeFromScopes() {
+          scopes.forEach(scope -> scope.removeOperation(this));
      }
 }

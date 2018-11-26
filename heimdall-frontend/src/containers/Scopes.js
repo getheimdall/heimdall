@@ -77,7 +77,7 @@ class Scopes extends Component {
             <Modal title="Add Scope"
                 footer={[
                     <Button id="cancelAddScope" key="back" onClick={this.handleCancel}>{i18n.t('cancel')}</Button>,
-                    <ComponentAuthority key="teste" privilegesAllowed={[privileges.PRIVILEGE_CREATE_SCOPE, privileges.PRIVILEGE_UPDATE_SCOPE]}>
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_SCOPE, privileges.PRIVILEGE_UPDATE_SCOPE]}>
                         <Button id="saveScope" key="submit" type="primary" loading={loading} onClick={this.handleSave}>{i18n.t('save')}</Button>
                     </ComponentAuthority>
                 ]}

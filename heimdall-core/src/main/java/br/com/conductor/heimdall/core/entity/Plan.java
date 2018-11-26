@@ -23,14 +23,13 @@ package br.com.conductor.heimdall.core.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.*;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import br.com.conductor.heimdall.core.enums.Status;
@@ -82,7 +81,7 @@ public class Plan implements Serializable {
              joinColumns = @JoinColumn(name = "PLAN_ID", referencedColumnName = "ID"),
              inverseJoinColumns = @JoinColumn(name = "SCOPE_ID", referencedColumnName = "ID"))
      @JsonIgnoreProperties({"plans"})
-     private List<Scope> scopes;
+     private Set<Scope> scopes;
 
      @PrePersist
      private void initValuesPersist() {
@@ -92,6 +91,14 @@ public class Plan implements Serializable {
                status = Status.ACTIVE;
           }
           creationDate = LocalDateTime.now();
+     }
+
+     /**
+      * Removes a Scope from a Plan
+      * @param scope {@link Scope} to be removed
+      */
+     public void removeScope(Scope scope) {
+          this.scopes.remove(scope);
      }
 
 }

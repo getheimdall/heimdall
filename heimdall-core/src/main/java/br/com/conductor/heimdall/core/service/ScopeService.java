@@ -148,6 +148,7 @@ public class ScopeService {
      * @param apiId Api Id
      * @param scopeId Scope Id
      */
+    @Transactional
     public void delete(final Long apiId, final Long scopeId) {
 
         Scope scope = scopeRepository.findByApiIdAndId(apiId, scopeId);
