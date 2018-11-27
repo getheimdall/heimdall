@@ -103,6 +103,7 @@ public class ScopesFilter extends ZuulFilter {
             final App app = appRepository.findByClientId(req.getHeader(CLIENT_ID));
 
             if (Objects.isNull(app)) return;
+            if (Objects.isNull(app.getPlans())) return;
 
             app.getPlans()
                     .forEach(plan -> {
@@ -115,6 +116,8 @@ public class ScopesFilter extends ZuulFilter {
                     });
 
             final Long operation = (Long) context.get(OPERATION_ID);
+
+            if (Objects.isNull(operation)) return;
 
             if (!allowedOperations.contains(operation)) {
                 context.setSendZuulResponse(false);

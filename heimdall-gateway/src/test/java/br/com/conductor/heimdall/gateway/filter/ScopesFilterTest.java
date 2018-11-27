@@ -272,4 +272,169 @@ public class ScopesFilterTest {
         assertEquals(Constants.SUCCESS, filterDetail.getStatus());
     }
 
+    @Test
+    public void overlappingPlansApp2() {
+        this.request.addHeader(CLIENT_ID, clientId1);
+
+        Plan plan1 = new Plan();
+        plan1.setId(100L);
+
+        Plan plan2 = new Plan();
+        plan2.setId(200L);
+
+        App app1 = new App();
+        app1.setId(10L);
+        app1.setClientId(clientId1);
+        app1.setPlans(Lists.newArrayList(plan1));
+
+        Operation operation1 = new Operation(1111L, null, null,null, null, null);
+        Operation operation2 = new Operation(2222L, null, null,null, null, null);
+        Operation operation3 = new Operation(3333L, null, null,null, null, null);
+
+        Scope scope1 = new Scope(123L, null, null, null, Sets.newHashSet(operation1, operation3), Sets.newHashSet(plan1));
+        Scope scope2 = new Scope(321L, null, null, null, Sets.newHashSet(operation2, operation3), Sets.newHashSet(plan2));
+
+        plan1.setScopes(Sets.newHashSet(scope1));
+        plan2.setScopes(Sets.newHashSet(scope2));
+
+        context.set(OPERATION_ID, operation2.getId());
+
+        Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(app1);
+
+        this.filter.run();
+
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+
+        assertEquals(HttpStatus.FORBIDDEN.value(), context.getResponseStatusCode());
+        assertEquals(Constants.SUCCESS, filterDetail.getStatus());
+    }
+
+    @Test
+    public void noClientIdHeader() {
+
+        App app = new App();
+        app.setId(1L);
+        app.setClientId(clientId1);
+
+        Plan plan = new Plan();
+        plan.setId(1L);
+
+        Operation operation = new Operation(1111L, null, null,null, null, null);
+        Scope scope = new Scope(1000L, null, null, null, null, null);
+
+        app.setPlans(Lists.newArrayList(plan));
+        plan.setScopes(Sets.newHashSet(scope));
+        scope.setOperations(Sets.newHashSet(operation));
+
+        context.set(OPERATION_ID, operation.getId());
+
+        Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(app);
+
+        this.filter.run();
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+
+        assertEquals(HttpStatus.OK.value(), context.getResponseStatusCode());
+        assertEquals(Constants.SUCCESS, filterDetail.getStatus());
+
+    }
+
+    @Test
+    public void noApp() {
+
+        this.request.addHeader(CLIENT_ID, clientId1);
+
+        Operation operation = new Operation(1111L, null, null,null, null, null);
+        Scope scope = new Scope(1000L, null, null, null, null, null);
+
+        scope.setOperations(Sets.newHashSet(operation));
+
+        context.set(OPERATION_ID, operation.getId());
+
+        Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(null);
+
+        this.filter.run();
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+
+        assertEquals(HttpStatus.OK.value(), context.getResponseStatusCode());
+        assertEquals(Constants.SUCCESS, filterDetail.getStatus());
+
+    }
+
+    @Test
+    public void noPlan() {
+        this.request.addHeader(CLIENT_ID, clientId1);
+
+        App app = new App();
+        app.setId(1L);
+        app.setClientId(clientId1);
+
+        Operation operation = new Operation(1111L, null, null,null, null, null);
+        Scope scope = new Scope(1000L, null, null, null, null, null);
+
+        scope.setOperations(Sets.newHashSet(operation));
+
+        context.set(OPERATION_ID, operation.getId());
+
+        Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(app);
+
+        this.filter.run();
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+
+        assertEquals(HttpStatus.OK.value(), context.getResponseStatusCode());
+        assertEquals(Constants.SUCCESS, filterDetail.getStatus());
+
+    }
+
+    @Test
+    public void noScopes() {
+        this.request.addHeader(CLIENT_ID, clientId1);
+
+        App app = new App();
+        app.setId(1L);
+        app.setClientId(clientId1);
+
+        Plan plan = new Plan();
+        plan.setId(1L);
+
+        Operation operation = new Operation(1111L, null, null,null, null, null);
+
+        context.set(OPERATION_ID, operation.getId());
+
+        Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(app);
+
+        this.filter.run();
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+
+        assertEquals(HttpStatus.OK.value(), context.getResponseStatusCode());
+        assertEquals(Constants.SUCCESS, filterDetail.getStatus());
+
+    }
+
+    @Test
+    public void noOperationIdContext() {
+        this.request.addHeader(CLIENT_ID, clientId1);
+
+        App app = new App();
+        app.setId(1L);
+        app.setClientId(clientId1);
+
+        Plan plan = new Plan();
+        plan.setId(1L);
+
+        Operation operation = new Operation(1111L, null, null,null, null, null);
+        Scope scope = new Scope(1000L, null, null, null, null, null);
+
+        app.setPlans(Lists.newArrayList(plan));
+        plan.setScopes(Sets.newHashSet(scope));
+        scope.setOperations(Sets.newHashSet(operation));
+
+        Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(app);
+
+        this.filter.run();
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+
+        assertEquals(HttpStatus.OK.value(), context.getResponseStatusCode());
+        assertEquals(Constants.SUCCESS, filterDetail.getStatus());
+
+    }
 }
