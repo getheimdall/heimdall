@@ -79,7 +79,7 @@ public class AppService {
      private PlanRepository planRepository;
 
      @Autowired
-     private AccessTokenRepository acessTokenRepository;
+     private AccessTokenRepository accessTokenRepository;
 
      @Autowired
      private AMQPCacheService amqpCacheService;
@@ -89,14 +89,13 @@ public class AppService {
       *
       * @param 	id						The id of the {@link App}
       * @return							The {@link App} that was found
-      * @throws NotFoundException		Resource not found
       */
      @Transactional(readOnly = true)
      public App find(Long id) {
 
           App app = appRepository.findOne(id);
           HeimdallException.checkThrow(isBlank(app), GLOBAL_RESOURCE_NOT_FOUND);
-          app.setAccessTokens(acessTokenRepository.findByAppId(app.getId()));
+          app.setAccessTokens(accessTokenRepository.findByAppId(app.getId()));
 
           return app;
      }
@@ -169,6 +168,8 @@ public class AppService {
           Developer dev = devRepository.findOne(app.getDeveloper().getId());
           HeimdallException.checkThrow(isBlank(dev), DEVELOPER_NOT_EXIST);
 
+          amqpCacheService.dispatchClean();
+
           return appRepository.save(app);
 
      }
@@ -186,7 +187,7 @@ public class AppService {
           App app = appRepository.findOne(id);
           HeimdallException.checkThrow(isBlank(app), GLOBAL_RESOURCE_NOT_FOUND);
           
-          app.setAccessTokens(acessTokenRepository.findByAppId(app.getId()));
+          app.setAccessTokens(accessTokenRepository.findByAppId(app.getId()));
           app = GenericConverter.mapperWithMapping(appDTO, app, new AppMap());
           app = appRepository.save(app);
           
@@ -242,15 +243,15 @@ public class AppService {
 
           if (app.getPlans() != null && app.getPlans().isEmpty()) {
 
-               Plan plan = planRepository.findOne(1l);
+               Plan plan = planRepository.findOne(1L);
                if (Objeto.notBlank(plan)) {
-//                    app.setPlans(Arrays.asList(plan));
                     app.setPlans(Lists.newArrayList(plan));
-
                }
           }
 
           app = appRepository.save(app);
+
+          amqpCacheService.dispatchClean();
 
           return app;
      }

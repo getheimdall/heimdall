@@ -30,6 +30,7 @@ import br.com.conductor.heimdall.core.entity.Scope;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.OperationRepository;
 import br.com.conductor.heimdall.core.repository.ScopeRepository;
+import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 import br.com.conductor.heimdall.core.util.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -53,6 +54,9 @@ public class ScopeService {
 
     @Autowired
     private OperationRepository operationRepository;
+
+    @Autowired
+    private AMQPCacheService amqpCacheService;
 
     @Transactional(readOnly = true)
     public Scope find(final Long apiId, final Long scopeId) {
@@ -139,6 +143,8 @@ public class ScopeService {
 
         scope = scopeRepository.save(scope);
 
+        amqpCacheService.dispatchClean();
+
         return scope;
     }
 
@@ -155,6 +161,8 @@ public class ScopeService {
         HeimdallException.checkThrow(scope == null, GLOBAL_RESOURCE_NOT_FOUND);
 
         scopeRepository.delete(scope);
+
+        amqpCacheService.dispatchClean();
     }
 
     /**
@@ -175,6 +183,8 @@ public class ScopeService {
         scope.setId(scopeId);
 
         scope = scopeRepository.save(scope);
+
+        amqpCacheService.dispatchClean();
 
         return scope;
     }
