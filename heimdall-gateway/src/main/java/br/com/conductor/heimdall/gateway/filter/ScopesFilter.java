@@ -62,7 +62,7 @@ public class ScopesFilter extends ZuulFilter {
 
     @Override
     public boolean shouldFilter() {
-        return true;
+        return RequestContext.getCurrentContext().sendZuulResponse();
     }
 
     @Override
