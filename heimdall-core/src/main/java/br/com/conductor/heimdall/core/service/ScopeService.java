@@ -43,6 +43,11 @@ import java.util.List;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 
+/**
+ * This class provides methods to create, read, update and delete the {@link Scope} entity.
+ * 
+ * @author Marcelo Aguiar Rodrigues
+ */
 @Service
 public class ScopeService {
 

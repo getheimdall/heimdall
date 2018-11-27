@@ -26,6 +26,11 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * Class is a Data Transfer Object for the {@link br.com.conductor.heimdall.core.entity.Scope}
+ *
+ * @author Marcelo Aguiar Rodrigues
+ */
 @Data
 public class ScopeDTO implements Serializable {
 

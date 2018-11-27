@@ -38,7 +38,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
- * TODO
+ * This class represents a Scope registered to the system.
  *
  * @author Marcelo Aguiar Rodrigues
  */
@@ -52,9 +52,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Scope implements Serializable {
 
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = 7495733828659838366L;
 
 	@Id

@@ -19,6 +19,9 @@
  */
 package br.com.conductor.heimdall.gateway.util;
 
+/**
+ * List of context related constants
+ */
 public final class ConstantsContext {
 
     public static final String API_ID = "api-id";

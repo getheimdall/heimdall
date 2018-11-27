@@ -138,7 +138,6 @@ public class ResourceService {
           
           Example<Resource> example = Example.of(resource, ExampleMatcher.matching().withIgnorePaths("api.creationDate").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
           
-          //TODO throw error: 'Caused by: org.postgresql.util.PSQLException: ERROR: relation "scopes_plans" does not exist' fix
           List<Resource> resources = resourceRepository.findAll(example);
           
           return resources;

@@ -42,6 +42,11 @@ import static br.com.conductor.heimdall.gateway.util.ConstantsContext.CLIENT_ID;
 import static br.com.conductor.heimdall.gateway.util.ConstantsContext.OPERATION_ID;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 
+/**
+ * Filter responsible for the access control to the Scopes
+ *
+ * @author Marcelo Aguiar Rodrigues
+ */
 @Component
 public class ScopesFilter extends ZuulFilter {
 

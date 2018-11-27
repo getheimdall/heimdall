@@ -40,6 +40,11 @@ import java.util.List;
 
 import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_SCOPES;
 
+/**
+ * Uses a {@link ScopeService} to provide methods to create, read, update and delete a {@link Scope}
+ *
+ * @author Marcelo Aguiar Rodrigues
+ */
 @io.swagger.annotations.Api(value = PATH_SCOPES, produces = MediaType.APPLICATION_JSON_VALUE, tags = {ConstantsTag.TAG_SCOPES})
 @RestController
 @RequestMapping(value = PATH_SCOPES)

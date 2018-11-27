@@ -29,7 +29,7 @@ import java.io.Serializable;
 /**
  * Class that represents a paged {@link Scope} list.
  *
- * @author Filipe Germano
+ * @author Marcelo Aguiar Rodrigues
  */
 @Data
 @EqualsAndHashCode(callSuper=false)
