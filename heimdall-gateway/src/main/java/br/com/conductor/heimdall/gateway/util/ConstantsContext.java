@@ -27,7 +27,6 @@ public final class ConstantsContext {
     public static final String OPERATION_ID = "operation-id";
     public static final String PATTERN = "pattern";
     public static final String SCOPES = "scopes";
-    public static final String SCOPES_RUN = "scopes-should-run";
 
     public static final String CLIENT_ID = "client_id";
     public static final String ACCESS_TOKEN = "access_token";

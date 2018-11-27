@@ -40,7 +40,6 @@ import java.util.Set;
 
 import static br.com.conductor.heimdall.gateway.util.ConstantsContext.CLIENT_ID;
 import static br.com.conductor.heimdall.gateway.util.ConstantsContext.OPERATION_ID;
-import static br.com.conductor.heimdall.gateway.util.ConstantsContext.SCOPES_RUN;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 
 @Component
@@ -63,8 +62,7 @@ public class ScopesFilter extends ZuulFilter {
 
     @Override
     public boolean shouldFilter() {
-        RequestContext context = RequestContext.getCurrentContext();
-        return context.get(SCOPES_RUN) != null && (Boolean) context.get(SCOPES_RUN);
+        return RequestContext.getCurrentContext().sendZuulResponse();
     }
 
     @Override
