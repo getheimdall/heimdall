@@ -183,7 +183,7 @@ class PlanForm extends Component {
                             }
                             {
                                 this.state.apiId !== 0 &&
-                                    <FormItem>
+                                    <FormItem label={i18n.t('scopes')}>
                                         <Transfer
                                             showSearch
                                             titles={[i18n.t('available_scopes'), i18n.t('attributed_scopes')]}
