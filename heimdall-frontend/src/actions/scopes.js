@@ -65,6 +65,7 @@ export const update = (apiId, scope) => dispatch => {
     scopeService.update(apiId, scope)
         .then(data => {
             // dispatch(getDeveloper(developer.id))
+            dispatch(getScopes(apiId))
             dispatch(sendNotification({ type: 'success', message: 'Scope updated' }))
             dispatch(finishLoading())
         })

@@ -3,12 +3,12 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { Row, Form, Col, Input, Transfer } from 'antd'
 
-import { operationService } from '../../services'
 import i18n from "../../i18n/i18n"
 import Loading from '../ui/Loading'
+import { operationService } from '../../services'
 import { PrivilegeUtils } from "../../utils/PrivilegeUtils"
-import { privileges } from "../../constants/privileges-types"
 import { getScope, clearScope } from '../../actions/scopes'
+import { privileges } from "../../constants/privileges-types"
 
 const FormItem = Form.Item
 
@@ -30,6 +30,12 @@ class ScopeForm extends Component {
         this.props.onRef(this)
     }
 
+    componentDidUpdate(prevProps) {
+        if (this.props.scope !== prevProps.scope) {
+            this.mountTransferSelected()
+        }
+    }
+
     componentWillUnmount() {
         this.props.dispatch(clearScope())
         this.props.onRef(undefined)
@@ -37,7 +43,6 @@ class ScopeForm extends Component {
 
     mountTransfer = () => {
         let transferDataSource = []
-        let transferSelected = []
 
         operationService.getOperationsByApi(this.props.idApi, this.props.idResource)
             .then(data => {
@@ -49,14 +54,18 @@ class ScopeForm extends Component {
                         disabled: !PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_SCOPE, privileges.PRIVILEGE_UPDATE_SCOPE])
                     }
                 })
-
-                if (this.props.scope && this.props.scope.operations) {
-                    transferSelected = this.props.scope.operations.map(p => p.id)
-                }
-
-                this.setState({ ...this.state, transferDataSource: transferDataSource, transferSelected: transferSelected, transferLoading: false })
-
+                this.setState({ ...this.state, transferDataSource: transferDataSource, transferLoading: false })
             })
+    }
+
+    mountTransferSelected = () => {
+        let transferSelected
+
+        if (this.props.scope && this.props.scope.operations) {
+            transferSelected = this.props.scope.operations.map(p => p.id)
+        }
+
+        this.setState({ ...this.state, transferSelected: transferSelected })
     }
 
     filterOption = (inputValue, option) => {
