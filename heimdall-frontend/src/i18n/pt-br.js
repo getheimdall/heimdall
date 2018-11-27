@@ -225,6 +225,7 @@ export default {
         'scopes': 'Escopos',
         'scope': 'Escopo',
         'add_scope': 'Adicionar Escopo',
+        'edit_scope': 'Editar Escopo',
         'available_operations': 'Operações Disponíveis',
         'attributed_operations': 'Operações Atribuídas',
         'available_scopes': 'Escopos disponíveis',

@@ -36,9 +36,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
@@ -89,7 +91,7 @@ public class ScopeService {
 
         Example<Scope> example = Example.of(scope, ExampleMatcher.matching().withIgnorePaths("api.creationDate").withIgnoreCase().withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING));
 
-        Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+        Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit(), new Sort(Sort.Direction.ASC, "id"));
         Page<Scope> page = scopeRepository.findAll(example, pageable);
 
         return new ScopePage(PageDTO.build(page));
@@ -111,7 +113,10 @@ public class ScopeService {
 
         Example<Scope> example = Example.of(scope, ExampleMatcher.matching().withIgnorePaths("api.creationDate").withIgnoreCase().withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING));
 
-        return scopeRepository.findAll(example);
+        List<Scope> scopes = scopeRepository.findAll(example);
+        scopes.sort(Comparator.comparing(Scope::getId));
+
+        return scopes;
     }
 
     /**

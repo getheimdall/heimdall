@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import i18n from "../i18n/i18n"
-
 import { Button, notification, Row, Tooltip, Modal, Col } from 'antd'
-import ListScopes from "../components/scopes/ListScopes"
+
+import i18n from "../i18n/i18n"
+import Loading from "../components/ui/Loading"
 import ScopeForm from "../components/scopes/ScopeForm"
+import ListScopes from "../components/scopes/ListScopes"
 import { privileges } from "../constants/privileges-types"
 import ComponentAuthority from "../components/policy/ComponentAuthority"
 import { getScopes, initLoading, save, clearScope, update, remove } from '../actions/scopes'
@@ -44,7 +45,7 @@ class Scopes extends Component {
         } else {
             this.props.dispatch(save(this.props.api.id, formObject))
         }
-        this.setState({ ...this.state, scopeSelected: 0 });
+        this.setState({ ...this.state, scopeSelected: 0 })
     }
 
     handleDelete = (objectId) => {
@@ -54,11 +55,11 @@ class Scopes extends Component {
 
     handleSave = () => {
         this.scopeForm.onSubmitForm()
-        this.setState({ ...this.state, scopeSelected: 0, visibleModal: false });
+        this.setState({ ...this.state, scopeSelected: 0, visibleModal: false })
     }
 
     handleCancel = () => {
-        this.setState({ ...this.state, scopeSelected: 0, visibleModal: false });
+        this.setState({ ...this.state, scopeSelected: 0, visibleModal: false })
     }
 
     showScopeModal = (formId) => () => {
@@ -66,18 +67,24 @@ class Scopes extends Component {
         if (formId) {
             newScopeSelected = formId
         }
-        this.setState({ ...this.state, scopeSelected: newScopeSelected, visibleModal: true });
+        this.setState({ ...this.state, scopeSelected: newScopeSelected, visibleModal: true })
     }
 
     render() {
 
         const { loading, scopes } = this.props
 
+        let title = 'add_scope'
+
+        if (this.state.scopeSelected !== 0) {
+            title = 'edit_scope'
+        }
+
         const modalScope =
-            <Modal title="Add Scope"
+            <Modal title={i18n.t(title)}
                 footer={[
                     <Button id="cancelAddScope" key="back" onClick={this.handleCancel}>{i18n.t('cancel')}</Button>,
-                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_SCOPE, privileges.PRIVILEGE_UPDATE_SCOPE]}>
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_SCOPE, privileges.PRIVILEGE_UPDATE_SCOPE]} key={1}>
                         <Button id="saveScope" key="submit" type="primary" loading={loading} onClick={this.handleSave}>{i18n.t('save')}</Button>
                     </ComponentAuthority>
                 ]}
@@ -93,7 +100,7 @@ class Scopes extends Component {
                 <Row type="flex" justify="center" align="bottom">
                     <Col style={{ marginTop: 20 }}>
                         {i18n.t('you_do_not_have_resources_in_this')} <b>{i18n.t('scope')}</b>!
-                            <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_SCOPE]}>
+                        <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_SCOPE]}>
                             <Button id="addScopeWhenListIsEmpty" type="dashed" className="add-tour" onClick={this.showScopeModal()}>
                                 {i18n.t('add_scope')}
                             </Button>
