@@ -18,6 +18,7 @@ import middlewares from './middlewares'
 import traces from './Traces'
 import privileges from './Privileges'
 import ldap from './Ldap'
+import providers from './Providers'
 
 export default combineReducers({
     apis,
@@ -37,5 +38,6 @@ export default combineReducers({
     caches,
     traces,
     privileges,
-    ldap
+    ldap,
+    providers
 })

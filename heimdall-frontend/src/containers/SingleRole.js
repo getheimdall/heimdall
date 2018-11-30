@@ -1,13 +1,14 @@
 import React, {Component} from 'react'
-import {push} from 'connected-react-router';
 import {connect} from 'react-redux'
+import {push} from 'connected-react-router'
+import {Card, notification, Row} from "antd"
 
-import RoleForm from "../components/roles/RoleForm";
-import {clearRole, clearRoles, getRole, initLoading, remove, save, update} from "../actions/roles";
-import PageHeader from "../components/ui/PageHeader";
-import {Card, notification, Row} from "antd";
-import Loading from "../components/ui/Loading";
-import {getAllPrivileges} from "../actions/privileges";
+import i18n from "../i18n/i18n"
+import Loading from "../components/ui/Loading"
+import RoleForm from "../components/roles/RoleForm"
+import PageHeader from "../components/ui/PageHeader"
+import {getAllPrivileges} from "../actions/privileges"
+import {clearRole, clearRoles, getRole, initLoading, remove, save, update} from "../actions/roles"
 
 class SingleRole extends Component {
 
@@ -59,13 +60,13 @@ class SingleRole extends Component {
 
         if (!privileges || privileges.length === 0) return <Loading/>
 
-        const title = role ? 'Edit' : 'Add'
+        const title = role ? i18n.t('edit') : i18n.t('add')
 
         return (
             <div>
-                <PageHeader title="Roles" icon="solution"/>
+                <PageHeader title={i18n.t('roles')} icon="solution"/>
                 <Row className="h-row bg-white">
-                    <Card style={{width: '100%'}} title={title + ' Role'}>
+                    <Card style={{width: '100%'}} title={`${title} ${i18n.t('roles')}`}>
                         <RoleForm
                             loading={this.props.loading}
                             role={role}

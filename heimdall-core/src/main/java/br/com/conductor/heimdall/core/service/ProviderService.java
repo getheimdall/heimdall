@@ -20,22 +20,26 @@ package br.com.conductor.heimdall.core.service;
  * ==========================LICENSE_END===================================
  */
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.StringMatcher;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.PageDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.ProviderDTO;
 import br.com.conductor.heimdall.core.dto.page.ProviderPage;
 import br.com.conductor.heimdall.core.entity.Provider;
+import br.com.conductor.heimdall.core.entity.ProviderParam;
 import br.com.conductor.heimdall.core.repository.ProviderRepository;
 import br.com.conductor.heimdall.core.util.Pageable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.ExampleMatcher.StringMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * This class provides methos to create, read, update and delete a {@link Provider}
@@ -56,6 +60,7 @@ public class ProviderService {
      */
     public Provider save(ProviderDTO providerPersist) {
         Provider provider = GenericConverter.mapper(providerPersist, Provider.class);
+        provider.getProviderParams().forEach(p -> p.setProvider(provider));
         return this.providerRepository.save(provider);
     }
 
@@ -66,10 +71,29 @@ public class ProviderService {
      * @param providerEdit The {@link ProviderDTO}
      * @return The edited {@link Provider}
      */
+    @Transactional
     public Provider edit(Long idProvider, ProviderDTO providerEdit) {
-        Provider found = this.providerRepository.findOne(idProvider);
-        Provider provider = GenericConverter.mapper(providerEdit, found);
-        return this.providerRepository.save(provider);
+        Provider found = providerRepository.findOne(idProvider);
+
+        found.setName(providerEdit.getName());
+        found.setPath(providerEdit.getPath());
+        if (Objects.nonNull(providerEdit.getDescription())) {
+            found.setDescription(providerEdit.getDescription());
+        }
+
+        List<ProviderParam> providers = providerEdit.getProviderParams().stream().map(providerParamsDTO -> {
+            ProviderParam providerParam = new ProviderParam();
+            providerParam.setProvider(found);
+            providerParam.setValue(providerParamsDTO.getValue());
+            providerParam.setLocation(providerParamsDTO.getLocation());
+            providerParam.setName(providerParamsDTO.getName());
+            return providerParam;
+        }).collect(Collectors.toList());
+
+        found.getProviderParams().clear();
+        found.getProviderParams().addAll(providers);
+
+        return this.providerRepository.save(found);
     }
 
     /**

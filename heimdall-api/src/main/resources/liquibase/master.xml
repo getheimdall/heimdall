@@ -37,5 +37,6 @@
     <include file="changelog/20180815115422-create-table-ldap.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20180815150000-insert-privileges-ldap.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20180815151344-add-privileges-ldap-to-role-admin.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20181129141113-remove-null-constraints-from-value-in-provider-param.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

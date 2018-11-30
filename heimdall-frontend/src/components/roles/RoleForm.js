@@ -1,11 +1,12 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-
 import {Button, Col, Form, Input, Modal, Row, Tooltip, Transfer} from 'antd'
-import ComponentAuthority from "../ComponentAuthority";
-import {PrivilegeUtils} from "../../utils/PrivilegeUtils";
-import {privileges} from "../../constants/privileges-types";
-import Loading from "../ui/Loading";
+
+import i18n from '../../i18n/i18n'
+import Loading from "../ui/Loading"
+import ComponentAuthority from "../ComponentAuthority"
+import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
+import {privileges} from "../../constants/privileges-types"
 
 const FormItem = Form.Item
 const confirm = Modal.confirm
@@ -42,7 +43,6 @@ class RoleForm extends Component {
                 payload.privileges = this.state.privilegesRole.map(p => {
                     return {id: p}
                 })
-                // console.log(payload)
                 this.props.handleSubmit(payload)
             }
         });
@@ -78,13 +78,13 @@ class RoleForm extends Component {
                     {role && getFieldDecorator('id', {initialValue: role.id})(<Input type='hidden'/>)}
                     <Row gutter={24} type="flex" justify="space-around" align="top">
                         <Col sm={24} md={8}>
-                            <FormItem label="Name">
+                            <FormItem label={i18n.t('name')}>
                                 {
                                     getFieldDecorator('name', {
                                         initialValue: role && role.name,
                                         rules: [
-                                            {required: true, message: 'Please input a role name!'},
-                                            {min: 4, message: 'Min of 4 Characters to name!'}
+                                            {required: true, message: i18n.t('please_input_role_name')},
+                                            {min: 4, message: i18n.t('min_4_characters_to_name')}
                                         ]
                                     })(<Input required
                                               disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_ROLE, privileges.PRIVILEGE_UPDATE_ROLE])}/>)
@@ -97,7 +97,7 @@ class RoleForm extends Component {
                                     <FormItem>
                                         <Transfer
                                             showSearch
-                                            titles={['Available privileges', 'Attributed privileges']}
+                                            titles={[i18n.t('available_privileges'), i18n.t('attributed_privileges')]}
                                             onChange={this.handleChangeTransfer}
                                             filterOption={this.filterOption}
                                             dataSource={this.state.storagePrivileges}

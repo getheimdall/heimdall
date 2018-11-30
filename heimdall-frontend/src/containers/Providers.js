@@ -1,25 +1,23 @@
-//3rd's
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import { connect } from 'react-redux'
-//components
-import { Row, Form, Card, Input, Col, notification } from 'antd'
-//actions
+import {Card, Col, Form, Row, Input, notification} from 'antd'
+
 import i18n from "../i18n/i18n"
-import Loading from '../components/ui/Loading'
-import PageHeader from '../components/ui/PageHeader'
-import ListPlans from '../components/plans/ListPlans'
+import Loading from "../components/ui/Loading"
+import PageHeader from "../components/ui/PageHeader"
 import FloatButton from '../components/ui/FloatButton'
 import {privileges} from "../constants/privileges-types"
+import ListProviders from '../components/providers/ListProviders'
 import ComponentAuthority from "../components/ComponentAuthority"
-import { getAllPlans, initLoading, remove, clearPlans } from '../actions/plans'
+import { initLoading, getAllProviders, clearProviders, remove } from "../actions/providers"
 
-class Plans extends Component {
+class Provider extends Component {
 
     state = { page: 0, pageSize: 10, searchQuery: {} }
 
     componentDidMount() {
         this.props.dispatch(initLoading())
-        this.props.dispatch(getAllPlans())
+        this.props.dispatch(getAllProviders())
     }
 
     componentWillReceiveProps(newProps) {
@@ -30,39 +28,40 @@ class Plans extends Component {
     }
 
     componentWillUnmount() {
-        this.props.dispatch(clearPlans())
-    }
-
-    handleDelete = (planId) => {
-        this.props.dispatch(initLoading())
-        this.props.dispatch(remove(planId))
+        this.props.dispatch(clearProviders())
     }
 
     handlePagination = (page, pageSize) => {
         this.setState({ ...this.state, page: page - 1, pageSize: pageSize })
         this.props.dispatch(initLoading())
-        this.props.dispatch(getAllPlans({ offset: page - 1, limit: 10, ...this.state.searchQuery }))
+        this.props.dispatch(getAllProviders({ offset: page - 1, limit: 10, ...this.state.searchQuery }))
+    }
+
+    handleDelete = providerId => {
+        this.props.dispatch(initLoading())
+        this.props.dispatch(remove(providerId))
     }
 
     onSearchForm = () => {
         this.props.form.validateFieldsAndScroll((err, payload) => {
             if (!err) {
                 this.props.dispatch(initLoading())
-                this.props.dispatch(getAllPlans({ offset: 0, limit: 10, ...payload }))
+                this.props.dispatch(getAllProviders({ offset: 0, limit: 10, ...payload }))
                 this.setState({ ...this.state, searchQuery: payload })
             }
         });
     }
 
     render() {
+        const loading = false
         const { getFieldDecorator } = this.props.form
-        const { plans, loading, history } = this.props
+        const { providers, history } = this.props
 
-        if (!plans) return <Loading />
+        if (!providers) return <Loading/>
 
         return (
             <div>
-                <PageHeader title={i18n.t('plans')} icon="profile" />
+                <PageHeader title={i18n.t('providers')} icon="cluster" />
 
                 <Row className="search-box">
                     <Card>
@@ -80,9 +79,9 @@ class Plans extends Component {
                 </Row>
 
                 <Row className="h-row bg-white">
-                    <ListPlans dataSource={plans} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading} />
-                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_PLAN]}>
-                        <FloatButton idButton="addPlan" history={history} to="/plans/new" label={i18n.t('add_new_plan')} />
+                    <ListProviders dataSource={providers} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading} />
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_READ_PROVIDER]}>
+                        <FloatButton idButton="addProvider" history={history} to="/providers/new" label={i18n.t('add_new_provider')} />
                     </ComponentAuthority>
                 </Row>
             </div>
@@ -92,12 +91,12 @@ class Plans extends Component {
 
 const mapStateToProps = state => {
     return {
-        plans: state.plans.plans,
-        loading: state.plans.loading,
-        notification: state.plans.notification
+        providers: state.providers.providers,
+        loading: state.providers.loading,
+        notification: state.providers.notification
     }
 }
 
-const PlansWrapped = Form.create({})(Plans)
+const ProviderWrapped = Form.create({})(Provider)
 
-export default connect(mapStateToProps)(PlansWrapped)
+export default connect(mapStateToProps)(ProviderWrapped)

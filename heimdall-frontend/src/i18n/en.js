@@ -221,6 +221,22 @@ export default {
         'this_operation_can_not_be_reverted': 'This operation can not be reverted.',
         'search_operations': 'Search operations',
         'app_name': 'App name',
-        'settings_ldap': 'Settings LDAP'
+        'settings_ldap': 'Settings LDAP',
+        'providers': 'Providers',
+        'add_new_provider': 'Add new Provider',
+        'provider_saved': 'Provider saved!',
+        'provider_updated': 'Provider updated',
+        'please_input_role_name':'Please input a role name!',
+        'min_4_characters_to_name':'Min of 4 Characters to name!',
+        'available_privileges':'Available privileges',
+        'attributed_privileges':'Attributed privileges',
+        'please_input_provider_name':'Please input a provider name!',
+        'please_input_provider_description': 'Please input a provider description!',
+        'add_provider_param': 'Add Provider Param',
+        'provider': 'Provider',
+        'provider_params': 'Provider Params',
+        'location': 'Location',
+        'please_input_provider_param_name': 'Please, input Provider Param name!',
+        'provider_param_already_exist': 'ProviderParam already exist!'
     }
 }
