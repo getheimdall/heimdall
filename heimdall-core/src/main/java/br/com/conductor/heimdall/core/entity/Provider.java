@@ -20,8 +20,6 @@ package br.com.conductor.heimdall.core.entity;
  * ==========================LICENSE_END===================================
  */
 
-import br.com.conductor.heimdall.core.enums.Status;
-import br.com.twsoftware.alfred.object.Objeto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -69,17 +67,12 @@ public class Provider implements Serializable {
     @Column(name = "CREATION_DATE", nullable = false, updatable = false)
     private LocalDateTime creationDate;
 
-    @Column(name = "STATUS", length = 10, nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Status status;
+    @Column(name = "PROVIDER_DEFAULT", nullable = false, updatable = false)
+    private boolean providerDefault;
 
     @PrePersist
     private void initValuesPersist() {
 
-        if (Objeto.isBlank(status)) {
-
-            status = Status.ACTIVE;
-        }
         creationDate = LocalDateTime.now();
     }
 }

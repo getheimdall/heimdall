@@ -27,6 +27,8 @@ import br.com.conductor.heimdall.core.dto.ProviderDTO;
 import br.com.conductor.heimdall.core.dto.page.ProviderPage;
 import br.com.conductor.heimdall.core.entity.Provider;
 import br.com.conductor.heimdall.core.entity.ProviderParam;
+import br.com.conductor.heimdall.core.exception.ExceptionMessage;
+import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.ProviderRepository;
 import br.com.conductor.heimdall.core.util.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +62,7 @@ public class ProviderService {
      */
     public Provider save(ProviderDTO providerPersist) {
         Provider provider = GenericConverter.mapper(providerPersist, Provider.class);
+        provider.setProviderDefault(false);
         provider.getProviderParams().forEach(p -> p.setProvider(provider));
         return this.providerRepository.save(provider);
     }
@@ -74,6 +77,9 @@ public class ProviderService {
     @Transactional
     public Provider edit(Long idProvider, ProviderDTO providerEdit) {
         Provider found = providerRepository.findOne(idProvider);
+
+        HeimdallException.checkThrow(Objects.isNull(found), ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND);
+        HeimdallException.checkThrow(found.isProviderDefault(), ExceptionMessage.DEFAULT_PROVIDER_CAN_NOT_UPDATED_OR_REMOVED);
 
         found.setName(providerEdit.getName());
         found.setPath(providerEdit.getPath());
@@ -107,7 +113,7 @@ public class ProviderService {
 
         Provider provider = GenericConverter.mapper(providerDTO, Provider.class);
         Example<Provider> example = Example.of(provider,
-                ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+                ExampleMatcher.matching().withIgnorePaths("providerDefault").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 
         Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
 
@@ -126,7 +132,7 @@ public class ProviderService {
 
         Provider provider = GenericConverter.mapper(providerDTO, Provider.class);
         Example<Provider> example = Example.of(provider,
-                ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+                ExampleMatcher.matching().withIgnorePaths("providerDefault").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 
         return this.providerRepository.findAll(example);
     }

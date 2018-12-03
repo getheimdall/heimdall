@@ -26,7 +26,7 @@ class ProviderParamForm extends React.Component {
     }
 
     componentWillUnmount() {
-        this.props.onRef(this)
+        this.props.onRef(undefined)
     }
 
     onSubmitForm = () => {
