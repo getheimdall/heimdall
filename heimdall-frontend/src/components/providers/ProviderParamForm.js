@@ -50,7 +50,6 @@ class ProviderParamForm extends React.Component {
                         if (!payload.id) {
                             payload.uuid = UUID.generate()
                         }
-                        payload.status = "ACTIVE"
                         this.props.onSubmit(payload)
                     }
                 }

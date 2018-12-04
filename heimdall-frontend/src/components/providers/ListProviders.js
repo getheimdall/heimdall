@@ -1,6 +1,6 @@
 import React from 'react'
 import {Link} from "react-router-dom"
-import {Button, Divider, Modal, Table, Tooltip} from 'antd'
+import {Button, Divider, Modal, Pagination, Row, Table, Tooltip} from 'antd'
 
 import i18n from "../../i18n/i18n"
 import ComponentAuthority from "../ComponentAuthority"
@@ -39,6 +39,7 @@ class ListProviders extends React.Component {
                         id="action"
                         key="action"
                         render={(text, record) => (
+                            !record.providerDefault &&
                             <span>
                                 <Tooltip title={i18n.t('edit')}>
                                     <Link to={"/providers/" + record.id}><Button type="primary" icon="edit" /></Link>
@@ -53,6 +54,9 @@ class ListProviders extends React.Component {
                         )}
                     />
                 </Table>
+                <Row type="flex" justify="center" className="h-row">
+                    <Pagination total={dataSource.totalElements} onChange={this.props.handlePagination} />
+                </Row>
             </div>
         )
     }

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Col, Form, Input, List, Modal, Row, Switch, Tooltip, Divider } from "antd"
+import { Button, Col, Form, Input, List, Modal, Row, Tooltip, Divider } from "antd"
 
 import i18n from "../../i18n/i18n"
 import ProviderParamForm from "./ProviderParamForm"
@@ -31,7 +31,6 @@ class ProviderForm extends React.Component {
         this.props.form.validateFieldsAndScroll((err, payload) => {
             if (!err) {
                 payload.providerParams = this.state.providerParams
-                payload.status = "ACTIVE"
                 this.props.handleSubmit(payload)
             }
         })
@@ -140,7 +139,7 @@ class ProviderForm extends React.Component {
                             <FormItem label={i18n.t('path')}>
                                 {
                                     getFieldDecorator('path', {
-                                        initialValue: provider && provider.name,
+                                        initialValue: provider && provider.path,
                                         rules: [
                                             {required: true, message: i18n.t('please_input_provider_description')}
                                         ]
@@ -153,23 +152,12 @@ class ProviderForm extends React.Component {
                             <FormItem label={i18n.t('description')}>
                                 {
                                     getFieldDecorator('description', {
-                                        initialValue: provider && provider.name,
+                                        initialValue: provider && provider.description,
                                         rules: [
                                             {required: true, message: i18n.t('please_input_provider_description')}
                                         ]
                                     })(<Input
                                         disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_PROVIDER, privileges.PRIVILEGE_UPDATE_PROVIDER])}/>)
-                                }
-                            </FormItem>
-                        </Col>
-                        <Col sm={24} md={5}>
-                            <FormItem label={i18n.t('status')}>
-                                {
-                                    getFieldDecorator('status', {
-                                        initialValue: provider ? provider.status === 'ACTIVE' : true,
-                                        valuePropName: 'checked'
-                                    })(<Switch required
-                                               disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_PROVIDER, privileges.PRIVILEGE_UPDATE_PROVIDER])}/>)
                                 }
                             </FormItem>
                         </Col>
