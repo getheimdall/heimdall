@@ -113,6 +113,8 @@ public enum ExceptionMessage {
 
     TOKEN_INVALID(UNAUTHORIZED.value(), "Token not valid", ForbiddenException.class),
 
+    SIGNATURE_DOES_NOT_MATCH(UNAUTHORIZED.value(), "JWT signature does not match locally computed signature.", UnauthorizedException.class),
+
     TOKEN_NOT_GENERATE(INTERNAL_SERVER_ERROR.value(), "Error to generate token", ForbiddenException.class),
 
     CODE_NOT_FOUND(UNAUTHORIZED.value(), "Code already used to generate token or not defined", UnauthorizedException.class),
