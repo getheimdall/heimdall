@@ -24,6 +24,7 @@ import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.PageDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.ProviderDTO;
+import br.com.conductor.heimdall.core.dto.ProviderParamsDTO;
 import br.com.conductor.heimdall.core.dto.page.ProviderPage;
 import br.com.conductor.heimdall.core.entity.Provider;
 import br.com.conductor.heimdall.core.entity.ProviderParam;
@@ -87,14 +88,8 @@ public class ProviderService {
             found.setDescription(providerEdit.getDescription());
         }
 
-        List<ProviderParam> providers = providerEdit.getProviderParams().stream().map(providerParamsDTO -> {
-            ProviderParam providerParam = new ProviderParam();
-            providerParam.setProvider(found);
-            providerParam.setValue(providerParamsDTO.getValue());
-            providerParam.setLocation(providerParamsDTO.getLocation());
-            providerParam.setName(providerParamsDTO.getName());
-            return providerParam;
-        }).collect(Collectors.toList());
+        List<ProviderParam> providers = providerEdit.getProviderParams().stream()
+                .map(providerParamsDTO -> getProviderParam(providerParamsDTO, found)).collect(Collectors.toList());
 
         found.getProviderParams().clear();
         found.getProviderParams().addAll(providers);
@@ -154,5 +149,14 @@ public class ProviderService {
      */
     public void delete(Long id) {
         this.providerRepository.delete(id);
+    }
+
+    protected ProviderParam getProviderParam(ProviderParamsDTO p, Provider provider) {
+        ProviderParam providerParam = new ProviderParam();
+        providerParam.setProvider(provider);
+        providerParam.setValue(p.getValue());
+        providerParam.setLocation(p.getLocation());
+        providerParam.setName(p.getName());
+        return providerParam;
     }
 }
