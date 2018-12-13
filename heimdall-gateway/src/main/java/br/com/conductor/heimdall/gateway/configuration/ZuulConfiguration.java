@@ -39,6 +39,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import br.com.conductor.heimdall.core.repository.OperationRepository;
+import br.com.conductor.heimdall.gateway.failsafe.CircuitBreakerManager;
 import br.com.conductor.heimdall.gateway.filter.CustomHostRoutingFilter;
 import br.com.conductor.heimdall.gateway.filter.CustomSendErrorFilter;
 import br.com.conductor.heimdall.gateway.filter.CustomSendResponseFilter;
@@ -76,6 +77,9 @@ public class ZuulConfiguration extends ZuulProxyAutoConfiguration {
 	@Qualifier("heimdallErrorController")
 	@Autowired(required = false)
 	private ErrorController errorController;
+	
+	@Autowired
+	private CircuitBreakerManager circuitBreakerManager;
 
 	@Bean
 	public ProxyRouteLocator proxyRouteLocator() {
@@ -105,7 +109,7 @@ public class ZuulConfiguration extends ZuulProxyAutoConfiguration {
 	@Bean
 	@ConditionalOnMissingBean({ SimpleHostRoutingFilter.class })
 	public SimpleHostRoutingFilter simpleHostRoutingFilter(ProxyRequestHelper helper, ZuulProperties zuulProperties) {
-		return new CustomHostRoutingFilter(helper, zuulProperties);
+		return new CustomHostRoutingFilter(helper, zuulProperties, circuitBreakerManager);
 	}
 
 	@Bean
