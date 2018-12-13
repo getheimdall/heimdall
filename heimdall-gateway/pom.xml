@@ -202,8 +202,7 @@
 				<configuration>
 					<baseImage>${docker.baseImage}</baseImage>
 					<imageName>${docker.imageName}</imageName>
-					<entryPoint>["java", "-Xmx4g", "-Xms1g", "-jar",
-						"/${project.build.finalName}.jar"]</entryPoint>
+					<entryPoint>["java", "-Xmx4g", "-Xms1g", "-jar", "/${project.build.finalName}.jar"]</entryPoint>
 					<forceTags>true</forceTags>
 					<serverId>${docker.serverId}</serverId>
 					<registryUrl>${docker.registryUrl}</registryUrl>
