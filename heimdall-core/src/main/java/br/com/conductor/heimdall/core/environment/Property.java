@@ -172,5 +172,14 @@ public class Property {
     	 private Integer allowInactive;
     	 private Boolean deleteDeprecated;
      }
+     
+     private FailSafe failsafe = new FailSafe();
+     
+     @Data
+     public class FailSafe {
+    	private int failureNumber = 3;
+    	private int sucessNumber = 3;
+    	private int delayTimeSeconds = 30;
+     }
 
 }

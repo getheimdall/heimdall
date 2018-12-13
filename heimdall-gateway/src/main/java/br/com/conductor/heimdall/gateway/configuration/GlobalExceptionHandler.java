@@ -46,6 +46,7 @@ import com.google.common.collect.Lists;
 import com.netflix.zuul.exception.ZuulException;
 
 import br.com.conductor.heimdall.core.exception.BadRequestException;
+import br.com.conductor.heimdall.core.exception.CircuitBreakerException;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.ForbiddenException;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
@@ -70,6 +71,27 @@ import lombok.extern.slf4j.Slf4j;
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+	
+	/**
+     * Method that captures all the {@link ServerErrorException} exceptions.
+     * 
+     * @param response
+     * {@link HttpServletResponse}
+     * @param request
+     * {@link HttpServletRequest}
+     * @param exception
+     * {@link Exception}
+     * @return {@link ErroInfo}
+     */
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(CircuitBreakerException.class)
+    public @ResponseBody ErroInfo handleCircuitBreakerException(HttpServletResponse response, HttpServletRequest request, NoHttpResponseException exception) {
+         
+         ErroInfo erroInfo = buildErrorInfo(request, exception);
+         log.error(exception.getMessage(), exception);
+         return erroInfo;
+         
+    }
 
      /**
       * Method that captures all the {@link NotFoundException} exceptions.
