@@ -221,6 +221,10 @@ export default {
         'this_operation_can_not_be_reverted': 'Esta operação não pode ser revertida.',
         'search_operations': 'Buscar operações',
         'app_name': 'Nome do app',
-        'settings_ldap': 'Configurações do LDAP'
+        'settings_ldap': 'Configurações do LDAP',
+        'please_input_role_name':'Por favor, insira o nome do papel!',
+        'min_4_characters_to_name': 'O nome deve ter no mínimo 4 caracteres!',
+        'available_privileges': 'Papéis disponíveis',
+        'attributed_privileges': 'Papéis atribuídos'
     }
 }
