@@ -29,7 +29,6 @@ public class MongoConfiguration {
 	@ConditionalOnProperty(name="heimdall.mongo.enabled", havingValue="true")
 	public MongoClient createMongoClient() {
 
-		System.out.println("mongo created");
 		MongoClient client;
 		if (Objeto.notBlank(property.getMongo().getUrl())) {
 
