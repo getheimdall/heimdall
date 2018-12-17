@@ -60,12 +60,10 @@ import br.com.conductor.heimdall.middleware.spec.Xml;
  * Implementation of the {@link Helper} interface.
  *
  * @author Filipe Germano
- *
+ * @author marcos.filho
  */
 public class HelperImpl implements Helper {
 	
-	@Autowired
-	private Call call;
 	@Autowired(required = false)
 	private MongoClient mongoClient;
 
@@ -85,7 +83,7 @@ public class HelperImpl implements Helper {
 	@Override
 	public Call call() {
 
-		return this.call;
+		return new CallImpl();
 	}
 
 	@Override

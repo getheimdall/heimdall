@@ -60,8 +60,6 @@ public class OAuthInterceptor extends HeimdallFilter {
         timeRefreshToken = {{timeRefreshToken}};
 
         privateKey = "{{privateKey}}";
-
-        this.helper = new HelperImpl();
     }
 
     @Override
@@ -90,7 +88,7 @@ public class OAuthInterceptor extends HeimdallFilter {
 
     @Override
     public void execute() throws Throwable {
-
+		this.helper = (Helper) BeanManager.getBean(Helper.class);
         OAuthInterceptorService oAuthInterceptorService = (OAuthInterceptorService) BeanManager.getBean(OAuthInterceptorService.class);
         oAuthInterceptorService.execute(TypeOAuth.{{typeOAuth}}, privateKey, timeAccessToken, timeRefreshToken, providerId, helper);
     }

@@ -165,40 +165,35 @@ public class DBMongoImpl implements DBMongo {
           return pageResponse;
      }
 
-     @Override
-     public <T> void insertMany(MongoCollection<Document> collection, List<T> objects) {
+	@Override
+	public <T> void insertMany(MongoCollection<Document> collection, List<T> objects) {
 
-          try {
+		try {
 
-               List<Document> ts = Lists.newArrayList();
-               for (T t : objects) {
+			List<Document> ts = Lists.newArrayList();
+			for (T t : objects) {
 
-                    ts.add(Document.parse(json.parse(t)));
-               }
-               collection.insertMany(ts);
-               this.datastore().save(ts);
-          } catch (Exception e) {
-               log.error(e.getMessage(), e);
-          } finally {
-               this.mongoClient.close();
-          }
-     }
+				ts.add(Document.parse(json.parse(t)));
+			}
+			collection.insertMany(ts);
+			this.datastore().save(ts);
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
+	}
 
-     @Override
-     public <T> void insertOne(MongoCollection<Document> collection, T object) {
+	@Override
+	public <T> void insertOne(MongoCollection<Document> collection, T object) {
 
-          try {
+		try {
 
-               Document document = Document.parse(json.parse(object));
-               collection.insertOne(document);
-          } catch (Exception e) {
+			Document document = Document.parse(json.parse(object));
+			collection.insertOne(document);
+		} catch (Exception e) {
 
-               log.error(e.getMessage(), e);
-          } finally {
-
-        	  this.mongoClient.close();
-          }
-     }
+			log.error(e.getMessage(), e);
+		}
+	}
 
      @Override
      public <T> Query<T> getQueryProvider(Object criteria) {
@@ -255,12 +250,12 @@ public class DBMongoImpl implements DBMongo {
 
           List<T> list = Lists.newArrayList();
           for (Document document : documents) {
-//               T parse = helper.json().parse(document.toJson(), classType);
             T parse = null;
 			try {
 				parse = new ObjectMapper().readValue(document.toJson(), classType);
 			} catch (IOException e) {
-				e.printStackTrace();
+				log.error("Json Parser error", e);
+				parse = null;
 			}
                list.add(parse);
           }
@@ -279,23 +274,6 @@ public class DBMongoImpl implements DBMongo {
 
           return database().getCollection(classType.getSimpleName());
      }
-
-//     private MongoClient createMongoClient() {
-//
-//          MongoClient client;
-//          if (Objeto.notBlank(property.getMongo().getUrl())) {
-//
-//               MongoClientURI uri = new MongoClientURI(property.getMongo().getUrl());
-//               client = new MongoClient(uri);
-//          } else {
-//               ServerAddress address = new ServerAddress(property.getMongo().getServerName(), property.getMongo().getPort().intValue());
-//               MongoCredential mongoCredential = MongoCredential.createCredential(property.getMongo().getUsername(), property.getMongo().getUsername(), property.getMongo().getPassword().toCharArray());
-//               MongoClientOptions mongoClientOptions = MongoClientOptions.builder().build();
-//               client = new MongoClient(address, mongoCredential, mongoClientOptions);
-//          }
-//
-//          return client;
-//     }
 
      @Override
      public <T> T merge(T object) {

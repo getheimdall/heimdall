@@ -36,6 +36,7 @@ import br.com.conductor.heimdall.middleware.util.Page;
  *
  * @author Filipe Germano
  * @author Jefferson X. Cardoso
+ * @author marcos.filho
  *
  */
 
