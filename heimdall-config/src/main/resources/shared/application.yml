@@ -42,7 +42,7 @@ heimdall:
         runLiquibase: true
         sendStringParametersAsUnicode: false
     mongo:
-        enabled: true
+        enabled: false
 #        serverName:
         url: mongodb://admin:admin@localhost
         port: 27017
