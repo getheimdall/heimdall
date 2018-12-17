@@ -19,8 +19,11 @@ package br.com.conductor.heimdall.gateway.filter.helper;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -55,6 +58,7 @@ import br.com.conductor.heimdall.middleware.spec.Response;
 import br.com.conductor.heimdall.middleware.spec.StackTrace;
 import br.com.conductor.heimdall.middleware.spec.Trace;
 import br.com.twsoftware.alfred.object.Objeto;
+import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -245,6 +249,7 @@ public class CallImpl implements Call {
                
                try {
                     
+            	    @Cleanup
                     InputStream in = (InputStream) context.get("requestEntity");
                     if (in == null) {
                          in = context.getRequest().getInputStream();

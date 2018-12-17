@@ -56,10 +56,8 @@ public class ClientIdInterceptor extends HeimdallFilter {
      {{/pathsNotAllowed}}           
 
           inboundURL = "{{inboundURL}}";
-
-          this.helper = new HelperImpl();
+          
           referenceId = {{referenceId}};
-
      }
 
      @Override
@@ -95,7 +93,7 @@ public class ClientIdInterceptor extends HeimdallFilter {
 
      @Override
      public void execute() throws Throwable {
-
+			this.helper = (Helper) BeanManager.getBean(Helper.class);
 //          securityService = (SecurityService) BeanManager.getBean(SecurityService.class);
 //          RequestContext ctx = RequestContext.getCurrentContext();
 //          HttpServletRequest request = ctx.getRequest();
