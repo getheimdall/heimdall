@@ -87,6 +87,10 @@ heimdall:
     middlewares:
         allowInactive: 0
         deleteDeprecated: false
+    failsafe:
+        failureNumber: 4
+        sucessNumber: 4
+        delayTimeSeconds: 30
 
 spring:
     pid:
