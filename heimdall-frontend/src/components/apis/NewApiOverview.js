@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Input, Form, Col, Row, Checkbox, Switch } from 'antd'
 
+import i18n from "../../i18n/i18n"
+
 const FormItem = Form.Item
 
 class NewApiOverview extends Component {
@@ -17,7 +19,6 @@ class NewApiOverview extends Component {
     onSubmitOverview() {
         this.props.form.validateFieldsAndScroll((err, payload) => {
             if (!err) {
-                console.log(payload)
                 if (payload.environments) {
                     payload.environments = payload.environments.map((env) => ({ id: env }))
                 }
@@ -40,52 +41,52 @@ class NewApiOverview extends Component {
                     <Col span={12} sm={24} md={12}>
                         <Row gutter={16}>
                             <Col sm={24} md={15}>
-                                <FormItem label="API Name">
+                                <FormItem label={i18n.t('api_name')}>
                                     {
                                         getFieldDecorator('name', {
-                                            rules: [{ required: true, message: 'Please input your api name!' }]
+                                            rules: [{ required: true, message: i18n.t('please_input_your_api_name') }]
                                         })(<Input />)
                                     }
                                 </FormItem>
                             </Col>
 
                             <Col sm={24} md={5}>
-                                <FormItem label="API version">
+                                <FormItem label={i18n.t('api_version')}>
                                     {
                                         getFieldDecorator('version', {
-                                            rules: [{ required: true, message: 'Please input your api version!' }]
+                                            rules: [{ required: true, message: i18n.t('please_input_your_api_version') }]
                                         })(<Input />)
                                     }
                                 </FormItem>
                             </Col>
 
                             <Col sm={24} md={15}>
-                                <FormItem label="Description">
+                                <FormItem label={i18n.t('description')}>
                                     {
                                         getFieldDecorator('description', {
-                                            rules: [{ required: true, message: 'Please input your api description!' }]
+                                            rules: [{ required: true, message: i18n.t('please_input_your_api_description') }]
                                         })(<Input />)
                                     }
                                 </FormItem>
                             </Col>
 
                             <Col sm={24} md={5}>
-                                <FormItem label="Base path">
+                                <FormItem label={i18n.t('base_path')}>
                                     {
                                         getFieldDecorator('basePath', {
                                             rules: [{ required: true, message: 'Please input your api base path!' }]
-                                        })(<Input placeholder="/basepath" />)
+                                        })(<Input addonBefore={"/"} placeholder={i18n.t('base_path')} />)
                                     }
                                 </FormItem>
                             </Col>
 
                             <Col sm={24} md={5}>
-                                <FormItem label="Status">
+                                <FormItem label={i18n.t('status')}>
                                     {
                                         getFieldDecorator('status', {
                                             initialValue: this.props.api.status === 'ACTIVE',
                                             valuePropName: 'checked',
-                                            rules: [{ required: true, message: 'Please input your api base path!' }]
+                                            rules: [{ required: true, message: i18n.t('please_select_your_api_status') }]
                                         })(<Switch required />)
                                     }
                                 </FormItem>
@@ -95,10 +96,10 @@ class NewApiOverview extends Component {
                     <Col span={12} sm={24} md={12}>
                         <Row gutter={16}>
                             <Col sm={24}>
-                                <FormItem label="Environments">
+                                <FormItem label={i18n.t('environments')}>
                                     {
                                         getFieldDecorator('environments', {
-                                            rules: [{ required: true, message: 'Please select an environment' }]
+                                            rules: [{ required: true, message: i18n.t('please_select_an_environment') }]
                                         })(<Checkbox.Group className='checkbox-conductor' options={this.props.environments} />)
                                     }
                                 </FormItem>

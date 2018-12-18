@@ -28,6 +28,7 @@ import java.sql.Statement;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.EnvironmentAware;
@@ -102,6 +103,7 @@ public class DataBaseConfiguration implements EnvironmentAware {
           hikariConfig.addDataSourceProperty("socketTimeout", property.getDatasource().getSocketTimeout());
           hikariConfig.addDataSourceProperty("loginTimeout", property.getDatasource().getLoginTimeout());
           hikariConfig.addDataSourceProperty("applicationName", property.getDatasource().getAppName());
+          hikariConfig.addDataSourceProperty("portNumber", property.getDatasource().getPortNumber());
           
           if (SQL_SERVER.equals(database)) {
                
@@ -136,7 +138,7 @@ public class DataBaseConfiguration implements EnvironmentAware {
       * @return					The {@link SpringLiquibase} instance created
       */
      @Bean
-     public SpringLiquibase liquibase(DataSource dataSource) {
+     public SpringLiquibase liquibase(@Qualifier("dataSource") DataSource dataSource) {
 
           liquibase = new SpringLiquibase();
           liquibase.setDataSource(dataSource);

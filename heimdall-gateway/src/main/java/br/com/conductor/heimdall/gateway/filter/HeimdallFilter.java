@@ -60,8 +60,8 @@ public abstract class HeimdallFilter extends ZuulFilter {
                return false;
           }
           
-          boolean validateExecution = should ? validateExecution() : should;
-          should = should ? should() : should;
+          boolean validateExecution = should && validateExecution();
+          should = should && should();
           
           long endTime = System.currentTimeMillis();
           long duration = (endTime - startTime);
@@ -88,7 +88,7 @@ public abstract class HeimdallFilter extends ZuulFilter {
                detail.setStatus(Constants.SUCCESS);
           } catch (Throwable e) {
                detail.setStatus(Constants.FAILED);
-               TraceContextHolder.getInstance().getActualTrace().setStackTrace(new StackTraceImpl(e.getClass().getName(), e.getMessage(), ExceptionUtils.getStackTrace(e)));
+               detail.setStackTrace(new StackTraceImpl(e.getClass().getName(), e.getMessage(), ExceptionUtils.getStackTrace(e)));
           } finally {
                long endTime = System.currentTimeMillis();
 

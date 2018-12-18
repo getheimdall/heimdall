@@ -22,6 +22,7 @@ package br.com.conductor.heimdall.gateway.configuration;
  */
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.web.ErrorController;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
@@ -30,6 +31,7 @@ import org.springframework.cloud.netflix.zuul.ZuulProxyAutoConfiguration;
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
 import org.springframework.cloud.netflix.zuul.filters.RouteLocator;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
+import org.springframework.cloud.netflix.zuul.filters.post.SendErrorFilter;
 import org.springframework.cloud.netflix.zuul.filters.post.SendResponseFilter;
 import org.springframework.cloud.netflix.zuul.filters.pre.PreDecorationFilter;
 import org.springframework.cloud.netflix.zuul.filters.route.SimpleHostRoutingFilter;
@@ -37,7 +39,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import br.com.conductor.heimdall.core.repository.OperationRepository;
+import br.com.conductor.heimdall.gateway.failsafe.CircuitBreakerManager;
 import br.com.conductor.heimdall.gateway.filter.CustomHostRoutingFilter;
+import br.com.conductor.heimdall.gateway.filter.CustomSendErrorFilter;
 import br.com.conductor.heimdall.gateway.filter.CustomSendResponseFilter;
 import br.com.conductor.heimdall.gateway.filter.HeimdallDecorationFilter;
 import br.com.conductor.heimdall.gateway.listener.StartServer;
@@ -52,72 +56,82 @@ import br.com.conductor.heimdall.gateway.zuul.storage.ZuulRouteStorage;
 @Configuration
 public class ZuulConfiguration extends ZuulProxyAutoConfiguration {
 
-     @Autowired
-     private ZuulRouteStorage zuulRouteStore;
+	@Autowired
+	private ZuulRouteStorage zuulRouteStore;
 
-     @Autowired
-     private DiscoveryClient discovery;
+	@Autowired
+	private DiscoveryClient discovery;
 
-     @Autowired
-     private ZuulProperties zuulProperties;
+	@Autowired
+	private ZuulProperties zuulProperties;
 
-     @Autowired
-     private ServerProperties server;
+	@Autowired
+	private ServerProperties server;
 
-     @Autowired
-     private OperationRepository operationRepository;
+	@Autowired
+	private OperationRepository operationRepository;
 
-     @Autowired
-     private RequestHelper requestHelper;
+	@Autowired
+	private RequestHelper requestHelper;
 
-     @Autowired(required = false)
-     private ErrorController errorController;
+	@Qualifier("heimdallErrorController")
+	@Autowired(required = false)
+	private ErrorController errorController;
+	
+	@Autowired
+	private CircuitBreakerManager circuitBreakerManager;
 
-     @Bean
-     public ProxyRouteLocator proxyRouteLocator() {
+	@Bean
+	public ProxyRouteLocator proxyRouteLocator() {
 
-          return new ProxyRouteLocator(server.getServletPath(), discovery, zuulProperties, zuulRouteStore);
+		return new ProxyRouteLocator(server.getServletPath(), discovery, zuulProperties, zuulRouteStore);
 
-     }
+	}
 
-     @Override
-     public PreDecorationFilter preDecorationFilter(RouteLocator routeLocator, ProxyRequestHelper proxyRequestHelper) {
+	@Override
+	public PreDecorationFilter preDecorationFilter(RouteLocator routeLocator, ProxyRequestHelper proxyRequestHelper) {
 
-          return new HeimdallDecorationFilter(proxyRouteLocator(), this.server.getServletPrefix(), zuulProperties, proxyRequestHelper, operationRepository, requestHelper);
-     }
+		return new HeimdallDecorationFilter(proxyRouteLocator(), this.server.getServletPrefix(), zuulProperties,
+				proxyRequestHelper, operationRepository, requestHelper);
+	}
 
-     @Bean
-     public SendResponseFilter sendResponseFilter() {
+	@Bean
+	public SendResponseFilter sendResponseFilter() {
 
-          return new CustomSendResponseFilter();
-     }
-     
-     @Bean
-     @ConditionalOnMissingBean(SimpleHostRoutingFilter.class)
-     public SimpleHostRoutingFilter simpleHostRoutingFilter(ProxyRequestHelper helper, ZuulProperties zuulProperties) {
-          return new CustomHostRoutingFilter(helper, zuulProperties);
-     }
+		return new CustomSendResponseFilter();
+	}
 
-     @Bean
-     public StartServer startServeltListenerZuul() {
+	@Override
+	public SendErrorFilter sendErrorFilter() {
+		return new CustomSendErrorFilter();
+	}
 
-          return new StartServer();
+	@Bean
+	@ConditionalOnMissingBean({ SimpleHostRoutingFilter.class })
+	public SimpleHostRoutingFilter simpleHostRoutingFilter(ProxyRequestHelper helper, ZuulProperties zuulProperties) {
+		return new CustomHostRoutingFilter(helper, zuulProperties, circuitBreakerManager);
+	}
 
-     }
+	@Bean
+	public StartServer startServeltListenerZuul() {
 
-     @Bean
-     public ZuulRouteStorage cacheZuulRouteStore() {
+		return new StartServer();
 
-          return new CacheZuulRouteStorage();
+	}
 
-     }
+	@Bean
+	public ZuulRouteStorage cacheZuulRouteStore() {
 
-     @Override
-     public HeimdallHandlerMapping zuulHandlerMapping(RouteLocator routes) {
+		return new CacheZuulRouteStorage();
 
-          HeimdallHandlerMapping handlerMapping = new HeimdallHandlerMapping(proxyRouteLocator(), zuulController());
-          handlerMapping.setErrorController(this.errorController);
-          return handlerMapping;
-     }
+	}
+
+	@Override
+	public HeimdallHandlerMapping zuulHandlerMapping(RouteLocator routes) {
+
+		HeimdallHandlerMapping handlerMapping = new HeimdallHandlerMapping(proxyRouteLocator(), zuulController());
+		handlerMapping.setErrorController(this.errorController);
+		return handlerMapping;
+	}
 
 }

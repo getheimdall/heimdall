@@ -26,10 +26,11 @@ package br.com.conductor.heimdall.core.util;
  * 
  * @author Filipe Germano
  * @author Marcos Filho
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
 public class ConstantsTag {
-     
+
      public static final String TAG_APIS = "Apis";
      public static final String TAG_MIDDLEWARES = "Middlewares";
      public static final String TAG_APPS = "Apps";
@@ -38,7 +39,7 @@ public class ConstantsTag {
      public static final String TAG_PLANS = "Plans";
      public static final String TAG_RESOURCES = "Resources";
      public static final String TAG_OPERATIONS = "Operations";
-     public static final String TAG_ACCESS_TOKENS = "AcessTokens";
+     public static final String TAG_ACCESS_TOKENS = "AccessTokens";
      public static final String TAG_INTERCEPTORS = "Interceptors";
      public static final String TAG_INTERCEPTORS_PLANS = "Plans Interceptors";
      public static final String TAG_INTERCEPTORS_RESOURCES = "Resources Interceptors";
@@ -47,5 +48,9 @@ public class ConstantsTag {
      public static final String TAG_USERS = "Users";
      public static final String TAG_ROLES = "Roles";
      public static final String TAG_PRIVILEGES = "Privileges";
-
+     public static final String TAG_PROVIDERS = "Providers";
+     public static final String TAG_TRACES = "Traces";
+     public static final String TAG_AUTH = "Auth";
+     public static final String TAG_LDAP = "Ldap";
+     public static final String TAG_METRICS = "Metrics";
 }

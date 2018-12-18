@@ -33,7 +33,8 @@ import lombok.extern.slf4j.Slf4j;
  *
  * @author Thiago Sampaio
  * @author Filipe Germano
- * @author Fabio Cicupira
+ * @author Fabio Sicupira
+ * @author Marcelo Aguiar Rodrigues
  *
  */
 @Slf4j
@@ -42,13 +43,11 @@ public class TraceContextHolder {
      private static final ThreadLocal<String> contextHolder = new ThreadLocal<>();
 
      private static final ConcurrentHashMap<String, Trace> traceMap = new ConcurrentHashMap<>();
-     
-     private boolean shouldPrint;
 
      /**
       * Implementation of the Initialization-on-demand holder idiom.
       * 
-      * @author Marcelo Rodrigues
+      * @author Marcelo Aguiar Rodrigues
       * @see <a href="http://literatejava.com/jvm/fastest-threadsafe-singleton-jvm/">Fastest Thread-safe Singleton in Java</a>
       * 
       */
@@ -74,33 +73,16 @@ public class TraceContextHolder {
       * @param request			{@link ServletRequest}
       * @return					{@link Trace}
       */
-     public Trace init(boolean printAllTrace, String profile, ServletRequest request) {
-          this.shouldPrint = true;
+     public Trace init(boolean printAllTrace, String profile, ServletRequest request, boolean printMongo) {
           String uuid = UUID.randomUUID().toString();
           contextHolder.set(uuid);
-          traceMap.put(uuid, new Trace(printAllTrace, profile, request));
+          traceMap.put(uuid, new Trace(printAllTrace, profile, request, printMongo));
           
           log.debug("Initializing TraceContext with ID: {}", uuid);
           return getActualTrace();
 
      }
-     
-     /**
-      * Disables the printing.
-      */
-     public void disablePrint() {
-          this.shouldPrint = false;
-     }
-     
-     /**
-      * Returns boolean that indicates if is safe to write.
-      * 
-      * @return		boolean should write
-      */
-     public boolean shouldWrite() {
-          return this.shouldPrint;
-     }
-     
+
      /**
       * Returns the actual {@link Trace}.
       * 

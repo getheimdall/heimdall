@@ -1,6 +1,8 @@
+import { push } from 'connected-react-router'
+
+import i18n from "../../i18n/i18n"
 import { DeveloperConstants } from '../../constants/actions-types'
 import { developerService } from '../../services'
-import { push } from 'connected-react-router';
 
 export const initLoading = () => dispatch => {
     dispatch({ type: DeveloperConstants.DEVELOPER_LOADING })
@@ -41,14 +43,14 @@ export const save = developer => dispatch => {
     developerService.save(developer)
         .then(data => {
             dispatch(getAllDevelopers())
-            dispatch(sendNotification({ type: 'success', message: 'Developer saved' }))
+            dispatch(sendNotification({ type: 'success', message: i18n.t('developer_saved') }))
             dispatch(push('/developers'))
             dispatch(finishLoading())
         })
         .catch(error => {
             console.log(error)
             if (error.response && error.response.status === 400) {
-                dispatch(sendNotification({ type: 'error', message: 'Error', description: error.response.data.message }))
+                dispatch(sendNotification({ type: 'error', message: i18n.t('error'), description: error.response.data.message }))
             }
             dispatch(finishLoading())
         })
@@ -58,13 +60,13 @@ export const update = developer => dispatch => {
     developerService.update(developer)
         .then(data => {
             dispatch(getDeveloper(developer.id))
-            dispatch(sendNotification({ type: 'success', message: 'Developer updated' }))
+            dispatch(sendNotification({ type: 'success', message: i18n.t('developer_updated') }))
             dispatch(finishLoading())
         })
         .catch(error => {
             console.log(error)
             if (error.response && error.response.status === 400) {
-                dispatch(sendNotification({ type: 'error', message: 'Error', description: error.response.data.message }))
+                dispatch(sendNotification({ type: 'error', message: i18n.t('error'), description: error.response.data.message }))
             }
             dispatch(finishLoading())
         })
@@ -74,7 +76,7 @@ export const remove = (developerId, query) => dispatch => {
     developerService.remove(developerId)
         .then(data => {
             dispatch(getAllDevelopers(query))
-            dispatch(sendNotification({ type: 'success', message: 'Developer removed' }))
+            dispatch(sendNotification({ type: 'success', message: i18n.t('developer_removed') }))
         })
 }
 

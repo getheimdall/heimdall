@@ -21,28 +21,6 @@ package br.com.conductor.heimdall.gateway.listener;
  * ==========================LICENSE_END===================================
  */
 
-import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
-
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
-import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-
-import com.google.common.collect.Lists;
-import com.netflix.zuul.FilterFileManager;
-import com.netflix.zuul.FilterLoader;
-import com.netflix.zuul.groovy.GroovyCompiler;
-import com.netflix.zuul.groovy.GroovyFileFilter;
-
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.entity.Middleware;
@@ -52,18 +30,40 @@ import br.com.conductor.heimdall.core.repository.InterceptorRepository;
 import br.com.conductor.heimdall.core.repository.MiddlewareRepository;
 import br.com.conductor.heimdall.core.service.FileService;
 import br.com.conductor.heimdall.core.util.Constants;
+import br.com.conductor.heimdall.gateway.configuration.HeimdallHandlerMapping;
 import br.com.conductor.heimdall.gateway.service.InterceptorFileService;
+import br.com.conductor.heimdall.gateway.util.HeimdallFilterFileManager;
 import br.com.twsoftware.alfred.io.Arquivo;
 import br.com.twsoftware.alfred.object.Objeto;
+import com.netflix.zuul.FilterLoader;
+import com.netflix.zuul.groovy.GroovyCompiler;
+import com.netflix.zuul.groovy.GroovyFileFilter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+
+import javax.annotation.PostConstruct;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+import java.io.File;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.*;
 
 /**
- * <h1>StartServer</h1><br/>
+ * StartServer
  * 
  * {@link ServletContextListener} implementation.
  *
  * @author Filipe Germano
  * @author Thiago Sampaio
+ * @author Marcelo Aguiar Rodrigues
  *
  */
 @Slf4j
@@ -83,7 +83,10 @@ public class StartServer implements ServletContextListener {
 
      @Autowired 
      private FileService fileService;
-     
+
+     @Autowired
+     private HeimdallHandlerMapping heimdallHandlerMapping;
+
      @Value("${zuul.filter.root}")
      private String zuulFilterRoot;
 
@@ -95,50 +98,50 @@ public class StartServer implements ServletContextListener {
      @Override
      public void contextInitialized(ServletContextEvent sce) {
 
-          log.info("Initializing Goovy Interceptors");
+          log.info("Initializing Groovy Interceptors");
+          heimdallHandlerMapping.initHandlers();
           initGroovyFilterManager();
 
      }
 
      @Override
-     public void contextDestroyed(ServletContextEvent sce) {
-
-     }
+     public void contextDestroyed(ServletContextEvent sce) { }
 
      private void initGroovyFilterManager() {
 
           try {
-                    
-               File preFolder = new File(zuulFilterRoot, "pre");          
-               File postFolder = new File(zuulFilterRoot, "post");
-               File routeFolder = new File(zuulFilterRoot, "route");
-               File middlewareFolder = new File(zuulFilterRoot, MIDDLEWARE_API_ROOT);
-               
-               
-               List<String> filesAbsolutePath = Lists.newArrayList();
-               filesAbsolutePath.add(preFolder.getAbsolutePath());
-               filesAbsolutePath.add(postFolder.getAbsolutePath());
-               filesAbsolutePath.add(routeFolder.getAbsolutePath());
-               filesAbsolutePath.add(middlewareFolder.getAbsolutePath());
-               
-               for (Api api : apis) {
-                    File apiFolder = new File(zuulFilterRoot, MIDDLEWARE_API_ROOT + File.separator + api.getId().toString());
-                    filesAbsolutePath.add(apiFolder.getAbsolutePath());
-               }
+
+               Set<String> filesAbsolutePath = filesAbsolutePath();
 
                FilterLoader.getInstance().setCompiler(new GroovyCompiler());
-               FilterFileManager.setFilenameFilter(new GroovyFileFilter());
-               
-               String[] array = filesAbsolutePath.toArray(new String[0]);
-               
-               FilterFileManager.init(zuulFilterInterval, array);
+
+               HeimdallFilterFileManager.setFilenameFilter(new GroovyFileFilter());
+               HeimdallFilterFileManager.init(zuulFilterInterval, filesAbsolutePath);
 
           } catch (Exception e) {
                throw new RuntimeException(e);
           }
 
      }
-     
+
+     private Set<String> filesAbsolutePath() {
+          String[] types = {PRE_TYPE, POST_TYPE, ROUTE_TYPE, MIDDLEWARE_API_ROOT};
+
+          Set<String> filesAbsolutePath = new HashSet<>();
+
+          for (String t : types) {
+               File folder = new File(zuulFilterRoot, t);
+               filesAbsolutePath.add(folder.getAbsolutePath());
+          }
+
+          for (Api api : apis) {
+               File apiFolder = new File(zuulFilterRoot, MIDDLEWARE_API_ROOT + File.separator + api.getId().toString());
+               filesAbsolutePath.add(apiFolder.getAbsolutePath());
+          }
+
+          return filesAbsolutePath;
+     }
+
      /**
       * Initializes the application
       */
@@ -160,17 +163,12 @@ public class StartServer implements ServletContextListener {
      /**
       * Creates all {@link Interceptor} from the repository
       */
-     public void createInterceptors() {
+     private void createInterceptors() {
           
-          apis = apiRepository.findAll();
           List<Interceptor> interceptors = interceptorRepository.findAll();
           if (Objeto.notBlank(interceptors)) {
                
-               interceptors.forEach(interceptor -> {
-
-                    interceptorFileService.createFileInterceptor(interceptor.getId());
-                    
-               });
+               interceptors.forEach(interceptor -> interceptorFileService.createFileInterceptor(interceptor.getId()));
 
           }
      }
@@ -181,17 +179,12 @@ public class StartServer implements ServletContextListener {
       * @param middlewareId		The {@link Middleware} Id
       */
      public void createMiddlewaresInterceptor(Long middlewareId) {
-          
+
           Middleware middleware = middlewareRepository.findOne(middlewareId);
           if (Objeto.notBlank(middleware) && Objeto.notBlank(middleware.getInterceptors())) {
-               
-               for (Interceptor interceptor : middleware.getInterceptors()) {
-                    
-                    interceptorFileService.createFileInterceptor(interceptor.getId());
-               }
-               
+
+               middleware.getInterceptors().forEach(interceptor -> interceptorFileService.createFileInterceptor(interceptor.getId()));
           }
-          
      }
 
      /**
@@ -199,17 +192,12 @@ public class StartServer implements ServletContextListener {
       * 
       * @param root		The folder root
       */
-     public void cleanFilesFolder(String root) {
+     private void cleanFilesFolder(String root) {
           
           File interceptorsFolder = new File(root);
-          Collection<File> files = Arquivo.listarArquivos(interceptorsFolder, new FilenameFilter(){
-               
-               @Override
-               public boolean accept(File dir, String name) {
-                    return name.contains(".groovy") || name.contains(".java") || name.contains(".jar");
-               }
-               
-          }, true);
+          Collection<File> files = Arquivo.listarArquivos(interceptorsFolder,
+                  (dir, name) -> name.contains(".groovy") || name.contains(".java") || name.contains(".jar"),
+                  true);
           
           files.forEach(f -> {
                try {
@@ -225,35 +213,19 @@ public class StartServer implements ServletContextListener {
      /**
       * Creates the folders necessary for the routes.
       */
-     public void createFolders() {
-          
-          File interceptorsFolder = new File(zuulFilterRoot);
-          if (!interceptorsFolder.exists()) {
-               interceptorsFolder.mkdirs();
+     private void createFolders() {
+
+          String[] types = {PRE_TYPE, POST_TYPE, ROUTE_TYPE, MIDDLEWARE_API_ROOT};
+
+          for (String t : types) {
+               File folder = new File(zuulFilterRoot, t);
+               if (!folder.exists()) {
+                    folder.mkdirs();
+               }
           }
 
-          File preFolder = new File(zuulFilterRoot, "pre");
-          if (!preFolder.exists()) {
-               preFolder.mkdirs();
-          }
-
-          File postFolder = new File(zuulFilterRoot, "post");
-          if (!postFolder.exists()) {
-               postFolder.mkdirs();
-          }
-
-          File routeFolder = new File(zuulFilterRoot, "route");
-          if (!routeFolder.exists()) {
-               routeFolder.mkdirs();
-          }
-
-          File middlewareFolder = new File(zuulFilterRoot, MIDDLEWARE_API_ROOT);
-          if (!middlewareFolder.exists()) {
-               middlewareFolder.mkdirs();
-          }
-
-          List<Api> findAll = apiRepository.findAll();
-          for (Api api : findAll) {
+          apis = apiRepository.findAll();
+          for (Api api : apis) {
                
                File apiFolder = new File(zuulFilterRoot, MIDDLEWARE_API_ROOT + File.separator + api.getId().toString() + File.separator + Constants.MIDDLEWARE_ROOT);
                if (!apiFolder.exists()) {
@@ -265,7 +237,7 @@ public class StartServer implements ServletContextListener {
      /**
       * Loads all Middleware files.
       */
-     public void loadAllMiddlewareFiles() {
+     private void loadAllMiddlewareFiles() {
           
           try {
                
@@ -289,7 +261,7 @@ public class StartServer implements ServletContextListener {
       * 
       * @param middlewareId		The {@link Middleware} Id
       */
-     public void loadMiddlewareFiles(Long middlewareId) {
+     void loadMiddlewareFiles(Long middlewareId) {
           
           try {
                
@@ -314,17 +286,26 @@ public class StartServer implements ServletContextListener {
       * 
       * @param path			The path to the {@link Middleware} files
       */
-     public void removeMiddlewareFiles(String path) {
+     void removeMiddlewareFiles(String path) {
           
           try {
                
                cleanFilesFolder(path);
+               HeimdallFilterFileManager.getInstance().removeDirectory(path);
                
           } catch (Exception e) {
                
                log.error(e.getMessage(), e);
           }
      }
-     
-     
+
+     /**
+      * Include a new api directory to the file path
+      *
+      * @param api new Api
+      */
+     public void addApiDirectoryToPath(Api api) {
+          File apiFolder = new File(zuulFilterRoot, MIDDLEWARE_API_ROOT + File.separator + api.getId().toString());
+          HeimdallFilterFileManager.getInstance().addNewDirectory(apiFolder.getAbsolutePath());
+     }
 }

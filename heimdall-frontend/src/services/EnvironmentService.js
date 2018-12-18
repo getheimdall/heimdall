@@ -1,3 +1,4 @@
+import i18n from "../i18n/i18n"
 import { HTTPv1 } from '../utils/Http'
 
 const getEnvironments = () => {
@@ -16,7 +17,7 @@ const getEnvironments = () => {
 
 const getEnvironment = (idEnvironment) => {
     if (isNaN(idEnvironment)) {
-        return Promise.reject(new Error('Invalid parameter'))
+        return Promise.reject(new Error(i18n.t('invalid_parameter')))
     }
 
     return HTTPv1.get('/environments/' + idEnvironment)
@@ -33,7 +34,6 @@ const getEnvironment = (idEnvironment) => {
 }
 
 const save = (environment) => {
-    console.log(JSON.stringify(environment))
     return HTTPv1.post('/environments', JSON.stringify(environment))
     .then(res => Promise.resolve(res.data))
     .catch(error => {

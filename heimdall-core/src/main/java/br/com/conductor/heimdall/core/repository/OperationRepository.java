@@ -96,6 +96,16 @@ public interface OperationRepository extends JpaRepository<Operation, Long> {
       * @return					The Operation found
       */
      Operation findByResourceIdAndMethodAndPath(Long resourceId, HttpMethod method, String path);
+     
+     /**
+      * Find an Operation by {@link Api} Id, HTTP method and Operation path.
+      * 
+      * @param apiId
+      * @param method
+      * @param path
+      * @return
+      */
+     Operation findByResourceApiIdAndMethodAndPath(Long apiId, HttpMethod method, String path);
 
      /**
       * Finds a Operation by its path and HTTP method.

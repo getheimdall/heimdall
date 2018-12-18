@@ -10,9 +10,9 @@ package br.com.conductor.heimdall.api.resource;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,30 +20,6 @@ package br.com.conductor.heimdall.api.resource;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-
-import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_MIDDLEWARES;
-
-import java.net.URI;
-import java.util.List;
-
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
 import br.com.conductor.heimdall.core.dto.MiddlewareDTO;
@@ -54,7 +30,21 @@ import br.com.conductor.heimdall.core.entity.Middleware;
 import br.com.conductor.heimdall.core.service.MiddlewareService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
 import br.com.twsoftware.alfred.object.Objeto;
+import com.google.common.net.HttpHeaders;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.Valid;
+import java.net.URI;
+import java.util.List;
+
+import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_MIDDLEWARES;
 
 /**
  * Uses a {@link MiddlewareService} to provide methods to create, read, update and delete a {@link Middleware}.
@@ -69,10 +59,10 @@ public class MiddlewareResource {
 
      @Autowired
      private MiddlewareService middlewareService;
-     
+
      /**
       * Finds a {@link Middleware} by its Id and {@link Api} Id.
-      * 
+      *
       * @param apiId				The Api Id
       * @param middlewareId			The Middleware Id
       * @return						{@link ResponseEntity}
@@ -80,7 +70,7 @@ public class MiddlewareResource {
      @ResponseBody
      @ApiOperation(value = "Find Middleware by id", response = Api.class)
      @GetMapping(value = "/{middlewareId}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_API)
+     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_MIDDLEWARE)
      public ResponseEntity<?> findById(@PathVariable("apiId") Long apiId, @PathVariable("middlewareId") Long middlewareId) {
 
           Middleware middleware = middlewareService.find(apiId, middlewareId);
@@ -90,7 +80,7 @@ public class MiddlewareResource {
 
      /**
       * Finds all {@link Middleware} from a request.
-      * 
+      *
       * @param apiId				The Api Id
       * @param middlewareDTO		{@link MiddlewareDTO}
       * @param pageableDTO			{@link PageableDTO}
@@ -99,24 +89,24 @@ public class MiddlewareResource {
      @ResponseBody
      @ApiOperation(value = "Find all Middlewares", responseContainer = "List", response = Middleware.class)
      @GetMapping
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_API)
+     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_MIDDLEWARE)
      public ResponseEntity<?> findAll(@PathVariable("apiId") Long apiId, @ModelAttribute MiddlewareDTO middlewareDTO, @ModelAttribute PageableDTO pageableDTO) {
-          
+
           if (Objeto.notBlank(pageableDTO)) {
-               
-               MiddlewarePage middlewarePage = middlewareService.list(apiId, middlewareDTO, pageableDTO);      
+
+               MiddlewarePage middlewarePage = middlewareService.list(apiId, middlewareDTO, pageableDTO);
                return ResponseEntity.ok(middlewarePage);
           } else {
-               
-               List<Middleware> middlewares = middlewareService.list(apiId, middlewareDTO);      
+
+               List<Middleware> middlewares = middlewareService.list(apiId, middlewareDTO);
                return ResponseEntity.ok(middlewares);
           }
-          
+
      }
 
      /**
       * Saves a {@link Middleware}.
-      * 
+      *
       * @param apiId				The Api Id
       * @param file					{@link MultipartFile} of the Api
       * @param middlewareDTO		{@link MiddlewareDTO}
@@ -125,10 +115,10 @@ public class MiddlewareResource {
      @ResponseBody
      @ApiOperation(value = "Save a new Middleware")
      @PostMapping(consumes = {MediaType.APPLICATION_JSON_UTF8_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE })
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_API)
-     public ResponseEntity<?> save(@PathVariable("apiId") Long apiId, 
-               @RequestParam("file") MultipartFile file, 
-               @Valid 
+     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_MIDDLEWARE)
+     public ResponseEntity<?> save(@PathVariable("apiId") Long apiId,
+               @RequestParam("file") MultipartFile file,
+               @Valid
                MiddlewareDTO middlewareDTO) {
 
           Middleware middleware = middlewareService.save(apiId, middlewareDTO, file);
@@ -138,7 +128,7 @@ public class MiddlewareResource {
 
      /**
       * Updates a {@link Middleware}.
-      * 
+      *
       * @param apiId				The Api Id
       * @param middlewareId			The Middleware Id
       * @param middlewareDTO		{@link MiddlewareDTO}
@@ -147,17 +137,17 @@ public class MiddlewareResource {
      @ResponseBody
      @ApiOperation(value = "Update Middleware")
      @PutMapping(value = "/{middlewareId}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_API)
+     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_MIDDLEWARE)
      public ResponseEntity<?> update(@PathVariable("apiId") Long apiId, @PathVariable("middlewareId") Long middlewareId, @RequestBody MiddlewareDTO middlewareDTO) {
 
           Middleware middleware = middlewareService.update(apiId, middlewareId, middlewareDTO);
-          
+
           return ResponseEntity.ok(middleware);
      }
 
      /**
       * Deletes a {@link Middleware}.
-      * 
+      *
       * @param apiId				The Api Id
       * @param middlewareId			The Middleware Id
       * @return						{@link ResponseEntity}
@@ -165,12 +155,34 @@ public class MiddlewareResource {
      @ResponseBody
      @ApiOperation(value = "Delete Middleware")
      @DeleteMapping(value = "/{middlewareId}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_API)
+     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_MIDDLEWARE)
      public ResponseEntity<?> delete(@PathVariable("apiId") Long apiId, @PathVariable("middlewareId") Long middlewareId) {
 
           middlewareService.delete(apiId, middlewareId);
-          
+
           return ResponseEntity.noContent().build();
+     }
+
+     /**
+      * Downloads a {@link Middleware} file by its Id and {@link Api} Id.
+      *
+      * @param apiId				The Api Id
+      * @param middlewareId			The Middleware Id
+      * @return						{@link ResponseEntity}
+      */
+     @ApiOperation(value = "Download Middleware file by id", response = Api.class)
+     @GetMapping(value = "/download/{middlewareId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_MIDDLEWARE)
+     public ResponseEntity<?> downloadFileById(@PathVariable("apiId") Long apiId, @PathVariable("middlewareId") Long middlewareId){
+
+          Middleware middleware = middlewareService.find(apiId, middlewareId);
+          ByteArrayResource resource = new ByteArrayResource(middleware.getFile());
+
+          return ResponseEntity.ok()
+                  .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                  .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + middleware.getName() + "-" +  middleware.getVersion() + "." + middleware.getType())
+                  .header("filename", middleware.getName() + "-" +  middleware.getVersion() + "." + middleware.getType())
+                  .body(resource);
      }
 
 }

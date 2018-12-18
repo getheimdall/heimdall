@@ -26,9 +26,11 @@ package br.com.conductor.heimdall.core.util;
  *
  * @author Filipe Germano
  * @author Marcos Filho
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
 public class ConstantsPath {
+	
      public static final String PATH_ROOT = "/";
      
      public static final String PATH_API = "/v1/api";
@@ -69,4 +71,16 @@ public class ConstantsPath {
      
      public static final String PATH_PRIVILEGES = PATH_API + "/privileges";
      
+     public static final String PATH_PROVIDER = PATH_API + "/providers";
+     
+     public static final String PATH_TRACES = PATH_API + "/traces";
+
+     public static final String PATH_LOGIN = PATH_API + "/login";
+
+     public static final String PATH_LOGOUT = PATH_API + "/logout";
+
+     public static final String PATH_LDAP = PATH_API + "/ldap";
+
+     public static final String PATH_METRICS = PATH_API + "/metrics";
+
 }

@@ -6,13 +6,13 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.5.7.RELEASE</version>
+		<version>1.5.14.RELEASE</version>
 		<relativePath />
 	</parent>
 
 	<groupId>br.com.conductor.heimdall</groupId>
 	<artifactId>heimdall</artifactId>
-	<version>1.1.65-SNAPSHOT</version>
+	<version>1.11.3-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Heimdall</name>
@@ -144,7 +144,6 @@
 		<mssql-jdbc.version>6.2.1.jre8</mssql-jdbc.version>
 		<jackson.version>2.9.2</jackson.version>
 		<spring-cloud.version>Dalston.SR4</spring-cloud.version>
-		<versao>${project.version}</versao>
 		<scala.version>2.11.7</scala.version>
 		<gatling.version>2.2.0</gatling.version>
 		<scala-maven-plugin.version>3.2.2</scala-maven-plugin.version>
@@ -160,6 +159,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20171018</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -243,12 +247,12 @@
 			<dependency>
 				<groupId>br.com.conductor.heimdall</groupId>
 				<artifactId>heimdall-core</artifactId>
-				<version>1.1.65-SNAPSHOT</version>
+				<version>1.11.3-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>br.com.conductor.heimdall</groupId>
 				<artifactId>heimdall-middleware-spec</artifactId>
-				<version>1.1.65-SNAPSHOT</version>
+				<version>1.11.3-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mongodb</groupId>
@@ -266,8 +270,8 @@
 	</dependencyManagement>
 
 	<modules>
-		<module>heimdall-core</module>
 		<module>heimdall-middleware-spec</module>
+		<module>heimdall-core</module>
 		<module>heimdall-gateway</module>
 		<module>heimdall-api</module>
 		<module>heimdall-config</module>

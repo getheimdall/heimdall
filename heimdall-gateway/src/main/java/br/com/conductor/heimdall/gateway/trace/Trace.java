@@ -21,31 +21,35 @@ package br.com.conductor.heimdall.gateway.trace;
  * ==========================LICENSE_END===================================
  */
 
-import static net.logstash.logback.marker.Markers.append;
-
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.List;
+import br.com.conductor.heimdall.core.exception.ExceptionMessage;
+import br.com.conductor.heimdall.core.exception.HeimdallException;
+import br.com.conductor.heimdall.core.util.LocalDateTimeSerializer;
+import br.com.conductor.heimdall.core.util.UrlUtil;
+import br.com.conductor.heimdall.middleware.spec.StackTrace;
+import br.com.twsoftware.alfred.object.Objeto;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
+import lombok.Data;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.time.LocalDateTime;
+import java.util.Enumeration;
+import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
-
-import br.com.conductor.heimdall.core.exception.ExceptionMessage;
-import br.com.conductor.heimdall.core.exception.HeimdallException;
-import br.com.conductor.heimdall.core.util.UrlUtil;
-import br.com.conductor.heimdall.middleware.spec.StackTrace;
-import br.com.twsoftware.alfred.object.Objeto;
-import lombok.Data;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import static net.logstash.logback.marker.Markers.append;
 
 /**
  * Represents the trace message.
@@ -56,6 +60,8 @@ import lombok.extern.slf4j.Slf4j;
 @Data
 @Slf4j
 public class Trace {
+	
+	 private static final Logger logMongo = LoggerFactory.getLogger("mongo");
 
      private String method;
 
@@ -68,7 +74,8 @@ public class Trace {
 
      private Long durationMillis;
 
-     private String insertedOnDate = br.com.twsoftware.alfred.data.Data.getDataFormatada(new Date(), "dd/MM/yyyy hh:mm:ss.SSS");
+     @JsonSerialize(using = LocalDateTimeSerializer.class)
+     private LocalDateTime insertedOnDate = LocalDateTime.now();
 
      private Long apiId;
 
@@ -107,6 +114,15 @@ public class Trace {
      
      @JsonIgnore
      private boolean printAllTrace;
+     @JsonIgnore
+     private boolean printMongo;
+
+     @JsonIgnore
+     private boolean shouldPrint;
+     
+     public Trace() {
+    	 
+     }
 
      /**
       * Creates a Trace.
@@ -115,12 +131,14 @@ public class Trace {
       * @param profile			String, profile
       * @param servletRequest	{@link ServletRequest}
       */
-     public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest){
+     public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printMongo){
 
+          this.shouldPrint = true;
           this.profile = profile;
           this.printAllTrace = printAllTrace;
+          this.printMongo = printMongo;
           HttpServletRequest request = (HttpServletRequest) servletRequest;
-          HeimdallException.checkThrow(request == null ? true : false, ExceptionMessage.GLOBAL_REQUEST_NOT_FOUND);
+          HeimdallException.checkThrow(request == null, ExceptionMessage.GLOBAL_REQUEST_NOT_FOUND);
 
           setInitialTime(System.currentTimeMillis());
           setMethod(request.getMethod());
@@ -131,7 +149,7 @@ public class Trace {
 
                List<String> listaIPs = Lists.newArrayList();
                while (headers.hasMoreElements()) {
-                    String ip = (String) headers.nextElement();
+                    String ip = headers.nextElement();
                     listaIPs.add(ip);
                }
 
@@ -191,16 +209,7 @@ public class Trace {
                setResultStatus(response.getStatus());
                setDurationMillis(System.currentTimeMillis() - getInitialTime());
                
-               if (printAllTrace) {
-                    log.info(" [HEIMDALL-TRACE] - {} ", new ObjectMapper().writeValueAsString(this));
-               } else {
-                    String url = "";
-                    if(Objeto.notBlank(getUrl())) {
-                         url = getUrl();
-                    }
-                    
-                    log.info(append("call", this), " [HEIMDALL-TRACE] - " + url);
-               }
+               prepareLog(response.getStatus());
 
           } catch (Exception e) {
 
@@ -212,5 +221,64 @@ public class Trace {
           }
 
      }
-     
+
+     /*
+      * Heimdall uses three levels of log depending on the status code of the response.
+      *
+      * Levels per status code range:
+      *   * 1xx~2xx = INFO
+      *   * 3xx~4xx = WARN
+      *   * OTHER   = ERROR
+      */
+     private void prepareLog(Integer statusCode) throws JsonProcessingException {
+
+          if (printAllTrace) {
+
+               if (isInfo(statusCode)) {
+
+                    log.info(" [HEIMDALL-TRACE] - {} ", new ObjectMapper().writeValueAsString(this));
+               } else if (isWarn(statusCode)) {
+
+                    log.warn(" [HEIMDALL-TRACE] - {} ", new ObjectMapper().writeValueAsString(this));
+               } else {
+
+                    log.error(" [HEIMDALL-TRACE] - {} ", new ObjectMapper().writeValueAsString(this));
+               }
+          } else {
+
+               String url = (Objeto.notBlank(getUrl())) ? getUrl() : "";
+
+               if (isInfo(statusCode)) {
+
+                    log.info(append("call", this), " [HEIMDALL-TRACE] - " + url);
+
+                    if (printMongo) logMongo.info(new ObjectMapper().writeValueAsString(this));
+               } else if (isWarn(statusCode)) {
+
+                    log.warn(append("call", this), " [HEIMDALL-TRACE] - " + url);
+                    if (printMongo) logMongo.warn(new ObjectMapper().writeValueAsString(this));
+               } else {
+
+                    log.error(append("call", this), " [HEIMDALL-TRACE] - " + url);
+                    if (printMongo) logMongo.error(new ObjectMapper().writeValueAsString(this));
+               }
+          }
+     }
+
+     /*
+      * Checks if the status code is in range 1xx to 2xx
+      */
+     private static boolean isInfo(Integer statusCode) {
+          return HttpStatus.valueOf(statusCode).is1xxInformational() ||
+                  HttpStatus.valueOf(statusCode).is2xxSuccessful();
+     }
+
+     /*
+      * Checks if the status code is in range 3xx to 4xx
+      */
+     private static boolean isWarn(Integer statusCode) {
+          return HttpStatus.valueOf(statusCode).is3xxRedirection() ||
+                  HttpStatus.valueOf(statusCode).is4xxClientError();
+     }
+
 }

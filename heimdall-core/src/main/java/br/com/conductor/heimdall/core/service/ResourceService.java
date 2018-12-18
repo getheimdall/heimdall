@@ -54,6 +54,7 @@ import br.com.conductor.heimdall.core.util.Pageable;
  * This class provides methos to create, read, update and delete a {@link Resource} resource.
  * 
  * @author Filipe Germano
+ * @author Marcelo Aguiar Rodrigues
  *
  */
 @Service
@@ -64,6 +65,12 @@ public class ResourceService {
 
      @Autowired
      private ApiRepository apiRepository;
+
+     @Autowired
+     private OperationService operationService;
+
+     @Autowired
+     private InterceptorService interceptorService;
      
      @Autowired
      private AMQPRouteService amqpRoute;
@@ -201,10 +208,25 @@ public class ResourceService {
 
           Resource resource = resourceRepository.findByApiIdAndId(apiId, resourceId);
           HeimdallException.checkThrow(isBlank(resource), GLOBAL_RESOURCE_NOT_FOUND);
+
+          // Deletes all operations attached to the Resource
+          operationService.deleteAllfromResource(apiId, resourceId);
+
+          // Deletes all interceptors attached to the Resource
+          interceptorService.deleteAllfromResource(resourceId);
           
           resourceRepository.delete(resource.getId());
           
           amqpRoute.dispatchRoutes();
      }
 
+     /**
+      * Deletes all Resources from a Api
+      *
+      * @param apiId Api with the Resources
+      */
+     public void deleteAllFromApi(Long apiId) {
+          List<Resource> resources = resourceRepository.findByApiId(apiId);
+          resources.forEach(resource -> this.delete(apiId, resource.getId()));
+     }
 }

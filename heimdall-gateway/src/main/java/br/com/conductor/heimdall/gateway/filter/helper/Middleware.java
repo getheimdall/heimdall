@@ -21,19 +21,18 @@ package br.com.conductor.heimdall.gateway.filter.helper;
  * ==========================LICENSE_END===================================
  */
 
+import groovy.lang.GroovyClassLoader;
+
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.Collection;
-import java.util.List;
-
-import com.google.common.collect.Lists;
-
-import groovy.lang.GroovyClassLoader;
+import java.util.Arrays;
+import java.util.Comparator;
 
 /**
  * Middleware representation.
  *
  * @author Filipe Germano
+ * @author Marcelo Aguiar Rodrigues
  *
  */
 public class Middleware {
@@ -52,7 +51,7 @@ public class Middleware {
      public Middleware(String pathReferences) {
 
           this.pathReferences = pathReferences;
-          classLoad(pathReferences);
+          loadClassPath();
      }
 
      /**
@@ -92,19 +91,15 @@ public class Middleware {
      /**
       * Returns a {@link GroovyClassLoader} created from a reference path.
       * 
-      * @param pathReferences	- The path with the references
       * @return					{@link GroovyClassLoader}
       */
-     private GroovyClassLoader classLoad(String pathReferences) {
+     private GroovyClassLoader loadClassPath() {
 
           classLoader = new GroovyClassLoader();
-          classLoader.addClasspath(pathReferences);
-          Collection<File> listFiles = listFiles(fileFilter(JAR));
-          
-          listFiles.forEach(f -> {
+          File lastModifiedFile = lastModified((dir, name) -> name.contains(JAR));
 
-               classLoader.addClasspath(pathReferences + File.separator + f.getName());
-          });
+          if (lastModifiedFile != null)
+               classLoader.addClasspath(pathReferences + File.separator + lastModifiedFile.getName());
           
           return classLoader;
      }
@@ -115,51 +110,34 @@ public class Middleware {
       * @param filter		- The FilenameFilter
       * @return				List<Files>
       */
-     private List<File> listFiles(FilenameFilter filter) {
+     private File lastModified(FilenameFilter filter) {
 
           File directory = new File(pathReferences);
           
-          List<File> files = Lists.newArrayList();
           File[] entries = directory.listFiles();
-          Long lastModified = 0l;
-          for (File entry : entries) {
-               if (filter == null || filter.accept(directory, entry.getName())) {                    
-                    if (lastModified == 0l) {
-                         
-                         lastModified = entry.lastModified();     
-                         files = Lists.newArrayList();
-                         files.add(entry);
-                    } else if (entry.lastModified() > lastModified) {
-                         
-                         lastModified = entry.lastModified();     
-                         files = Lists.newArrayList();
-                         files.add(entry);
-                    }
-               }
-               if (entry.isDirectory()) {
-                    files.addAll(listFiles(filter));
-               }
-          }
 
-          return files;
+          return (entries != null)
+             ? Arrays.stream(entries)
+                  .filter(e -> filter.accept(directory, e.getName()))
+                  .max(Comparator.comparingLong(File::lastModified))
+                  .orElse(null)
+             : null;
+
      }
 
      /*
-      * Creates a new FilenameFilter with specific extension.
-      * 
-      * @param		- The file extension
+      * Converts the middleware version from the name of the file.
+      *
+      * This functionality is not used yet but it will be needed when we implement the automatic middleware versioning.
+      *
+      * Ex.: version 2.15.57
+      *      integer generated: 2015057
       */
-     private FilenameFilter fileFilter(String fileExtension) {
-
-          return new FilenameFilter() {
-
-               @Override
-               public boolean accept(File dir, String name) {
-
-                    return name.contains(fileExtension);
-               }
-
-          };
+     private static Integer version(File file) {
+          String[] values = file.getName().replaceAll(".+\\.\\d{14}\\.(.+)\\.jar", "$1").split("\\.");
+          return Integer.parseInt(values[0])*1000000 +
+                  Integer.parseInt(values[1])*1000 +
+                  Integer.parseInt(values[2]);
      }
-     
+
 }

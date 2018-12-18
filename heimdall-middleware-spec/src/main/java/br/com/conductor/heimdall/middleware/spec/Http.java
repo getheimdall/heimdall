@@ -21,6 +21,8 @@ package br.com.conductor.heimdall.middleware.spec;
  * ==========================LICENSE_END===================================
  */
 
+import org.springframework.web.client.RestTemplate;
+
 import java.util.Map;
 
 /**
@@ -74,6 +76,14 @@ public interface Http {
      public Http body(Map<String, Object> params);
 
      /**
+      * Sets a body to the Http.
+      * 
+      * @param params   The String representation of the body
+      * @return               The updated Http
+      */
+     public Http body(String params);
+     
+     /**
       * Sends a GET request to the Api and receives a {@link ApiResponse}.
       * 
       * @return			A ApiResponse object
@@ -101,4 +111,16 @@ public interface Http {
       */
      public ApiResponse sendDelete();
 
+    /**
+     * Sends a PATCH request to the Api and receives a {@link ApiResponse}.
+     *
+     * @return			A ApiResponse object
+     */
+    public ApiResponse sendPatch();
+
+    /**
+     * Set RestTemplate custom object
+     * @return               A RestTemplate object
+     */
+     public RestTemplate clientProvider(RestTemplate restTemplate);
 }

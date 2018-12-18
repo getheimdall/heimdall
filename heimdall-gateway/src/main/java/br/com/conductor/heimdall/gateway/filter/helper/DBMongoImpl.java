@@ -1,6 +1,8 @@
 
 package br.com.conductor.heimdall.gateway.filter.helper;
 
+import java.io.IOException;
+
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -35,22 +37,16 @@ import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.query.FindOptions;
 import org.mongodb.morphia.query.Query;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
-import com.mongodb.MongoClientURI;
-import com.mongodb.MongoCredential;
-import com.mongodb.ServerAddress;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 
-import br.com.conductor.heimdall.core.environment.Property;
-import br.com.conductor.heimdall.core.util.BeanManager;
 import br.com.conductor.heimdall.middleware.spec.DB;
 import br.com.conductor.heimdall.middleware.spec.DBMongo;
-import br.com.conductor.heimdall.middleware.spec.Helper;
 import br.com.conductor.heimdall.middleware.spec.Json;
 import br.com.conductor.heimdall.middleware.util.Page;
 import br.com.twsoftware.alfred.object.Objeto;
@@ -68,17 +64,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DBMongoImpl implements DBMongo {
 
-     Json json = new JsonImpl();
+     private Json json = new JsonImpl();
 
      private String databaseName;
-
-     private Property property;
 
      private final static Integer PAGE = 0;
 
      private final static Integer LIMIT = 100;
 
-     private Helper helper = new HelperImpl();
+	 private MongoClient mongoClient;
 
      /**
       * Initializes the database connection by name.
@@ -86,11 +80,10 @@ public class DBMongoImpl implements DBMongo {
       * @param databaseName
       * Database names
       */
-     public DBMongoImpl(String databaseName) {
+     public DBMongoImpl(String databaseName, MongoClient mongoClient) {
 
           this.databaseName = databaseName;
-          this.property = BeanManager.getApplicationContext().getBean(Property.class);
-
+          this.mongoClient = mongoClient;
      }
 
      @Override
@@ -136,28 +129,19 @@ public class DBMongoImpl implements DBMongo {
 
           Query<T> query = this.prepareQuery(criteria, this.datastore());
 
-          List<T> list = Lists.newArrayList();
+          List<T> list;
           Long totalElements = query.count();
           
           page = page == null ? PAGE : page;
           limit = limit == null || limit > LIMIT ? LIMIT : limit;
-
-          if ((page != null && page > 1) && (limit != null && limit > 0) && (limit <= LIMIT)) {
-
-               list = query.asList(new FindOptions().limit(limit).skip(page * limit));
-
-          } else if ((page != null && page == 0) && (limit != null && limit > 0) && (limit <= LIMIT)) {
-               list = query.asList(new FindOptions().limit(limit));
-
-          } else if ((limit != null && limit > 0) && (limit <= LIMIT)) {
-               list = query.asList(new FindOptions().limit(limit));
-
+          
+          if (page >= 1 && limit > 0) {
+               list = query.asList(new FindOptions().limit(limit).skip(page * limit));  
           } else {
                list = query.asList(new FindOptions().limit(limit));
           }
 
-
-          return (Page<T>) buildPage(list, page, limit, totalElements);
+          return buildPage(list, page, limit, totalElements);
      }
 
      @Override
@@ -171,7 +155,7 @@ public class DBMongoImpl implements DBMongo {
           pageResponse.totalElements = totalElements;
           pageResponse.hasPreviousPage = page > 0;
           pageResponse.hasNextPage = page < (pageResponse.totalPages - 1);
-          pageResponse.hasContent = Objeto.notBlank(list);
+          pageResponse.hasContent = list != null && list.size() > 0;
           pageResponse.first = page == 0;
           pageResponse.last = page == (pageResponse.totalPages - 1);
           pageResponse.nextPage = page == (pageResponse.totalPages - 1) ? page : page + 1;
@@ -181,47 +165,40 @@ public class DBMongoImpl implements DBMongo {
           return pageResponse;
      }
 
-     @Override
-     public <T> void insertMany(MongoCollection<Document> collection, List<T> objects) {
+	@Override
+	public <T> void insertMany(MongoCollection<Document> collection, List<T> objects) {
 
-          try {
+		try {
 
-               List<Document> ts = Lists.newArrayList();
-               for (T t : objects) {
+			List<Document> ts = Lists.newArrayList();
+			for (T t : objects) {
 
-                    ts.add(Document.parse(json.parse(t)));
-               }
-               collection.insertMany(ts);
-          } catch (Exception e) {
-               log.error(e.getMessage(), e);
-          } finally {
+				ts.add(Document.parse(json.parse(t)));
+			}
+			collection.insertMany(ts);
+			this.datastore().save(ts);
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
+	}
 
-               createMongoClient().close();
-          }
-     }
+	@Override
+	public <T> void insertOne(MongoCollection<Document> collection, T object) {
 
-     @Override
-     public <T> void insertOne(MongoCollection<Document> collection, T object) {
+		try {
 
-          try {
+			Document document = Document.parse(json.parse(object));
+			collection.insertOne(document);
+		} catch (Exception e) {
 
-               Document document = Document.parse(json.parse(object));
-               collection.insertOne(document);
-          } catch (Exception e) {
-
-               log.error(e.getMessage(), e);
-          } finally {
-
-               createMongoClient().close();
-          }
-     }
+			log.error(e.getMessage(), e);
+		}
+	}
 
      @Override
      public <T> Query<T> getQueryProvider(Object criteria) {
 
-          Query<T> query = (Query<T>) this.prepareQuery(criteria, this.datastore());
-
-          return query;
+          return this.prepareQuery(criteria, this.datastore());
      }
 
      @Override
@@ -229,8 +206,9 @@ public class DBMongoImpl implements DBMongo {
 
           page = page == null ? PAGE : page;
           limit = limit == null || limit > LIMIT ? LIMIT : limit;
-          FindIterable<Document> documents = null;
-          if ((page != null && page > 0) && (limit != null && limit > 0) && (limit <= LIMIT)) {
+          FindIterable<Document> documents;
+
+          if (page > 0 && limit > 0) {
 
                if (Objeto.notBlank(filters)) {
 
@@ -239,7 +217,7 @@ public class DBMongoImpl implements DBMongo {
 
                     documents = collection.find().limit(limit).skip(page * limit);
                }
-          } else if ((page != null && page == 0) && (limit != null && limit > 0) && (limit <= LIMIT)) {
+          } else if (page == 0 && limit > 0) {
 
                if (Objeto.notBlank(filters)) {
 
@@ -248,7 +226,7 @@ public class DBMongoImpl implements DBMongo {
 
                     documents = collection.find(Filters.and(filters)).limit(limit);
                }
-          } else if ((limit != null && limit > 0) && (limit <= LIMIT)) {
+          } else if (limit > 0) {
 
                if (Objeto.notBlank(filters)) {
 
@@ -272,8 +250,13 @@ public class DBMongoImpl implements DBMongo {
 
           List<T> list = Lists.newArrayList();
           for (Document document : documents) {
-
-               T parse = helper.json().parse(document.toJson(), classType);
+            T parse = null;
+			try {
+				parse = new ObjectMapper().readValue(document.toJson(), classType);
+			} catch (IOException e) {
+				log.error("Json Parser error", e);
+				parse = null;
+			}
                list.add(parse);
           }
 
@@ -283,34 +266,13 @@ public class DBMongoImpl implements DBMongo {
      @Override
      public MongoCollection<Document> collection(String name) {
 
-          MongoCollection<Document> collection = database().getCollection(name);
-
-          return collection;
+          return database().getCollection(name);
      }
 
      @Override
      public <T> MongoCollection<Document> collection(Class<T> classType) {
 
-          MongoCollection<Document> collection = database().getCollection(classType.getSimpleName());
-
-          return collection;
-     }
-
-     private MongoClient createMongoClient() {
-
-          MongoClient client;
-          if (Objeto.notBlank(property.getMongo().getUrl())) {
-
-               MongoClientURI uri = new MongoClientURI(property.getMongo().getUrl());
-               client = new MongoClient(uri);
-          } else {
-               ServerAddress address = new ServerAddress(property.getMongo().getServerName(), property.getMongo().getPort().intValue());
-               MongoCredential mongoCredential = MongoCredential.createCredential(property.getMongo().getUsername(), property.getMongo().getUsername(), property.getMongo().getPassword().toCharArray());
-               MongoClientOptions mongoClientOptions = MongoClientOptions.builder().build();
-               client = new MongoClient(address, mongoCredential, mongoClientOptions);
-          }
-
-          return client;
+          return database().getCollection(classType.getSimpleName());
      }
 
      @Override
@@ -328,30 +290,23 @@ public class DBMongoImpl implements DBMongo {
      }
 
      private Datastore datastore() {
-
-          Morphia morphia = new Morphia();
-
-          return morphia.createDatastore(createMongoClient(), this.databaseName);
+    	 
+          return new Morphia().createDatastore(this.mongoClient, this.databaseName);
      }
 
      private MongoDatabase database() {
 
-          MongoDatabase database = createMongoClient().getDatabase(databaseName);
-          return database;
+          return this.mongoClient.getDatabase(databaseName);
      }
 
      private <T> Object getValueId(T object) {
 
-          Field id = Arrays.asList(object.getClass().getDeclaredFields()).stream().filter(field -> field.getAnnotation(Id.class) != null).findFirst().get();
-          if (id != null) {
-               id.setAccessible(true);
-               try {
-                    return id.get(object);
-               } catch (IllegalArgumentException e) {
-                    log.error(e.getMessage(), e);
-               } catch (IllegalAccessException e) {
-                    log.error(e.getMessage(), e);
-               }
+          Field id = Arrays.stream(object.getClass().getDeclaredFields()).filter(field -> field.getAnnotation(Id.class) != null).findFirst().get();
+          id.setAccessible(true);
+          try {
+               return id.get(object);
+          } catch (IllegalArgumentException | IllegalAccessException e) {
+               log.error(e.getMessage(), e);
           }
           return null;
      }

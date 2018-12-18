@@ -88,7 +88,7 @@ public class InterceptorListener {
      @RabbitListener(queues = RabbitConstants.LISTENER_HEIMDALL_REFRESH_INTERCEPTORS)
      public void refreshAllInterceptors(final Message message) {
 
-          log.info("Refreshc all Interceptors");
+          log.info("Refresh all Interceptors");
 
           try {
 

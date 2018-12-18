@@ -31,6 +31,7 @@ import lombok.Data;
  * This class represents the environment.
  * 
  * @author Filipe Germano
+ * @author Marcelo Aguiar Rodrigues
  *
  */
 @Data
@@ -150,6 +151,9 @@ public class Property {
           private String collection;
           private String username;
           private String password;
+          private Long queueSize;
+          private Long discardingThreshold;
+          private String zoneId;
           
      }
 
@@ -159,6 +163,23 @@ public class Property {
      public class Trace {
           private boolean printAllTrace = false;
           private List<String> sanitizes = new ArrayList<>();
+     }
+     
+     private Middlewares middlewares = new Middlewares();
+     
+     @Data
+     public class Middlewares {
+    	 private Integer allowInactive;
+    	 private Boolean deleteDeprecated;
+     }
+     
+     private FailSafe failsafe = new FailSafe();
+     
+     @Data
+     public class FailSafe {
+    	private int failureNumber = 3;
+    	private int sucessNumber = 3;
+    	private int delayTimeSeconds = 30;
      }
 
 }

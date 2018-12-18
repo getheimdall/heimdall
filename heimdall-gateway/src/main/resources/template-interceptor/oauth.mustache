@@ -1,0 +1,96 @@
+import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
+import br.com.conductor.heimdall.core.enums.TypeOAuth;
+import br.com.conductor.heimdall.core.util.BeanManager;
+import br.com.conductor.heimdall.gateway.filter.helper.Helper;
+import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
+import br.com.conductor.heimdall.gateway.filter.helper.HelperImpl;
+import br.com.conductor.heimdall.gateway.service.LifeCycleService;
+import br.com.conductor.heimdall.gateway.service.OAuthInterceptorService;
+import br.com.conductor.heimdall.middleware.spec.Helper;
+
+import com.netflix.zuul.context.RequestContext;
+
+import java.util.HashSet;
+import java.util.Set;
+
+public class OAuthInterceptor extends HeimdallFilter {
+
+    private static Set<String> pathsAllowed;
+
+    private static Set<String> pathsNotAllowed;
+
+    private static String inboundURL;
+
+    private static String method;
+
+    private static Long referenceId;
+
+    private Helper helper;
+
+    private Long providerId;
+
+    private int timeAccessToken;
+
+    private int timeRefreshToken;
+
+    private String privateKey;
+
+    public OAuthInterceptor() {
+
+        pathsAllowed = new HashSet<>();
+        {{#pathsAllowed}}
+        pathsAllowed.add("{{.}}");
+        {{/pathsAllowed}}
+
+        pathsNotAllowed = new HashSet<>();
+        {{#pathsNotAllowed}}
+        pathsNotAllowed.add("{{.}}");
+        {{/pathsNotAllowed}}
+
+        inboundURL = "{{inboundURL}}";
+
+        method = "{{method}}";
+
+        referenceId = {{referenceId}};
+
+        providerId = {{providerId}};
+
+        timeAccessToken = {{timeAccessToken}};
+
+        timeRefreshToken = {{timeRefreshToken}};
+
+        privateKey = "{{privateKey}}";
+    }
+
+    @Override
+    public int filterOrder() {
+
+        return {{order}};
+    }
+
+    @Override
+    public String filterType() {
+
+        return "{{executionPoint}}";
+    }
+
+    @Override
+    public String getName() {
+        return "{{name}}"
+    }
+
+    @Override
+    public boolean should() {
+
+        LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest(), referenceId);
+    }
+
+    @Override
+    public void execute() throws Throwable {
+		this.helper = (Helper) BeanManager.getBean(Helper.class);
+        OAuthInterceptorService oAuthInterceptorService = (OAuthInterceptorService) BeanManager.getBean(OAuthInterceptorService.class);
+        oAuthInterceptorService.execute(TypeOAuth.{{typeOAuth}}, privateKey, timeAccessToken, timeRefreshToken, providerId, helper);
+    }
+
+}

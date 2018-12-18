@@ -1,17 +1,16 @@
 //3rd's
 import React, { Component } from 'react'
-import { push } from 'connected-react-router';
 import { connect } from 'react-redux'
-
-// actions
-import { getUser, initLoading, clearUser, clearUsers, update, save, remove } from '../actions/users';
-import { getAllRoles } from '../actions/roles';
-
+import { push } from 'connected-react-router'
 //components
 import { Card, Row, notification } from 'antd'
-import PageHeader from '../components/ui/PageHeader'
+// actions
+import i18n from "../i18n/i18n"
 import Loading from '../components/ui/Loading'
-import UserForm from '../components/users/UserForm';
+import { getAllRoles } from '../actions/roles'
+import PageHeader from '../components/ui/PageHeader'
+import UserForm from '../components/users/UserForm'
+import { getUser, initLoading, clearUser, clearUsers, update, save, remove } from '../actions/users'
 
 class SingleUser extends Component {
 
@@ -42,6 +41,7 @@ class SingleUser extends Component {
         if (formObject.id) {
             this.props.dispatch(clearUser())
             this.props.dispatch(update(formObject))
+            this.props.dispatch(getUser(formObject.id))
         } else {
             this.props.dispatch(save(formObject))
         }
@@ -57,18 +57,18 @@ class SingleUser extends Component {
         const { user, roles } = this.props
 
         if (this.state.loadEntity && !user) return <Loading />
-        const title = user ? 'Edit' : 'Add'
+        const title = user ? i18n.t('edit') : i18n.t('add')
 
         return (
             <div>
-                <PageHeader title="Users" icon="user" />
+                <PageHeader title={i18n.t('users')} icon="user" />
                 <Row className="h-row bg-white">
-                    <Card style={{ width: '100%' }} title={title + ' User'}>
+                    <Card style={{ width: '100%' }} title={title + ' ' + i18n.t('user')}>
                         <UserForm user={user}
                             handleDelete={this.handleDelete}
                             handleSubmit={this.handleSubmit}
                             loading={this.props.loading}
-                            roles={roles}/>
+                            roles={roles ? roles.content : []}/>
                     </Card>
                 </Row>
             </div>

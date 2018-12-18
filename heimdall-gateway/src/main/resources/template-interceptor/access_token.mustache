@@ -15,6 +15,7 @@ import br.com.conductor.heimdall.gateway.filter.helper.*;
 import br.com.conductor.heimdall.core.entity.AccessToken;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.enums.Location;
+import br.com.conductor.heimdall.gateway.service.LifeCycleService;
 import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
 import br.com.conductor.heimdall.gateway.service.SecurityService;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
@@ -33,6 +34,8 @@ public class AccessTokenInterceptor extends HeimdallFilter {
      private static String inboundURL;
 
      private static String method;
+
+     private static Long referenceId;
 
      private SecurityService securityService;
 
@@ -54,7 +57,7 @@ public class AccessTokenInterceptor extends HeimdallFilter {
 
           inboundURL = "{{inboundURL}}";
 
-          this.helper = new HelperImpl();
+          referenceId = {{referenceId}};
 
      }
 
@@ -73,7 +76,11 @@ public class AccessTokenInterceptor extends HeimdallFilter {
      @Override
      public boolean should() {
 
-          return InterceptorLifeCycle.{{lifeCycle}}.filter(pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest());
+        LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
+        return lifeCycleService.validateAccessToken(RequestContext.getCurrentContext().getRequest(),
+                                                        getApiId(),
+                                                        Location.valueOf("{{location}}"),
+                                                        "{{name}}");
      }
      
      @Override
@@ -88,6 +95,7 @@ public class AccessTokenInterceptor extends HeimdallFilter {
      @Override
      public void execute() throws Throwable {
 
+		  this.helper = (Helper) BeanManager.getBean(Helper.class);
           securityService = (SecurityService) BeanManager.getBean(SecurityService.class);
           RequestContext ctx = RequestContext.getCurrentContext();
           HttpServletRequest request = ctx.getRequest();          
@@ -107,7 +115,7 @@ public class AccessTokenInterceptor extends HeimdallFilter {
                clientId = request.getParameter(nameClientId);       
           }
 
-          securityService.validadeAccessToken(ctx, helper, getApiId(), clientId, accessToken);       
+          securityService.validadeAccessToken(ctx, getApiId(), clientId, accessToken);
 
      }     
 

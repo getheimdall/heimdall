@@ -20,18 +20,32 @@ package br.com.conductor.heimdall.gateway.filter.helper;
  * ==========================LICENSE_END===================================
  */
 
+import java.io.IOException;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.apache.commons.lang.StringUtils;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+
+import com.fasterxml.jackson.core.JsonParser;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 
+import br.com.conductor.heimdall.core.dto.BeanValidationErrorDTO;
+import br.com.conductor.heimdall.middleware.exception.BeanValidationException;
 import br.com.conductor.heimdall.middleware.spec.Json;
 import br.com.twsoftware.alfred.object.Objeto;
 import lombok.extern.slf4j.Slf4j;
@@ -45,111 +59,182 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class JsonImpl implements Json {
 
-     public String parse(Map<String, Object> body) {
+	public String parse(Map<String, Object> body) {
 
-          try {
-               String json = mapper().writeValueAsString(body);
+		try {
+			String json = mapper().writeValueAsString(body);
 
-               return json;
-          } catch (JsonProcessingException e) {
+			return json;
+		} catch (JsonProcessingException e) {
 
-               log.error(e.getMessage(), e);
-               return null;
-          }
-     }
+			log.error(e.getMessage(), e);
+			return null;
+		}
+	}
 
-     public String parse(String string) {          
-          
-          try {
-               
-               JSONObject jsonObject = new JSONObject(string);
-               
-               return jsonObject.toString();
-          } catch (JSONException e) {
+	public String parse(String string) {
 
-               if (Objeto.notBlank(string)) {
+		try {
+
+			JSONObject jsonObject = new JSONObject(string);
+
+			return jsonObject.toString();
+		} catch (JSONException e) {
+			try {
+				JSONArray array = new JSONArray(string);
+				return array.toString();
+			} catch (JSONException ex1) {
+				if (Objeto.notBlank(string)) {
+					return string;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	public <T> String parse(T object) {
+
+		try {
+
+			String jsonInString = mapper().writeValueAsString(object);
+
+			return jsonInString;
+		} catch (Exception e) {
+
+			log.error(e.getMessage(), e);
+			return null;
+		}
+	}
+
+	public <T> T parse(String json, Class<?> classType) throws BeanValidationException {
+
+		try {
+			@SuppressWarnings("unchecked")
+			T obj = (T) mapper().readValue(json, classType);
+			
+			Set<ConstraintViolation<T>> violations = validator().validate(obj);
+
+			if (!violations.isEmpty()) {
+			     
+			     String jsonViolations = parse(violations.stream().map(v -> {
+			          return new BeanValidationErrorDTO(v.getPropertyPath().toString(), v.getMessage());
+			     }).collect(Collectors.toList()));
+			     
+			     throw new BeanValidationException("Bean validation error.", jsonViolations);
+			}
+			
+			return obj;
+		} catch (BeanValidationException e) {
+		     log.debug(e.getMessage(), e);
+		     throw e;
+		} catch (Exception e) {
+
+			log.error(e.getMessage(), e);
+			return null;
+		}
+	}
+
+	@Override
+	public <T> T parse(String json, TypeReference<T> type) throws BeanValidationException {
+	     try {
+	          mapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+			@SuppressWarnings("unchecked")
+			T obj = (T) mapper().readValue(json, type);
+			
+			Set<ConstraintViolation<T>> violations = validator().validate(obj);
+			
+			if (!violations.isEmpty()) {
                     
-                    return string;
-               } else {
+                    String jsonViolations = parse(violations.stream().map(v -> {
+                         return new BeanValidationErrorDTO(v.getPropertyPath().toString(), v.getMessage());
+                    }).collect(Collectors.toList()));
                     
-                    log.error(e.getMessage(), e);
-                    return null;
+                    throw new BeanValidationException("Bean validation error.", jsonViolations);
                }
-          }
-     }
-     
-     public <T> String parse(T object) {
+			
+			return obj;
+	     } catch (BeanValidationException e) {
+               log.debug(e.getMessage(), e);
+               throw e;
+		} catch (Exception e) {
 
-          try {
-               
-               String jsonInString = mapper().writeValueAsString(object);
-               
-               return jsonInString;
-          } catch (Exception e) {
-               
-               log.error(e.getMessage(), e);
-               return null;
-          }
-     }
+			log.error(e.getMessage(), e);
+			return null;
+		}
+	}
 
-     public <T> T parse(String json, Class<?> classType) {
 
-          try {
-               mapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-               @SuppressWarnings("unchecked")
-               T obj = (T) mapper().readValue(json, classType);
+	public <T> T parse(String json, Class<?> parametrized, Class<?>... parameterClasses) throws BeanValidationException {
+		try {
+			@SuppressWarnings("unchecked")
+			T obj = (T) mapper().readValue(json, TypeFactory.defaultInstance().constructParametricType(parametrized, parameterClasses));
+			
+			Set<ConstraintViolation<T>> violations = validator().validate(obj);
+               
+			if (!violations.isEmpty()) {
+                    
+                    String jsonViolations = parse(violations.stream().map(v -> {
+                         return new BeanValidationErrorDTO(v.getPropertyPath().toString(), v.getMessage());
+                    }).collect(Collectors.toList()));
+                    
+                    throw new BeanValidationException("Bean validation error.", jsonViolations);
+               }
+               
                return obj;
-          } catch (Exception e) {
-
+          } catch (BeanValidationException e) {
                log.error(e.getMessage(), e);
-               return null;
-          } 
+               throw e;
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+			return null;
+		}
+	}
+
+	public <T> Map<String, Object> parseToMap(T object) {
+
+		try {
+			ObjectMapper mapper = mapper().setSerializationInclusion(Include.NON_NULL);
+			String jsonInString = mapper.writeValueAsString(object);
+
+			@SuppressWarnings("unchecked")
+			Map<String, Object> map = mapper.readValue(jsonInString, Map.class);
+			return map;
+		} catch (Exception e) {
+
+			log.error(e.getMessage(), e);
+			return null;
+		}
+	}
+
+	public boolean isJson(String string) {
+
+		try {
+			JsonParser parser = new ObjectMapper().getFactory().createParser(string);
+
+			while (parser.nextToken() != null) {}
+
+			return true;
+		} catch (IOException e) {
+		    return false;
+        }
+
+	}
+
+	private ObjectMapper mapper() {
+
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+		return mapper;
+	}
+	
+	private Validator validator() {
+
+          ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+          Validator validator = factory.getValidator();
+          return validator;
      }
-     
-     public <T> Map<String, Object> parseToMap(T object) {
-
-          try {
-               mapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-               ObjectMapper mapper = mapper().setSerializationInclusion(Include.NON_NULL);
-               String jsonInString = mapper.writeValueAsString(object);
-               
-               @SuppressWarnings("unchecked")
-               Map<String, Object> map = mapper.readValue(jsonInString, Map.class);
-               return map;
-          } catch (Exception e) {
-
-               log.error(e.getMessage(), e);
-               return null;
-          } 
-     }
-     
-     public boolean isJson(String string) {          
-          
-          boolean valid = false;
-          try {
-               
-               JSONObject jsonObject = new JSONObject(string);
-               if (Objeto.notBlank(jsonObject)) {
-                    
-                    valid = true;
-               }
-          } catch (JSONException e) {
-
-               valid = false;
-          }
-          
-          return valid;
-     }
-
-
-     private ObjectMapper mapper() {
-          
-          ObjectMapper mapper = new ObjectMapper();
-          mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-          mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);          
-          
-          return mapper;
-     }    
-     
-     
 }

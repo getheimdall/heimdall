@@ -1,4 +1,4 @@
-import { combineReducers } from 'redux'
+import {combineReducers} from 'redux'
 // Reducers
 import apis from './apis'
 import auth from './auth'
@@ -14,6 +14,10 @@ import queue from './Queue'
 import users from './Users'
 import roles from './Roles'
 import caches from './Caches'
+import middlewares from './middlewares'
+import traces from './Traces'
+import privileges from './Privileges'
+import ldap from './Ldap'
 
 export default combineReducers({
     apis,
@@ -29,5 +33,9 @@ export default combineReducers({
     queue,
     users,
     roles,
-    caches
+    middlewares,
+    caches,
+    traces,
+    privileges,
+    ldap
 })

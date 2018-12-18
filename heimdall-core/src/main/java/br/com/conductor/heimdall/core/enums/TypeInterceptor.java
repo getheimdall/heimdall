@@ -22,15 +22,39 @@ package br.com.conductor.heimdall.core.enums;
  */
 
 import br.com.conductor.heimdall.core.entity.Interceptor;
+import br.com.conductor.heimdall.core.interceptor.HeimdallInterceptor;
+import br.com.conductor.heimdall.core.interceptor.impl.*;
+import lombok.Getter;
 
 /**
  * Enum that hold the types of {@link Interceptor}.
  *
  * @author Filipe Germano
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ * @author Marcelo Aguiar Rodrigues
  *
  */
+@Getter
 public enum TypeInterceptor {
 
-     LOG, MOCK, RATTING, ACCESS_TOKEN, CLIENT_ID, CUSTOM, MIDDLEWARE;
+	MOCK(new MockHeimdallInterceptor()),
+	RATTING(new RattingHeimdallInterceptor()),
+	ACCESS_TOKEN(new AccessTokenHeimdallInterceptor()),
+	CLIENT_ID(new ClientIdHeimdallInterceptor()),
+	CUSTOM(new CustomHeimdallInterceptor()),
+	MIDDLEWARE(new MiddlewareHeimdallInterceptor()),
+	OAUTH(new OAuthHeimdallInterceptor()),
+	BLACKLIST(new BlacklistHeimdallInterceptor()),
+	WHITELIST(new WhitelistHeimdallInterceptor()),
+	CACHE(new CacheHeimdallInterceptor()),
+	CACHE_CLEAR(new CacheClearHeimdallInterceptor()),
+	IDENTIFIER(new IdentifierHeimdallInterceptor()),
+	LOG_MASKER(new LogMaskerHeimdallInterceptor());
+
+	private HeimdallInterceptor heimdallInterceptor;
+
+	TypeInterceptor(HeimdallInterceptor heimdallInterceptor) {
+		this.heimdallInterceptor = heimdallInterceptor;
+	}
 
 }

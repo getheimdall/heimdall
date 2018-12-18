@@ -27,7 +27,6 @@ import br.com.conductor.heimdall.core.dto.PageDTO;
 import br.com.conductor.heimdall.core.entity.Api;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 /**
  * Class that represents a paged {@link Api} list.
@@ -36,7 +35,6 @@ import lombok.NoArgsConstructor;
  *
  */
 @Data
-@NoArgsConstructor
 @EqualsAndHashCode(callSuper=false)
 public class ApiPage extends PageDTO<Api> implements Serializable {
 

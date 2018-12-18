@@ -2,6 +2,7 @@ package br.com.conductor.heimdall.core.service;
 
 import static org.junit.Assert.assertEquals;
 
+import br.com.conductor.heimdall.core.entity.Plan;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -20,6 +21,9 @@ import br.com.conductor.heimdall.core.exception.NotFoundException;
 import br.com.conductor.heimdall.core.repository.AccessTokenRepository;
 import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 @RunWith(MockitoJUnitRunner.class)
 public class AccessTokenServiceTest {
@@ -44,16 +48,21 @@ public class AccessTokenServiceTest {
      public void notPermitToSaveTheAccessTokenWithCodeExistent() {
           thrown.expect(BadRequestException.class);
           thrown.expectMessage("Token already exists");
-          
+
           AccessTokenPersist persist = new AccessTokenPersist();
           persist.setCode("123456");
           persist.setApp(new ReferenceIdDTO(10L));
-          
+
+          Plan plan = new Plan();
+          plan.setId(1L);
+          persist.setPlans(Collections.singletonList(new ReferenceIdDTO(1L)));
+
           AccessToken recoverAt = new AccessToken();
           recoverAt.setCode("123456");
           
           App appRecovered = new App();
           appRecovered.setId(10L);
+          appRecovered.setPlans(Collections.singletonList(plan));
           
           Mockito.when(accessTokenRepository.findByCode(Mockito.anyString())).thenReturn(recoverAt);
           Mockito.when(appRespository.findOne(Mockito.anyLong())).thenReturn(appRecovered);
@@ -66,12 +75,17 @@ public class AccessTokenServiceTest {
           AccessTokenPersist persist = new AccessTokenPersist();
           persist.setCode("123456");
           persist.setApp(new ReferenceIdDTO(10L));
-          
+
+          Plan plan = new Plan();
+          plan.setId(1L);
+          persist.setPlans(Collections.singletonList(new ReferenceIdDTO(1L)));
+
           AccessToken recoverAt = new AccessToken();
           recoverAt.setCode("123456");
           
           App appRecovered = new App();
           appRecovered.setId(10L);
+          appRecovered.setPlans(Collections.singletonList(plan));
           
           Mockito.when(accessTokenRepository.findByCode(Mockito.anyString())).thenReturn(null);
           Mockito.when(appRespository.findOne(Mockito.anyLong())).thenReturn(appRecovered);
@@ -87,9 +101,15 @@ public class AccessTokenServiceTest {
      public void generateAccessTokenWithRandomCode() {
           AccessTokenPersist persist = new AccessTokenPersist();
           persist.setApp(new ReferenceIdDTO(10L));
+
+          Plan plan = new Plan();
+          plan.setId(1L);
+
+          persist.setPlans(Collections.singletonList(new ReferenceIdDTO(1L)));
           
           App appRecovered = new App();
           appRecovered.setId(10L);
+          appRecovered.setPlans(Collections.singletonList(plan));
           
           Mockito.when(accessTokenRepository.findByCode(Mockito.anyString())).thenReturn(null);
           Mockito.when(appRespository.findOne(Mockito.anyLong())).thenReturn(appRecovered);
@@ -102,7 +122,7 @@ public class AccessTokenServiceTest {
      @Test
      public void notPermitToSaveAccessTokenWithInvalidApp() {
           thrown.expect(BadRequestException.class);
-          thrown.expectMessage("App not exist");
+          thrown.expectMessage("App does not exist");
           
           AccessTokenPersist persist = new AccessTokenPersist();
           persist.setApp(new ReferenceIdDTO(10L));
@@ -120,10 +140,15 @@ public class AccessTokenServiceTest {
      public void callOneRecursiveSaveWhenRandomNumberExistInDatabase() {
           AccessTokenPersist persist = new AccessTokenPersist();
           persist.setApp(new ReferenceIdDTO(10L));
-          
+
+          Plan plan = new Plan();
+          plan.setId(1L);
+          persist.setPlans(Collections.singletonList(new ReferenceIdDTO(1L)));
+
           App appRecovered = new App();
           appRecovered.setId(10L);
-          
+          appRecovered.setPlans(Collections.singletonList(plan));
+
           AccessToken recoverAt = new AccessToken();
           recoverAt.setCode("123456");
           
@@ -151,7 +176,7 @@ public class AccessTokenServiceTest {
      @Test
      public void notPermitUpdateAnAccessTokenWithInexistentApp() {
           thrown.expect(BadRequestException.class);
-          thrown.expectMessage("App not exist");
+          thrown.expectMessage("App does not exist");
           
           AccessTokenPersist accessTokenPersist = new AccessTokenPersist();
           accessTokenPersist.setApp(new ReferenceIdDTO(10L));
@@ -169,13 +194,18 @@ public class AccessTokenServiceTest {
      public void updatingAnAccessTokenWithExistentApp() {         
           AccessTokenPersist accessTokenPersist = new AccessTokenPersist();
           accessTokenPersist.setApp(new ReferenceIdDTO(10L));
-          
+
+          Plan plan = new Plan();
+          plan.setId(1L);
+          accessTokenPersist.setPlans(Collections.singletonList(new ReferenceIdDTO(1L)));
+
           AccessToken recoverAt = new AccessToken();
           recoverAt.setCode("123456");
           
           App appRecovered = new App();
           appRecovered.setId(10L);
-          
+          appRecovered.setPlans(Collections.singletonList(plan));
+
           Mockito.when(accessTokenRepository.findOne(Mockito.anyLong())).thenReturn(recoverAt);
           Mockito.when(appRespository.findOne(Mockito.anyLong())).thenReturn(appRecovered);
           

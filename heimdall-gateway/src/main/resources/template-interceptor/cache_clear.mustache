@@ -1,0 +1,102 @@
+import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
+import br.com.conductor.heimdall.core.util.BeanManager;
+import br.com.conductor.heimdall.core.util.Constants;
+import br.com.conductor.heimdall.gateway.service.CacheInterceptorService;
+import br.com.conductor.heimdall.gateway.service.LifeCycleService;
+import br.com.conductor.heimdall.gateway.trace.FilterDetail;
+import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
+import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+
+import com.netflix.zuul.context.RequestContext;
+import com.netflix.zuul.ZuulFilter;
+
+import java.util.Set;
+import java.util.HashSet;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
+
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
+
+public class CacheClearInterceptor extends ZuulFilter {
+
+    private static Set<String> pathsAllowed;
+
+    private static Set<String> pathsNotAllowed;
+
+    private static String inboundURL;
+
+    private static String method;
+
+    private static String cacheName;
+
+    private static Long referenceId;
+
+    private FilterDetail detail;
+
+    public CacheClearInterceptor() {
+
+        cacheName = "{{cache}}";
+
+        method = "{{method}}";
+
+        pathsAllowed = new HashSet<>();
+        {{#pathsAllowed}}
+        pathsAllowed.add("{{.}}");
+        {{/pathsAllowed}}
+
+        pathsNotAllowed = new HashSet<>();
+        {{#pathsNotAllowed}}
+        pathsNotAllowed.add("{{.}}");
+        {{/pathsNotAllowed}}
+
+        inboundURL = "{{inboundURL}}";
+
+        detail = new FilterDetail();
+
+        referenceId = {{referenceId}};
+    }
+
+    @Override
+    public String filterType() {
+        return POST_TYPE;
+    }
+
+    @Override
+    public int filterOrder() {
+        return {{order}};
+    }
+
+    @Override
+    public boolean shouldFilter() {
+        LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest(), referenceId);
+    }
+
+    @Override
+    public Object run() throws Throwable {
+        long startTime = System.currentTimeMillis();
+        try {
+            process();
+            detail.setStatus(Constants.SUCCESS);
+        } catch (Exception e) {
+            detail.setStatus(Constants.FAILED);
+            detail.setStackTrace(new StackTraceImpl(e.getClass().getName(), e.getMessage(), ExceptionUtils.getStackTrace(e)));
+        } finally {
+            long endTime = System.currentTimeMillis();
+
+            long duration = (endTime - startTime);
+
+            detail.setName(this.getClass().getSimpleName());
+            detail.setTimeInMillisRun(duration);
+            TraceContextHolder.getInstance().getActualTrace().addFilter(detail);
+        }
+
+        return null;
+    }
+
+    private void process() {
+
+        CacheInterceptorService cacheInterceptorService = (CacheInterceptorService) BeanManager.getBean(CacheInterceptorService.class);
+        cacheInterceptorService.cacheClearInterceptor(cacheName);
+    }
+}

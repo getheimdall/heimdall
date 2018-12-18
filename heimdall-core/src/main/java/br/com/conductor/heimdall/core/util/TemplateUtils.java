@@ -22,15 +22,20 @@ package br.com.conductor.heimdall.core.util;
  */
 
 /**
- * This class provides templates for Ratting, AccessToken and Mock.
+ * This class provides templates for Ratting, AccessToken, Mock, OAuth and Cache.
  * 
  * @author Filipe Germano
- *
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ * @author Marcelo Aguiar Rodrigues
  */
 public class TemplateUtils {
 
      public static final String TEMPLATE_RATTING = "{\"calls\":20,\"interval\":\"MINUTES\"}";
      public static final String TEMPLATE_ACCESS_TOKEN = "{\"location\": \"HEADER\", \"name\": \"access_token\"}";
      public static final String TEMPLATE_MOCK = "{\"body\": \"Example Mock\", \"status\": \"200\"}";
-
+     public static final String TEMPLATE_OAUTH = "{\"providerId\": 1 , \"typeOAuth\":\"GENERATE\", \"timeAccessToken\":20, \"timeRefreshToken\":1800, \"privateKey\":\"privateKey\" }";
+     public static final String TEMPLATE_BLOCK_IPS = "{\"ips\": [ \"127.0.0.0\", \"127.0.0.1\" ]}";
+     public static final String TEMPLATE_CACHE = "{\"cache\":\"cache-name\", \"timeToLive\": 10000, \"headers\": [\"header1\", \"header2\"], \"queryParams\": [\"queryParam1\", \"queryParam2\"]}";
+     public static final String TEMPLATE_CACHE_CLEAR = "{\"cache\":\"cache-name\"}";
+     public static final String TEMPLATE_LOG_MASKER = "{\"body\":true,\"uri\":true,\"headers\":true,\"ignoredHeaders\":[\"headerName\"]}";
 }

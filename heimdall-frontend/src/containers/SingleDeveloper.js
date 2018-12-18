@@ -1,16 +1,15 @@
 //3rd's
 import React, { Component } from 'react'
-import { push } from 'connected-react-router';
+import { push } from 'connected-react-router'
 import { connect } from 'react-redux'
-
-// actions
-import { getDeveloper, initLoading, clearDeveloper, clearDevelopers, update, save, remove } from '../actions/developers';
-
 //components
 import { Card, Row } from 'antd'
-import PageHeader from '../components/ui/PageHeader'
+// actions
+import i18n from "../i18n/i18n"
 import Loading from '../components/ui/Loading'
-import DeveloperForm from '../components/developers/DeveloperForm';
+import PageHeader from '../components/ui/PageHeader'
+import DeveloperForm from '../components/developers/DeveloperForm'
+import { getDeveloper, initLoading, clearDeveloper, clearDevelopers, update, save, remove } from '../actions/developers'
 
 class SingleDeveloper extends Component {
 
@@ -39,7 +38,6 @@ class SingleDeveloper extends Component {
     }
 
     handleDelete = (developerId) => {
-        console.log(developerId)
         this.props.dispatch(remove(developerId))
         this.props.dispatch(clearDevelopers())
         this.props.dispatch(push('/developers'))
@@ -49,13 +47,13 @@ class SingleDeveloper extends Component {
         const { developer } = this.props
 
         if (this.state.loadDev && !developer) return <Loading />
-        const title = developer ? 'Edit' : 'Add'
+        const title = developer ? i18n.t('edit') : i18n.t('add')
 
         return (
             <div>
-                <PageHeader title="Developers" icon="code" />
+                <PageHeader title={i18n.t('developers')} icon="code" />
                 <Row className="h-row bg-white">
-                    <Card style={{ width: '100%' }} title={title + ' Developer'}>
+                    <Card style={{ width: '100%' }} title={title + ' ' + i18n.t('developer')}>
                         <DeveloperForm developer={developer} handleDelete={this.handleDelete} handleSubmit={this.handleSubmit} loading={this.props.loading} />
                     </Card>
                 </Row>
