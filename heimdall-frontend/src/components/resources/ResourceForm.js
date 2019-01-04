@@ -3,12 +3,13 @@ import { Row, Form, Col, Input } from 'antd'
 import { bindActionCreators } from 'redux'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-import { isEmpty } from '../../utils/CommonUtils'
 
-import { toggleModal, resetResource, getResource, save, update } from '../../actions/resources'
+import i18n from "../../i18n/i18n"
 import Loading from '../ui/Loading'
-import {PrivilegeUtils} from "../../utils/PrivilegeUtils";
-import {privileges} from "../../constants/privileges-types";
+import { isEmpty } from '../../utils/CommonUtils'
+import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
+import {privileges} from "../../constants/privileges-types"
+import { toggleModal, resetResource, getResource, save, update } from '../../actions/resources'
 
 const FormItem = Form.Item
 
@@ -54,17 +55,17 @@ class ResourceForm extends Component {
                     {this.props.resource ? getFieldDecorator('id', { initialValue: this.props.resource.id })(<Input type='hidden' />) : null}
                     <Row>
                         <Col sm={24}>
-                            <FormItem label="Name">
+                            <FormItem label={i18n.t('name')}>
                                 {
                                     getFieldDecorator('name', {
                                         initialValue: this.props.resource ? this.props.resource.name : '',
-                                        rules: [{ required: true, message: 'Please input your api name!' }]
+                                        rules: [{ required: true, message: i18n.t('please_input_api_name') }]
                                     })(<Input required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_RESOURCE, privileges.PRIVILEGE_UPDATE_RESOURCE])}/>)
                                 }
                             </FormItem>
                         </Col>
                         <Col sm={24}>
-                            <FormItem label="Description">
+                            <FormItem label={i18n.t('description')}>
                                 {
                                     getFieldDecorator('description', {
                                         initialValue: this.props.resource ? this.props.resource.description : ''

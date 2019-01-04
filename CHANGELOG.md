@@ -1,15 +1,72 @@
 # Heimdall Changelog
 
-### v1.4.1
+### v1.7.0-stable
+* **BreakChange**
+   * Log interceptor as ZuulFilter (now log are embedded and will be registered in all request's, and interceptors logs will be deleted) [Pull Request #130](https://github.com/getheimdall/heimdall/pull/130);
+
 * **Feature**
 
-    * Authentication with token JWT [Pull Request #98](https://github.com/getheimdall/heimdall/pull/98)
-        * Changing basic auth for authentication with Jwt token, validating and generating new tokens on all requests;
-        * Adding Authentication in Swagger;
-        * Updating resources tests in api module.
-    * Adding feature to download Middleware file [Pull Request #105](https://github.com/getheimdall/heimdall/pull/105)
+   * Adding id's on frontend component's to improve tests [Pull Request #127](https://github.com/getheimdall/heimdall/pull/127);
+   * Adding metrics resource, All metrics will be extracted from the logs that Heimdall saves on mongoDB. [Pull Request #128](https://github.com/getheimdall/heimdall/pull/128);
+   * Optional disable 4xx error handler in http client on Heimdall-spec [Pull Request #129](https://github.com/getheimdall/heimdall/pull/129);
+   * Adding stack trace per filter [Pull Request #131](https://github.com/getheimdall/heimdall/pull/131);
+   * Improve the interceptor's UX on frontend [Pull Request #132](https://github.com/getheimdall/heimdall/pull/132);
+   * Adding HTTP PATCH method support to spec [Pull Request #135](https://github.com/getheimdall/heimdall/pull/135);
+   * Improve algorithm to cache interceptor delete with more precision [Pull Request #136](https://github.com/getheimdall/heimdall/pull/136);
+   * Added Api level to Interceptors [Pull Request #136](https://github.com/getheimdall/heimdall/pull/137);
 
 * **Bugfix**
+
+   * Fixed bug dropdown menus fixed when scrolling page [Pull Request #133](https://github.com/getheimdall/heimdall/pull/133);
+   * Middleware file response not working [Pull Request #123](https://github.com/getheimdall/heimdall/pull/123);
+
+### v1.6.6-stable 
+* **Feature**
+
+   * Adding bean validation do middleware [Pull Request #115](https://github.com/getheimdall/heimdall/pull/115);
+   * The error request will not be dispatched to Spring error controller, the response will write in the same request [Pull Request #126](https://github.com/getheimdall/heimdall/pull/126);
+
+* **Bugfix**
+
+   * Middleware file response not working [Pull Request #123](https://github.com/getheimdall/heimdall/pull/123);
+
+### v1.6.5-stable 
+* **Bugfix**
+
+   * Fixing the middleware registration when a new middleware are added to a new api [Pull Request #120](https://github.com/getheimdall/heimdall/pull/120)
+   * Updating changelogs
+
+### v1.6.3-stable 
+* **Bugfix**
+
+    * Changing the mongo appender to async, sync appender generating problems when the mongo off [Pull Request #117](https://github.com/getheimdall/heimdall/pull/117)
+    * Removing cloud config health check 
+
+### v1.6.1-stable
+* **Bugfix**
+	
+    * Rollback the spring cloud dependency to tracking some possible thread leak from middlewares;
+
+### v1.6.0-stable
+
+* **Feature**
+
+    * Adding cache interceptor [Pull Request #109](https://github.com/getheimdall/heimdall/pull/109);
+    
+* **Bugfix**	
+
+    * Fix middleware listing when using paging [Pull Request #108](https://github.com/getheimdall/heimdall/pull/108); 
+    * Fix rate limit interceptor, wasn't working correctly [Pull Request #111](https://github.com/getheimdall/heimdall/pull/111);
+    * Fix client id interceptor validation [Pull Request #110](https://github.com/getheimdall/heimdall/pull/110); 
+
+### v1.5.0-stable
+
+* **Feature**
+
+    * Adding feature to download Middleware file [Pull Request #105](https://github.com/getheimdall/heimdall/pull/105)
+    
+* **Bugfix**
+
     * The class path loader when adding a new middleware had some issues that in some circumstances could cause the new middleware to not be loaded. [Pull Request #96](https://github.com/getheimdall/heimdall/pull/96)
 
 ### v1.4.0-stable

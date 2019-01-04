@@ -181,7 +181,7 @@ public class ResourceResource {
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_REFRESH_RESOURCE)
     public ResponseEntity<?> refresh(@PathVariable("apiId") Long apiId) {
 
-        aMQPRouteService.dispatchAllRoutes();
+        aMQPRouteService.dispatchRoutes();
 
         return ResponseEntity.noContent().build();
     }

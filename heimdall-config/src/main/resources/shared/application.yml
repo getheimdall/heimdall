@@ -44,14 +44,15 @@ heimdall:
     mongo:
         enabled: false
 #        serverName:
-#        url: mongodb://localhost
-#        port: 27017
-#        dataBase: logging
-#        collection: logs
-#        username: admin
-#        password: admin
-#        queueSize: 500
-#        discardingThreshold: 0
+        url: mongodb://admin:admin@localhost
+        port: 27017
+        dataBase: logging
+        collection: logs
+        username: admin
+        password: admin
+        queueSize: 500
+        discardingThreshold: 0
+        zoneId: America/Sao_Paulo
     trace:
         printAllTrace: true
         sanitizes:
@@ -74,11 +75,11 @@ heimdall:
     security:
         enabled: true
         ldap:
-            enabled: true
-            url: ldap://conductor.tecnologia:389
-            searchBase: DC=conductor,DC=tecnologia
-            userDn: sgr.admin@conductor.tecnologia
-            password: ThanaWr6
+            enabled: false
+            url: ldap://your.domain:port
+            searchBase: searchBase
+            userDn: user@domain
+            password: pass
             userSearchFilter: sAMAccountName={0}
         jwt:
             expiration-time: 600
@@ -86,6 +87,10 @@ heimdall:
     middlewares:
         allowInactive: 0
         deleteDeprecated: false
+    failsafe:
+        failureNumber: 4
+        sucessNumber: 4
+        delayTimeSeconds: 30
 
 spring:
     pid:

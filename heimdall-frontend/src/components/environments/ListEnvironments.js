@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
+import { List, Avatar, Tag, Tooltip, Button, Modal, Row, Col } from 'antd'
 
-import { List, Avatar, Tag, Tooltip, Button, Modal, Row, Col } from 'antd';
-import ComponentAuthority from "../ComponentAuthority";
-import {privileges} from "../../constants/privileges-types";
+import i18n from "../../i18n/i18n"
+import ComponentAuthority from "../ComponentAuthority"
+import {privileges} from "../../constants/privileges-types"
 
 const confirm = Modal.confirm;
 
@@ -12,10 +13,10 @@ class ListEnvironments extends Component {
 
     showDeleteConfirm = (environmentId) => (e) => {
         confirm({
-            title: 'Are you sure?',
-            okText: 'Yes',
+            title: i18n.t('are_you_sure'),
+            okText: i18n.t('yes'),
             okType: 'danger',
-            cancelText: 'No',
+            cancelText: i18n.t('no'),
             onOk: () => {
                 this.props.handleDelete(environmentId)
             }
@@ -32,11 +33,11 @@ class ListEnvironments extends Component {
                     dataSource={this.props.environments}
                     renderItem={env => (
                         <List.Item actions={[
-                            <Tooltip title="Edit">
+                            <Tooltip title={i18n.t('edit')}>
                                 <Link to={"/environments/"+env.id}><Button type="primary" icon="edit" /></Link>
                             </Tooltip>,
                             <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_ENVIRONMENT]}>
-                                <Tooltip title="Delete">
+                                <Tooltip title={i18n.t('delete')}>
                                     <Button type="danger" icon="delete" onClick={this.showDeleteConfirm(env.id)} />
                                 </Tooltip>
                             </ComponentAuthority>
@@ -47,16 +48,18 @@ class ListEnvironments extends Component {
                                 description={
                                     <Row>
                                         <Col sm={24}>
-                                            <b>Inbound URL:</b> {env.inboundURL}
+                                            <b>{i18n.t('inbound_url')}:</b> {env.inboundURL}
                                         </Col>
                                         <Col sm={24}>
-                                            <b>Outbound URL:</b> {env.outboundURL}
+                                            <b>{i18n.t('outbound_url')}:</b> {env.outboundURL}
                                         </Col>
                                     </Row>
                                 }
                             />
-                            {env.status === 'ACTIVE' && <Tag color="green">{env.status}</Tag>}
-                            {env.status === 'INACTIVE' && <Tag color="red">{env.status}</Tag>}
+                            <span style={{textTransform: 'uppercase'}}>
+                                {env.status === 'ACTIVE' && <Tag color="green">{i18n.t('active')}</Tag>}
+                                {env.status === 'INACTIVE' && <Tag color="red">{i18n.t('inactive')}</Tag>}
+                            </span>
                         </List.Item>
                     )}
                 />

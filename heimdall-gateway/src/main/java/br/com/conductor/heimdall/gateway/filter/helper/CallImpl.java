@@ -19,17 +19,20 @@ package br.com.conductor.heimdall.gateway.filter.helper;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.GZIPInputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
@@ -55,12 +58,14 @@ import br.com.conductor.heimdall.middleware.spec.Response;
 import br.com.conductor.heimdall.middleware.spec.StackTrace;
 import br.com.conductor.heimdall.middleware.spec.Trace;
 import br.com.twsoftware.alfred.object.Objeto;
+import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * Implementation of the {@link Call} interface.
  *
  * @author Filipe Germano
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
 @Slf4j
@@ -244,6 +249,7 @@ public class CallImpl implements Call {
                
                try {
                     
+            	    @Cleanup
                     InputStream in = (InputStream) context.get("requestEntity");
                     if (in == null) {
                          in = context.getRequest().getInputStream();
@@ -462,26 +468,40 @@ public class CallImpl implements Call {
 
           @Override
           public void setBody(byte[] body) {
-               
-               ByteArrayInputStream stream;
-               try {
-                    if (body != null) {
-                         
-                         stream = new ByteArrayInputStream(body);
-                    } else {
-                         
-                         stream = new ByteArrayInputStream("".getBytes("UTF-8"));;
-                    }
-                    
-                    context.setSendZuulResponse(false);
-                    context.setResponseDataStream(stream);
-               } catch (UnsupportedEncodingException e) {
-                    
-                    log.error(e.getMessage(), e);
-               }
-               
+              setBody(body, false);
           }
-          
+
+         @Override
+         public void setBody(byte[] body, boolean gzip) {
+
+             InputStream stream;
+             try {
+                 if (body != null) {
+                     stream = new ByteArrayInputStream(body);
+                     if (gzip) {
+                         stream = new GZIPInputStream(stream);
+                     }
+                 } else {
+                     stream = new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8));
+                 }
+                 context.setSendZuulResponse(false);
+                 context.setResponseDataStream(stream);
+                 writeResponse(stream, context.getResponse().getOutputStream(), body);
+
+             } catch (UnsupportedEncodingException e) {
+                 log.error(e.getMessage(), e);
+             } catch (IOException e) {
+                 e.printStackTrace();
+             }
+
+         }
+
+         private void writeResponse(InputStream zin, OutputStream out, byte[] body) throws IOException {
+             int bytesRead = -1;
+             while ((bytesRead = zin.read(body)) != -1) {
+                 out.write(body, 0, bytesRead);
+             }
+         }
      }
      
      @Override

@@ -1,18 +1,17 @@
 //3rd's
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-
-//actions
-import { getAllPlans, initLoading, remove, clearPlans } from '../actions/plans'
-
 //components
-import { Row, Button, Form, Card, Input, Col, notification } from 'antd'
+import { Row, Form, Card, Input, Col, notification } from 'antd'
+//actions
+import i18n from "../i18n/i18n"
+import Loading from '../components/ui/Loading'
 import PageHeader from '../components/ui/PageHeader'
 import ListPlans from '../components/plans/ListPlans'
-import Loading from '../components/ui/Loading'
 import FloatButton from '../components/ui/FloatButton'
-import ComponentAuthority from "../components/ComponentAuthority";
-import {privileges} from "../constants/privileges-types";
+import {privileges} from "../constants/privileges-types"
+import ComponentAuthority from "../components/ComponentAuthority"
+import { getAllPlans, initLoading, remove, clearPlans } from '../actions/plans'
 
 class Plans extends Component {
 
@@ -58,27 +57,23 @@ class Plans extends Component {
     render() {
         const { getFieldDecorator } = this.props.form
         const { plans, loading, history } = this.props
+        console.log(this.props)
 
         if (!plans) return <Loading />
 
         return (
             <div>
-                <PageHeader title="Plans" icon="profile" />
+                <PageHeader title={i18n.t('plans')} icon="profile" />
 
                 <Row className="search-box">
                     <Card>
                         <Form>
-                            <Row gutter={24}>
+                            <Row gutter={24} type="flex" justify="start">
                                 <Col sm={24} md={5}>
-                                    {getFieldDecorator('name')(<Input.Search onSearch={this.onSearchForm} placeholder="name" />)}
+                                    {getFieldDecorator('name')(<Input.Search onSearch={this.onSearchForm} placeholder={i18n.t('name')} />)}
                                 </Col>
                                 <Col sm={24} md={5}>
-                                    {getFieldDecorator('description')(<Input.Search onSearch={this.onSearchForm} placeholder="description" />)}
-                                </Col>
-                                <Col sm={24} md={14}>
-                                    <Row type="flex" justify="end">
-                                        <Button className="card-button" type="primary" icon="search" onClick={this.onSearchForm}>Search</Button>
-                                    </Row>
+                                    {getFieldDecorator('description')(<Input.Search onSearch={this.onSearchForm} placeholder={i18n.t('description')} />)}
                                 </Col>
                             </Row>
                         </Form>
@@ -88,7 +83,7 @@ class Plans extends Component {
                 <Row className="h-row bg-white">
                     <ListPlans dataSource={plans} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading} />
                     <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_PLAN]}>
-                        <FloatButton history={history} to="/plans/new" label="Add new PLAN" />
+                        <FloatButton idButton="addPlan" history={history} to="/plans/new" label={i18n.t('add_new_plan')} />
                     </ComponentAuthority>
                 </Row>
             </div>

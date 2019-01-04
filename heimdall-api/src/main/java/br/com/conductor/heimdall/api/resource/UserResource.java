@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import br.com.conductor.heimdall.api.dto.UserEditDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -138,14 +139,14 @@ public class UserResource {
       * Updates a {@link User}.
       * 
       * @param userId				The User Id
-      * @param userDTO				{@link UserDTO}
+      * @param userDTO				{@link UserEditDTO}
       * @return						{@link ResponseEntity}
       */
      @ResponseBody
      @ApiOperation(value = "Update User")
      @PutMapping(value = "/{userId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_USER)
-     public ResponseEntity<?> update(@PathVariable("userId") Long userId, @RequestBody UserDTO userDTO) {
+     public ResponseEntity<?> update(@PathVariable("userId") Long userId, @RequestBody UserEditDTO userDTO) {
 
           User user = userService.update(userId, userDTO);
 

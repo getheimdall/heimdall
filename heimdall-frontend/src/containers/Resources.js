@@ -1,18 +1,18 @@
 import React, {Component} from 'react'
+import PropTypes from 'prop-types'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
-import {clearResources, getAllResourcesByApi, remove, toggleModal} from '../actions/resources'
-import PropTypes from 'prop-types'
-
 import {Button, Col, Modal, notification, Row, Tooltip} from 'antd'
 
-import Loading from '../components/ui/Loading'
+import i18n from "../i18n/i18n"
 import Operations from './Operations'
-import ResourceForm from '../components/resources/ResourceForm'
+import Loading from '../components/ui/Loading'
 import HeimdallCollapse from '../components/collapse'
-import ComponentAuthority from "../components/ComponentAuthority";
+import {PrivilegeUtils} from "../utils/PrivilegeUtils"
 import {privileges} from '../constants/privileges-types'
-import {PrivilegeUtils} from "../utils/PrivilegeUtils";
+import ResourceForm from '../components/resources/ResourceForm'
+import ComponentAuthority from "../components/ComponentAuthority"
+import {clearResources, getAllResourcesByApi, remove, toggleModal} from '../actions/resources'
 
 const HeimdallPanel = HeimdallCollapse.Panel;
 const ButtonGroup = Button.Group;
@@ -95,35 +95,33 @@ class Resources extends Component {
         if (!resources) return <Loading/>
 
         const modalResource =
-            <Modal title="Add Resource"
+            <Modal title={i18n.t('add_resource')}
                    footer={[
-                       <Button key="back" onClick={this.handleCancel}>Cancel</Button>,
+                       <Button id="cancelAddResource" key="back" onClick={this.handleCancel}>{i18n.t('cancel')}</Button>,
                        <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_UPDATE_RESOURCE]}>
-                           <Button key="submit" type="primary" loading={loading} onClick={this.handleSave}>
-                               Save
+                           <Button id="saveResource" key="submit" type="primary" loading={loading} onClick={this.handleSave}>
+                               {i18n.t('save')}
                            </Button>
                        </ComponentAuthority>
                    ]}
                    visible={this.props.visibleModal}
                    onCancel={this.handleCancel}
-                   destroyOnClose>
-                <ResourceForm onRef={ref => (this.addResource = ref)} resourceId={this.state.resourceSelected}
-                              idApi={api.id}/>
+                   destroyOnClose >
+                <ResourceForm onRef={ref => (this.addResource = ref)} resourceId={this.state.resourceSelected} idApi={api.id} />
             </Modal>
 
         if (resources && resources.length === 0) {
             return (
                 <Row type="flex" justify="center" align="bottom">
                     { PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_RESOURCE]) &&
-                    <Col style={{marginTop: 20}}>
-                        You don't have resources in this <b>API</b>, please <Button type="dashed" className="add-tour"
-                                                                                    onClick={this.addResourceModal}>Add Resource</Button>
-                    </Col>
+                        <Col style={{marginTop: 20}}>
+                            {i18n.t('you_do_not_have_resources_in_this')} <b>{i18n.t('api')}</b>! <Button id="addResourceWhenListIsEmpty" type="dashed" className="add-tour" onClick={this.addResourceModal}>{i18n.t('add_resource')}</Button>
+                        </Col>
                     }
                     { !PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_RESOURCE]) &&
-                    <Col style={{marginTop: 20}}>
-                        You don't have resources in this <b>API</b>
-                    </Col>
+                        <Col style={{marginTop: 20}}>
+                            {i18n.t('you_do_not_have_resources_in_this')} <b>{i18n.t('api')}</b>!
+                        </Col>
                     }
                     {modalResource}
                 </Row>
@@ -139,12 +137,11 @@ class Resources extends Component {
                                            key={resource.id} extra={
                                 <Row type="flex" justify="center">
                                     <ButtonGroup>
-                                        <Tooltip title="Update">
-                                            <Button type="primary" icon="edit"
-                                                    onClick={this.updateResourceModal(resource.id)}/>
+                                        <Tooltip title={i18n.t('edit')}>
+                                            <Button type="primary" icon="edit" onClick={this.updateResourceModal(resource.id)} />
                                         </Tooltip>
                                         <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_RESOURCE]}>
-                                            <Tooltip title="Delete">
+                                            <Tooltip title={i18n.t('delete')}>
                                                 <Button type="danger" icon="delete"
                                                         onClick={this.remove(api.id, resource.id)}/>
                                             </Tooltip>
@@ -152,7 +149,7 @@ class Resources extends Component {
                                     </ButtonGroup>
                                 </Row>
                             } extraWidth={10}>
-                                <Operations idResource={resource.id} idApi={api.id}/>
+                                <Operations idResource={resource.id} idApi={api.id} apiBasepath={api.basePath} />
                             </HeimdallPanel>
                         )
                     })}
@@ -160,14 +157,11 @@ class Resources extends Component {
                 <br/>
                 <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_RESOURCE]}>
                     <Row type="flex" justify="end">
-                        <Tooltip title="Add Resource">
-                            <Button className="card-button add-tour" type="primary" icon="plus"
-                                    onClick={this.addResourceModal} size="large" shape="circle"/>
+                        <Tooltip title={i18n.t('add_resource')}>
+                            <Button id="addResource" className="card-button add-tour" type="primary" icon="plus" onClick={this.addResourceModal} size="large" shape="circle" />
                         </Tooltip>
                     </Row>
-
                 </ComponentAuthority>
-
                 {modalResource}
             </Row>
         )

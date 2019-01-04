@@ -122,7 +122,7 @@ public class AccessTokenServiceTest {
      @Test
      public void notPermitToSaveAccessTokenWithInvalidApp() {
           thrown.expect(BadRequestException.class);
-          thrown.expectMessage("App not exist");
+          thrown.expectMessage("App does not exist");
           
           AccessTokenPersist persist = new AccessTokenPersist();
           persist.setApp(new ReferenceIdDTO(10L));
@@ -176,7 +176,7 @@ public class AccessTokenServiceTest {
      @Test
      public void notPermitUpdateAnAccessTokenWithInexistentApp() {
           thrown.expect(BadRequestException.class);
-          thrown.expectMessage("App not exist");
+          thrown.expectMessage("App does not exist");
           
           AccessTokenPersist accessTokenPersist = new AccessTokenPersist();
           accessTokenPersist.setApp(new ReferenceIdDTO(10L));

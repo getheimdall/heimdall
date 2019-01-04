@@ -1,9 +1,12 @@
 import React, {Component} from 'react'
-// import FloatMenu from '../ui/FloatMenu'
-import {Form, Input, Row, Col, Checkbox, Switch, Tooltip, Button, Modal} from 'antd'
-import ComponentAuthority from "../ComponentAuthority";
+import { Form, Input, Row, Col, Checkbox, Switch, Tooltip, Button, Modal } from 'antd'
+
+import i18n from "../../i18n/i18n"
+import ComponentAuthority from "../ComponentAuthority"
+import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
 import { privileges } from '../../constants/privileges-types'
-import {PrivilegeUtils} from "../../utils/PrivilegeUtils";
+
+// import FloatMenu from '../ui/FloatMenu'
 
 const FormItem = Form.Item
 const confirm = Modal.confirm;
@@ -41,10 +44,16 @@ class ApiDefinition extends Component {
         const idApi = this.props.api.id
 
         confirm({
-            title: 'Are you sure?',
-            okText: 'Yes',
+            title: i18n.t('are_you_sure'),
+            okText: i18n.t('yes'),
+            content: (
+                <div>
+                    <p>{ i18n.t('deleting_an_api_delete_resources_operations_interceptors_middlewares') }</p>
+                    <p>{ i18n.t('this_operation_can_not_be_reverted') }</p>
+                </div>
+            ),
             okType: 'danger',
-            cancelText: 'No',
+            cancelText: i18n.t('no'),
             onOk() {
                 deleteApi(idApi)
             }
@@ -71,56 +80,56 @@ class ApiDefinition extends Component {
                         <Col sm={24} md={12}>
                             <Row gutter={16}>
                                 <Col sm={24} md={15}>
-                                    <FormItem label="API Name">
+                                    <FormItem label={i18n.t('api_name')}>
                                         {
                                             getFieldDecorator('name', {
                                                 initialValue: api.name,
-                                                rules: [{required: true, message: 'Please input your api name!'}]
+                                                rules: [{required: true, message: i18n.t('please_input_your_api_name') }]
                                             })(<Input disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_API])}/>)
                                         }
                                     </FormItem>
                                 </Col>
 
                                 <Col sm={24} md={5}>
-                                    <FormItem label="API version">
+                                    <FormItem label={i18n.t('api_version')}>
                                         {
                                             getFieldDecorator('version', {
                                                 initialValue: api.version,
-                                                rules: [{required: true, message: 'Please input your api version!'}]
+                                                rules: [{required: true, message: i18n.t('please_input_your_api_version') }]
                                             })(<Input disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_API])}/>)
                                         }
                                     </FormItem>
                                 </Col>
 
                                 <Col sm={24} md={15}>
-                                    <FormItem label="Description">
+                                    <FormItem label={i18n.t('description')}>
                                         {
                                             getFieldDecorator('description', {
                                                 initialValue: api.description,
-                                                rules: [{required: true, message: 'Please input your api description!'}]
+                                                rules: [{required: true, message: i18n.t('please_input_your_api_description') }]
                                             })(<Input disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_API])}/>)
                                         }
                                     </FormItem>
                                 </Col>
 
                                 <Col sm={24} md={5}>
-                                    <FormItem label="Base path">
+                                    <FormItem label={i18n.t('base_path')}>
                                         {
                                             getFieldDecorator('basePath', {
-                                                initialValue: api.basePath,
-                                                rules: [{required: true, message: 'Please input your api base path!'}]
-                                            })(<Input disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_API])}/>)
+                                                initialValue: api.basePath.replace("/", ""),
+                                                rules: [{required: true, message: i18n.t('please_input_your_api_base_path') }]
+                                            })(<Input addonBefore={"/"} disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_API])}/>)
                                         }
                                     </FormItem>
                                 </Col>
 
                                 <Col sm={24} md={5}>
-                                    <FormItem label="Status">
+                                    <FormItem label={i18n.t('status')}>
                                         {
                                             getFieldDecorator('status', {
                                                 initialValue: api.status === 'ACTIVE',
                                                 valuePropName: 'checked',
-                                                rules: [{required: true, message: 'Please input your api base path!'}]
+                                                rules: [{required: true, message: i18n.t('please_select_your_api_status') }]
                                             })(<Switch required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_API])}/>)
                                         }
                                     </FormItem>
@@ -130,11 +139,11 @@ class ApiDefinition extends Component {
                         <Col sm={24} md={12}>
                             <Row gutter={16}>
                                 <Col sm={24}>
-                                    <FormItem label="Environments">
+                                    <FormItem label={i18n.t('environments')}>
                                         {
                                             getFieldDecorator('environments', {
                                                 initialValue: api.environments ? api.environments.map(env => env.id) : [],
-                                                rules: [{required: true, message: 'Please select an environment'}]
+                                                rules: [{required: true, message: i18n.t('please_select_an_environment') }]
                                             })(<Checkbox.Group className='checkbox-conductor' options={options} disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_API])}/>)
                                         }
                                     </FormItem>
@@ -146,15 +155,13 @@ class ApiDefinition extends Component {
 
                 <Row type="flex" justify="end">
                     <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_API]}>
-                        <Tooltip title="Delete">
-                            <Button className="card-button" type="danger" ghost icon="delete"
-                                    onClick={this.showDeleteConfirm} size="large" shape="circle"/>
+                        <Tooltip title={i18n.t('delete')}>
+                            <Button id="deleteApi" className="card-button" type="danger" ghost icon="delete" onClick={this.showDeleteConfirm} size="large" shape="circle" />
                         </Tooltip>
                     </ComponentAuthority>
                     <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_UPDATE_API]}>
-                        <Tooltip title="Save">
-                            <Button className="card-button" type="primary" icon="save" onClick={this.onSubmitApi}
-                                    size="large" shape="circle"/>
+                        <Tooltip title={i18n.t('save')}>
+                            <Button id="saveApi" className="card-button" type="primary" icon="save" onClick={this.onSubmitApi} size="large" shape="circle" />
                         </Tooltip>
                     </ComponentAuthority>
                 </Row>

@@ -1,6 +1,22 @@
 
 package br.com.conductor.heimdall.gateway.service;
 
+import static br.com.conductor.heimdall.core.util.ConstantsCache.CACHE_BUCKET;
+import static br.com.conductor.heimdall.core.util.ConstantsCache.CACHE_TIME_TO_LIVE;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.assertj.core.util.Lists;
+import org.redisson.api.RBucket;
+import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.netflix.zuul.context.RequestContext;
+
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -24,17 +40,6 @@ package br.com.conductor.heimdall.gateway.service;
 import br.com.conductor.heimdall.core.util.BeanManager;
 import br.com.conductor.heimdall.middleware.spec.ApiResponse;
 import br.com.conductor.heimdall.middleware.spec.Helper;
-import com.netflix.zuul.context.RequestContext;
-import org.assertj.core.util.Lists;
-import org.redisson.api.RBucket;
-import org.redisson.api.RedissonClient;
-import org.springframework.stereotype.Service;
-
-import java.util.Collections;
-import java.util.List;
-
-import static br.com.conductor.heimdall.core.util.ConstantsCache.CACHE_BUCKET;
-import static br.com.conductor.heimdall.core.util.ConstantsCache.CACHE_TIME_TO_LIVE;
 
 /**
  * Cache service provides methods to create and delete a response cache from a request.
@@ -43,6 +48,9 @@ import static br.com.conductor.heimdall.core.util.ConstantsCache.CACHE_TIME_TO_L
  */
 @Service
 public class CacheInterceptorService {
+	
+	@Autowired
+    private Helper helper;
 
     /**
      * Checks if the request is in cache. If true then returns the cached response, otherwise
@@ -50,11 +58,10 @@ public class CacheInterceptorService {
      *
      * @param cacheName   Cache name provided
      * @param timeToLive  How much time the cache will live (0 or less to live forever)
-     * @param helper      {@link Helper}
      * @param headers     List of headers that when present signal that the request should be cached
      * @param queryParams List of queryParams that when present signal that the request should be cached
      */
-    public void cacheInterceptor(String cacheName, Long timeToLive, Helper helper, List<String> headers, List<String> queryParams) {
+    public void cacheInterceptor(String cacheName, Long timeToLive, List<String> headers, List<String> queryParams) {
 
         RedissonClient redisson = (RedissonClient) BeanManager.getBean(RedissonClient.class);
 
@@ -79,22 +86,15 @@ public class CacheInterceptorService {
     /**
      * Clears a cache if it exists
      *
-     * @param cacheName   Cache name provided
-     * @param headers     List of headers that when present signal that the request should be cached
-     * @param queryParams List of queryParams that when present signal that the request should be cached
+     * @param cacheName Cache name provided
      */
-    public void cacheClearInterceptor(String cacheName, List<String> headers, List<String> queryParams) {
+    public void cacheClearInterceptor(String cacheName) {
 
         RedissonClient redisson = (RedissonClient) BeanManager.getBean(RedissonClient.class);
 
         RequestContext context = RequestContext.getCurrentContext();
 
-        if (shouldCache(context, headers, queryParams)) {
-            RBucket<ApiResponse> rBucket = redisson.getBucket(createCacheKey(context, cacheName, headers, queryParams));
-            if (rBucket.get() != null) {
-                rBucket.delete();
-            }
-        }
+        redisson.getKeys().deleteByPattern(createDeleteCacheKey(context, cacheName));
     }
 
     /*
@@ -126,9 +126,28 @@ public class CacheInterceptorService {
                 "headers" + headersBuilder.toString();
     }
 
+    /*
+     * Creates a cache key to delete the cache
+     */
+    private String createDeleteCacheKey(RequestContext context, String cacheName) {
+
+        return context.get("api-id") + "-" +
+                context.get("api-name") + ":" +
+                cacheName + ":*";
+    }
+
+    /*
+     * Defines if the cache should be written
+     */
     private boolean shouldCache(RequestContext context, List<String> headers, List<String> queryParams) {
-        return Collections.list(context.getRequest().getHeaderNames()).containsAll(headers) &&
-                Lists.newArrayList(context.getRequestQueryParams().keySet()).containsAll(queryParams);
+
+        Map<String, List<String>> requestQueryParams = (context.getRequestQueryParams() != null) ? context.getRequestQueryParams() : new HashMap<>();
+
+        boolean queries = Lists.newArrayList(requestQueryParams.keySet()).containsAll(queryParams);
+
+        boolean header = (context.getRequest().getHeaderNames() != null) && Collections.list(context.getRequest().getHeaderNames()).containsAll(headers);
+
+        return header && queries;
     }
 
 }

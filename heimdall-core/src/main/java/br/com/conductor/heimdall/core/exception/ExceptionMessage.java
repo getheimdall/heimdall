@@ -33,7 +33,8 @@ import static org.springframework.http.HttpStatus.*;
  * 
  * @author Filipe Germano
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
- * 
+ * @author Marcelo Aguiar Rodrigues
+ *
  */
 @Slf4j
 public enum ExceptionMessage {
@@ -53,6 +54,8 @@ public enum ExceptionMessage {
     INTERCEPTOR_LIMIT_REACHED(BAD_REQUEST.value(), "Intercept limit reached", BadRequestException.class),
 
     INTERCEPTOR_INVALID_CONTENT(BAD_REQUEST.value(), "Content for {} interceptor is incorrect. Use the standard: {}", BadRequestException.class),
+
+    INTERCEPTOR_NO_APP_FOUND(BAD_REQUEST.value(), "No App registered to this Api with client_id provided.", BadRequestException.class),
 
     INTERCEPTOR_NOT_EXIST(BAD_REQUEST.value(), "Interceptor defined not exist", BadRequestException.class),
 
@@ -78,7 +81,7 @@ public enum ExceptionMessage {
 
     RESOURCE_METHOD_NOT_ACCEPT(BAD_REQUEST.value(), "method not accepted please use: GET, POST, PUT, PATH or DELETE", BadRequestException.class),
 
-    APP_NOT_EXIST(BAD_REQUEST.value(), "App not exist", BadRequestException.class),
+    APP_NOT_EXIST(BAD_REQUEST.value(), "App does not exist", BadRequestException.class),
 
     API_BASEPATH_EXIST(BAD_REQUEST.value(), "The basepath defined exist", BadRequestException.class),
 
@@ -104,7 +107,7 @@ public enum ExceptionMessage {
 
     ENVIRONMENT_INBOUND_DNS_PATTERN(BAD_REQUEST.value(), "Environment inbound URL has to follow the pattern http[s]://host.domain[:port] or www.host.domain[:port]", BadRequestException.class),PROVIDER_NOT_FOUND(BAD_REQUEST.value(), "Provider not found", BadRequestException.class),
      
-    PROVIDER_USER_UNAUTHORIZED(UNAUTHORIZED.value(), "User provider unauthorized", UnauthorizedException.class),
+    PROVIDER_USER_UNAUTHORIZED(UNAUTHORIZED.value(), "User provided unauthorized", UnauthorizedException.class),
      
     TOKEN_EXPIRED(UNAUTHORIZED.value(), "Token expired", UnauthorizedException.class),
 
@@ -115,6 +118,8 @@ public enum ExceptionMessage {
     CODE_NOT_FOUND(UNAUTHORIZED.value(), "Code already used to generate token or not defined", UnauthorizedException.class),
 
     GRANT_TYPE_NOT_FOUND(BAD_REQUEST.value(), "grant_type not found", BadRequestException.class),
+
+    WRONG_GRANT_TYPE_INFORMED(BAD_REQUEST.value(), "Wrong grant_type informed", BadRequestException.class),
 
     REFRESH_TOKEN_NOT_FOUND(BAD_REQUEST.value(), "refresh_token not found", BadRequestException.class),
 
@@ -132,14 +137,21 @@ public enum ExceptionMessage {
 
     USERNAME_OR_PASSWORD_INCORRECT(BAD_REQUEST.value(), "Username or password incorrect", BadRequestException.class),
 
+    USERNAME_ALREADY_EXIST(BAD_REQUEST.value(), "Username already exist!", BadRequestException.class),
+
+    EMAIL_ALREADY_EXIST(BAD_REQUEST.value(), "Email already exist!", BadRequestException.class),
+
     CLIENT_ID_ALREADY(BAD_REQUEST.value(), "clientId already used", BadRequestException.class),
 
     CLIENT_ID_NOT_FOUND(BAD_REQUEST.value(), "client_id not found", BadRequestException.class),
 
     AUTHORIZATION_NOT_FOUND(UNAUTHORIZED.value(), "Authorization not found in header", UnauthorizedException.class),
 
-    RESPONSE_TYPE_NOT_FOUND(BAD_REQUEST.value(), "response_type not found", BadRequestException.class);
-
+    RESPONSE_TYPE_NOT_FOUND(BAD_REQUEST.value(), "response_type not found", BadRequestException.class),
+  
+    ROLE_ALREADY_EXIST(BAD_REQUEST.value(), "Role already exist!", BadRequestException.class),
+    
+    CIRCUIT_BREAK_ACTIVE(SERVICE_UNAVAILABLE.value(), "Circuit break enabled", ServerErrorException.class);
 
     @Getter
     private Integer httpCode;
@@ -208,20 +220,22 @@ public enum ExceptionMessage {
      */
     public void raise(String... dynamicText) {
 
+        String messageDefault = this.defaultMessage;
+
         if (dynamicText != null && dynamicText.length > 0) {
 
             Integer count = 0;
-            String baseMessage = this.defaultMessage;
+            String baseMessage = messageDefault;
             while (baseMessage.contains("{}")) {
 
                 if (dynamicText.length == 1) {
 
-                    this.message = this.defaultMessage.replace("{}", dynamicText[count]);
+                    this.message = messageDefault.replace("{}", dynamicText[count]);
                     baseMessage = this.message;
                 } else {
 
-                    this.defaultMessage = this.defaultMessage.replaceFirst("\\{\\}", dynamicText[count]);
-                    this.message = this.defaultMessage;
+                    messageDefault = messageDefault.replaceFirst("\\{\\}", dynamicText[count]);
+                    this.message = messageDefault;
                     baseMessage = this.message;
 
                 }
@@ -230,6 +244,7 @@ public enum ExceptionMessage {
         }
         raise();
     }
+
 
     /**
      * Method responsible for validation of error codes with code 400.

@@ -174,7 +174,7 @@ public class TokenAuthenticationService {
                 }
             } catch (ExpiredJwtException ex) {
                 credentialStateService.logout(token);
-                HeimdallException.checkThrow(true, ExceptionMessage.TOKEN_EXPIRED);
+                ExceptionMessage.TOKEN_EXPIRED.raise();
             }
         }
 

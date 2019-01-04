@@ -4,13 +4,14 @@
 	<parent>
 		<groupId>br.com.conductor.heimdall</groupId>
 		<artifactId>heimdall</artifactId>
-		<version>1.6.5-SNAPSHOT</version>
+		<version>1.11.3-SNAPSHOT</version>
 	</parent>
 	<artifactId>heimdall-config</artifactId>
 	<name>heimdall-config</name>
 	<packaging>jar</packaging>
 
 	<properties>
+		<docker.baseImage>java:openjdk-8-jdk-alpine</docker.baseImage>
 		<docker.imageName>getheimdall/heimdall-config</docker.imageName>
 		<docker.serverId>docker-hub</docker.serverId>
 		<docker.registryUrl>https://hub.docker.com/</docker.registryUrl>
@@ -46,7 +47,7 @@
 				<artifactId>docker-maven-plugin</artifactId>
 				<version>0.4.1</version>
 				<configuration>
-					<baseImage>java:openjdk-8-jdk-alpine</baseImage>
+					<baseImage>${docker.baseImage}</baseImage>
 					<imageName>${docker.imageName}</imageName>
 					<entryPoint>["java", "-Xmx600m", "-Xms200m", "-jar", "/${project.build.finalName}.jar"]</entryPoint>
 					<forceTags>true</forceTags>

@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
  * This class provides methods to generate and validate token with JWT
  *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ * @author Marcelo Aguiar Rodrigues
  */
 @Slf4j
 public class JwtUtils {
@@ -84,6 +85,7 @@ public class JwtUtils {
         TokenImplicit tokenImplicit = new TokenImplicit();
         tokenImplicit.setAccessToken(token);
         tokenImplicit.setExpiration(LocalDateTime.now().until(dateExpiredAccessToken, ChronoUnit.SECONDS));
+        tokenImplicit.setToken_type("bearer");
         return tokenImplicit;
     }
 
@@ -117,7 +119,8 @@ public class JwtUtils {
         }
 
         List<String> list = claimsFromTheToken.get("operations", ArrayList.class);
-        operations.addAll(list);
+        if (list != null && !list.isEmpty())
+            operations.addAll(list);
 
         return operations;
     }

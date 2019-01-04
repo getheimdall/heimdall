@@ -1,20 +1,20 @@
 //3rd's
 import React, { Component } from 'react'
-import { push } from 'connected-react-router';
+import { push } from 'connected-react-router'
 import { connect } from 'react-redux'
-
-// actions
-import { getAccessToken, initLoading, clearAccessToken, clearAccessTokens, update, save, remove } from '../actions/access-tokens';
-import { appSource, getAppSourceByName, clearAppSource, fetchingApp } from '../actions/apps';
-import { getAllPlans, clearPlans } from '../actions/plans'
-
+import moment from 'moment'
 //components
 import { Card, Row, notification } from 'antd'
-import PageHeader from '../components/ui/PageHeader'
+// actions
+import i18n from "../i18n/i18n"
+import { isEmpty } from '../utils/CommonUtils'
 import Loading from '../components/ui/Loading'
-import AccessTokenForm from '../components/access-tokens/AccessTokenForm';
-import { isEmpty } from '../utils/CommonUtils';
-import moment from 'moment'
+import PageHeader from '../components/ui/PageHeader'
+import { getAllPlans, clearPlans } from '../actions/plans'
+import AccessTokenForm from '../components/access-tokens/AccessTokenForm'
+import { appSource, getAppSourceByName, clearAppSource, fetchingApp } from '../actions/apps'
+import { getAccessToken, initLoading, clearAccessToken, clearAccessTokens, update, save, remove } from '../actions/access-tokens'
+
 
 class SingleAccessToken extends Component {
 
@@ -79,14 +79,14 @@ class SingleAccessToken extends Component {
         const { accessToken } = this.props
 
         if (this.state.loadEntity && !accessToken) return <Loading />
-        const title = accessToken ? 'Edit' : 'Add'
+        const title = accessToken ? i18n.t('edit') : i18n.t('add')
         const { appSource } = this.props
 
         return (
             <div>
-                <PageHeader title="Access Tokens" icon="key" />
+                <PageHeader title={i18n.t('access_tokens')} icon="key" />
                 <Row className="h-row bg-white">
-                    <Card style={{ width: '100%' }} title={title + ' Access Token'}>
+                    <Card style={{ width: '100%' }} title={title + ' ' + i18n.t('access_token')}>
                         <AccessTokenForm accessToken={accessToken}
                             plans={this.props.plans}
                             handleDelete={this.handleDelete}
