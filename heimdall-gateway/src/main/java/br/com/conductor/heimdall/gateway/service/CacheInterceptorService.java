@@ -102,7 +102,7 @@ public class CacheInterceptorService {
      */
     private String createCacheKey(RequestContext context, String cacheName, List<String> headers, List<String> queryParams) {
 
-        String apiId = (String) context.get("api-id");
+        Long apiId = (Long) context.get("api-id");
         String apiName = (String) context.get("api-name");
 
         StringBuilder headersBuilder = new StringBuilder();
