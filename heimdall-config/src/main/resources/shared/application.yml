@@ -134,6 +134,9 @@ endpoints:
         sensitive: false
     actuator:
         enabled: true
+    trace:
+        filter:
+            enabled: false
 
 management:
     context-path: /manager
