@@ -4,7 +4,7 @@ import {Button, Col, Form, Input, Row, Switch, Tooltip} from 'antd'
 import PropTypes from "prop-types";
 import {PrivilegeUtils} from "../../utils/PrivilegeUtils";
 import {privileges} from "../../constants/privileges-types";
-import ComponentAuthority from "../ComponentAuthority";
+import ComponentAuthority from "../policy/ComponentAuthority";
 
 const FormItem = Form.Item
 

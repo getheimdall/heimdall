@@ -5,9 +5,9 @@ import { Row, notification } from 'antd'
 import i18n from "../i18n/i18n"
 import Loading from '../components/ui/Loading'
 import PageHeader from '../components/ui/PageHeader'
-import FloatButton from '../components/ui/FloatButton'
+import RouteButton from '../components/ui/RouteButton'
 import {privileges} from "../constants/privileges-types"
-import ComponentAuthority from "../components/ComponentAuthority"
+import ComponentAuthority from "../components/policy/ComponentAuthority"
 import ListEnvironments from '../components/environments/ListEnvironments'
 import { getAllEnvironments, remove, initLoading } from '../actions/environments'
 
@@ -42,7 +42,7 @@ class Environments extends Component {
                     <ListEnvironments environments={environments} handleDelete={this.handleDelete} />
                     {loading && <Loading />}
                     <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_ENVIRONMENT]}>
-                        <FloatButton idButton="addEnvironment" history={history} to="/environments/new" label={i18n.t('add_new_environment')} />
+                        <RouteButton idButton="addEnvironment" history={history} to="/environments/new" label={i18n.t('add_new_environment')} />
                     </ComponentAuthority>
                 </Row>
             </div>

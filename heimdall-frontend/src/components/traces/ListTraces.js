@@ -26,7 +26,7 @@ class ListTraces extends Component {
                     )} />
                     <Column title={i18n.t('duration')} dataIndex="trace.durationMillis" id="duration"/>
                     <Column
-                        title={i18n.t('action')}
+                        align="right"
                         id="action"
                         key="action"
                         render={(text, record) => (

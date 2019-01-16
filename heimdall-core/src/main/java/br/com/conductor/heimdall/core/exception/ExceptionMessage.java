@@ -155,7 +155,20 @@ public enum ExceptionMessage {
 
     ROLE_ALREADY_EXIST(BAD_REQUEST.value(), "Role already exist!", BadRequestException.class),
 
-    CIRCUIT_BREAK_ACTIVE(SERVICE_UNAVAILABLE.value(), "Circuit break enabled", ServerErrorException.class);
+    CIRCUIT_BREAK_ACTIVE(SERVICE_UNAVAILABLE.value(), "Circuit break enabled", ServerErrorException.class),
+
+    SCOPE_INVALID_OPERATION(BAD_REQUEST.value(), "Operation with id '{}' does not exist", BadRequestException.class),
+
+    SCOPE_INVALID_PLAN(BAD_REQUEST.value(), "Plan id with '{}' does not exist", BadRequestException.class),
+
+    SCOPE_OPERATION_NOT_IN_API(BAD_REQUEST.value(), "Operation '{}' not in Api '{}'", BadRequestException.class),
+
+    SCOPE_PLAN_NOT_IN_API(BAD_REQUEST.value(), "Plan '{}' not in Api '{}'", BadRequestException.class),
+
+    SCOPE_INVALID_NAME(BAD_REQUEST.value(), "A Scope with the provided name already exists", BadRequestException.class),
+
+    SCOPE_NO_OPERATION_FOUND(BAD_REQUEST.value(), "A Scope must have at least one Operation", BadRequestException.class);
+
 
     @Getter
     private Integer httpCode;

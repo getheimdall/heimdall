@@ -46,6 +46,7 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
+import br.com.conductor.heimdall.core.entity.*;
 import br.com.conductor.heimdall.core.enums.HttpMethod;
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
 import org.springframework.cloud.netflix.zuul.filters.Route;
@@ -63,8 +64,6 @@ import org.springframework.web.util.UrlPathHelper;
 
 import com.netflix.zuul.context.RequestContext;
 
-import br.com.conductor.heimdall.core.entity.Environment;
-import br.com.conductor.heimdall.core.entity.Operation;
 import br.com.conductor.heimdall.core.repository.OperationRepository;
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.core.util.ConstantsPath;
@@ -288,11 +287,13 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
 
                         String basePath = operation.getResource().getApi().getBasePath();
                         requestURI = org.apache.commons.lang.StringUtils.removeStart(requestURI, basePath);
+
                         ctx.put(PATTERN, org.apache.commons.lang.StringUtils.removeStart(pattern, basePath));
                         ctx.put(API_NAME, operation.getResource().getApi().getName());
                         ctx.put(API_ID, operation.getResource().getApi().getId());
                         ctx.put(RESOURCE_ID, operation.getResource().getId());
                         ctx.put(OPERATION_ID, operation.getId());
+                        ctx.put(SCOPES, operation.getScopesIds());
 
                         List<Environment> environments = operation.getResource().getApi().getEnvironments();
 

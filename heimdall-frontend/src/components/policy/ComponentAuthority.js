@@ -1,6 +1,6 @@
 import {Component} from 'react'
 import PropTypes from "prop-types";
-import {PrivilegeUtils} from "../utils/PrivilegeUtils";
+import {PrivilegeUtils} from "../../utils/PrivilegeUtils";
 
 class ComponentAuthority extends Component {
 

@@ -19,6 +19,7 @@ import traces from './Traces'
 import privileges from './Privileges'
 import ldap from './Ldap'
 import providers from './Providers'
+import scopes from './Scopes'
 
 export default combineReducers({
     apis,
@@ -39,5 +40,6 @@ export default combineReducers({
     traces,
     privileges,
     ldap,
-    providers
+    providers,
+    scopes
 })

@@ -30,5 +30,6 @@
     <include file="changelog/20181008152933-delete-rows-log-interceptors.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20181129141113-remove-null-constraints-from-value-in-provider-param.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20181203115559-update-table-provider-with-provider-default.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20181112113200-added-scopes-structure.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
