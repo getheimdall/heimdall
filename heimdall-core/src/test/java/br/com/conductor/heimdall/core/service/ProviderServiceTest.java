@@ -20,12 +20,13 @@ package br.com.conductor.heimdall.core.service;
  * ==========================LICENSE_END===================================
  */
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import java.util.ArrayList;
-import java.util.List;
-
+import br.com.conductor.heimdall.core.dto.PageableDTO;
+import br.com.conductor.heimdall.core.dto.ProviderDTO;
+import br.com.conductor.heimdall.core.dto.ProviderParamsDTO;
+import br.com.conductor.heimdall.core.dto.page.ProviderPage;
+import br.com.conductor.heimdall.core.entity.Provider;
+import br.com.conductor.heimdall.core.exception.ForbiddenException;
+import br.com.conductor.heimdall.core.repository.ProviderRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,12 +39,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import br.com.conductor.heimdall.core.dto.PageableDTO;
-import br.com.conductor.heimdall.core.dto.ProviderDTO;
-import br.com.conductor.heimdall.core.dto.ProviderParamsDTO;
-import br.com.conductor.heimdall.core.dto.page.ProviderPage;
-import br.com.conductor.heimdall.core.entity.Provider;
-import br.com.conductor.heimdall.core.repository.ProviderRepository;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
@@ -84,6 +85,7 @@ public class ProviderServiceTest {
 		this.providerDatabase = new Provider();
 		this.providerDatabase.setId(1L);
 		this.providerDatabase.setName("Prov Authentication");
+		this.providerDatabase.setProviderDefault(false);
 	}
 
 	@Test
@@ -99,12 +101,16 @@ public class ProviderServiceTest {
 
 	@Test
 	public void testEditProvider() {
+		this.providerDatabase
+				.setProviderParams(providerDTO.getProviderParams().stream()
+				.map(p -> providerService.getProviderParam(p, providerDatabase))
+				.collect(Collectors.toList()));
 		Mockito.when(this.providerRepository.findOne(1L)).thenReturn(providerDatabase);
 		Mockito.when(providerRepository.save(Mockito.any(Provider.class))).thenReturn(providerDatabase);
 		
 		this.providerDTO.setName("Prov Authentication");
 		Provider providerResp = this.providerService.edit(1L, this.providerDTO);
-		
+
 		assertEquals(this.providerDatabase.getName(), providerResp.getName());
 		Mockito.verify(this.providerRepository, Mockito.times(1)).save(Mockito.any(Provider.class));
 	}
@@ -112,46 +118,54 @@ public class ProviderServiceTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testListWithPageableAndFilter() {
-		
+
 		PageableDTO pageableDTO = new PageableDTO();
 		pageableDTO.setLimit(10);
 		pageableDTO.setOffset(0);
-		
+
 		ArrayList<Provider> listProviders = new ArrayList<>();
-		
+
 		this.providerDatabase.setName("Provider Authentication");
-		
+
 		listProviders.add(providerDatabase);
-		
-		Page<Provider> page = new PageImpl<>(listProviders); 
-		
+
+		Page<Provider> page = new PageImpl<>(listProviders);
+
 		Mockito.when(this.providerRepository.findAll(Mockito.any(Example.class), Mockito.any(Pageable.class))).thenReturn(page);
-		
+
 		ProviderPage providerPageResp = this.providerService.listWithPageableAndFilter(this.providerDTO, pageableDTO);
-		
+
 		assertEquals(1L, providerPageResp.getTotalElements());
 		Mockito.verify(this.providerRepository, Mockito.times(1)).findAll(Mockito.any(Example.class), Mockito.any(Pageable.class));
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testListWithFilter() {
-		
+
 		List<Provider> listProviders = new ArrayList<>();
 		this.providerDatabase.setName("Provider Authentication");
 		listProviders.add(providerDatabase);
-		
+
 		Mockito.when(providerRepository.findAll(Mockito.any(Example.class))).thenReturn(listProviders);
-		
+
 		List<Provider> listProvidersResp = this.providerService.listWithFilter(providerDTO);
-		
+
 		assertEquals(listProviders.size(), listProvidersResp.size());
 		Mockito.verify(this.providerRepository, Mockito.times(1)).findAll(Mockito.any(Example.class));
 	}
-	
+
 	@Test
 	public void testDelete() {
 		this.providerService.delete(1L);
 		Mockito.verify(this.providerRepository, Mockito.times(1)).delete(1L);
+	}
+
+	@Test(expected = ForbiddenException.class)
+	public void testUpdateProviderWhenDefaultIsTrue() {
+		providerDatabase.setProviderDefault(true);
+		Mockito.when(this.providerRepository.findOne(Mockito.any(Long.class))).thenReturn(providerDatabase);
+
+		providerService.edit(1L, providerDTO);
 	}
 }

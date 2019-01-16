@@ -20,16 +20,12 @@ package br.com.conductor.heimdall.core.dto;
  * ==========================LICENSE_END===================================
  */
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.List;
+import br.com.conductor.heimdall.core.entity.Provider;
+import lombok.Data;
 
 import javax.validation.constraints.NotNull;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import br.com.conductor.heimdall.core.entity.Provider;
-import br.com.conductor.heimdall.core.enums.Status;
-import lombok.Data;
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * Class is a Data Transfer Object for the {@link Provider}.
@@ -52,10 +48,5 @@ public class ProviderDTO implements Serializable {
     @NotNull
     private List<ProviderParamsDTO> providerParams;
 
-    @JsonIgnore
-    private LocalDateTime creationDate;
-
-    @JsonIgnore
-    private Status status = Status.ACTIVE;
 
 }
