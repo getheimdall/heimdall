@@ -10,9 +10,9 @@ import {getAllAccessTokens, initLoading, remove} from '../actions/access-tokens'
 import i18n from "../i18n/i18n"
 import Loading from '../components/ui/Loading'
 import PageHeader from '../components/ui/PageHeader'
-import FloatButton from '../components/ui/FloatButton'
+import RouteButton from '../components/ui/RouteButton'
 import { privileges } from "../constants/privileges-types"
-import ComponentAuthority from "../components/ComponentAuthority"
+import ComponentAuthority from "../components/policy/ComponentAuthority"
 import ListAccessTokens from '../components/access-tokens/ListAccessTokens'
 
 class AccessTokens extends Component {
@@ -78,7 +78,7 @@ class AccessTokens extends Component {
                 <Row className="h-row bg-white">
                     <ListAccessTokens dataSource={accessTokens} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading}/>
                     <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_ACCESSTOKEN]}>
-                        <FloatButton idButton="addAccessToken" history={history} to="/tokens/new" label={i18n.t('add_new_access_token')} />
+                        <RouteButton idButton="addAccessToken" history={history} to="/tokens/new" label={i18n.t('add_new_access_token')} />
                     </ComponentAuthority>
                 </Row>
             </div>

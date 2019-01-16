@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 
 import { Modal, Row, Table, Divider, Tooltip, Button, Pagination } from 'antd';
-import ComponentAuthority from "../ComponentAuthority";
+import ComponentAuthority from "../policy/ComponentAuthority";
 import {privileges} from "../../constants/privileges-types";
 import i18n from "../../i18n/i18n";
 

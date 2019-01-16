@@ -102,14 +102,12 @@ public class CacheInterceptorService {
      */
     private String createCacheKey(RequestContext context, String cacheName, List<String> headers, List<String> queryParams) {
 
-        String apiId = (String) context.get("api-id");
-        String apiName = (String) context.get("api-name");
-
         StringBuilder headersBuilder = new StringBuilder();
         headers.forEach(s -> headersBuilder
                 .append(s)
                 .append("=")
                 .append(context.getRequest().getHeader(s))
+                .append("/")
         );
 
         StringBuilder queryParamsBuilder = new StringBuilder();
@@ -117,13 +115,14 @@ public class CacheInterceptorService {
                 .append(s)
                 .append("=")
                 .append(context.getRequestQueryParams().get(s))
+                .append("/")
         );
 
-        return apiId + "-" + apiName + ":" +
+        return context.get("api-id") + "-" + context.get("api-name") + ":" +
                 cacheName + ":" +
                 context.getRequest().getRequestURL().toString() + ":" +
-                "queryParams" + queryParamsBuilder.toString() + ":" +
-                "headers" + headersBuilder.toString();
+                "queryParams=" + queryParamsBuilder.toString() + ":" +
+                "headers=" + headersBuilder.toString();
     }
 
     /*

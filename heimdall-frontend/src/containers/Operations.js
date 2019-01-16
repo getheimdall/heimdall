@@ -9,7 +9,7 @@ import Loading from '../components/ui/Loading'
 import {PrivilegeUtils} from "../utils/PrivilegeUtils"
 import {privileges} from "../constants/privileges-types"
 import FloatSearch from './../components/ui/FloatSearch'
-import ComponentAuthority from "../components/ComponentAuthority"
+import ComponentAuthority from "../components/policy/ComponentAuthority"
 import OperationForm from '../components/operations/OperationForm'
 
 const ButtonGroup = Button.Group;

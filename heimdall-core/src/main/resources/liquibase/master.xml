@@ -28,6 +28,7 @@
     <include file="changelog/20180718175848-update-column-token-in-oauth-authorizes.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20180719142230-add_columns-grantType-expirationDate-expirationTime-in-oauth-authorizes.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20181008152933-delete-rows-log-interceptors.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20181112113200-added-scopes-structure.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20180905160326-add-column-password-in-developer.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
