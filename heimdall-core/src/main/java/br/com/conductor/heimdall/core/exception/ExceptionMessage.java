@@ -165,7 +165,7 @@ public enum ExceptionMessage {
 
     SCOPE_NO_OPERATION_FOUND(BAD_REQUEST.value(), "A Scope must have at least one Operation", BadRequestException.class),
 
-    CORS_INTERCEPTOR_NOT_API_LIFE_CYCLE(BAD_REQUEST.value(), "The CORS Interceptor must of Lifecycle type API", BadRequestException.class),
+    CORS_INTERCEPTOR_NOT_API_LIFE_CYCLE(BAD_REQUEST.value(), "The CORS Interceptor only allowed for API LifeCycle", BadRequestException.class),
 
     CORS_INTERCEPTOR_ALREADY_ASSIGNED_TO_THIS_API(BAD_REQUEST.value(), "A CORS Interceptor already assigned to this API", BadRequestException.class);
 
