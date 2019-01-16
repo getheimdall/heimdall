@@ -151,7 +151,11 @@ public enum ExceptionMessage {
 
     RESPONSE_TYPE_NOT_FOUND(BAD_REQUEST.value(), "response_type not found", BadRequestException.class),
 
-    DEFAULT_PROVIDER_CAN_NOT_UPDATED_OR_REMOVED(FORBIDDEN.value(), "Default Provider can't to be updated or removed!", ForbiddenException.class);
+    DEFAULT_PROVIDER_CAN_NOT_UPDATED_OR_REMOVED(FORBIDDEN.value(), "Default Provider can't to be updated or removed!", ForbiddenException.class),
+
+    ROLE_ALREADY_EXIST(BAD_REQUEST.value(), "Role already exist!", BadRequestException.class),
+
+    CIRCUIT_BREAK_ACTIVE(SERVICE_UNAVAILABLE.value(), "Circuit break enabled", ServerErrorException.class);
 
     @Getter
     private Integer httpCode;

@@ -226,10 +226,6 @@ export default {
         'add_new_provider': 'Adicionar novo Provedor',
         'provider_saved': 'Provedor salvo!',
         'provider_updated': 'Provedor atualizado!',
-        'please_input_role_name':'Por favor, insira o nome do Papel!',
-        'min_4_characters_to_name':'O nome deve ter no mínimo 4 caracteres!',
-        'available_privileges':'Privilégios disponíveis',
-        'attributed_privileges':'Privilégios atribuídos',
         'please_input_provider_name':'Por favor, insira o nome do Provedor!',
         'please_input_provider_description': 'Por favor, insira a descrição do Provedor!',
         'add_provider_param': 'Adicionar parâmetro de Provedor',
@@ -237,6 +233,10 @@ export default {
         'provider_params': 'Parâmetros de Provedor',
         'location': 'Localização',
         'please_input_provider_param_name': 'Por favor, insira o nome do Parâmetro do Provedor!',
-        'provider_param_already_exist': 'Parâmetro do provider já existente!'
+        'provider_param_already_exist': 'Parâmetro do provider já existente!',
+        'please_input_role_name':'Por favor, insira o nome do papel!',
+        'min_4_characters_to_name': 'O nome deve ter no mínimo 4 caracteres!',
+        'available_privileges': 'Papéis disponíveis',
+        'attributed_privileges': 'Papéis atribuídos'
     }
 }

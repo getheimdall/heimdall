@@ -41,8 +41,6 @@ public class CustomInterceptor extends HeimdallFilter {
 
           inboundURL = "{{inboundURL}}";
 
-          this.helper = new HelperImpl();
-
           referenceId = {{referenceId}};
      }
 
@@ -72,7 +70,7 @@ public class CustomInterceptor extends HeimdallFilter {
 
      @Override
      public void execute() throws Throwable {
-
+		  this.helper = (Helper) BeanManager.getBean(Helper.class);
           {{{content}}}
      }
 

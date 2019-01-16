@@ -23,7 +23,6 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
@@ -33,6 +32,7 @@ import java.util.Objects;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StreamUtils;
@@ -43,7 +43,6 @@ import com.netflix.zuul.context.RequestContext;
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.core.util.ContentTypeUtils;
 import br.com.conductor.heimdall.core.util.UrlUtil;
-import br.com.conductor.heimdall.gateway.filter.helper.HelperImpl;
 import br.com.conductor.heimdall.gateway.trace.FilterDetail;
 import br.com.conductor.heimdall.gateway.trace.RequestResponseParser;
 import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
@@ -61,6 +60,8 @@ import lombok.Cleanup;
 public class LogResponseFilter extends ZuulFilter {
 
     private FilterDetail detail = new FilterDetail();
+    @Autowired
+    private Helper helper;
 
     @Override
     public int filterOrder() {
@@ -102,8 +103,6 @@ public class LogResponseFilter extends ZuulFilter {
     }
 
     private void execute() throws Throwable {
-        Helper helper = new HelperImpl();
-
         RequestContext ctx = RequestContext.getCurrentContext();
 
 

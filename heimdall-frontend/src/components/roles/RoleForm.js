@@ -1,12 +1,11 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 import {Button, Col, Form, Input, Modal, Row, Tooltip, Transfer} from 'antd'
-
-import i18n from '../../i18n/i18n'
-import Loading from "../ui/Loading"
-import ComponentAuthority from "../ComponentAuthority"
-import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
-import {privileges} from "../../constants/privileges-types"
+import ComponentAuthority from "../ComponentAuthority";
+import {PrivilegeUtils} from "../../utils/PrivilegeUtils";
+import {privileges} from "../../constants/privileges-types";
+import Loading from "../ui/Loading";
+import i18n from "../../i18n/i18n";
 
 const FormItem = Form.Item
 const confirm = Modal.confirm
@@ -50,10 +49,10 @@ class RoleForm extends Component {
 
     showDeleteConfirm = (roleId) => (e) => {
         confirm({
-            title: 'Are you sure?',
-            okText: 'Yes',
+            title: i18n.t('are_you_sure'),
+            okText: i18n.t('yes'),
             okType: 'danger',
-            cancelText: 'No',
+            cancelText: i18n.t('no'),
             onOk: () => {
                 this.props.handleDelete(roleId)
             }
@@ -113,7 +112,7 @@ class RoleForm extends Component {
                 <br/>
                 <Row type="flex" justify="end">
                     <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_ROLE]}>
-                        <Tooltip title="Delete">
+                        <Tooltip title={i18n.t('delete')}>
                             <Button className="card-button" type="danger" ghost icon="delete" size="large"
                                     shape="circle"
                                     disabled={!role} onClick={role && this.showDeleteConfirm(role.id)}
@@ -122,7 +121,7 @@ class RoleForm extends Component {
                     </ComponentAuthority>
                     <ComponentAuthority
                         privilegesAllowed={[privileges.PRIVILEGE_CREATE_ROLE, privileges.PRIVILEGE_UPDATE_ROLE]}>
-                        <Tooltip title="Save">
+                        <Tooltip title={i18n.t('save')}>
                             <Button className="card-button" type="primary" icon="save" size="large" shape="circle"
                                     onClick={this.onSubmitForm} loading={loading}/>
                         </Tooltip>

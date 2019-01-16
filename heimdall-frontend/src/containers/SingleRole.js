@@ -86,7 +86,8 @@ const mapStateToProps = state => {
     return {
         role: state.roles.role,
         loading: state.roles.loading,
-        privileges: state.privileges.privileges
+        privileges: state.privileges.privileges,
+        notification: state.roles.notification
     }
 }
 

@@ -226,10 +226,6 @@ export default {
         'add_new_provider': 'Add new Provider',
         'provider_saved': 'Provider saved!',
         'provider_updated': 'Provider updated',
-        'please_input_role_name':'Please input a role name!',
-        'min_4_characters_to_name':'Min of 4 Characters to name!',
-        'available_privileges':'Available privileges',
-        'attributed_privileges':'Attributed privileges',
         'please_input_provider_name':'Please input a provider name!',
         'please_input_provider_description': 'Please input a provider description!',
         'add_provider_param': 'Add Provider Param',
@@ -237,6 +233,10 @@ export default {
         'provider_params': 'Provider Params',
         'location': 'Location',
         'please_input_provider_param_name': 'Please, input Provider Param name!',
-        'provider_param_already_exist': 'ProviderParam already exist!'
+        'provider_param_already_exist': 'ProviderParam already exist!',
+        'please_input_role_name':'Please input a role name!',
+        'min_4_characters_to_name': 'Min of 4 Characters to name!',
+        'available_privileges': 'Available privileges',
+        'attributed_privileges': 'Attributed privileges'
     }
 }

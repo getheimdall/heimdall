@@ -19,26 +19,29 @@
  */
 package br.com.conductor.heimdall.gateway.filter;
 
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
+
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import com.netflix.zuul.ZuulFilter;
+import com.netflix.zuul.context.RequestContext;
+
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.core.util.DigestUtils;
 import br.com.conductor.heimdall.core.util.UrlUtil;
-import br.com.conductor.heimdall.gateway.filter.helper.HelperImpl;
 import br.com.conductor.heimdall.gateway.trace.FilterDetail;
 import br.com.conductor.heimdall.gateway.trace.RequestResponseParser;
 import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.middleware.spec.Helper;
-import com.netflix.zuul.ZuulFilter;
-import com.netflix.zuul.context.RequestContext;
-import org.apache.commons.lang.exception.ExceptionUtils;
-import org.springframework.stereotype.Component;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 
 /**
  * Logs the request to the trace
@@ -49,6 +52,8 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 public class LogRequestFilter extends ZuulFilter {
 
     private FilterDetail detail = new FilterDetail();
+    @Autowired
+    private Helper helper;
 
     @Override
     public int filterOrder() {
@@ -90,8 +95,7 @@ public class LogRequestFilter extends ZuulFilter {
     }
 
     private void execute() {
-        Helper helper = new HelperImpl();
-
+    	
         RequestContext ctx = RequestContext.getCurrentContext();
         HttpServletRequest request = ctx.getRequest();
 
