@@ -47,10 +47,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.*;
@@ -292,9 +289,9 @@ public class HeimdallDecorationFilterTest {
         resource.setId(88L);
         resource.setApi(api);
 
-        Operation opPost = new Operation(10L, HttpMethod.POST, "/api/foo", "post foo description", resource);
-        Operation opDelete = new Operation(11L, HttpMethod.DELETE, "/api/foo", "delete foo description", resource);
-        Operation opGet = new Operation(13L, HttpMethod.GET, "/api/foo", "all foo description", resource);
+        Operation opPost = new Operation(10L, HttpMethod.POST, "/api/foo", "post foo description", resource, new HashSet<>());
+        Operation opDelete = new Operation(11L, HttpMethod.DELETE, "/api/foo", "delete foo description", resource, new HashSet<>());
+        Operation opGet = new Operation(13L, HttpMethod.GET, "/api/foo", "all foo description", resource, new HashSet<>());
 
         Mockito.when(routeLocator.getAtomicRoutes()).thenReturn(new AtomicReference<>(routes));
         Mockito.when(operationRepository.findByEndPoint("/v2/api/foo")).thenReturn(Lists.newArrayList(opPost, opDelete, opGet));
@@ -321,9 +318,9 @@ public class HeimdallDecorationFilterTest {
         resource.setId(88L);
         resource.setApi(api);
 
-        Operation opPost = new Operation(10L, HttpMethod.POST, "/api/foo", "post foo description", resource);
-        Operation opDelete = new Operation(11L, HttpMethod.DELETE, "/api/foo", "delete foo description", resource);
-        Operation opGet = new Operation(13L, HttpMethod.GET, "/api/foo", "all foo description", resource);
+        Operation opPost = new Operation(10L, HttpMethod.POST, "/api/foo", "post foo description", resource, new HashSet<>());
+        Operation opDelete = new Operation(11L, HttpMethod.DELETE, "/api/foo", "delete foo description", resource, new HashSet<>());
+        Operation opGet = new Operation(13L, HttpMethod.GET, "/api/foo", "all foo description", resource, new HashSet<>());
 
         Mockito.when(routeLocator.getAtomicRoutes()).thenReturn(new AtomicReference<>(routes));
         Mockito.when(operationRepository.findByEndPoint("/v2/api/foo")).thenReturn(Lists.newArrayList(opPost, opDelete, opGet));
@@ -351,9 +348,9 @@ public class HeimdallDecorationFilterTest {
         resource.setId(88L);
         resource.setApi(api);
 
-        Operation opPost = new Operation(10L, HttpMethod.POST, "/api/foo", "post foo description", resource);
-        Operation opDelete = new Operation(11L, HttpMethod.OPTIONS, "/api/foo", "delete foo description", resource);
-        Operation opGet = new Operation(13L, HttpMethod.GET, "/api/foo", "all foo description", resource);
+        Operation opPost = new Operation(10L, HttpMethod.POST, "/api/foo", "post foo description", resource, new HashSet<>());
+        Operation opDelete = new Operation(11L, HttpMethod.OPTIONS, "/api/foo", "delete foo description", resource, new HashSet<>());
+        Operation opGet = new Operation(13L, HttpMethod.GET, "/api/foo", "all foo description", resource, new HashSet<>());
 
         Mockito.when(routeLocator.getAtomicRoutes()).thenReturn(new AtomicReference<>(routes));
         Mockito.when(operationRepository.findByEndPoint("/v2/api/foo")).thenReturn(Lists.newArrayList(opPost, opDelete, opGet));
