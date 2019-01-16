@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import { Form, Input, Row, Col, Checkbox, Switch, Tooltip, Button, Modal } from 'antd'
 
 import i18n from "../../i18n/i18n"
-import ComponentAuthority from "../ComponentAuthority"
+import ComponentAuthority from "../policy/ComponentAuthority"
 import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
 import { privileges } from '../../constants/privileges-types'
 

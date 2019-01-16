@@ -4,7 +4,7 @@ import {Button, Card, Icon, Input, message, notification, Pagination, Row, Table
 
 import i18n from "../i18n/i18n"
 import {privileges} from "../constants/privileges-types"
-import ComponentAuthority from "../components/ComponentAuthority"
+import ComponentAuthority from "../components/policy/ComponentAuthority"
 import {downloadMiddleware, getMiddlewares, initLoading, save} from '../actions/middlewares'
 
 const Dragger = Upload.Dragger

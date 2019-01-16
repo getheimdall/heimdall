@@ -53,4 +53,6 @@ public class ConstantsTag {
      public static final String TAG_AUTH = "Auth";
      public static final String TAG_LDAP = "Ldap";
      public static final String TAG_METRICS = "Metrics";
+     public static final String TAG_SCOPES = "Scopes";
+
 }

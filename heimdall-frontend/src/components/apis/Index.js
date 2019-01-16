@@ -7,7 +7,7 @@ import i18n from "../../i18n/i18n"
 import Loading from '../ui/Loading'
 import PageHeader from '../ui/PageHeader'
 import { getAllApis } from '../../actions/apis'
-import ComponentAuthority from "../ComponentAuthority"
+import ComponentAuthority from "../policy/ComponentAuthority"
 import { privileges } from '../../constants/privileges-types'
 // import FloatButton from '../ui/FloatButton'
 

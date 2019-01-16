@@ -23,18 +23,9 @@ package br.com.conductor.heimdall.core.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Set;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -84,7 +75,14 @@ public class Plan implements Serializable {
      @Column(name = "STATUS", length = 10, nullable = false)
      @Enumerated(EnumType.STRING)
      private Status status;
-     
+
+     @ManyToMany(fetch = FetchType.EAGER)
+     @JoinTable(name = "SCOPES_PLANS",
+             joinColumns = @JoinColumn(name = "PLAN_ID", referencedColumnName = "ID"),
+             inverseJoinColumns = @JoinColumn(name = "SCOPE_ID", referencedColumnName = "ID"))
+     @JsonIgnoreProperties({"plans"})
+     private Set<Scope> scopes;
+
      @PrePersist
      private void initValuesPersist() {
 
@@ -93,6 +91,14 @@ public class Plan implements Serializable {
                status = Status.ACTIVE;
           }
           creationDate = LocalDateTime.now();
+     }
+
+     /**
+      * Removes a Scope from a Plan
+      * @param scope {@link Scope} to be removed
+      */
+     public void removeScope(Scope scope) {
+          this.scopes.remove(scope);
      }
 
 }

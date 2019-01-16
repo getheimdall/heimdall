@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { Modal, Table, Divider, Tag, Tooltip, Button, Row, Pagination } from 'antd'
 
 import i18n from "../../i18n/i18n"
-import ComponentAuthority from "../ComponentAuthority"
+import ComponentAuthority from "../policy/ComponentAuthority"
 import {privileges} from "../../constants/privileges-types"
 
 const confirm = Modal.confirm;
@@ -39,7 +39,7 @@ class ListUsers extends Component {
                         </span>
                     )} />
                     <Column
-                        title={i18n.t('action')}
+                        align="right"
                         id="action"
                         key="action"
                         width={180}
