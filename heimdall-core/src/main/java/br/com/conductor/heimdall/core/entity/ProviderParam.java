@@ -20,26 +20,17 @@ package br.com.conductor.heimdall.core.entity;
  * ==========================LICENSE_END===================================
  */
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.PrePersist;
-import javax.persistence.Table;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
-import br.com.conductor.heimdall.core.enums.Status;
-import br.com.twsoftware.alfred.object.Objeto;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import javax.persistence.*;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * This class represents a ProviderParams registered to the system.
@@ -52,6 +43,8 @@ import lombok.EqualsAndHashCode;
 @DynamicUpdate
 @DynamicInsert
 @EqualsAndHashCode(of = {"id"})
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProviderParam implements Serializable {
 
     private static final long serialVersionUID = 2575009691412505853L;
@@ -73,17 +66,14 @@ public class ProviderParam implements Serializable {
     @Column(name = "CREATION_DATE", nullable = false, updatable = false)
     private LocalDateTime creationDate;
 
-    @Column(name = "STATUS", length = 10, nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Status status;
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinColumn(name = "provider_id")
+    @JsonIgnoreProperties("providerParams")
+    private Provider provider;
 
     @PrePersist
     private void initValuesPersist() {
 
-        if (Objeto.isBlank(status)) {
-
-            status = Status.ACTIVE;
-        }
         creationDate = LocalDateTime.now();
     }
 }

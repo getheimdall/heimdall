@@ -41,6 +41,8 @@ import SingleTrace from "../containers/SingleTrace";
 import Roles from "../containers/Roles";
 import SingleRole from "../containers/SingleRole";
 import SingleLdap from "../containers/SingleLdap";
+import Providers from "../containers/Providers";
+import SingleProvider from "../containers/SingleProvider";
 
 const routes = ({history}) => (
     <Switch>
@@ -107,6 +109,12 @@ const routes = ({history}) => (
                   component={Authorization([privileges.PRIVILEGE_READ_ROLE])(FadeIn(SingleRole))}/>
         <AppRoute layout={MainLayout} history={history} exact path="/ldap"
                   component={Authorization([privileges.PRIVILEGE_READ_LDAP])(FadeIn(SingleLdap))}/>
+        <AppRoute layout={MainLayout} history={history} exact path="/providers"
+                  component={Authorization([privileges.PRIVILEGE_READ_PROVIDER])(FadeIn(Providers))}/>
+        <AppRoute layout={MainLayout} history={history} exact path="/providers/new"
+                  component={Authorization([privileges.PRIVILEGE_READ_PROVIDER, privileges.PRIVILEGE_CREATE_PROVIDER])(FadeIn(SingleProvider))}/>
+        <AppRoute layout={MainLayout} history={history} exact path="/providers/:id"
+                  component={Authorization([privileges.PRIVILEGE_READ_PROVIDER])(FadeIn(SingleProvider))}/>
         {/* routes not finded or 404 */}
         <Redirect to="/"/>
         {/* <AppRoute layout={MainLayout} history={history} component={Authorization('TESTE)(FadeIn(Apis))} /> */}

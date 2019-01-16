@@ -99,6 +99,11 @@ class SideBar extends Component {
                                 <SidebarLink to="/ldap" label={i18n.t('settings_ldap')} history={history} icon="setting"/>
                             </Menu.Item>
                         }
+                        {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_PROVIDER]) &&
+                        <Menu.Item key="providers" className="providers">
+                            <SidebarLink to="/providers" label={i18n.t('providers')} history={history} icon="cluster"/>
+                        </Menu.Item>
+                        }
                     </Menu>
                 </Affix>
             </Sider>
