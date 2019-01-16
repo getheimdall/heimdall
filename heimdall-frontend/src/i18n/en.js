@@ -176,7 +176,7 @@ export default {
         'operation': 'Operation',
         'please_input_operation_method': 'Please, input operation method!',
         'please_input_operation_path': 'Please, input operation path!',
-        'you_need_select_api': 'You need select an API!',
+        'you_need_select_api': 'You need an API!',
         'please_input_plan_name': 'Please, input an plan name!',
         'please_input_plan_description': 'Please, input an plan description!',
         'please_input_api_name': 'Please, input api name!',
@@ -230,5 +230,10 @@ export default {
         'attributed_operations': 'Attributed Operations',
         'available_scopes': 'Available Scopes',
         'attributed_scopes': 'Attributed Scopes'
+        'settings_ldap': 'Settings LDAP',
+        'please_input_role_name':'Please input a role name!',
+        'min_4_characters_to_name': 'Min of 4 Characters to name!',
+        'available_privileges': 'Available privileges',
+        'attributed_privileges': 'Attributed privileges'
     }
 }

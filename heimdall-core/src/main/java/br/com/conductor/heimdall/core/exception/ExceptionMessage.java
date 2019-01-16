@@ -149,6 +149,12 @@ public enum ExceptionMessage {
 
     RESPONSE_TYPE_NOT_FOUND(BAD_REQUEST.value(), "response_type not found", BadRequestException.class),
 
+    ROLE_ALREADY_EXIST(BAD_REQUEST.value(), "Role already exist!", BadRequestException.class),
+
+    CIRCUIT_BREAK_ACTIVE(SERVICE_UNAVAILABLE.value(), "Circuit break enabled", ServerErrorException.class),
+
+    RESPONSE_TYPE_NOT_FOUND(BAD_REQUEST.value(), "response_type not found", BadRequestException.class),
+
     SCOPE_INVALID_OPERATION(BAD_REQUEST.value(), "Operation with id '{}' does not exist", BadRequestException.class),
 
     SCOPE_INVALID_PLAN(BAD_REQUEST.value(), "Plan id with '{}' does not exist", BadRequestException.class),

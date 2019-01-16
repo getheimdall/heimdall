@@ -229,7 +229,11 @@ export default {
         'available_operations': 'Operações Disponíveis',
         'attributed_operations': 'Operações Atribuídas',
         'available_scopes': 'Escopos disponíveis',
-        'attributed_scopes': 'Escopos atribuídos'
-
+        'attributed_scopes': 'Escopos atribuídos',
+        'settings_ldap': 'Configurações do LDAP',
+        'please_input_role_name':'Por favor, insira o nome do papel!',
+        'min_4_characters_to_name': 'O nome deve ter no mínimo 4 caracteres!',
+        'available_privileges': 'Papéis disponíveis',
+        'attributed_privileges': 'Papéis atribuídos'
     }
 }

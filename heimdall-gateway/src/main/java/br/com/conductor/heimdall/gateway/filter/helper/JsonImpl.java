@@ -20,6 +20,7 @@ package br.com.conductor.heimdall.gateway.filter.helper;
  * ==========================LICENSE_END===================================
  */
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,6 +30,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
+import com.fasterxml.jackson.core.JsonParser;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -207,25 +209,16 @@ public class JsonImpl implements Json {
 
 	public boolean isJson(String string) {
 
-		boolean valid = false;
 		try {
+			JsonParser parser = new ObjectMapper().getFactory().createParser(string);
 
-			JSONObject jsonObject = new JSONObject(string);
-			if (Objeto.notBlank(jsonObject)) {
+			while (parser.nextToken() != null) {}
 
-				valid = true;
-			}
-		} catch (JSONException e) {
+			return true;
+		} catch (IOException e) {
+		    return false;
+        }
 
-			try {
-				new JSONArray(string);
-				valid = true;
-			} catch (JSONException ex1) {
-				valid = false;
-			}
-		}
-
-		return valid;
 	}
 
 	private ObjectMapper mapper() {

@@ -46,8 +46,6 @@ public class MiddlewareInterceptor extends HeimdallFilter {
 
           inboundURL = "{{inboundURL}}";
 
-          this.helper = new HelperImpl();
-
           referenceId = {{referenceId}};
 
      }
@@ -78,7 +76,7 @@ public class MiddlewareInterceptor extends HeimdallFilter {
 
      @Override
      public void execute() throws Throwable {
-          
+          this.helper = (Helper) BeanManager.getBean(Helper.class);
           RequestContext ctx = RequestContext.getCurrentContext();
           ctx.setSendZuulResponse(false);
           try {

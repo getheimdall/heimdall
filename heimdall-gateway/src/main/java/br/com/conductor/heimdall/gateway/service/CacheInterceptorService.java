@@ -1,6 +1,22 @@
 
 package br.com.conductor.heimdall.gateway.service;
 
+import static br.com.conductor.heimdall.core.util.ConstantsCache.CACHE_BUCKET;
+import static br.com.conductor.heimdall.core.util.ConstantsCache.CACHE_TIME_TO_LIVE;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.assertj.core.util.Lists;
+import org.redisson.api.RBucket;
+import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.netflix.zuul.context.RequestContext;
+
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -22,22 +38,8 @@ package br.com.conductor.heimdall.gateway.service;
  */
 
 import br.com.conductor.heimdall.core.util.BeanManager;
-import br.com.conductor.heimdall.gateway.filter.helper.HelperImpl;
 import br.com.conductor.heimdall.middleware.spec.ApiResponse;
 import br.com.conductor.heimdall.middleware.spec.Helper;
-import com.netflix.zuul.context.RequestContext;
-import org.assertj.core.util.Lists;
-import org.redisson.api.RBucket;
-import org.redisson.api.RedissonClient;
-import org.springframework.stereotype.Service;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static br.com.conductor.heimdall.core.util.ConstantsCache.CACHE_BUCKET;
-import static br.com.conductor.heimdall.core.util.ConstantsCache.CACHE_TIME_TO_LIVE;
 
 /**
  * Cache service provides methods to create and delete a response cache from a request.
@@ -46,6 +48,9 @@ import static br.com.conductor.heimdall.core.util.ConstantsCache.CACHE_TIME_TO_L
  */
 @Service
 public class CacheInterceptorService {
+	
+	@Autowired
+    private Helper helper;
 
     /**
      * Checks if the request is in cache. If true then returns the cached response, otherwise
@@ -57,8 +62,6 @@ public class CacheInterceptorService {
      * @param queryParams List of queryParams that when present signal that the request should be cached
      */
     public void cacheInterceptor(String cacheName, Long timeToLive, List<String> headers, List<String> queryParams) {
-
-        Helper helper = new HelperImpl();
 
         RedissonClient redisson = (RedissonClient) BeanManager.getBean(RedissonClient.class);
 
