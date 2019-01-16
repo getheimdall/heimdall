@@ -1,6 +1,8 @@
 
 package br.com.conductor.heimdall.gateway.filter.helper;
 
+import java.io.IOException;
+
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -35,22 +37,16 @@ import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.query.FindOptions;
 import org.mongodb.morphia.query.Query;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.mongodb.MongoClient;
-import com.mongodb.MongoClientOptions;
-import com.mongodb.MongoClientURI;
-import com.mongodb.MongoCredential;
-import com.mongodb.ServerAddress;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 
-import br.com.conductor.heimdall.core.environment.Property;
-import br.com.conductor.heimdall.core.util.BeanManager;
 import br.com.conductor.heimdall.middleware.spec.DB;
 import br.com.conductor.heimdall.middleware.spec.DBMongo;
-import br.com.conductor.heimdall.middleware.spec.Helper;
 import br.com.conductor.heimdall.middleware.spec.Json;
 import br.com.conductor.heimdall.middleware.util.Page;
 import br.com.twsoftware.alfred.object.Objeto;
@@ -72,13 +68,11 @@ public class DBMongoImpl implements DBMongo {
 
      private String databaseName;
 
-     private Property property;
-
      private final static Integer PAGE = 0;
 
      private final static Integer LIMIT = 100;
 
-     private Helper helper = new HelperImpl();
+	 private MongoClient mongoClient;
 
      /**
       * Initializes the database connection by name.
@@ -86,11 +80,10 @@ public class DBMongoImpl implements DBMongo {
       * @param databaseName
       * Database names
       */
-     public DBMongoImpl(String databaseName) {
+     public DBMongoImpl(String databaseName, MongoClient mongoClient) {
 
           this.databaseName = databaseName;
-          this.property = BeanManager.getApplicationContext().getBean(Property.class);
-
+          this.mongoClient = mongoClient;
      }
 
      @Override
@@ -172,40 +165,35 @@ public class DBMongoImpl implements DBMongo {
           return pageResponse;
      }
 
-     @Override
-     public <T> void insertMany(MongoCollection<Document> collection, List<T> objects) {
+	@Override
+	public <T> void insertMany(MongoCollection<Document> collection, List<T> objects) {
 
-          try {
+		try {
 
-               List<Document> ts = Lists.newArrayList();
-               for (T t : objects) {
+			List<Document> ts = Lists.newArrayList();
+			for (T t : objects) {
 
-                    ts.add(Document.parse(json.parse(t)));
-               }
-               collection.insertMany(ts);
-          } catch (Exception e) {
-               log.error(e.getMessage(), e);
-          } finally {
+				ts.add(Document.parse(json.parse(t)));
+			}
+			collection.insertMany(ts);
+			this.datastore().save(ts);
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
+	}
 
-               createMongoClient().close();
-          }
-     }
+	@Override
+	public <T> void insertOne(MongoCollection<Document> collection, T object) {
 
-     @Override
-     public <T> void insertOne(MongoCollection<Document> collection, T object) {
+		try {
 
-          try {
+			Document document = Document.parse(json.parse(object));
+			collection.insertOne(document);
+		} catch (Exception e) {
 
-               Document document = Document.parse(json.parse(object));
-               collection.insertOne(document);
-          } catch (Exception e) {
-
-               log.error(e.getMessage(), e);
-          } finally {
-
-               createMongoClient().close();
-          }
-     }
+			log.error(e.getMessage(), e);
+		}
+	}
 
      @Override
      public <T> Query<T> getQueryProvider(Object criteria) {
@@ -262,8 +250,13 @@ public class DBMongoImpl implements DBMongo {
 
           List<T> list = Lists.newArrayList();
           for (Document document : documents) {
-
-               T parse = helper.json().parse(document.toJson(), classType);
+            T parse = null;
+			try {
+				parse = new ObjectMapper().readValue(document.toJson(), classType);
+			} catch (IOException e) {
+				log.error("Json Parser error", e);
+				parse = null;
+			}
                list.add(parse);
           }
 
@@ -282,23 +275,6 @@ public class DBMongoImpl implements DBMongo {
           return database().getCollection(classType.getSimpleName());
      }
 
-     private MongoClient createMongoClient() {
-
-          MongoClient client;
-          if (Objeto.notBlank(property.getMongo().getUrl())) {
-
-               MongoClientURI uri = new MongoClientURI(property.getMongo().getUrl());
-               client = new MongoClient(uri);
-          } else {
-               ServerAddress address = new ServerAddress(property.getMongo().getServerName(), property.getMongo().getPort().intValue());
-               MongoCredential mongoCredential = MongoCredential.createCredential(property.getMongo().getUsername(), property.getMongo().getUsername(), property.getMongo().getPassword().toCharArray());
-               MongoClientOptions mongoClientOptions = MongoClientOptions.builder().build();
-               client = new MongoClient(address, mongoCredential, mongoClientOptions);
-          }
-
-          return client;
-     }
-
      @Override
      public <T> T merge(T object) {
 
@@ -314,15 +290,13 @@ public class DBMongoImpl implements DBMongo {
      }
 
      private Datastore datastore() {
-
-          Morphia morphia = new Morphia();
-
-          return morphia.createDatastore(createMongoClient(), this.databaseName);
+    	 
+          return new Morphia().createDatastore(this.mongoClient, this.databaseName);
      }
 
      private MongoDatabase database() {
 
-          return createMongoClient().getDatabase(databaseName);
+          return this.mongoClient.getDatabase(databaseName);
      }
 
      private <T> Object getValueId(T object) {
