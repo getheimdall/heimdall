@@ -9,9 +9,9 @@ import { getAllDevelopers, initLoading, clearDevelopers, remove } from '../actio
 import i18n from "../i18n/i18n"
 import Loading from '../components/ui/Loading'
 import PageHeader from '../components/ui/PageHeader'
-import FloatButton from '../components/ui/FloatButton'
+import RouteButton from '../components/ui/RouteButton'
 import {privileges} from "../constants/privileges-types"
-import ComponentAuthority from "../components/ComponentAuthority"
+import ComponentAuthority from "../components/policy/ComponentAuthority"
 import ListDevelopers from '../components/developers/ListDevelopers'
 
 class Developers extends Component {
@@ -78,8 +78,8 @@ class Developers extends Component {
 
                 <Row className="h-row bg-white">
                     <ListDevelopers dataSource={developers} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading} />
-                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_UPDATE_INTERCEPTOR]}>
-                        <FloatButton idButton="addDeveloper" history={history} to="/developers/new" label={i18n.t('add_new_developer')} />
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_DEVELOPER]}>
+                        <RouteButton idButton="addDeveloper" history={history} to="/developers/new" label={i18n.t('add_new_developer')} />
                     </ComponentAuthority>
                 </Row>
             </div>

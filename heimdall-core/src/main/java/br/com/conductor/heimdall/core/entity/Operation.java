@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.core.entity;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -10,9 +7,9 @@ package br.com.conductor.heimdall.core.entity;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,24 +17,17 @@ package br.com.conductor.heimdall.core.entity;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.entity;
 
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.Set;
+import java.util.stream.Collectors;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -53,7 +43,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * This class represents a Operation registered to the system.
- * 
+ *
  * @author Filipe Germano
  *
  */
@@ -65,6 +55,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(of = { "id" })
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Operation implements Serializable {
 
      private static final long serialVersionUID = -7728017075091653564L;
@@ -89,6 +80,10 @@ public class Operation implements Serializable {
      @JsonManagedReference
      private Resource resource;
 
+     @JsonIgnore
+     @ManyToMany(fetch = FetchType.EAGER, mappedBy="operations")
+     private Set<Scope> scopes;
+
      /**
       * Adjust the path to not permit the save or update with "/" or spaces in the end of path.
       */
@@ -99,5 +94,15 @@ public class Operation implements Serializable {
           if (this.path.endsWith(ConstantsPath.PATH_ROOT)) {
                this.path = StringUtils.removeEnd(path, ConstantsPath.PATH_ROOT);
           }
+     }
+
+     @JsonIgnore
+     public Set<Long> getScopesIds() {
+          return this.scopes != null ? this.scopes.stream().map(Scope::getId).collect(Collectors.toSet()) : Collections.EMPTY_SET;
+     }
+
+     @PreRemove
+     private void removeFromScopes() {
+          scopes.forEach(scope -> scope.removeOperation(this));
      }
 }

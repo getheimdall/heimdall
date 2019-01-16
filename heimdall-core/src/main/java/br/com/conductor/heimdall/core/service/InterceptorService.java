@@ -24,11 +24,9 @@ package br.com.conductor.heimdall.core.service;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.converter.InterceptorMap;
 import br.com.conductor.heimdall.core.dto.*;
-import br.com.conductor.heimdall.core.dto.interceptor.OAuthDTO;
 import br.com.conductor.heimdall.core.dto.interceptor.RateLimitDTO;
 import br.com.conductor.heimdall.core.dto.page.InterceptorPage;
 import br.com.conductor.heimdall.core.entity.*;
-import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.enums.Status;
 import br.com.conductor.heimdall.core.enums.TypeInterceptor;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
@@ -54,17 +52,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
 import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 
 /**
- * This class provides methos to create, read, update and delete a {@link Interceptor} resource.<br/>
+ * This class provides methods to create, read, update and delete a {@link Interceptor} resource.<br/>
  * This class also performs a validation  before it saves or deletes a {@link Interceptor}.
  *
  * @author Filipe Germano
@@ -94,9 +89,6 @@ public class InterceptorService {
 
     @Autowired
     private RateLimitRepository ratelimitRepository;
-
-    @Autowired
-    private AppRepository appRepository;
 
     @Autowired
     private AMQPInterceptorService amqpInterceptorService;
@@ -184,10 +176,6 @@ public class InterceptorService {
             mountRatelimitInRedis(interceptor);
         }
 
-        if (TypeInterceptor.OAUTH == interceptor.getType()) {
-            checkAppAndClientId(interceptor);
-        }
-
         interceptor = interceptorRepository.save(interceptor);
 
         if (TypeInterceptor.CORS.equals(interceptor.getType())) {
@@ -252,10 +240,6 @@ public class InterceptorService {
 
         if (TypeInterceptor.RATTING == interceptor.getType()) {
             mountRatelimitInRedis(interceptor);
-        }
-
-        if (TypeInterceptor.OAUTH == interceptor.getType()) {
-            checkAppAndClientId(interceptor);
         }
 
         interceptor = interceptorRepository.save(interceptor);
@@ -447,31 +431,4 @@ public class InterceptorService {
         return path;
     }
 
-    /*
-     * When adding a OAuth Interceptor a privateKey is expected.
-     * This privateKey must be the ClientId from an App that is related to the Api via a Plan,
-     * if not throws an Exception.
-     */
-    private void checkAppAndClientId(Interceptor interceptor) {
-        try {
-            String content = interceptor.getContent();
-            OAuthDTO oAuthDTO = JsonUtils.convertJsonToObject(content, OAuthDTO.class);
-
-            final String privateKey = oAuthDTO.getPrivateKey();
-            App app = appRepository.findByClientId(privateKey);
-
-            HeimdallException.checkThrow(app == null, APP_NOT_EXIST);
-
-            final List<Plan> appPlans = app.getPlans();
-            final List<Plan> apiPlans = interceptor.getApi().getPlans();
-
-            Set<Plan> common = new HashSet<>(appPlans);
-            common.retainAll(apiPlans);
-
-            HeimdallException.checkThrow(common.size() == 0, INTERCEPTOR_NO_APP_FOUND);
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-            ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(TypeInterceptor.OAUTH.name(), TemplateUtils.TEMPLATE_OAUTH);
-        }
-    }
 }

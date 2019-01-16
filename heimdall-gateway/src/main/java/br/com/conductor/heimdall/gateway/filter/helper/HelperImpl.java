@@ -1,6 +1,10 @@
 
 package br.com.conductor.heimdall.gateway.filter.helper;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.mongodb.MongoClient;
+
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -56,9 +60,12 @@ import br.com.conductor.heimdall.middleware.spec.Xml;
  * Implementation of the {@link Helper} interface.
  *
  * @author Filipe Germano
- *
+ * @author marcos.filho
  */
 public class HelperImpl implements Helper {
+	
+	@Autowired(required = false)
+	private MongoClient mongoClient;
 
 	private boolean enableHandler;
 
@@ -76,8 +83,7 @@ public class HelperImpl implements Helper {
 	@Override
 	public Call call() {
 
-		Call call = new CallImpl();
-		return call;
+		return new CallImpl();
 	}
 
 	@Override
@@ -90,9 +96,9 @@ public class HelperImpl implements Helper {
 
 		switch (type) {
 		case MONGODB:
-			return new DBMongoImpl(databaseName);
+			return new DBMongoImpl(databaseName, mongoClient);
 		default:
-			return new DBMongoImpl(databaseName);
+			return new DBMongoImpl(databaseName, mongoClient);
 		}
 	}
 

@@ -10,6 +10,7 @@ import ApiDefinition from './ApiDefinition'
 import Resources from '../../containers/Resources'
 import Middlewares from '../../containers/Middlewares'
 import Interceptors from '../../containers/Interceptors'
+import Scopes from '../../containers/Scopes';
 import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
 import { privileges } from '../../constants/privileges-types'
 import {clearEnvironments, getAllEnvironments} from '../../actions/environments'
@@ -73,6 +74,10 @@ class SingleApi extends Component {
                             <TabPane tab={<div role="tab" className="ant-tabs-tab middlewares">{i18n.t('middlewares')}</div>}
                                      key="4">
                                 <Middlewares api={api}/>
+                            </TabPane>}
+                            {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_SCOPE]) &&
+                            <TabPane tab={<div role="tab" className="ant-tabs-tab">{i18n.t('scopes')}</div>} key="5">
+                                <Scopes api={api}/>
                             </TabPane>}
                         </Tabs>
                     </Card>

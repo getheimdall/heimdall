@@ -2,10 +2,11 @@ import React, {Component} from 'react'
 import PropTypes from 'prop-types'
 
 import {Button, Col, Form, Input, Modal, Row, Tooltip, Transfer} from 'antd'
-import ComponentAuthority from "../ComponentAuthority";
+import ComponentAuthority from "../policy/ComponentAuthority";
 import {PrivilegeUtils} from "../../utils/PrivilegeUtils";
 import {privileges} from "../../constants/privileges-types";
 import Loading from "../ui/Loading";
+import i18n from "../../i18n/i18n";
 
 const FormItem = Form.Item
 const confirm = Modal.confirm
@@ -50,10 +51,10 @@ class RoleForm extends Component {
 
     showDeleteConfirm = (roleId) => (e) => {
         confirm({
-            title: 'Are you sure?',
-            okText: 'Yes',
+            title: i18n.t('are_you_sure'),
+            okText: i18n.t('yes'),
             okType: 'danger',
-            cancelText: 'No',
+            cancelText: i18n.t('no'),
             onOk: () => {
                 this.props.handleDelete(roleId)
             }
@@ -78,13 +79,13 @@ class RoleForm extends Component {
                     {role && getFieldDecorator('id', {initialValue: role.id})(<Input type='hidden'/>)}
                     <Row gutter={24} type="flex" justify="space-around" align="top">
                         <Col sm={24} md={8}>
-                            <FormItem label="Name">
+                            <FormItem label={i18n.t('label')}>
                                 {
                                     getFieldDecorator('name', {
                                         initialValue: role && role.name,
                                         rules: [
-                                            {required: true, message: 'Please input a role name!'},
-                                            {min: 4, message: 'Min of 4 Characters to name!'}
+                                            {required: true, message: i18n.t('please_input_role_name')},
+                                            {min: 4, message: i18n.t('min_4_characters_to_name')}
                                         ]
                                     })(<Input required
                                               disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_ROLE, privileges.PRIVILEGE_UPDATE_ROLE])}/>)
@@ -97,7 +98,7 @@ class RoleForm extends Component {
                                     <FormItem>
                                         <Transfer
                                             showSearch
-                                            titles={['Available privileges', 'Attributed privileges']}
+                                            titles={[i18n.t('available_privileges'), i18n.t('attributed_privileges')]}
                                             onChange={this.handleChangeTransfer}
                                             filterOption={this.filterOption}
                                             dataSource={this.state.storagePrivileges}
@@ -113,7 +114,7 @@ class RoleForm extends Component {
                 <br/>
                 <Row type="flex" justify="end">
                     <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_ROLE]}>
-                        <Tooltip title="Delete">
+                        <Tooltip title={i18n.t('delete')}>
                             <Button className="card-button" type="danger" ghost icon="delete" size="large"
                                     shape="circle"
                                     disabled={!role} onClick={role && this.showDeleteConfirm(role.id)}
@@ -122,7 +123,7 @@ class RoleForm extends Component {
                     </ComponentAuthority>
                     <ComponentAuthority
                         privilegesAllowed={[privileges.PRIVILEGE_CREATE_ROLE, privileges.PRIVILEGE_UPDATE_ROLE]}>
-                        <Tooltip title="Save">
+                        <Tooltip title={i18n.t('save')}>
                             <Button className="card-button" type="primary" icon="save" size="large" shape="circle"
                                     onClick={this.onSubmitForm} loading={loading}/>
                         </Tooltip>

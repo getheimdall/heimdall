@@ -221,6 +221,19 @@ export default {
         'this_operation_can_not_be_reverted': 'This operation can not be reverted.',
         'search_operations': 'Search operations',
         'app_name': 'App name',
-        'settings_ldap': 'Settings LDAP'
+        'settings_ldap': 'Settings LDAP',
+        'scopes': 'Scopes',
+        'scope': 'Scope',
+        'add_scope': 'Add Scope',
+        'edit_scope': 'Edit Scope',
+        'available_operations': 'Available Operations',
+        'attributed_operations': 'Attributed Operations',
+        'available_scopes': 'Available Scopes',
+        'attributed_scopes': 'Attributed Scopes'
+        'settings_ldap': 'Settings LDAP',
+        'please_input_role_name':'Please input a role name!',
+        'min_4_characters_to_name': 'Min of 4 Characters to name!',
+        'available_privileges': 'Available privileges',
+        'attributed_privileges': 'Attributed privileges'
     }
 }

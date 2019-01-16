@@ -4,7 +4,7 @@ import {Link} from 'react-router-dom'
 import { Modal, Row, Table, Divider, Tag, Tooltip, Button, Pagination } from 'antd'
 
 import i18n from "../../i18n/i18n"
-import ComponentAuthority from "../ComponentAuthority"
+import ComponentAuthority from "../policy/ComponentAuthority"
 import { privileges }from "../../constants/privileges-types"
 
 const confirm = Modal.confirm;
@@ -41,7 +41,6 @@ class ListAccessTokens extends Component {
                     <Column title={i18n.t('token')} dataIndex="code" id="code" width={400}/>
                     <Column title={i18n.t('app')} dataIndex="app.name" id="name"/>
                     <Column
-                        title={i18n.t('action')}
                         id="action"
                         key="action"
                         align="right"

@@ -3,8 +3,9 @@ import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 
 import { Modal, Row, Table, Divider, Tooltip, Button, Pagination } from 'antd';
-import ComponentAuthority from "../ComponentAuthority";
+import ComponentAuthority from "../policy/ComponentAuthority";
 import {privileges} from "../../constants/privileges-types";
+import i18n from "../../i18n/i18n";
 
 const confirm = Modal.confirm;
 const { Column } = Table;
@@ -13,10 +14,10 @@ class ListRoles extends Component {
 
     showDeleteConfirm = (roleId) => (e) => {
         confirm({
-            title: 'Are you sure?',
-            okText: 'Yes',
+            title: i18n.t('are_you_sure'),
+            okText: i18n.t('yes'),
             okType: 'danger',
-            cancelText: 'No',
+            cancelText: i18n.t('no'),
             onOk: () => {
                 this.props.handleDelete(roleId)
             }
@@ -28,19 +29,21 @@ class ListRoles extends Component {
         return (
             <div>
                 <Table dataSource={dataSource.content} rowKey={record => record.id} loading={loading} pagination={false}>
-                    <Column title="ID" dataIndex="id" id="id" />
-                    <Column title="Name" dataIndex="name" id="name" />
+                    <Column title={i18n.t('id')} dataIndex="id" id="id" width={100}/>
+                    <Column title={i18n.t('name')} dataIndex="name" id="name"/>
                     <Column
                         id="action"
                         key="action"
+                        title={i18n.t('action')}
+                        align="right"
                         render={(text, record) => (
                             <span>
-                                <Tooltip title="Edit">
+                                <Tooltip title={i18n.t('edit')}>
                                     <Link to={"/roles/" + record.id}><Button type="primary" icon="edit" /></Link>
                                 </Tooltip>
                                 <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_ROLE]}>
                                     <Divider type="vertical" />
-                                    <Tooltip title="Delete">
+                                    <Tooltip title={i18n.t('delete')}>
                                         <Button type="danger" icon="delete" onClick={this.showDeleteConfirm(record.id)} />
                                     </Tooltip>
                                 </ComponentAuthority>

@@ -19,12 +19,14 @@
  */
 package br.com.conductor.heimdall.gateway.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.netflix.zuul.context.RequestContext;
+
 import br.com.conductor.heimdall.core.util.ConstantsInterceptors;
-import br.com.conductor.heimdall.gateway.filter.helper.HelperImpl;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.middleware.spec.Helper;
-import com.netflix.zuul.context.RequestContext;
-import org.springframework.stereotype.Service;
 
 /**
  * Mock Interceptor service provides a simple response to show the user.
@@ -33,6 +35,9 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class MockInterceptorService {
+	
+	@Autowired
+    private Helper helper;
 
     /**
      * Creates a response to the user with the body content.
@@ -42,7 +47,6 @@ public class MockInterceptorService {
      */
     public void execute(Integer status, String body) {
 
-        Helper helper = new HelperImpl();
         RequestContext ctx = RequestContext.getCurrentContext();
 
         String response;

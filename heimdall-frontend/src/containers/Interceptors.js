@@ -14,7 +14,7 @@ import { getAllPlans, clearPlans } from '../actions/plans'
 import { interceptorSort } from '../utils/InterceptorUtils'
 import { receiveQueue, clearQueue } from '../actions/queues'
 import {countInterceptorsByCycle} from "../utils/BadgeUtils"
-import ComponentAuthority from "../components/ComponentAuthority"
+import ComponentAuthority from "../components/policy/ComponentAuthority"
 import { getAllOperations, clearOperations } from '../actions/operations'
 import { getAllResourcesByApi, clearResources } from '../actions/resources'
 import DnDInterceptorType from '../components/interceptors/DnDInterceptorType'
