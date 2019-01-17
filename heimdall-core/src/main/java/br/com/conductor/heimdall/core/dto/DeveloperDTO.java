@@ -50,7 +50,6 @@ public class DeveloperDTO implements Serializable {
      @Size(max = 180)
      private String email;
 
-     @NotNull
      @Size(max = 300)
      private String password;
      
