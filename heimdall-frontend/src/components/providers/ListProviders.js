@@ -3,7 +3,7 @@ import {Link} from "react-router-dom"
 import {Button, Divider, Modal, Pagination, Row, Table, Tooltip} from 'antd'
 
 import i18n from "../../i18n/i18n"
-import ComponentAuthority from "../ComponentAuthority"
+import ComponentAuthority from "../policy/ComponentAuthority"
 import {privileges} from "../../constants/privileges-types"
 
 const confirm = Modal.confirm

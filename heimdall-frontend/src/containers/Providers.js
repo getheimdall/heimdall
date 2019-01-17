@@ -8,7 +8,7 @@ import PageHeader from "../components/ui/PageHeader"
 import FloatButton from '../components/ui/FloatButton'
 import {privileges} from "../constants/privileges-types"
 import ListProviders from '../components/providers/ListProviders'
-import ComponentAuthority from "../components/ComponentAuthority"
+import ComponentAuthority from "../components/policy/ComponentAuthority"
 import { initLoading, getAllProviders, clearProviders, remove } from "../actions/providers"
 
 class Provider extends Component {
