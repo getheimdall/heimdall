@@ -20,31 +20,16 @@ package br.com.conductor.heimdall.core.entity;
  * ==========================LICENSE_END===================================
  */
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.PrePersist;
-import javax.persistence.Table;
-
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
-import br.com.conductor.heimdall.core.enums.Status;
-import br.com.twsoftware.alfred.object.Objeto;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import javax.persistence.*;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * This class represents a Provider registered to the system.
@@ -75,24 +60,19 @@ public class Provider implements Serializable {
     @Column(name = "PATH", length = 1000)
     private String path;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "provider_id", nullable = false)
+    @OneToMany(mappedBy = "provider", cascade={CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, orphanRemoval=true, fetch = FetchType.EAGER)
+    @JsonIgnoreProperties("provider")
     private List<ProviderParam> providerParams;
 
     @Column(name = "CREATION_DATE", nullable = false, updatable = false)
     private LocalDateTime creationDate;
 
-    @Column(name = "STATUS", length = 10, nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Status status;
+    @Column(name = "PROVIDER_DEFAULT", nullable = false, updatable = false)
+    private boolean providerDefault;
 
     @PrePersist
     private void initValuesPersist() {
 
-        if (Objeto.isBlank(status)) {
-
-            status = Status.ACTIVE;
-        }
         creationDate = LocalDateTime.now();
     }
 }

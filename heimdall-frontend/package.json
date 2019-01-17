@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "antd": "3.8.0",
+    "antd": "3.10.9",
     "axios": "0.18.0",
     "classnames": "2.2.5",
     "connected-react-router": "4.3.0",

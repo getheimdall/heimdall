@@ -113,6 +113,8 @@ public enum ExceptionMessage {
 
     TOKEN_INVALID(UNAUTHORIZED.value(), "Token not valid", ForbiddenException.class),
 
+    SIGNATURE_DOES_NOT_MATCH(UNAUTHORIZED.value(), "JWT signature does not match locally computed signature.", UnauthorizedException.class),
+
     TOKEN_NOT_GENERATE(INTERNAL_SERVER_ERROR.value(), "Error to generate token", ForbiddenException.class),
 
     CODE_NOT_FOUND(UNAUTHORIZED.value(), "Code already used to generate token or not defined", UnauthorizedException.class),
@@ -149,6 +151,8 @@ public enum ExceptionMessage {
 
     RESPONSE_TYPE_NOT_FOUND(BAD_REQUEST.value(), "response_type not found", BadRequestException.class),
 
+    DEFAULT_PROVIDER_CAN_NOT_UPDATED_OR_REMOVED(FORBIDDEN.value(), "Default Provider can't to be updated or removed!", ForbiddenException.class),
+
     ROLE_ALREADY_EXIST(BAD_REQUEST.value(), "Role already exist!", BadRequestException.class),
 
     CIRCUIT_BREAK_ACTIVE(SERVICE_UNAVAILABLE.value(), "Circuit break enabled", ServerErrorException.class),
@@ -163,9 +167,7 @@ public enum ExceptionMessage {
 
     SCOPE_INVALID_NAME(BAD_REQUEST.value(), "A Scope with the provided name already exists", BadRequestException.class),
 
-    SCOPE_NO_OPERATION_FOUND(BAD_REQUEST.value(), "A Scope must have at least one Operation", BadRequestException.class),
-
-    ;
+    SCOPE_NO_OPERATION_FOUND(BAD_REQUEST.value(), "A Scope must have at least one Operation", BadRequestException.class);
 
 
     @Getter
@@ -239,7 +241,7 @@ public enum ExceptionMessage {
 
         if (dynamicText != null && dynamicText.length > 0) {
 
-            int count = 0;
+            Integer count = 0;
             String baseMessage = messageDefault;
             while (baseMessage.contains("{}")) {
 
