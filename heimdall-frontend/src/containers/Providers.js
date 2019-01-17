@@ -5,7 +5,7 @@ import {Card, Col, Form, Row, Input, notification} from 'antd'
 import i18n from "../i18n/i18n"
 import Loading from "../components/ui/Loading"
 import PageHeader from "../components/ui/PageHeader"
-import FloatButton from '../components/ui/FloatButton'
+import RouteButton from "../components/ui/RouteButton"
 import {privileges} from "../constants/privileges-types"
 import ListProviders from '../components/providers/ListProviders'
 import ComponentAuthority from "../components/policy/ComponentAuthority"
@@ -81,7 +81,7 @@ class Provider extends Component {
                 <Row className="h-row bg-white">
                     <ListProviders dataSource={providers} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading} />
                     <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_READ_PROVIDER]}>
-                        <FloatButton idButton="addProvider" history={history} to="/providers/new" label={i18n.t('add_new_provider')} />
+                        <RouteButton idButton="addProvider" history={history} to="/providers/new" label={i18n.t('add_new_provider')} />
                     </ComponentAuthority>
                 </Row>
             </div>
