@@ -229,8 +229,7 @@ export default {
         'available_operations': 'Available Operations',
         'attributed_operations': 'Attributed Operations',
         'available_scopes': 'Available Scopes',
-        'attributed_scopes': 'Attributed Scopes'
-        'settings_ldap': 'Settings LDAP',
+        'attributed_scopes': 'Attributed Scopes',
         'please_input_role_name':'Please input a role name!',
         'min_4_characters_to_name': 'Min of 4 Characters to name!',
         'available_privileges': 'Available privileges',
