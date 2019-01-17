@@ -3,7 +3,6 @@ import { connect } from 'react-redux'
 import { Button, notification, Row, Tooltip, Modal, Col } from 'antd'
 
 import i18n from "../i18n/i18n"
-import Loading from "../components/ui/Loading"
 import ScopeForm from "../components/scopes/ScopeForm"
 import ListScopes from "../components/scopes/ListScopes"
 import { privileges } from "../constants/privileges-types"
