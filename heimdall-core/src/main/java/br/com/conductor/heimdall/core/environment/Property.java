@@ -153,6 +153,7 @@ public class Property {
           private String password;
           private Long queueSize;
           private Long discardingThreshold;
+          private String zoneId;
           
      }
 
@@ -170,6 +171,15 @@ public class Property {
      public class Middlewares {
     	 private Integer allowInactive;
     	 private Boolean deleteDeprecated;
+     }
+     
+     private FailSafe failsafe = new FailSafe();
+     
+     @Data
+     public class FailSafe {
+    	private int failureNumber = 3;
+    	private int sucessNumber = 3;
+    	private int delayTimeSeconds = 30;
      }
 
 }

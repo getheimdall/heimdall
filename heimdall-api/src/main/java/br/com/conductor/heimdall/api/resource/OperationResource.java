@@ -84,7 +84,7 @@ public class OperationResource {
       */
      @ResponseBody
      @ApiOperation(value = "Find Operation by id", response = Operation.class)
-     @GetMapping(value = "/{operationId}")
+     @GetMapping(value = "/resources/{resourceId}/operations/{operationId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_OPERATION)
      public ResponseEntity<?> findById(@PathVariable("apiId") Long apiId, @PathVariable("resourceId") Long resourceId, @PathVariable("operationId") Long operationId) {
 
@@ -108,7 +108,7 @@ public class OperationResource {
       */
      @ResponseBody
      @ApiOperation(value = "Find all Operations", responseContainer = "List", response = Operation.class)
-     @GetMapping
+     @GetMapping(value = "/resources/{resourceId}/operations")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_OPERATION)
      public ResponseEntity<?> findAll(@PathVariable("apiId") Long apiId, @PathVariable("resourceId") Long resourceId, @ModelAttribute OperationDTO operationDTO, @ModelAttribute PageableDTO pageableDTO) {
 
@@ -136,7 +136,7 @@ public class OperationResource {
       */
      @ResponseBody
      @ApiOperation(value = "Save a new Operation")
-     @PostMapping
+     @PostMapping(value = "/resources/{resourceId}/operations")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_OPERATION)
      public ResponseEntity<?> save(@PathVariable("apiId") Long apiId, @PathVariable("resourceId") Long resourceId, @RequestBody @Valid OperationDTO operationDTO) {
 
@@ -160,7 +160,7 @@ public class OperationResource {
       */
      @ResponseBody
      @ApiOperation(value = "Update Operation")
-     @PutMapping(value = "/{operationId}")
+     @PutMapping(value = "/resources/{resourceId}/operations/{operationId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_OPERATION)
      public ResponseEntity<?> update(@PathVariable("apiId") Long apiId, @PathVariable("resourceId") Long resourceId, @PathVariable("operationId") Long operationId, @RequestBody OperationDTO operationDTO) {
 
@@ -182,7 +182,7 @@ public class OperationResource {
       */
      @ResponseBody
      @ApiOperation(value = "Delete Operation")
-     @DeleteMapping(value = "/{operationId}")
+     @DeleteMapping(value = "/resources/{resourceId}/operations/{operationId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_OPERATION)
      public ResponseEntity<?> delete(@PathVariable("apiId") Long apiId, @PathVariable("resourceId") Long resourceId, @PathVariable("operationId") Long operationId) {
 
@@ -202,13 +202,29 @@ public class OperationResource {
       */
      @ResponseBody
      @ApiOperation(value = "Refresh all Operations")
-     @PostMapping(value = "/refresh")
+     @PostMapping(value = "/resources/{resourceId}/operations/refresh")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_REFRESH_OPERATION)
      public ResponseEntity<?> refresh(@PathVariable("apiId") Long apiId, @PathVariable("resourceId") Long resourceId) {
 
-          aMQPRouteService.dispatchAllRoutes();
+          aMQPRouteService.dispatchRoutes();
 
           return ResponseEntity.noContent().build();
+     }
+
+     /**
+      * Lists all Operations from an Api
+      *
+      * @param apiId The Api Id
+      * @return The complete list of Operations
+      */
+     @ResponseBody
+     @ApiOperation(value = "Find all Operations", responseContainer = "List", response = Operation.class)
+     @GetMapping(value = "/operations")
+     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_OPERATION)
+     public ResponseEntity<?> findAllOperations(@PathVariable("apiId") Long apiId) {
+
+          List<Operation> operations = operationService.list(apiId);
+          return ResponseEntity.ok(operations);
      }
 
 }

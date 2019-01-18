@@ -20,6 +20,7 @@ package br.com.conductor.heimdall.gateway.filter.helper;
  * ==========================LICENSE_END===================================
  */
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,6 +30,7 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
+import com.fasterxml.jackson.core.JsonParser;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,6 +39,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -206,30 +209,22 @@ public class JsonImpl implements Json {
 
 	public boolean isJson(String string) {
 
-		boolean valid = false;
 		try {
+			JsonParser parser = new ObjectMapper().getFactory().createParser(string);
 
-			JSONObject jsonObject = new JSONObject(string);
-			if (Objeto.notBlank(jsonObject)) {
+			while (parser.nextToken() != null) {}
 
-				valid = true;
-			}
-		} catch (JSONException e) {
+			return true;
+		} catch (IOException e) {
+		    return false;
+        }
 
-			try {
-				new JSONArray(string);
-				valid = true;
-			} catch (JSONException ex1) {
-				valid = false;
-			}
-		}
-
-		return valid;
 	}
 
 	private ObjectMapper mapper() {
 
 		ObjectMapper mapper = new ObjectMapper();
+		mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 

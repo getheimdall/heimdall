@@ -115,6 +115,8 @@ public enum ExceptionMessage {
 
     TOKEN_INVALID(UNAUTHORIZED.value(), "Token not valid", ForbiddenException.class),
 
+    SIGNATURE_DOES_NOT_MATCH(UNAUTHORIZED.value(), "JWT signature does not match locally computed signature.", UnauthorizedException.class),
+
     TOKEN_NOT_GENERATE(INTERNAL_SERVER_ERROR.value(), "Error to generate token", ForbiddenException.class),
 
     CODE_NOT_FOUND(UNAUTHORIZED.value(), "Code already used to generate token or not defined", UnauthorizedException.class),
@@ -137,13 +139,38 @@ public enum ExceptionMessage {
 
     API_BASEPATH_MALFORMED(BAD_REQUEST.value(), "Api basepath can not contain a wild card", BadRequestException.class),
 
+    USERNAME_OR_PASSWORD_INCORRECT(BAD_REQUEST.value(), "Username or password incorrect", BadRequestException.class),
+
+    USERNAME_ALREADY_EXIST(BAD_REQUEST.value(), "Username already exist!", BadRequestException.class),
+
+    EMAIL_ALREADY_EXIST(BAD_REQUEST.value(), "Email already exist!", BadRequestException.class),
+
     CLIENT_ID_ALREADY(BAD_REQUEST.value(), "clientId already used", BadRequestException.class),
 
     CLIENT_ID_NOT_FOUND(BAD_REQUEST.value(), "client_id not found", BadRequestException.class),
 
     AUTHORIZATION_NOT_FOUND(UNAUTHORIZED.value(), "Authorization not found in header", UnauthorizedException.class),
 
-    RESPONSE_TYPE_NOT_FOUND(BAD_REQUEST.value(), "response_type not found", BadRequestException.class);
+    RESPONSE_TYPE_NOT_FOUND(BAD_REQUEST.value(), "response_type not found", BadRequestException.class),
+
+    DEFAULT_PROVIDER_CAN_NOT_UPDATED_OR_REMOVED(FORBIDDEN.value(), "Default Provider can't to be updated or removed!", ForbiddenException.class),
+
+    ROLE_ALREADY_EXIST(BAD_REQUEST.value(), "Role already exist!", BadRequestException.class),
+
+    CIRCUIT_BREAK_ACTIVE(SERVICE_UNAVAILABLE.value(), "Circuit break enabled", ServerErrorException.class),
+
+    SCOPE_INVALID_OPERATION(BAD_REQUEST.value(), "Operation with id '{}' does not exist", BadRequestException.class),
+
+    SCOPE_INVALID_PLAN(BAD_REQUEST.value(), "Plan id with '{}' does not exist", BadRequestException.class),
+
+    SCOPE_OPERATION_NOT_IN_API(BAD_REQUEST.value(), "Operation '{}' not in Api '{}'", BadRequestException.class),
+
+    SCOPE_PLAN_NOT_IN_API(BAD_REQUEST.value(), "Plan '{}' not in Api '{}'", BadRequestException.class),
+
+    SCOPE_INVALID_NAME(BAD_REQUEST.value(), "A Scope with the provided name already exists", BadRequestException.class),
+
+    SCOPE_NO_OPERATION_FOUND(BAD_REQUEST.value(), "A Scope must have at least one Operation", BadRequestException.class);
+
 
     @Getter
     private Integer httpCode;
@@ -212,20 +239,22 @@ public enum ExceptionMessage {
      */
     public void raise(String... dynamicText) {
 
+        String messageDefault = this.defaultMessage;
+
         if (dynamicText != null && dynamicText.length > 0) {
 
             Integer count = 0;
-            String baseMessage = this.defaultMessage;
+            String baseMessage = messageDefault;
             while (baseMessage.contains("{}")) {
 
                 if (dynamicText.length == 1) {
 
-                    this.message = this.defaultMessage.replace("{}", dynamicText[count]);
+                    this.message = messageDefault.replace("{}", dynamicText[count]);
                     baseMessage = this.message;
                 } else {
 
-                    this.defaultMessage = this.defaultMessage.replaceFirst("\\{\\}", dynamicText[count]);
-                    this.message = this.defaultMessage;
+                    messageDefault = messageDefault.replaceFirst("\\{\\}", dynamicText[count]);
+                    this.message = messageDefault;
                     baseMessage = this.message;
 
                 }
@@ -234,6 +263,7 @@ public enum ExceptionMessage {
         }
         raise();
     }
+
 
     /**
      * Method responsible for validation of error codes with code 400.

@@ -31,6 +31,7 @@ import org.apache.http.NoHttpResponseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
@@ -365,6 +366,33 @@ public class GlobalExceptionHandler{
 
           ErroInfo erroInfo = buildErrorInfo(request, new HeimdallException(ExceptionMessage.GLOBAL_JSON_INVALID_FORMAT));
           return erroInfo;
+
+     }
+
+     /**
+      * Method that captures all the {@link DataIntegrityViolationException} exceptions.
+      *
+      * @param response
+      * {@link HttpServletResponse}
+      * @param request
+      * {@link HttpServletRequest}
+      * @param exception
+      * {@link Exception}
+      * @return {@link ErroInfo}.
+      */
+     @ResponseStatus(HttpStatus.BAD_REQUEST)
+     @ExceptionHandler(DataIntegrityViolationException.class)
+     public @ResponseBody ErroInfo handleSqlException(HttpServletResponse response, HttpServletRequest request, DataIntegrityViolationException exception) {
+
+          if (exception.getMessage().contains("email")) {
+               return buildErrorInfo(request, new HeimdallException(ExceptionMessage.EMAIL_ALREADY_EXIST));
+          }
+
+          if (exception.getMessage().contains("username")) {
+               return buildErrorInfo(request, new HeimdallException(ExceptionMessage.USERNAME_ALREADY_EXIST));
+          }
+
+          return buildErrorInfo(request, new HeimdallException(ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND));
 
      }
 

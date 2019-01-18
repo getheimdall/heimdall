@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.gateway.service;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -19,16 +17,16 @@ package br.com.conductor.heimdall.gateway.service;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.service;
 
-import static br.com.conductor.heimdall.core.util.ConstantsOAuth.*;
 import br.com.conductor.heimdall.core.dto.request.OAuthRequest;
 import br.com.conductor.heimdall.core.dto.response.TokenImplicit;
-import br.com.conductor.heimdall.core.entity.OAuthAuthorize;
-import br.com.conductor.heimdall.core.entity.Provider;
-import br.com.conductor.heimdall.core.entity.ProviderParam;
-import br.com.conductor.heimdall.core.entity.TokenOAuth;
+import br.com.conductor.heimdall.core.entity.*;
 import br.com.conductor.heimdall.core.enums.TypeOAuth;
-import br.com.conductor.heimdall.core.exception.*;
+import br.com.conductor.heimdall.core.exception.ExceptionMessage;
+import br.com.conductor.heimdall.core.exception.HeimdallException;
+import br.com.conductor.heimdall.core.exception.UnauthorizedException;
+import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.service.OAuthService;
 import br.com.conductor.heimdall.core.util.JwtUtils;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
@@ -46,6 +44,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import static br.com.conductor.heimdall.core.util.ConstantsOAuth.*;
 
 /**
  * Provides methods to validate request with OAuthInterceptor.
@@ -70,7 +70,43 @@ public class OAuthInterceptorService {
     @Autowired
     private OAuthService oAuthService;
 
+    @Autowired
+    private AppRepository appRepository;
+
     private Helper helper;
+
+    /**
+     * Runs the service for the OAuth
+     *
+     * @param typeOAuth        type of the OAuth
+     * @param privateKey       privateKey used in Token
+     * @param timeAccessToken  time to expire accessToken
+     * @param timeRefreshToken time to expire refreshToken
+     * @param providerId       {@link Provider} id
+     * @param helper           {@link Helper}
+     */
+    public void execute(TypeOAuth typeOAuth, String privateKey, int timeAccessToken, int timeRefreshToken, Long providerId, Helper helper) {
+
+        try {
+            executeInterceptor(typeOAuth, privateKey, timeAccessToken, timeRefreshToken, providerId, helper);
+        } catch( HeimdallException ex ){
+            generateResponse( ex.getMsgEnum().getMessage(), ex.getMsgEnum().getHttpCode());
+        }
+    }
+
+    /**
+     * Method that sends a Response
+     *
+     * @param message    Response message
+     * @param httpStatus {@link HttpStatus} of the response
+     */
+    private void generateResponse(String message, int httpStatus) {
+        message = "{ \"error\" : \"" + message + "\" }";
+        TraceContextHolder.getInstance().getActualTrace().trace(message);
+        this.helper.call().response().setStatus(httpStatus);
+        this.helper.call().response().header().add("Content-Type", "application/json");
+        this.helper.call().response().setBody(message);
+    }
 
     /**
      * Method to validate Interceptor OAuth and execute the operation correct, accord the type of the OAuth.
@@ -92,7 +128,6 @@ public class OAuthInterceptorService {
             return;
         }
 
-        HeimdallException.checkThrow(!privateKey.equals(oAuthRequest.getClientId()), ExceptionMessage.CLIENT_ID_NOT_FOUND);
         HeimdallException.checkThrow(Objeto.isBlank(oAuthRequest.getGrantType()), ExceptionMessage.GRANT_TYPE_NOT_FOUND);
 
         String body = helper.call().request().getBody();
@@ -100,16 +135,17 @@ public class OAuthInterceptorService {
         timeRefreshToken = (timeRefreshToken <= 0) ? TIME_REFRESH_TOKEN : timeRefreshToken;
 
         String clientId = helper.call().request().header().get("client_id");
+        String accessToken = helper.call().request().header().get("access_token");
 
         switch (typeOAuth) {
             case GENERATE:
-                runGenerate(oAuthRequest, clientId, privateKey, timeAccessToken, timeRefreshToken, body);
+                runGenerate(oAuthRequest, privateKey, timeAccessToken, timeRefreshToken, body);
                 return;
             case AUTHORIZE:
-                runAuthorize(oAuthRequest, clientId, providerId, privateKey, timeAccessToken, timeRefreshToken, body);
+                runAuthorize(oAuthRequest, clientId, providerId, privateKey, timeAccessToken, timeRefreshToken, body, accessToken);
                 return;
             default:
-                HeimdallException.checkThrow(true, ExceptionMessage.TYPE_OAUTH_NOT_FOUND);
+                ExceptionMessage.TYPE_OAUTH_NOT_FOUND.raise();
         }
 
     }
@@ -120,7 +156,8 @@ public class OAuthInterceptorService {
      * @param oAuthRequest {@link OAuthRequest}
      * @param providerId   {@link Provider} id
      */
-    private void runAuthorize(OAuthRequest oAuthRequest, String clientId, Long providerId, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsJson) {
+
+    private void runAuthorize(OAuthRequest oAuthRequest, String clientId, Long providerId, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsJson, String accessToken) {
 
         HeimdallException.checkThrow(Objeto.isBlank(oAuthRequest.getClientId()), ExceptionMessage.CLIENT_ID_NOT_FOUND);
 
@@ -128,14 +165,16 @@ public class OAuthInterceptorService {
 
         switch (oAuthRequest.getGrantType().toUpperCase()) {
             case GRANT_TYPE_PASSWORD:
-                passwordFlow(provider, oAuthRequest, clientId, privateKey, timeAccessToken, timeRefreshToken, claimsJson);
+                passwordFlow(provider, oAuthRequest, clientId, privateKey, timeAccessToken, timeRefreshToken, claimsJson, accessToken);
                 break;
             case GRANT_TYPE_IMPLICIT:
                 implicitFlow(oAuthRequest, privateKey, timeAccessToken, claimsJson);
                 break;
             case GRANT_TYPE_REFRESH_TOKEN:
-                refreshFlow(oAuthRequest, clientId, privateKey, timeAccessToken, timeRefreshToken, claimsJson);
+                refreshFlow(oAuthRequest, privateKey, timeAccessToken, timeRefreshToken, claimsJson);
                 break;
+            default:
+                ExceptionMessage.WRONG_GRANT_TYPE_INFORMED.raise();
         }
 
         // Not in use yet
@@ -165,8 +204,8 @@ public class OAuthInterceptorService {
      * @param claimsJson       Claims to payload in JSON
      * @throws HeimdallException Code not found, code already used, grant_type not found
      */
-    private void runGenerate(OAuthRequest oAuthRequest, String clientId, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsJson) throws HeimdallException {
-        TokenOAuth tokenOAuth = oAuthService.generateTokenOAuth(oAuthRequest, clientId, privateKey, timeAccessToken, timeRefreshToken, claimsJson);
+    private void runGenerate(OAuthRequest oAuthRequest, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsJson) throws HeimdallException {
+        TokenOAuth tokenOAuth = oAuthService.generateTokenOAuth(oAuthRequest, oAuthRequest.getClientId(), privateKey, timeAccessToken, timeRefreshToken, claimsJson);
         String tokenOAuthJson = helper.json().parse(tokenOAuth);
         generateResponseWithSuccess(tokenOAuthJson);
     }
@@ -233,6 +272,8 @@ public class OAuthInterceptorService {
         if (Objeto.isBlank(body)) {
             oAuthRequest = new OAuthRequest();
         } else {
+            HeimdallException.checkThrow(!helper.json().isJson(body), ExceptionMessage.GLOBAL_JSON_INVALID_FORMAT);
+
             oAuthRequest = helper.json().parse(body, OAuthRequest.class);
         }
 
@@ -312,22 +353,32 @@ public class OAuthInterceptorService {
     /*
      * OAuth2.0 Password Flow
      */
-    private void passwordFlow(Provider provider, OAuthRequest oAuthRequest, String clientId, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsJson) {
-        Http http = helper.http().url(provider.getPath());
 
-        http = addAllParamsToRequestProvider(http, provider.getProviderParams());
+    private void passwordFlow(Provider provider, OAuthRequest oAuthRequest, String clientId, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsJson, String accessToken) {
 
-        try {
-            ApiResponse apiResponse = http.sendPost();
+        if (provider.isProviderDefault()) {
+            App appActive = appRepository.findAppActive(clientId);
+            HeimdallException.checkThrow(Objects.isNull(appActive), ExceptionMessage.CLIENT_ID_NOT_FOUND);
 
-            HeimdallException.checkThrow(!(Series.valueOf(apiResponse.getStatus()) == Series.SUCCESSFUL), ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);
+            List<AccessToken> accessTokens = appActive.getAccessTokens();
+            HeimdallException.checkThrow(accessTokens.stream().noneMatch(ac -> ac.getCode().equals(accessToken)), ExceptionMessage.ACCESS_DENIED);
+        } else {
+            Http http = helper.http().url(provider.getPath());
 
-        } catch (Exception ex) {
-            log.error(ex.getMessage(), ex);
-            throw new UnauthorizedException(ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);
+            http = addAllParamsToRequestProvider(http, provider.getProviderParams());
+
+            try {
+                ApiResponse apiResponse = http.sendPost();
+
+                HeimdallException.checkThrow(!(Series.valueOf(apiResponse.getStatus()) == Series.SUCCESSFUL), ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);
+
+            } catch (Exception ex) {
+                log.error(ex.getMessage(), ex);
+                throw new UnauthorizedException(ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);
+            }
         }
 
-        TokenOAuth tokenOAuth = oAuthService.generateTokenOAuth(oAuthRequest, clientId, privateKey, timeAccessToken, timeRefreshToken, claimsJson);
+        TokenOAuth tokenOAuth = oAuthService.generateTokenOAuth(oAuthRequest, oAuthRequest.getClientId(), privateKey, timeAccessToken, timeRefreshToken, claimsJson);
         if (Objects.nonNull(tokenOAuth)) {
             tokenOAuth.setToken_type("bearer");
             generateResponseWithSuccess(helper.json().parse(tokenOAuth));
@@ -348,8 +399,8 @@ public class OAuthInterceptorService {
     /*
      * OAuth2.0 Refresh Flow
      */
-    private void refreshFlow(OAuthRequest oAuthRequest, String clientId, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsJson) {
-        TokenOAuth tokenOAuth = oAuthService.generateTokenOAuth(oAuthRequest, clientId, privateKey, timeAccessToken, timeRefreshToken, claimsJson);
+    private void refreshFlow(OAuthRequest oAuthRequest, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsJson) {
+        TokenOAuth tokenOAuth = oAuthService.generateTokenOAuth(oAuthRequest, oAuthRequest.getClientId(), privateKey, timeAccessToken, timeRefreshToken, claimsJson);
         if (Objects.nonNull(tokenOAuth)) {
             tokenOAuth.setToken_type("bearer");
             generateResponseWithSuccess(helper.json().parse(tokenOAuth));

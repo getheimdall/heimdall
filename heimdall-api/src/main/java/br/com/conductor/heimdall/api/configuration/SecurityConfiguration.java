@@ -1,4 +1,3 @@
-
 package br.com.conductor.heimdall.api.configuration;
 
 /*-
@@ -10,9 +9,9 @@ package br.com.conductor.heimdall.api.configuration;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,11 +20,14 @@ package br.com.conductor.heimdall.api.configuration;
  * ==========================LICENSE_END===================================
  */
 
+import br.com.conductor.heimdall.api.filter.JWTAuthenticationFilter;
+import br.com.conductor.heimdall.api.service.TokenAuthenticationService;
+import br.com.conductor.heimdall.core.util.ConstantsPath;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.ldap.core.support.LdapContextSource;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -34,100 +36,64 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.ldap.authentication.BindAuthenticator;
-import org.springframework.security.ldap.authentication.LdapAuthenticationProvider;
-import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
-import org.springframework.security.ldap.search.LdapUserSearch;
-import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
-
-import br.com.conductor.heimdall.api.environment.LdapProperty;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * Extends the {@link WebSecurityConfigurerAdapter} class.
  *
  * @author Marcos Filho
- *
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Configuration
 @ConditionalOnProperty("heimdall.security.enabled")
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
-     
-     @Autowired
-     private LdapProperty ldapProps;
-     
-     @Autowired
-     private UserDetailsService userDetailsService;
-     
-     @Autowired
-     private LdapAuthoritiesPopulator populator;
-     
-     @Autowired
-     private PasswordEncoder passwordEncoder;
 
-     @Override
-     protected void configure(HttpSecurity httpSecurity) throws Exception {
+    @Autowired
+    private UserDetailsService userDetailsService;
 
-          httpSecurity
-               .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-               .and()
-               .authorizeRequests().antMatchers("/error").permitAll()
-               .and()
-               .authorizeRequests().antMatchers("/v1/api/integrations/**").permitAll()
-               .anyRequest().authenticated()
-               .and()
-               .httpBasic()
-               .and()
-               .logout().permitAll();
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-          httpSecurity.csrf().disable();
-          httpSecurity.headers().frameOptions().disable();
+    @Autowired
+    private TokenAuthenticationService tokenAuthenticationService;
 
-     }
+    @Override
+    protected void configure(HttpSecurity httpSecurity) throws Exception {
 
-     @Override
-     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-          
-          if (ldapProps.isEnabled()) {
-               
-               auth.authenticationProvider(ldapProvider());
-          }
-          auth.authenticationProvider(jdbcProvider());
-     }
-     
-     /**
-      * Returns a configured {@link DaoAuthenticationProvider}.
-      * 
-      * @return {@link DaoAuthenticationProvider}
-      */
-     @Bean
-     public DaoAuthenticationProvider jdbcProvider() {
-         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-         authProvider.setUserDetailsService(userDetailsService);
-         authProvider.setPasswordEncoder(passwordEncoder);
-         return authProvider;
-     }
-     
-     /**
-      * Returns a configured {@link LdapAuthenticationProvider}.
-      * 
-      * @return {@link LdapAuthenticationProvider}
-      */
-     @Bean
-     @ConditionalOnProperty("heimdall.security.ldap.enabled")
-     public LdapAuthenticationProvider ldapProvider() {
-          
-          LdapContextSource contextSource = new LdapContextSource();
-          contextSource.setUrl(ldapProps.getUrl());
-          contextSource.setUserDn(ldapProps.getUserDn());
-          contextSource.setPassword(ldapProps.getPassword());
-          contextSource.setReferral("follow");
-          contextSource.afterPropertiesSet();
-          
-          LdapUserSearch ldapUserSearch = new FilterBasedLdapUserSearch(ldapProps.getSearchBase(), ldapProps.getUserSearchFilter(), contextSource);
-          
-          BindAuthenticator bindAuthenticator = new BindAuthenticator(contextSource);
-          bindAuthenticator.setUserSearch(ldapUserSearch);
-          return new LdapAuthenticationProvider(bindAuthenticator, populator);
-     }
+        httpSecurity
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authorizeRequests().antMatchers("/error").permitAll()
+                .and()
+                .authorizeRequests().antMatchers("/v1/api/integrations/**").permitAll()
+                .antMatchers("/v1/index.html", "/v1/swagger**", "/docs", "/v1/favicon**").permitAll()
+                .antMatchers(HttpMethod.POST, ConstantsPath.PATH_LOGIN).permitAll()
+                .anyRequest().authenticated()
+                .and()
+                .addFilterBefore(new JWTAuthenticationFilter(tokenAuthenticationService), UsernamePasswordAuthenticationFilter.class);
+
+        httpSecurity.csrf().disable();
+        httpSecurity.headers().frameOptions().disable();
+
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.authenticationProvider(jdbcProvider());
+    }
+
+    /**
+     * Returns a configured {@link DaoAuthenticationProvider}.
+     *
+     * @return {@link DaoAuthenticationProvider}
+     */
+    @Bean
+    public DaoAuthenticationProvider jdbcProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder);
+        return authProvider;
+    }
+
 }

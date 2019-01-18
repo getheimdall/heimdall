@@ -44,14 +44,15 @@ heimdall:
     mongo:
         enabled: false
 #        serverName:
-#        url: mongodb://localhost
-#        port: 27017
-#        dataBase: logging
-#        collection: logs
-#        username: admin
-#        password: admin
-#        queueSize: 500
-#        discardingThreshold: 0
+        url: mongodb://admin:admin@localhost
+        port: 27017
+        dataBase: logging
+        collection: logs
+        username: admin
+        password: admin
+        queueSize: 500
+        discardingThreshold: 0
+        zoneId: America/Sao_Paulo
     trace:
         printAllTrace: true
         sanitizes:
@@ -75,14 +76,21 @@ heimdall:
         enabled: true
         ldap:
             enabled: false
-            #url: ldap://your.host:port
-            #searchBase: DC=name,DC=name
-            #userDn: your@mail.user
-            #password: password
-            #userSearchFilter: sAMAccountName={0}    
+            url: ldap://your.domain:port
+            searchBase: searchBase
+            userDn: user@domain
+            password: pass
+            userSearchFilter: sAMAccountName={0}
+        jwt:
+            expiration-time: 600
+            secret: secretKey
     middlewares:
         allowInactive: 0
         deleteDeprecated: false
+    failsafe:
+        failureNumber: 4
+        sucessNumber: 4
+        delayTimeSeconds: 30
 
 spring:
     pid:
@@ -119,13 +127,16 @@ springfox:
         swagger:
             v2:
                 path: /docs
-                
-endpoints:    
+
+endpoints:
     routes:
         enabled: true
         sensitive: false
     actuator:
         enabled: true
+    trace:
+        filter:
+            enabled: false
 
 management:
     context-path: /manager
@@ -146,7 +157,7 @@ management:
 zuul:
     filter:
         root: /tmp/interceptores
-        
+
 security:
     basic:
         enabled: false

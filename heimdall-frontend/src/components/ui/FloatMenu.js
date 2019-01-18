@@ -2,6 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { Button, Tooltip } from 'antd'
 
+import i18n from "../../i18n/i18n"
+
 const buttonStyle = {
     position: 'fixed',
     bottom: '30px',
@@ -18,10 +20,10 @@ const buttonStyle2 = {
 
 const FloatMenu = ({saveFunction, history}) => (
     <div>
-        <Tooltip title="Save">
+        <Tooltip title={i18n.t('save')}>
             <Button style={buttonStyle} type="primary" icon="save" onClick={saveFunction} size="large" shape="circle" />
         </Tooltip>
-        <Tooltip title="Cancel">
+        <Tooltip title={i18n.t('cancel')}>
             <Button style={buttonStyle2} type="primary" ghost icon="close" onClick={() => history.goBack()} size="large" shape="circle" />
         </Tooltip>
     </div> 

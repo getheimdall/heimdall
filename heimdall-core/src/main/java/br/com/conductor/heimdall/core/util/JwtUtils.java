@@ -26,10 +26,7 @@ import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.exception.UnauthorizedException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -182,6 +179,8 @@ public class JwtUtils {
                     .getBody();
         } catch (ExpiredJwtException e) {
             throw new UnauthorizedException(ExceptionMessage.TOKEN_EXPIRED);
+        } catch (SignatureException ex) {
+            throw new UnauthorizedException(ExceptionMessage.SIGNATURE_DOES_NOT_MATCH);
         }
     }
 

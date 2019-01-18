@@ -18,6 +18,7 @@ import org.springframework.util.StringUtils;
 import com.netflix.zuul.context.RequestContext;
 import com.netflix.zuul.exception.ZuulException;
 
+import br.com.conductor.heimdall.core.exception.CircuitBreakerException;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import lombok.extern.slf4j.Slf4j;
@@ -33,11 +34,15 @@ public class CustomSendErrorFilter extends SendErrorFilter {
 
 			HttpServletRequest request = ctx.getRequest();
 
-			log.warn("Error during filtering", exception);
+			if (exception.getCause() != null) {
+				log.error("Error catched", exception.getCause());
+			} else {
+				log.error("Error during filtering", exception);
+			}
 
 			String message = null;
-			if (StringUtils.hasText(exception.errorCause)) {
-				message = exception.errorCause;
+			if (exception.getCause() != null && StringUtils.hasText(exception.getCause().getMessage())) {
+				message = exception.getCause().getMessage();
 			}
 
 			Map<String, Object> errorAttributes = new LinkedHashMap<String, Object>();
@@ -59,7 +64,6 @@ public class CustomSendErrorFilter extends SendErrorFilter {
 			}
 
 			if ((!StringUtils.isEmpty(message) || errorAttributes.get("message") == null)) {
-				System.out.println("tem message" + message);
 				errorAttributes.put("message", StringUtils.isEmpty(message) ? "No message available" : message);
 			}
 
@@ -80,6 +84,7 @@ public class CustomSendErrorFilter extends SendErrorFilter {
 
 	
 	public ZuulException findZuulException(Throwable throwable) {
+
 		if (throwable.getCause() instanceof ZuulRuntimeException) {
 			// this was a failure initiated by one of the local filters
 			return (ZuulException) throwable.getCause().getCause();

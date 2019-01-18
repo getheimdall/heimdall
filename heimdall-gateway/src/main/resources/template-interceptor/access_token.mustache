@@ -57,8 +57,6 @@ public class AccessTokenInterceptor extends HeimdallFilter {
 
           inboundURL = "{{inboundURL}}";
 
-          this.helper = new HelperImpl();
-
           referenceId = {{referenceId}};
 
      }
@@ -97,6 +95,7 @@ public class AccessTokenInterceptor extends HeimdallFilter {
      @Override
      public void execute() throws Throwable {
 
+		  this.helper = (Helper) BeanManager.getBean(Helper.class);
           securityService = (SecurityService) BeanManager.getBean(SecurityService.class);
           RequestContext ctx = RequestContext.getCurrentContext();
           HttpServletRequest request = ctx.getRequest();          

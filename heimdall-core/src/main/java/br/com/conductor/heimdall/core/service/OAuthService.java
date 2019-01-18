@@ -23,10 +23,12 @@ package br.com.conductor.heimdall.core.service;
 import static br.com.conductor.heimdall.core.util.ConstantsOAuth.*;
 import br.com.conductor.heimdall.core.dto.request.OAuthRequest;
 import br.com.conductor.heimdall.core.dto.response.TokenImplicit;
+import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.entity.OAuthAuthorize;
 import br.com.conductor.heimdall.core.entity.Provider;
 import br.com.conductor.heimdall.core.entity.TokenOAuth;
 import br.com.conductor.heimdall.core.exception.*;
+import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.repository.OAuthAuthorizeRepository;
 import br.com.conductor.heimdall.core.util.JwtUtils;
 import br.com.twsoftware.alfred.object.Objeto;
@@ -50,8 +52,12 @@ public class OAuthService {
 
     @Autowired
     private OAuthAuthorizeRepository oAuthAuthorizeRepository;
+
     @Autowired
     private ProviderService providerService;
+
+    @Autowired
+    private AppRepository appRepository;
 
     /**
      * Generates {@link TokenOAuth} from Code Authorize or RefreshToken
@@ -173,9 +179,8 @@ public class OAuthService {
         try {
             JwtUtils.tokenExpired(token, privateKey);
         } catch (HeimdallException ex) {
-
             this.oAuthAuthorizeRepository.delete(this.oAuthAuthorizeRepository.findByTokenAuthorize(token));
-            throw new UnauthorizedException(ExceptionMessage.TOKEN_EXPIRED);
+            throw ex;
         }
     }
 
@@ -245,6 +250,11 @@ public class OAuthService {
      * @param token    The token
      */
     public void saveToken(String clientId, String token, LocalDateTime expirationDate, String grantType, int expirationTime) {
+
+        App app = appRepository.findByClientId(clientId);
+
+        HeimdallException.checkThrow(app == null, ExceptionMessage.CLIENT_ID_NOT_FOUND);
+
         OAuthAuthorize oAuthAuthorizeAccessToken = new OAuthAuthorize();
         oAuthAuthorizeAccessToken.setClientId(clientId);
         oAuthAuthorizeAccessToken.setTokenAuthorize(token);
