@@ -105,7 +105,7 @@ public class ApiService {
 
         Api api = apiRepository.findOne(id);
         List<Resource> resources = resourceService.list(api.getId(), new ResourceDTO());
-        api.setResources(resources);
+        api.setResources(new HashSet<>(resources));
 
         return swaggerService.exportApiToSwaggerJSON(api);
     }

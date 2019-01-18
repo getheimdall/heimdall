@@ -41,7 +41,6 @@ import java.util.stream.Collectors;
 /**
  * This class provides methods to import and export Swagger.
  *
- * @author Filipe Germano
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Service
@@ -86,7 +85,7 @@ public class SwaggerService {
         readTags(swagger.getTags(), resources, api.getId());
         readPaths(swagger.getPaths(), api.getBasePath(), resources, api.getId());
 
-        api.setResources(resources);
+        api.setResources(new HashSet<>(resources));
 
         return api;
     }
