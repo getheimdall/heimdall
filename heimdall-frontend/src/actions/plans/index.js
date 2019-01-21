@@ -67,6 +67,7 @@ export const update = plan => dispatch => {
             if (error.response && error.response.status === 400) {
                 dispatch(sendNotification({ type: 'error', message: i18n.t('error'), description: error.response.data.message }))
             }
+            dispatch(getPlan(plan.id))
             dispatch(finishLoading())
         })
 }

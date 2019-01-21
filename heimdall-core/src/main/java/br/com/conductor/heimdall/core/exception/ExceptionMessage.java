@@ -83,6 +83,8 @@ public enum ExceptionMessage {
 
     APP_NOT_EXIST(BAD_REQUEST.value(), "App does not exist", BadRequestException.class),
 
+    API_NOT_EXIST(BAD_REQUEST.value(), "Api does not exist", BadRequestException.class),
+
     API_BASEPATH_EXIST(BAD_REQUEST.value(), "The basepath defined exist", BadRequestException.class),
 
     API_BASEPATH_EMPTY(BAD_REQUEST.value(), "Basepath not defined", BadRequestException.class),
@@ -167,8 +169,9 @@ public enum ExceptionMessage {
 
     SCOPE_INVALID_NAME(BAD_REQUEST.value(), "A Scope with the provided name already exists", BadRequestException.class),
 
-    SCOPE_NO_OPERATION_FOUND(BAD_REQUEST.value(), "A Scope must have at least one Operation", BadRequestException.class);
+    SCOPE_NO_OPERATION_FOUND(BAD_REQUEST.value(), "A Scope must have at least one Operation", BadRequestException.class),
 
+    DEFAULT_PLAN_ALREADY_EXIST_TO_THIS_API(BAD_REQUEST.value(), "Default plan already exist to this Api", BadRequestException.class);
 
     @Getter
     private Integer httpCode;

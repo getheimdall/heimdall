@@ -41,6 +41,7 @@ import lombok.EqualsAndHashCode;
  * This class represents a Plan registered to the system.
  * 
  * @author Filipe Germano
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
 @Data
@@ -71,6 +72,9 @@ public class Plan implements Serializable {
      
      @Column(name = "CREATION_DATE", nullable = false, updatable=false)
      private LocalDateTime creationDate;
+
+     @Column(name = "DEFAULT_PLAN", nullable = false)
+     private boolean defaultPlan;
      
      @Column(name = "STATUS", length = 10, nullable = false)
      @Enumerated(EnumType.STRING)

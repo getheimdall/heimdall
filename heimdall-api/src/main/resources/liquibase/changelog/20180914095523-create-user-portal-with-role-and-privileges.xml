@@ -9,7 +9,7 @@
 		</preConditions>
 		<sql>
 			INSERT INTO roles (name) VALUES ('PORTAL');
-			INSERT INTO roles_privileges (role_id, privilege_id) SELECT r.id, p.id FROM privileges p, roles r WHERE r.name like 'PORTAL' and p.name in ('READ_API', 'CREATE_ACCESSTOKEN', 'READ_ACCESSTOKEN', 'UPDATE_ACCESSTOKEN', 'DELETE_ACCESSTOKEN', 'READ_DEVELOPER', 'CREATE_DEVELOPER', 'UPDATE_DEVELOPER', 'DELETE_DEVELOPER', 'READ_APP', 'CREATE_APP', 'UPDATE_APP', 'DELETE_APP');
+			INSERT INTO roles_privileges (role_id, privilege_id) SELECT r.id, p.id FROM privileges p, roles r WHERE r.name like 'PORTAL' and p.name in ('READ_API', 'CREATE_ACCESSTOKEN', 'READ_ACCESSTOKEN', 'UPDATE_ACCESSTOKEN', 'DELETE_ACCESSTOKEN', 'READ_DEVELOPER', 'CREATE_DEVELOPER', 'UPDATE_DEVELOPER', 'DELETE_DEVELOPER', 'READ_APP', 'CREATE_APP', 'UPDATE_APP', 'DELETE_APP', 'READ_PLAN');
 		</sql>
 	</changeSet>
 

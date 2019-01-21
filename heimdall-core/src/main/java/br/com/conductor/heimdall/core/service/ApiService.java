@@ -30,17 +30,20 @@ import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
 import br.com.conductor.heimdall.core.dto.page.ApiPage;
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Environment;
+import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.ApiRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
 import br.com.conductor.heimdall.core.util.Pageable;
 import br.com.conductor.heimdall.core.util.StringUtils;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -193,6 +196,22 @@ public class ApiService {
 
           apiRepository.delete(api);
           amqpRoute.dispatchRoutes();
+     }
+
+     /**
+      * Find plans from {@link Api} by its ID.
+      *
+      * @param id   The ID of the {@link Api}
+      * @return     List of the {@link Plan}
+      */
+     @Transactional(readOnly = true)
+     public List<Plan> plansByApi(Long id) {
+
+          Api found = apiRepository.findOne(id);
+          HeimdallException.checkThrow(Objects.isNull(found), API_NOT_EXIST);
+
+          Hibernate.initialize(found.getPlans());
+          return found.getPlans();
      }
 
     /*

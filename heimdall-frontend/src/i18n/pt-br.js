@@ -245,6 +245,7 @@ export default {
         'please_input_role_name':'Por favor, insira o nome do papel!',
         'min_4_characters_to_name': 'O nome deve ter no mínimo 4 caracteres!',
         'available_privileges': 'Papéis disponíveis',
-        'attributed_privileges': 'Papéis atribuídos'
+        'attributed_privileges': 'Papéis atribuídos',
+        'default_plan_this_api': 'Plano default dessa API'
     }
 }

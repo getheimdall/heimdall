@@ -32,5 +32,6 @@
     <include file="changelog/20181203115559-update-table-provider-with-provider-default.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20181112113200-added-scopes-structure.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20180905160326-add-column-password-in-developer.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20190121145232-add-column-default-plan-in-plan.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
