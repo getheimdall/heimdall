@@ -91,10 +91,38 @@ const deleteApi = id => {
     })
 }
 
+const getSwagger = apiId => {
+    return HTTPv1.get(`/apis/${apiId}/swagger`)
+        .then(result => {
+            return Promise.resolve(result.data)
+        })
+        .catch(error => {
+            if (error.response && error.response.status === 404) {
+               return Promise.reject(new Error('Resource not found'))
+            }
+            throw error
+        })
+}
+
+const updateBySwagger = (apiId, swagger, override) => {
+    return HTTPv1.put(`/apis/${apiId}/swagger?override=${override}`, JSON.stringify(swagger))
+        .then(result => {
+            return Promise.resolve(result.data)
+        })
+        .catch(error => {
+            if (error.response && error.response.status === 404) {
+                return Promise.reject(new Error('Resource not found'))
+            }
+            throw error
+        })
+}
+
 export const apiService = {
     getApis,
     getApiById,
     updateApi,
     saveApi,
-    deleteApi
+    deleteApi,
+    getSwagger,
+    updateBySwagger
 }

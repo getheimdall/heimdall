@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>br.com.conductor.heimdall</groupId>
 		<artifactId>heimdall</artifactId>
-		<version>1.12.0-SNAPSHOT</version>
+		<version>1.12.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>heimdall-core</artifactId>
@@ -143,6 +143,16 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-actuator</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.swagger</groupId>
+			<artifactId>swagger-parser</artifactId>
+			<version>1.0.38</version>
+		</dependency>
+		<dependency>
+			<groupId>io.swagger</groupId>
+			<artifactId>swagger-models</artifactId>
+			<version>1.5.21</version>
 		</dependency>
 	</dependencies>
 

@@ -246,6 +246,7 @@ export default {
         'min_4_characters_to_name': 'O nome deve ter no mínimo 4 caracteres!',
         'available_privileges': 'Papéis disponíveis',
         'attributed_privileges': 'Papéis atribuídos',
-        'default_plan_this_api': 'Plano padrão'
+        'default_plan_this_api': 'Plano padrão',
+        'swagger-editor': 'Editor do Swagger'
     }
 }

@@ -23,21 +23,23 @@ package br.com.conductor.heimdall.core.service;
 
 import br.com.conductor.heimdall.core.converter.ApiMap;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.dto.ApiDTO;
-import br.com.conductor.heimdall.core.dto.PageDTO;
-import br.com.conductor.heimdall.core.dto.PageableDTO;
-import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
+import br.com.conductor.heimdall.core.dto.*;
 import br.com.conductor.heimdall.core.dto.page.ApiPage;
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Environment;
 import br.com.conductor.heimdall.core.entity.Plan;
+import br.com.conductor.heimdall.core.entity.Operation;
+import br.com.conductor.heimdall.core.entity.Resource;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.ApiRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
 import br.com.conductor.heimdall.core.util.Pageable;
 import br.com.conductor.heimdall.core.util.StringUtils;
 import org.hibernate.Hibernate;
+import io.swagger.models.Swagger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.StringMatcher;
@@ -45,10 +47,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
@@ -62,6 +62,7 @@ import static br.com.twsoftware.alfred.object.Objeto.notBlank;
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Service
+@Slf4j
 public class ApiService {
 
      @Autowired
@@ -79,13 +80,16 @@ public class ApiService {
      @Autowired
      private MiddlewareService middlewareService;
 
-     /**
-      * Finds a {@link Api} by its ID.
-      *
-      * @param 	id						The ID of the {@link Api}
-      * @return							The {@link Api}
-      */
-     public Api find(Long id) {
+    @Autowired
+    private SwaggerService swaggerService;
+
+    /**
+     * Finds a {@link Api} by its ID.
+     *
+     * @param id The ID of the {@link Api}
+     * @return The {@link Api}
+     */
+    public Api find(Long id) {
 
           Api api = apiRepository.findOne(id);
           HeimdallException.checkThrow(isBlank(api), GLOBAL_RESOURCE_NOT_FOUND);
@@ -93,110 +97,149 @@ public class ApiService {
           return api;
      }
 
-     /**
-      * Generates a paged list of the {@link Api}'s
-      *
-      * @param 	apiDTO					{@link ApiDTO}
-      * @param 	pageableDTO				{@link PageableDTO}
-      * @return 						The paged {@link Api} list as a {@link ApiPage} object
-      */
-     public ApiPage list(ApiDTO apiDTO, PageableDTO pageableDTO) {
+    /**
+     * Get Swagger from {@link Api} by its ID.
+     *
+     * @param id The ID of the {@link Api}
+     * @return The {@link Api}
+     */
+    public Swagger findSwaggerByApi(Long id) {
 
-          Api api = GenericConverter.mapper(apiDTO, Api.class);
+        Api api = apiRepository.findOne(id);
+        List<Resource> resources = resourceService.list(api.getId(), new ResourceDTO());
+        api.setResources(new HashSet<>(resources));
 
-          Example<Api> example = Example.of(api, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+        return swaggerService.exportApiToSwaggerJSON(api);
+    }
 
-          Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
-          Page<Api> page = apiRepository.findAll(example, pageable);
+    /**
+     * Generates a paged list of the {@link Api}'s
+     *
+     * @param apiDTO      {@link ApiDTO}
+     * @param pageableDTO {@link PageableDTO}
+     * @return The paged {@link Api} list as a {@link ApiPage} object
+     */
+    public ApiPage list(ApiDTO apiDTO, PageableDTO pageableDTO) {
 
-          ApiPage apiPage = new ApiPage(PageDTO.build(page));
+        Api api = GenericConverter.mapper(apiDTO, Api.class);
 
-          return apiPage;
-     }
+        Example<Api> example = Example.of(api, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 
-     /**
-      * Generates a list of the {@link Api}'s
-      *
-      * @param 	apiDTO					{@link ApiDTO}
-      * @return 						The list of {@link Api}'s
-      */
-     public List<Api> list(ApiDTO apiDTO) {
+        Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+        Page<Api> page = apiRepository.findAll(example, pageable);
 
-          Api api = GenericConverter.mapper(apiDTO, Api.class);
+        ApiPage apiPage = new ApiPage(PageDTO.build(page));
 
-          Example<Api> example = Example.of(api, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+        return apiPage;
+    }
 
-          List<Api> apis = apiRepository.findAll(example);
+    /**
+     * Generates a list of the {@link Api}'s
+     *
+     * @param apiDTO {@link ApiDTO}
+     * @return The list of {@link Api}'s
+     */
+    public List<Api> list(ApiDTO apiDTO) {
 
-          return apis;
-     }
+        Api api = GenericConverter.mapper(apiDTO, Api.class);
 
-     /**
-      * Saves a {@link Api}.
-      *
-      * @param 	apiDTO					{@link ApiDTO}
-      * @return							The saved {@link Api}
-      */
-     public Api save(ApiDTO apiDTO) {
+        Example<Api> example = Example.of(api, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 
-          Api validateApi = apiRepository.findByBasePath(apiDTO.getBasePath());
-          HeimdallException.checkThrow(notBlank(validateApi), API_BASEPATH_EXIST);
-          HeimdallException.checkThrow(validateBasepath(apiDTO), API_BASEPATH_MALFORMED);
-          HeimdallException.checkThrow(isBlank(apiDTO.getBasePath()), API_BASEPATH_EMPTY);
-          HeimdallException.checkThrow(validateInboundsEnvironments(apiDTO.getEnvironments()), API_CANT_ENVIRONMENT_INBOUND_URL_EQUALS);
+        List<Api> apis = apiRepository.findAll(example);
 
-          Api api = GenericConverter.mapperWithMapping(apiDTO, Api.class, new ApiMap());
-          api.setBasePath(StringUtils.removeMultipleSlashes(api.getBasePath()));
+        return apis;
+    }
 
-          api = apiRepository.save(api);
+    /**
+     * Saves a {@link Api}.
+     *
+     * @param apiDTO {@link ApiDTO}
+     * @return The saved {@link Api}
+     */
+    public Api save(ApiDTO apiDTO) {
 
-          amqpRoute.dispatchRoutes();
-          return api;
-     }
+        Api validateApi = apiRepository.findByBasePath(apiDTO.getBasePath());
+        HeimdallException.checkThrow(notBlank(validateApi), API_BASEPATH_EXIST);
+        HeimdallException.checkThrow(validateBasepath(apiDTO), API_BASEPATH_MALFORMED);
+        HeimdallException.checkThrow(isBlank(apiDTO.getBasePath()), API_BASEPATH_EMPTY);
+        HeimdallException.checkThrow(validateInboundsEnvironments(apiDTO.getEnvironments()), API_CANT_ENVIRONMENT_INBOUND_URL_EQUALS);
 
-     /**
-      * Updates a {@link Api} by its ID.
-      *
-      * @param 	id						The ID of the {@link Api}
-      * @param 	apiDTO					{@link ApiDTO}
-      * @return							The updated {@link Api}
-      */
-     public Api update(Long id, ApiDTO apiDTO) {
+        Api api = GenericConverter.mapperWithMapping(apiDTO, Api.class, new ApiMap());
+        api.setBasePath(StringUtils.removeMultipleSlashes(api.getBasePath()));
 
-          Api api = apiRepository.findOne(id);
-          HeimdallException.checkThrow(isBlank(api), GLOBAL_RESOURCE_NOT_FOUND);
+        api = apiRepository.save(api);
 
-          Api validateApi = apiRepository.findByBasePath(apiDTO.getBasePath());
-          HeimdallException.checkThrow(notBlank(validateApi) && validateApi.getId() != api.getId(), API_BASEPATH_EXIST);
-          HeimdallException.checkThrow(validateBasepath(apiDTO), API_BASEPATH_MALFORMED);
-          HeimdallException.checkThrow(isBlank(apiDTO.getBasePath()), API_BASEPATH_EMPTY);
-          HeimdallException.checkThrow(validateInboundsEnvironments(apiDTO.getEnvironments()), API_CANT_ENVIRONMENT_INBOUND_URL_EQUALS);
+        amqpRoute.dispatchRoutes();
+        return api;
+    }
 
-          api = GenericConverter.mapperWithMapping(apiDTO, api, new ApiMap());
-          api.setBasePath(StringUtils.removeMultipleSlashes(api.getBasePath()));
+    /**
+     * Updates a {@link Api} by its ID.
+     *
+     * @param id     The ID of the {@link Api}
+     * @param apiDTO {@link ApiDTO}
+     * @return The updated {@link Api}
+     */
+    public Api update(Long id, ApiDTO apiDTO) {
 
-          api = apiRepository.save(api);
+        Api api = apiRepository.findOne(id);
+        HeimdallException.checkThrow(isBlank(api), GLOBAL_RESOURCE_NOT_FOUND);
 
-          amqpRoute.dispatchRoutes();
-          return api;
-     }
+        Api validateApi = apiRepository.findByBasePath(apiDTO.getBasePath());
+        HeimdallException.checkThrow(notBlank(validateApi) && validateApi.getId() != api.getId(), API_BASEPATH_EXIST);
+        HeimdallException.checkThrow(validateBasepath(apiDTO), API_BASEPATH_MALFORMED);
+        HeimdallException.checkThrow(isBlank(apiDTO.getBasePath()), API_BASEPATH_EMPTY);
+        HeimdallException.checkThrow(validateInboundsEnvironments(apiDTO.getEnvironments()), API_CANT_ENVIRONMENT_INBOUND_URL_EQUALS);
 
-     /**
-      * Deletes a {@link Api} by its ID.
-      *
-      * @param 	id						The ID of the {@link Api}
-      */
-     public void delete(Long id) {
+        api = GenericConverter.mapperWithMapping(apiDTO, api, new ApiMap());
+        api.setBasePath(StringUtils.removeMultipleSlashes(api.getBasePath()));
 
-          Api api = apiRepository.findOne(id);
-          HeimdallException.checkThrow(isBlank(api), GLOBAL_RESOURCE_NOT_FOUND);
+        api = apiRepository.save(api);
 
-          resourceService.deleteAllFromApi(id);
-          middlewareService.deleteAll(id);
+        amqpRoute.dispatchRoutes();
+        return api;
+    }
 
-          apiRepository.delete(api);
-          amqpRoute.dispatchRoutes();
-     }
+    /**
+     * Updates a {@link Api} by Swagger JSON.
+     *
+     * @param id      The ID of the {@link Api}
+     * @param swagger {@link JSONObject}
+     * @return The updated {@link Api}
+     */
+    public Api updateBySwagger(Long id, String swagger, boolean override) {
+
+        Api api = apiRepository.findOne(id);
+        HeimdallException.checkThrow(isBlank(api), GLOBAL_RESOURCE_NOT_FOUND);
+
+        try {
+            api = swaggerService.importApiFromSwaggerJSON(api, swagger, override);
+        } catch (IOException e) {
+            HeimdallException.checkThrow(isBlank(api), GLOBAL_SWAGGER_JSON_INVALID_FORMAT);
+        }
+
+        api = apiRepository.save(api);
+
+        amqpRoute.dispatchRoutes();
+        return api;
+    }
+
+    /**
+     * Deletes a {@link Api} by its ID.
+     *
+     * @param id The ID of the {@link Api}
+     */
+    public void delete(Long id) {
+
+        Api api = apiRepository.findOne(id);
+        HeimdallException.checkThrow(isBlank(api), GLOBAL_RESOURCE_NOT_FOUND);
+
+        resourceService.deleteAllFromApi(id);
+        middlewareService.deleteAll(id);
+
+        apiRepository.delete(api);
+        amqpRoute.dispatchRoutes();
+    }
 
      /**
       * Find plans from {@link Api} by its ID.

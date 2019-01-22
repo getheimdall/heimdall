@@ -1,5 +1,5 @@
 import React from 'react'
-import {Switch, Redirect} from 'react-router'
+import { Switch, Redirect } from 'react-router'
 // HOCs
 import FadeIn from '../components/wrappers/FadeIn'
 import AppRoute from '../components/wrappers/AppRouter'
@@ -43,8 +43,9 @@ import SingleRole from "../containers/SingleRole";
 import SingleLdap from "../containers/SingleLdap";
 import Providers from "../containers/Providers";
 import SingleProvider from "../containers/SingleProvider";
+import SingleApiSwaggerEditor from "../components/apis/SingleApiSwaggerEditor"
 
-const routes = ({history}) => (
+const routes = ({ history }) => (
     <Switch>
         <AppRoute layout={MainLayout} history={history} exact path="/"
                   component={Authorization([privileges.PRIVILEGE_READ_API])(FadeIn(Apis))}/>
@@ -54,6 +55,8 @@ const routes = ({history}) => (
                   component={Authorization([privileges.PRIVILEGE_CREATE_API, privileges.PRIVILEGE_UPDATE_API])(FadeIn(NewApi))}/>
         <AppRoute layout={MainLayout} history={history} exact path="/apis/:id"
                   component={Authorization([privileges.PRIVILEGE_READ_API])(FadeIn(SingleApi))}/>
+        <AppRoute layout={MainLayout} history={history} exact path="/apis/:id/swagger-editor"
+                  component={Authorization([privileges.PRIVILEGE_READ_API])(FadeIn(SingleApiSwaggerEditor))} />
         <AppRoute layout={MainLayout} history={history} path="/apis/:id/api"
                   component={Authorization([privileges.PRIVILEGE_READ_API])(FadeIn(SingleListApis))}/>
         <AppRoute layout={MainLayout} history={history} path="/apis/:id/interceptors"
@@ -116,8 +119,8 @@ const routes = ({history}) => (
         <AppRoute layout={MainLayout} history={history} exact path="/providers/:id"
                   component={Authorization([privileges.PRIVILEGE_READ_PROVIDER])(FadeIn(SingleProvider))}/>
         {/* routes not finded or 404 */}
-        <Redirect to="/"/>
-        {/* <AppRoute layout={MainLayout} history={history} component={Authorization('TESTE)(FadeIn(Apis))} /> */}
+        <Redirect to="/" />
+        {/* <AppRoute layout={MainLayout} history={history} component={Authorization()(FadeIn(Apis))} /> */}
 
     </Switch>
 )
