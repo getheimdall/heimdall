@@ -119,6 +119,9 @@ public class ScopesFilter extends ZuulFilter {
 
             if (Objects.isNull(operation)) return;
 
+            // If the allowedOperations is empty it means that Scopes are not set
+            if (allowedOperations.isEmpty()) return;
+
             if (!allowedOperations.contains(operation)) {
                 context.setSendZuulResponse(false);
                 context.setResponseStatusCode(HttpStatus.FORBIDDEN.value());
