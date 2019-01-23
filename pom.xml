@@ -12,7 +12,7 @@
 
 	<groupId>br.com.conductor.heimdall</groupId>
 	<artifactId>heimdall</artifactId>
-	<version>1.12.1-SNAPSHOT</version>
+	<version>1.12.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Heimdall</name>
@@ -256,12 +256,12 @@
 			<dependency>
 				<groupId>br.com.conductor.heimdall</groupId>
 				<artifactId>heimdall-core</artifactId>
-				<version>1.12.1-SNAPSHOT</version>
+				<version>1.12.2-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>br.com.conductor.heimdall</groupId>
 				<artifactId>heimdall-middleware-spec</artifactId>
-				<version>1.12.1-SNAPSHOT</version>
+				<version>1.12.2-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mongodb</groupId>
