@@ -40,13 +40,13 @@
 	<changeSet id="03" author="conductor\dijalma.silva">
 		<preConditions>
 			<sqlCheck expectedResult="1">
-				select count(*) from providers where provider_default = true
+				SELECT count(*) FROM PROVIDERS P WHERE P.PROVIDER_DEFAULT = 'true' OR P.PROVIDER_DEFAULT = 1
 			</sqlCheck>
 		</preConditions>
 
 		<sql>
-			insert into provider_params (name, location, value, creation_date, provider_id) values ('access_token' , 'HEADER', '', CURRENT_TIMESTAMP, (select id from providers where provider_default = true));
-			insert into provider_params (name, location, value, creation_date, provider_id) values ('client_id' , 'HEADER', '', CURRENT_TIMESTAMP, (select id from providers where provider_default = true));
+			insert into provider_params (name, location, value, creation_date, provider_id) values ('access_token' , 'HEADER', '', CURRENT_TIMESTAMP, (select id from providers p where P.PROVIDER_DEFAULT = 'true' OR P.PROVIDER_DEFAULT = 1));
+			insert into provider_params (name, location, value, creation_date, provider_id) values ('client_id' , 'HEADER', '', CURRENT_TIMESTAMP, (select id from providers p where P.PROVIDER_DEFAULT = 'true' OR P.PROVIDER_DEFAULT = 1));
 		</sql>
 	</changeSet>
 
