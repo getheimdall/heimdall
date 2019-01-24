@@ -120,6 +120,8 @@ public class Trace {
      @JsonIgnore
      private boolean shouldPrint;
      
+     private String version;
+     
      public Trace() {
     	 
      }
@@ -131,12 +133,13 @@ public class Trace {
       * @param profile			String, profile
       * @param servletRequest	{@link ServletRequest}
       */
-     public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printMongo){
+     public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printMongo, String version){
 
           this.shouldPrint = true;
           this.profile = profile;
           this.printAllTrace = printAllTrace;
           this.printMongo = printMongo;
+          this.version = version;
           HttpServletRequest request = (HttpServletRequest) servletRequest;
           HeimdallException.checkThrow(request == null, ExceptionMessage.GLOBAL_REQUEST_NOT_FOUND);
 

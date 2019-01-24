@@ -68,7 +68,5 @@
 			</plugin>
 		</plugins>
 	</build>	
-	<description>Spring Cloud Config is horizontally scalable centralized configuration service for distributed systems. It uses a pluggable repository layer that currently supports local storage, Git, and Subversion.
-
-In this project, We use native profile, which simply loads config files from the local classpath. You can see shared directory in Config service resources. Now, when Heimdall-api requests it's configuration, Config service responses with shared/application-api.yml.</description>
+	<description>Spring Cloud Config is horizontally scalable centralized configuration service for distributed systems. It uses a pluggable repository layer that currently supports local storage, Git, and Subversion. In this project, We use native profile, which simply loads config files from the local classpath. You can see shared directory in Config service resources. Now, when Heimdall-api requests it's configuration, Config service responses with shared/application-api.yml.</description>
 </project>

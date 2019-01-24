@@ -81,7 +81,7 @@ public class SecurityServiceTest {
         ctx.clear();
         ctx.setRequest(this.request);
         ctx.setResponse(this.response);
-        TraceContextHolder.getInstance().init(true, "developer", request, false);
+        TraceContextHolder.getInstance().init(true, "developer", request, false, "");
 
         clientId = "simpleId";
         someOtherClientId = "someOtherClientId";
