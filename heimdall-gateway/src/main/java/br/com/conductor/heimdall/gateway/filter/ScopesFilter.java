@@ -19,7 +19,6 @@
  */
 package br.com.conductor.heimdall.gateway.filter;
 
-import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.trace.FilterDetail;
@@ -33,8 +32,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
-import java.util.HashSet;
+import java.math.BigInteger;
 import java.util.Objects;
 import java.util.Set;
 
@@ -97,30 +95,15 @@ public class ScopesFilter extends ZuulFilter {
         final String client_id = context.getRequest().getHeader(CLIENT_ID);
 
         if (client_id != null) {
-            final HttpServletRequest req = context.getRequest();
+            final Set<BigInteger> allowedOperations = appRepository.findAllOperationIdsFromScopesByClientId(client_id);
 
-            final Set<Long> allowedOperations = new HashSet<>();
-            final App app = appRepository.findByClientId(req.getHeader(CLIENT_ID));
+            final Long opFromCtx = (Long) context.get(OPERATION_ID);
+            if (Objects.isNull(opFromCtx)) return;
 
-            if (Objects.isNull(app)) return;
-            if (Objects.isNull(app.getPlans())) return;
-
-            app.getPlans()
-                    .forEach(plan -> {
-                        if (plan != null)
-                            plan.getScopes()
-                                    .forEach(scope -> {
-                                        if (scope != null)
-                                            allowedOperations.addAll(scope.getOperationsIds());
-                                    });
-                    });
-
-            final Long operation = (Long) context.get(OPERATION_ID);
-
-            if (Objects.isNull(operation)) return;
+            final BigInteger operation = new BigInteger(opFromCtx.toString());
 
             // If the allowedOperations is empty it means that Scopes are not set
-            if (allowedOperations.isEmpty()) return;
+            if (allowedOperations == null || allowedOperations.isEmpty()) return;
 
             if (!allowedOperations.contains(operation)) {
                 context.setSendZuulResponse(false);
