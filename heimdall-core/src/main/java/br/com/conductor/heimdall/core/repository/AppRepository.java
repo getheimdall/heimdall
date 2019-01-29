@@ -21,7 +21,9 @@ package br.com.conductor.heimdall.core.repository;
  * ==========================LICENSE_END===================================
  */
 
+import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.LockModeType;
 
@@ -83,4 +85,6 @@ public interface AppRepository extends JpaRepository<App, Long> {
 	@Query("select p from App a join a.plans p where a.id = :appId")
 	List<Plan> findPlansByApp(@Param("appId") Long appId);
 
+     @Query(value = "select so.operation_id from scopes_operations as so inner join scopes_plans as sp on so.scope_id = sp.scope_id inner join apps_plans as ap on sp.plan_id = ap.plan_id inner join apps on apps.id = ap.app_id and apps.client_id = ?", nativeQuery = true)
+     Set<BigInteger> findAllOperationIdsFromScopesByClientId(String clientId);
 }
