@@ -1,7 +1,11 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-
 import { Row, Form, Input, Col, Switch, Tooltip, Button, Modal } from 'antd'
+
+import i18n from "../../i18n/i18n"
+import ComponentAuthority from "../policy/ComponentAuthority"
+import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
+import {privileges} from "../../constants/privileges-types"
 import ListVariablesEnvironment from './ListVariablesEnvironment'
 
 const FormItem = Form.Item
@@ -53,10 +57,10 @@ class EnvironmentForm extends Component {
 
     showDeleteConfirm = (environmentId) => (e) => {
         confirm({
-            title: 'Are you sure?',
-            okText: 'Yes',
+            title: i18n.t('are_you_sure'),
+            okText: i18n.t('yes'),
             okType: 'danger',
-            cancelText: 'No',
+            cancelText: i18n.t('no'),
             onOk: () => {
                 this.props.handleDelete(environmentId)
             }
@@ -117,56 +121,63 @@ class EnvironmentForm extends Component {
                     {environment && getFieldDecorator('id', { initialValue: environment.id })(<Input type='hidden' />)}
                     <Row gutter={24}>
                         <Col sm={24} md={12} >
-                            <FormItem label="Name">
+                            <FormItem label={i18n.t('name')}>
                                 {
                                     getFieldDecorator('name', {
                                         initialValue: environment && environment.name,
-                                        rules: [{ required: true, message: 'Please input your environment name!' }]
-                                    })(<Input required />)
+                                        rules: [{ required: true, message: i18n.t('please_input_your_environment_name') }]
+                                    })(<Input required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_ENVIRONMENT, privileges.PRIVILEGE_UPDATE_ENVIRONMENT])}/>)
                                 }
                             </FormItem>
                         </Col>
                         <Col sm={24} md={12}>
-                            <FormItem label="Inbound URL">
+                            <FormItem label={i18n.t('inbound_url')}>
                                 {
                                     getFieldDecorator('inboundURL', {
                                         initialValue: environment && environment.inboundURL,
-                                        rules: [{ required: true, message: 'Please input your environment inbound!' }]
-                                    })(<Input required />)
+                                        rules: [{ required: true, message: i18n.t('please_input_your_environment_inbound') }]
+                                    })(<Input required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_ENVIRONMENT, privileges.PRIVILEGE_UPDATE_ENVIRONMENT])}/>)
                                 }
                             </FormItem>
                         </Col>
                         <Col sm={24} md={12}>
-                            <FormItem label="Description">
+                            <FormItem label={i18n.t('description')}>
                                 {
                                     getFieldDecorator('description', {
                                         initialValue: environment && environment.description,
-                                        rules: [{ required: true, message: 'Please input your environment description!' }]
-                                    })(<Input required />)
+                                        rules: [{ required: true, message: i18n.t('please_input_your_environment_description') }]
+                                    })(<Input required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_ENVIRONMENT, privileges.PRIVILEGE_UPDATE_ENVIRONMENT])}/>)
                                 }
                             </FormItem>
                         </Col>
 
                         <Col sm={24} md={12}>
-                            <FormItem label="Outbound URL">
+                            <FormItem label={i18n.t('outbound_url')}>
                                 {
                                     getFieldDecorator('outboundURL', {
                                         initialValue: environment && environment.outboundURL,
-                                        rules: [{ required: true, message: 'Please input your environment outbound!' }]
-                                    })(<Input required />)
+                                        rules: [{ required: true, message: i18n.t('please_input_your_environment_outbound') }]
+                                    })(<Input required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_ENVIRONMENT, privileges.PRIVILEGE_UPDATE_ENVIRONMENT])}/>)
                                 }
                             </FormItem>
                         </Col>
 
                         <Col sm={24} md={24}>
                             <fieldset>
-                                <legend><div className="ant-card-head-title">Variables</div></legend>
+                                <legend><div className="ant-card-head-title">{i18n.t('variables')}</div></legend>
                                 {
                                     this.state.variables.length === 0 ?
                                         <Row type="flex" justify="center" align="bottom">
+                                            { PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_ENVIRONMENT, privileges.PRIVILEGE_UPDATE_ENVIRONMENT]) &&
                                             <Col style={{ marginTop: 20 }}>
-                                                You don't have variables in this <b>Environment</b>, please <Button type="dashed" className="add-tour" onClick={this.initVariables}>Add Variable</Button>
+                                                {i18n.t('you_do_not_have_variables_in_this')} <b>{i18n.t('environment')}</b>! <Button id="addEnvironmentsVariable" type="dashed" className="add-tour" onClick={this.initVariables}>{i18n.t('add_variable')}</Button>
                                             </Col>
+                                            }
+                                            {!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_ENVIRONMENT, privileges.PRIVILEGE_UPDATE_ENVIRONMENT]) &&
+                                            <Col style={{ marginTop: 20 }}>
+                                                You don't have variables in this <b>Environment</b>
+                                            </Col>
+                                            }
                                         </Row>
                                         :
                                         <ListVariablesEnvironment variables={this.state.variables} form={this.props.form} add={this.add} remove={this.remove} loading={this.props.loading} />
@@ -175,12 +186,12 @@ class EnvironmentForm extends Component {
                         </Col>
 
                         <Col sm={24} md={24}>
-                            <FormItem label="Status">
+                            <FormItem label={i18n.t('status')}>
                                 {
                                     getFieldDecorator('status', {
                                         initialValue: environment ? environment.status === 'ACTIVE' : true,
                                         valuePropName: 'checked'
-                                    })(<Switch required />)
+                                    })(<Switch required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_ENVIRONMENT, privileges.PRIVILEGE_UPDATE_ENVIRONMENT])}/>)
                                 }
                             </FormItem>
                         </Col>
@@ -189,12 +200,16 @@ class EnvironmentForm extends Component {
                 </Form>
 
                 <Row type="flex" justify="end">
-                    <Tooltip title="Delete">
-                        <Button className="card-button" type="danger" ghost icon="delete" size="large" shape="circle" disabled={!environment} onClick={environment && this.showDeleteConfirm(environment.id)} loading={loading} />
-                    </Tooltip>
-                    <Tooltip title="Save">
-                        <Button className="card-button" type="primary" icon="save" size="large" shape="circle" onClick={this.onSubmitForm} loading={loading} />
-                    </Tooltip>
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_ENVIRONMENT]}>
+                        <Tooltip title={i18n.t('delete')}>
+                            <Button id="deleteEnvironment" className="card-button" type="danger" ghost icon="delete" size="large" shape="circle" disabled={!environment} onClick={environment && this.showDeleteConfirm(environment.id)} loading={loading} />
+                        </Tooltip>
+                    </ComponentAuthority>
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_ENVIRONMENT, privileges.PRIVILEGE_UPDATE_ENVIRONMENT]}>
+                        <Tooltip title={i18n.t('save')}>
+                            <Button id="saveEnvironment" className="card-button" type="primary" icon="save" size="large" shape="circle" onClick={this.onSubmitForm} loading={loading} />
+                        </Tooltip>
+                    </ComponentAuthority>
                 </Row>
             </Row>
         )

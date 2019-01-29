@@ -1,11 +1,16 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import { operationService } from '../services'
+import { List, Avatar, Button, Row, Col, Tooltip, Modal, notification } from 'antd'
 
-import { List, Avatar, Button, Row, Col, Tooltip, Modal, notification } from 'antd';
+import i18n from '../i18n/i18n'
+import { operationService } from '../services'
 import Loading from '../components/ui/Loading'
-import OperationForm from '../components/operations/OperationForm';
+import {PrivilegeUtils} from "../utils/PrivilegeUtils"
+import {privileges} from "../constants/privileges-types"
+import FloatSearch from './../components/ui/FloatSearch'
+import ComponentAuthority from "../components/policy/ComponentAuthority"
+import OperationForm from '../components/operations/OperationForm'
 
 const ButtonGroup = Button.Group;
 
@@ -13,7 +18,7 @@ class Operations extends Component {
 
     constructor(props) {
         super(props)
-        this.state = { operations: null, operationSelected: 0, visibleModal: false }
+        this.state = { operations: null, operationSelected: 0, visibleModal: false, operationsFiltered: null, visibleSearch: false }
     }
 
     componentDidMount() {
@@ -43,9 +48,8 @@ class Operations extends Component {
         this.setState({ ...this.state, operations: null });
         operationService.getOperationsByResource(this.props.idApi, this.props.idResource)
             .then(data => {
-                this.setState({ ...this.state, operations: data });
+                this.setState({ ...this.state, operations: data, operationsFiltered: data});
             })
-
     }
 
     saveOperation = (idApi, idResource, operation) => {
@@ -70,7 +74,7 @@ class Operations extends Component {
             })
             .catch(error => {
                 if (error.response && error.response.status === 400) {
-                    notification['error']({ message: 'Error', description: error.response.data.message })
+                    notification['error']({ message: i18n.t('error'), description: error.response.data.message })
                 }
                 this.reloadOperations()
             })
@@ -94,30 +98,54 @@ class Operations extends Component {
         this.removeOperation(this.props.idApi, this.props.idResource, operationId)
     }
 
+    toggleSearch = () => {
+        const { visibleSearch } = this.state
+        this.setState({ ...this.state, visibleSearch: !visibleSearch })
+    }
+
+    filterOperationsByPath = (e) => {
+        const value = e.target.value
+        const { operations } = this.state
+        try {
+            const reg = new RegExp(value, 'i')
+            this.setState({ ...this.state, operationsFiltered: operations.filter(o => o.path.match(reg) !== null)})
+        } catch (e) {
+            this.setState({ ...this.state, operationsFiltered: operations })
+        }
+    }
+
     render() {
-        const { operations } = this.state;
+        const { operations, operationsFiltered, visibleSearch } = this.state;
         const { loading } = this.props
         if (!operations) return <Loading />
 
         const modalOperation =
-            <Modal title="Add Operation"
-            
+            <Modal title={i18n.t('add_operation')}
                 footer={[
-                    <Button key="back" onClick={this.handleCancel}>Cancel</Button>,
-                    <Button key="submit" type="primary" loading={loading} onClick={this.handleSave}>Save</Button>
+                    <Button id="cancelAddOperation" key="back" onClick={this.handleCancel}>{i18n.t('cancel')}</Button>,
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_OPERATION, privileges.PRIVILEGE_UPDATE_OPERATION]}>
+                        <Button id="saveOperation" key="submit" type="primary" loading={loading} onClick={this.handleSave}>{i18n.t('save')}</Button>
+                    </ComponentAuthority>
                 ]}
                 visible={this.state.visibleModal}
                 onCancel={this.handleCancel}
                 destroyOnClose >
-                <OperationForm onRef={ref => (this.operationForm = ref)} onSubmit={this.submitPayload} operationId={this.state.operationSelected} idApi={this.props.idApi} idResource={this.props.idResource} />
+                <OperationForm onRef={ref => (this.operationForm = ref)} onSubmit={this.submitPayload} operationId={this.state.operationSelected} idApi={this.props.idApi} idResource={this.props.idResource} apiBasepath={this.props.apiBasepath}/>
             </Modal>
 
         if (operations && operations.length === 0) {
             return (
                 <Row type="flex" justify="center" align="bottom">
+                    {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_OPERATION]) &&
+                        <Col style={{ marginTop: 20 }}>
+                            {i18n.t('you_do_not_have')} <b style={{textTransform: 'uppercase'}}>{i18n.t('operations')}</b> {i18n.t('in_this')} <b style={{textTransform: 'uppercase'}}>{i18n.t('resource')}</b>! <Button id="addOperationWhenListIsEmpty" type="dashed" onClick={this.showOperationModal()}>{i18n.t('add_operation')}</Button>
+                        </Col>
+                    }
+                    {!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_OPERATION]) &&
                     <Col style={{ marginTop: 20 }}>
-                        You don't have <b>OPERATIONS</b> in this <b>RESOURCE</b>, please <Button type="dashed" onClick={this.showOperationModal()}>Add Operation</Button>
+                        {i18n.t('you_do_not_have')} <b style={{textTransform: 'uppercase'}}>{i18n.t('operations')}</b> {i18n.t('in_this')} <b style={{textTransform: 'uppercase'}}>{i18n.t('resource')}</b>!
                     </Col>
+                    }
 
                     {modalOperation}
                 </Row>
@@ -125,17 +153,27 @@ class Operations extends Component {
         }
 
         return (
-            <div>
-                <Row type="flex" justify="center">
-                    <Tooltip title="Add Operation">
-                        <Button type="dashed" icon="plus" onClick={this.showOperationModal()}>Add Operation</Button>
-                    </Tooltip>
-                </Row>
+            <div style={{ position: 'relative' }}>
+                { visibleSearch && <FloatSearch callbackKeyUp={this.filterOperationsByPath} handleClose={this.toggleSearch}/>}
+                <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_OPERATION]}>
+                    <Row type="flex" justify="center">
+                        <Col style={{margin: 5}}>
+                            <Tooltip title={i18n.t('add_operation')}>
+                                <Button id="addOperation" type="dashed" icon="plus" onClick={this.showOperationModal()}>{i18n.t('add_operation')}</Button>
+                            </Tooltip>
+                        </Col>
+                        <Col style={{margin: 5}}>
+                            <Tooltip title={i18n.t('search_operations')}>
+                                <Button id="searchOperations" type="dashed" icon="search" onClick={this.toggleSearch}>{i18n.t('search_operations')}</Button>
+                            </Tooltip>
+                        </Col>
+                    </Row>
+                </ComponentAuthority>
                 {/* <hr /> */}
                 <List
                     className="demo-loadmore-list"
                     itemLayout="horizontal"
-                    dataSource={operations}
+                    dataSource={operationsFiltered}
                     renderItem={operation => {
                         let color;
                         if (operation.method === 'GET') {
@@ -165,12 +203,14 @@ class Operations extends Component {
                                 />
                                 <Row type="flex" justify="center">
                                     <ButtonGroup>
-                                        <Tooltip title="Update">
+                                        <Tooltip title={i18n.t('edit')}>
                                             <Button type="primary" icon="edit" onClick={this.showOperationModal(operation.id)} />
                                         </Tooltip>
-                                        <Tooltip title="Delete">
-                                            <Button type="danger" icon="delete" onClick={this.remove(operation.id)} />
-                                        </Tooltip>
+                                        <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_OPERATION]}>
+                                            <Tooltip title={i18n.t('delete')}>
+                                                <Button type="danger" icon="delete" onClick={this.remove(operation.id)} />
+                                            </Tooltip>
+                                        </ComponentAuthority>
                                     </ButtonGroup>
                                 </Row>
                             </List.Item>
@@ -186,7 +226,8 @@ class Operations extends Component {
 
 Operations.propType = {
     idApi: PropTypes.number.isRequired,
-    idResource: PropTypes.number.isRequired
+    idResource: PropTypes.number.isRequired,
+    apiBasepath: PropTypes.number.isRequired
 }
 
 const mapStateToProps = state => {

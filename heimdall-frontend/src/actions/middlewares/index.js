@@ -1,6 +1,7 @@
-import {MiddlewaresConstants} from "../../constants/actions-types";
-import {middlewareService} from "../../services/MiddlewareService";
-import {FileUtils} from "../../utils/FileUtils";
+import i18n from '../../i18n/i18n'
+import {MiddlewaresConstants} from "../../constants/actions-types"
+import {middlewareService} from "../../services/MiddlewareService"
+import {FileUtils} from "../../utils/FileUtils"
 
 export const initLoading = () => dispatch => {
     dispatch({type: MiddlewaresConstants.MIDDLEWARE_LOADING})
@@ -43,14 +44,14 @@ export const getMiddleware = (id, apiId) => dispatch => {
         })
 }
 
-export const downloadMiddleware = (id, apiId, apiName, versionMiddleware) => dispatch => {
+export const downloadMiddleware = (id, apiId) => dispatch => {
     middlewareService.downloadMiddleware(id, apiId)
-        .then(data => {
-            FileUtils.fileDownload(data, `${apiName}-${versionMiddleware}.jar`, FileUtils.JAR_FILE)
+        .then(response => {
+            FileUtils.fileDownload(response.data, response.headers['filename'])
             dispatch({ type: MiddlewaresConstants.MIDDLEWARE_DOWNLOAD})
             dispatch(finishLoading())
         })
-        .catch(error => {
-            dispatch(sendNotification({ type: "error", message: "Failed to download file" }))
+        .catch(() => {
+            dispatch(sendNotification({ type: "error", message: i18n.t('failed_download_file') }))
         })
 }

@@ -21,21 +21,6 @@ package br.com.conductor.heimdall.api.service;
  * ==========================LICENSE_END===================================
  */
 
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.PRIVILEGES_NOT_EXIST;
-import static br.com.twsoftware.alfred.object.Objeto.isBlank;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.StringMatcher;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import br.com.conductor.heimdall.api.dto.RoleDTO;
 import br.com.conductor.heimdall.api.dto.page.RolePage;
 import br.com.conductor.heimdall.api.entity.Privilege;
@@ -45,15 +30,31 @@ import br.com.conductor.heimdall.api.repository.RoleRepository;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.PageDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
+import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.util.Pageable;
 import br.com.twsoftware.alfred.object.Objeto;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.ExampleMatcher.StringMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.PRIVILEGES_NOT_EXIST;
+import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 
 /**
  * Provides methods to create, read, update and delete a {@link Role}.
  *
  * @author Marcos Filho
- *
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Service
 public class RoleService {
@@ -75,7 +76,11 @@ public class RoleService {
      public Role save(RoleDTO roleDTO) {
 
           Role role = GenericConverter.mapper(roleDTO, Role.class);
-          
+
+          Set<Role> nameRole = roleRepository.findByName(roleDTO.getName());
+
+          HeimdallException.checkThrow(nameRole.size() > 0, ExceptionMessage.ROLE_ALREADY_EXIST);
+
           List<Long> invalidPrivileges = new ArrayList<>();
           role.getPrivileges().forEach(p -> {
                Privilege privilege = privilegeRepository.findOne(p.getId());
@@ -174,10 +179,13 @@ public class RoleService {
 
           Role role = roleRepository.findOne(roleId);
           HeimdallException.checkThrow(isBlank(role), GLOBAL_RESOURCE_NOT_FOUND);
-          
-          role = GenericConverter.mapper(roleDTO, Role.class);
-          role = roleRepository.save(role);
-          
-          return role;
+          Set<Role> roleByName = roleRepository.findByName(roleDTO.getName());
+
+          if (roleByName.size() > 0){
+               HeimdallException.checkThrow(roleByName.stream().anyMatch(r -> !r.getId().equals(roleId) && r.getName().equals(roleDTO.getName())), ExceptionMessage.ROLE_ALREADY_EXIST);
+          }
+
+          Role roleMapper = GenericConverter.mapper(roleDTO, role);
+          return roleRepository.save(roleMapper);
      }
 }

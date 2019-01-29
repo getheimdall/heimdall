@@ -39,7 +39,6 @@ public abstract class StringUtils {
 	 * @param  prefix					The number to be prefixed
 	 * @param  order					The order
 	 * @return							The prefixed order created
-	 * @throws BadRequestException
 	 */
      public static String generateOrder(Integer prefix, Integer order) {
 
@@ -57,7 +56,7 @@ public abstract class StringUtils {
       */
      public static String concatCamelCase(String... strings) {
           
-          String value = "";
+          StringBuilder value = new StringBuilder();
           for (String string : strings) {
                
                String[] splits = string.split("_");
@@ -65,12 +64,12 @@ public abstract class StringUtils {
                     
                     if (Objeto.notBlank(split)) {
                          
-                         value += split.substring(0, 1).toUpperCase() + split.substring(1).toLowerCase();
+                         value.append(split.substring(0, 1).toUpperCase()).append(split.substring(1).toLowerCase());
                     }
                }
           }
           
-          return value;          
+          return value.toString();
      }
 
      /**
@@ -98,4 +97,17 @@ public abstract class StringUtils {
           
      }
 
+    /**
+     * Removes all instances of double forward slash from a path and
+     * makes sure that there is one forward slash at the start of the
+     * path.
+     *
+     * @param path Path to be parsed
+     * @return     The path with one forward slash at the start and
+     *             single forward slashes where there were double
+     */
+     public static String removeMultipleSlashes(String path) {
+         path = "/" + path;
+         return path.replaceAll("//+", "/");
+     }
 }

@@ -88,7 +88,7 @@ public abstract class HeimdallFilter extends ZuulFilter {
                detail.setStatus(Constants.SUCCESS);
           } catch (Throwable e) {
                detail.setStatus(Constants.FAILED);
-               TraceContextHolder.getInstance().getActualTrace().setStackTrace(new StackTraceImpl(e.getClass().getName(), e.getMessage(), ExceptionUtils.getStackTrace(e)));
+               detail.setStackTrace(new StackTraceImpl(e.getClass().getName(), e.getMessage(), ExceptionUtils.getStackTrace(e)));
           } finally {
                long endTime = System.currentTimeMillis();
 

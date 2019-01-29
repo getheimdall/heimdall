@@ -1,20 +1,23 @@
-import React, { Component } from 'react'
+import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import { Link } from 'react-router-dom'
+import {Link} from 'react-router-dom'
+import { Modal, Row, Table, Divider, Tag, Tooltip, Button, Pagination } from 'antd'
 
-import { Modal, Row, Table, Divider, Tag, Tooltip, Button, Pagination } from 'antd';
+import i18n from "../../i18n/i18n"
+import ComponentAuthority from "../policy/ComponentAuthority"
+import { privileges }from "../../constants/privileges-types"
 
 const confirm = Modal.confirm;
-const { Column } = Table;
+const {Column} = Table;
 
 class ListAccessTokens extends Component {
 
     showDeleteConfirm = (accessTokenId) => (e) => {
         confirm({
-            title: 'Are you sure?',
-            okText: 'Yes',
+            title: i18n.t('are_you_sure'),
+            okText: i18n.t('yes'),
             okType: 'danger',
-            cancelText: 'No',
+            cancelText: i18n.t('no'),
             onOk: () => {
                 this.props.handleDelete(accessTokenId)
             }
@@ -22,39 +25,42 @@ class ListAccessTokens extends Component {
     }
 
     render() {
-        const { dataSource } = this.props
-        const { loading } = this.props
+        const {dataSource} = this.props
+        const {loading} = this.props
         return (
             <div>
-                <Table dataSource={dataSource.content} rowKey={record => record.id} scroll={{x:1155}} loading={loading} pagination={false}>
-                    <Column title="ID" dataIndex="id" id="id" width={200} />
+                <Table dataSource={dataSource.content} rowKey={record => record.id} scroll={{x: 1155}} loading={loading}
+                       pagination={false}>
+                    <Column title={i18n.t('id')} dataIndex="id" id="id" width={200}/>
                     <Column title="Status" id="status" key="status" width={200} render={(record) => (
                         <span>
-                            {record.status === 'ACTIVE' && <Tag color="green">{record.status}</Tag>}
-                            {record.status === 'INACTIVE' && <Tag color="red">{record.status}</Tag>}
+                            {record.status === 'ACTIVE' && <Tag color="green">{i18n.t('active')}</Tag>}
+                            {record.status === 'INACTIVE' && <Tag color="red">{i18n.t('inactive')}</Tag>}
                         </span>
-                    )} />
-                    <Column title="Token" dataIndex="code" id="code" width={400} />
-                    <Column title="App" dataIndex="app.name" id="name" />
+                    )}/>
+                    <Column title={i18n.t('token')} dataIndex="code" id="code" width={400}/>
+                    <Column title={i18n.t('app')} dataIndex="app.name" id="name"/>
                     <Column
                         id="action"
                         key="action"
                         align="right"
                         render={(text, record) => (
                             <span>
-                                <Tooltip title="Edit">
-                                    <Link to={"/tokens/" + record.id}><Button type="primary" icon="edit" /></Link>
+                                <Tooltip title={i18n.t('edit')}>
+                                    <Link to={"/tokens/" + record.id}><Button type="primary" icon="edit"/></Link>
                                 </Tooltip>
-                                <Divider type="vertical" />
-                                <Tooltip title="Delete">
-                                    <Button type="danger" icon="delete" onClick={this.showDeleteConfirm(record.id)} />
-                                </Tooltip>
+                                <Divider type="vertical"/>
+                                <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_ACCESSTOKEN]}>
+                                    <Tooltip title={i18n.t('delete')}>
+                                        <Button type="danger" icon="delete" onClick={this.showDeleteConfirm(record.id)} />
+                                    </Tooltip>
+                                </ComponentAuthority>
                             </span>
                         )}
                     />
                 </Table>
                 <Row type="flex" justify="center" className="h-row">
-                    <Pagination total={dataSource.totalElements} onChange={this.props.handlePagination} />
+                    <Pagination total={dataSource.totalElements} onChange={this.props.handlePagination}/>
                 </Row>
             </div>
         )

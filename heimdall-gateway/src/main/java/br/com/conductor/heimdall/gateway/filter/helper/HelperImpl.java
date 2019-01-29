@@ -1,6 +1,10 @@
 
 package br.com.conductor.heimdall.gateway.filter.helper;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.mongodb.MongoClient;
+
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -56,64 +60,77 @@ import br.com.conductor.heimdall.middleware.spec.Xml;
  * Implementation of the {@link Helper} interface.
  *
  * @author Filipe Germano
- *
+ * @author marcos.filho
  */
 public class HelperImpl implements Helper {
+	
+	@Autowired(required = false)
+	private MongoClient mongoClient;
 
-     @Override
-     public ApiResponse apiResponse() {
+	private boolean enableHandler;
 
-          ApiResponse apiResponse = new ApiResponseImpl();
-          return apiResponse;
-     }
+	public HelperImpl() {
+		enableHandler = false;
+	}
 
-     @Override
-     public Call call() {
+	@Override
+	public ApiResponse apiResponse() {
 
-          Call call = new CallImpl();
-          return call;
-     }
+		ApiResponse apiResponse = new ApiResponseImpl();
+		return apiResponse;
+	}
 
-     @Override
-     public DB db(String databaseName) {
+	@Override
+	public Call call() {
 
-          return db(databaseName, DBType.MONGODB);
-     }
+		return new CallImpl();
+	}
 
-     private DB db(String databaseName, DBType type) {
+	@Override
+	public DB db(String databaseName) {
 
-          switch (type) {
-               case MONGODB:
-                    return new DBMongoImpl(databaseName);
-               default:
-                    return new DBMongoImpl(databaseName);
-          }
-     }
+		return db(databaseName, DBType.MONGODB);
+	}
 
-     @Override
-     public DBMongo dbMongo(String databaseName) {
+	private DB db(String databaseName, DBType type) {
 
-          return (DBMongo) db(databaseName, DBType.MONGODB);
-     }
+		switch (type) {
+		case MONGODB:
+			return new DBMongoImpl(databaseName, mongoClient);
+		default:
+			return new DBMongoImpl(databaseName, mongoClient);
+		}
+	}
 
-     @Override
-     public Http http() {
+	@Override
+	public DBMongo dbMongo(String databaseName) {
 
-          Http http = new HttpImpl();
-          return http;
-     }
+		return (DBMongo) db(databaseName, DBType.MONGODB);
+	}
 
-     @Override
-     public Json json() {
+	@Override
+	public Http http() {
 
-          Json json = new JsonImpl();
-          return json;
-     }
+		Http http = new HttpImpl(enableHandler);
+		return http;
+	}
 
-     @Override
-     public Xml xml() {
+	@Override
+	public Json json() {
 
-          return new XmlImpl();
-     }
+		Json json = new JsonImpl();
+		return json;
+	}
+
+	@Override
+	public Xml xml() {
+
+		return new XmlImpl();
+	}
+
+	@Override
+	public void httpHandler(boolean useHandler) {
+		this.enableHandler = useHandler;
+	}
 
 }

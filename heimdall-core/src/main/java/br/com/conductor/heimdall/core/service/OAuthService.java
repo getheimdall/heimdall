@@ -23,10 +23,12 @@ package br.com.conductor.heimdall.core.service;
 import static br.com.conductor.heimdall.core.util.ConstantsOAuth.*;
 import br.com.conductor.heimdall.core.dto.request.OAuthRequest;
 import br.com.conductor.heimdall.core.dto.response.TokenImplicit;
+import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.entity.OAuthAuthorize;
 import br.com.conductor.heimdall.core.entity.Provider;
 import br.com.conductor.heimdall.core.entity.TokenOAuth;
 import br.com.conductor.heimdall.core.exception.*;
+import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.repository.OAuthAuthorizeRepository;
 import br.com.conductor.heimdall.core.util.JwtUtils;
 import br.com.twsoftware.alfred.object.Objeto;
@@ -50,8 +52,12 @@ public class OAuthService {
 
     @Autowired
     private OAuthAuthorizeRepository oAuthAuthorizeRepository;
+
     @Autowired
     private ProviderService providerService;
+
+    @Autowired
+    private AppRepository appRepository;
 
     /**
      * Generates {@link TokenOAuth} from Code Authorize or RefreshToken
@@ -64,33 +70,19 @@ public class OAuthService {
      * @return The {@link TokenOAuth}
      * @throws HeimdallException Token expired, code not found, grant_type not found, Code already used
      */
-    public TokenOAuth generateTokenOAuth(OAuthRequest oAuthRequest, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsObject) throws HeimdallException {
-        //verify if grantType exist
+    public TokenOAuth generateTokenOAuth(OAuthRequest oAuthRequest, String clientId, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsObject) throws HeimdallException {
+
         if (Objeto.isBlank(oAuthRequest.getGrantType())) {
             throw new BadRequestException(ExceptionMessage.GRANT_TYPE_NOT_FOUND);
         }
-        //verify type of the grantType
+
         switch (oAuthRequest.getGrantType().toUpperCase()) {
             case GRANT_TYPE_PASSWORD:
-                //verify if code exist
-                if (Objeto.isBlank(oAuthRequest.getCode())) {
-                    throw new BadRequestException(ExceptionMessage.CODE_NOT_FOUND);
-                }
-                //decode code
-                String decodedCode = new String(Base64.getDecoder().decode(oAuthRequest.getCode()));
-                //get clientId from code
-                String clientId = decodedCode.split("::")[1];
-                //get OAuthAuthorize from database by clientId and token
-                OAuthAuthorize foundCode = oAuthAuthorizeRepository.findByClientIdAndTokenAuthorize(clientId, oAuthRequest.getCode());
-                //verify if OAuthAuthorize exist
-                if (Objeto.isBlank(foundCode)) {
-                    throw new BadRequestException(ExceptionMessage.CODE_NOT_FOUND);
-                }
-                //get objects the from body request
+
                 final Map<String, Object> claimsFromJSONObjectBodyRequest = JwtUtils.getClaimsFromJSONObjectBodyRequest(claimsObject);
-                //generate TokenOAuth
+
                 TokenOAuth tokenOAuth = JwtUtils.generateTokenOAuth(privateKey, timeAccessToken, timeRefreshToken, claimsFromJSONObjectBodyRequest);
-                //save accessToken
+
                 saveToken(
                         clientId,
                         tokenOAuth.getAccessToken(),
@@ -98,7 +90,7 @@ public class OAuthService {
                         GRANT_TYPE_PASSWORD,
                         timeAccessToken
                 );
-                //save refreshToken
+
                 saveToken(
                         clientId,
                         tokenOAuth.getRefreshToken(),
@@ -106,9 +98,7 @@ public class OAuthService {
                         GRANT_TYPE_REFRESH_TOKEN,
                         timeRefreshToken
                 );
-                //delete token used
-                this.oAuthAuthorizeRepository.delete(foundCode);
-                //return new tokens
+
                 return tokenOAuth;
             case GRANT_TYPE_REFRESH_TOKEN:
                 if (Objeto.isBlank(oAuthRequest.getRefreshToken())) {
@@ -189,9 +179,8 @@ public class OAuthService {
         try {
             JwtUtils.tokenExpired(token, privateKey);
         } catch (HeimdallException ex) {
-
             this.oAuthAuthorizeRepository.delete(this.oAuthAuthorizeRepository.findByTokenAuthorize(token));
-            throw new UnauthorizedException(ExceptionMessage.TOKEN_EXPIRED);
+            throw ex;
         }
     }
 
@@ -261,6 +250,11 @@ public class OAuthService {
      * @param token    The token
      */
     public void saveToken(String clientId, String token, LocalDateTime expirationDate, String grantType, int expirationTime) {
+
+        App app = appRepository.findByClientId(clientId);
+
+        HeimdallException.checkThrow(app == null, ExceptionMessage.CLIENT_ID_NOT_FOUND);
+
         OAuthAuthorize oAuthAuthorizeAccessToken = new OAuthAuthorize();
         oAuthAuthorizeAccessToken.setClientId(clientId);
         oAuthAuthorizeAccessToken.setTokenAuthorize(token);

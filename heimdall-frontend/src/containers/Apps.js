@@ -1,16 +1,18 @@
 //3rd's
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-
+//components
+import { Row, Form, Input, Col, Card, notification } from 'antd'
 //actions
 import { getAllApps, initLoading, remove } from '../actions/apps'
 
-//components
-import { Row, Button, Form, Input, Col, Card, notification } from 'antd'
-import PageHeader from '../components/ui/PageHeader'
+import i18n from "../i18n/i18n"
 import Loading from '../components/ui/Loading'
-import ListApps from '../components/apps/ListApps';
-import FloatButton from '../components/ui/FloatButton'
+import ListApps from '../components/apps/ListApps'
+import PageHeader from '../components/ui/PageHeader'
+import RouteButton from '../components/ui/RouteButton'
+import {privileges} from "../constants/privileges-types"
+import ComponentAuthority from "../components/policy/ComponentAuthority"
 
 class Apps extends Component {
 
@@ -57,24 +59,19 @@ class Apps extends Component {
 
         return (
             <div>
-                <PageHeader title="Apps" icon="appstore" />
+                <PageHeader title={i18n.t('apps')} icon="appstore" />
                 <Row className="search-box">
                     <Card>
                         <Form>
-                            <Row gutter={24}>
+                            <Row gutter={24} type="flex" justify="start">
                                 <Col sm={24} md={5}>
-                                    {getFieldDecorator('name')(<Input.Search onSearch={this.onSearchForm} placeholder="name" />)}
+                                    {getFieldDecorator('name')(<Input.Search onSearch={this.onSearchForm} placeholder={i18n.t('name')} />)}
                                 </Col>
                                 <Col sm={24} md={5}>
-                                    {getFieldDecorator('description')(<Input.Search onSearch={this.onSearchForm} placeholder="description" />)}
+                                    {getFieldDecorator('description')(<Input.Search onSearch={this.onSearchForm} placeholder={i18n.t('description')} />)}
                                 </Col>
                                 <Col sm={24} md={5}>
-                                    {getFieldDecorator('clientId')(<Input.Search onSearch={this.onSearchForm} placeholder="clientId" />)}
-                                </Col>
-                                <Col sm={24} md={9}>
-                                    <Row type="flex" justify="end">
-                                        <Button className="card-button" type="primary" icon="search" onClick={this.onSearchForm}>Search</Button>
-                                    </Row>
+                                    {getFieldDecorator('clientId')(<Input.Search onSearch={this.onSearchForm} placeholder={i18n.t('client_id')} />)}
                                 </Col>
                             </Row>
                         </Form>
@@ -84,7 +81,9 @@ class Apps extends Component {
                 <Row className="h-row bg-white">
                     <ListApps dataSource={apps} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading} />
 
-                    <FloatButton history={history} to="/apps/new" label="Add new App" />
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_APP]}>
+                        <RouteButton idButton="addApp" history={history} to="/apps/new" label={i18n.t('add_new_app')} />
+                    </ComponentAuthority>
                 </Row>
             </div>
         )

@@ -25,14 +25,10 @@ const getMiddlewares = (params = {params: {}}, apiId) => {
         })
 }
 
-const getMiddleware = (id, apiId) => {
-
-}
-
 const downloadMiddleware = (id, apiId) => {
-    return HTTPv1.get('/apis/' + apiId + '/middlewares/download/' + id)
+    return HTTPv1.get('/apis/' + apiId + '/middlewares/download/' + id, {responseType: 'blob'})
         .then(res => {
-            return Promise.resolve(res.data);
+            return Promise.resolve(res);
         }).catch(error => {
             console.log('Error: ', error)
             if (error.response ** error.response.status === 404) {
@@ -46,6 +42,5 @@ const downloadMiddleware = (id, apiId) => {
 export const middlewareService = {
     save,
     getMiddlewares,
-    getMiddleware,
     downloadMiddleware
 }

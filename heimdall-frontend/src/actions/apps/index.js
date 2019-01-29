@@ -1,7 +1,9 @@
-import { AppConstants } from '../../constants/actions-types'
-import { appService } from '../../services'
-import { push } from 'connected-react-router';
 import { notification } from 'antd'
+import { push } from 'connected-react-router'
+
+import i18n from "../../i18n/i18n"
+import { appService } from '../../services'
+import { AppConstants } from '../../constants/actions-types'
 
 export const initLoading = () => dispatch => {
     dispatch({ type: AppConstants.APP_LOADING })
@@ -38,13 +40,13 @@ export const save = app => dispatch => {
     appService.save(app)
         .then(data => {
             dispatch(getAllApps())
-            notification['success']({ message: 'App saved' })
+            notification['success']({ message:  i18n.t('app_saved') })
             dispatch(push('/apps'))
             dispatch(finishLoading())
         })
         .catch(error => {
             if (error.response && error.response.status === 400) {
-                notification['error']({ message: 'Error', description: error.response.data.message })
+                notification['error']({ message: i18n.t('error'), description: error.response.data.message })
             }
             dispatch(finishLoading())
         })
@@ -54,12 +56,12 @@ export const update = app => dispatch => {
     appService.update(app)
         .then(data => {
             dispatch(getApp(app.id))
-            notification['success']({ message: 'App updated' })
+            notification['success']({ message: i18n.t('app_updated') })
             dispatch(finishLoading())
         })
         .catch(error => {
             if (error.response && error.response.status === 400) {
-                notification['error']({ message: 'Error', description: error.response.data.message })
+                notification['error']({ message: i18n.t('error'), description: error.response.data.message })
             }
             dispatch(finishLoading())
         })
@@ -69,7 +71,7 @@ export const remove = (appId, query) => dispatch => {
     appService.remove(appId)
         .then(data => {
             dispatch(getAllApps(query))
-            notification['success']({ message: 'App removed' })
+            notification['success']({ message: i18n.t('app_removed') })
         })
 }
 

@@ -1,22 +1,25 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { DragDropContext } from 'react-dnd';
-import HTML5Backend from 'react-dnd-html5-backend';
+import { DragDropContext } from 'react-dnd'
+import HTML5Backend from 'react-dnd-html5-backend'
+import { Row, Col, Form, Select, Icon, Card, Button, notification, Progress, Tag, Alert, Badge } from 'antd'
 
-import DropClientInterceptors from '../components/interceptors/DropClientInterceptors'
-import { interceptorSort } from '../utils/InterceptorUtils'
+import i18n from "../i18n/i18n"
 import UUID from '../utils/UUID'
-
-import { getAllInterceptors, initLoading, getAllInterceptorsTypes, clearInterceptors, clearInterceptorsTypes, saveAll, updateAll, removeAll } from '../actions/interceptors';
-import { getAllPlans, clearPlans } from '../actions/plans';
+import ColorUtils from "../utils/ColorUtils"
+import Loading from '../components/ui/Loading'
+import {PrivilegeUtils} from "../utils/PrivilegeUtils"
+import {privileges} from "../constants/privileges-types"
+import { getAllPlans, clearPlans } from '../actions/plans'
+import { interceptorSort } from '../utils/InterceptorUtils'
 import { receiveQueue, clearQueue } from '../actions/queues'
-
-import { Row, Col, Form, Select, Icon, Card, Button, notification, Progress, Tag, Alert } from 'antd'
-import Loading from '../components/ui/Loading';
-import { getAllResourcesByApi, clearResources } from '../actions/resources';
-import { getAllOperations, clearOperations } from '../actions/operations';
-import DnDInterceptorType from '../components/interceptors/DnDInterceptorType';
-import ColorUtils from "../utils/ColorUtils";
+import {countInterceptorsByCycle} from "../utils/BadgeUtils"
+import ComponentAuthority from "../components/policy/ComponentAuthority"
+import { getAllOperations, clearOperations } from '../actions/operations'
+import { getAllResourcesByApi, clearResources } from '../actions/resources'
+import DnDInterceptorType from '../components/interceptors/DnDInterceptorType'
+import DropClientInterceptors from '../components/interceptors/DropClientInterceptors'
+import { getAllInterceptors, initLoading, getAllInterceptorsTypes, clearInterceptors, clearInterceptorsTypes, saveAll, updateAll, removeAll } from '../actions/interceptors'
 
 const Option = Select.Option
 
@@ -24,9 +27,11 @@ class Interceptors extends Component {
 
     state = {
         environmentId: 0,
+        apiId: 0,
         planId: 0,
         resourceId: 0,
         operationId: 0,
+        apiSelected: true,
         planSelected: false,
         resourceSelected: false,
         operationSelected: false,
@@ -35,6 +40,40 @@ class Interceptors extends Component {
         candidatesToDelete: [],
         showProgress: false,
         progress: 0
+    }
+
+    filterByLifeCycle = (interceptors) => {
+        if (this.state.operationSelected) {
+            return interceptors.filter(interceptor => {
+                return (interceptor.referenceId === this.state.operationId && interceptor.lifeCycle === 'OPERATION') ||
+                (interceptor.referenceId === this.state.resourceId && interceptor.lifeCycle === 'RESOURCE') ||
+                (!this.state.planSelected && interceptor.lifeCycle === 'PLAN') ||
+                (this.state.planSelected && interceptor.lifeCycle === 'PLAN' && interceptor.referenceId === this.state.planId)
+            })
+        }
+
+        if (this.state.resourceSelected) {
+            const { operations } = this.props
+            let operationsIds = []
+            if (operations) {
+                operationsIds = operations.map(op => op.id)
+            }
+            return interceptors.filter(interceptor => {
+                return (interceptor.referenceId === this.state.resourceId && interceptor.lifeCycle === 'RESOURCE')||
+                    (operationsIds.includes(interceptor.referenceId) && interceptor.lifeCycle === 'OPERATION') ||
+                    (!this.state.planSelected && interceptor.lifeCycle === 'PLAN') ||
+                    (this.state.planSelected && interceptor.lifeCycle === 'PLAN' && interceptor.referenceId === this.state.planId)
+            })
+        }
+
+        if (this.state.planSelected) {
+            return interceptors.filter(interceptor => {
+                return (interceptor.lifeCycle === 'RESOURCE') ||
+                    (interceptor.lifeCycle === 'OPERATION') ||
+                    (interceptor.referenceId === this.state.planId && interceptor.lifeCycle === 'PLAN')
+            })
+        }
+        return interceptors
     }
 
     filterByExecutionPoint = (interceptors, point) => {
@@ -48,12 +87,14 @@ class Interceptors extends Component {
     }
 
     componentDidMount() {
-        const query = { 'api.id': this.props.api.id, offset: 0 }
+        const { id }  = this.props.api
+        const query = {'api.id': id, offset: 0}
+        this.setState({ ...this.state, apiId: id })
         this.props.dispatch(initLoading())
         this.props.dispatch(getAllInterceptors(query))
         this.props.dispatch(getAllInterceptorsTypes())
         this.props.dispatch(getAllPlans(query))
-        this.props.dispatch(getAllResourcesByApi(this.props.api.id))
+        this.props.dispatch(getAllResourcesByApi(id))
     }
 
     componentWillUnmount() {
@@ -65,28 +106,28 @@ class Interceptors extends Component {
 
     componentWillReceiveProps(newProps) {
         if (newProps.notification && newProps.notification !== this.props.notification) {
-            const { type, message, description } = newProps.notification
-            notification[type]({ message, description })
+            const {type, message, description} = newProps.notification
+            notification[type]({message, description})
         }
 
-        const { showProgress } = this.state
+        const {showProgress} = this.state
         // progress
         if (newProps.queueCount && newProps.queueCount >= 1) {
             let percentage = Math.round(100 / newProps.queueCount)
-            this.setState({ showProgress: true, progress: percentage })
+            this.setState({showProgress: true, progress: percentage})
         }
 
         if (newProps.queueCount === 0 && showProgress) {
             notification.info({
-                message: 'Interceptors processed'
+                message: i18n.t('interceptors_processed')
             })
-            this.setState({ showProgress: false, progress: 0 })
+            this.setState({showProgress: false, progress: 0})
         }
     }
 
     componentDidUpdate(prevProps, prevState) {
         if (prevProps.queueCount === 0 && !this.props.queueCount) {
-            this.setState({ ...this.state, candidatesToSave: [], candidatesToDelete: [], candidatesToUpdate: [] })
+            this.setState({...this.state, candidatesToSave: [], candidatesToDelete: [], candidatesToUpdate: []})
         }
 
         if (this.props.queueCount === 0) {
@@ -96,7 +137,7 @@ class Interceptors extends Component {
             this.props.dispatch(clearPlans())
             this.props.dispatch(clearResources())
 
-            const query = { 'api.id': this.props.api.id, offset: 0 }
+            const query = {'api.id': this.props.api.id, offset: 0}
             this.props.dispatch(getAllInterceptors(query))
             this.props.dispatch(getAllPlans(query))
             this.props.dispatch(getAllResourcesByApi(this.props.api.id))
@@ -112,7 +153,7 @@ class Interceptors extends Component {
             }
 
             formObject.uuid = UUID.generate()
-            this.setState({ ...this.state, candidatesToUpdate: [...candidates, formObject] })
+            this.setState({...this.state, candidatesToUpdate: [...candidates, formObject]})
         } else {
             formObject.status = 'SAVE'
             let candidates = this.state.candidatesToSave
@@ -121,7 +162,7 @@ class Interceptors extends Component {
             }
 
             formObject.uuid = UUID.generate()
-            this.setState({ ...this.state, candidatesToSave: [...candidates, formObject] })
+            this.setState({...this.state, candidatesToSave: [...candidates, formObject]})
         }
     }
 
@@ -130,72 +171,128 @@ class Interceptors extends Component {
             if (interceptor.status) {
                 //just remove from candidatesToUpdate
                 const candidatesUpdated = this.state.candidatesToUpdate.filter(item => item.uuid !== interceptor.uuid)
-                this.setState({ ...this.state, candidatesToUpdate: candidatesUpdated })
+                this.setState({...this.state, candidatesToUpdate: candidatesUpdated})
             } else {
                 //add to candidatesToDelete
-                this.setState({ ...this.state, candidatesToDelete: [...this.state.candidatesToDelete, interceptor] })
+                this.setState({...this.state, candidatesToDelete: [...this.state.candidatesToDelete, interceptor]})
             }
         } else {
             //if enter here its because the user added a new interceptor and decided to remove
             const candidatesUpdated = this.state.candidatesToSave.filter(item => item.uuid !== interceptor.uuid)
-            this.setState({ ...this.state, candidatesToSave: candidatesUpdated })
+            this.setState({...this.state, candidatesToSave: candidatesUpdated})
         }
     }
 
     handleSelectChange = (type) => (value) => {
+        const { planSelected, resourceSelected, operationSelected } = this.state
         switch (type) {
             case 'ENV':
                 //dispatch ENV interceptors
-                if (value === 0) {
-                    this.setState({ ...this.state, environmentId: value })
-                } else {
-                    this.setState({ ...this.state, environmentId: value })
-                }
+                this.setState({...this.state, environmentId: value})
                 break;
             case 'PLAN':
                 //dispatch PLAN interceptors
                 if (value === 0) {
-                    this.setState({ ...this.state, planSelected: false, planId: value })
+                    const apiSelectedResult = !operationSelected && !resourceSelected
+                    this.setState({
+                        ...this.state,
+                        planSelected: false,
+                        planId: value,
+                        apiSelected: apiSelectedResult
+                    })
                 } else {
-                    this.setState({ ...this.state, planSelected: true, planId: value })
+                    this.setState({
+                        ...this.state, planSelected: true, planId: value,
+                        apiSelected: false
+                    })
                 }
                 break;
             case 'RES':
                 //dispatch RESOURCES interceptors
                 this.props.dispatch(clearOperations())
                 if (value === 0) {
-                    this.setState({ ...this.state, resourceSelected: false, resourceId: value })
+                    const apiSelectedResult = !planSelected
+                    this.setState({
+                        ...this.state,
+                        resourceSelected: false,
+                        resourceId: value,
+                        operationSelected: false,
+                        operationId: 0,
+                        apiSelected: apiSelectedResult
+                    })
                 } else {
-                    this.setState({ ...this.state, resourceSelected: true, resourceId: value })
+                    this.setState({
+                        ...this.state, resourceSelected: true, resourceId: value, operationSelected: false,
+                        operationId: 0, apiSelected: false
+                    })
                     this.props.dispatch(getAllOperations(this.props.api.id, value))
                 }
                 break;
             default:
                 //dispatch OPERATIONS interceptors
-                if (value === 0) {
-                    this.setState({ ...this.state, operationSelected: false, operationId: value })
-                } else {
-                    this.setState({ ...this.state, operationSelected: true, operationId: value })
-                }
+                const test = value !== 0;
+                this.setState({...this.state, operationSelected: test, operationId: value})
+        }
+        this.updateAllParams()
+    }
+
+    handleFilterOperation = (input, option) => {
+        const path = option.props.children[2]
+        try {
+            const reg = new RegExp(input, 'i')
+            return path.match(reg) !== null
+        } catch (e) {
+            return true
         }
     }
 
+    updateAllParams = () => {
+        const query = {'api.id': this.props.api.id, offset: 0}
+        this.props.dispatch(initLoading())
+        this.props.dispatch(getAllInterceptors(query))
+        this.props.dispatch(getAllInterceptorsTypes())
+    }
+
     discardChanges = () => {
-        this.setState({ ...this.state, candidatesToDelete: [], candidatesToSave: [], candidatesToUpdate: [] })
+        this.setState({...this.state, candidatesToDelete: [], candidatesToSave: [], candidatesToUpdate: []})
+        this.updateAllParams()
     }
 
     saveChanges = () => {
         const totalInterceptors = this.state.candidatesToSave.length + this.state.candidatesToUpdate.length + this.state.candidatesToDelete.length
         this.props.dispatch(receiveQueue(totalInterceptors))
-
+        if (this.state.candidatesToSave.length > 0 || this.state.candidatesToUpdate.length > 0 || this.state.candidatesToDelete.length > 0){
+            this.props.dispatch(initLoading())
+        }
         if (this.state.candidatesToSave.length > 0) this.props.dispatch(saveAll(this.state.candidatesToSave))
         if (this.state.candidatesToUpdate.length > 0) this.props.dispatch(updateAll(this.state.candidatesToUpdate))
         if (this.state.candidatesToDelete.length > 0) this.props.dispatch(removeAll(this.state.candidatesToDelete))
     }
 
     render() {
+        const { interceptors, api, operations } = this.props
 
-        const { interceptors, api } = this.props
+        let environmentPath
+        let operationPath
+
+        if (this.state.environmentId !== 0 && api && api.environments){
+            const env = api.environments.find(e => e.id === this.state.environmentId)
+            if (env) {
+                environmentPath = env.inboundURL
+            } else {
+                environmentPath = ''
+            }
+        }
+
+        if (this.state.operationId !== 0 && operations) {
+            const op = operations.find(o => o.id === this.state.operationId)
+            if (op) {
+                operationPath = op.path
+            } else {
+                operationPath = ''
+            }
+        }
+
         let allInterceptors
 
         let interceptorsPreFiltered
@@ -203,6 +300,9 @@ class Interceptors extends Component {
 
         if (this.props.interceptors) {
             allInterceptors = interceptors.content
+            allInterceptors = this.filterByLifeCycle(allInterceptors)
+            allInterceptors.concat(interceptors.content.filter(interceptor => interceptor.lifeCycle === 'API'))
+
             if (this.state.candidatesToSave.length > 0) {
                 allInterceptors = allInterceptors.concat(this.state.candidatesToSave)
             }
@@ -255,28 +355,33 @@ class Interceptors extends Component {
 
             interceptorsPreFiltered = interceptorsPreOrdered
             interceptorsPostFiltered = interceptorsPostOrdered
+
         }
 
         const hasNoChanges = this.state.candidatesToSave.length === 0 && this.state.candidatesToUpdate.length === 0 && this.state.candidatesToDelete.length === 0
         const canAddInterceptor =
-            (this.state.planSelected || this.state.resourceSelected || this.state.operationSelected)
+            (this.state.apiSelected || this.state.planSelected || this.state.resourceSelected || this.state.operationSelected)
             && (interceptorsPreFiltered && interceptorsPostFiltered)
             && (this.props.plans || !this.props.resources)
 
         return (
             <div>
-                <Alert message="Select any option to enable the interceptors" type="info" closable style={{ marginBottom: 10 }} showIcon />
+                <Alert message={i18n.t('select_any_option_to_enable_the_interceptors')} type="info" closable
+                       style={{marginBottom: 10}} showIcon/>
                 <Card
-                    title="Choose your Interceptors"
-                    style={{ marginBottom: 20 }}
+                    title={i18n.t('choose_your_interceptors')}
+                    style={{marginBottom: 20}}
                     className="inside-shadow"
+                    extra={
+                        <span>{environmentPath}{api.basePath}{operationPath}</span>
+                    }
                 >
                     <Form>
                         <Row gutter={20} type="flex" justify="space-between" align="middle">
                             <Col sm={24} md={6}>
-                                <Form.Item label="Environments">
+                                <Form.Item label={i18n.t('environments')}>
                                     <Select defaultValue={0} onChange={this.handleSelectChange('ENV')}>
-                                        <Option value={0}>All</Option>
+                                        <Option value={0}>{i18n.t('all')}</Option>
                                         {api && api.environments.map((env, index) => (
                                             <Option key={index} value={env.id}>{env.name}</Option>
                                         ))}
@@ -284,32 +389,39 @@ class Interceptors extends Component {
                                 </Form.Item>
                             </Col>
                             <Col sm={24} md={6}>
-                                <Form.Item label="Plans">
-                                    <Select defaultValue={0} onChange={this.handleSelectChange('PLAN')} disabled={!this.props.plans}>
-                                        <Option value={0}>All</Option>
+                                <Form.Item label={i18n.t('plans')}>
+                                    <Select defaultValue={0} onChange={this.handleSelectChange('PLAN')} disabled={!this.props.plans} className="heimdall-select-filter-complete">
+                                        <Option value={0}>{i18n.t('all')}</Option>
                                         {this.props.plans && this.props.plans.content.map((plan, index) => (
-                                            <Option key={index} value={plan.id}>{plan.name}</Option>
+                                            <Option key={index} value={plan.id}>{plan.name}
+                                                <Badge title="Numbers of interceptors" className="heimdall-badge-interceptors-count" count={countInterceptorsByCycle(interceptors && interceptors.content, 'PLAN', plan.id)}/>
+                                            </Option>
                                         ))}
                                     </Select>
                                 </Form.Item>
                             </Col>
                             <Col sm={24} md={6}>
-                                <Form.Item label="Resources">
-                                    <Select defaultValue={0} onChange={this.handleSelectChange('RES')} disabled={!this.props.resources}>
-                                        <Option value={0}>All</Option>
+                                <Form.Item label={i18n.t('resources')}>
+                                    <Select defaultValue={0} onChange={this.handleSelectChange('RES')} disabled={!this.props.resources} className="heimdall-select-filter-complete">
+                                        <Option value={0}>{i18n.t('all')}</Option>
                                         {this.props.resources && this.props.resources.map((res, index) => (
-                                            <Option key={index} value={res.id}>{res.name}</Option>
+                                            <Option key={index} value={res.id}>
+                                                <Badge title="Numbers of interceptors" className="heimdall-badge-interceptors-count" count={countInterceptorsByCycle(interceptors && interceptors.content, 'RESOURCE', res.id)}/>
+                                                {res.name}</Option>
                                         ))}
                                     </Select>
                                 </Form.Item>
                             </Col>
 
                             <Col sm={24} md={6}>
-                                <Form.Item label="Operations">
-                                    <Select defaultValue={0} onChange={this.handleSelectChange('OP')} disabled={!this.props.operations}>
-                                        <Option value={0}>All</Option>
+                                <Form.Item label={i18n.t('operations')}>
+                                    <Select showSearch value={this.state.operationId} onChange={this.handleSelectChange('OP')} disabled={!this.props.operations} className="heimdall-select-filter-complete" filterOption={this.handleFilterOperation}>
+                                        <Option value={0}>{i18n.t('all')}</Option>
                                         {this.props.operations && this.props.operations.map((op, index) => (
-                                            <Option key={index} value={op.id}><Tag color={ColorUtils.getColorMethod(op.method)}>{op.method}</Tag> {op.path}</Option>
+                                            <Option key={index} value={op.id}>
+                                                <Badge title="Numbers of interceptors" className="heimdall-badge-interceptors-count" count={countInterceptorsByCycle(interceptors && interceptors.content, 'OPERATION', op.id)}/>
+                                                <Tag color={ColorUtils.getColorMethod(op.method)}>{op.method}</Tag> {op.path}
+                                            </Option>
                                         ))}
                                     </Select>
                                 </Form.Item>
@@ -318,25 +430,29 @@ class Interceptors extends Component {
                     </Form>
                 </Card>
 
-                <Card title="Interceptors"
-                    extra={
-                        <Row type="flex" justify="center">
-                            {this.state.showProgress && <Progress type="circle" percent={this.state.progress} width={30} status="active" style={{marginRight: 10}} />}
-                            <Tag color="#989898">Can Drag</Tag>
-                            <Tag color="#c3cc93">Plan</Tag>
-                            <Tag color="#8edce0">Resource</Tag>
-                            <Tag color="#607d8b">Operation</Tag>
-                        </Row>}
+                <Card title={i18n.t('interceptors')}
+                      extra={
+                          <Row type="flex" justify="center">
+                              {this.state.showProgress &&
+                              <Progress type="circle" percent={this.state.progress} width={30} status="active"
+                                        style={{marginRight: 10}}/>}
+                              <Tag color="#989898">{i18n.t('can_drag')}</Tag>
+                              <Tag color="#ffa613">{i18n.t('api')}</Tag>
+                              <Tag color="#c3cc93">{i18n.t('plan')}</Tag>
+                              <Tag color="#8edce0">{i18n.t('resource')}</Tag>
+                              <Tag color="#607d8b">{i18n.t('operation')}</Tag>
+                          </Row>}
                 >
                     <div>
-                        <Row style={{ marginBottom: 20 }}>
-                            {!this.props.interceptorTypes && <Loading />}
+                        <Row style={{marginBottom: 20}}>
+                            {!this.props.interceptorTypes && <Loading/>}
                             {this.props.interceptorTypes && this.props.interceptorTypes.map((interceptor, index) => (
                                 <DnDInterceptorType key={index}
                                     type={interceptor.type}
                                     icon='code-o'
-                                    canAddInterceptor={canAddInterceptor}
-                                    color={canAddInterceptor && '#989898'}
+                                    canAddInterceptor={PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_INTERCEPTOR, privileges.PRIVILEGE_UPDATE_INTERCEPTOR]) && canAddInterceptor}
+                                    color={PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_INTERCEPTOR, privileges.PRIVILEGE_UPDATE_INTERCEPTOR]) && canAddInterceptor && '#989898'}
+                                    apiId={this.state.apiId !== 0 && this.state.apiId}
                                     environmentId={this.state.environmentId !== 0 && this.state.environmentId}
                                     planId={this.state.planId !== 0 && this.state.planId}
                                     resourceId={this.state.resourceId !== 0 && this.state.resourceId}
@@ -345,9 +461,13 @@ class Interceptors extends Component {
                                 />
                             ))}
                         </Row>
-                        <DropClientInterceptors interceptors={interceptorsPreFiltered} description="REQUEST" loading={this.props.loading} executionPoint={'FIRST'} handleForm={this.handleForm} handleDelete={this.handleDelete} />
-                        <br />
-                        <DropClientInterceptors interceptors={interceptorsPostFiltered} description="RESPONSE" loading={this.props.loading} executionPoint={'SECOND'} handleForm={this.handleForm} handleDelete={this.handleDelete} />
+                        <DropClientInterceptors interceptors={interceptorsPreFiltered} description={i18n.t('request')}
+                                                loading={this.props.loading} executionPoint={'FIRST'}
+                                                handleForm={this.handleForm} handleDelete={this.handleDelete}/>
+                        <br/>
+                        <DropClientInterceptors interceptors={interceptorsPostFiltered} description={i18n.t('response')}
+                                                loading={this.props.loading} executionPoint={'SECOND'}
+                                                handleForm={this.handleForm} handleDelete={this.handleDelete}/>
                     </div>
                 </Card>
                 <Row>
@@ -358,12 +478,14 @@ class Interceptors extends Component {
                     </Col>
                     <Col md={12}>
                         <Row className="h-row" type="flex" justify="end">
-                            <Button className="card-button" type="danger" disabled={hasNoChanges} onClick={this.discardChanges}>
-                                <Icon type="delete" /> Discard
+                            <Button id="discardInterceptors" className="card-button" type="danger" disabled={hasNoChanges} onClick={this.discardChanges}>
+                                <Icon type="delete" /> {i18n.t('discard')}
                             </Button>
-                            <Button className="card-button" type="primary" disabled={hasNoChanges} onClick={this.saveChanges}>
-                                <Icon type="save" /> Save Changes
-                            </Button>
+                            <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_INTERCEPTOR]}>
+                                <Button id="saveInterceptors" className="card-button" type="primary" disabled={hasNoChanges} onClick={this.saveChanges}>
+                                    <Icon type="save" /> {i18n.t('save_changes')}
+                                </Button>
+                            </ComponentAuthority>
                         </Row>
                     </Col>
                 </Row>

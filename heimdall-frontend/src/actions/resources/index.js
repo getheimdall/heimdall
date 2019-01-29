@@ -1,7 +1,8 @@
-import { ResourceConstants } from '../../constants/actions-types'
-import { resourceService } from '../../services'
-
 import { notification } from 'antd'
+
+import i18n from "../../i18n/i18n"
+import { resourceService } from '../../services'
+import { ResourceConstants } from '../../constants/actions-types'
 
 const getAllResourcesAction = resources => ({ type: ResourceConstants.ALL_RESOURCES, resources })
 
@@ -55,7 +56,7 @@ export const save = (idApi, resource) => dispatch => {
     .catch(error => {
         console.log(error)
         if (error.response && error.response.status === 400) {
-            notification['error']({ message: 'Error', description: error.response.data.message})
+            notification['error']({ message: i18n.t('error'), description: error.response.data.message})
         }
     })
     .then(() => {
@@ -76,7 +77,7 @@ export const update = (idApi, resource) => dispatch => {
     })
     .catch(error => {
         if (error.response && error.response.status === 400) {
-            notification['error']({ message: 'Error', description: error.response.data.message})
+            notification['error']({ message: i18n.t('error'), description: error.response.data.message})
             dispatch(getAllResourcesByApi(idApi))
         }
         console.log(error)
@@ -89,7 +90,7 @@ export const remove = (idApi, idResource) => dispatch => {
     .catch(error => {
         console.log(error)
         if (error.response && error.response.status === 400) {
-            notification['error']({ message: 'Error', description: error.response.data.message})
+            notification['error']({ message: i18n.t('error'), description: error.response.data.message})
         }
     })
     .then(() => {

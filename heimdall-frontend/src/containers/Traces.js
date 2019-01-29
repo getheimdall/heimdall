@@ -1,14 +1,15 @@
 //3rd's
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
-//actions
-import {getAllTraces, initLoading} from "../actions/traces";
 //components
 import {Card, Col, Form, notification, Row, Select, Input, Button, DatePicker, TimePicker} from 'antd'
+//actions
+import Loading from '../components/ui/Loading'
 import PageHeader from '../components/ui/PageHeader'
 import ListTraces from '../components/traces/ListTraces'
-import Loading from '../components/ui/Loading'
-import FilterTraceUtils from "../utils/FilterTraceUtils";
+import FilterTraceUtils from "../utils/FilterTraceUtils"
+import {getAllTraces, initLoading} from "../actions/traces"
+import i18n from "../i18n/i18n";
 
 const {Option} = Select
 
@@ -128,14 +129,14 @@ class Traces extends Component {
 
         return (
             <div>
-                <PageHeader title="Traces" icon="sync"/>
+                <PageHeader title={i18n.t('traces')} icon="sync"/>
 
                 <Row className="search-box">
                     <Card>
                         <Form>
                             <Row>
                                 <Col sm={24} md={8}>
-                                    <h3>Add filter:</h3>
+                                    <h3>{i18n.t('add_filter')}:</h3>
                                     <Select onChange={this.handleSelectFilter} key="filterSelect">
                                         {
                                             filters.map((element, i) => {
@@ -224,8 +225,7 @@ class Traces extends Component {
                             )}
                             <br/>
                             <div style={{width: "100%", textAlign: "left"}}>
-                                <Button type="primary" onClick={() => this.sendFilters()} icon="search">Apply
-                                    filters</Button>
+                                <Button id="searchTraces" type="primary" onClick={() => this.sendFilters()} icon="search">{i18n.t('apply_filters')}</Button>
                             </div>
                         </Form>
                     </Card>

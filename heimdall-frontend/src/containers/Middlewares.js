@@ -1,6 +1,10 @@
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {Button, Card, Icon, Input, message, notification, Pagination, Row, Table, Tag, Tooltip, Upload} from 'antd'
+
+import i18n from "../i18n/i18n"
+import {privileges} from "../constants/privileges-types"
+import ComponentAuthority from "../components/policy/ComponentAuthority"
 import {downloadMiddleware, getMiddlewares, initLoading, save} from '../actions/middlewares'
 
 const Dragger = Upload.Dragger
@@ -30,11 +34,11 @@ class Middlewares extends Component {
         const status = info.file.status
         if (status === 'done') {
             this.setState({...this.state, version: ""})
-            message.success(`${info.file.name} file uploaded successfully.`)
+            message.success(`${info.file.name} ${i18n.t('file_uploaded_successfully')}`)
             this.props.dispatch(initLoading())
             this.props.dispatch(getMiddlewares({offset: this.state.page, limit: 10}, this.props.api.id))
         } else if (status === 'error') {
-            message.error(`${info.file.name} file upload failed.`)
+            message.error(`${info.file.name} ${i18n.t('file_upload_failed')}`)
             message.error(info.file.error.response.data.message)
         }
     }
@@ -49,16 +53,20 @@ class Middlewares extends Component {
         const splitName = file.name.split('.')
         const type = splitName[splitName.length - 1]
         const isJar = type === "jar"
+
         if (!isJar) {
-            message.error('You can only upload JAR file!')
+            message.error(i18n.t('you_can_only_upload_jar_file'))
+            return false
         }
 
         const isLtOrE25M = file.size / 1024 / 1024 <= 25;
+
         if (!isLtOrE25M) {
-            message.error('Jar must smaller or equal than 25MB!')
+            message.error(i18n.t('jar_must_smaller_or_equal_than_25_mb'))
+            return false
         }
 
-        return isJar && isLtOrE25M
+        return true
     }
 
     sendFileUpload = (info) => {
@@ -75,10 +83,9 @@ class Middlewares extends Component {
         this.setState({...this.state, version: event.target.value})
     }
 
-    handleFileDownload = (middlewareId, version) => {
-        const apiName = this.props.api.name;
+    handleFileDownload = (middlewareId) => {
         this.props.dispatch(initLoading())
-        this.props.dispatch(downloadMiddleware(middlewareId, this.props.api.id, apiName, version))
+        this.props.dispatch(downloadMiddleware(middlewareId, this.props.api.id))
     }
 
     verifyVersionIsEmpty = () => {
@@ -100,29 +107,30 @@ class Middlewares extends Component {
 
         return (
             <div>
+                <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_MIDDLEWARE]}>
+                    <Card
+                        title={i18n.t('upload_middleware')}
+                        style={{marginBottom: 20}}
+                        className="inside-shadow"
+                    >
+                        <Row>
+                            <Input placeholder={i18n.t('version')} onChange={(event) => this.handleOnChangeVersion(event)}
+                                   addonBefore={i18n.t('version')} value={this.state.version}/>
+                        </Row>
+                        <br/>
+                        <Row>
+                            <Dragger id="dragMiddleware" {...propsFileUpload} disabled={this.verifyVersionIsEmpty()}>
+                                <p className="ant-upload-drag-icon">
+                                    <Icon type="inbox"/>
+                                </p>
+                                <p className="ant-upload-text">{i18n.t('click_or_drag_middleware_to_this_area_to_upload')}</p>
+                                <p className="ant-upload-hint">{i18n.t('support_for_single_upload_at_time')}</p>
+                            </Dragger>
+                        </Row>
+                    </Card>
+                </ComponentAuthority>
                 <Card
-                    title="Upload middleware"
-                    style={{marginBottom: 20}}
-                    className="inside-shadow"
-                >
-                    <Row>
-                        <Input placeholder="version" onChange={(event) => this.handleOnChangeVersion(event)}
-                               addonBefore="Version" value={this.state.version}/>
-                    </Row>
-                    <br/>
-                    <Row>
-                        <Dragger {...propsFileUpload} disabled={this.verifyVersionIsEmpty()}>
-                            <p className="ant-upload-drag-icon">
-                                <Icon type="inbox"/>
-                            </p>
-                            <p className="ant-upload-text">Click or drag middleware to this area to upload</p>
-                            <p className="ant-upload-hint">Support for a single upload. Strictly prohibit from uploading
-                                company data or other band files</p>
-                        </Dragger>
-                    </Row>
-                </Card>
-                <Card
-                    title="Versions middlewares"
+                    title={i18n.t('version_middleware')}
                     style={{marginBottom: 20}}
                     className="inside-shadow"
                 >
@@ -131,19 +139,19 @@ class Middlewares extends Component {
                         <div>
                             <Table dataSource={middlewares.content} loading={loading} rowKey={record => record.id}
                                    pagination={false} >
-                                <Column title="ID" dataIndex="id" id="id"/>
-                                <Column title="Path" dataIndex="path" id="path"/>
-                                <Column title="Version" dataIndex="version" id="version"/>
-                                <Column title="Status" id="status" key="status" render={(record) => (
+                                <Column title={i18n.t('id')} dataIndex="id" id="id"/>
+                                <Column title={i18n.t('path')} dataIndex="path" id="path"/>
+                                <Column title={i18n.t('version')} dataIndex="version" id="version"/>
+                                <Column title={i18n.t('status')} id="status" key="status" render={(record) => (
                                     <span>
-                                        {record.status === 'ACTIVE' && <Tag color="green">{record.status}</Tag>}
-                                        {record.status === 'INACTIVE' && <Tag color="red">{record.status}</Tag>}
+                                        {record.status === 'ACTIVE' && <Tag color="green">{i18n.t('active')}</Tag>}
+                                        {record.status === 'INACTIVE' && <Tag color="red">{i18n.t('inactive')}</Tag>}
                                     </span>
                                 )}/>
-                                <Column title="Created on" dataIndex="creationDate"/>
-                                <Column title="Download" render={(record) => (
-                                    <Tooltip title="Download this file">
-                                        <Button className="card-button add-tour" type="primary" icon="download" onClick={() => this.handleFileDownload(record.id, record.version)} size="large" shape="circle" />
+                                <Column title={i18n.t('created_on')} dataIndex="creationDate"/>
+                                <Column title={i18n.t('download')} render={(record) => (
+                                    <Tooltip title={i18n.t('download_this_file')}>
+                                        <Button className="card-button add-tour" type="primary" icon="download" onClick={() => this.handleFileDownload(record.id)} size="large" shape="circle" />
                                     </Tooltip>
                                 )}/>
                             </Table>

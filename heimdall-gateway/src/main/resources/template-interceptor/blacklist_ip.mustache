@@ -1,88 +1,80 @@
-import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
-
-import java.util.*;
-
-import com.netflix.zuul.ZuulFilter;
-import com.google.common.collect.Sets;
-import com.netflix.zuul.context.RequestContext;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
-import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
-import br.com.conductor.heimdall.middleware.spec.*;
 import br.com.conductor.heimdall.core.util.BeanManager;
+import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
 import br.com.conductor.heimdall.gateway.service.IpsInterceptorService;
-import org.springframework.http.HttpStatus;
+import br.com.conductor.heimdall.gateway.service.LifeCycleService;
+
+import com.netflix.zuul.context.RequestContext;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class BlacklistInterceptor extends HeimdallFilter {
 
-     private static Set<String> pathsAllowed;
+    private static Set<String> pathsAllowed;
 
-     private static Set<String> pathsNotAllowed;
+    private static Set<String> pathsNotAllowed;
 
-     private static Set<String> blacklist;
+    private static Set<String> blacklist;
 
-     private static String inboundURL;
+    private static String inboundURL;
 
-     private static String method;
+    private static String method;
 
-     private IpsInterceptorService ipsInterceptorService;
+    private static Long referenceId;
 
-     public BlacklistInterceptor() {
+    public BlacklistInterceptor() {
 
-          pathsAllowed = Sets.newHashSet(); {{#pathsAllowed}}
-          pathsAllowed.add("{{.}}");     {{/pathsAllowed}}
+        pathsAllowed = new HashSet<>();
+        {{#pathsAllowed}}
+        pathsAllowed.add("{{.}}");
+        {{/pathsAllowed}}
 
-          pathsNotAllowed = Sets.newHashSet();     {{#pathsNotAllowed}}
-          pathsNotAllowed.add("{{.}}");     {{/pathsNotAllowed}}
+        pathsNotAllowed = new HashSet<>();
+        {{#pathsNotAllowed}}
+        pathsNotAllowed.add("{{.}}");
+        {{/pathsNotAllowed}}
 
-          blacklist = Sets.newHashSet();   {{#ips}}
-          blacklist.add("{{.}}");      {{/ips}}
+        blacklist = new HashSet<>();
+        {{#ips}}
+        blacklist.add("{{.}}");
+        {{/ips}}
 
-          inboundURL = "{{inboundURL}}";
-          method = "{{method}}";
+        inboundURL = "{{inboundURL}}";
 
-     }
+        method = "{{method}}";
 
-     @Override
-     public int filterOrder() {
+        referenceId = {{referenceId}};
+    }
 
-          return {{order}};
-     }
+    @Override
+    public int filterOrder() {
 
-     @Override
-     public String filterType() {
+        return {{order}};
+    }
 
-          return "{{executionPoint}}";
-     }
+    @Override
+    public String filterType() {
 
-     @Override
-     public boolean should() {
+        return "{{executionPoint}}";
+    }
 
-           return InterceptorLifeCycle.{{lifeCycle}}.filter(pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest());
-     }
+    @Override
+    public String getName() {
+        return "{{name}}";
+    }
 
-     @Override
-     public String getName() {
-     	return "{{name}}";
-     }
+    @Override
+    public boolean should() {
 
-     @Override
-     public void execute() throws Throwable {
+        LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest(), referenceId);
+    }
 
-            try {
+    @Override
+    public void execute() throws Throwable {
 
-                RequestContext ctx = RequestContext.getCurrentContext();
-
-                ipsInterceptorService = (IpsInterceptorService) BeanManager.getBean(IpsInterceptorService.class);
-
-                if (ipsInterceptorService.verifyIpInList(ctx.getRequest(), blacklist)){
-                    ctx.getResponse().sendError(HttpStatus.UNAUTHORIZED.value(), "IP unauthorized");
-                }
-            } catch (IOException e) {
-                TraceContextHolder.getInstance().getActualTrace().trace(e.getMessage());
-            } finally {
-                return null;
-            }
-
-     }
+        IpsInterceptorService ipsInterceptorService = (IpsInterceptorService) BeanManager.getBean(IpsInterceptorService.class);
+        ipsInterceptorService.executeBlackList(blacklist);
+    }
 }

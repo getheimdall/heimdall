@@ -26,10 +26,7 @@ import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.exception.UnauthorizedException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -43,6 +40,7 @@ import java.util.stream.Collectors;
  * This class provides methods to generate and validate token with JWT
  *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ * @author Marcelo Aguiar Rodrigues
  */
 @Slf4j
 public class JwtUtils {
@@ -84,6 +82,7 @@ public class JwtUtils {
         TokenImplicit tokenImplicit = new TokenImplicit();
         tokenImplicit.setAccessToken(token);
         tokenImplicit.setExpiration(LocalDateTime.now().until(dateExpiredAccessToken, ChronoUnit.SECONDS));
+        tokenImplicit.setToken_type("bearer");
         return tokenImplicit;
     }
 
@@ -117,7 +116,8 @@ public class JwtUtils {
         }
 
         List<String> list = claimsFromTheToken.get("operations", ArrayList.class);
-        operations.addAll(list);
+        if (list != null && !list.isEmpty())
+            operations.addAll(list);
 
         return operations;
     }
@@ -179,6 +179,8 @@ public class JwtUtils {
                     .getBody();
         } catch (ExpiredJwtException e) {
             throw new UnauthorizedException(ExceptionMessage.TOKEN_EXPIRED);
+        } catch (SignatureException ex) {
+            throw new UnauthorizedException(ExceptionMessage.SIGNATURE_DOES_NOT_MATCH);
         }
     }
 

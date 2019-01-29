@@ -28,11 +28,13 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.OPERATIO
 import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 import static br.com.twsoftware.alfred.object.Objeto.notBlank;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import br.com.conductor.heimdall.core.entity.Interceptor;
-import br.com.conductor.heimdall.core.repository.InterceptorRepository;
+import br.com.conductor.heimdall.core.entity.Api;
+import br.com.conductor.heimdall.core.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -73,10 +75,10 @@ public class OperationService {
      private ResourceRepository resourceRepository;
 
      @Autowired
-     private InterceptorRepository interceptorRepository;
+     private InterceptorService interceptorService;
 
      @Autowired
-     private InterceptorService interceptorService;
+     private ApiService apiService;
 
      @Autowired
      private AMQPRouteService amqpRoute;
@@ -85,13 +87,12 @@ public class OperationService {
      private AMQPCacheService amqpCacheService;
 
      /**
-      * Finds a {@link Operation} by its Id, {@link Resource} Id and {@link Api} Id.
+      * Finds a {@link Operation} by its Id, {@link Resource} Id and {@link br.com.conductor.heimdall.core.entity.Api} Id.
       * 
-      * @param  apiId						The {@link Api} Id
+      * @param  apiId						The {@link br.com.conductor.heimdall.core.entity.Api} Id
       * @param 	resourceId					The {@link Resource} Id
       * @param 	operationId					The {@link Operation} Id
       * @return								The {@link Operation} found
-      * @throws NotFoundException			Resource not found
       */
      @Transactional(readOnly = true)
      public Operation find(Long apiId, Long resourceId, Long operationId) {
@@ -105,12 +106,11 @@ public class OperationService {
      /**
       * Generates a paged list of {@link Operation} from a request.
       * 
-      * @param  apiId						The {@link Api} Id
+      * @param  apiId						The {@link br.com.conductor.heimdall.core.entity.Api} Id
       * @param 	resourceId					The {@link Resource} Id
       * @param 	operationDTO				The {@link OperationDTO}
       * @param 	pageableDTO					The {@link PageableDTO}
       * @return								The paged {@link Operation} list as a {@link OperationPage} object
-      * @throws NotFoundException			Resource not found
       */
      @Transactional(readOnly = true)
      public OperationPage list(Long apiId, Long resourceId, OperationDTO operationDTO, PageableDTO pageableDTO) {
@@ -125,20 +125,17 @@ public class OperationService {
           
           Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
           Page<Operation> page = operationRepository.findAll(example, pageable);
-          
-          OperationPage operationPage = new OperationPage(PageDTO.build(page));
-          
-          return operationPage;
+
+          return new OperationPage(PageDTO.build(page));
      }
 
      /**
       * Generates a list of {@link Operation} from a request.
       * 
-      * @param  apiId						The {@link Api} Id
+      * @param  apiId						The {@link br.com.conductor.heimdall.core.entity.Api} Id
       * @param 	resourceId					The {@link Resource} Id
       * @param 	operationDTO				The {@link OperationDTO}
       * @return								The list of {@link Operation}
-      * @throws NotFoundException			Resource not found
       */
      @Transactional(readOnly = true)
      public List<Operation> list(Long apiId, Long resourceId, OperationDTO operationDTO) {
@@ -150,21 +147,39 @@ public class OperationService {
           operation.setResource(resource);
           
           Example<Operation> example = Example.of(operation, ExampleMatcher.matching().withIgnorePaths("resource.api").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
-          
-          List<Operation> operations = operationRepository.findAll(example);
-          
-          return operations;
+
+          return operationRepository.findAll(example);
+     }
+
+     /**
+      * Lists all {@link Operation} from one {@link Api}
+      *
+      * @param apiId The {@link Api} Id
+      * @return The complete list of all {@link Operation} from the {@link Api}
+      */
+     public List<Operation> list(final Long apiId) {
+          final Api api = apiService.find(apiId);
+
+          final List<Operation> operations = new ArrayList<>();
+
+          final OperationDTO operationDTO = new OperationDTO();
+
+          api.getResources().forEach(resource -> operations.addAll(this.list(apiId, resource.getId(), operationDTO)));
+
+          if (!operations.isEmpty()) {
+               return operations.stream().map(op -> new Operation(op.getId(), op.getMethod(), op.getPath(), null, null, null)).collect(Collectors.toList());
+          }
+
+          return new ArrayList<>();
      }
      
      /**
       * Saves a {@link Operation} to the repository.
       * 
-      * @param  apiId						The {@link Api} Id
+      * @param  apiId						The {@link br.com.conductor.heimdall.core.entity.Api} Id
       * @param 	resourceId					The {@link Resource} Id
       * @param 	operationDTO				The {@link OperationDTO}
       * @return								The saved {@link Operation}
-      * @throws NotFoundException			Resource not found
-      * @throws	BadRequestException			Only one operation per resource
       */
      @Transactional
      public Operation save(Long apiId, Long resourceId, OperationDTO operationDTO) {
@@ -174,10 +189,11 @@ public class OperationService {
                     
           Operation resData = operationRepository.findByResourceApiIdAndMethodAndPath(apiId, operationDTO.getMethod(), operationDTO.getPath());
           HeimdallException.checkThrow(notBlank(resData) && (resData.getResource().getId() == resource.getId()), ONLY_ONE_OPERATION_PER_RESOURCE);
-          
+
           Operation operation = GenericConverter.mapper(operationDTO, Operation.class);
           operation.setResource(resource);
-          
+          operation.setPath(StringUtils.removeMultipleSlashes(operation.getPath()));
+
           HeimdallException.checkThrow(validateSingleWildCardOperationPath(operation), OPERATION_CANT_HAVE_SINGLE_WILDCARD);
           HeimdallException.checkThrow(validateDoubleWildCardOperationPath(operation), OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END);
 
@@ -189,15 +205,13 @@ public class OperationService {
      }
 
      /**
-      * Updates a {@link Operation} by its Id, {@link Api} Id, {@link Resource} Id and {@link OperationDTO}.
+      * Updates a {@link Operation} by its Id, {@link br.com.conductor.heimdall.core.entity.Api} Id, {@link Resource} Id and {@link OperationDTO}.
       * 
-      * @param  apiId						The {@link Api} Id
+      * @param  apiId						The {@link br.com.conductor.heimdall.core.entity.Api} Id
       * @param 	resourceId					The {@link Resource} Id
       * @param 	operationId					The {@link Operation} Id
       * @param 	operationDTO				The {@link OperationDTO}
       * @return								The updated {@link Operation}
-      * @throws NotFoundException			Resource not found
-      * @throws BadRequestException			Only one operation per resource
       */
      @Transactional
      public Operation update(Long apiId, Long resourceId, Long operationId, OperationDTO operationDTO) {
@@ -206,10 +220,11 @@ public class OperationService {
           HeimdallException.checkThrow(isBlank(operation), GLOBAL_RESOURCE_NOT_FOUND);
           
           Operation resData = operationRepository.findByResourceApiIdAndMethodAndPath(apiId, operationDTO.getMethod(), operationDTO.getPath());
-          HeimdallException.checkThrow(notBlank(resData) && (resData.getResource().getId().equals(operation.getResource().getId())) && (resData.getId() != operation.getId()), ONLY_ONE_OPERATION_PER_RESOURCE);
+          HeimdallException.checkThrow(notBlank(resData) && (resData.getResource().getId().equals(operation.getResource().getId())) && (!resData.getId().equals(operation.getId())), ONLY_ONE_OPERATION_PER_RESOURCE);
           
           operation = GenericConverter.mapper(operationDTO, operation);
-          
+          operation.setPath(StringUtils.removeMultipleSlashes(operation.getPath()));
+
           HeimdallException.checkThrow(validateSingleWildCardOperationPath(operation), OPERATION_CANT_HAVE_SINGLE_WILDCARD);
           HeimdallException.checkThrow(validateDoubleWildCardOperationPath(operation), OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END);
           
@@ -223,12 +238,11 @@ public class OperationService {
      }
      
      /**
-      * Deletes a {@link Operation} by its Id, {@link Resource} Id and {@link Api} Id.
+      * Deletes a {@link Operation} by its Id, {@link Resource} Id and {@link br.com.conductor.heimdall.core.entity.Api} Id.
       * 
-      * @param  apiId						The {@link Api} Id
+      * @param  apiId						The {@link br.com.conductor.heimdall.core.entity.Api} Id
       * @param 	resourceId					The {@link Resource} Id
       * @param 	operationId					The {@link Operation} Id
-      * @throws NotFoundException			Resource not found
       */
      @Transactional
      public void delete(Long apiId, Long resourceId, Long operationId) {
@@ -237,8 +251,7 @@ public class OperationService {
           HeimdallException.checkThrow(isBlank(operation), GLOBAL_RESOURCE_NOT_FOUND);
 
           // Deletes all interceptors attached to the Operation
-          List<Interceptor> interceptors = interceptorRepository.findByOperationId(operationId);
-          interceptors.forEach(interceptor -> interceptorService.delete(interceptor.getId()));
+          interceptorService.deleteAllfromOperation(operationId);
 
           operationRepository.delete(operation.getId());
           amqpCacheService.dispatchClean(ConstantsCache.OPERATION_ACTIVE_FROM_ENDPOINT, operation.getResource().getApi().getBasePath() + operation.getPath());
@@ -246,13 +259,25 @@ public class OperationService {
           
           amqpRoute.dispatchRoutes();
      }
-     
+
+     /**
+      * Deletes all Operations from a Resource
+      *
+      * @param apiId      Api with the Resource
+      * @param resourceId Resource with the Operations
+      */
+     @Transactional
+     public void deleteAllfromResource(Long apiId, Long resourceId) {
+          List<Operation> operations = operationRepository.findByResourceApiIdAndResourceId(apiId, resourceId);
+          operations.forEach(operation -> this.delete(apiId, resourceId, operation.getId()));
+     }
+
      /*
       * A Operation can not have a single wild card at any point in it.
       * 
       * @return  true when the path of the operation contains a single wild card, false otherwise
       */
-     private static boolean validateSingleWildCardOperationPath(Operation operation) {
+     private boolean validateSingleWildCardOperationPath(Operation operation) {
          
           return Arrays.asList(operation.getPath().split("/")).contains("*");
      }
@@ -262,7 +287,7 @@ public class OperationService {
       * 
       * @return true when the path has more than one double wild card or one not at the end, false otherwise
       */
-     private static boolean validateDoubleWildCardOperationPath(Operation operation) {
+     private boolean validateDoubleWildCardOperationPath(Operation operation) {
          List<String> path = Arrays.asList(operation.getPath().split("/"));
                    
          if (path.contains("**"))
