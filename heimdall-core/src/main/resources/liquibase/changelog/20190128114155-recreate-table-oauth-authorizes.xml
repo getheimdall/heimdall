@@ -12,7 +12,7 @@
 
     <changeSet id="02" author="conductor\dijalma.silva">
         <createTable tableName="OAUTH_AUTHORIZES">
-            <column name="ID" type="BIGINT">
+            <column name="ID" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" primaryKeyName="PK_OAUTH_AUTHORIZES" nullable="false"/>
             </column>
             <column name="CLIENT_ID" type="VARCHAR(250)">
