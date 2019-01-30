@@ -355,7 +355,7 @@ public class OAuthInterceptorService {
      */
 
     private void passwordFlow(Provider provider, OAuthRequest oAuthRequest, String clientId, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsJson, String accessToken) {
-
+        validateClientId(clientId);
         validateInProvider(provider, clientId, accessToken);
 
         TokenOAuth tokenOAuth = oAuthService.generateTokenOAuth(oAuthRequest, oAuthRequest.getClientId(), privateKey, timeAccessToken, timeRefreshToken, claimsJson);
@@ -369,7 +369,7 @@ public class OAuthInterceptorService {
      * OAuth2.0 Implicit Flow
      */
     private void implicitFlow(Provider provider, OAuthRequest oAuthRequest, String clientId, String privateKey, int timeAccessToken, String claimsJson, String accessToken) {
-
+        validateClientId(clientId);
         validateInProvider(provider, clientId, accessToken);
 
         TokenImplicit tokenImplicit = oAuthService.generateTokenImplicit(oAuthRequest, privateKey, timeAccessToken, claimsJson);
