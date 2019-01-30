@@ -36,10 +36,12 @@ import br.com.conductor.heimdall.middleware.spec.ApiResponse;
 import br.com.conductor.heimdall.middleware.spec.Helper;
 import br.com.conductor.heimdall.middleware.spec.Http;
 import br.com.twsoftware.alfred.object.Objeto;
+import com.netflix.zuul.context.RequestContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -388,6 +390,12 @@ public class OAuthInterceptorService {
         }
 
     }
+
+    private void validateClientId(String clientId) {
+        App appActive = appRepository.findAppActive(clientId);
+        HeimdallException.checkThrow(Objects.isNull(appActive), ExceptionMessage.CLIENT_ID_NOT_FOUND);
+    }
+
 
     private void validateInProvider(Provider provider, String clientId, String accessToken) {
         if (provider.isProviderDefault()) {
