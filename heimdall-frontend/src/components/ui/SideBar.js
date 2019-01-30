@@ -8,6 +8,7 @@ import SidebarLink from './SidebarLink'
 import { infoService } from "../../services/InfoService"
 import { PrivilegeUtils } from "../../utils/PrivilegeUtils"
 import { privileges } from "../../constants/privileges-types"
+import { menuitem } from "../../constants/sidebar-items"
 import { updateKeys } from '../../actions/navbar'
 
 const { Sider } = Layout
@@ -22,7 +23,7 @@ class SideBar extends Component {
         const pathname = this.props.history.location.pathname
 
         if (pathname === "/") {
-            this.props.dispatch(updateKeys(['apis']))
+            this.props.dispatch(updateKeys([menuitem.DEFAULT_KEY]))
         } else {
             const key = pathname.split('/')
             this.props.dispatch(updateKeys([key[1]]))
@@ -59,66 +60,66 @@ class SideBar extends Component {
                     <Logo history={history} collapsed={this.state.collapsed} />
                     <Menu theme="dark" mode="inline" onSelect={this.onSelect} selectedKeys={this.props.keys} defaultSelectedKeys={['apis']} style={!this.state.collapsed ? { width: '200px' } : { width: '80px' }}>
                         {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_API]) &&
-                            <Menu.Item key="apis" className="apis">
+                            <Menu.Item key={menuitem.APIS} className="apis">
                                 <SidebarLink to="/apis" label={i18n.t('apis')} history={history} icon="api" />
                             </Menu.Item>
                         }
 
                         {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_PLAN]) &&
-                            <Menu.Item key="plans" className="plans">
+                            <Menu.Item key={menuitem.PLANS} className="plans">
                                 <SidebarLink to="/plans" label={i18n.t('plans')} history={history} icon="profile" />
                             </Menu.Item>
                         }
 
                         {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_APP]) &&
-                            <Menu.Item key="apps" className="apps">
+                            <Menu.Item key={menuitem.APPS} className="apps">
                                 <SidebarLink to="/apps" label={i18n.t('apps')} history={history} icon="appstore" />
                             </Menu.Item>
                         }
 
                         {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_ACCESSTOKEN]) &&
-                            <Menu.Item key="tokens" className="accessToken">
+                            <Menu.Item key={menuitem.TOKENS} className="accessToken">
                                 <SidebarLink to="/tokens" label={i18n.t('access_tokens')} history={history} icon="key" />
                             </Menu.Item>
                         }
 
                         {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_ENVIRONMENT]) &&
-                            <Menu.Item key="environments" className="environments">
+                            <Menu.Item key={menuitem.ENVIRONMENTS} className="environments">
                                 <SidebarLink to="/environments" label={i18n.t('environments')} history={history} icon="codepen" />
                             </Menu.Item>
                         }
 
                         {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_DEVELOPER]) &&
-                            <Menu.Item key="developers" className="developers">
+                            <Menu.Item key={menuitem.DEVELOPERS} className="developers">
                                 <SidebarLink to="/developers" label={i18n.t('developers')} history={history} icon="code" />
                             </Menu.Item>
                         }
 
                         {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_ROLE]) &&
-                            <Menu.Item key="roles" className="roles">
+                            <Menu.Item key={menuitem.ROLES} className="roles">
                                 <SidebarLink to="/roles" label={i18n.t('roles')} history={history} icon="solution" />
                             </Menu.Item>
                         }
 
                         {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_USER]) &&
-                            <Menu.Item key="users" className="users">
+                            <Menu.Item key={menuitem.USERS} className="users">
                                 <SidebarLink to="/users" label={i18n.t('users')} history={history} icon="user" />
                             </Menu.Item>
                         }
 
                         {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_TRACES]) && traces &&
-                            <Menu.Item key="traces" className="traces">
+                            <Menu.Item key={menuitem.TRACES} className="traces">
                                 <SidebarLink to="/traces" label={i18n.t('traces')} history={history} icon="sync" />
                             </Menu.Item>
                         }
 
                         {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_LDAP]) &&
-                            <Menu.Item key="ldap" className="ldap">
+                            <Menu.Item key={menuitem.LDAP} className="ldap">
                                 <SidebarLink to="/ldap" label={i18n.t('settings_ldap')} history={history} icon="setting" />
                             </Menu.Item>
                         }
                         {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_PROVIDER]) &&
-                            <Menu.Item key="providers" className="providers">
+                            <Menu.Item key={menuitem.PROVIDERS} className="providers">
                                 <SidebarLink to="/providers" label={i18n.t('providers')} history={history} icon="cluster" />
                             </Menu.Item>
                         }
