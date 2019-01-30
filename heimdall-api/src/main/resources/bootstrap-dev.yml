@@ -1,7 +1,0 @@
-spring:
-  application:
-    name: application-api-dev
-  cloud:
-    config:
-      uri: http://localhost:8888
-      fail-fast: true
