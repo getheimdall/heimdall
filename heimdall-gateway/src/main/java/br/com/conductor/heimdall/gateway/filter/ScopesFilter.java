@@ -19,6 +19,7 @@
  */
 package br.com.conductor.heimdall.gateway.filter;
 
+import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.trace.FilterDetail;
@@ -32,12 +33,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
-import java.math.BigInteger;
-import java.util.Objects;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import static br.com.conductor.heimdall.gateway.util.ConstantsContext.CLIENT_ID;
-import static br.com.conductor.heimdall.gateway.util.ConstantsContext.OPERATION_ID;
+import static br.com.conductor.heimdall.gateway.util.ConstantsContext.*;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 
 /**
@@ -95,15 +95,32 @@ public class ScopesFilter extends ZuulFilter {
         final String client_id = context.getRequest().getHeader(CLIENT_ID);
 
         if (client_id != null) {
-            final Set<BigInteger> allowedOperations = appRepository.findAllOperationIdsFromScopesByClientId(client_id);
 
-            final Long opFromCtx = (Long) context.get(OPERATION_ID);
-            if (Objects.isNull(opFromCtx)) return;
+            App app = appRepository.findByClientId(client_id);
+            if (app == null || app.getPlans() == null) return;
 
-            final BigInteger operation = new BigInteger(opFromCtx.toString());
+            Set<Long> apis = app.getPlans().stream().map(plan -> plan.getApi().getId()).collect(Collectors.toSet());
+            Long apiId = (Long) context.get(API_ID);
+            if (!apis.contains(apiId)) return;
+
+            final Set<Long> allowedOperations = new HashSet<>();
+
+            app.getPlans()
+                    .forEach(plan -> {
+                        if (plan != null)
+                            plan.getScopes()
+                                    .forEach(scope -> {
+                                        if (scope != null)
+                                            allowedOperations.addAll(scope.getOperationsIds());
+                                    });
+                    });
+
+            final Long operation = (Long) context.get(OPERATION_ID);
+
+            if (operation == null) return;
 
             // If the allowedOperations is empty it means that Scopes are not set
-            if (allowedOperations == null || allowedOperations.isEmpty()) return;
+            if (allowedOperations.isEmpty()) return;
 
             if (!allowedOperations.contains(operation)) {
                 context.setSendZuulResponse(false);

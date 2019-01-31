@@ -19,10 +19,7 @@
  */
 package br.com.conductor.heimdall.gateway.filter;
 
-import br.com.conductor.heimdall.core.entity.App;
-import br.com.conductor.heimdall.core.entity.Operation;
-import br.com.conductor.heimdall.core.entity.Plan;
-import br.com.conductor.heimdall.core.entity.Scope;
+import br.com.conductor.heimdall.core.entity.*;
 import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.trace.FilterDetail;
@@ -42,13 +39,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import java.math.BigInteger;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
-import static br.com.conductor.heimdall.gateway.util.ConstantsContext.CLIENT_ID;
-import static br.com.conductor.heimdall.gateway.util.ConstantsContext.OPERATION_ID;
+import static br.com.conductor.heimdall.gateway.util.ConstantsContext.*;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -90,12 +81,16 @@ public class ScopesFilterTest {
 
         this.request.addHeader(CLIENT_ID, clientId1);
 
+        Api api = new Api();
+        api.setId(1L);
+
         App app = new App();
-        app.setId(1L);
+        app.setId(10L);
         app.setClientId(clientId1);
 
         Plan plan = new Plan();
-        plan.setId(1L);
+        plan.setId(20L);
+        plan.setApi(api);
 
         Operation operation = new Operation(1111L, null, null,null, null, null);
         Scope scope = new Scope(1000L, null, null, null, null, null);
@@ -106,7 +101,7 @@ public class ScopesFilterTest {
 
         context.set(OPERATION_ID, operation.getId() + 1);
 
-        Mockito.when(appRepository.findAllOperationIdsFromScopesByClientId(Mockito.anyString())).thenReturn(Collections.emptySet());
+        Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(app);
 
         this.filter.run();
         final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
@@ -121,12 +116,16 @@ public class ScopesFilterTest {
 
         this.request.addHeader(CLIENT_ID, clientId1);
 
+        Api api = new Api();
+        api.setId(1L);
+
         App app = new App();
-        app.setId(1L);
+        app.setId(10L);
         app.setClientId(clientId1);
 
         Plan plan = new Plan();
-        plan.setId(2L);
+        plan.setId(20L);
+        plan.setApi(api);
 
         Operation operation = new Operation(1111L, null, null,null, null, null);
         Scope scope = new Scope(1000L, null, null, null, null, null);
@@ -137,10 +136,7 @@ public class ScopesFilterTest {
 
         context.set(OPERATION_ID, operation.getId());
 
-        Set<BigInteger> allowedOperations = new HashSet<>();
-        allowedOperations.add(new BigInteger(operation.getId().toString()));
-
-        Mockito.when(appRepository.findAllOperationIdsFromScopesByClientId(Mockito.anyString())).thenReturn(allowedOperations);
+        Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(app);
 
         this.filter.run();
         final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
@@ -154,11 +150,19 @@ public class ScopesFilterTest {
     public void multiplePlansSuccess() {
         this.request.addHeader(CLIENT_ID, clientId1);
 
+        Api api1 = new Api();
+        api1.setId(1L);
+
+        Api api2 = new Api();
+        api2.setId(2L);
+
         Plan plan1 = new Plan();
         plan1.setId(100L);
+        plan1.setApi(api1);
 
         Plan plan2 = new Plan();
         plan2.setId(200L);
+        plan2.setApi(api2);
 
         App app1 = new App();
         app1.setId(10L);
@@ -186,11 +190,7 @@ public class ScopesFilterTest {
 
         context.set(OPERATION_ID, operation1.getId());
 
-        Set<BigInteger> allowedOperations = new HashSet<>();
-        allowedOperations.add(new BigInteger(operation1.getId().toString()));
-        allowedOperations.add(new BigInteger(operation2.getId().toString()));
-
-        Mockito.when(appRepository.findAllOperationIdsFromScopesByClientId(Mockito.anyString())).thenReturn(allowedOperations);
+        Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(app1);
 
         this.filter.run();
 
@@ -205,11 +205,19 @@ public class ScopesFilterTest {
     public void multiplePlansFailure() {
         this.request.addHeader(CLIENT_ID, clientId2);
 
+        Api api1 = new Api();
+        api1.setId(1L);
+
+        Api api2 = new Api();
+        api2.setId(2L);
+
         Plan plan1 = new Plan();
         plan1.setId(100L);
+        plan1.setApi(api1);
 
         Plan plan2 = new Plan();
         plan2.setId(200L);
+        plan2.setApi(api2);
 
         App app1 = new App();
         app1.setId(10L);
@@ -231,11 +239,9 @@ public class ScopesFilterTest {
         plan2.setScopes(Sets.newHashSet(scope2));
 
         context.set(OPERATION_ID, operation1.getId());
+        context.set(API_ID, api2.getId());
 
-        Set<BigInteger> allowedOperations = new HashSet<>();
-        allowedOperations.add(new BigInteger(operation2.getId().toString()));
-
-        Mockito.when(appRepository.findAllOperationIdsFromScopesByClientId(Mockito.anyString())).thenReturn(allowedOperations);
+        Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(app2);
 
         this.filter.run();
 
@@ -249,11 +255,19 @@ public class ScopesFilterTest {
     public void overlappingPlansApp1() {
         this.request.addHeader(CLIENT_ID, clientId1);
 
+        Api api1 = new Api();
+        api1.setId(1L);
+
+        Api api2 = new Api();
+        api2.setId(2L);
+
         Plan plan1 = new Plan();
         plan1.setId(100L);
+        plan1.setApi(api1);
 
         Plan plan2 = new Plan();
         plan2.setId(200L);
+        plan2.setApi(api2);
 
         App app1 = new App();
         app1.setId(10L);
@@ -276,12 +290,9 @@ public class ScopesFilterTest {
         plan2.setScopes(Sets.newHashSet(scope2));
 
         context.set(OPERATION_ID, operation3.getId());
+        context.set(API_ID, api1.getId());
 
-        Set<BigInteger> allowedOperations = new HashSet<>();
-        allowedOperations.add(new BigInteger(operation1.getId().toString()));
-        allowedOperations.add(new BigInteger(operation3.getId().toString()));
-
-        Mockito.when(appRepository.findAllOperationIdsFromScopesByClientId(Mockito.anyString())).thenReturn(allowedOperations);
+        Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(app1);
 
         this.filter.run();
 
@@ -295,11 +306,19 @@ public class ScopesFilterTest {
     public void overlappingPlansApp2() {
         this.request.addHeader(CLIENT_ID, clientId1);
 
+        Api api1 = new Api();
+        api1.setId(1L);
+
+        Api api2 = new Api();
+        api2.setId(2L);
+
         Plan plan1 = new Plan();
         plan1.setId(100L);
+        plan1.setApi(api1);
 
         Plan plan2 = new Plan();
         plan2.setId(200L);
+        plan2.setApi(api2);
 
         App app1 = new App();
         app1.setId(10L);
@@ -317,12 +336,9 @@ public class ScopesFilterTest {
         plan2.setScopes(Sets.newHashSet(scope2));
 
         context.set(OPERATION_ID, operation2.getId());
+        context.set(API_ID, api1.getId());
 
-        Set<BigInteger> allowedOperations = new HashSet<>();
-        allowedOperations.add(new BigInteger(operation1.getId().toString()));
-        allowedOperations.add(new BigInteger(operation3.getId().toString()));
-
-        Mockito.when(appRepository.findAllOperationIdsFromScopesByClientId(Mockito.anyString())).thenReturn(allowedOperations);
+        Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(app1);
 
         this.filter.run();
 
@@ -335,12 +351,16 @@ public class ScopesFilterTest {
     @Test
     public void noClientIdHeader() {
 
+        Api api = new Api();
+        api.setId(1L);
+
         App app = new App();
-        app.setId(1L);
+        app.setId(100L);
         app.setClientId(clientId1);
 
         Plan plan = new Plan();
-        plan.setId(1L);
+        plan.setId(10L);
+        plan.setApi(api);
 
         Operation operation = new Operation(1111L, null, null,null, null, null);
         Scope scope = new Scope(1000L, null, null, null, null, null);
@@ -350,6 +370,7 @@ public class ScopesFilterTest {
         scope.setOperations(Sets.newHashSet(operation));
 
         context.set(OPERATION_ID, operation.getId());
+        context.set(API_ID, api.getId());
 
         this.filter.run();
         final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
@@ -364,14 +385,18 @@ public class ScopesFilterTest {
 
         this.request.addHeader(CLIENT_ID, clientId1);
 
+        Api api = new Api();
+        api.setId(1L);
+
         Operation operation = new Operation(1111L, null, null,null, null, null);
         Scope scope = new Scope(1000L, null, null, null, null, null);
 
         scope.setOperations(Sets.newHashSet(operation));
 
         context.set(OPERATION_ID, operation.getId());
+        context.set(API_ID, api.getId());
 
-        Mockito.when(appRepository.findAllOperationIdsFromScopesByClientId(Mockito.anyString())).thenReturn(null);
+        Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(null);
 
         this.filter.run();
         final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
@@ -396,7 +421,7 @@ public class ScopesFilterTest {
 
         context.set(OPERATION_ID, operation.getId());
 
-        Mockito.when(appRepository.findAllOperationIdsFromScopesByClientId(Mockito.anyString())).thenReturn(null);
+        Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(app);
 
         this.filter.run();
         final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
@@ -421,7 +446,7 @@ public class ScopesFilterTest {
 
         context.set(OPERATION_ID, operation.getId());
 
-        Mockito.when(appRepository.findAllOperationIdsFromScopesByClientId(Mockito.anyString())).thenReturn(null);
+        Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(app);
 
         this.filter.run();
         final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
@@ -435,12 +460,16 @@ public class ScopesFilterTest {
     public void noOperationIdContext() {
         this.request.addHeader(CLIENT_ID, clientId1);
 
+        Api api = new Api();
+        api.setId(1L);
+
         App app = new App();
-        app.setId(1L);
+        app.setId(100L);
         app.setClientId(clientId1);
 
         Plan plan = new Plan();
-        plan.setId(1L);
+        plan.setId(10L);
+        plan.setApi(api);
 
         Operation operation = new Operation(1111L, null, null,null, null, null);
         Scope scope = new Scope(1000L, null, null, null, null, null);
@@ -449,7 +478,7 @@ public class ScopesFilterTest {
         plan.setScopes(Sets.newHashSet(scope));
         scope.setOperations(Sets.newHashSet(operation));
 
-        Mockito.when(appRepository.findAllOperationIdsFromScopesByClientId(Mockito.anyString())).thenReturn(null);
+        Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(app);
 
         this.filter.run();
         final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
