@@ -392,17 +392,16 @@ public class OAuthInterceptorService {
     }
 
     private void validateClientId(String clientId) {
-        App appActive = appRepository.findAppActive(clientId);
+        final App appActive = appRepository.findAppActive(clientId);
         HeimdallException.checkThrow(Objects.isNull(appActive), ExceptionMessage.CLIENT_ID_NOT_FOUND);
     }
 
 
     private void validateInProvider(Provider provider, String clientId, String accessToken) {
         if (provider.isProviderDefault()) {
-            App appActive = appRepository.findAppActive(clientId);
-            HeimdallException.checkThrow(Objects.isNull(appActive), ExceptionMessage.CLIENT_ID_NOT_FOUND);
+            final App appActive = appRepository.findAppActive(clientId);
 
-            List<AccessToken> accessTokens = appActive.getAccessTokens();
+            final List<AccessToken> accessTokens = appActive.getAccessTokens();
             HeimdallException.checkThrow(accessTokens.stream().noneMatch(ac -> ac.getCode().equals(accessToken)), ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);
         } else {
 
