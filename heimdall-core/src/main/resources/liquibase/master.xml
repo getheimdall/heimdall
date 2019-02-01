@@ -16,8 +16,12 @@
     <property name="floatType" value="float" dbms="mysql, oracle"/>
     <property name="booleanType" value="varchar(6)" dbms="h2"/>
     <property name="booleanType" value="varchar(1)" dbms="mssql"/>
-    
-    
+
+    <property name="true" value="1" dbms="mssql, oracle" />
+    <property name="false" value="0" dbms="mssql, oracle" />
+    <property name="true" value="true" dbms="postgresql, h2, mysql" />
+    <property name="false" value="false" dbms="postgresql, h2, mysql" />
+
     <property name="inteiro" value="bigint" dbms="mssql, h2, oracle"/>
     
     <include file="changelog/20180501121201-initial-core-schemes.xml" relativeToChangelogFile="true"/>
@@ -31,5 +35,6 @@
     <include file="changelog/20181129141113-remove-null-constraints-from-value-in-provider-param.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20181203115559-update-table-provider-with-provider-default.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20181112113200-added-scopes-structure.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20190128114155-recreate-table-oauth-authorizes.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
