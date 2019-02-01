@@ -19,10 +19,10 @@
  */
 package br.com.conductor.heimdall.gateway.service;
 
-import br.com.conductor.heimdall.core.entity.Api;
+import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
-import br.com.conductor.heimdall.core.repository.ApiRepository;
+import br.com.conductor.heimdall.core.repository.AppRepository;
 import com.netflix.zuul.context.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,7 +41,7 @@ import static br.com.conductor.heimdall.gateway.util.ConstantsContext.*;
 public class LifeCycleService {
 
     @Autowired
-    private ApiRepository apiRepository;
+    private AppRepository appRepository;
 
     public boolean should(InterceptorLifeCycle interceptorLifeCycle,
                           Long referenceId,
@@ -65,7 +65,7 @@ public class LifeCycleService {
             case API:
                 return referenceId.equals(apiId);
             case PLAN:
-                return validatePlan(apiId, referenceId);
+                return validatePlan(context, referenceId);
             case RESOURCE:
                 return referenceId.equals(resourceId);
             case OPERATION:
@@ -76,14 +76,18 @@ public class LifeCycleService {
 
     }
 
-    private boolean validatePlan(Long apiId, Long referenceId) {
+    private boolean validatePlan(RequestContext context, Long referenceId) {
 
-        Api api = apiRepository.findOne(apiId);
+        String client_id = context.getRequest().getHeader(CLIENT_ID);
 
-        if (api == null) return false;
-        if (api.getPlans() == null || api.getPlans().isEmpty()) return false;
+        if (client_id == null) return false;
 
-        Set<Long> plansIds = api.getPlans().stream().map(Plan::getId).collect(Collectors.toSet());
+        App app = appRepository.findByClientId(client_id);
+
+        if (app == null) return false;
+        if (app.getPlans() == null || app.getPlans().isEmpty()) return false;
+
+        Set<Long> plansIds = app.getPlans().stream().map(Plan::getId).collect(Collectors.toSet());
 
         return plansIds.contains(referenceId);
     }
