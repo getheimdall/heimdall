@@ -83,11 +83,10 @@ public class MiddlewareInterceptor extends HeimdallFilter {
 
         try {
             def middleware = m.instance("{{{content}}}");
+            ctx.setSendZuulResponse(false);
             middleware.run(helper);
         } catch (Exception e) {
             throw e;
-        } finally {
-            ctx.setSendZuulResponse(false);
         }
     }
 
