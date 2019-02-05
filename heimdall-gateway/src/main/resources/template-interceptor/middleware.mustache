@@ -86,6 +86,10 @@ public class MiddlewareInterceptor extends HeimdallFilter {
             ctx.setSendZuulResponse(false);
             middleware.run(helper);
         } catch (Exception e) {
+            helper.call().response().header().add("Content-Type", "application/json");
+            helper.call().response().setBody("{\"message\":\"Middleware Exception\"}");
+            helper.call().response().setStatus(500);
+            ctx.setSendZuulResponse(false);
             throw e;
         }
     }
