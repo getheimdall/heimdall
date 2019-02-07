@@ -196,6 +196,7 @@ public class UserService {
          String username = principal.getName();
          User userLogged = userRepository.findByUserName(username);
 
+         HeimdallException.checkThrow(userLogged.getType().equals(TypeUser.LDAP), USER_LDAP_UNAUTHORIZED_TO_CHANGE_PASSWORD);
          HeimdallException.checkThrow(isBlank(userLogged), GLOBAL_RESOURCE_NOT_FOUND);
          HeimdallException.checkThrow(!passwordEncoder.matches(userPasswordDTO.getCurrentPassword(), userLogged.getPassword()), USER_CURRENT_PASSWORD_NOT_MATCHING);
          HeimdallException.checkThrow(passwordEncoder.matches(userPasswordDTO.getNewPassword(), userLogged.getPassword()), USER_NEW_PASSWORD_EQUALS_CURRENT_PASSWORD);
