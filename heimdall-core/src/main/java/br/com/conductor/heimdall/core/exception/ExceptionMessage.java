@@ -177,7 +177,9 @@ public enum ExceptionMessage {
 
     USER_NEW_PASSWORD_NOT_MATCHING(BAD_REQUEST.value(), "New password not matching!", BadRequestException.class),
 
-    USER_UNAUTHORIZED_TO_CHANGE_PASSWORD(UNAUTHORIZED.value(), "You can't change the password!", UnauthorizedException.class);
+    USER_UNAUTHORIZED_TO_CHANGE_PASSWORD(UNAUTHORIZED.value(), "You can't change the password!", UnauthorizedException.class),
+
+    USER_LDAP_UNAUTHORIZED_TO_CHANGE_PASSWORD(UNAUTHORIZED.value(), "User from LDAP can't change the password!", UnauthorizedException.class);
 
 
     @Getter
