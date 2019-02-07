@@ -40,5 +40,6 @@
     <include file="changelog/20181206115232-add-unique-constraints-to-role-name.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20181112145330-insert-privileges-for-scopes.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20181128143000-removed-duplicates-privileges-and-added-unique-constraint.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20190206173936-insert-privileges-for-user-update-password.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

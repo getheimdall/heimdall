@@ -20,45 +20,33 @@
 
 package br.com.conductor.heimdall.api.dto;
 
-import br.com.conductor.heimdall.core.enums.Status;
-import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
- * Data transference object class that represents a Heimdall LDAP.
+ * Data transference object class that represents updates in password to a Heimdall User.
  *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class LdapDTO implements Serializable {
+public class UserPasswordDTO implements Serializable {
 
-    private Long id;
+    @NotNull
+    @Size(max = 16)
+    @JsonProperty("current_password")
+    private String currentPassword;
 
-    @NotNull(message = "URL needs to be informed.")
-    @Size(max = 200)
-    private String url;
+    @NotNull
+    @Size(max = 16)
+    @JsonProperty("new_password")
+    private String newPassword;
 
-    @NotNull(message = "SearchBase needs to be informed.")
-    private String searchBase;
-
-    @NotNull(message = "UserDn needs to be informed.")
-    @Size(max = 100)
-    private String userDn;
-
-    @NotNull(message = "Password needs to be informed.")
-    private String password;
-
-    @NotNull(message = "UserSearchFilter needs to be informed.")
-    @Size(max = 120)
-    private String userSearchFilter;
-
-    @NotNull(message = "Status needs to be informed.")
-    private Status status;
+    @NotNull
+    @Size(max = 16)
+    @JsonProperty("new_password_validate")
+    private String newPasswordValidate;
 }

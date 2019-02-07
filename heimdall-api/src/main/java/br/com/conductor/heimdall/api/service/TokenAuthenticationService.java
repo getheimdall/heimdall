@@ -184,9 +184,7 @@ public class TokenAuthenticationService {
     private Collection<? extends GrantedAuthority> getAuthoritiesByRoles(Set<Role> roles) {
         Set<GrantedAuthority> authorities = new HashSet<>();
 
-        roles.forEach(role -> {
-            role.getPrivileges().forEach(privilege -> authorities.add(new SimpleGrantedAuthority(privilege.getName())));
-        });
+        roles.forEach(role -> role.getPrivileges().forEach(privilege -> authorities.add(new SimpleGrantedAuthority(privilege.getName()))));
 
         return authorities;
     }

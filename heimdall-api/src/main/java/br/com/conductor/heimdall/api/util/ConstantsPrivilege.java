@@ -97,6 +97,7 @@ public class ConstantsPrivilege {
      public static final String PRIVILEGE_CREATE_USER = "hasAuthority('CREATE_USER')";
      public static final String PRIVILEGE_UPDATE_USER = "hasAuthority('UPDATE_USER')";
      public static final String PRIVILEGE_DELETE_USER = "hasAuthority('DELETE_USER')";
+     public static final String PRIVILEGE_UPDATE_PASSWORD_USER = "hasAuthority('UPDATE_PASSWORD_USER')";
      
      public static final String PRIVILEGE_READ_PROVIDER = "hasAuthority('READ_PROVIDER')";
      public static final String PRIVILEGE_CREATE_PROVIDER = "hasAuthority('CREATE_PROVIDER')";

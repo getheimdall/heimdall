@@ -21,25 +21,11 @@ package br.com.conductor.heimdall.api.service;
  * ==========================LICENSE_END===================================
  */
 
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
-import static br.com.twsoftware.alfred.object.Objeto.isBlank;
-
-import java.util.List;
-import java.util.Set;
-
-import br.com.conductor.heimdall.api.dto.UserEditDTO;
-import br.com.conductor.heimdall.api.entity.Role;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.StringMatcher;
-import org.springframework.data.domain.Page;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import br.com.conductor.heimdall.api.dto.UserDTO;
+import br.com.conductor.heimdall.api.dto.UserEditDTO;
+import br.com.conductor.heimdall.api.dto.UserPasswordDTO;
 import br.com.conductor.heimdall.api.dto.page.UserPage;
+import br.com.conductor.heimdall.api.entity.Role;
 import br.com.conductor.heimdall.api.entity.User;
 import br.com.conductor.heimdall.api.enums.TypeUser;
 import br.com.conductor.heimdall.api.repository.RoleRepository;
@@ -49,11 +35,27 @@ import br.com.conductor.heimdall.core.dto.PageDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.util.Pageable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.data.domain.ExampleMatcher.StringMatcher;
+import org.springframework.data.domain.Page;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.security.Principal;
+import java.util.List;
+import java.util.Set;
+
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
+import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 
 /**
  * Provides methods to create, read, update and delete a {@link User}.
  *
  * @author Marcos Filho
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
 @Service
@@ -183,4 +185,23 @@ public class UserService {
           
           return user;
      }
+
+     /**
+      * Updates password the {@link User}
+      * @param principal {@link Principal}
+      * @param userPasswordDTO {@link UserPasswordDTO}
+      */
+    public void updatePassword(Principal principal, UserPasswordDTO userPasswordDTO) {
+
+         String username = principal.getName();
+         User userLogged = userRepository.findByUserName(username);
+
+         HeimdallException.checkThrow(isBlank(userLogged), GLOBAL_RESOURCE_NOT_FOUND);
+         HeimdallException.checkThrow(!passwordEncoder.matches(userPasswordDTO.getCurrentPassword(), userLogged.getPassword()), USER_CURRENT_PASSWORD_NOT_MATCHING);
+         HeimdallException.checkThrow(passwordEncoder.matches(userPasswordDTO.getNewPassword(), userLogged.getPassword()), USER_NEW_PASSWORD_EQUALS_CURRENT_PASSWORD);
+         HeimdallException.checkThrow(!userPasswordDTO.getNewPassword().equals(userPasswordDTO.getNewPasswordValidate()), USER_NEW_PASSWORD_NOT_MATCHING);
+
+         userLogged.setPassword(passwordEncoder.encode(userPasswordDTO.getNewPassword()));
+         userRepository.save(userLogged);
+    }
 }

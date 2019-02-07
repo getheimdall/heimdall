@@ -169,7 +169,15 @@ public enum ExceptionMessage {
 
     SCOPE_INVALID_NAME(BAD_REQUEST.value(), "A Scope with the provided name already exists", BadRequestException.class),
 
-    SCOPE_NO_OPERATION_FOUND(BAD_REQUEST.value(), "A Scope must have at least one Operation", BadRequestException.class);
+    SCOPE_NO_OPERATION_FOUND(BAD_REQUEST.value(), "A Scope must have at least one Operation", BadRequestException.class),
+
+    USER_NEW_PASSWORD_EQUALS_CURRENT_PASSWORD(BAD_REQUEST.value(), "New password must different from the current password!", BadRequestException.class),
+
+    USER_CURRENT_PASSWORD_NOT_MATCHING(BAD_REQUEST.value(), "Current password not matching!", BadRequestException.class),
+
+    USER_NEW_PASSWORD_NOT_MATCHING(BAD_REQUEST.value(), "New password not matching!", BadRequestException.class),
+
+    USER_UNAUTHORIZED_TO_CHANGE_PASSWORD(UNAUTHORIZED.value(), "You can't change the password!", UnauthorizedException.class);
 
 
     @Getter
