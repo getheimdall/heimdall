@@ -29,7 +29,7 @@ HTTPv1.interceptors.response.use(res => {
     return res
 }, error => {
     const response = error.response
-    if ((response.status === 500) && response.data.message.includes("Token expired")) {
+    if (response.status === 403) {
         localStorage.clear()
         window.location.pathname = '/login'
     }

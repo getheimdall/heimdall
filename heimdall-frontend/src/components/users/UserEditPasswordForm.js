@@ -30,6 +30,7 @@ class UserEditPasswordForm extends Component {
                                         initialValue: '',
                                         rules: [
                                             { required: true, message: i18n.t('please_input_current_password') },
+                                            { min: 5, message: i18n.t('min_5_characters_to_current_password')},
                                             { max: 16, message: i18n.t('max_16_characters_to_current_password') }
                                         ]
                                     })(<Input type="password" disabled={PrivilegeUtils.verifyTypeUser('LDAP')} />)
@@ -43,6 +44,7 @@ class UserEditPasswordForm extends Component {
                                         initialValue: '',
                                         rules: [
                                             { required: true, message: i18n.t('please_input_new_password') },
+                                            { min: 5, message: i18n.t('min_5_characters_to_new_password')},
                                             { max: 16, message: i18n.t('max_16_characters_to_new_password') }
                                         ]
                                     })(<Input type="password" disabled={PrivilegeUtils.verifyTypeUser('LDAP')} />)
@@ -52,10 +54,11 @@ class UserEditPasswordForm extends Component {
                         <Col sm={24} md={12}>
                             <FormItem label={i18n.t('confirm_new_password')}>
                                 {
-                                    getFieldDecorator('new_password_validate', {
+                                    getFieldDecorator('confirm_new_password', {
                                         initialValue: '',
                                         rules: [
                                             { required: true, message: i18n.t('please_input_confirm_new_password') },
+                                            { min: 5, message: i18n.t('min_5_characters_to_confirm_new_password')},
                                             { max: 16, message: i18n.t('max_16_characters_to_confirm_new_password') }
                                         ]
                                     })(<Input type="password" disabled={PrivilegeUtils.verifyTypeUser('LDAP')} />)

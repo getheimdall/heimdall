@@ -255,6 +255,9 @@ export default {
         'max_16_characters_to_new_password': 'Max of 16 characters to new password',
         'confirm_new_password': 'Confirm new password',
         'please_input_confirm_new_password': 'Please, confirm the new password',
-        'max_16_characters_to_confirm_new_password': 'Max of 16 characters in confirm the new password'
+        'max_16_characters_to_confirm_new_password': 'Max of 16 characters in confirm the new password',
+        'min_5_characters_to_current_password': 'Mix of 5 characters to current password',
+        'min_5_characters_to_new_password': 'Mix of 5 characters to new password',
+        'min_5_characters_to_confirm_new_password': 'Mix of 5 characters to confirm new password'
     }
 }

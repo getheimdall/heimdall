@@ -167,9 +167,9 @@ public class UserResource {
      @ResponseBody
      @ApiOperation(value = "Update password of the User")
      @PutMapping(value = "/password")
-     public ResponseEntity<?> updatePassword(@ApiParam(hidden = true) Principal principal, @RequestBody UserPasswordDTO userPasswordDTO) {
+     public ResponseEntity<?> updatePassword(@ApiParam(hidden = true) Principal principal, @RequestBody @Valid UserPasswordDTO userPasswordDTO) {
 
-          userService.updatePassword(principal, userPasswordDTO);
+          userService.updatePassword(principal, userPasswordDTO.getCurrentPassword(), userPasswordDTO.getNewPassword(), userPasswordDTO.getConfirmNewPassword());
 
           return ResponseEntity.ok().build();
      }

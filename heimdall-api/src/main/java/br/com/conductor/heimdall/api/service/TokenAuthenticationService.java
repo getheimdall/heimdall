@@ -36,6 +36,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -52,6 +54,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -175,11 +178,18 @@ public class TokenAuthenticationService {
                         addAuthentication(response, user, claims.getId());
                         return new UsernamePasswordAuthenticationToken(userFound.getUserName(), userFound.getPassword(), getAuthoritiesByRoles(userFound.getRoles()));
                     }
-                    return null;
                 }
             } catch (ExpiredJwtException ex) {
                 credentialStateService.logout(token);
-                ExceptionMessage.TOKEN_EXPIRED.raise();
+                response.reset();
+                response.setStatus(HttpStatus.FORBIDDEN.value());
+                response.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+                log.error(ex.getMessage(), ex);
+                try {
+                    response.getWriter().write("{ \"error\": \"Token expired\" }");
+                } catch (IOException e) {
+                    log.error(e.getMessage(), e);
+                }
             }
         }
 

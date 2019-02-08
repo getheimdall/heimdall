@@ -36,17 +36,17 @@ import java.io.Serializable;
 public class UserPasswordDTO implements Serializable {
 
     @NotNull
-    @Size(max = 16)
+    @Size(min = 5, max = 16)
     @JsonProperty("current_password")
     private String currentPassword;
 
     @NotNull
-    @Size(max = 16)
+    @Size(min = 5, max = 16)
     @JsonProperty("new_password")
     private String newPassword;
 
     @NotNull
-    @Size(max = 16)
-    @JsonProperty("new_password_validate")
-    private String newPasswordValidate;
+    @Size(min = 5, max = 16)
+    @JsonProperty("confirm_new_password")
+    private String confirmNewPassword;
 }

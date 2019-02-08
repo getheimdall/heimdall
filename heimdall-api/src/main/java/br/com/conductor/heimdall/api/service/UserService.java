@@ -23,7 +23,6 @@ package br.com.conductor.heimdall.api.service;
 
 import br.com.conductor.heimdall.api.dto.UserDTO;
 import br.com.conductor.heimdall.api.dto.UserEditDTO;
-import br.com.conductor.heimdall.api.dto.UserPasswordDTO;
 import br.com.conductor.heimdall.api.dto.page.UserPage;
 import br.com.conductor.heimdall.api.entity.Role;
 import br.com.conductor.heimdall.api.entity.User;
@@ -69,7 +68,10 @@ public class UserService {
      
      @Autowired
      private PasswordEncoder passwordEncoder;
-     
+
+     @Autowired
+     private CredentialStateService credentialStateService;
+
      /**
       * Saves a {@link User}.
       * 
@@ -188,21 +190,25 @@ public class UserService {
 
      /**
       * Updates password the {@link User}
+      *
       * @param principal {@link Principal}
-      * @param userPasswordDTO {@link UserPasswordDTO}
+      * @param currentPassword     The current password
+      * @param newPassword         The new password
+      * @param confirmNewPassword  The confirm new password
       */
-    public void updatePassword(Principal principal, UserPasswordDTO userPasswordDTO) {
+    public void updatePassword(Principal principal, String currentPassword, String newPassword, String confirmNewPassword) {
 
-         String username = principal.getName();
+         final String username = principal.getName();
          User userLogged = userRepository.findByUserName(username);
 
          HeimdallException.checkThrow(userLogged.getType().equals(TypeUser.LDAP), USER_LDAP_UNAUTHORIZED_TO_CHANGE_PASSWORD);
          HeimdallException.checkThrow(isBlank(userLogged), GLOBAL_RESOURCE_NOT_FOUND);
-         HeimdallException.checkThrow(!passwordEncoder.matches(userPasswordDTO.getCurrentPassword(), userLogged.getPassword()), USER_CURRENT_PASSWORD_NOT_MATCHING);
-         HeimdallException.checkThrow(passwordEncoder.matches(userPasswordDTO.getNewPassword(), userLogged.getPassword()), USER_NEW_PASSWORD_EQUALS_CURRENT_PASSWORD);
-         HeimdallException.checkThrow(!userPasswordDTO.getNewPassword().equals(userPasswordDTO.getNewPasswordValidate()), USER_NEW_PASSWORD_NOT_MATCHING);
+         HeimdallException.checkThrow(!passwordEncoder.matches(currentPassword, userLogged.getPassword()), USER_CURRENT_PASSWORD_NOT_MATCHING);
+         HeimdallException.checkThrow(passwordEncoder.matches(newPassword, userLogged.getPassword()), USER_NEW_PASSWORD_EQUALS_CURRENT_PASSWORD);
+         HeimdallException.checkThrow(!newPassword.equals(confirmNewPassword), USER_NEW_PASSWORD_NOT_MATCHING);
 
-         userLogged.setPassword(passwordEncoder.encode(userPasswordDTO.getNewPassword()));
+         userLogged.setPassword(passwordEncoder.encode(newPassword));
          userRepository.save(userLogged);
+         credentialStateService.revokeByUsername(username);
     }
 }
