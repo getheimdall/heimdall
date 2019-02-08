@@ -9,7 +9,7 @@ import Loading from '../components/ui/Loading'
 import {PrivilegeUtils} from "../utils/PrivilegeUtils"
 import {privileges} from "../constants/privileges-types"
 import FloatSearch from './../components/ui/FloatSearch'
-import ComponentAuthority from "../components/ComponentAuthority"
+import ComponentAuthority from "../components/policy/ComponentAuthority"
 import OperationForm from '../components/operations/OperationForm'
 
 const ButtonGroup = Button.Group;
@@ -138,12 +138,12 @@ class Operations extends Component {
                 <Row type="flex" justify="center" align="bottom">
                     {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_OPERATION]) &&
                         <Col style={{ marginTop: 20 }}>
-                            You don't have <b>OPERATIONS</b> in this <b>RESOURCE</b>, please <Button type="dashed" onClick={this.showOperationModal()}>Add Operation</Button>
+                            {i18n.t('you_do_not_have')} <b style={{textTransform: 'uppercase'}}>{i18n.t('operations')}</b> {i18n.t('in_this')} <b style={{textTransform: 'uppercase'}}>{i18n.t('resource')}</b>! <Button id="addOperationWhenListIsEmpty" type="dashed" onClick={this.showOperationModal()}>{i18n.t('add_operation')}</Button>
                         </Col>
                     }
                     {!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_OPERATION]) &&
                     <Col style={{ marginTop: 20 }}>
-                        {i18n.t('you_do_not_have')} <b style={{textTransform: 'uppercase'}}>{i18n.t('operations')}</b> {i18n.t('in_this')} <b style={{textTransform: 'uppercase'}}>{i18n.t('resource')}</b>! <Button id="addOperationWhenListIsEmpty" type="dashed" onClick={this.showOperationModal()}>{i18n.t('add_operation')}</Button>
+                        {i18n.t('you_do_not_have')} <b style={{textTransform: 'uppercase'}}>{i18n.t('operations')}</b> {i18n.t('in_this')} <b style={{textTransform: 'uppercase'}}>{i18n.t('resource')}</b>!
                     </Col>
                     }
 

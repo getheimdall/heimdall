@@ -3,9 +3,9 @@ import {connect} from 'react-redux'
 import PageHeader from '../components/ui/PageHeader'
 import {Button, Card, Col, Form, Input, notification, Row} from "antd";
 import ListRoles from "../components/roles/ListRoles";
-import FloatButton from "../components/ui/FloatButton";
+import RouteButton from "../components/ui/RouteButton";
 import {initLoading, getAllRoles, remove, clearRoles, clearRole} from "../actions/roles";
-import ComponentAuthority from "../components/ComponentAuthority";
+import ComponentAuthority from "../components/policy/ComponentAuthority";
 import {privileges} from "../constants/privileges-types";
 
 class Roles extends Component {
@@ -78,7 +78,7 @@ class Roles extends Component {
                 <Row className="h-row bg-white">
                     <ListRoles dataSource={roles} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading}/>
                     <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_ROLE]}>
-                        <FloatButton history={this.props.history} label="Add new ROLE" to="/roles/new"/>
+                        <RouteButton idButton="role-id" history={this.props.history} label="Add new ROLE" to="/roles/new"/>
                     </ComponentAuthority>
                 </Row>
             </div>

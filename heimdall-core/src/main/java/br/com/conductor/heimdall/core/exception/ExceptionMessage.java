@@ -65,6 +65,8 @@ public enum ExceptionMessage {
 
     INTERCEPTOR_IGNORED_INVALID(BAD_REQUEST.value(), "Reference operations invalid: {}", BadRequestException.class),
 
+    INTERCEPTOR_INVALID_LIFECYCLE(BAD_REQUEST.value(), "{} interceptor can not be attached to the Plan life cycle", BadRequestException.class),
+
     MIDDLEWARE_UNSUPPORTED_TYPE(BAD_REQUEST.value(), "File type differs from .jar not supported", BadRequestException.class),
 
     MIDDLEWARE_CONTAINS_INTERCEOPTORS(BAD_REQUEST.value(), "Middleware still contains interceptors associated", BadRequestException.class),
@@ -113,6 +115,8 @@ public enum ExceptionMessage {
 
     TOKEN_INVALID(UNAUTHORIZED.value(), "Token not valid", ForbiddenException.class),
 
+    SIGNATURE_DOES_NOT_MATCH(UNAUTHORIZED.value(), "JWT signature does not match locally computed signature.", UnauthorizedException.class),
+
     TOKEN_NOT_GENERATE(INTERNAL_SERVER_ERROR.value(), "Error to generate token", ForbiddenException.class),
 
     CODE_NOT_FOUND(UNAUTHORIZED.value(), "Code already used to generate token or not defined", UnauthorizedException.class),
@@ -148,10 +152,25 @@ public enum ExceptionMessage {
     AUTHORIZATION_NOT_FOUND(UNAUTHORIZED.value(), "Authorization not found in header", UnauthorizedException.class),
 
     RESPONSE_TYPE_NOT_FOUND(BAD_REQUEST.value(), "response_type not found", BadRequestException.class),
-  
+
+    DEFAULT_PROVIDER_CAN_NOT_UPDATED_OR_REMOVED(FORBIDDEN.value(), "Default Provider can't to be updated or removed!", ForbiddenException.class),
+
     ROLE_ALREADY_EXIST(BAD_REQUEST.value(), "Role already exist!", BadRequestException.class),
-    
-    CIRCUIT_BREAK_ACTIVE(SERVICE_UNAVAILABLE.value(), "Circuit break enabled", ServerErrorException.class);
+
+    CIRCUIT_BREAK_ACTIVE(SERVICE_UNAVAILABLE.value(), "Circuit break enabled", ServerErrorException.class),
+
+    SCOPE_INVALID_OPERATION(BAD_REQUEST.value(), "Operation with id '{}' does not exist", BadRequestException.class),
+
+    SCOPE_INVALID_PLAN(BAD_REQUEST.value(), "Plan id with '{}' does not exist", BadRequestException.class),
+
+    SCOPE_OPERATION_NOT_IN_API(BAD_REQUEST.value(), "Operation '{}' not in Api '{}'", BadRequestException.class),
+
+    SCOPE_PLAN_NOT_IN_API(BAD_REQUEST.value(), "Plan '{}' not in Api '{}'", BadRequestException.class),
+
+    SCOPE_INVALID_NAME(BAD_REQUEST.value(), "A Scope with the provided name already exists", BadRequestException.class),
+
+    SCOPE_NO_OPERATION_FOUND(BAD_REQUEST.value(), "A Scope must have at least one Operation", BadRequestException.class);
+
 
     @Getter
     private Integer httpCode;

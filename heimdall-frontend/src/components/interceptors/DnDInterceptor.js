@@ -7,7 +7,7 @@ import { Button, Modal, Icon, Popover} from 'antd'
 import i18n from "../../i18n/i18n"
 import InterceptorForm from './InterceptorForm'
 import ItemTypes from '../../constants/items-types'
-import ComponentAuthority from "../ComponentAuthority"
+import ComponentAuthority from "../policy/ComponentAuthority"
 import {privileges} from "../../constants/privileges-types"
 
 const interceptorSpec = {

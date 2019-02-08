@@ -27,6 +27,7 @@ import br.com.conductor.heimdall.core.entity.Developer;
 import br.com.conductor.heimdall.core.exception.BadRequestException;
 import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.repository.DeveloperRepository;
+import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -52,6 +53,9 @@ public class AppServiceTest {
 
     @Mock
     private DeveloperRepository devRepository;
+
+    @Mock
+    private AMQPCacheService amqpCacheService;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();

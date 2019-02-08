@@ -25,10 +25,6 @@ const getMiddlewares = (params = {params: {}}, apiId) => {
         })
 }
 
-const getMiddleware = (id, apiId) => {
-
-}
-
 const downloadMiddleware = (id, apiId) => {
     return HTTPv1.get('/apis/' + apiId + '/middlewares/download/' + id, {responseType: 'blob'})
         .then(res => {
@@ -46,6 +42,5 @@ const downloadMiddleware = (id, apiId) => {
 export const middlewareService = {
     save,
     getMiddlewares,
-    getMiddleware,
     downloadMiddleware
 }

@@ -22,6 +22,7 @@ package br.com.conductor.heimdall.core.dto;
  */
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -50,7 +51,9 @@ public class PlanDTO implements Serializable {
      
      @NotNull
      private ReferenceIdDTO api;
-     
+
+     private List<ReferenceIdDTO> scopes;
+
      private Status status;
      
 }

@@ -102,6 +102,22 @@ public class ProviderResource {
     }
 
     /**
+     * Finds {@link Provider} by its Id
+     *
+     * @param id    The {@link Provider} Id
+     * @return      THe {@link Provider}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Find Provider by ID", response = Provider.class)
+    @GetMapping("/{id}")
+    public ResponseEntity<?> findById(@PathVariable Long id) {
+
+        Provider provider = providerService.findOne(id);
+
+        return ResponseEntity.ok(provider);
+    }
+
+    /**
      * Updates a {@link Provider} by its Id
      *
      * @param idProvider  The {@link Provider} Id

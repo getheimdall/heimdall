@@ -1,0 +1,94 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <!-- Added Scopes table -->
+    <changeSet author="conductor\marcelo.rodrigues" id="01">
+        <createTable tableName="SCOPES">
+            <column autoIncrement="true" name="ID" type="bigint">
+                <constraints primaryKey="true" primaryKeyName="PK_SCOPES"/>
+            </column>
+            <column name="NAME" type="varchar(180)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="DESCRIPTION" type="varchar(200)"/>
+            <column name="API_ID" type="bigint"/>
+        </createTable>
+    </changeSet>
+
+    <!-- Added Scopes Plan table to relate the entities -->
+    <changeSet author="conductor\marcelo.rodrigues" id="02">
+        <createTable tableName="SCOPES_PLANS">
+            <column name="SCOPE_ID" type="bigint">
+                <constraints primaryKey="true" primaryKeyName="PK_SCOPES_PLANS"/>
+            </column>
+            <column name="PLAN_ID" type="bigint">
+                <constraints primaryKey="true" primaryKeyName="PK_SCOPES_PLANS"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="conductor\marcelo.rodrigues" id="03">
+        <addForeignKeyConstraint baseColumnNames="PLAN_ID"
+                                 baseTableName="SCOPES_PLANS"
+                                 constraintName="FK_SCOPES_PLANS_PLAN_ID"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 onDelete="NO ACTION"
+                                 onUpdate="NO ACTION"
+                                 referencedColumnNames="ID"
+                                 referencedTableName="PLANS"
+                                 validate="true"/>
+    </changeSet>
+    <changeSet author="conductor\marcelo.rodrigues" id="04">
+        <addForeignKeyConstraint baseColumnNames="SCOPE_ID"
+                                 baseTableName="SCOPES_PLANS"
+                                 constraintName="FK_SCOPES_PLANS_SCOPE_ID"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 onDelete="NO ACTION"
+                                 onUpdate="NO ACTION"
+                                 referencedColumnNames="ID"
+                                 referencedTableName="SCOPES"
+                                 validate="true"/>
+    </changeSet>
+
+    <!-- Added Scopes Operations table to relate the entities -->
+    <changeSet author="conductor\marcelo.rodrigues" id="05">
+        <createTable tableName="SCOPES_OPERATIONS">
+            <column name="SCOPE_ID" type="bigint">
+                <constraints primaryKey="true" primaryKeyName="PK_SCOPES_OPERATIONS"/>
+            </column>
+            <column name="OPERATION_ID" type="bigint">
+                <constraints primaryKey="true" primaryKeyName="PK_SCOPES_OPERATIONS"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="conductor\marcelo.rodrigues" id="06">
+        <addForeignKeyConstraint baseColumnNames="OPERATION_ID"
+                                 baseTableName="SCOPES_OPERATIONS"
+                                 constraintName="FK_SCOPES_OPERATIONS_OPERATION_ID"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 onDelete="NO ACTION"
+                                 onUpdate="NO ACTION"
+                                 referencedColumnNames="ID"
+                                 referencedTableName="OPERATIONS"
+                                 validate="true"/>
+    </changeSet>
+    <changeSet author="conductor\marcelo.rodrigues" id="07">
+        <addForeignKeyConstraint baseColumnNames="SCOPE_ID"
+                                 baseTableName="SCOPES_OPERATIONS"
+                                 constraintName="FK_SCOPES_OPERATIONS_SCOPE_ID"
+                                 deferrable="false"
+                                 initiallyDeferred="false"
+                                 onDelete="NO ACTION"
+                                 onUpdate="NO ACTION"
+                                 referencedColumnNames="ID"
+                                 referencedTableName="SCOPES"
+                                 validate="true"/>
+    </changeSet>
+</databaseChangeLog>

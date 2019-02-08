@@ -1,22 +1,3 @@
-
-package br.com.conductor.heimdall.gateway.service;
-
-import static br.com.conductor.heimdall.core.util.ConstantsCache.CACHE_BUCKET;
-import static br.com.conductor.heimdall.core.util.ConstantsCache.CACHE_TIME_TO_LIVE;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.assertj.core.util.Lists;
-import org.redisson.api.RBucket;
-import org.redisson.api.RedissonClient;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.netflix.zuul.context.RequestContext;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -36,10 +17,25 @@ import com.netflix.zuul.context.RequestContext;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.service;
 
 import br.com.conductor.heimdall.core.util.BeanManager;
 import br.com.conductor.heimdall.middleware.spec.ApiResponse;
 import br.com.conductor.heimdall.middleware.spec.Helper;
+import com.netflix.zuul.context.RequestContext;
+import org.assertj.core.util.Lists;
+import org.redisson.api.RBucket;
+import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static br.com.conductor.heimdall.core.util.ConstantsCache.CACHE_BUCKET;
+import static br.com.conductor.heimdall.core.util.ConstantsCache.CACHE_TIME_TO_LIVE;
 
 /**
  * Cache service provides methods to create and delete a response cache from a request.
@@ -102,14 +98,12 @@ public class CacheInterceptorService {
      */
     private String createCacheKey(RequestContext context, String cacheName, List<String> headers, List<String> queryParams) {
 
-        String apiId = (String) context.get("api-id");
-        String apiName = (String) context.get("api-name");
-
         StringBuilder headersBuilder = new StringBuilder();
         headers.forEach(s -> headersBuilder
                 .append(s)
                 .append("=")
                 .append(context.getRequest().getHeader(s))
+                .append("/")
         );
 
         StringBuilder queryParamsBuilder = new StringBuilder();
@@ -117,13 +111,14 @@ public class CacheInterceptorService {
                 .append(s)
                 .append("=")
                 .append(context.getRequestQueryParams().get(s))
+                .append("/")
         );
 
-        return apiId + "-" + apiName + ":" +
+        return context.get("api-id") + "-" + context.get("api-name") + ":" +
                 cacheName + ":" +
                 context.getRequest().getRequestURL().toString() + ":" +
-                "queryParams" + queryParamsBuilder.toString() + ":" +
-                "headers" + headersBuilder.toString();
+                "queryParams=" + queryParamsBuilder.toString() + ":" +
+                "headers=" + headersBuilder.toString();
     }
 
     /*
