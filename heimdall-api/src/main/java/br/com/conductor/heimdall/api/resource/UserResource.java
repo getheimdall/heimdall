@@ -167,7 +167,6 @@ public class UserResource {
      @ResponseBody
      @ApiOperation(value = "Update password of the User")
      @PutMapping(value = "/password")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_PASSWORD_USER)
      public ResponseEntity<?> updatePassword(@ApiParam(hidden = true) Principal principal, @RequestBody UserPasswordDTO userPasswordDTO) {
 
           userService.updatePassword(principal, userPasswordDTO);

@@ -43,6 +43,7 @@ import SingleRole from "../containers/SingleRole";
 import SingleLdap from "../containers/SingleLdap";
 import Providers from "../containers/Providers";
 import SingleProvider from "../containers/SingleProvider";
+import UsersChangePassword from "../containers/UsersChangePassword";
 
 const routes = ({history}) => (
     <Switch>
@@ -93,6 +94,7 @@ const routes = ({history}) => (
                   component={Authorization([privileges.PRIVILEGE_READ_ACCESSTOKEN])(FadeIn(SingleAccessToken))}/>
         <AppRoute layout={MainLayout} history={history} exact path="/users"
                   component={Authorization([privileges.PRIVILEGE_READ_USER])(FadeIn(Users))}/>
+        <AppRoute layout={MainLayout} history={history} exact path="/users/change-password" component={FadeIn(UsersChangePassword)} />
         <AppRoute layout={MainLayout} history={history} exact path="/users/new"
                   component={Authorization([privileges.PRIVILEGE_CREATE_USER, privileges.PRIVILEGE_UPDATE_USER])(FadeIn(SingleUser))}/>
         <AppRoute layout={MainLayout} history={history} exact path="/users/:id"

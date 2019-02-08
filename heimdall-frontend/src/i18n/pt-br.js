@@ -245,6 +245,16 @@ export default {
         'please_input_role_name':'Por favor, insira o nome do papel!',
         'min_4_characters_to_name': 'O nome deve ter no mínimo 4 caracteres!',
         'available_privileges': 'Papéis disponíveis',
-        'attributed_privileges': 'Papéis atribuídos'
+        'attributed_privileges': 'Papéis atribuídos',
+        'change_password': 'Alterar senha',
+        'current_password': 'Senha atual',
+        'please_input_current_password': 'Por favor, digite a senha atual!',
+        'max_16_characters_to_current_password': 'A senha atual permite até 16 caracteres!',
+        'new_password': 'Nova senha',
+        'please_input_new_password': 'Por favor, digite a nova senha!',
+        'max_16_characters_to_new_password': 'Limite de 16 caracteres para a nova senha!',
+        'confirm_new_password': 'Confirmar senha nova',
+        'please_input_confirm_new_password': 'Por favor, confirme a senha nova!',
+        'max_16_characters_to_confirm_new_password': 'Limite de 16 caracteres para a confirmação da nova senha!'
     }
 }

@@ -245,6 +245,16 @@ export default {
         'please_input_role_name':'Please input a role name!',
         'min_4_characters_to_name': 'Min of 4 Characters to name!',
         'available_privileges': 'Available privileges',
-        'attributed_privileges': 'Attributed privileges'
+        'attributed_privileges': 'Attributed privileges',
+        'change_password': 'Change password',
+        'current_password': 'Current password',
+        'please_input_current_password': 'Please, input the current password',
+        'max_16_characters_to_current_password': 'Max of 16 characters to current password',
+        'new_password': 'New password',
+        'please_input_new_password': 'Please, input the new password',
+        'max_16_characters_to_new_password': 'Max of 16 characters to new password',
+        'confirm_new_password': 'Confirm new password',
+        'please_input_confirm_new_password': 'Please, confirm the new password',
+        'max_16_characters_to_confirm_new_password': 'Max of 16 characters in confirm the new password'
     }
 }
