@@ -52,6 +52,7 @@ import lombok.EqualsAndHashCode;
  * This class represents a Developer registered to the system.
  * 
  * @author Filipe Germano
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
 @Data
@@ -74,6 +75,9 @@ public class Developer implements Serializable {
 
      @Column(name = "EMAIL", length = 180, nullable = false, unique = true)
      private String email;
+
+     @Column(name = "PASSWORD", length = 300)
+     private String password;
 
      @Column(name = "CREATION_DATE", nullable = false)
      private LocalDateTime creationDate;

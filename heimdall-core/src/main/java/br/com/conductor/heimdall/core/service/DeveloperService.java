@@ -26,6 +26,7 @@ import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 
 import java.util.List;
 
+import br.com.conductor.heimdall.core.dto.request.DeveloperLogin;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -48,6 +49,7 @@ import br.com.conductor.heimdall.core.util.Pageable;
  * This class provides methods to create, read, update and delete the {@link Developer} resource.
  * 
  * @author Filipe Germano
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
 @Service
@@ -69,6 +71,17 @@ public class DeveloperService {
           HeimdallException.checkThrow(isBlank(developer), GLOBAL_RESOURCE_NOT_FOUND);
                               
           return developer;
+     }
+
+     /**
+      * Finds a {@link Developer} by its email and password.
+      *
+      * @param developerLogin The {@link DeveloperLogin}
+      * @return The Developer
+      */
+     public Developer login(DeveloperLogin developerLogin) {
+
+          return developerRepository.findByEmailAndPassword(developerLogin.getEmail(), developerLogin.getPassword());
      }
      
      /**

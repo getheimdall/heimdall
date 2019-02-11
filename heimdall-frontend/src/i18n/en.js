@@ -246,6 +246,7 @@ export default {
         'min_4_characters_to_name': 'Min of 4 Characters to name!',
         'available_privileges': 'Available privileges',
         'attributed_privileges': 'Attributed privileges',
+        'default_plan_this_api': 'Default',
         'change_password': 'Change password',
         'current_password': 'Current password',
         'please_input_current_password': 'Please, input the current password',
