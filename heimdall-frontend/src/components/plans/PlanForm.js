@@ -74,7 +74,6 @@ class PlanForm extends Component {
     onSubmitForm = () => {
         this.props.form.validateFieldsAndScroll((err, payload) => {
             if (!err) {
-                console.log(payload)
                 payload.status = payload.status ? 'ACTIVE' : 'INACTIVE'
                 payload.api.id = Number(payload.api.id)
                 payload.scopes = this.state.transferSelected.map(p => {
