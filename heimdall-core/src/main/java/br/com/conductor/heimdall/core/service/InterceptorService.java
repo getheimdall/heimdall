@@ -27,6 +27,7 @@ import br.com.conductor.heimdall.core.dto.*;
 import br.com.conductor.heimdall.core.dto.interceptor.RateLimitDTO;
 import br.com.conductor.heimdall.core.dto.page.InterceptorPage;
 import br.com.conductor.heimdall.core.entity.*;
+import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.enums.Status;
 import br.com.conductor.heimdall.core.enums.TypeInterceptor;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
@@ -166,6 +167,8 @@ public class InterceptorService {
 
         List<Long> ignoredOperations = ignoredValidate(interceptorDTO.getIgnoredOperations(), operationRepository);
         HeimdallException.checkThrow(Objeto.notBlank(ignoredOperations), INTERCEPTOR_IGNORED_INVALID, ignoredOperations.toString());
+
+        HeimdallException.checkThrow((TypeInterceptor.CLIENT_ID.equals(interceptor.getType()) && InterceptorLifeCycle.PLAN.equals(interceptor.getLifeCycle())), INTERCEPTOR_INVALID_LIFECYCLE, interceptor.getType().name());
 
         if (TypeInterceptor.RATTING == interceptor.getType()) {
             mountRatelimitInRedis(interceptor);

@@ -65,6 +65,8 @@ public enum ExceptionMessage {
 
     INTERCEPTOR_IGNORED_INVALID(BAD_REQUEST.value(), "Reference operations invalid: {}", BadRequestException.class),
 
+    INTERCEPTOR_INVALID_LIFECYCLE(BAD_REQUEST.value(), "{} interceptor can not be attached to the Plan life cycle", BadRequestException.class),
+
     MIDDLEWARE_UNSUPPORTED_TYPE(BAD_REQUEST.value(), "File type differs from .jar not supported", BadRequestException.class),
 
     MIDDLEWARE_CONTAINS_INTERCEOPTORS(BAD_REQUEST.value(), "Middleware still contains interceptors associated", BadRequestException.class),

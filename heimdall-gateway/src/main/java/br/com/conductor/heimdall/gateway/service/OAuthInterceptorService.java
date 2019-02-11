@@ -161,14 +161,12 @@ public class OAuthInterceptorService {
 
         HeimdallException.checkThrow(Objeto.isBlank(oAuthRequest.getClientId()), ExceptionMessage.CLIENT_ID_NOT_FOUND);
 
-        Provider provider = oAuthService.getProvider(providerId);
-
         switch (oAuthRequest.getGrantType().toUpperCase()) {
             case GRANT_TYPE_PASSWORD:
-                passwordFlow(provider, oAuthRequest, clientId, privateKey, timeAccessToken, timeRefreshToken, claimsJson, accessToken);
+                passwordFlow(oAuthService.getProvider(providerId), oAuthRequest, clientId, privateKey, timeAccessToken, timeRefreshToken, claimsJson, accessToken);
                 break;
             case GRANT_TYPE_IMPLICIT:
-                implicitFlow(oAuthRequest, privateKey, timeAccessToken, claimsJson);
+                implicitFlow(oAuthService.getProvider(providerId), oAuthRequest, clientId, privateKey, timeAccessToken, claimsJson, accessToken);
                 break;
             case GRANT_TYPE_REFRESH_TOKEN:
                 refreshFlow(oAuthRequest, privateKey, timeAccessToken, timeRefreshToken, claimsJson);
@@ -355,28 +353,8 @@ public class OAuthInterceptorService {
      */
 
     private void passwordFlow(Provider provider, OAuthRequest oAuthRequest, String clientId, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsJson, String accessToken) {
-
-        if (provider.isProviderDefault()) {
-            App appActive = appRepository.findAppActive(clientId);
-            HeimdallException.checkThrow(Objects.isNull(appActive), ExceptionMessage.CLIENT_ID_NOT_FOUND);
-
-            List<AccessToken> accessTokens = appActive.getAccessTokens();
-            HeimdallException.checkThrow(accessTokens.stream().noneMatch(ac -> ac.getCode().equals(accessToken)), ExceptionMessage.ACCESS_DENIED);
-        } else {
-            Http http = helper.http().url(provider.getPath());
-
-            http = addAllParamsToRequestProvider(http, provider.getProviderParams());
-
-            try {
-                ApiResponse apiResponse = http.sendPost();
-
-                HeimdallException.checkThrow(!(Series.valueOf(apiResponse.getStatus()) == Series.SUCCESSFUL), ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);
-
-            } catch (Exception ex) {
-                log.error(ex.getMessage(), ex);
-                throw new UnauthorizedException(ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);
-            }
-        }
+        validateClientId(clientId);
+        validateInProvider(provider, clientId, accessToken);
 
         TokenOAuth tokenOAuth = oAuthService.generateTokenOAuth(oAuthRequest, oAuthRequest.getClientId(), privateKey, timeAccessToken, timeRefreshToken, claimsJson);
         if (Objects.nonNull(tokenOAuth)) {
@@ -388,7 +366,10 @@ public class OAuthInterceptorService {
     /*
      * OAuth2.0 Implicit Flow
      */
-    private void implicitFlow(OAuthRequest oAuthRequest, String privateKey, int timeAccessToken, String claimsJson) {
+    private void implicitFlow(Provider provider, OAuthRequest oAuthRequest, String clientId, String privateKey, int timeAccessToken, String claimsJson, String accessToken) {
+        validateClientId(clientId);
+        validateInProvider(provider, clientId, accessToken);
+
         TokenImplicit tokenImplicit = oAuthService.generateTokenImplicit(oAuthRequest, privateKey, timeAccessToken, claimsJson);
         if (Objects.nonNull(tokenImplicit)) {
             tokenImplicit.setToken_type("bearer");
@@ -406,5 +387,34 @@ public class OAuthInterceptorService {
             generateResponseWithSuccess(helper.json().parse(tokenOAuth));
         }
 
+    }
+
+    private void validateClientId(String clientId) {
+        final App appActive = appRepository.findAppActive(clientId);
+        HeimdallException.checkThrow(Objects.isNull(appActive), ExceptionMessage.CLIENT_ID_NOT_FOUND);
+    }
+
+
+    private void validateInProvider(Provider provider, String clientId, String accessToken) {
+        if (provider.isProviderDefault()) {
+            final App appActive = appRepository.findAppActive(clientId);
+
+            final List<AccessToken> accessTokens = appActive.getAccessTokens();
+            HeimdallException.checkThrow(accessTokens.stream().noneMatch(ac -> ac.getCode().equals(accessToken)), ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);
+        } else {
+
+            Http http = helper.http().url(provider.getPath());
+            http = addAllParamsToRequestProvider(http, provider.getProviderParams());
+
+            try {
+
+                final ApiResponse apiResponse = http.sendPost();
+                HeimdallException.checkThrow(!(Series.valueOf(apiResponse.getStatus()) == Series.SUCCESSFUL), ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);
+
+            } catch (Exception ex) {
+                log.error(ex.getMessage(), ex);
+                throw new UnauthorizedException(ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);
+            }
+        }
     }
 }
