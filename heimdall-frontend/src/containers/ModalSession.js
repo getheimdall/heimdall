@@ -5,7 +5,7 @@ import {Button, Col, Form, Icon, Input, Modal, Row, Skeleton} from 'antd'
 
 import i18n from "../i18n/i18n"
 import {login} from "../actions/auth"
-import Session from "../utils/SessionManagement"
+import Session from "../services/SessionService"
 import {clearTime, closeModalSession} from "../actions/session"
 
 const FormItem = Form.Item;

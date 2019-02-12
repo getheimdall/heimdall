@@ -47,12 +47,14 @@ export const login = (login, password, renderToHomePage) => dispatch => {
             })
             .catch(error => {
                 notification['error']({ message: i18n.t('failed_to_get_privileges_this_user') })
+                dispatch(closeModalSession())
                 dispatch(push('/login'))
                 dispatch(finishLoading())
             })
     }).catch(error => {
         notification['error']({ message: i18n.t('username_password_incorrect') })
         dispatch(loginFailed(i18n.t('username_password_incorrect')))
+        dispatch(closeModalSession())
         dispatch(push('/login'))
         dispatch(finishLoading())
     })

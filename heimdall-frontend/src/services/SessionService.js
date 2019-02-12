@@ -1,6 +1,7 @@
-import {openModalSession} from "../actions/session";
+import {JwtUtils} from "../utils/JwtUtils"
+import {openModalSession, updateTime} from "../actions/session"
 
-class SessionManagement {
+class SessionService {
 
     _dispatchs;
     _timeoutIds;
@@ -9,15 +10,20 @@ class SessionManagement {
         this._dispatchs = []
         this._timeoutIds = []
 
-        if (!SessionManagement.instance) {
-            SessionManagement.instance = this
+        if (!SessionService.instance) {
+            SessionService.instance = this
         }
 
-        return SessionManagement.instance
+        return SessionService.instance
     }
 
     addDispatch = (name, dispatch) => {
         this._dispatchs.push({ name: name, dispatch: dispatch })
+    }
+
+    setTimeSessionFromToken = token => {
+        const timeToExpire = parseInt(JwtUtils.getTimeToExpiresInSeconds(token), 10)
+        Session.dispatch('modalSession', updateTime(timeToExpire))
     }
 
     createTimeOut = time => {
@@ -48,7 +54,7 @@ class SessionManagement {
     }
 }
 
-const Session = new SessionManagement()
+const Session = new SessionService()
 Object.freeze(Session)
 
 export default Session
