@@ -52,7 +52,15 @@ public class CORSInterceptorService {
     }
 
     public void executeCorsPostFilter(Map<String, String> cors) {
-        addHeadersToResponse(cors);
+        RequestContext ctx = RequestContext.getCurrentContext();
+        HttpServletResponse response = ctx.getResponse();
+        List<Pair<String, String>> zuulResponseHeaders = ctx.getZuulResponseHeaders();
+        List<String> headersFromResponse = zuulResponseHeaders.stream().map(Pair::first).collect(Collectors.toList());
+
+        cors.entrySet()
+                .stream()
+                .filter(entry -> !headersFromResponse.contains(entry.getKey()))
+                .forEach(entry -> response.setHeader(entry.getKey(), entry.getValue()));
     }
 
     private void addHeadersToResponseOptions(Map<String, String> cors) {
@@ -67,15 +75,4 @@ public class CORSInterceptorService {
                 .forEach(entry -> ctx.addZuulResponseHeader(entry.getKey(), entry.getValue()));
     }
 
-    private void addHeadersToResponse(Map<String, String> cors) {
-        RequestContext ctx = RequestContext.getCurrentContext();
-        HttpServletResponse response = ctx.getResponse();
-        List<Pair<String, String>> zuulResponseHeaders = ctx.getZuulResponseHeaders();
-        List<String> headersFromResponse = zuulResponseHeaders.stream().map(Pair::first).collect(Collectors.toList());
-
-        cors.entrySet()
-                .stream()
-                .filter(entry -> !headersFromResponse.contains(entry.getKey()))
-                .forEach(entry -> response.setHeader(entry.getKey(), entry.getValue()));
-    }
 }
