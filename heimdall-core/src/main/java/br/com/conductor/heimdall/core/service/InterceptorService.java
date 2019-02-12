@@ -181,8 +181,9 @@ public class InterceptorService {
         interceptor = interceptorRepository.save(interceptor);
 
         if (TypeInterceptor.CORS.equals(interceptor.getType())) {
-            interceptor.getApi().setCors(true);
-            interceptor.setApi(apiRepository.save(interceptor.getApi()));
+            Api api = apiRepository.findOne(interceptor.getApi().getId());
+            api.setCors(true);
+            apiRepository.save(api);
         }
 
         if (TypeInterceptor.MIDDLEWARE.equals(interceptor.getType())) {
