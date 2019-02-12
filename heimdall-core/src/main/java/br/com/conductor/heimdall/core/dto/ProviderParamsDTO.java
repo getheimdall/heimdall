@@ -42,6 +42,5 @@ public class ProviderParamsDTO implements Serializable {
     @NotNull
     private String location;
 
-    @NotNull
     private String value;
 }

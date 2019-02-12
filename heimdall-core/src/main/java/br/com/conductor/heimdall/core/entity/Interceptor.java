@@ -24,6 +24,8 @@ package br.com.conductor.heimdall.core.entity;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -197,6 +199,14 @@ public class Interceptor implements Serializable {
                default:
                     break;
           }
+     }
+
+     public Set<Long> getIgnoredResourcesIds() {
+          return ignoredResources.stream().map(Resource::getId).collect(Collectors.toSet());
+     }
+
+     public Set<Long> getIgnoredOperationsIds() {
+          return ignoredOperations.stream().map(Operation::getId).collect(Collectors.toSet());
      }
      
 }
