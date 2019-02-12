@@ -42,10 +42,7 @@ import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
@@ -125,6 +122,8 @@ public class ApiService {
 
           List<Api> apis = apiRepository.findAll(example);
 
+          apis.sort(Comparator.comparing(Api::getId));
+
           return apis;
      }
 
@@ -164,7 +163,7 @@ public class ApiService {
           HeimdallException.checkThrow(isBlank(api), GLOBAL_RESOURCE_NOT_FOUND);
 
           Api validateApi = apiRepository.findByBasePath(apiDTO.getBasePath());
-          HeimdallException.checkThrow(notBlank(validateApi) && validateApi.getId() != api.getId(), API_BASEPATH_EXIST);
+          HeimdallException.checkThrow(notBlank(validateApi) && !Objects.equals(validateApi.getId(), api.getId()), API_BASEPATH_EXIST);
           HeimdallException.checkThrow(validateBasepath(apiDTO), API_BASEPATH_MALFORMED);
           HeimdallException.checkThrow(isBlank(apiDTO.getBasePath()), API_BASEPATH_EMPTY);
           HeimdallException.checkThrow(validateInboundsEnvironments(apiDTO.getEnvironments()), API_CANT_ENVIRONMENT_INBOUND_URL_EQUALS);
