@@ -280,9 +280,10 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                     List<Operation> operations = operationRepository.findByEndPoint(pattern);
                     Operation operation = null;
                     if (Objects.nonNull(operations) && !operations.isEmpty()) {
+
                         if (method.equals(HttpMethod.OPTIONS.name())) {
                             Optional<Operation> first = operations.stream().findFirst();
-                            if (first.isPresent() && first.get().getResource().getApi().isCors()) {
+                            if (first.get().getResource().getApi().isCors()) {
                                 operation = first.get();
                             }
                         }
