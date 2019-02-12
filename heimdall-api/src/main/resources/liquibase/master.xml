@@ -39,5 +39,6 @@
     <include file="changelog/20180815151344-add-privileges-ldap-to-role-admin.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20181206115232-add-unique-constraints-to-role-name.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20181112145330-insert-privileges-for-scopes.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20181128143000-removed-duplicates-privileges-and-added-unique-constraint.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

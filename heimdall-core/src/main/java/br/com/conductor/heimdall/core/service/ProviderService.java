@@ -20,22 +20,29 @@ package br.com.conductor.heimdall.core.service;
  * ==========================LICENSE_END===================================
  */
 
-import java.util.List;
-
+import br.com.conductor.heimdall.core.converter.GenericConverter;
+import br.com.conductor.heimdall.core.dto.PageDTO;
+import br.com.conductor.heimdall.core.dto.PageableDTO;
+import br.com.conductor.heimdall.core.dto.ProviderDTO;
+import br.com.conductor.heimdall.core.dto.ProviderParamsDTO;
+import br.com.conductor.heimdall.core.dto.page.ProviderPage;
+import br.com.conductor.heimdall.core.entity.Provider;
+import br.com.conductor.heimdall.core.entity.ProviderParam;
+import br.com.conductor.heimdall.core.exception.ExceptionMessage;
+import br.com.conductor.heimdall.core.exception.HeimdallException;
+import br.com.conductor.heimdall.core.repository.ProviderRepository;
+import br.com.conductor.heimdall.core.util.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.dto.PageDTO;
-import br.com.conductor.heimdall.core.dto.PageableDTO;
-import br.com.conductor.heimdall.core.dto.ProviderDTO;
-import br.com.conductor.heimdall.core.dto.page.ProviderPage;
-import br.com.conductor.heimdall.core.entity.Provider;
-import br.com.conductor.heimdall.core.repository.ProviderRepository;
-import br.com.conductor.heimdall.core.util.Pageable;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * This class provides methos to create, read, update and delete a {@link Provider}
@@ -56,6 +63,8 @@ public class ProviderService {
      */
     public Provider save(ProviderDTO providerPersist) {
         Provider provider = GenericConverter.mapper(providerPersist, Provider.class);
+        provider.setProviderDefault(false);
+        provider.getProviderParams().forEach(p -> p.setProvider(provider));
         return this.providerRepository.save(provider);
     }
 
@@ -66,10 +75,26 @@ public class ProviderService {
      * @param providerEdit The {@link ProviderDTO}
      * @return The edited {@link Provider}
      */
+    @Transactional
     public Provider edit(Long idProvider, ProviderDTO providerEdit) {
-        Provider found = this.providerRepository.findOne(idProvider);
-        Provider provider = GenericConverter.mapper(providerEdit, found);
-        return this.providerRepository.save(provider);
+        Provider found = providerRepository.findOne(idProvider);
+
+        HeimdallException.checkThrow(Objects.isNull(found), ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND);
+        HeimdallException.checkThrow(found.isProviderDefault(), ExceptionMessage.DEFAULT_PROVIDER_CAN_NOT_UPDATED_OR_REMOVED);
+
+        found.setName(providerEdit.getName());
+        found.setPath(providerEdit.getPath());
+        if (Objects.nonNull(providerEdit.getDescription())) {
+            found.setDescription(providerEdit.getDescription());
+        }
+
+        List<ProviderParam> providers = providerEdit.getProviderParams().stream()
+                .map(providerParamsDTO -> getProviderParam(providerParamsDTO, found)).collect(Collectors.toList());
+
+        found.getProviderParams().clear();
+        found.getProviderParams().addAll(providers);
+
+        return this.providerRepository.save(found);
     }
 
     /**
@@ -83,7 +108,7 @@ public class ProviderService {
 
         Provider provider = GenericConverter.mapper(providerDTO, Provider.class);
         Example<Provider> example = Example.of(provider,
-                ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+                ExampleMatcher.matching().withIgnorePaths("providerDefault").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 
         Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
 
@@ -102,7 +127,7 @@ public class ProviderService {
 
         Provider provider = GenericConverter.mapper(providerDTO, Provider.class);
         Example<Provider> example = Example.of(provider,
-                ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+                ExampleMatcher.matching().withIgnorePaths("providerDefault").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 
         return this.providerRepository.findAll(example);
     }
@@ -124,5 +149,14 @@ public class ProviderService {
      */
     public void delete(Long id) {
         this.providerRepository.delete(id);
+    }
+
+    protected ProviderParam getProviderParam(ProviderParamsDTO p, Provider provider) {
+        ProviderParam providerParam = new ProviderParam();
+        providerParam.setProvider(provider);
+        providerParam.setValue(p.getValue());
+        providerParam.setLocation(p.getLocation());
+        providerParam.setName(p.getName());
+        return providerParam;
     }
 }

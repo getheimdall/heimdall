@@ -179,9 +179,8 @@ public class OAuthService {
         try {
             JwtUtils.tokenExpired(token, privateKey);
         } catch (HeimdallException ex) {
-
             this.oAuthAuthorizeRepository.delete(this.oAuthAuthorizeRepository.findByTokenAuthorize(token));
-            throw new UnauthorizedException(ExceptionMessage.TOKEN_EXPIRED);
+            throw ex;
         }
     }
 

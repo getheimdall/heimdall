@@ -175,7 +175,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
         }
 
         if (ctx.getRequest().getHeader(CLIENT_ID) != null) {
-            TraceContextHolder.getInstance().getActualTrace().setClientId(ctx.getRequest().getHeader(ACCESS_TOKEN));
+            TraceContextHolder.getInstance().getActualTrace().setClientId(ctx.getRequest().getHeader(CLIENT_ID));
         }
         if (heimdallRoute != null) {
 

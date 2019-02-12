@@ -1,0 +1,53 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+	<changeSet id="01" author="conductor\dijalma.silva">
+		<preConditions>
+			<tableExists tableName="PROVIDERS" />
+			<tableExists tableName="PROVIDER_PARAMS" />
+		</preConditions>
+
+		<dropColumn tableName="PROVIDERS" columnName="STATUS" />
+		<dropColumn tableName="PROVIDER_PARAMS" columnName="STATUS" />
+
+		<addColumn tableName="PROVIDERS">
+			<column name="PROVIDER_DEFAULT" type="BOOLEAN" defaultValue="false">
+				<constraints nullable="false" />
+			</column>
+		</addColumn>
+	</changeSet>
+	
+	<changeSet id="02" author="conductor\dijalma.silva">
+		<preConditions>
+			<tableExists tableName="PROVIDERS" />
+			<tableExists tableName="PROVIDER_PARAMS" />
+			<columnExists tableName="PROVIDERS" columnName="PROVIDER_DEFAULT" />
+		</preConditions>
+		
+		<insert tableName="PROVIDERS">
+			<column name="NAME" value="HEIMDALL PROVIDER" />
+			<column name="DESCRIPTION" value="DEFAULT PROVIDER OF THE HEIMDALL" />
+			<column name="PATH" value=""/>
+			<column name="CREATION_DATE"  valueDate="${now}" />
+			<column name="PROVIDER_DEFAULT" valueBoolean="${true}" />
+		</insert>
+	</changeSet>
+
+	<changeSet id="03" author="conductor\dijalma.silva">
+		<preConditions>
+			<sqlCheck expectedResult="1">
+				SELECT count(*) FROM PROVIDERS P WHERE P.PROVIDER_DEFAULT = ${true}
+			</sqlCheck>
+		</preConditions>
+
+		<sql>
+			insert into provider_params (name, location, value, creation_date, provider_id) values ('access_token' , 'HEADER', '', CURRENT_TIMESTAMP, (select id from providers p where P.PROVIDER_DEFAULT = ${true}));
+			insert into provider_params (name, location, value, creation_date, provider_id) values ('client_id' , 'HEADER', '', CURRENT_TIMESTAMP, (select id from providers p where P.PROVIDER_DEFAULT = ${true}));
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
