@@ -3,6 +3,7 @@ import {push} from 'connected-react-router'
 
 import i18n from "../../i18n/i18n"
 import {userService} from '../../services'
+import {closeModalSession} from "../session"
 import { AuthConstants } from '../../constants/actions-types'
 import {privilegeService} from "../../services/PrivilegeService"
 
@@ -29,19 +30,23 @@ export const finishLoading = () => dispatch => {
     dispatch({ type: AuthConstants.AUTH_LOADING_FINISH })
 }
 
-export const login = (login, password) => dispatch => {
+export const login = (login, password, renderToHomePage) => dispatch => {
     dispatch(initLoading())
     userService.login(login, password)
     .then(data => {
-        notification['success']({ message: i18n.t('welcome_heimdall') })
+        if (renderToHomePage) notification['success']({ message: i18n.t('welcome_heimdall') })
         dispatch(loginSuccessful(data))
         privilegeService.getPrivilegesByUsername(login)
             .then(data => {
-                dispatch(push('/'))
+                if (renderToHomePage) {
+                    dispatch(push('/'))
+                } else {
+                    dispatch(closeModalSession())
+                }
                 dispatch(finishLoading())
             })
             .catch(error => {
-                notification['error']({ message: 'Failed to get privileges this user' })
+                notification['error']({ message: i18n.t('failed_to_get_privileges_this_user') })
                 dispatch(push('/login'))
                 dispatch(finishLoading())
             })
