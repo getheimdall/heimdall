@@ -79,7 +79,7 @@ public class CorsServiceTest {
         this.ctx.setRequest(request);
         this.ctx.setResponse(response);
 
-        this.corsInterceptorService.executeCorsPreFilter(ctx, cors);
+        this.corsInterceptorService.executeCorsPreFilter(cors);
 
         List<Pair<String, String>> zuulResponseHeaders = this.ctx.getZuulResponseHeaders();
 
@@ -105,7 +105,7 @@ public class CorsServiceTest {
         this.ctx.setRequest(request);
         this.ctx.setResponse(response);
 
-        this.corsInterceptorService.executeCorsPreFilter(ctx, cors);
+        this.corsInterceptorService.executeCorsPreFilter(cors);
 
         Assert.assertNotNull(this.ctx.get("CORSApply"));
     }
@@ -118,7 +118,7 @@ public class CorsServiceTest {
         this.ctx.setRequest(request);
         this.ctx.setResponse(response);
 
-        this.corsInterceptorService.executeCorsPostFilter(ctx, cors);
+        this.corsInterceptorService.executeCorsPostFilter(cors);
 
         HttpServletResponse response = ctx.getResponse();
 
