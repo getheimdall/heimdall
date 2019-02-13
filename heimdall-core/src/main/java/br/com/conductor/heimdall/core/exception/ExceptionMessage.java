@@ -69,7 +69,7 @@ public enum ExceptionMessage {
 
     MIDDLEWARE_UNSUPPORTED_TYPE(BAD_REQUEST.value(), "File type differs from .jar not supported", BadRequestException.class),
 
-    MIDDLEWARE_CONTAINS_INTERCEOPTORS(BAD_REQUEST.value(), "Middleware still contains interceptors associated", BadRequestException.class),
+    MIDDLEWARE_CONTAINS_INTERCEPTORS(BAD_REQUEST.value(), "Middleware still contains interceptors associated", BadRequestException.class),
 
     MIDDLEWARE_INVALID_FILE(BAD_REQUEST.value(), "Invalid file", BadRequestException.class),
 
@@ -172,6 +172,10 @@ public enum ExceptionMessage {
     SCOPE_INVALID_NAME(BAD_REQUEST.value(), "A Scope with the provided name already exists", BadRequestException.class),
 
     SCOPE_NO_OPERATION_FOUND(BAD_REQUEST.value(), "A Scope must have at least one Operation", BadRequestException.class),
+  
+    CORS_INTERCEPTOR_NOT_API_LIFE_CYCLE(BAD_REQUEST.value(), "The CORS Interceptor only allowed for API LifeCycle", BadRequestException.class),
+
+    CORS_INTERCEPTOR_ALREADY_ASSIGNED_TO_THIS_API(BAD_REQUEST.value(), "A CORS Interceptor already assigned to this API", BadRequestException.class),
 
     DEFAULT_PLAN_ALREADY_EXIST_TO_THIS_API(BAD_REQUEST.value(), "Default plan already exist to this Api", BadRequestException.class);
 
@@ -246,7 +250,7 @@ public enum ExceptionMessage {
 
         if (dynamicText != null && dynamicText.length > 0) {
 
-            Integer count = 0;
+            int count = 0;
             String baseMessage = messageDefault;
             while (baseMessage.contains("{}")) {
 
