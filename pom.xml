@@ -144,9 +144,6 @@
 		<mssql-jdbc.version>6.2.1.jre8</mssql-jdbc.version>
 		<jackson.version>2.9.2</jackson.version>
 		<spring-cloud.version>Dalston.SR4</spring-cloud.version>
-		<scala.version>2.11.7</scala.version>
-		<gatling.version>2.2.0</gatling.version>
-		<scala-maven-plugin.version>3.2.2</scala-maven-plugin.version>
 		<versao>${project.version}</versao>		
 	</properties>
 
@@ -283,7 +280,6 @@
 		<module>heimdall-core</module>
 		<module>heimdall-gateway</module>
 		<module>heimdall-api</module>
-		<module>heimdall-config</module>
 	</modules>
 	<scm>
 		<url>https://github.com/getheimdall/heimdall</url>
