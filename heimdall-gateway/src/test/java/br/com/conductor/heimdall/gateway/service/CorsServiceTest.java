@@ -21,6 +21,8 @@ package br.com.conductor.heimdall.gateway.service;
  */
 
 import br.com.conductor.heimdall.core.enums.HttpMethod;
+import br.com.conductor.heimdall.core.util.Constants;
+import br.com.conductor.heimdall.gateway.util.ConstantsContext;
 import com.netflix.util.Pair;
 import com.netflix.zuul.context.RequestContext;
 import org.junit.Assert;
@@ -107,7 +109,7 @@ public class CorsServiceTest {
 
         this.corsInterceptorService.executeCorsPreFilter(cors);
 
-        Assert.assertNotNull(this.ctx.get("CORSApply"));
+        Assert.assertNotNull(this.ctx.get(ConstantsContext.CORS_FILTER));
     }
 
     @Test
