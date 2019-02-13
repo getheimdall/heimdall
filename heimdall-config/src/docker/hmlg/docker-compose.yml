@@ -1,7 +1,0 @@
-heimdall-config-@branch@:
-  image: conductorcr.azurecr.io/@conductorcr.namespace@/heimdall-config:@versao@
-  labels:
-    aplicacao: heimdall-config-hmlg
-    io.rancher.scheduler.affinity:host_label: tipo=node
-    io.rancher.container.pull_image: always
-    io.rancher.scheduler.affinity:container_label_soft_ne: io.rancher.stack_service.name=heimdall-config-@branch@/heimdall-config-@branch@
