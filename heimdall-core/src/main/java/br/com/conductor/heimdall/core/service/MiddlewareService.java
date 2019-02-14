@@ -266,7 +266,7 @@ public class MiddlewareService {
 
           Middleware middleware = middlewareRepository.findByApiIdAndId(apiId, middlewareId);
           HeimdallException.checkThrow(isBlank(middleware), GLOBAL_RESOURCE_NOT_FOUND);
-          HeimdallException.checkThrow((Objeto.notBlank(middleware.getInterceptors()) && middleware.getInterceptors().size() > 0), ExceptionMessage.MIDDLEWARE_CONTAINS_INTERCEOPTORS);
+          HeimdallException.checkThrow((Objeto.notBlank(middleware.getInterceptors()) && middleware.getInterceptors().size() > 0), ExceptionMessage.MIDDLEWARE_CONTAINS_INTERCEPTORS);
 
           amqpMiddlewareService.dispatchRemoveMiddlewares(middleware.getPath());
           middlewareRepository.delete(middleware.getId());

@@ -38,4 +38,9 @@ public class TemplateUtils {
      public static final String TEMPLATE_CACHE = "{\"cache\":\"cache-name\", \"timeToLive\": 10000, \"headers\": [\"header1\", \"header2\"], \"queryParams\": [\"queryParam1\", \"queryParam2\"]}";
      public static final String TEMPLATE_CACHE_CLEAR = "{\"cache\":\"cache-name\"}";
      public static final String TEMPLATE_LOG_MASKER = "{\"body\":true,\"uri\":true,\"headers\":true,\"ignoredHeaders\":[\"headerName\"]}";
+     public static final String TEMPLATE_CORS = "{\"Access-Control-Allow-Origin\": \"*\", " +
+             "\"Access-Control-Allow-Credentials\": \"true\", " +
+             "\"Access-Control-Allow-Methods\": \"POST, GET, PUT, PATCH, DELETE, OPTIONS\", " +
+             "\"Access-Control-Allow-Headers\": \"origin, content-type, accept, authorization, x-requested-with, X-AUTH-TOKEN, access_token, client_id, device_id, credential\", " +
+             "\"Access-Control-Max-Age\": \"3600\"}";
 }
