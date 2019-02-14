@@ -60,7 +60,7 @@ heimdall:
             - client_id
     redis:
         host: 127.0.0.1
-        port: 6379
+        port: 6379 
         maxTotal: 128
         maxIdle: 128
         minIdle: 16
