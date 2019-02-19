@@ -106,6 +106,8 @@ spring:
         type: redis
 
 endpoints:
+    env:
+        keys-to-sanitize: url, host, serverName
     routes:
         enabled: true
         sensitive: false
