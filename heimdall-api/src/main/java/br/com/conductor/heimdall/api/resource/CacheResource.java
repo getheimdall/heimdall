@@ -122,4 +122,20 @@ public class CacheResource {
           return ResponseEntity.noContent().build();
      }
 
+     /**
+      * Deletes all caches created by Cache interceptors.
+      *
+      * @return						{@link ResponseEntity}
+      */
+     @ResponseBody
+     @ApiOperation(value = "Delete all caches created by Cache interceptors")
+     @DeleteMapping("/interceptors")
+     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_CACHES)
+     public ResponseEntity<?> deleteInterceptors() {
+
+          amqpCacheService.dispatchCleanInterceptorsCache();
+
+          return ResponseEntity.noContent().build();
+     }
+
 }

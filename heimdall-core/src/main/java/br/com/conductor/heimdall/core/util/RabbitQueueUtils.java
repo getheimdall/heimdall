@@ -46,6 +46,7 @@ public class RabbitQueueUtils {
                System.setProperty("heimdall.queue.interceptors-remove", RabbitConstants.QUEUE_HEIMDALL_REMOVE_INTERCEPTORS + "." + InetAddress.getLocalHost().getHostName());
                System.setProperty("heimdall.queue.middlewares", RabbitConstants.QUEUE_HEIMDALL_MIDDLEWARES + "." + InetAddress.getLocalHost().getHostName());
                System.setProperty("heimdall.queue.remove-middlewares", RabbitConstants.QUEUE_HEIMDALL_REMOVE_MIDDLEWARES + "." + InetAddress.getLocalHost().getHostName());
+               System.setProperty("heimdall.queue.clean-interceptors-cache", RabbitConstants.QUEUE_HEIMDALL_CLEAN_INTERCEPTORS_CACHE + "." + InetAddress.getLocalHost().getHostName());
           } catch (UnknownHostException e) {
                
         	  log.error(e.getMessage(), e);

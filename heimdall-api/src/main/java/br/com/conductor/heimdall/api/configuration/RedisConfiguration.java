@@ -23,11 +23,13 @@ package br.com.conductor.heimdall.api.configuration;
 
 import java.time.Duration;
 
+import br.com.conductor.heimdall.core.util.ConstantsInterceptors;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
-import org.redisson.config.SingleServerConfig;
+import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -145,13 +147,26 @@ public class RedisConfiguration {
       * 
       * @return {@link RedissonClient}
       */
-     @Bean
-     public RedissonClient redissonClient() {
+     @Bean(autowire = Autowire.BY_NAME)
+     public RedissonClient redissonClientRateLimitInterceptor() {
+
+          return createConnection(ConstantsInterceptors.RATE_LIMIT_DATABASE);
+     }
+
+     @Bean(autowire = Autowire.BY_NAME)
+     public RedissonClient redissonClientCacheInterceptor() {
+
+          return createConnection(ConstantsInterceptors.CACHE_INTERCEPTOR_DATABASE);
+     }
+
+     private RedissonClient createConnection(int database) {
 
           Config config = new Config();
-          SingleServerConfig singleServerConfig = config.useSingleServer();
-          singleServerConfig.setAddress(property.getRedis().getHost() + ":" + property.getRedis().getPort());
-          singleServerConfig.setConnectionPoolSize(property.getRedis().getConnectionPoolSize());
+          config.useSingleServer()
+                  .setAddress(property.getRedis().getHost() + ":" + property.getRedis().getPort())
+                  .setConnectionPoolSize(property.getRedis().getConnectionPoolSize())
+                  .setDatabase(database);
+
           return Redisson.create(config);
      }
 }
