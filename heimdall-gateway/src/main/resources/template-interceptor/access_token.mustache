@@ -63,7 +63,7 @@ public class AccessTokenInterceptor extends HeimdallFilter {
     @Override
     public boolean should() {
         LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
-        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredResources, ignoredOperations);
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredResources, ignoredOperations, {{interceptorStatus}});
     }
 
     @Override

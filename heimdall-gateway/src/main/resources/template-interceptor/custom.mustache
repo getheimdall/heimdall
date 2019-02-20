@@ -35,11 +35,14 @@ public class CustomInterceptor extends HeimdallFilter {
     private static Set<Long> ignoredResources;
     private static Long referenceId;
     private static Long apiId;
+    private static boolean status;
     private Helper helper;
 
     public CustomInterceptor() {
         referenceId = {{referenceId}};
         apiId = {{apiId}};
+        status = {{interceptorStatus}};
+
         ignoredOperations = new HashSet<>();
         {{#ignoredOperations}}
         ignoredOperations.add({{.}});
@@ -64,7 +67,7 @@ public class CustomInterceptor extends HeimdallFilter {
     @Override
     public boolean should() {
         LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
-        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredResources, ignoredOperations);
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredResources, ignoredOperations, status);
     }
 
     @Override

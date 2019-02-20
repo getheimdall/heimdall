@@ -36,6 +36,7 @@ public class WhitelistInterceptor extends HeimdallFilter {
     private static Set<String> whitelist;
     private static Long referenceId;
     private static Long apiId;
+    private static boolean status;
 
     public WhitelistInterceptor() {
 
@@ -56,6 +57,7 @@ public class WhitelistInterceptor extends HeimdallFilter {
 
         referenceId = {{referenceId}};
         apiId = {{apiId}};
+        status = {{interceptorStatus}};
     }
 
     @Override
@@ -76,7 +78,7 @@ public class WhitelistInterceptor extends HeimdallFilter {
     @Override
     public boolean should() {
         LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
-        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredResources, ignoredOperations);
+            return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredResources, ignoredOperations, status);
     }
 
     @Override

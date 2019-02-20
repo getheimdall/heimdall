@@ -22,6 +22,7 @@ package br.com.conductor.heimdall.gateway.service;
 import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
+import br.com.conductor.heimdall.core.enums.Status;
 import br.com.conductor.heimdall.core.repository.AppRepository;
 import com.netflix.zuul.context.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,10 @@ public class LifeCycleService {
                           Long referenceId,
                           Long apiId,
                           Set<Integer> ignoredResources,
-                          Set<Integer> ignoredOperations) {
+                          Set<Integer> ignoredOperations,
+                          Boolean status) {
+
+        if (!status) return false;
 
         if (referenceId == null) return false;
         RequestContext context = RequestContext.getCurrentContext();

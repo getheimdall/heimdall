@@ -35,11 +35,13 @@ public class CorsPreInterceptor extends HeimdallFilter {
     private static Map<String, String> cors;
     private static Long referenceId;
     private static Long apiId;
+    private static boolean status;
 
     public CorsPreInterceptor() {
 
         referenceId = {{referenceId}};
         apiId = {{apiId}};
+        status = {{interceptorStatus}};
 
         ignoredOperations = new HashSet<>();
         {{#ignoredOperations}}
@@ -60,7 +62,7 @@ public class CorsPreInterceptor extends HeimdallFilter {
     @Override
     public boolean should() {
         LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
-        return lifeCycleService.should(InterceptorLifeCycle.API, referenceId, apiId, ignoredResources, ignoredOperations);
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredResources, ignoredOperations, status);
     }
 
     @Override

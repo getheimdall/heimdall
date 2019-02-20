@@ -29,6 +29,7 @@ import javax.validation.constraints.Size;
 
 import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
+import br.com.conductor.heimdall.core.enums.Status;
 import br.com.conductor.heimdall.core.enums.TypeExecutionPoint;
 import br.com.conductor.heimdall.core.enums.TypeInterceptor;
 import lombok.Data;
@@ -76,5 +77,7 @@ public class InterceptorDTO implements Serializable {
      private List<ReferenceIdDTO> ignoredOperations;
      
      private ReferenceIdDTO api;
+
+     private Boolean status;
      
 }
