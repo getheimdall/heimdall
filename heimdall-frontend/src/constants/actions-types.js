@@ -221,3 +221,7 @@ export const ScopeConstants = {
     CLEAR_SCOPE: 'CLEAR_SCOPE',
     FORM_LOADING: 'FORM_LOADING'
 }
+
+export const NavbarConstants = {
+    UPDATE_MENU_KEYS: 'UPDATE_MENU_KEYS'
+}
