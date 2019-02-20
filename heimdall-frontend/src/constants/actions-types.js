@@ -228,3 +228,7 @@ export const SessionConstants = {
     SESSION_OPEN_MODAL: 'SESSION_OPEN_MODAL',
     SESSION_CLOSE_MODAL: 'SESSION_CLOSE_MODAL',
 }
+
+export const NavbarConstants = {
+    UPDATE_MENU_KEYS: 'UPDATE_MENU_KEYS'
+}

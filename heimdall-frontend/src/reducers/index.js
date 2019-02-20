@@ -21,6 +21,7 @@ import ldap from './Ldap'
 import providers from './Providers'
 import scopes from './Scopes'
 import session from './Session'
+import navbar from './Navbar'
 
 export default combineReducers({
     apis,
@@ -43,5 +44,6 @@ export default combineReducers({
     ldap,
     providers,
     scopes,
-    session
+    session,
+    navbar
 })
