@@ -85,6 +85,10 @@ class DropClientInterceptors extends Component {
                         } else if (interceptor.lifeCycle === 'OPERATION') {
                             color = '#607d8b'
                         }
+
+                        // Adds transparency to inactive interceptors
+                        if (!interceptor.status) color = color.concat('33')
+
                         return <DnDInterceptor
                             key={index}
                             type={interceptor.type}

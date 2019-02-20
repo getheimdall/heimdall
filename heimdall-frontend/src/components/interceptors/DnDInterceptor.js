@@ -144,7 +144,7 @@ class DnDInterceptor extends Component {
     render() {
         const {type, interceptor, color, icon, isDragging, connectDragSource, connectDropTarget, isOver, canDrop} = this.props
         const opacity = isDragging ? 0.4 : 1
-        const borderColor = interceptor.status && 'solid 1px #000000'
+        const borderColor = interceptor.state && 'solid 1px #000000'
         const style = {
             margin: '0 5px',
             opacity: opacity,
