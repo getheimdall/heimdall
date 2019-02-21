@@ -58,7 +58,7 @@ class InterceptorForm extends Component {
     }
 
     render() {
-        const { getFieldDecorator } = this.props.form
+        const { getFieldDecorator, getFieldValue } = this.props.form
         
         const {
             apiId,
@@ -95,6 +95,16 @@ class InterceptorForm extends Component {
             referenceId = operationId
         }
 
+        let status
+        if (getFieldValue('status') === undefined) {
+            if (interceptor) {
+                status = interceptor.status
+            } else {
+                status = true
+            }
+        } else {
+            status = getFieldValue('status')
+        }
 
         return (
             <Row>
@@ -116,7 +126,7 @@ class InterceptorForm extends Component {
                                         rules: [
                                             { required: true, message: i18n.t('please_define_name') }
                                         ]
-                                    })(<Input required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR])}/>)
+                                    })(<Input required disabled={!(PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR]) && status)}/>)
                                 }
                             </FormItem>
                         </Col>
@@ -126,9 +136,7 @@ class InterceptorForm extends Component {
                                     getFieldDecorator('status', {
                                         initialValue: interceptor && interceptor.status
                                     })(<Switch disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR])}
-                                               defaultChecked={interceptor ? interceptor.status : true}
-                                        >
-                                            Active
+                                               defaultChecked={interceptor ? interceptor.status : true}>
                                         </Switch>
                                     )
                                 }
@@ -139,7 +147,7 @@ class InterceptorForm extends Component {
                                 {
                                     getFieldDecorator('description', {
                                         initialValue: interceptor && interceptor.description
-                                    })(<Input disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR])}/>)
+                                    })(<Input disabled={!(PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR]) && status)}/>)
                                 }
                             </FormItem>
                         </Col>
@@ -151,7 +159,7 @@ class InterceptorForm extends Component {
                                         rules: [
                                             { required: true, message: i18n.t('please_select_life_cycle') }
                                         ]
-                                    })(<Select onChange={this.handleLifeCycle} disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR])}>
+                                    })(<Select onChange={this.handleLifeCycle} disabled={!(PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR]) && status)}>
                                         {apiId && <Select.Option value="API">{i18n.t('api')}</Select.Option>}
                                         {planId && <Select.Option value="PLAN">{i18n.t('plan')}</Select.Option>}
                                         {resourceId && <Select.Option value="RESOURCE">{i18n.t('resource')}</Select.Option>}
@@ -168,7 +176,7 @@ class InterceptorForm extends Component {
                                         rules: [
                                             { required: true, message: i18n.t('please_input_content') }
                                         ]
-                                    })(<TextArea rows={8} required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR])}/>)
+                                    })(<TextArea rows={8} required disabled={!(PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR]) && status)}/>)
                                 }
                             </FormItem>
                         </Col>}
