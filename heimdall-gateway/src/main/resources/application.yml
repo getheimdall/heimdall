@@ -13,9 +13,9 @@ heimdall:
     hostname: hostname
     excludeRabbit: true
     retryable: false
-    splunk:
-        enabled: false
-        #destination:
+    logstash:
+        enabled: true
+        destination: 127.0.0.1
     rewrite:
         enable: false
         prefix: heimdall
