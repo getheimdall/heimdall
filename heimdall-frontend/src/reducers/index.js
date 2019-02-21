@@ -20,6 +20,7 @@ import privileges from './Privileges'
 import ldap from './Ldap'
 import providers from './Providers'
 import scopes from './Scopes'
+import navbar from './Navbar'
 
 export default combineReducers({
     apis,
@@ -41,5 +42,6 @@ export default combineReducers({
     privileges,
     ldap,
     providers,
-    scopes
+    scopes,
+    navbar
 })
