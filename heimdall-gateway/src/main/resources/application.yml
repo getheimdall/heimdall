@@ -54,13 +54,13 @@ heimdall:
         discardingThreshold: 0
         zoneId: America/Sao_Paulo
     trace:
-        printAllTrace: false
+        printAllTrace: true
         sanitizes:
             - access_token
             - client_id
     redis:
         host: 127.0.0.1
-        port: 6379
+        port: 6379 
         maxTotal: 128
         maxIdle: 128
         minIdle: 16
@@ -72,18 +72,6 @@ heimdall:
         numTestsPerEvictionRun: 3
         blockWhenExhausted: true
         connectionPoolSize: 10
-    security:
-        enabled: true
-        ldap:
-            enabled: false
-            url: ldap://your.domain:port
-            searchBase: searchBase
-            userDn: user@domain
-            password: pass
-            userSearchFilter: sAMAccountName={0}
-        jwt:
-            expiration-time: 600
-            secret: secretKey
     middlewares:
         allowInactive: 0
         deleteDeprecated: false
@@ -116,19 +104,10 @@ spring:
         requested-heartbeat: 10
     cache:
         type: redis
-    http:
-        multipart:
-            enabled: true
-            max-file-size: 25MB
-            max-request-size: 25MB
-
-springfox:
-    documentation:
-        swagger:
-            v2:
-                path: /docs
 
 endpoints:
+    env:
+        keys-to-sanitize: url, host, serverName
     routes:
         enabled: true
         sensitive: false
@@ -155,8 +134,17 @@ management:
             enabled: false
 
 zuul:
+    ignoredPatterns: /manager/**
+    include-debug-header: false
+    debug: 
+        parameter: debug
+        request: false
     filter:
         root: /tmp/interceptores
+        interval: 8
+    host: 
+        socket-timeout-millis: 40000
+        connect-timeout-millis: 40000  
 
 security:
     basic:
