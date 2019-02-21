@@ -47,75 +47,64 @@ import java.time.ZoneId;
 @Configuration
 public class LogConfiguration {
 
-     private static final int DEFAULT_QUEUE_SIZE = 500;
+	private static final int DEFAULT_QUEUE_SIZE = 500;
 
-     private static final String DEFAULT_ZONE_ID = ZoneId.systemDefault().getId();
+	private static final String DEFAULT_ZONE_ID = ZoneId.systemDefault().getId();
 
-     @Autowired
-     private Property property;
-     
-     @PostConstruct
-     public void onStartUp() {
-    	 if (property.getMongo().getEnabled()) {
-    		 
-             LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-             Logger logger = (Logger) LoggerFactory.getLogger("mongo");
-             logger.setAdditive(false);
+	@Autowired
+	private Property property;
 
-             String zoneId = property.getMongo().getZoneId() != null ? property.getMongo().getZoneId() : DEFAULT_ZONE_ID;
+	@PostConstruct
+	public void onStartUp() {
+		if (property.getMongo().getEnabled()) {
 
-             // Creating custom MongoDBAppender
-             Appender<ILoggingEvent> appender;
-             if (property.getMongo().getUrl() != null) {
-          	     appender = new MongoDBAppender(property.getMongo().getUrl(), property.getMongo().getDataBase(), property.getMongo().getCollection(), zoneId);
-             } else {
-          	     appender = new MongoDBAppender(property.getMongo().getServerName(), property.getMongo().getPort(), property.getMongo().getDataBase(), property.getMongo().getCollection(), zoneId);
-             }
-             appender.setContext(lc);
-             appender.start();
+			LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+			Logger logger = (Logger) LoggerFactory.getLogger("mongo");
+			logger.setAdditive(false);
 
-             // Creating AsyncAppender
-             int queueSize = (property.getMongo().getQueueSize() != null) ? property.getMongo().getQueueSize().intValue() : DEFAULT_QUEUE_SIZE;
+			String zoneId = property.getMongo().getZoneId() != null ? property.getMongo().getZoneId() : DEFAULT_ZONE_ID;
 
-             AsyncAppender asyncAppender = new AsyncAppender();
-             asyncAppender.setQueueSize(queueSize);
-             if (property.getMongo().getDiscardingThreshold() != null) {            	 
-            	 asyncAppender.setDiscardingThreshold(property.getMongo().getDiscardingThreshold().intValue());
-             }
-             asyncAppender.addAppender(appender);
-             asyncAppender.start();
+			// Creating custom MongoDBAppender
+			Appender<ILoggingEvent> appender;
+			if (property.getMongo().getUrl() != null) {
+				appender = new MongoDBAppender(property.getMongo().getUrl(), property.getMongo().getDataBase(), property.getMongo().getCollection(), zoneId);
+			} else {
+				appender = new MongoDBAppender(property.getMongo().getServerName(), property.getMongo().getPort(), property.getMongo().getDataBase(), property.getMongo().getCollection(), zoneId);
+			}
+			appender.setContext(lc);
+			appender.start();
 
-             logger.addAppender(asyncAppender);
-        }
-     }
+			// Creating AsyncAppender
+			int queueSize = (property.getMongo().getQueueSize() != null) ? property.getMongo().getQueueSize().intValue() : DEFAULT_QUEUE_SIZE;
 
-     /**
-      * Returns the proper logging strategy.
-      * @return		
-      */
-     @Bean
-     public Logger loggerTrace() {
+			AsyncAppender asyncAppender = new AsyncAppender();
+			asyncAppender.setQueueSize(queueSize);
+			if (property.getMongo().getDiscardingThreshold() != null) {
+				asyncAppender.setDiscardingThreshold(property.getMongo().getDiscardingThreshold().intValue());
+			}
+			asyncAppender.addAppender(appender);
+			asyncAppender.start();
 
-          if (property.getSplunk().getEnabled()) {
+			logger.addAppender(asyncAppender);
+		}
 
-               LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-               Logger logger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+		if (property.getLogstash().getEnabled()) {
 
-               LogstashTcpSocketAppender appender = new net.logstash.logback.appender.LogstashTcpSocketAppender();
-               appender.addDestination(property.getSplunk().getDestination());
+			LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+			Logger logger = (Logger) LoggerFactory.getLogger("logstash");
 
-               LogstashEncoder encoder = new net.logstash.logback.encoder.LogstashEncoder();
+			LogstashTcpSocketAppender appender = new net.logstash.logback.appender.LogstashTcpSocketAppender();
+			appender.addDestination(property.getLogstash().getDestination());
 
-               appender.setEncoder(encoder);
-               appender.setContext(lc);
-               appender.start();
+			LogstashEncoder encoder = new net.logstash.logback.encoder.LogstashEncoder();
 
-               logger.addAppender(appender);
+			appender.setEncoder(encoder);
+			appender.setContext(lc);
+			appender.start();
 
-          }
+			logger.addAppender(appender);
 
-          return null;
-
-     }
+		}
+	}
 
 }
