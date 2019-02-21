@@ -142,37 +142,55 @@ class DnDInterceptor extends Component {
     }
 
     render() {
-        const {type, interceptor, color, icon, isDragging, connectDragSource, connectDropTarget, isOver, canDrop} = this.props
-        const opacity = isDragging ? 0.4 : 1
-        const borderColor = interceptor.state && 'solid 1px #000000'
+        const {type, interceptor, icon, isDragging, connectDragSource, connectDropTarget, isOver, canDrop} = this.props
+
+        // Set background color
+        let styledIsOver = {}
+        if (interceptor.state) {
+            styledIsOver = { background: '#c8c8c8' }
+        }
+        if (canDrop && !isOver) {
+            styledIsOver = { background: '#64befc' }
+        }
+        if (isOver && canDrop) {
+            styledIsOver = { background: '#58fc9f' }
+        }
+        if (!canDrop && isOver) {
+            styledIsOver = { background: '#fc474c' }
+        }
+
+        // Set interceptor color
+        let color
+        if (interceptor.lifeCycle === 'API') {
+            color = '#ffa613'
+        } else if (interceptor.lifeCycle === 'PLAN') {
+            color = '#c3cc93'
+        } else if (interceptor.lifeCycle === 'RESOURCE') {
+            color = '#8edce0'
+        } else if (interceptor.lifeCycle === 'OPERATION') {
+            color = '#607d8b'
+        }
+
+        // Set interceptor opacity
+        let opacity = 1
+        if (isDragging) {
+            opacity = 0.4
+        } else {
+            if (!interceptor.status) {
+                opacity = 0.3
+            }
+        }
+
+        // const borderColor = interceptor.state && 'solid 1px #000000'
         const style = {
+            top: '5px',
             margin: '0 5px',
             opacity: opacity,
             cursor: 'move',
             marginBottom: 5,
             padding: 5,
             backgroundColor: color,
-            border: borderColor
-        }
-
-        let styledIsOver = {}
-
-        if (canDrop && !isOver) {
-            styledIsOver = {
-                background: '#64befc'
-            }
-        }
-
-        if (isOver && canDrop) {
-            styledIsOver = {
-                background: '#58fc9f'
-            }
-        }
-
-        if (!canDrop && isOver) {
-            styledIsOver = {
-                background: '#fc474c'
-            }
+            border: 'solid 1px #000000'
         }
 
         const resumeInterceptor = (
