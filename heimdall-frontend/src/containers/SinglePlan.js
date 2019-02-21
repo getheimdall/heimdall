@@ -4,7 +4,7 @@ import { push } from 'connected-react-router'
 import { connect } from 'react-redux'
 import moment from 'moment'
 //components
-import { Card, Row } from 'antd'
+import {Card, notification, Row} from 'antd'
 // actions
 import i18n from "../i18n/i18n"
 import Loading from '../components/ui/Loading'
@@ -27,6 +27,11 @@ class SinglePlan extends Component {
     }
 
     componentWillReceiveProps(newProps) {
+        if (newProps.notification && newProps.notification !== this.props.notification) {
+            const { type, message, description } = newProps.notification
+            notification[type]({ message, description })
+        }
+
         if (newProps.plan && newProps.plan !== this.props.plan) {
             this.props.dispatch(apiSource([newProps.plan.api]))
         }
@@ -97,7 +102,8 @@ const mapStateToProps = state => {
         plan: state.plans.plan,
         loading: state.plans.loading,
         apiSource: state.apis.apiSource,
-        fetching: state.apis.fetching
+        fetching: state.apis.fetching,
+        notification: state.plans.notification
     }
 }
 

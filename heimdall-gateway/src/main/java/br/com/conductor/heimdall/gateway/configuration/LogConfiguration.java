@@ -19,6 +19,14 @@
  */
 package br.com.conductor.heimdall.gateway.configuration;
 
+import java.time.ZoneId;
+
+import javax.annotation.PostConstruct;
+
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+
 import br.com.conductor.heimdall.core.environment.Property;
 import br.com.conductor.heimdall.gateway.appender.MongoDBAppender;
 import ch.qos.logback.classic.AsyncAppender;
@@ -28,13 +36,6 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import net.logstash.logback.appender.LogstashTcpSocketAppender;
 import net.logstash.logback.encoder.LogstashEncoder;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-import javax.annotation.PostConstruct;
-import java.time.ZoneId;
 
 /**
  * Class responsible to configure the logging.
@@ -47,75 +48,65 @@ import java.time.ZoneId;
 @Configuration
 public class LogConfiguration {
 
-     private static final int DEFAULT_QUEUE_SIZE = 500;
+	private static final int DEFAULT_QUEUE_SIZE = 500;
 
-     private static final String DEFAULT_ZONE_ID = ZoneId.systemDefault().getId();
+	private static final String DEFAULT_ZONE_ID = ZoneId.systemDefault().getId();
 
-     @Autowired
-     private Property property;
-     
-     @PostConstruct
-     public void onStartUp() {
-    	 if (property.getMongo().getEnabled()) {
-    		 
-             LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-             Logger logger = (Logger) LoggerFactory.getLogger("mongo");
-             logger.setAdditive(false);
+	@Autowired
+	private Property property;
 
-             String zoneId = property.getMongo().getZoneId() != null ? property.getMongo().getZoneId() : DEFAULT_ZONE_ID;
+	@PostConstruct
+	public void onStartUp() {
+		if (property.getMongo().getEnabled()) {
 
-             // Creating custom MongoDBAppender
-             Appender<ILoggingEvent> appender;
-             if (property.getMongo().getUrl() != null) {
-          	     appender = new MongoDBAppender(property.getMongo().getUrl(), property.getMongo().getDataBase(), property.getMongo().getCollection(), zoneId);
-             } else {
-          	     appender = new MongoDBAppender(property.getMongo().getServerName(), property.getMongo().getPort(), property.getMongo().getDataBase(), property.getMongo().getCollection(), zoneId);
-             }
-             appender.setContext(lc);
-             appender.start();
+			LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+			Logger logger = (Logger) LoggerFactory.getLogger("mongo");
+			logger.setAdditive(false);
 
-             // Creating AsyncAppender
-             int queueSize = (property.getMongo().getQueueSize() != null) ? property.getMongo().getQueueSize().intValue() : DEFAULT_QUEUE_SIZE;
+			String zoneId = property.getMongo().getZoneId() != null ? property.getMongo().getZoneId() : DEFAULT_ZONE_ID;
 
-             AsyncAppender asyncAppender = new AsyncAppender();
-             asyncAppender.setQueueSize(queueSize);
-             if (property.getMongo().getDiscardingThreshold() != null) {            	 
-            	 asyncAppender.setDiscardingThreshold(property.getMongo().getDiscardingThreshold().intValue());
-             }
-             asyncAppender.addAppender(appender);
-             asyncAppender.start();
+			// Creating custom MongoDBAppender
+			Appender<ILoggingEvent> appender;
+			if (property.getMongo().getUrl() != null) {
+				appender = new MongoDBAppender(property.getMongo().getUrl(), property.getMongo().getDataBase(), property.getMongo().getCollection(), zoneId);
+			} else {
+				appender = new MongoDBAppender(property.getMongo().getServerName(), property.getMongo().getPort(), property.getMongo().getDataBase(), property.getMongo().getCollection(), zoneId);
+			}
+			appender.setContext(lc);
+			appender.start();
 
-             logger.addAppender(asyncAppender);
-        }
-     }
+			// Creating AsyncAppender
+			int queueSize = (property.getMongo().getQueueSize() != null) ? property.getMongo().getQueueSize().intValue() : DEFAULT_QUEUE_SIZE;
 
-     /**
-      * Returns the proper logging strategy.
-      * @return		
-      */
-     @Bean
-     public Logger loggerTrace() {
+			AsyncAppender asyncAppender = new AsyncAppender();
+			asyncAppender.setQueueSize(queueSize);
+			if (property.getMongo().getDiscardingThreshold() != null) {
+				asyncAppender.setDiscardingThreshold(property.getMongo().getDiscardingThreshold().intValue());
+			}
+			asyncAppender.addAppender(appender);
+			asyncAppender.start();
 
-          if (property.getSplunk().getEnabled()) {
+			logger.addAppender(asyncAppender);
+		}
 
-               LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-               Logger logger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+		if (property.getLogstash().getEnabled()) {
 
-               LogstashTcpSocketAppender appender = new net.logstash.logback.appender.LogstashTcpSocketAppender();
-               appender.addDestination(property.getSplunk().getDestination());
+			LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+			Logger logger = (Logger) LoggerFactory.getLogger("logstash");
+			logger.setAdditive(false);
 
-               LogstashEncoder encoder = new net.logstash.logback.encoder.LogstashEncoder();
+			LogstashTcpSocketAppender appender = new net.logstash.logback.appender.LogstashTcpSocketAppender();
+			appender.addDestination(property.getLogstash().getDestination());
 
-               appender.setEncoder(encoder);
-               appender.setContext(lc);
-               appender.start();
+			LogstashEncoder encoder = new net.logstash.logback.encoder.LogstashEncoder();
 
-               logger.addAppender(appender);
+			appender.setEncoder(encoder);
+			appender.setContext(lc);
+			appender.start();
 
-          }
+			logger.addAppender(appender);
 
-          return null;
-
-     }
+		}
+	}
 
 }

@@ -23,7 +23,6 @@ class PlanForm extends Component {
 
     componentDidMount() {
         if (this.props.plan && this.props.plan.api && this.props.plan.api.id) {
-            console.log(this.props.plan)
             this.setState({ ...this.state, apiId: this.props.plan.api.id})
         }
     }
@@ -201,11 +200,21 @@ class PlanForm extends Component {
                                     </FormItem>
                             }
                         </Col>
-                        <Col sm={24} md={4}>
+                        <Col sm={12} md={4}>
                             <FormItem label={i18n.t('status')}>
                                 {
                                     getFieldDecorator('status', {
                                         initialValue: plan ? plan.status === 'ACTIVE' : true,
+                                        valuePropName: 'checked'
+                                    })(<Switch required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_PLAN, privileges.PRIVILEGE_UPDATE_PLAN])}/>)
+                                }
+                            </FormItem>
+                        </Col>
+                        <Col sm={12} md={4}>
+                            <FormItem label={i18n.t('default_plan_this_api')}>
+                                {
+                                    getFieldDecorator('defaultPlan', {
+                                        initialValue: plan && plan.defaultPlan,
                                         valuePropName: 'checked'
                                     })(<Switch required disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_PLAN, privileges.PRIVILEGE_UPDATE_PLAN])}/>)
                                 }

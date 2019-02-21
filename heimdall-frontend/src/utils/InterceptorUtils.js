@@ -5,6 +5,11 @@ export const TEMPLATE_IPS = "{\"ips\": [ \"127.0.0.0\", \"127.0.0.1\" ]}";
 export const TEMPLATE_CACHE = "{\"cache\":\"cache-name\", \"timeToLive\": 10000, \"headers\": [\"header1\", \"header2\"], \"queryParams\": [\"queryParam1\", \"queryParam2\"]}";
 export const TEMPLATE_CACHE_CLEAR = "{\"cache\":\"cache-name\"}";
 export const TEMPLATE_IDENTIFIER = "{}";
+export const TEMPLATE_CORS = "{\"Access-Control-Allow-Origin\": \"*\", " +
+    "\"Access-Control-Allow-Credentials\": \"true\", " +
+    "\"Access-Control-Allow-Methods\": \"POST, GET, PUT, PATCH, DELETE, OPTIONS\", " +
+    "\"Access-Control-Allow-Headers\": \"origin, content-type, accept, authorization, x-requested-with, X-AUTH-TOKEN, access_token, client_id, device_id, credential\", " +
+    "\"Access-Control-Max-Age\": \"3600\"}";
 
 export const getTemplate = (type) => {
     if (type === 'ACCESS_TOKEN') {
@@ -39,6 +44,9 @@ export const getTemplate = (type) => {
         return TEMPLATE_IDENTIFIER
     }
 
+    if (type === 'CORS') {
+        return TEMPLATE_CORS
+    }
 
 }
 

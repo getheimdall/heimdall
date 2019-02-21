@@ -1,5 +1,4 @@
-
-package br.com.conductor.heimdall.core.dto;
+package br.com.conductor.heimdall.core.dto.request;
 
 /*-
  * =========================LICENSE_START==================================
@@ -10,9 +9,9 @@ package br.com.conductor.heimdall.core.dto;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,38 +20,22 @@ package br.com.conductor.heimdall.core.dto;
  * ==========================LICENSE_END===================================
  */
 
-import java.io.Serializable;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import br.com.conductor.heimdall.core.entity.Developer;
-import br.com.conductor.heimdall.core.enums.Status;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+
 /**
- * Class is a Data Transfer Object for the {@link Developer}.
+ * Class is a Data Transfer Object for the Developer authentication.
  *
- * @author Filipe Germano
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
- *
  */
 @Data
-public class DeveloperDTO implements Serializable {
+public class DeveloperLogin implements Serializable {
 
-     private static final long serialVersionUID = 4498108219434718793L;
+    @NotNull
+    private String email;
 
-     @NotNull
-     @Size(max = 180)
-     private String name;
-     
-     @NotNull
-     @Size(max = 180)
-     private String email;
-
-     @Size(max = 300)
-     private String password;
-     
-     private Status status;
-
+    @NotNull
+    private String password;
 }
