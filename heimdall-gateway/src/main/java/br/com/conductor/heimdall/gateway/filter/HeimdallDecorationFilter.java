@@ -42,6 +42,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -278,8 +279,18 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                     auxMatch = true;
                     List<Operation> operations = operationRepository.findByEndPoint(pattern);
                     Operation operation = null;
-                    if (operations != null && !operations.isEmpty()) {
-                        operation = operations.stream().filter(o -> o.getMethod().equals(HttpMethod.ALL) || method.equals(o.getMethod().name().toUpperCase())).findFirst().orElse(null);
+                    if (Objects.nonNull(operations) && !operations.isEmpty()) {
+
+                        if (method.equals(HttpMethod.OPTIONS.name())) {
+                            Optional<Operation> first = operations.stream().findFirst();
+                            if (first.get().getResource().getApi().isCors()) {
+                                operation = first.get();
+                            }
+                        }
+
+                        if (Objects.isNull(operation)) {
+                            operation = operations.stream().filter(o -> o.getMethod().equals(HttpMethod.ALL) || method.equals(o.getMethod().name().toUpperCase())).findFirst().orElse(null);
+                        }
                     }
 
                     if (operation != null) {

@@ -29,16 +29,26 @@ import br.com.conductor.heimdall.core.entity.Developer;
  * Provides methods to access a {@link Developer}.
  *
  * @author Filipe Germano
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
 public interface DeveloperRepository extends JpaRepository<Developer, Long> {
 
 	 /**
-	  * Finds a Developer by its email.
+	  * Finds a {@link Developer} by its email.
 	  * 
 	  * @param  email		The Developer email
 	  * @return				The Developer found
 	  */
      Developer findByEmail(String email);
+
+	/**
+	 * Finds a {@link Developer} by its email and password
+	 *
+	 * @param  email		The Developer email
+	 * @param  password		The Developer password
+	 * @return				The Developer found
+	 */
+     Developer findByEmailAndPassword(String email, String password);
 
 }
