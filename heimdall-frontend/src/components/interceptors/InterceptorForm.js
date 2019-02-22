@@ -168,7 +168,7 @@ class InterceptorForm extends Component {
                                 }
                             </FormItem>
                         </Col>
-                        {type !== 'LOG' && <Col sm={24} md={24} >
+                        <Col sm={24} md={24} >
                             <FormItem label={i18n.t('content')}>
                                 {
                                     getFieldDecorator('content', {
@@ -179,7 +179,7 @@ class InterceptorForm extends Component {
                                     })(<TextArea rows={8} required disabled={!(PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR]) && status)}/>)
                                 }
                             </FormItem>
-                        </Col>}
+                        </Col>
                     </Row>
                 </Form>
             </Row >
