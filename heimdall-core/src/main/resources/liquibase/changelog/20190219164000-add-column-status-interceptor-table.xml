@@ -7,7 +7,7 @@
 
     <changeSet id="01" author="conductor\marcelo.rodrigues">
         <addColumn tableName="INTERCEPTORS">
-            <column name="STATUS" defaultValue="true" type="boolean">
+            <column name="STATUS" defaultValue="${true}" type="boolean">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
