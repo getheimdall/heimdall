@@ -170,13 +170,6 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
         final String method = ctx.getRequest().getMethod().toUpperCase();
         HeimdallRoute heimdallRoute = getMatchingHeimdallRoute(requestURI, method, ctx);
 
-        if (ctx.getRequest().getHeader(ACCESS_TOKEN) != null) {
-            TraceContextHolder.getInstance().getActualTrace().setAccessToken(ctx.getRequest().getHeader(ACCESS_TOKEN));
-        }
-
-        if (ctx.getRequest().getHeader(CLIENT_ID) != null) {
-            TraceContextHolder.getInstance().getActualTrace().setClientId(ctx.getRequest().getHeader(CLIENT_ID));
-        }
         if (heimdallRoute != null) {
 
             if (heimdallRoute.isMethodNotAllowed()) {

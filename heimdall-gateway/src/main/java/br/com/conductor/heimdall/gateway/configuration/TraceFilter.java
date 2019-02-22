@@ -80,7 +80,7 @@ public class TraceFilter implements Filter {
 		try {
 
 			trace = TraceContextHolder.getInstance().init(prop.getTrace().isPrintAllTrace(), profile, request,
-					prop.getMongo().getEnabled());
+					prop.getMongo().getEnabled(), prop.getLogstash().getEnabled());
 			if (shouldDisableTrace(request)) {
 				trace.setShouldPrint(false);
 			}
