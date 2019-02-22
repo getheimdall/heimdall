@@ -1,8 +1,0 @@
-${AnsiColor.GREEN}   _    _      _               _       _ _ 
-${AnsiColor.GREEN}  | |  | |    (_)             | |     | | |
-${AnsiColor.GREEN}  | |__| | ___ _ _ __ ___   __| | __ _| | |
-${AnsiColor.GREEN}  |  __  |/ _ \ | '_ ` _ \ / _` |/ _` | | |
-${AnsiColor.GREEN}  | |  | |  __/ | | | | | | (_| | (_| | | |
-${AnsiColor.GREEN}  |_|  |_|\___|_|_| |_| |_|\__,_|\__,_|_|_|
-${AnsiColor.GREEN}                                           
-${AnsiColor.GREEN}                                                                              

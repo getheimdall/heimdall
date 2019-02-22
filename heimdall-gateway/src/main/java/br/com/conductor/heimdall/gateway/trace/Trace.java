@@ -62,6 +62,8 @@ import static net.logstash.logback.marker.Markers.append;
 public class Trace {
 	
 	 private static final Logger logMongo = LoggerFactory.getLogger("mongo");
+	 
+	 private static final Logger logstash = LoggerFactory.getLogger("logstash");
 
      private String method;
 
@@ -120,6 +122,9 @@ public class Trace {
      @JsonIgnore
      private boolean shouldPrint;
      
+     @JsonIgnore
+     private boolean printLogstash;
+     
      public Trace() {
     	 
      }
@@ -131,12 +136,13 @@ public class Trace {
       * @param profile			String, profile
       * @param servletRequest	{@link ServletRequest}
       */
-     public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printMongo){
+     public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printMongo, boolean printLogstash){
 
           this.shouldPrint = true;
           this.profile = profile;
           this.printAllTrace = printAllTrace;
           this.printMongo = printMongo;
+          this.printLogstash = printLogstash;
           HttpServletRequest request = (HttpServletRequest) servletRequest;
           HeimdallException.checkThrow(request == null, ExceptionMessage.GLOBAL_REQUEST_NOT_FOUND);
 
@@ -244,7 +250,7 @@ public class Trace {
 
                     log.error(" [HEIMDALL-TRACE] - {} ", new ObjectMapper().writeValueAsString(this));
                }
-          } else {
+          } else if (printMongo) {
 
                String url = (Objeto.notBlank(getUrl())) ? getUrl() : "";
 
@@ -262,6 +268,23 @@ public class Trace {
                     log.error(append("call", this), " [HEIMDALL-TRACE] - " + url);
                     if (printMongo) logMongo.error(new ObjectMapper().writeValueAsString(this));
                }
+          } else if (printLogstash) {
+        	  String url = (Objeto.notBlank(getUrl())) ? getUrl() : "";
+
+              if (isInfo(statusCode)) {
+
+                   log.info(append("call", this), " [HEIMDALL-TRACE] - " + url);
+
+                   if (printLogstash) logstash.info(new ObjectMapper().writeValueAsString(this));
+              } else if (isWarn(statusCode)) {
+
+                   log.warn(append("call", this), " [HEIMDALL-TRACE] - " + url);
+                   if (printLogstash) logstash.warn(new ObjectMapper().writeValueAsString(this));
+              } else {
+
+                   log.error(append("call", this), " [HEIMDALL-TRACE] - " + url);
+                   if (printLogstash) logstash.error(new ObjectMapper().writeValueAsString(this));
+              }
           }
      }
 

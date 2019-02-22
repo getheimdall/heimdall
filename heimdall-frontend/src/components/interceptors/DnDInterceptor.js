@@ -138,6 +138,7 @@ class DnDInterceptor extends Component {
     }
 
     handleRemoveInterceptor = () => {
+        this.hide();
         this.props.handleDelete(this.props.interceptor);
     }
 

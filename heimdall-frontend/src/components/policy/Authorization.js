@@ -19,7 +19,6 @@ const Authorization = (privilegesAllowed) => (WrappedComponent) => {
                     <WrappedComponent {...this.props} />
                 </ComponentAuthority>
             )
-
         }
 
     }
