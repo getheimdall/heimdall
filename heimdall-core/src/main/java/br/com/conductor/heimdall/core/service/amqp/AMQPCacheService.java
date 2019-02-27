@@ -70,4 +70,9 @@ public class AMQPCacheService {
           rabbitTemplate.convertAndSend(RabbitConstants.EXCHANGE_FANOUT_HEIMDALL_CLEAN_ALL_CACHES, "", "");
      }
 
+     public void dispatchCleanInterceptorsCache() {
+
+          rabbitTemplate.convertAndSend(RabbitConstants.EXCHANGE_FANOUT_HEIMDALL_CLEAN_INTERCEPTORS_CACHE, "", "");
+     }
+
 }
