@@ -31,6 +31,12 @@ public class ResponseHandler {
 
         headerNames.forEach(s -> headers.putIfAbsent(s, response.getHeader(s)));
 
+        if (!headers.containsKey(HttpHeaders.CONTENT_TYPE)) {
+            headers.put(HttpHeaders.CONTENT_TYPE, context.getResponse().getContentType());
+        }
+
+        headers.remove("X-Application-Context");
+
         return headers;
     }
 
