@@ -109,7 +109,6 @@ public class CacheWriterFilter extends ZuulFilter {
         HttpServletResponse response = context.getResponse();
 
         Map<String, String> headers = ResponseHandler.getResponseHeaders(context);
-        headers.put(HttpHeaders.CONTENT_TYPE, context.getResponse().getContentType());
 
         ApiResponse apiResponse = new ApiResponseImpl();
         apiResponse.setHeaders(headers);
