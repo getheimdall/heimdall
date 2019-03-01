@@ -19,6 +19,7 @@
  */
 package br.com.conductor.heimdall.gateway.service;
 
+import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.middleware.spec.ApiResponse;
 import br.com.conductor.heimdall.middleware.spec.Helper;
 import com.netflix.zuul.context.RequestContext;
@@ -65,6 +66,8 @@ public class CacheInterceptorService {
 
         RequestContext context = RequestContext.getCurrentContext();
 
+        boolean responseFromCache = false;
+
         if (shouldCache(context, headers, queryParams)) {
             RBucket<ApiResponse> rBucket = redissonClientCacheInterceptor.getBucket(createCacheKey(context, cacheName, headers, queryParams));
 
@@ -77,8 +80,12 @@ public class CacheInterceptorService {
                 helper.call().response().header().addAll(response.getHeaders());
                 helper.call().response().setBody(response.getBody());
                 helper.call().response().setStatus(response.getStatus());
+                context.setSendZuulResponse(false);
+                responseFromCache = true;
             }
         }
+
+        TraceContextHolder.getInstance().getActualTrace().setCache(responseFromCache);
     }
 
     /**
