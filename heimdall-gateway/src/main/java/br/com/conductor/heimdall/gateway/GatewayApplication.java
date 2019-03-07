@@ -31,6 +31,7 @@ import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import br.com.conductor.heimdall.core.environment.Property;
 import br.com.conductor.heimdall.core.util.RabbitQueueUtils;
@@ -50,6 +51,7 @@ import br.com.conductor.heimdall.core.util.RabbitQueueUtils;
 @EntityScan("br.com.conductor.heimdall.core.entity")
 @EnableJpaRepositories("br.com.conductor.heimdall.core.repository")
 @EnableCaching
+@EnableScheduling
 public class GatewayApplication extends SpringBootServletInitializer  {
      
      public static void main(String[] args) {
