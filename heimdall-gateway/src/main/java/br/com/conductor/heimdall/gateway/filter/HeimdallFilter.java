@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.gateway.filter;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -10,9 +7,9 @@ package br.com.conductor.heimdall.gateway.filter;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,8 +17,8 @@ package br.com.conductor.heimdall.gateway.filter;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.filter;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.stereotype.Component;
 
 import com.netflix.zuul.ZuulFilter;
@@ -29,7 +26,6 @@ import com.netflix.zuul.context.RequestContext;
 
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.trace.FilterDetail;
-import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 
 /**
@@ -48,6 +44,7 @@ public abstract class HeimdallFilter extends ZuulFilter {
      
      @Override
      public boolean shouldFilter() {
+          this.detail.clear();
           long startTime = System.currentTimeMillis();
           boolean should = true;
           
@@ -88,7 +85,6 @@ public abstract class HeimdallFilter extends ZuulFilter {
                detail.setStatus(Constants.SUCCESS);
           } catch (Throwable e) {
                detail.setStatus(Constants.FAILED);
-               detail.setStackTrace(new StackTraceImpl(e.getClass().getName(), e.getMessage(), ExceptionUtils.getStackTrace(e)));
           } finally {
                long endTime = System.currentTimeMillis();
 
