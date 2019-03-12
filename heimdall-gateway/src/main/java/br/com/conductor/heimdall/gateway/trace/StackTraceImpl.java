@@ -46,4 +46,7 @@ public class StackTraceImpl implements StackTrace {
      @JsonInclude(JsonInclude.Include.NON_NULL)
      public String stack;
 
+     public StackTraceImpl(String clazz, String message) {
+          this(clazz, message, null);
+     }
 }
