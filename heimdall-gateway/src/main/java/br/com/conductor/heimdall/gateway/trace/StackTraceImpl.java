@@ -25,7 +25,6 @@ import br.com.conductor.heimdall.middleware.spec.StackTrace;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * Data class that represents a custom Stack Trace.
@@ -36,7 +35,6 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class StackTraceImpl implements StackTrace {
 
      public String clazz;
