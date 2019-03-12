@@ -19,6 +19,8 @@
  */
 package br.com.conductor.heimdall.gateway.trace;
 
+import br.com.conductor.heimdall.middleware.spec.StackTrace;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.Getter;
@@ -45,6 +47,9 @@ public class FilterDetail {
      @Getter(AccessLevel.NONE)
      private long totalTimeInMillis;
 
+     @JsonInclude(JsonInclude.Include.NON_NULL)
+     private StackTrace stackTrace;
+
      /**
       * Returns the total time in milliseconds.
       * 
@@ -61,5 +66,6 @@ public class FilterDetail {
           this.timeInMillisShould = 0;
           this.status = null;
           this.totalTimeInMillis = 0;
+          this.stackTrace = null;
      }
 }
