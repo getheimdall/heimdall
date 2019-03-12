@@ -34,7 +34,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -55,6 +54,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import org.springframework.security.core.AuthenticationException;
 
 /**
  * Data class that holds tha JTW properties.
@@ -96,9 +96,10 @@ public class TokenAuthenticationService {
                 accountCredentials.getPassword(),
                 Collections.emptyList());
         Authentication authenticate = null;
+        
         try {
             authenticate = authenticationManager.authenticate(userFound);
-        } catch (Exception ex) {
+        } catch (AuthenticationException ex) {
             log.error(ex.getMessage(), ex);
 
             Ldap ldapActive = ldapService.getLdapActive();
@@ -107,23 +108,23 @@ public class TokenAuthenticationService {
                 try {
                     authenticateManagerBuilder.authenticationProvider(ldapProvider(ldapActive));
                     authenticate = ldapProvider(ldapActive).authenticate(userFound);
-                } catch (Exception exception) {
+                } catch (AuthenticationException exception) {
                     log.error(exception.getMessage(), exception);
                 }
             }
         }
 
-        if (Objects.nonNull(authenticate)){
-            addAuthentication(response, accountCredentials.getUsername(), null);
-            response.setStatus(200);
-            try {
-                response.getWriter().write("{ \"Login with success!\" }");
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
-            }
-        } else {
-            HeimdallException.checkThrow(true, ExceptionMessage.USERNAME_OR_PASSWORD_INCORRECT);
+        if (Objects.isNull(authenticate)) HeimdallException.checkThrow(true, ExceptionMessage.USERNAME_OR_PASSWORD_INCORRECT);
+        
+        addAuthentication(response, accountCredentials.getUsername(), null);
+        
+        response.setStatus(200);
+        try {
+            response.getWriter().write("{ \"Login with success!\" }");
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
         }
+        
     }
 
     private void addAuthentication(HttpServletResponse response, String username, String jti) {
@@ -156,7 +157,6 @@ public class TokenAuthenticationService {
 
         if (token != null && !token.isEmpty()) {
             token = token.replace(TOKEN_PREFIX, "");
-            // faz parse do token
             try {
                 Claims claims = Jwts.parser()
                         .setSigningKey(jwtProperty.getSecret())
@@ -165,7 +165,7 @@ public class TokenAuthenticationService {
                 String user = claims.getSubject();
 
                 if (user != null) {
-                    if (!credentialStateService.verifyIfTokenIsRevokeOrLogout(claims.getId())) {
+                    if (credentialStateService.isLogged(claims.getId())) {
                         User userFound = userService.findByUsername(user);
                         addAuthentication(response, user, claims.getId());
                         return new UsernamePasswordAuthenticationToken(userFound.getUserName(), userFound.getPassword(), getAuthoritiesByRoles(userFound.getRoles()));
