@@ -38,13 +38,14 @@ import org.springframework.cloud.netflix.zuul.filters.route.SimpleHostRoutingFil
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import br.com.conductor.heimdall.core.repository.OperationRepository;
+import br.com.conductor.heimdall.core.repository.EnvironmentRepository;
 import br.com.conductor.heimdall.gateway.failsafe.CircuitBreakerManager;
 import br.com.conductor.heimdall.gateway.filter.CustomHostRoutingFilter;
 import br.com.conductor.heimdall.gateway.filter.CustomSendErrorFilter;
 import br.com.conductor.heimdall.gateway.filter.CustomSendResponseFilter;
 import br.com.conductor.heimdall.gateway.filter.HeimdallDecorationFilter;
 import br.com.conductor.heimdall.gateway.listener.StartServer;
+import br.com.conductor.heimdall.gateway.router.CredentialRepository;
 import br.com.conductor.heimdall.gateway.util.RequestHelper;
 import br.com.conductor.heimdall.gateway.zuul.route.ProxyRouteLocator;
 import br.com.conductor.heimdall.gateway.zuul.storage.CacheZuulRouteStorage;
@@ -69,7 +70,7 @@ public class ZuulConfiguration extends ZuulProxyAutoConfiguration {
 	private ServerProperties server;
 
 	@Autowired
-	private OperationRepository operationRepository;
+	private EnvironmentRepository environmentRepository;
 
 	@Autowired
 	private RequestHelper requestHelper;
@@ -80,6 +81,9 @@ public class ZuulConfiguration extends ZuulProxyAutoConfiguration {
 	
 	@Autowired
 	private CircuitBreakerManager circuitBreakerManager;
+	
+	@Autowired
+	private CredentialRepository credentialRepository;
 
 	@Bean
 	public ProxyRouteLocator proxyRouteLocator() {
@@ -92,7 +96,7 @@ public class ZuulConfiguration extends ZuulProxyAutoConfiguration {
 	public PreDecorationFilter preDecorationFilter(RouteLocator routeLocator, ProxyRequestHelper proxyRequestHelper) {
 
 		return new HeimdallDecorationFilter(proxyRouteLocator(), this.server.getServletPrefix(), zuulProperties,
-				proxyRequestHelper, operationRepository, requestHelper);
+				proxyRequestHelper, requestHelper, credentialRepository, environmentRepository);
 	}
 
 	@Bean
