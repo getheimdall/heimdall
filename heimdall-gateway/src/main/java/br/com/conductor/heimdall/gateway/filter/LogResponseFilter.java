@@ -31,7 +31,6 @@ import java.util.Objects;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
@@ -89,7 +88,7 @@ public class LogResponseFilter extends ZuulFilter {
             detail.setStatus(Constants.SUCCESS);
         } catch (Throwable e) {
             detail.setStatus(Constants.FAILED);
-            TraceContextHolder.getInstance().getActualTrace().setStackTrace(new StackTraceImpl(e.getClass().getName(), e.getMessage(), ExceptionUtils.getStackTrace(e)));
+            TraceContextHolder.getInstance().getActualTrace().setStackTrace(new StackTraceImpl(e.getClass().getName(), e.getMessage()));
         } finally {
             long endTime = System.currentTimeMillis();
 
