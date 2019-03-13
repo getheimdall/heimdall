@@ -72,9 +72,11 @@ import lombok.extern.slf4j.Slf4j;
 public class CallImpl implements Call {
 
      private RequestContext context;
+     private ThreadLocal<byte[]> buffers;
      
-     public CallImpl() {
+     public CallImpl(ThreadLocal<byte[]> buffers) {
 
+          this.buffers = buffers;
           context = RequestContext.getCurrentContext();
      }
      
@@ -486,7 +488,7 @@ public class CallImpl implements Call {
                  }
                  context.setSendZuulResponse(false);
                  context.setResponseDataStream(stream);
-                 writeResponse(stream, context.getResponse().getOutputStream(), body);
+                 writeResponse(stream, context.getResponse().getOutputStream());
 
              } catch (UnsupportedEncodingException e) {
                  log.error(e.getMessage(), e);
@@ -496,10 +498,11 @@ public class CallImpl implements Call {
 
          }
 
-         private void writeResponse(InputStream zin, OutputStream out, byte[] body) throws IOException {
+         private void writeResponse(InputStream zin, OutputStream out) throws IOException {
+        	 byte[] bytes = buffers.get();
              int bytesRead = -1;
-             while ((bytesRead = zin.read(body)) != -1) {
-                 out.write(body, 0, bytesRead);
+             while ((bytesRead = zin.read(bytes)) != -1) {
+                 out.write(bytes, 0, bytesRead);
              }
          }
      }

@@ -107,7 +107,7 @@ public class ScopesFilter extends ZuulFilter {
 
             app.getPlans()
                     .forEach(plan -> {
-                        if (plan != null)
+                        if (plan != null && apiId != plan.getApi().getId())
                             plan.getScopes()
                                     .forEach(scope -> {
                                         if (scope != null)

@@ -66,11 +66,14 @@ public class HelperImpl implements Helper {
 	
 	@Autowired(required = false)
 	private MongoClient mongoClient;
+	
+	private ThreadLocal<byte[]> buffers;
 
 	private boolean enableHandler;
 
 	public HelperImpl() {
 		enableHandler = false;
+		buffers = ThreadLocal.withInitial(() -> new byte[8192]);
 	}
 
 	@Override
@@ -83,7 +86,7 @@ public class HelperImpl implements Helper {
 	@Override
 	public Call call() {
 
-		return new CallImpl();
+		return new CallImpl(buffers);
 	}
 
 	@Override
