@@ -47,10 +47,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.Assert.*;
@@ -88,7 +85,7 @@ public class HeimdallDecorationFilterTest {
         this.ctx.clear();
         this.ctx.setRequest(this.request);
         this.ctx.setResponse(this.response);
-        TraceContextHolder.getInstance().init(true, "developer", this.request, false, "");
+        TraceContextHolder.getInstance().init(true, "developer", this.request, false, false);
     }
 
     @Test
@@ -269,6 +266,96 @@ public class HeimdallDecorationFilterTest {
         Mockito.when(operationRepository.findByEndPoint("/v2/api/foo")).thenReturn(Lists.newArrayList(opPost, opDelete, opGet));
 
         HeimdallRoute heimdallRoute = this.filter.getMatchingHeimdallRoute("/v2/api/foo", HttpMethod.GET.name(), this.ctx);
+        assertNotNull(heimdallRoute);
+        assertEquals("/api/foo", heimdallRoute.getRoute().getPath());
+    }
+
+    @Test
+    public void testCallMethodIsOptionWithCors() {
+
+        this.request.setRequestURI("/v2/api/foo");
+        this.request.setMethod(HttpMethod.OPTIONS.name());
+        Map<String, ZuulRoute> routes = new LinkedHashMap<>();
+        ZuulRoute route = new ZuulRoute("idFoo", "/v2/api/foo", null, "my.dns.com.br", true, null, Sets.newConcurrentHashSet());
+        routes.put("/v2/api/foo", route);
+
+        Api api = new Api();
+        api.setId(10L);
+        api.setBasePath("/v2");
+        api.setName("apiName");
+        api.setCors(true);
+
+        Resource resource = new Resource();
+        resource.setId(88L);
+        resource.setApi(api);
+
+        Operation opPost = new Operation(10L, HttpMethod.POST, "/api/foo", "post foo description", resource, new HashSet<>());
+        Operation opDelete = new Operation(11L, HttpMethod.DELETE, "/api/foo", "delete foo description", resource, new HashSet<>());
+        Operation opGet = new Operation(13L, HttpMethod.GET, "/api/foo", "all foo description", resource, new HashSet<>());
+
+        Mockito.when(routeLocator.getAtomicRoutes()).thenReturn(new AtomicReference<>(routes));
+        Mockito.when(operationRepository.findByEndPoint("/v2/api/foo")).thenReturn(Lists.newArrayList(opPost, opDelete, opGet));
+
+        HeimdallRoute heimdallRoute = this.filter.getMatchingHeimdallRoute("/v2/api/foo", HttpMethod.OPTIONS.name(), this.ctx);
+        assertNotNull(heimdallRoute);
+        assertEquals("/api/foo", heimdallRoute.getRoute().getPath());
+    }
+
+    @Test
+    public void testCallMethodIsOptionWithoutCors() {
+        this.request.setRequestURI("/v2/api/foo");
+        this.request.setMethod(HttpMethod.OPTIONS.name());
+        Map<String, ZuulRoute> routes = new LinkedHashMap<>();
+        ZuulRoute route = new ZuulRoute("idFoo", "/v2/api/foo", null, "my.dns.com.br", true, null, Sets.newConcurrentHashSet());
+        routes.put("/v2/api/foo", route);
+
+        Api api = new Api();
+        api.setId(10L);
+        api.setBasePath("/v2");
+        api.setName("apiName");
+
+        Resource resource = new Resource();
+        resource.setId(88L);
+        resource.setApi(api);
+
+        Operation opPost = new Operation(10L, HttpMethod.POST, "/api/foo", "post foo description", resource, new HashSet<>());
+        Operation opDelete = new Operation(11L, HttpMethod.DELETE, "/api/foo", "delete foo description", resource, new HashSet<>());
+        Operation opGet = new Operation(13L, HttpMethod.GET, "/api/foo", "all foo description", resource, new HashSet<>());
+
+        Mockito.when(routeLocator.getAtomicRoutes()).thenReturn(new AtomicReference<>(routes));
+        Mockito.when(operationRepository.findByEndPoint("/v2/api/foo")).thenReturn(Lists.newArrayList(opPost, opDelete, opGet));
+
+        HeimdallRoute heimdallRoute = this.filter.getMatchingHeimdallRoute("/v2/api/foo", HttpMethod.OPTIONS.name(), this.ctx);
+        assertTrue(heimdallRoute.isMethodNotAllowed());
+    }
+
+    @Test
+    public void testCallMethodInOperationsWithoutCors() {
+
+        this.request.setRequestURI("/v2/api/foo");
+        this.request.setMethod(HttpMethod.OPTIONS.name());
+        Map<String, ZuulRoute> routes = new LinkedHashMap<>();
+        ZuulRoute route = new ZuulRoute("idFoo", "/v2/api/foo", null, "my.dns.com.br", true, null, Sets.newConcurrentHashSet());
+        routes.put("/v2/api/foo", route);
+
+        Api api = new Api();
+        api.setId(10L);
+        api.setBasePath("/v2");
+        api.setName("apiName");
+        api.setCors(false);
+
+        Resource resource = new Resource();
+        resource.setId(88L);
+        resource.setApi(api);
+
+        Operation opPost = new Operation(10L, HttpMethod.POST, "/api/foo", "post foo description", resource, new HashSet<>());
+        Operation opDelete = new Operation(11L, HttpMethod.OPTIONS, "/api/foo", "delete foo description", resource, new HashSet<>());
+        Operation opGet = new Operation(13L, HttpMethod.GET, "/api/foo", "all foo description", resource, new HashSet<>());
+
+        Mockito.when(routeLocator.getAtomicRoutes()).thenReturn(new AtomicReference<>(routes));
+        Mockito.when(operationRepository.findByEndPoint("/v2/api/foo")).thenReturn(Lists.newArrayList(opPost, opDelete, opGet));
+
+        HeimdallRoute heimdallRoute = this.filter.getMatchingHeimdallRoute("/v2/api/foo", HttpMethod.OPTIONS.name(), this.ctx);
         assertNotNull(heimdallRoute);
         assertEquals("/api/foo", heimdallRoute.getRoute().getPath());
     }

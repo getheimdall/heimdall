@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.gateway.service;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -20,11 +17,13 @@ package br.com.conductor.heimdall.gateway.service;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.service;
 
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.entity.Developer;
 import br.com.conductor.heimdall.core.entity.Plan;
+import br.com.conductor.heimdall.core.enums.Location;
 import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import com.netflix.zuul.context.RequestContext;
@@ -49,10 +48,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
-public class SecurityServiceTest {
+public class ClientIdInterceptorServiceTest {
 
     @InjectMocks
-    private SecurityService securityService;
+    private ClientIdInterceptorService clientIdInterceptorService;
 
     @Mock
     private AppRepository appRepository;
@@ -81,10 +80,12 @@ public class SecurityServiceTest {
         ctx.clear();
         ctx.setRequest(this.request);
         ctx.setResponse(this.response);
-        TraceContextHolder.getInstance().init(true, "developer", request, false, "");
+        TraceContextHolder.getInstance().init(true, "developer", request, false, false);
 
         clientId = "simpleId";
         someOtherClientId = "someOtherClientId";
+
+        this.request.addHeader("client_id", clientId);
 
         api1 = new Api();
         api1.setId(10L);
@@ -115,7 +116,7 @@ public class SecurityServiceTest {
 
         Mockito.when(appRepository.findByClientId(clientId)).thenReturn(app);
 
-        securityService.validateClientId(this.ctx, api1.getId(), clientId);
+        clientIdInterceptorService.validate(api1.getId(), Location.HEADER);
 
         // Internal Server Error is expected because the request has no finished at this
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), this.ctx.getResponseStatusCode());
@@ -126,7 +127,7 @@ public class SecurityServiceTest {
 
         Mockito.when(appRepository.findByClientId(clientId)).thenReturn(app);
 
-        securityService.validateClientId(this.ctx, api2.getId(), clientId);
+        clientIdInterceptorService.validate(api2.getId(), Location.HEADER);
 
         // Internal Server Error is expected because the request has no finished at this
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), this.ctx.getResponseStatusCode());
@@ -135,7 +136,7 @@ public class SecurityServiceTest {
     @Test
     public void clientIdNullTest() {
 
-        securityService.validateClientId(this.ctx, 10L, null);
+        clientIdInterceptorService.validate( 10L, null);
 
         assertEquals(HttpStatus.UNAUTHORIZED.value(), this.ctx.getResponseStatusCode());
         assertTrue((Boolean) this.ctx.get(INTERRUPT));
@@ -145,7 +146,7 @@ public class SecurityServiceTest {
     @Test
     public void apiIdNullTest() {
 
-        securityService.validateClientId(this.ctx, null, clientId);
+        clientIdInterceptorService.validate(null, Location.HEADER);
 
         assertEquals(HttpStatus.UNAUTHORIZED.value(), this.ctx.getResponseStatusCode());
         assertTrue((Boolean) this.ctx.get(INTERRUPT));
@@ -156,9 +157,11 @@ public class SecurityServiceTest {
     @Test
     public void unauthorizedClientIdTest() {
 
-        Mockito.when(appRepository.findByClientId(clientId)).thenReturn(app);
+        this.request.addHeader("client_id", someOtherClientId);
 
-        securityService.validateClientId(this.ctx, api1.getId(), someOtherClientId);
+        Mockito.when(appRepository.findByClientId(someOtherClientId)).thenReturn(null);
+
+        clientIdInterceptorService.validate(api1.getId(), Location.HEADER);
 
         assertEquals(HttpStatus.UNAUTHORIZED.value(), this.ctx.getResponseStatusCode());
         assertTrue((Boolean) this.ctx.get(INTERRUPT));
@@ -174,7 +177,7 @@ public class SecurityServiceTest {
 
         Mockito.when(appRepository.findByClientId(clientId)).thenReturn(app);
 
-        securityService.validateClientId(this.ctx, api.getId(), clientId);
+        clientIdInterceptorService.validate(api.getId(), Location.HEADER);
 
         assertEquals(HttpStatus.UNAUTHORIZED.value(), this.ctx.getResponseStatusCode());
         assertTrue((Boolean) this.ctx.get(INTERRUPT));
@@ -192,7 +195,7 @@ public class SecurityServiceTest {
 
         Mockito.when(appRepository.findByClientId(clientId)).thenReturn(app);
 
-        securityService.validateClientId(this.ctx, api.getId(), clientId);
+        clientIdInterceptorService.validate(api.getId(), Location.HEADER);
 
         assertEquals(HttpStatus.UNAUTHORIZED.value(), this.ctx.getResponseStatusCode());
         assertTrue((Boolean) this.ctx.get(INTERRUPT));

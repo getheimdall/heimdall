@@ -7,15 +7,16 @@ info:
 
 server:
     context-path: /
+    port: 9090
 
 heimdall:
     contextPath: /heimdall/v1
     hostname: hostname
     excludeRabbit: true
     retryable: false
-    splunk:
-        enabled: false
-        #destination:
+    logstash:
+        enabled: true
+        destination: 127.0.0.1
     rewrite:
         enable: false
         prefix: heimdall
@@ -53,11 +54,6 @@ heimdall:
         queueSize: 500
         discardingThreshold: 0
         zoneId: America/Sao_Paulo
-    trace:
-        printAllTrace: true
-        sanitizes:
-            - access_token
-            - client_id
     redis:
         host: 127.0.0.1
         port: 6379
@@ -74,23 +70,12 @@ heimdall:
         connectionPoolSize: 10
     security:
         enabled: true
-        ldap:
-            enabled: false
-            url: ldap://your.domain:port
-            searchBase: searchBase
-            userDn: user@domain
-            password: pass
-            userSearchFilter: sAMAccountName={0}
         jwt:
             expiration-time: 600
             secret: secretKey
     middlewares:
         allowInactive: 0
         deleteDeprecated: false
-    failsafe:
-        failureNumber: 4
-        sucessNumber: 4
-        delayTimeSeconds: 30
 
 spring:
     pid:
@@ -157,6 +142,7 @@ management:
 zuul:
     filter:
         root: /tmp/interceptores
+        interval: 8
 
 security:
     basic:

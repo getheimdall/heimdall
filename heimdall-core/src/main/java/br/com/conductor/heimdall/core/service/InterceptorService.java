@@ -27,6 +27,7 @@ import br.com.conductor.heimdall.core.dto.*;
 import br.com.conductor.heimdall.core.dto.interceptor.RateLimitDTO;
 import br.com.conductor.heimdall.core.dto.page.InterceptorPage;
 import br.com.conductor.heimdall.core.entity.*;
+import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.enums.Status;
 import br.com.conductor.heimdall.core.enums.TypeInterceptor;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
@@ -122,7 +123,7 @@ public class InterceptorService {
 
         Interceptor interceptor = GenericConverter.mapper(interceptorDTO, Interceptor.class);
 
-        Example<Interceptor> example = Example.of(interceptor, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+        Example<Interceptor> example = Example.of(interceptor, ExampleMatcher.matching().withIgnorePaths("api.cors").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 
         Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
         Page<Interceptor> page = interceptorRepository.findAll(example, pageable);
@@ -141,7 +142,7 @@ public class InterceptorService {
 
         Interceptor interceptor = GenericConverter.mapper(interceptorDTO, Interceptor.class);
 
-        Example<Interceptor> example = Example.of(interceptor, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+        Example<Interceptor> example = Example.of(interceptor, ExampleMatcher.matching().withIgnorePaths("api.cors").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 
         return interceptorRepository.findAll(example);
     }
@@ -161,17 +162,29 @@ public class InterceptorService {
 
         validateTemplate(interceptor.getType(), interceptor.getContent());
 
+//        if (TypeInterceptor.CORS.equals(interceptor.getType())) {
+//            validateFilterCors(interceptor);
+//        }
+
         List<Long> ignoredResources = ignoredValidate(interceptorDTO.getIgnoredResources(), resourceRepository);
         HeimdallException.checkThrow(Objeto.notBlank(ignoredResources), INTERCEPTOR_IGNORED_INVALID, ignoredResources.toString());
 
         List<Long> ignoredOperations = ignoredValidate(interceptorDTO.getIgnoredOperations(), operationRepository);
         HeimdallException.checkThrow(Objeto.notBlank(ignoredOperations), INTERCEPTOR_IGNORED_INVALID, ignoredOperations.toString());
 
+        HeimdallException.checkThrow((TypeInterceptor.CLIENT_ID.equals(interceptor.getType()) && InterceptorLifeCycle.PLAN.equals(interceptor.getLifeCycle())), INTERCEPTOR_INVALID_LIFECYCLE, interceptor.getType().name());
+
         if (TypeInterceptor.RATTING == interceptor.getType()) {
             mountRatelimitInRedis(interceptor);
         }
 
         interceptor = interceptorRepository.save(interceptor);
+
+//        if (TypeInterceptor.CORS.equals(interceptor.getType())) {
+//            Api api = apiRepository.findOne(interceptor.getApi().getId());
+//            api.setCors(true);
+//            apiRepository.save(api);
+//        }
 
         if (TypeInterceptor.MIDDLEWARE.equals(interceptor.getType())) {
 
@@ -220,6 +233,10 @@ public class InterceptorService {
         HeimdallException.checkThrow(isBlank(interceptor), GLOBAL_RESOURCE_NOT_FOUND);
         interceptor = GenericConverter.mapperWithMapping(interceptorDTO, interceptor, new InterceptorMap());
 
+//        if (TypeInterceptor.CORS.equals(interceptor.getType())) {
+//            HeimdallException.checkThrow(interceptor.getLifeCycle() != InterceptorLifeCycle.API, ExceptionMessage.CORS_INTERCEPTOR_NOT_API_LIFE_CYCLE);
+//        }
+
         interceptor = validateLifeCycle(interceptor);
 
         validateTemplate(interceptor.getType(), interceptor.getContent());
@@ -262,6 +279,12 @@ public class InterceptorService {
         }
 
         interceptorRepository.delete(interceptor);
+
+//        if (TypeInterceptor.CORS.equals(interceptor.getType())) {
+//            interceptor.getApi().setCors(false);
+//            apiRepository.save(interceptor.getApi());
+//        }
+
         amqpInterceptorService.dispatchRemoveInterceptors(new InterceptorFileDTO(interceptor.getId(), pathName));
     }
 
@@ -354,6 +377,11 @@ public class InterceptorService {
         }
 
         return interceptor;
+    }
+
+    private void validateFilterCors(Interceptor interceptor) {
+        HeimdallException.checkThrow(interceptor.getLifeCycle() != InterceptorLifeCycle.API, ExceptionMessage.CORS_INTERCEPTOR_NOT_API_LIFE_CYCLE);
+        HeimdallException.checkThrow(interceptor.getApi().isCors(), ExceptionMessage.CORS_INTERCEPTOR_ALREADY_ASSIGNED_TO_THIS_API);
     }
 
     private List<Long> ignoredValidate(List<ReferenceIdDTO> referenceIdDTOs, JpaRepository<?, Long> repository) {

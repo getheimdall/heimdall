@@ -1,17 +1,17 @@
-package br.com.heimdall.config;
+package br.com.conductor.heimdall.core.dto.request;
 
 /*-
  * =========================LICENSE_START==================================
- * heimdall-config
+ * heimdall-core
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,24 +20,22 @@ package br.com.heimdall.config;
  * ==========================LICENSE_END===================================
  */
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.support.SpringBootServletInitializer;
-import org.springframework.cloud.config.server.EnableConfigServer;
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 
 /**
- * Main application for Heimdall. <br/>
- * Since Heimdall is a SpringBoot application, this is a {@link SpringBootServletInitializer}
- *  
- * @author Marcos Filho
- * @see <a href="https://projects.spring.io/spring-boot/">https://projects.spring.io/spring-boot/</a>
- * 
+ * Class is a Data Transfer Object for the Developer authentication.
+ *
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
-@SpringBootApplication
-@EnableConfigServer
-public class ConfigApplication extends SpringBootServletInitializer {
+@Data
+public class DeveloperLogin implements Serializable {
 
-     public static void main(String[] args) {
-          SpringApplication.run(ConfigApplication.class, args);
-     }
+    @NotNull
+    private String email;
+
+    @NotNull
+    private String password;
 }

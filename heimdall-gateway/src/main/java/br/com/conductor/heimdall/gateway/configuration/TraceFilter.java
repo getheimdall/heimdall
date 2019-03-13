@@ -34,7 +34,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.info.BuildProperties;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -84,7 +83,7 @@ public class TraceFilter implements Filter {
 		try {
 
 			trace = TraceContextHolder.getInstance().init(prop.getTrace().isPrintAllTrace(), profile, request,
-					prop.getMongo().getEnabled(), buildProperties.getVersion());
+					prop.getMongo().getEnabled(), prop.getLogstash().getEnabled());
 			if (shouldDisableTrace(request)) {
 				trace.setShouldPrint(false);
 			}
@@ -99,7 +98,7 @@ public class TraceFilter implements Filter {
 			} else {			
 				chain.doFilter(request, response);
 			}
-			
+
 		} catch (Exception e) {
 
 			log.error("Error {} during request {} exception {}", e.getMessage(),((HttpServletRequest) request).getRequestURL(), e.getStackTrace());

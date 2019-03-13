@@ -13,9 +13,9 @@ heimdall:
     hostname: hostname
     excludeRabbit: true
     retryable: false
-    splunk:
-        enabled: false
-        #destination:
+    logstash:
+        enabled: true
+        destination: 127.0.0.1
     rewrite:
         enable: false
         prefix: heimdall
@@ -36,28 +36,31 @@ heimdall:
         appName: HEIMDALL
         databaseName: heimdall
         portNumber: 5432
-        serverName: postgres
+        serverName: 127.0.0.1
         username: postgres
         password: 123456
         runLiquibase: true
         sendStringParametersAsUnicode: false
     mongo:
         enabled: false
-        serverName: mongo
-        #url: 
+#        serverName:
+        url: mongodb://admin:admin@localhost
         port: 27017
         dataBase: logging
         collection: logs
         username: admin
         password: admin
+        queueSize: 500
+        discardingThreshold: 0
+        zoneId: America/Sao_Paulo
     trace:
         printAllTrace: true
         sanitizes:
             - access_token
             - client_id
     redis:
-        host: redis
-        port: 6379
+        host: 127.0.0.1
+        port: 6379 
         maxTotal: 128
         maxIdle: 128
         minIdle: 16
@@ -69,15 +72,13 @@ heimdall:
         numTestsPerEvictionRun: 3
         blockWhenExhausted: true
         connectionPoolSize: 10
-    security:
-        enabled: true
-        ldap:
-            enabled: false
-            #url: ldap://your.host:port
-            #searchBase: DC=name,DC=name
-            #userDn: your@mail.user
-            #password: password
-            #userSearchFilter: sAMAccountName={0}    
+    middlewares:
+        allowInactive: 0
+        deleteDeprecated: false
+    failsafe:
+        failureNumber: 4
+        sucessNumber: 4
+        delayTimeSeconds: 30
 
 spring:
     pid:
@@ -97,25 +98,24 @@ spring:
             INDENT_OUTPUT: true
             WRITE-DATES-AS-TIMESTAMPS: false
     rabbitmq:
-        host: rabbitmq
+        host: 127.0.0.1
         port: 5672
         #virtual-host: dev
         requested-heartbeat: 10
     cache:
         type: redis
 
-springfox:
-    documentation:
-        swagger:
-            v2:
-                path: /docs
-                
-endpoints:    
+endpoints:
+    env:
+        keys-to-sanitize: url, host, serverName
     routes:
         enabled: true
         sensitive: false
     actuator:
         enabled: true
+    trace:
+        filter:
+            enabled: false
 
 management:
     context-path: /manager
@@ -134,9 +134,18 @@ management:
             enabled: false
 
 zuul:
+    ignoredPatterns: /manager/**
+    include-debug-header: false
+    debug: 
+        parameter: debug
+        request: false
     filter:
         root: /tmp/interceptores
-        
+        interval: 8
+    host: 
+        socket-timeout-millis: 40000
+        connect-timeout-millis: 40000  
+
 security:
     basic:
         enabled: false

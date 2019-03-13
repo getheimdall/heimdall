@@ -42,6 +42,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -169,13 +170,6 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
         final String method = ctx.getRequest().getMethod().toUpperCase();
         HeimdallRoute heimdallRoute = getMatchingHeimdallRoute(requestURI, method, ctx);
 
-        if (ctx.getRequest().getHeader(ACCESS_TOKEN) != null) {
-            TraceContextHolder.getInstance().getActualTrace().setAccessToken(ctx.getRequest().getHeader(ACCESS_TOKEN));
-        }
-
-        if (ctx.getRequest().getHeader(CLIENT_ID) != null) {
-            TraceContextHolder.getInstance().getActualTrace().setClientId(ctx.getRequest().getHeader(CLIENT_ID));
-        }
         if (heimdallRoute != null) {
 
             if (heimdallRoute.isMethodNotAllowed()) {
@@ -278,8 +272,18 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                     auxMatch = true;
                     List<Operation> operations = operationRepository.findByEndPoint(pattern);
                     Operation operation = null;
-                    if (operations != null && !operations.isEmpty()) {
-                        operation = operations.stream().filter(o -> o.getMethod().equals(HttpMethod.ALL) || method.equals(o.getMethod().name().toUpperCase())).findFirst().orElse(null);
+                    if (Objects.nonNull(operations) && !operations.isEmpty()) {
+
+                        if (method.equals(HttpMethod.OPTIONS.name())) {
+                            Optional<Operation> first = operations.stream().findFirst();
+                            if (first.get().getResource().getApi().isCors()) {
+                                operation = first.get();
+                            }
+                        }
+
+                        if (Objects.isNull(operation)) {
+                            operation = operations.stream().filter(o -> o.getMethod().equals(HttpMethod.ALL) || method.equals(o.getMethod().name().toUpperCase())).findFirst().orElse(null);
+                        }
                     }
 
                     if (operation != null) {

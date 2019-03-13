@@ -1,0 +1,25 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="conductor\dijalma.silva" id="1">
+		<preConditions>
+			<tableExists tableName="ROLES"/>
+		</preConditions>
+		<sql>
+			INSERT INTO roles (name) VALUES ('PORTAL');
+			INSERT INTO roles_privileges (role_id, privilege_id) SELECT r.id, p.id FROM privileges p, roles r WHERE r.name like 'PORTAL' and p.name in ('READ_API', 'CREATE_ACCESSTOKEN', 'READ_ACCESSTOKEN', 'UPDATE_ACCESSTOKEN', 'DELETE_ACCESSTOKEN', 'READ_DEVELOPER', 'CREATE_DEVELOPER', 'UPDATE_DEVELOPER', 'DELETE_DEVELOPER', 'READ_APP', 'CREATE_APP', 'UPDATE_APP', 'DELETE_APP', 'READ_PLAN');
+		</sql>
+	</changeSet>
+
+	<changeSet author="conductor\dijalma.silva" id="2">
+		<preConditions>
+			<tableExists tableName="USERS" />
+		</preConditions>
+		<sql>
+			INSERT INTO USERS (FIRST_NAME, LAST_NAME, EMAIL, STATUS, PASSWORD, CREATION_DATE, USERNAME, TYPE_USER) VALUES ('PORTAL', 'DEVELOPER', 'heimdall.portal@conductor.com.br', 'ACTIVE', '$2a$11$XZIl8uQbr46IO9hATCwR4u2hmcYWdtrMVowJgPUE9t/WX8dt3IOq6', CURRENT_TIMESTAMP, 'portal', 'DATABASE');
+			INSERT INTO USERS_ROLES (USER_ID, ROLE_ID) SELECT u.id, r.id FROM ROLES r, USERS u WHERE r.name like 'PORTAL' and u.username like 'portal';
+		</sql>
+	</changeSet>
+</databaseChangeLog>

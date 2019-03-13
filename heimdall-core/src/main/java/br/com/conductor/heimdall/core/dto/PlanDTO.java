@@ -35,7 +35,7 @@ import lombok.Data;
  * Class is a Data Transfer Object for the {@link Plan}.
  *
  * @author Filipe Germano
- *
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Data
 public class PlanDTO implements Serializable {
@@ -51,6 +51,9 @@ public class PlanDTO implements Serializable {
      
      @NotNull
      private ReferenceIdDTO api;
+
+     @NotNull
+     private boolean defaultPlan;
 
      private List<ReferenceIdDTO> scopes;
 

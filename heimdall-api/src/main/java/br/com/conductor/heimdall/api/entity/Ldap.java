@@ -15,20 +15,25 @@ import java.io.Serializable;
 @Entity
 public class Ldap implements Serializable {
 
-    @Id
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -1018313339857163210L;
+
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "URL", length = 200, nullable = false)
     private String url;
 
-    @Column(name = "SEARCH_BASE", nullable = false)
+    @Column(name = "SEARCH_BASE", length = 200, nullable = false)
     private String searchBase;
 
     @Column(name = "USER_DN", length = 100, nullable = false)
     private String userDn;
 
-    @Column(name = "PASSWORD", nullable = false)
+    @Column(name = "PASSWORD", length = 100, nullable = false)
     private String password;
 
     @Column(name = "USER_SEARCH_FILTER", length = 120, nullable = false)
