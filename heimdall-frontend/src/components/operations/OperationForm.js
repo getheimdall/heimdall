@@ -60,6 +60,7 @@ class OperationForm extends Component {
                                         <Option value="PUT">PUT</Option>
                                         <Option value="PATCH">PATCH</Option>
                                         <Option value="DELETE">DELETE</Option>
+                                        <Option value="OPTIONS">OPTIONS</Option>
                                         <Option value="ALL">ALL</Option>
                                     </Select>
                                 )}
