@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
     
     <property name="now" value="now()" dbms="mysql,h2"/>
-    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="now()" dbms="postgresql"/>
     <property name="now" value="GETDATE()" dbms="mssql" />
     <property name="now" value="sysdate" dbms="oracle"/>
 
