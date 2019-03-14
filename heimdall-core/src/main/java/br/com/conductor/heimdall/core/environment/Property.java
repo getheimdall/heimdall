@@ -40,10 +40,10 @@ public class Property {
 
      private String contextPath;
 
-     private Splunk splunk = new Splunk();
+     private Logstash logstash = new Logstash();
 
      @Data
-     public class Splunk{
+     public class Logstash {
 
           private Boolean enabled;
 

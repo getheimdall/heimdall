@@ -34,6 +34,7 @@ import lombok.Data;
  * Class is a Data Transfer Object for the {@link Developer}.
  *
  * @author Filipe Germano
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
 @Data
@@ -48,6 +49,9 @@ public class DeveloperDTO implements Serializable {
      @NotNull
      @Size(max = 180)
      private String email;
+
+     @Size(max = 300)
+     private String password;
      
      private Status status;
 

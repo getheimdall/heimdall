@@ -30,7 +30,7 @@ import br.com.twsoftware.alfred.object.Objeto;
 import com.mongodb.*;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.mongodb.morphia.Datastore;
+import org.mongodb.morphia.AdvancedDatastore;
 import org.mongodb.morphia.Morphia;
 import org.mongodb.morphia.aggregation.Accumulator;
 import org.mongodb.morphia.aggregation.AggregationPipeline;
@@ -66,6 +66,8 @@ public class MongoLogConnector implements Serializable {
 
      private String databaseName;
 
+     private String collection;
+
      @Autowired
      private Property property;
 
@@ -78,17 +80,20 @@ public class MongoLogConnector implements Serializable {
      @PostConstruct
      public void init() {
     	 this.databaseName = property.getMongo().getDataBase();
+    	 this.collection = property.getMongo().getCollection();
      }
 
      /**
       * Initializes the database connection by name.
       * 
       * @param databaseName
+      * @param collection
       * Database names
       */
-     public MongoLogConnector(String databaseName) {
+     public MongoLogConnector(String databaseName, String collection) {
 
          this.databaseName = databaseName;
+         this.collection = collection;
 
      }
 
@@ -101,7 +106,7 @@ public class MongoLogConnector implements Serializable {
      public LogTrace findOne(LogTrace object) {
 
          Object idMongo = getValueId(object);
-         return this.datastore().get(object.getClass(), idMongo);
+         return this.datastore().get(this.collection, object.getClass(), idMongo);
      }
 
     /**
@@ -127,12 +132,12 @@ public class MongoLogConnector implements Serializable {
      * @return List of metrics
      */
      public List<Metric> findByTop(String id, int size, Periods period) {
-         final Datastore datastore = this.datastore();
-         Query<LogTrace> query = prepareRange(datastore.createQuery(LogTrace.class), period);
+         final AdvancedDatastore datastore = this.datastore();
+         Query<LogTrace> query = prepareRange(datastore.createQuery(this.collection, LogTrace.class), period);
 
          query.field(id).notEqual(null);
 
-         final AggregationPipeline pipeline = datastore.createAggregation(LogTrace.class)
+         final AggregationPipeline pipeline = datastore.createAggregation(this.collection, LogTrace.class)
                  .match(query)
                  .group(id,
                          Group.grouping("metric", Group.last(id)),
@@ -149,12 +154,12 @@ public class MongoLogConnector implements Serializable {
      }
 
      public List<Metric> findByMetricBySum(String id, String source, String metric, Periods period) {
-         final Datastore datastore = this.datastore();
-         Query<LogTrace> query = prepareRange(datastore.createQuery(LogTrace.class), period);
+         final AdvancedDatastore datastore = this.datastore();
+         Query<LogTrace> query = prepareRange(datastore.createQuery(this.collection, LogTrace.class), period);
 
          query.field(source).equal(id);
 
-         final AggregationPipeline aggregation = datastore.createAggregation(LogTrace.class)
+         final AggregationPipeline aggregation = datastore.createAggregation(this.collection, LogTrace.class)
                  .match(query)
                  .group(metric,
                          Group.grouping("metric", Group.last(metric)),
@@ -170,12 +175,12 @@ public class MongoLogConnector implements Serializable {
 
      public List<Metric> findByMetricByAvg(String id, String source, String metric, Periods period) {
 
-         final Datastore datastore = this.datastore();
-         Query<LogTrace> query = prepareRange(datastore.createQuery(LogTrace.class), period);
+         final AdvancedDatastore datastore = this.datastore();
+         Query<LogTrace> query = prepareRange(datastore.createQuery(this.collection, LogTrace.class), period);
 
          query.field(source).equal(id);
 
-         final AggregationPipeline aggregation = datastore.createAggregation(LogTrace.class)
+         final AggregationPipeline aggregation = datastore.createAggregation(this.collection, LogTrace.class)
                  .match(query)
                  .group(source,
                          Group.grouping("metric", Group.last(source)),
@@ -190,7 +195,7 @@ public class MongoLogConnector implements Serializable {
      }
 
      private Query<LogTrace> prepareRange(Query<LogTrace> query, Periods date) {
-         String insertedOnDate = "trace.insertedOnDate";
+         String insertedOnDate = "ts";
          switch(date) {
              case TODAY: {
                  query.field(insertedOnDate).containsIgnoreCase(LocalDate.now().format(DateTimeFormatter.ISO_DATE));
@@ -223,7 +228,7 @@ public class MongoLogConnector implements Serializable {
      }
 
      private Query<LogTrace> prepareQuery(List<FiltersDTO> filtersDTOs) {
-         Query<LogTrace> query = this.datastore().createQuery(LogTrace.class);
+         Query<LogTrace> query = this.datastore().createQuery(this.collection, LogTrace.class);
 
          filtersDTOs.forEach(filtersDTO -> {
 
@@ -375,7 +380,7 @@ public class MongoLogConnector implements Serializable {
           }
      }
 
-     private Datastore datastore() {
+     private AdvancedDatastore datastore() {
 
           Morphia morphia = new Morphia();
 
@@ -383,7 +388,7 @@ public class MongoLogConnector implements Serializable {
               this.createMongoClient();
           }
 
-          return morphia.createDatastore(this.client, this.databaseName);
+          return (AdvancedDatastore) morphia.createDatastore(this.client, this.databaseName);
      }
 
      private <T> Object getValueId(T object) {
