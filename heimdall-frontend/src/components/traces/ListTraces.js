@@ -14,21 +14,23 @@ class ListTraces extends Component {
         const {dataSource, loading} = this.props
         return (
             <div>
-                <Table dataSource={dataSource.content} rowKey={record => record.id.toString()} loading={loading}
+                <Table dataSource={dataSource.content} rowKey={record => record.id.toString()} scroll={{x: 1168}} loading={loading}
                        pagination={false}>
-                    <Column title={i18n.t('id')} dataIndex="id" id="id"/>
+                    <Column title={i18n.t('method')} dataIndex="trace.method" id="method" align={'center'} width={'8%'}/>
                     <Column title={i18n.t('url')} dataIndex="trace.url" id="url"/>
-                    <Column title={i18n.t('method')} dataIndex="trace.method" id="method"/>
-                    <Column title={i18n.t('status')} id="trace.resultStatus" key="status" render={(record) => (
+                    <Column title={i18n.t('status')} id="trace.resultStatus" key="status" align={'center'} width={'8%'} render={(record) => (
                         <span>
-                            <Tag color={ColorUtils.getColorStatus(record.trace.resultStatus)}>{record.trace.resultStatus === 'ACTIVE' ? i18n.t('active') : i18n.t('inactive')}</Tag>
+                            <Tag color={ColorUtils.getColorStatus(record.trace.resultStatus)}>{record.trace.resultStatus}</Tag>
                         </span>
                     )} />
-                    <Column title={i18n.t('duration')} dataIndex="trace.durationMillis" id="duration"/>
+                    <Column title={i18n.t('duration')} dataIndex="trace.durationMillis" id="duration" align={'center'} width={'8%'}/>
+                    <Column title={i18n.t('time')} dataIndex="ts" id="ts" align={'center'} width={'15%'}/>
                     <Column
-                        align="right"
+                        title={i18n.t('details')}
+                        align="center"
                         id="action"
                         key="action"
+                        width={'8%'}
                         render={(text, record) => (
                             <span>
                                 <Tooltip title={i18n.t('view')}>

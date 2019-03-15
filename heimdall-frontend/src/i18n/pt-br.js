@@ -57,7 +57,7 @@ export default {
         'add_filter': 'Adicionar filtro',
         'apply_filters': 'Aplicar filtros',
         'method': 'Método',
-        'duration': 'Duration',
+        'duration': 'Duração',
         'status_response': 'Status da resposta',
         'request_time_duration': 'Tempo de duração da requisição',
         'date_of_trace': 'Data do Trace',
@@ -246,6 +246,8 @@ export default {
         'min_4_characters_to_name': 'O nome deve ter no mínimo 4 caracteres!',
         'available_privileges': 'Papéis disponíveis',
         'attributed_privileges': 'Papéis atribuídos',
-        'default_plan_this_api': 'Plano padrão'
+        'default_plan_this_api': 'Plano padrão',
+        'time': 'Tempo',
+        'details': 'Detalhes'
     }
 }

@@ -1,56 +1,39 @@
 const getColorMethod = (method) => {
-    let color;
-    if (method === 'GET') {
-        color = '#61affe'
-    } else if (method === 'POST') {
-        color = '#49cc90'
-    } else if (method === 'DELETE') {
-        color = '#f93e3e'
-    } else if (method === 'PUT') {
-        color = '#fca130'
-    } else if (method === 'PATCH') {
-        color = '#50e3c2'
-    }
 
-    return color;
-}
+    const colors = {
+        'GET': '#61affe',
+        'POST': '#49cc90',
+        'DELETE': '#f93e3e',
+        'PUT': '#fca130',
+        'PATCH': '#50e3c2'
+    };
+    return colors[method] ? colors[method] : '#ce86fe';
+};
 
 const getColorStatus = (status) => {
-    let color;
     status = Math.floor(status / 100);
 
-    if (status === 1){
-        color = '#99c2ff'
-    } else if (status === 2) {
-        color = '#56b63f'
-    } else if (status === 3) {
-        color = '#ffae7a'
-    } else if (status === 4) {
-        color = '#ff6c6c'
-    } else {
-        color = '#ce86fe'
-    }
+    const colors = {
+        1: '#99c2ff',
+        2: '#56b63f',
+        3: '#ce86fe',
+        4: '#ffae7a'
+    };
 
-    return color;
-}
+    return colors[status] ? colors[status] : '#ff4444';
+};
 
 const getColorLevel = (level) => {
-    let color;
 
-    if (level === 'INFO') {
-        color = '#2950a0'
-    } else if (level === 'DEBUG') {
-        color = '#6f4bae'
-    } else if (level === 'ERROR') {
-        color = '#8c0b0c'
-    } else if (level === 'WARN') {
-        color = '#b65e2f'
-    } else {
-        color = '#a5b0b9'
-    }
+    const colors = {
+        'INFO': '#2950a0',
+        'DEBUG':'#6f4bae',
+        'ERROR':'#8c0b0c',
+        'WARN':'#b65e2f'
+    };
 
-    return color;
-}
+    return colors[level] ? colors[level] : '#a5b0b9';
+};
 
 const getColorActivate = (active) => {
 
