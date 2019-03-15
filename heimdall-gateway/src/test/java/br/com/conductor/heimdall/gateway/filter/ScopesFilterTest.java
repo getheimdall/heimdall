@@ -72,7 +72,7 @@ public class ScopesFilterTest {
         context.setRequest(this.request);
         context.setResponse(this.response);
         context.setResponseStatusCode(HttpStatus.OK.value());
-        TraceContextHolder.getInstance().init(true, "developer", this.request, false, false);
+        TraceContextHolder.getInstance().init(true, "developer", this.request, false, false, "");
 
     }
 
@@ -92,7 +92,7 @@ public class ScopesFilterTest {
         plan.setId(20L);
         plan.setApi(api);
 
-        Operation operation = new Operation(1111L, null, null,null, null, null);
+        Operation operation = new Operation(1111L, null, null,null, null);
         Scope scope = new Scope(1000L, null, null, null, null, null);
 
         app.setPlans(Lists.newArrayList(plan));
@@ -127,7 +127,7 @@ public class ScopesFilterTest {
         plan.setId(20L);
         plan.setApi(api);
 
-        Operation operation = new Operation(1111L, null, null,null, null, null);
+        Operation operation = new Operation(1111L, null, null,null, null);
         Scope scope = new Scope(1000L, null, null, null, null, null);
 
         app.setPlans(Lists.newArrayList(plan));
@@ -174,8 +174,8 @@ public class ScopesFilterTest {
         app2.setClientId(clientId2);
         app2.setPlans(Lists.newArrayList(plan2));
 
-        Operation operation1 = new Operation(1111L, null, null,null, null, null);
-        Operation operation2 = new Operation(2222L, null, null,null, null, null);
+        Operation operation1 = new Operation(1111L, null, null,null, null);
+        Operation operation2 = new Operation(2222L, null, null,null, null);
 
         Scope scope1 = new Scope();
         scope1.setId(123L);
@@ -229,8 +229,8 @@ public class ScopesFilterTest {
         app2.setClientId(clientId2);
         app2.setPlans(Lists.newArrayList(plan2));
 
-        Operation operation1 = new Operation(1111L, null, null,null, null, null);
-        Operation operation2 = new Operation(2222L, null, null,null, null, null);
+        Operation operation1 = new Operation(1111L, null, null,null, null);
+        Operation operation2 = new Operation(2222L, null, null,null, null);
 
         Scope scope1 = new Scope(123L, null, null, null, Sets.newHashSet(operation1), Sets.newHashSet(plan1));
         Scope scope2 = new Scope(321L, null, null, null, Sets.newHashSet(operation2), Sets.newHashSet(plan2));
@@ -279,9 +279,9 @@ public class ScopesFilterTest {
         app2.setClientId(clientId2);
         app2.setPlans(Lists.newArrayList(plan2));
 
-        Operation operation1 = new Operation(1111L, null, null,null, null, null);
-        Operation operation2 = new Operation(2222L, null, null,null, null, null);
-        Operation operation3 = new Operation(3333L, null, null,null, null, null);
+        Operation operation1 = new Operation(1111L, null, null,null, null);
+        Operation operation2 = new Operation(2222L, null, null,null, null);
+        Operation operation3 = new Operation(3333L, null, null,null, null);
 
         Scope scope1 = new Scope(123L, null, null, null, Sets.newHashSet(operation1, operation3), Sets.newHashSet(plan1));
         Scope scope2 = new Scope(321L, null, null, null, Sets.newHashSet(operation2, operation3), Sets.newHashSet(plan2));
@@ -325,9 +325,9 @@ public class ScopesFilterTest {
         app1.setClientId(clientId1);
         app1.setPlans(Lists.newArrayList(plan1));
 
-        Operation operation1 = new Operation(1111L, null, null,null, null, null);
-        Operation operation2 = new Operation(2222L, null, null,null, null, null);
-        Operation operation3 = new Operation(3333L, null, null,null, null, null);
+        Operation operation1 = new Operation(1111L, null, null,null, null);
+        Operation operation2 = new Operation(2222L, null, null,null, null);
+        Operation operation3 = new Operation(3333L, null, null,null, null);
 
         Scope scope1 = new Scope(123L, null, null, null, Sets.newHashSet(operation1, operation3), Sets.newHashSet(plan1));
         Scope scope2 = new Scope(321L, null, null, null, Sets.newHashSet(operation2, operation3), Sets.newHashSet(plan2));
@@ -362,7 +362,7 @@ public class ScopesFilterTest {
         plan.setId(10L);
         plan.setApi(api);
 
-        Operation operation = new Operation(1111L, null, null,null, null, null);
+        Operation operation = new Operation(1111L, null, null,null, null);
         Scope scope = new Scope(1000L, null, null, null, null, null);
 
         app.setPlans(Lists.newArrayList(plan));
@@ -388,7 +388,7 @@ public class ScopesFilterTest {
         Api api = new Api();
         api.setId(1L);
 
-        Operation operation = new Operation(1111L, null, null,null, null, null);
+        Operation operation = new Operation(1111L, null, null,null, null);
         Scope scope = new Scope(1000L, null, null, null, null, null);
 
         scope.setOperations(Sets.newHashSet(operation));
@@ -414,7 +414,7 @@ public class ScopesFilterTest {
         app.setId(1L);
         app.setClientId(clientId1);
 
-        Operation operation = new Operation(1111L, null, null,null, null, null);
+        Operation operation = new Operation(1111L, null, null,null, null);
         Scope scope = new Scope(1000L, null, null, null, null, null);
 
         scope.setOperations(Sets.newHashSet(operation));
@@ -442,7 +442,7 @@ public class ScopesFilterTest {
         Plan plan = new Plan();
         plan.setId(1L);
 
-        Operation operation = new Operation(1111L, null, null,null, null, null);
+        Operation operation = new Operation(1111L, null, null,null, null);
 
         context.set(OPERATION_ID, operation.getId());
 
@@ -471,7 +471,7 @@ public class ScopesFilterTest {
         plan.setId(10L);
         plan.setApi(api);
 
-        Operation operation = new Operation(1111L, null, null,null, null, null);
+        Operation operation = new Operation(1111L, null, null,null, null);
         Scope scope = new Scope(1000L, null, null, null, null, null);
 
         app.setPlans(Lists.newArrayList(plan));

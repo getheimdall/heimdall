@@ -24,7 +24,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +41,10 @@ public class CacheService {
      
      @Autowired
      CacheManager cacheManager;
-     
+
+     @Autowired
+     private RedissonClient redissonClientCacheInterceptor;
+
      /**
       * Returns the list of cached names.
       * 
@@ -83,6 +88,10 @@ public class CacheService {
      public void clean(String key) {
           
           cacheManager.getCache(key).clear();
+     }
+
+     public void cleanInterceptorsCache() {
+          redissonClientCacheInterceptor.getKeys().flushdb();
      }
 
 }

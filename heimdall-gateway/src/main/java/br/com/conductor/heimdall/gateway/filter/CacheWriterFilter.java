@@ -25,18 +25,19 @@ import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.filter.helper.ApiResponseImpl;
 import br.com.conductor.heimdall.gateway.trace.FilterDetail;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import br.com.conductor.heimdall.gateway.util.ResponseHandler;
 import br.com.conductor.heimdall.middleware.spec.ApiResponse;
+import br.com.conductor.heimdall.middleware.spec.Helper;
 import lombok.extern.slf4j.Slf4j;
 
-import com.google.common.collect.Maps;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import org.redisson.api.RBucket;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -56,6 +57,9 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 public class CacheWriterFilter extends ZuulFilter {
 
     private FilterDetail detail = new FilterDetail();
+
+    @Autowired
+    private Helper helper;
 
     @Override
     public String filterType() {
@@ -81,7 +85,7 @@ public class CacheWriterFilter extends ZuulFilter {
         try {
             process();
             detail.setStatus(Constants.SUCCESS);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             detail.setStatus(Constants.FAILED);
             log.error("Error during CacheWriterFilter", e);
         } finally {
@@ -97,19 +101,18 @@ public class CacheWriterFilter extends ZuulFilter {
         return null;
     }
 
-    private void process() {
+    private void process() throws Throwable {
         RequestContext context = RequestContext.getCurrentContext();
 
         RBucket<ApiResponse> rBucket = (RBucket<ApiResponse>) context.get(CACHE_BUCKET);
 
         HttpServletResponse response = context.getResponse();
 
-        Map<String, String> headers = getResponseHeaders(response);
-        headers.put(HttpHeaders.CONTENT_TYPE, context.getResponse().getContentType());
+        Map<String, String> headers = ResponseHandler.getResponseHeaders(context);
 
         ApiResponse apiResponse = new ApiResponseImpl();
         apiResponse.setHeaders(headers);
-        apiResponse.setBody(context.getResponseBody());
+        apiResponse.setBody(ResponseHandler.getResponseBody(context, headers, helper));
         apiResponse.setStatus(response.getStatus());
 
         Long timeToLive = (Long) context.get(CACHE_TIME_TO_LIVE);
@@ -121,16 +124,4 @@ public class CacheWriterFilter extends ZuulFilter {
 
     }
 
-    /*
-     * Copies the response headers from the HttpServletResponse to a Map
-     */
-    private Map<String, String> getResponseHeaders(HttpServletResponse response) {
-
-        Map<String, String> map = Maps.newHashMap();
-        Collection<String> headerNames = response.getHeaderNames();
-
-        headerNames.forEach(s -> map.put(s, response.getHeader(s)));
-
-        return map;
-    }
 }

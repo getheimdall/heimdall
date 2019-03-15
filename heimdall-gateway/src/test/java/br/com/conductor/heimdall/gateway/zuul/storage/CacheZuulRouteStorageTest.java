@@ -62,9 +62,9 @@ public class CacheZuulRouteStorageTest {
           resource.setApi(api);
           resource.setOperations(new ArrayList<>());
           
-          Operation opPost = new Operation(10L, HttpMethod.POST, "/api/foo", "POST description", resource, null);
-          Operation opGet = new Operation(10L, HttpMethod.GET, "/api/foo/{id}", "GET description", resource, null);
-          Operation opDelete = new Operation(10L, HttpMethod.DELETE, "/api/foo/{id}", "DELETE description", resource, null);
+          Operation opPost = new Operation(10L, HttpMethod.POST, "/api/foo", "POST description", resource);
+          Operation opGet = new Operation(10L, HttpMethod.GET, "/api/foo/{id}", "GET description", resource);
+          Operation opDelete = new Operation(10L, HttpMethod.DELETE, "/api/foo/{id}", "DELETE description", resource);
           resource.getOperations().addAll(Arrays.asList(opDelete, opGet, opPost));
           
           res.add(resource);

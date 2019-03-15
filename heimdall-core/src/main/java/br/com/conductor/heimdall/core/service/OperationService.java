@@ -167,7 +167,7 @@ public class OperationService {
           api.getResources().forEach(resource -> operations.addAll(this.list(apiId, resource.getId(), operationDTO)));
 
           if (!operations.isEmpty()) {
-               return operations.stream().map(op -> new Operation(op.getId(), op.getMethod(), op.getPath(), null, null, null)).collect(Collectors.toList());
+               return operations.stream().map(op -> new Operation(op.getId(), op.getMethod(), op.getPath(), null, null)).collect(Collectors.toList());
           }
 
           return new ArrayList<>();

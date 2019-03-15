@@ -38,4 +38,8 @@ public class ConstantsInterceptors {
      public static final String GLOBAL_ACCESS_NOT_ALLOWED_API = "Access not allowed for this API";
 
      public static final String IDENTIFIER_ID = "identifier_id";
+
+     public static final int RATE_LIMIT_DATABASE = 2;
+
+     public static final int CACHE_INTERCEPTOR_DATABASE = 4;
 }

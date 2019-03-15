@@ -94,6 +94,16 @@
 		    	<role>Developer</role>
 		    </roles>
 	  	</developer>
+		<developer>
+			<id>manoel.filho</id>
+			<name>Manoel Dijalma</name>
+			<email>manoel.filho at conductor.com.br</email>
+			<organization>Conductor Tecnologia SA</organization>
+			<organizationUrl>http://www.conductor.com.br</organizationUrl>
+			<roles>
+				<role>Developer</role>
+			</roles>
+		</developer>
 	  	<developer>
 		   	<id>marcelo.rodrigues</id>
 		    <name>Marcelo Rodrigues</name>

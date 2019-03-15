@@ -102,6 +102,8 @@ public class Trace {
      private RequestResponseParser response;
 
      private String pattern;
+
+     private Boolean cache;
      
      @JsonInclude(Include.NON_NULL)
      private StackTrace stackTrace;
@@ -125,16 +127,19 @@ public class Trace {
      @JsonIgnore
      private boolean printLogstash;
      
+     private String version;
+     
      public Trace() {
     	 
      }
 
      /**
-      * Creates a Trace.
-      * 
-      * @param printAllTrace	boolean, should print all trace
-      * @param profile			String, profile
-      * @param servletRequest	{@link ServletRequest}
+      * Create a Trace.
+      * @param printAllTrace
+      * @param profile
+      * @param servletRequest
+      * @param printMongo
+      * @param printLogstash
       */
      public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printMongo, boolean printLogstash){
 
@@ -166,6 +171,21 @@ public class Trace {
      }
      
      /**
+      * Create a Trace.
+      * 
+      * @param printAllTrace
+      * @param profile
+      * @param servletRequest
+      * @param printMongo
+      * @param printLogstash
+      * @param version
+      */
+     public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printMongo, boolean printLogstash, String version) {
+    	 this(printAllTrace, profile, servletRequest, printMongo, printLogstash);
+    	 this.version = version;
+     }
+
+	/**
       * Adds a {@link FilterDetail} to the List.
       * 
       * @param detail {@link FilterDetail}

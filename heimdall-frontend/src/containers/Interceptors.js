@@ -146,7 +146,7 @@ class Interceptors extends Component {
 
     handleForm = (formObject) => {
         if (formObject.id) {
-            formObject.status = 'UPDATE'
+            formObject.state = 'UPDATE'
             let candidates = this.state.candidatesToUpdate
             if (this.state.candidatesToUpdate.some(updatable => updatable.id === formObject.id)) {
                 candidates = this.state.candidatesToUpdate.filter(item => item.id !== formObject.id)
@@ -155,7 +155,7 @@ class Interceptors extends Component {
             formObject.uuid = UUID.generate()
             this.setState({...this.state, candidatesToUpdate: [...candidates, formObject]})
         } else {
-            formObject.status = 'SAVE'
+            formObject.state = 'SAVE'
             let candidates = this.state.candidatesToSave
             if (this.state.candidatesToSave.some(updatable => updatable.uuid === formObject.uuid)) {
                 candidates = this.state.candidatesToSave.filter(item => item.uuid !== formObject.uuid)
@@ -168,7 +168,7 @@ class Interceptors extends Component {
 
     handleDelete = (interceptor) => {
         if (interceptor.id) {
-            if (interceptor.status) {
+            if (interceptor.state) {
                 //just remove from candidatesToUpdate
                 const candidatesUpdated = this.state.candidatesToUpdate.filter(item => item.uuid !== interceptor.uuid)
                 this.setState({...this.state, candidatesToUpdate: candidatesUpdated})
