@@ -33,7 +33,7 @@
     </changeSet>
 
     <changeSet id="03" author="conductor\marcelo.rodrigues">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <tableExists tableName="PLANS" />
             <not>
                 <columnExists tableName="PLANS" columnName="DEFAULT_PLAN"/>

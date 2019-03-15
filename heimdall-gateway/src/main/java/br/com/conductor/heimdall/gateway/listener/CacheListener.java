@@ -77,5 +77,18 @@ public class CacheListener {
                cacheService.clean();
           }
           
-     }  
+     }
+
+     /**
+      * Cleans the Rabbit cache with specific message.
+      *
+      * @param message	{@link Message}
+      */
+     @RabbitListener( queues = RabbitConstants.LISTENER_HEIMDALL_CLEAN_INTERCEPTORS_CACHE)
+     public void cleanInterceptorsCache(final Message message) {
+
+          log.info("Clean all caches from Cache interceptors");
+          cacheService.cleanInterceptorsCache();
+     }
+
 }

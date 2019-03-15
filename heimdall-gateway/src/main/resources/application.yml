@@ -140,7 +140,7 @@ zuul:
         parameter: debug
         request: false
     filter:
-        root: /tmp/interceptores
+        root: /tmp/interceptors
         interval: 8
     host: 
         socket-timeout-millis: 40000
