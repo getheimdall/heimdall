@@ -32,18 +32,32 @@ import br.com.conductor.heimdall.core.util.JwtUtils;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.middleware.enums.HttpStatus;
 import br.com.conductor.heimdall.middleware.enums.HttpStatus.Series;
-import br.com.conductor.heimdall.middleware.spec.ApiResponse;
-import br.com.conductor.heimdall.middleware.spec.Helper;
 import br.com.conductor.heimdall.middleware.spec.Http;
-import br.com.twsoftware.alfred.object.Objeto;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.netflix.zuul.context.RequestContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static br.com.conductor.heimdall.core.util.ConstantsOAuth.*;
 
@@ -73,7 +87,7 @@ public class OAuthInterceptorService {
     @Autowired
     private AppRepository appRepository;
 
-    private Helper helper;
+    private RequestContext context;
 
     /**
      * Runs the service for the OAuth
@@ -83,14 +97,13 @@ public class OAuthInterceptorService {
      * @param timeAccessToken  time to expire accessToken
      * @param timeRefreshToken time to expire refreshToken
      * @param providerId       {@link Provider} id
-     * @param helper           {@link Helper}
      */
-    public void execute(TypeOAuth typeOAuth, String privateKey, int timeAccessToken, int timeRefreshToken, Long providerId, Helper helper) {
+    public void execute(TypeOAuth typeOAuth, String privateKey, int timeAccessToken, int timeRefreshToken, Long providerId) {
 
         try {
-            executeInterceptor(typeOAuth, privateKey, timeAccessToken, timeRefreshToken, providerId, helper);
+            executeInterceptor(typeOAuth, privateKey, timeAccessToken, timeRefreshToken, providerId);
         } catch( HeimdallException ex ){
-            generateResponse( ex.getMsgEnum().getMessage(), ex.getMsgEnum().getHttpCode());
+            generateResponseWithError( ex.getMsgEnum().getMessage(), ex.getMsgEnum().getHttpCode());
         }
     }
 
@@ -100,12 +113,17 @@ public class OAuthInterceptorService {
      * @param message    Response message
      * @param httpStatus {@link HttpStatus} of the response
      */
-    private void generateResponse(String message, int httpStatus) {
+    private void generateResponseWithError(String message, int httpStatus) {
         message = "{ \"error\" : \"" + message + "\" }";
         TraceContextHolder.getInstance().getActualTrace().trace(message);
-        this.helper.call().response().setStatus(httpStatus);
-        this.helper.call().response().header().add("Content-Type", "application/json");
-        this.helper.call().response().setBody(message);
+        HttpServletResponse response = context.getResponse();
+        response.setStatus(httpStatus);
+        response.addHeader("Content-Type", "application/json");
+        try {
+            response.getWriter().write(message);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
     }
 
     /**
@@ -116,11 +134,10 @@ public class OAuthInterceptorService {
      * @param timeAccessToken  time to expire accessToken
      * @param timeRefreshToken time to expire refreshToken
      * @param providerId       {@link Provider} id
-     * @param helper           {@link Helper}
      */
-    public void executeInterceptor(TypeOAuth typeOAuth, String privateKey, int timeAccessToken, int timeRefreshToken, Long providerId, Helper helper) {
+    public void executeInterceptor(TypeOAuth typeOAuth, String privateKey, int timeAccessToken, int timeRefreshToken, Long providerId) {
 
-        this.helper = helper;
+        this.context = RequestContext.getCurrentContext();
         OAuthRequest oAuthRequest = recoverOAuthRequest();
 
         if (typeOAuth == TypeOAuth.VALIDATE) {
@@ -128,14 +145,23 @@ public class OAuthInterceptorService {
             return;
         }
 
-        HeimdallException.checkThrow(Objeto.isBlank(oAuthRequest.getGrantType()), ExceptionMessage.GRANT_TYPE_NOT_FOUND);
+        HeimdallException
+            .checkThrow(Objects.isNull(oAuthRequest.getGrantType()) || oAuthRequest.getGrantType().isEmpty(), ExceptionMessage.GRANT_TYPE_NOT_FOUND);
 
-        String body = helper.call().request().getBody();
+        HttpServletRequest request = context.getRequest();
+        String body = "";
+
+        try {
+            body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+
         timeAccessToken = (timeAccessToken <= 0) ? TIME_ACCESS_TOKEN : timeAccessToken;
         timeRefreshToken = (timeRefreshToken <= 0) ? TIME_REFRESH_TOKEN : timeRefreshToken;
 
-        String clientId = helper.call().request().header().get("client_id");
-        String accessToken = helper.call().request().header().get("access_token");
+        String clientId = request.getHeader("client_id");
+        String accessToken = request.getHeader("access_token");
 
         switch (typeOAuth) {
             case GENERATE:
@@ -159,7 +185,7 @@ public class OAuthInterceptorService {
 
     private void runAuthorize(OAuthRequest oAuthRequest, String clientId, Long providerId, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsJson, String accessToken) {
 
-        HeimdallException.checkThrow(Objeto.isBlank(oAuthRequest.getClientId()), ExceptionMessage.CLIENT_ID_NOT_FOUND);
+        HeimdallException.checkThrow(Objects.isNull(oAuthRequest.getClientId()) || oAuthRequest.getClientId().isEmpty(), ExceptionMessage.CLIENT_ID_NOT_FOUND);
 
         switch (oAuthRequest.getGrantType().toUpperCase()) {
             case GRANT_TYPE_PASSWORD:
@@ -204,8 +230,14 @@ public class OAuthInterceptorService {
      */
     private void runGenerate(OAuthRequest oAuthRequest, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsJson) throws HeimdallException {
         TokenOAuth tokenOAuth = oAuthService.generateTokenOAuth(oAuthRequest, oAuthRequest.getClientId(), privateKey, timeAccessToken, timeRefreshToken, claimsJson);
-        String tokenOAuthJson = helper.json().parse(tokenOAuth);
-        generateResponseWithSuccess(tokenOAuthJson);
+        String tokenOAuthJson;
+        try {
+            tokenOAuthJson = mapper().writeValueAsString(tokenOAuth);
+            generateResponseWithSuccess(tokenOAuthJson);
+        } catch (JsonProcessingException e) {
+            log.error(e.getMessage(), e);
+            throw new HeimdallException(ExceptionMessage.GLOBAL_JSON_INVALID_FORMAT);
+        }
     }
 
     /**
@@ -216,9 +248,9 @@ public class OAuthInterceptorService {
      */
     private void runValidate(String privateKey) throws HeimdallException {
 
-        String authorization = helper.call().request().header().get("Authorization");
+        String authorization = context.getRequest().getHeader("Authorization");
 
-        HeimdallException.checkThrow((Objeto.isBlank(authorization) ||
+        HeimdallException.checkThrow((Objects.isNull(authorization) || authorization.isEmpty() ||
                 !authorization.matches("Bearer .+")), ExceptionMessage.AUTHORIZATION_NOT_FOUND);
 
 
@@ -253,7 +285,7 @@ public class OAuthInterceptorService {
                     GRANT_TYPE_IMPLICIT,
                     oAuthAuthorizeFromToken.getExpirationTime()
             );
-            helper.call().response().header().set("access_token", tokenImplicit.getAccessToken());
+            context.getResponse().addHeader("access_token", tokenImplicit.getAccessToken());
         }
     }
 
@@ -263,36 +295,48 @@ public class OAuthInterceptorService {
      * @return The {@link OAuthRequest}
      */
     private OAuthRequest recoverOAuthRequest() {
+        HttpServletRequest request = context.getRequest();
 
-        String body = helper.call().request().getBody();
+        String body = null;
+        try {
+            body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+
         OAuthRequest oAuthRequest;
 
-        if (Objeto.isBlank(body)) {
+        if (Objects.isNull(body) || body.isEmpty()) {
             oAuthRequest = new OAuthRequest();
         } else {
-            HeimdallException.checkThrow(!helper.json().isJson(body), ExceptionMessage.GLOBAL_JSON_INVALID_FORMAT);
-
-            oAuthRequest = helper.json().parse(body, OAuthRequest.class);
+            HeimdallException.checkThrow(!isJson(body), ExceptionMessage.GLOBAL_JSON_INVALID_FORMAT);
+            try {
+                oAuthRequest = mapper().readValue(body, OAuthRequest.class);
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+                oAuthRequest = new OAuthRequest();
+            }
         }
 
-        if (Objeto.isBlank(oAuthRequest.getClientId())) {
-            oAuthRequest.setClientId(helper.call().request().header().get("client_id"));
+        if (Objects.isNull(oAuthRequest.getClientId()) || oAuthRequest.getClientId().isEmpty()) {
+            oAuthRequest.setClientId(request.getHeader("client_id"));
         }
 
-        if (Objeto.isBlank(oAuthRequest.getGrantType())) {
-            oAuthRequest.setGrantType(helper.call().request().header().get("grant_type"));
+        if (Objects.isNull(oAuthRequest.getGrantType()) || oAuthRequest.getGrantType().isEmpty()) {
+            oAuthRequest.setGrantType(request.getHeader("grant_type"));
         }
 
-        if (Objeto.isBlank(oAuthRequest.getCode())) {
-            oAuthRequest.setCode(helper.call().request().header().get("code"));
+//        Not in use yet
+//        if (Objeto.isBlank(oAuthRequest.getCode())) {
+//            oAuthRequest.setCode(helper.call().request().header().get("code"));
+//        }
+
+        if (Objects.isNull(oAuthRequest.getRefreshToken()) || oAuthRequest.getRefreshToken().isEmpty()) {
+            oAuthRequest.setRefreshToken(request.getHeader("refresh_token"));
         }
 
-        if (Objeto.isBlank(oAuthRequest.getRefreshToken())) {
-            oAuthRequest.setRefreshToken(helper.call().request().header().get("refresh_token"));
-        }
-
-        if (Objeto.isBlank(oAuthRequest.getResponseType())) {
-            oAuthRequest.setResponseType(helper.call().request().header().get("response_type"));
+        if (Objects.isNull(oAuthRequest.getResponseType()) || oAuthRequest.getResponseType().isEmpty()) {
+            oAuthRequest.setResponseType(request.getHeader("response_type"));
         }
 
         return oAuthRequest;
@@ -301,36 +345,47 @@ public class OAuthInterceptorService {
     /**
      * Method that adds all parameters needed to make the request with the provider
      *
-     * @param http           {@link Http}
+     * @param uri The {@link UriComponentsBuilder} to set query params
      * @param providerParams List of the {@link ProviderParam}
      * @return The {@link Http} result
      */
-    private Http addAllParamsToRequestProvider(Http http, List<ProviderParam> providerParams) {
+    private HttpEntity createHttpEntity(UriComponentsBuilder uri, List<ProviderParam> providerParams) {
+
+        HttpHeaders headers = new HttpHeaders();
+        String body = "";
+
         Map<String, Object> paramsBody = new HashMap<>();
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
+
         for (ProviderParam param : providerParams) {
 
-            if (Objeto.isBlank(param.getValue())) {
-                param.setValue(helper.call().request().header().get(param.getName()));
+            if (Objects.isNull(param.getValue()) || param.getValue().isEmpty()) {
+                param.setValue(context.getRequest().getHeader(param.getName()));
             }
 
             switch (param.getLocation().toUpperCase()) {
                 case "HEADER":
-                    http = http.header(param.getName(), param.getValue());
+                    headers.add(param.getName(), param.getValue());
                     break;
                 case "BODY":
                     paramsBody.put(param.getName(), param.getValue());
                     break;
                 default:
-                    http = http.queryParam(param.getName(), param.getValue());
+                    queryParams.put(param.getName(), Collections.singletonList(param.getValue()));
                     break;
             }
         }
 
         if (paramsBody.size() > 0) {
-            http = http.body(paramsBody);
+            try {
+                body = StringEscapeUtils.unescapeJava(mapper().writeValueAsString(paramsBody));
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage(), e);
+            }
         }
 
-        return http;
+        uri.queryParams(queryParams);
+        return new HttpEntity<>(body, headers);
     }
 
     /**
@@ -340,11 +395,17 @@ public class OAuthInterceptorService {
      */
     private void generateResponseWithSuccess(String message) {
         TraceContextHolder.getInstance().getActualTrace().trace(message);
-        helper.call().response().setStatus(HttpStatus.OK.value());
-        helper.call().response().header().add("Content-Type", "application/json");
-        helper.call().response().header().add("Cache-Control", "no-store");
-        helper.call().response().header().add("Pragma", "no-cache");
-        helper.call().response().setBody(message);
+        HttpServletResponse response = context.getResponse();
+        response.setStatus(HttpStatus.OK.value());
+        response.addHeader("Content-Type", "application/json");
+        response.addHeader("Cache-Control", "no-store");
+        response.addHeader("Pragma", "no-cache");
+
+        try {
+            response.getWriter().write(message);
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
     }
 
 
@@ -359,7 +420,11 @@ public class OAuthInterceptorService {
         TokenOAuth tokenOAuth = oAuthService.generateTokenOAuth(oAuthRequest, oAuthRequest.getClientId(), privateKey, timeAccessToken, timeRefreshToken, claimsJson);
         if (Objects.nonNull(tokenOAuth)) {
             tokenOAuth.setToken_type("bearer");
-            generateResponseWithSuccess(helper.json().parse(tokenOAuth));
+            try {
+                generateResponseWithSuccess(mapper().writeValueAsString(tokenOAuth));
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage(), e);
+            }
         }
     }
 
@@ -373,7 +438,11 @@ public class OAuthInterceptorService {
         TokenImplicit tokenImplicit = oAuthService.generateTokenImplicit(oAuthRequest, privateKey, timeAccessToken, claimsJson);
         if (Objects.nonNull(tokenImplicit)) {
             tokenImplicit.setToken_type("bearer");
-            generateResponseWithSuccess(helper.json().parse(tokenImplicit));
+            try {
+                generateResponseWithSuccess(mapper().writeValueAsString(tokenImplicit));
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage(), e);
+            }
         }
     }
 
@@ -384,7 +453,11 @@ public class OAuthInterceptorService {
         TokenOAuth tokenOAuth = oAuthService.generateTokenOAuth(oAuthRequest, oAuthRequest.getClientId(), privateKey, timeAccessToken, timeRefreshToken, claimsJson);
         if (Objects.nonNull(tokenOAuth)) {
             tokenOAuth.setToken_type("bearer");
-            generateResponseWithSuccess(helper.json().parse(tokenOAuth));
+            try {
+                generateResponseWithSuccess(mapper().writeValueAsString(tokenOAuth));
+            } catch (JsonProcessingException e) {
+                log.error(e.getMessage(), e);
+            }
         }
 
     }
@@ -403,18 +476,43 @@ public class OAuthInterceptorService {
             HeimdallException.checkThrow(accessTokens.stream().noneMatch(ac -> ac.getCode().equals(accessToken)), ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);
         } else {
 
-            Http http = helper.http().url(provider.getPath());
-            http = addAllParamsToRequestProvider(http, provider.getProviderParams());
+            RestTemplate template = new RestTemplate();
+            UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(provider.getPath());
+
+            ResponseEntity<String> entityResponse = template
+                    .exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.POST, createHttpEntity(uriComponentsBuilder, provider.getProviderParams()), String.class);
 
             try {
-
-                final ApiResponse apiResponse = http.sendPost();
-                HeimdallException.checkThrow(!(Series.valueOf(apiResponse.getStatus()) == Series.SUCCESSFUL), ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);
-
+                HeimdallException.checkThrow(!(Series.valueOf(entityResponse.getStatusCodeValue()) == Series.SUCCESSFUL), ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);
             } catch (Exception ex) {
                 log.error(ex.getMessage(), ex);
                 throw new UnauthorizedException(ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);
             }
         }
+    }
+
+    private ObjectMapper mapper() {
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+
+        return mapper;
+    }
+
+    public boolean isJson(String string) {
+
+        try {
+            JsonParser parser = mapper().getFactory().createParser(string);
+
+            while (parser.nextToken() != null) {}
+
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+
     }
 }
