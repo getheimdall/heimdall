@@ -54,7 +54,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -116,14 +115,10 @@ public class OAuthInterceptorService {
     private void generateResponseWithError(String message, int httpStatus) {
         message = "{ \"error\" : \"" + message + "\" }";
         TraceContextHolder.getInstance().getActualTrace().trace(message);
-        HttpServletResponse response = context.getResponse();
-        response.setStatus(httpStatus);
-        response.addHeader("Content-Type", "application/json");
-        try {
-            response.getWriter().write(message);
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        }
+        context.getResponse().setStatus(httpStatus);
+        context.addZuulResponseHeader("Content-Type", "application/json");
+        context.setResponseBody(message);
+        context.setSendZuulResponse(false);
     }
 
     /**
@@ -152,6 +147,7 @@ public class OAuthInterceptorService {
         String body = "";
 
         try {
+
             body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
         } catch (IOException e) {
             log.error(e.getMessage(), e);
@@ -395,17 +391,13 @@ public class OAuthInterceptorService {
      */
     private void generateResponseWithSuccess(String message) {
         TraceContextHolder.getInstance().getActualTrace().trace(message);
-        HttpServletResponse response = context.getResponse();
-        response.setStatus(HttpStatus.OK.value());
-        response.addHeader("Content-Type", "application/json");
-        response.addHeader("Cache-Control", "no-store");
-        response.addHeader("Pragma", "no-cache");
 
-        try {
-            response.getWriter().write(message);
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        }
+        context.getResponse().setStatus(HttpStatus.OK.value());
+        context.addZuulResponseHeader("Content-Type", "application/json");
+        context.addZuulResponseHeader("Cache-Control", "no-store");
+        context.addZuulResponseHeader("Pragma", "no-cache");
+        context.setResponseBody(message);
+        context.setSendZuulResponse(false);
     }
 
 
@@ -479,10 +471,10 @@ public class OAuthInterceptorService {
             RestTemplate template = new RestTemplate();
             UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(provider.getPath());
 
-            ResponseEntity<String> entityResponse = template
+            try {
+                ResponseEntity<String> entityResponse = template
                     .exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.POST, createHttpEntity(uriComponentsBuilder, provider.getProviderParams()), String.class);
 
-            try {
                 HeimdallException.checkThrow(!(Series.valueOf(entityResponse.getStatusCodeValue()) == Series.SUCCESSFUL), ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);
             } catch (Exception ex) {
                 log.error(ex.getMessage(), ex);
