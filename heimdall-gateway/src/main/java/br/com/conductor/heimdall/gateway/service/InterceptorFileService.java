@@ -109,6 +109,7 @@ public class InterceptorFileService {
             parameters.put("zuulFilterRoot", zuulFilterRoot);
             parameters.put("path", createPath(interceptor));
             parameters.put("apiId", interceptor.getApi().getId());
+            parameters.put("interceptorStatus", interceptor.getStatus());
 
             if (interceptor.getReferenceId() != null)
                 parameters.put("referenceId", interceptor.getReferenceId());

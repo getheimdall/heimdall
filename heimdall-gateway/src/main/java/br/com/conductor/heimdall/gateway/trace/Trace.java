@@ -102,6 +102,8 @@ public class Trace {
      private RequestResponseParser response;
 
      private String pattern;
+
+     private Boolean cache;
      
      @JsonInclude(Include.NON_NULL)
      private StackTrace stackTrace;

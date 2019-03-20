@@ -39,6 +39,7 @@
     <include file="changelog/20180905160326-add-column-password-in-developer.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20190121145232-add-column-default-plan-in-plan.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20190128114155-recreate-table-oauth-authorizes.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20190219164000-add-column-status-interceptor-table.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20190222142000-recreate-default-plan-column.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
