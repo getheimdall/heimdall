@@ -31,7 +31,6 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -66,7 +65,7 @@ public class JsonImpl implements Json {
 		try {
 			String json = mapper().writeValueAsString(body);
 
-			return StringEscapeUtils.unescapeJava(json);
+			return json;
 		} catch (JsonProcessingException e) {
 
 			log.error(e.getMessage(), e);
@@ -80,7 +79,7 @@ public class JsonImpl implements Json {
 
 			JSONObject jsonObject = new JSONObject(string);
 
-			return StringEscapeUtils.unescapeJava(jsonObject.toString());
+			return jsonObject.toString();
 		} catch (JSONException e) {
 			try {
 				JSONArray array = new JSONArray(string);
@@ -101,7 +100,7 @@ public class JsonImpl implements Json {
 
 			String jsonInString = mapper().writeValueAsString(object);
 
-			return StringEscapeUtils.unescapeJava(jsonInString);
+			return jsonInString;
 		} catch (Exception e) {
 
 			log.error(e.getMessage(), e);
