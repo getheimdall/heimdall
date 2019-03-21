@@ -230,9 +230,6 @@ public enum ExceptionMessage {
         } else if (this.serverError()) {
 
             throw new ServerErrorException(this);
-        } else if (this.serviceUnavailable()) {
-
-            throw new ServerErrorException(this);
         }
 
     }
@@ -319,13 +316,6 @@ public enum ExceptionMessage {
     private Boolean serverError() {
 
         return this.httpCode == INTERNAL_SERVER_ERROR.value();
-    }
-
-    /**
-     * Method responsible for validation of error codes with code 503.
-     */
-    private boolean serviceUnavailable() {
-        return this.httpCode == SERVICE_UNAVAILABLE.value();
     }
 
 }
