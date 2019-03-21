@@ -17,23 +17,21 @@
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-package br.com.conductor.heimdall.gateway.util;
+package br.com.conductor.heimdall.gateway.failsafe;
+
+import lombok.Data;
+import net.jodah.failsafe.CircuitBreaker;
 
 /**
- * List of context related constants
+ * Circuit Breaker entity
+ *
+ * @author Marcelo Rodrigues
  */
-public final class ConstantsContext {
+@Data
+public class CircuitBreakerHolder {
 
-    public static final String API_ID = "api-id";
-    public static final String API_NAME = "api-name";
-    public static final String RESOURCE_ID = "resource-id";
-    public static final String OPERATION_ID = "operation-id";
-    public static final String OPERATION_PATH = "operation-path";
-    public static final String PATTERN = "pattern";
-    public static final String CORS_FILTER = "run-cors-post-filter";
-    public static final String CIRCUIT_BREAKER_ENABLED = "Circuit-Breaker";
+    private CircuitBreaker circuitBreaker;
 
-    public static final String CLIENT_ID = "client_id";
-    public static final String ACCESS_TOKEN = "access_token";
+    private Throwable throwable;
 
 }

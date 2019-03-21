@@ -22,11 +22,7 @@ package br.com.conductor.heimdall.gateway.filter;
  */
 
 import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
-import static br.com.conductor.heimdall.gateway.util.ConstantsContext.API_ID;
-import static br.com.conductor.heimdall.gateway.util.ConstantsContext.API_NAME;
-import static br.com.conductor.heimdall.gateway.util.ConstantsContext.OPERATION_ID;
-import static br.com.conductor.heimdall.gateway.util.ConstantsContext.PATTERN;
-import static br.com.conductor.heimdall.gateway.util.ConstantsContext.RESOURCE_ID;
+import static br.com.conductor.heimdall.gateway.util.ConstantsContext.*;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.FORWARD_LOCATION_PREFIX;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.FORWARD_TO_KEY;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.HTTPS_PORT;
@@ -306,6 +302,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                         ctx.put(API_ID, credential.getApiId());
                         ctx.put(RESOURCE_ID, credential.getResourceId());
                         ctx.put(OPERATION_ID, credential.getOperationId());
+                        ctx.put(OPERATION_PATH, credential.getOperationPath());
 
                         List<Environment> environments = environmentRepository.findByApiId(credential.getApiId());
 
