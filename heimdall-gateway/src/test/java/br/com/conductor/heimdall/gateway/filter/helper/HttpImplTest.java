@@ -35,6 +35,33 @@ public class HttpImplTest {
      }
      
      @Test
+     public void sendGetWithNoParams() {
+          Mockito.when(restTemplate.getForEntity(Mockito.any(URI.class), Mockito.any(Class.class))).thenReturn(responseEntity);
+          
+          ApiResponse apiResponse = subject.url("https://www.google.com/search")
+                                           .sendGet();
+          assertNotNull(apiResponse);
+          assertNotNull(apiResponse.getStatus());
+          assertNotNull(apiResponse.getBody());
+          assertEquals(apiResponse.getStatus().intValue(), HttpStatus.OK.value());
+          assertEquals(apiResponse.getBody(), "OK");
+     }
+     
+     @Test
+     public void sendGetWithInvalidParams() {
+          Mockito.when(restTemplate.getForEntity(Mockito.any(URI.class), Mockito.any(Class.class))).thenReturn(responseEntity);
+          
+          ApiResponse apiResponse = subject.url("https://www.google.com/search")
+                                           .queryParam("search", null)
+                                           .sendGet();
+          assertNotNull(apiResponse);
+          assertNotNull(apiResponse.getStatus());
+          assertNotNull(apiResponse.getBody());
+          assertEquals(apiResponse.getStatus().intValue(), HttpStatus.OK.value());
+          assertEquals(apiResponse.getBody(), "OK");
+     }
+     
+     @Test
      public void setUrlThenAddQueryParam() {
           Mockito.when(restTemplate.getForEntity(Mockito.any(URI.class), Mockito.any(Class.class))).thenReturn(responseEntity);
           

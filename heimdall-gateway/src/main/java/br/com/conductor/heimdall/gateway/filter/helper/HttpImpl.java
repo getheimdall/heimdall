@@ -71,11 +71,13 @@ public class HttpImpl implements Http {
     private MultiValueMap<String, String> queryParams;
 
     public HttpImpl() {
-        this.enableHandler = false;
+        this(false);
+    
     }
 
     public HttpImpl(boolean enableHandler) {
         this.enableHandler = enableHandler;
+        queryParams = new LinkedMultiValueMap<>();
     }
 
     @Override
@@ -110,7 +112,6 @@ public class HttpImpl implements Http {
 
     @Override
     public HttpImpl queryParam(String name, String value) {
-        queryParams = Objects.isNull(queryParams) ? new LinkedMultiValueMap<>() : queryParams;
 
         if (Objects.nonNull(value)) {
             queryParams.add(name, value);
