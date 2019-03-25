@@ -244,6 +244,7 @@ export default {
         'attributed_scopes': 'Attributed Scopes',
         'please_input_role_name':'Please input a role name!',
         'min_4_characters_to_name': 'Min of 4 Characters to name!',
+        'min_6_characters_to_name': 'Name must be at least 6 characters long!',
         'available_privileges': 'Available privileges',
         'attributed_privileges': 'Attributed privileges',
         'default_plan_this_api': 'Default'

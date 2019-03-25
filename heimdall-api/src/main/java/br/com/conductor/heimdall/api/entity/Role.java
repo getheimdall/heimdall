@@ -71,7 +71,7 @@ public class Role {
      @Column(name = "NAME", length = 80, nullable = false)
      private String name;
      
-     @ManyToMany(mappedBy = "roles", fetch = FetchType.EAGER)
+     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
      @JsonIgnore
      private Set<User> users;
   
