@@ -103,6 +103,7 @@ public class AccessToken implements Serializable {
                status = Status.ACTIVE;
           }
           creationDate = LocalDateTime.now();
+          code = code.trim();
      }
 
 }

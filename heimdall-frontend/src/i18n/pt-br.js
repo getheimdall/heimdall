@@ -160,6 +160,7 @@ export default {
         'min_5_characters_to_description': 'A descrição deve ter no mínimo 5 caracteres!',
         'min_6_characters_to_client_id': 'O ID do Cliente deve ter no mínimo 6 caracteres!',
         'please_input_email_developer': 'Por favor, insira o email de um desenvolvedor!',
+        'please_pick_plan': 'Por favor, selecione ao menos um Plano!',
         'please_input_your_name': 'Por favor, insira seu nome!',
         'please_input_valid_email': 'Por favor, insira um email válido!',
         'please_input_your_environment_name': 'Por favor, insira o nome do ambiente!',
@@ -246,6 +247,9 @@ export default {
         'min_4_characters_to_name': 'O nome deve ter no mínimo 4 caracteres!',
         'available_privileges': 'Papéis disponíveis',
         'attributed_privileges': 'Papéis atribuídos',
-        'default_plan_this_api': 'Plano padrão'
+        'default_plan_this_api': 'Plano padrão',
+        'app_plans_invalid': 'Planos do App são invalidos!',
+        'please_check_token_spacing': 'Por favor, verificar espaçamentos no Token!',
+        'please_check_client_id_spacing': 'Por favor, verificar espaçamentos no Client ID!'
     }
 }

@@ -114,6 +114,7 @@ public class App implements Serializable {
         }
 
         creationDate = LocalDateTime.now();
+        clientId = clientId.trim();
     }
 
     @PostLoad
