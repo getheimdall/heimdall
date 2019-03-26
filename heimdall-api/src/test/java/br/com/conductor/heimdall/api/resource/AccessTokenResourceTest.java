@@ -74,13 +74,35 @@ public class AccessTokenResourceTest {
      
      @Test
      @WithMockUser(username="tester", authorities={"CREATE_ACCESSTOKEN"})
-     public void testSavingAccessTokenWithoutRequiredField() throws Exception {
+     public void testSavingAccessTokenWithoutApp() throws Exception {
           
           mockMvc.perform(MockMvcRequestBuilders.post(ConstantsPath.PATH_ACCESS_TOKENS, 10L)
-                 .content("{\"code\":\"!!@!##1212\"}")
-                 .contentType(MediaType.APPLICATION_JSON))
+                                                .content("{\"code\":\"!!@!##1212\", \"plans\": [{\"id\": 5}]}")
+                                                .contentType(MediaType.APPLICATION_JSON))
                  .andExpect(MockMvcResultMatchers.status().is4xxClientError())
                  .andExpect(MockMvcResultMatchers.content().json("{\"status\":400,\"exception\":\"MethodArgumentNotValidException\",\"erros\":[{\"defaultMessage\":\"may not be null\",\"field\":\"app\",\"code\":\"NotNull\"}]}"));
+     }
+     
+     @Test
+     @WithMockUser(username="tester", authorities={"CREATE_ACCESSTOKEN"})
+     public void testSavingAccessTokenWithEmptyPlans() throws Exception {
+          
+          mockMvc.perform(MockMvcRequestBuilders.post(ConstantsPath.PATH_ACCESS_TOKENS, 10L)
+                                                .content("{\"code\":\"!!@!##1212\", \"app\":{\"id\":10}, \"plans\": [] }")
+                                                .contentType(MediaType.APPLICATION_JSON))
+                 .andExpect(MockMvcResultMatchers.status().is4xxClientError())
+                 .andExpect(MockMvcResultMatchers.content().json("{\"status\":400,\"exception\":\"MethodArgumentNotValidException\",\"erros\":[{\"defaultMessage\":\"size must be between 1 and 2147483647\",\"field\":\"plans\",\"code\":\"Size\"}]}"));
+     }
+     
+     @Test
+     @WithMockUser(username="tester", authorities={"CREATE_ACCESSTOKEN"})
+     public void testSavingAccessTokenWithoutPlans() throws Exception {
+          
+          mockMvc.perform(MockMvcRequestBuilders.post(ConstantsPath.PATH_ACCESS_TOKENS, 10L)
+                                                .content("{\"code\":\"!!@!##1212\", \"app\":{\"id\":10}}")
+                                                .contentType(MediaType.APPLICATION_JSON))
+                 .andExpect(MockMvcResultMatchers.status().is4xxClientError())
+                 .andExpect(MockMvcResultMatchers.content().json("{\"status\":400,\"exception\":\"MethodArgumentNotValidException\",\"erros\":[{\"defaultMessage\":\"may not be null\",\"field\":\"plans\",\"code\":\"NotNull\"}]}"));
      }
      
      @Test
@@ -93,7 +115,7 @@ public class AccessTokenResourceTest {
           Mockito.when(service.save(Mockito.any(AccessTokenPersist.class))).thenReturn(recoverAt);
           
           mockMvc.perform(MockMvcRequestBuilders.post(ConstantsPath.PATH_ACCESS_TOKENS, 10L)
-                 .content("{\"code\":\"!!@!##1212\",\"app\":{\"id\":10}}")
+                 .content("{\"code\":\"!!@!##1212\",\"app\":{\"id\":10}, \"plans\": [{\"id\": 5}]}")
                  .contentType(MediaType.APPLICATION_JSON))
                  .andExpect(MockMvcResultMatchers.status().isCreated());
      }
