@@ -248,6 +248,19 @@ export default {
         'attributed_privileges': 'Attributed privileges',
         'default_plan_this_api': 'Default',
         'failed_to_get_privileges_this_user': 'Failed to get privileges this user',
-        'session_expired': 'Session expired'
+        'session_expired': 'Session expired',
+        'change_password': 'Change password',
+        'current_password': 'Current password',
+        'please_input_current_password': 'Please, input the current password',
+        'max_16_characters_to_current_password': 'Max of 16 characters to current password',
+        'new_password': 'New password',
+        'please_input_new_password': 'Please, input the new password',
+        'max_16_characters_to_new_password': 'Max of 16 characters to new password',
+        'confirm_new_password': 'Confirm new password',
+        'please_input_confirm_new_password': 'Please, confirm the new password',
+        'max_16_characters_to_confirm_new_password': 'Max of 16 characters in confirm the new password',
+        'min_5_characters_to_current_password': 'Mix of 5 characters to current password',
+        'min_5_characters_to_new_password': 'Mix of 5 characters to new password',
+        'min_5_characters_to_confirm_new_password': 'Mix of 5 characters to confirm new password'
     }
 }

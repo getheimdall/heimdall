@@ -24,6 +24,10 @@ class ModalSession extends Component {
         }
     }
 
+    componentWillUnmount() {
+        Session.cancelTimeouts()
+    }
+
     confirmSession = () => {
         this.props.form.validateFields((err, values) => {
             if (!err) {

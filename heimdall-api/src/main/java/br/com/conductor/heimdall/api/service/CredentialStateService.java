@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Base64;
+import java.util.List;
 
 /**
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
@@ -71,5 +72,11 @@ public class CredentialStateService {
             final String user = payload.getString("sub");
             save(jti, user, CredentialStateEnum.LOGOUT);
         }
+    }
+
+    public void revokeByUsername(String username) {
+        List<CredentialState> credentials = credentialStateRepository.findByUsernameAndStateEquals(username, CredentialStateEnum.LOGIN);
+        credentials.forEach(credentialState -> credentialState.setState(CredentialStateEnum.REVOKE));
+        credentialStateRepository.save(credentials);
     }
 }

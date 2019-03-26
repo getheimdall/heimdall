@@ -79,7 +79,7 @@ class LdapForm extends Component {
                                         rules: [
                                             { required: true,  message: 'Please input the password!' }
                                         ]
-                                    })(<Input required
+                                    })(<Input required type="password"
                                               disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_LDAP])}/>)
                                 }
                             </FormItem>

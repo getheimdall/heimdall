@@ -181,6 +181,16 @@ public enum ExceptionMessage {
 
     CORS_INTERCEPTOR_ALREADY_ASSIGNED_TO_THIS_API(BAD_REQUEST.value(), "A CORS Interceptor already assigned to this API", BadRequestException.class),
 
+    USER_NEW_PASSWORD_EQUALS_CURRENT_PASSWORD(BAD_REQUEST.value(), "New password must different from the current password!", BadRequestException.class),
+
+    USER_CURRENT_PASSWORD_NOT_MATCHING(BAD_REQUEST.value(), "Current password not matching!", BadRequestException.class),
+
+    USER_NEW_PASSWORD_NOT_MATCHING(BAD_REQUEST.value(), "New password not matching!", BadRequestException.class),
+
+    USER_UNAUTHORIZED_TO_CHANGE_PASSWORD(UNAUTHORIZED.value(), "You can't change the password!", UnauthorizedException.class),
+
+    USER_LDAP_UNAUTHORIZED_TO_CHANGE_PASSWORD(UNAUTHORIZED.value(), "User from LDAP can't change the password!", UnauthorizedException.class),
+
     DEFAULT_PLAN_ALREADY_EXIST_TO_THIS_API(BAD_REQUEST.value(), "Default plan already exist to this Api", BadRequestException.class);
 
     @Getter

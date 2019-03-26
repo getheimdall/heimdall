@@ -8,11 +8,15 @@ import logo from '../icon-heimdall.png'
 import formLogo from '../logo-form.png'
 
 import LoginForm from '../components/login/LoginForm'
+import Session from "../services/SessionService"
 
 
 class Login extends Component {
 
     componentDidMount() {
+        if (Session){
+            Session.cancelTimeouts()
+        }
         if (!userService.isUserLogged()) {
             this.props.logout()
         }
