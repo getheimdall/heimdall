@@ -71,11 +71,10 @@ public class InterceptorFileService {
      * @param id The {@link Interceptor} Id
      */
     @Transactional(readOnly = true)
-    public void createFileInterceptor(Long id) {
+    public void createFileInterceptor(Interceptor interceptor) {
 
         try {
 
-            Interceptor interceptor = interceptorRepository.findOne(id);
             HeimdallException.checkThrow(interceptor == null, ExceptionMessage.INTERCEPTOR_NOT_EXIST);
 
             File file = templateInterceptor(interceptor.getType(), interceptor.getExecutionPoint());
