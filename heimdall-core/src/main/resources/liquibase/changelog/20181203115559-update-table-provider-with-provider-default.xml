@@ -32,8 +32,8 @@
 			<column name="NAME" value="HEIMDALL PROVIDER" />
 			<column name="DESCRIPTION" value="DEFAULT PROVIDER OF THE HEIMDALL" />
 			<column name="PATH" value=""/>
-			<column name="CREATION_DATE"  valueDate="${now}" />
-			<column name="PROVIDER_DEFAULT" valueBoolean="${true}" />
+			<column name="CREATION_DATE"  value="${now}" />
+			<column name="PROVIDER_DEFAULT" value="${true}" />
 		</insert>
 	</changeSet>
 

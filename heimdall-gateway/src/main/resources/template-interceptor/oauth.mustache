@@ -44,6 +44,7 @@ public class OAuthInterceptor extends HeimdallFilter {
     private int timeAccessToken;
     private int timeRefreshToken;
     private String privateKey;
+    private static boolean status;
 
     public OAuthInterceptor() {
         ignoredOperations = new HashSet<>();
@@ -62,6 +63,7 @@ public class OAuthInterceptor extends HeimdallFilter {
         timeAccessToken = {{timeAccessToken}};
         timeRefreshToken = {{timeRefreshToken}};
         privateKey = "{{privateKey}}";
+        status = {{interceptorStatus}};
     }
 
     @Override
@@ -82,7 +84,7 @@ public class OAuthInterceptor extends HeimdallFilter {
     @Override
     public boolean should() {
         LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
-        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredResources, ignoredOperations);
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredResources, ignoredOperations, status);
     }
 
     @Override

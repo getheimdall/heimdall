@@ -19,7 +19,7 @@
  */
 package br.com.conductor.heimdall.gateway.service;
 
-import br.com.conductor.heimdall.core.util.BeanManager;
+import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.middleware.spec.ApiResponse;
 import br.com.conductor.heimdall.middleware.spec.Helper;
 import com.netflix.zuul.context.RequestContext;
@@ -36,6 +36,8 @@ import java.util.Map;
 
 import static br.com.conductor.heimdall.core.util.ConstantsCache.CACHE_BUCKET;
 import static br.com.conductor.heimdall.core.util.ConstantsCache.CACHE_TIME_TO_LIVE;
+import static br.com.conductor.heimdall.gateway.util.ConstantsContext.API_ID;
+import static br.com.conductor.heimdall.gateway.util.ConstantsContext.API_NAME;
 
 /**
  * Cache service provides methods to create and delete a response cache from a request.
@@ -48,6 +50,9 @@ public class CacheInterceptorService {
 	@Autowired
     private Helper helper;
 
+	@Autowired
+	private RedissonClient redissonClientCacheInterceptor;
+
     /**
      * Checks if the request is in cache. If true then returns the cached response, otherwise
      * continues the request normally and signals to create the cache for this request.
@@ -59,12 +64,12 @@ public class CacheInterceptorService {
      */
     public void cacheInterceptor(String cacheName, Long timeToLive, List<String> headers, List<String> queryParams) {
 
-        RedissonClient redisson = (RedissonClient) BeanManager.getBean(RedissonClient.class);
-
         RequestContext context = RequestContext.getCurrentContext();
 
+        boolean responseFromCache = false;
+
         if (shouldCache(context, headers, queryParams)) {
-            RBucket<ApiResponse> rBucket = redisson.getBucket(createCacheKey(context, cacheName, headers, queryParams));
+            RBucket<ApiResponse> rBucket = redissonClientCacheInterceptor.getBucket(createCacheKey(context, cacheName, headers, queryParams));
 
             if (rBucket.get() == null) {
                 context.put(CACHE_BUCKET, rBucket);
@@ -75,8 +80,12 @@ public class CacheInterceptorService {
                 helper.call().response().header().addAll(response.getHeaders());
                 helper.call().response().setBody(response.getBody());
                 helper.call().response().setStatus(response.getStatus());
+                context.setSendZuulResponse(false);
+                responseFromCache = true;
             }
         }
+
+        TraceContextHolder.getInstance().getActualTrace().setCache(responseFromCache);
     }
 
     /**
@@ -85,12 +94,9 @@ public class CacheInterceptorService {
      * @param cacheName Cache name provided
      */
     public void cacheClearInterceptor(String cacheName) {
-
-        RedissonClient redisson = (RedissonClient) BeanManager.getBean(RedissonClient.class);
-
         RequestContext context = RequestContext.getCurrentContext();
 
-        redisson.getKeys().deleteByPattern(createDeleteCacheKey(context, cacheName));
+        redissonClientCacheInterceptor.getKeys().deleteByPattern(createDeleteCacheKey(context, cacheName));
     }
 
     /*
@@ -98,27 +104,42 @@ public class CacheInterceptorService {
      */
     private String createCacheKey(RequestContext context, String cacheName, List<String> headers, List<String> queryParams) {
 
-        StringBuilder headersBuilder = new StringBuilder();
-        headers.forEach(s -> headersBuilder
-                .append(s)
-                .append("=")
-                .append(context.getRequest().getHeader(s))
-                .append("/")
-        );
+        StringBuilder cacheKey = new StringBuilder();
+        cacheKey.append(context.get(API_ID));
+        cacheKey.append("-");
+        cacheKey.append(context.get(API_NAME));
+        cacheKey.append(":");
+        cacheKey.append(cacheName);
+        cacheKey.append(":");
+        cacheKey.append(context.getRequest().getRequestURL().toString());
 
-        StringBuilder queryParamsBuilder = new StringBuilder();
-        queryParams.forEach(s -> queryParamsBuilder
-                .append(s)
-                .append("=")
-                .append(context.getRequestQueryParams().get(s))
-                .append("/")
-        );
+        if (headers != null && !headers.isEmpty()) {
+            cacheKey.append(":headers=");
+            StringBuilder headersBuilder = new StringBuilder();
+            headers.forEach(s -> headersBuilder
+                    .append(s)
+                    .append("=")
+                    .append(context.getRequest().getHeader(s))
+                    .append(":")
+            );
 
-        return context.get("api-id") + "-" + context.get("api-name") + ":" +
-                cacheName + ":" +
-                context.getRequest().getRequestURL().toString() + ":" +
-                "queryParams=" + queryParamsBuilder.toString() + ":" +
-                "headers=" + headersBuilder.toString();
+            cacheKey.append(headersBuilder.toString());
+        }
+
+        if (queryParams != null && !queryParams.isEmpty()) {
+            cacheKey.append(":queryParams=");
+            StringBuilder queryParamsBuilder = new StringBuilder();
+            queryParams.forEach(s -> queryParamsBuilder
+                    .append(s)
+                    .append("=")
+                    .append(context.getRequestQueryParams().get(s))
+                    .append(":")
+            );
+
+            cacheKey.append(queryParamsBuilder.toString());
+        }
+
+        return cacheKey.toString();
     }
 
     /*
@@ -126,8 +147,8 @@ public class CacheInterceptorService {
      */
     private String createDeleteCacheKey(RequestContext context, String cacheName) {
 
-        return context.get("api-id") + "-" +
-                context.get("api-name") + ":" +
+        return context.get(API_ID) + "-" +
+                context.get(API_NAME) + ":" +
                 cacheName + ":*";
     }
 

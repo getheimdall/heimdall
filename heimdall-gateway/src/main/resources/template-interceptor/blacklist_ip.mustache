@@ -34,6 +34,7 @@ public class BlacklistInterceptor extends HeimdallFilter {
     private static Set<Long> ignoredResources;
     private static Long referenceId;
     private static Long apiId;
+    private static boolean status;
 
     public BlacklistInterceptor() {
         blacklist = new HashSet<>();
@@ -53,6 +54,7 @@ public class BlacklistInterceptor extends HeimdallFilter {
 
         referenceId = {{referenceId}};
         apiId = {{apiId}};
+        status = {{interceptorStatus}};
     }
 
     @Override
@@ -73,7 +75,7 @@ public class BlacklistInterceptor extends HeimdallFilter {
     @Override
     public boolean should() {
         LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
-        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredResources, ignoredOperations);
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredResources, ignoredOperations, status);
     }
 
     @Override

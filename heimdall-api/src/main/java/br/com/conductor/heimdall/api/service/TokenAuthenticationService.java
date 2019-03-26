@@ -58,6 +58,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import org.springframework.security.core.AuthenticationException;
 
 /**
  * Data class that holds tha JTW properties.
@@ -107,7 +108,7 @@ public class TokenAuthenticationService {
         try {
             authenticate = authenticationManager.authenticate(userFound);
             userAuthenticateResponse.setType(TypeUser.DATABASE);
-        } catch (Exception ex) {
+        } catch (AuthenticationException ex) {
             Ldap ldapActive = ldapService.getLdapActive();
 
             if (Objects.nonNull(ldapActive)){
@@ -115,12 +116,10 @@ public class TokenAuthenticationService {
                     authenticateManagerBuilder.authenticationProvider(ldapProvider(ldapActive));
                     authenticate = ldapProvider(ldapActive).authenticate(userFound);
                     userAuthenticateResponse.setType(TypeUser.LDAP);
-                } catch (Exception exception) {
+                } catch (AuthenticationException exception) {
                     log.error(exception.getMessage(), exception);
                 }
             }
-
-            log.error(ex.getMessage(), ex);
         }
 
         if (Objects.nonNull(authenticate)){
@@ -164,7 +163,6 @@ public class TokenAuthenticationService {
 
         if (token != null && !token.isEmpty()) {
             token = token.replace(TOKEN_PREFIX, "");
-            // faz parse do token
             try {
                 Claims claims = Jwts.parser()
                         .setSigningKey(jwtProperty.getSecret())
@@ -173,7 +171,7 @@ public class TokenAuthenticationService {
                 String user = claims.getSubject();
 
                 if (user != null) {
-                    if (!credentialStateService.verifyIfTokenIsRevokeOrLogout(claims.getId())) {
+                    if (credentialStateService.isLogged(claims.getId())) {
                         User userFound = userService.findByUsername(user);
                         addAuthentication(response, user, claims.getId());
                         return new UsernamePasswordAuthenticationToken(userFound.getUserName(), userFound.getPassword(), getAuthoritiesByRoles(userFound.getRoles()));
@@ -181,10 +179,8 @@ public class TokenAuthenticationService {
                 }
             } catch (ExpiredJwtException ex) {
                 credentialStateService.logout(token);
-                response.reset();
                 response.setStatus(HttpStatus.FORBIDDEN.value());
                 response.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
-                log.error(ex.getMessage(), ex);
                 try {
                     response.getWriter().write("{ \"error\": \"Token expired\" }");
                 } catch (IOException e) {

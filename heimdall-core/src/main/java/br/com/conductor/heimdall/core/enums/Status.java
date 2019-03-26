@@ -29,5 +29,5 @@ package br.com.conductor.heimdall.core.enums;
  */
 public enum Status {
 
-     ACTIVE, INACTIVE, REVOKED, DEPRECATED;
+     ACTIVE, INACTIVE, REVOKED, DEPRECATED
 }

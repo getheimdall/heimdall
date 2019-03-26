@@ -41,5 +41,6 @@
     <include file="changelog/20181112145330-insert-privileges-for-scopes.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20181128143000-removed-duplicates-privileges-and-added-unique-constraint.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20180914095523-create-user-portal-with-role-and-privileges.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20190219165100-change-ldap-length-column.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

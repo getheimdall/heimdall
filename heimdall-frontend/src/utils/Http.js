@@ -1,4 +1,5 @@
 import axios from 'axios'
+import Session from "../services/SessionService"
 
 const baseURL = process.env.REACT_APP_SCHEME + '://' + process.env.REACT_APP_ADDRESS + ':' + process.env.REACT_APP_PORT
 
@@ -26,6 +27,7 @@ HTTPv1.interceptors.request.use(req => {
 HTTPv1.interceptors.response.use(res => {
     const token = res.headers.authorization
     localStorage.setItem('token', token)
+    Session.setTimeSessionFromToken(token)
     return res
 }, error => {
     const response = error.response

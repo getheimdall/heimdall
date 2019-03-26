@@ -37,6 +37,7 @@ public class MiddlewareInterceptor extends HeimdallFilter {
     private static Long apiId;
     private Middleware m;
     private Helper helper;
+    private static boolean status;
 
     public MiddlewareInterceptor() {
 
@@ -53,6 +54,7 @@ public class MiddlewareInterceptor extends HeimdallFilter {
         m = new Middleware("{{{pathMiddleware}}}");
         referenceId = {{referenceId}};
         apiId = {{apiId}};
+        status = {{interceptorStatus}};
     }
 
     @Override
@@ -68,7 +70,7 @@ public class MiddlewareInterceptor extends HeimdallFilter {
     @Override
     public boolean should() {
         LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
-        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredResources, ignoredOperations);
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredResources, ignoredOperations, status);
     }
 
     @Override

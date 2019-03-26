@@ -40,6 +40,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static br.com.conductor.heimdall.core.util.ConstantsInterceptors.IDENTIFIER_ID;
 
@@ -108,7 +109,7 @@ public class HttpImpl implements Http {
     @Override
     public HttpImpl queryParam(String name, String value) {
 
-        if (Objeto.notBlank(value)) {
+        if (Objects.nonNull(value)) {
 
             uriComponentsBuilder.queryParam(name, value);
         }

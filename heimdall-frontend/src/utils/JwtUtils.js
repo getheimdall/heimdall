@@ -4,6 +4,13 @@ const decodePayloadAsJson = (token) => {
     return JSON.parse(window.atob(base64))
 }
 
+const getTimeToExpiresInSeconds = token => {
+    const decode = decodePayloadAsJson(token)
+    const dateNow = Date.now() / 1000
+    return decode.exp - dateNow
+}
+
 export const JwtUtils = {
-    decodePayloadAsJson
+    decodePayloadAsJson,
+    getTimeToExpiresInSeconds
 }

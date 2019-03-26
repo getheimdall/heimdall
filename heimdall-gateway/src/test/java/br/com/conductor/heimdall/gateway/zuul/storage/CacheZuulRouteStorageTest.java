@@ -53,7 +53,7 @@ public class CacheZuulRouteStorageTest {
           Environment environment = new Environment();
           environment.setInboundURL("dns.production.com.br");
           environment.setOutboundURL("dns.production.com.br");
-          Api api = new Api(10L, "foo", "v1", "fooDescription", "/foo", LocalDateTime.now(), new HashSet<>(), Status.ACTIVE, null, null, environments, null, null);
+          Api api = new Api(10L, "foo", "v1", "fooDescription", "/foo", false, LocalDateTime.now(), new HashSet<>(), Status.ACTIVE, null, null, environments, null, null);
           
           List<Resource> res = new LinkedList<>();
           
@@ -62,9 +62,9 @@ public class CacheZuulRouteStorageTest {
           resource.setApi(api);
           resource.setOperations(new ArrayList<>());
           
-          Operation opPost = new Operation(10L, HttpMethod.POST, "/api/foo", "POST description", resource, null);
-          Operation opGet = new Operation(10L, HttpMethod.GET, "/api/foo/{id}", "GET description", resource, null);
-          Operation opDelete = new Operation(10L, HttpMethod.DELETE, "/api/foo/{id}", "DELETE description", resource, null);
+          Operation opPost = new Operation(10L, HttpMethod.POST, "/api/foo", "POST description", resource);
+          Operation opGet = new Operation(10L, HttpMethod.GET, "/api/foo/{id}", "GET description", resource);
+          Operation opDelete = new Operation(10L, HttpMethod.DELETE, "/api/foo/{id}", "DELETE description", resource);
           resource.getOperations().addAll(Arrays.asList(opDelete, opGet, opPost));
           
           res.add(resource);

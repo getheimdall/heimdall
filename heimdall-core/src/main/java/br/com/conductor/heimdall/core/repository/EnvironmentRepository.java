@@ -1,6 +1,12 @@
 
 package br.com.conductor.heimdall.core.repository;
 
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -22,11 +28,6 @@ package br.com.conductor.heimdall.core.repository;
  */
 
 import br.com.conductor.heimdall.core.entity.Environment;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-
-import java.util.List;
 
 /**
  * Provides methods to access a {@link Environment}.
@@ -43,6 +44,14 @@ public interface EnvironmentRepository extends JpaRepository<Environment, Long> 
      * @return The Environment found
      */
     List<Environment> findByInboundURL(String inboundURL);
+    
+    /**
+     * Find all Environments by Api id
+     * @param apiId
+     * @return
+     */
+    @Query("select api.environments from Api api where api.id = :apiId")
+    List<Environment> findByApiId(@Param("apiId") Long apiId);
 
 
     /**

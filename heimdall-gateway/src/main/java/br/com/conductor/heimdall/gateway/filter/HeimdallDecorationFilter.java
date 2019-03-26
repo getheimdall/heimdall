@@ -22,7 +22,11 @@ package br.com.conductor.heimdall.gateway.filter;
  */
 
 import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
-import static br.com.conductor.heimdall.gateway.util.ConstantsContext.*;
+import static br.com.conductor.heimdall.gateway.util.ConstantsContext.API_ID;
+import static br.com.conductor.heimdall.gateway.util.ConstantsContext.API_NAME;
+import static br.com.conductor.heimdall.gateway.util.ConstantsContext.OPERATION_ID;
+import static br.com.conductor.heimdall.gateway.util.ConstantsContext.PATTERN;
+import static br.com.conductor.heimdall.gateway.util.ConstantsContext.RESOURCE_ID;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.FORWARD_LOCATION_PREFIX;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.FORWARD_TO_KEY;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.HTTPS_PORT;
@@ -42,12 +46,11 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
-import br.com.conductor.heimdall.core.entity.*;
-import br.com.conductor.heimdall.core.enums.HttpMethod;
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
@@ -64,10 +67,14 @@ import org.springframework.web.util.UrlPathHelper;
 
 import com.netflix.zuul.context.RequestContext;
 
-import br.com.conductor.heimdall.core.repository.OperationRepository;
+import br.com.conductor.heimdall.core.entity.Environment;
+import br.com.conductor.heimdall.core.enums.HttpMethod;
+import br.com.conductor.heimdall.core.repository.EnvironmentRepository;
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.core.util.ConstantsPath;
 import br.com.conductor.heimdall.core.util.UrlUtil;
+import br.com.conductor.heimdall.gateway.router.Credential;
+import br.com.conductor.heimdall.gateway.router.CredentialRepository;
 import br.com.conductor.heimdall.gateway.trace.FilterDetail;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.gateway.util.RequestHelper;
@@ -97,15 +104,17 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
 
     private ProxyRequestHelper proxyRequestHelper;
 
-    private OperationRepository operationRepository;
-
     private PathMatcher pathMatcher = new AntPathMatcher();
 
     private RequestHelper requestHelper;
 
     private FilterDetail detail = new FilterDetail();
+    
+    private CredentialRepository credentialRepository;
+    
+    private EnvironmentRepository environmentRepository;
 
-    public HeimdallDecorationFilter(ProxyRouteLocator routeLocator, String dispatcherServletPath, ZuulProperties properties, ProxyRequestHelper proxyRequestHelper, OperationRepository operationRepository, RequestHelper requestHelper) {
+    public HeimdallDecorationFilter(ProxyRouteLocator routeLocator, String dispatcherServletPath, ZuulProperties properties, ProxyRequestHelper proxyRequestHelper, RequestHelper requestHelper, CredentialRepository credentialRepository, EnvironmentRepository environmentRepository) {
 
         super(routeLocator, dispatcherServletPath, properties, proxyRequestHelper);
         this.routeLocator = routeLocator;
@@ -113,9 +122,10 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
         this.urlPathHelper.setRemoveSemicolonContent(properties.isRemoveSemicolonContent());
         this.dispatcherServletPath = dispatcherServletPath;
         this.proxyRequestHelper = proxyRequestHelper;
-        this.operationRepository = operationRepository;
         this.zuulServletPath = properties.getServletPath();
         this.requestHelper = requestHelper;
+        this.credentialRepository = credentialRepository;
+        this.environmentRepository = environmentRepository;
     }
 
     @Override
@@ -169,13 +179,6 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
         final String method = ctx.getRequest().getMethod().toUpperCase();
         HeimdallRoute heimdallRoute = getMatchingHeimdallRoute(requestURI, method, ctx);
 
-        if (ctx.getRequest().getHeader(ACCESS_TOKEN) != null) {
-            TraceContextHolder.getInstance().getActualTrace().setAccessToken(ctx.getRequest().getHeader(ACCESS_TOKEN));
-        }
-
-        if (ctx.getRequest().getHeader(CLIENT_ID) != null) {
-            TraceContextHolder.getInstance().getActualTrace().setClientId(ctx.getRequest().getHeader(CLIENT_ID));
-        }
         if (heimdallRoute != null) {
 
             if (heimdallRoute.isMethodNotAllowed()) {
@@ -276,26 +279,35 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                 if (this.pathMatcher.match(pattern, requestURI)) {
 
                     auxMatch = true;
-                    List<Operation> operations = operationRepository.findByEndPoint(pattern);
-                    Operation operation = null;
-                    if (operations != null && !operations.isEmpty()) {
-                        operation = operations.stream().filter(o -> o.getMethod().equals(HttpMethod.ALL) || method.equals(o.getMethod().name().toUpperCase())).findFirst().orElse(null);
+                    List<Credential> credentials = credentialRepository.findByPattern(pattern);
+                    Credential credential = null;
+                    if (Objects.nonNull(credentials) && !credentials.isEmpty()) {
+
+                        if (method.equals(HttpMethod.OPTIONS.name())) {
+                            Optional<Credential> first = credentials.stream().findFirst();
+                            if (first.get().isCors()) {
+                            	credential = first.get();
+                            }
+                        }
+
+                        if (Objects.isNull(credential)) {
+                        	credential = credentials.stream().filter(o -> o.getMethod().equals(HttpMethod.ALL.name()) || method.equals(o.getMethod().toUpperCase())).findFirst().orElse(null);
+                        }
                     }
 
-                    if (operation != null) {
+                    if (credential != null) {
                         ZuulRoute zuulRoute = entry.getValue();
 
-                        String basePath = operation.getResource().getApi().getBasePath();
+                        String basePath = credential.getApiBasePath();
                         requestURI = org.apache.commons.lang.StringUtils.removeStart(requestURI, basePath);
 
                         ctx.put(PATTERN, org.apache.commons.lang.StringUtils.removeStart(pattern, basePath));
-                        ctx.put(API_NAME, operation.getResource().getApi().getName());
-                        ctx.put(API_ID, operation.getResource().getApi().getId());
-                        ctx.put(RESOURCE_ID, operation.getResource().getId());
-                        ctx.put(OPERATION_ID, operation.getId());
-                        ctx.put(SCOPES, operation.getScopesIds());
+                        ctx.put(API_NAME, credential.getApiName());
+                        ctx.put(API_ID, credential.getApiId());
+                        ctx.put(RESOURCE_ID, credential.getResourceId());
+                        ctx.put(OPERATION_ID, credential.getOperationId());
 
-                        List<Environment> environments = operation.getResource().getApi().getEnvironments();
+                        List<Environment> environments = environmentRepository.findByApiId(credential.getApiId());
 
                         String location = null;
                         if (environments != null) {
@@ -318,11 +330,11 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
 
                         TraceContextHolder traceContextHolder = TraceContextHolder.getInstance();
 
-                        traceContextHolder.getActualTrace().setApiId(operation.getResource().getApi().getId());
-                        traceContextHolder.getActualTrace().setApiName(operation.getResource().getApi().getName());
-                        traceContextHolder.getActualTrace().setResourceId(operation.getResource().getId());
-                        traceContextHolder.getActualTrace().setOperationId(operation.getId());
-                        traceContextHolder.getActualTrace().setPattern(operation.getPath());
+                        traceContextHolder.getActualTrace().setApiId(credential.getApiId());
+                        traceContextHolder.getActualTrace().setApiName(credential.getApiName());
+                        traceContextHolder.getActualTrace().setResourceId(credential.getResourceId());
+                        traceContextHolder.getActualTrace().setOperationId(credential.getOperationId());
+                        traceContextHolder.getActualTrace().setPattern(credential.getOperationPath());
 
                         return new HeimdallRoute(pattern, route, false);
                     } else {

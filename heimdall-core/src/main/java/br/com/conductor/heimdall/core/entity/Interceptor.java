@@ -152,6 +152,9 @@ public class Interceptor implements Serializable {
      @JoinColumn(name = "API_ID")
      @JsonIgnore
      private Api api;
+
+     @Column(name = "STATUS", nullable = false)
+     private Boolean status;
      
      @PrePersist
      private void initValuesPersist() {

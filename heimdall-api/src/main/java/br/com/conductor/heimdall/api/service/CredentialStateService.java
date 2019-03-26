@@ -43,21 +43,16 @@ public class CredentialStateService {
         return credentialStateRepository.findByJti(jti);
     }
 
-    public boolean verifyIfTokenIsRevokeOrLogout(String jti) {
-        return  credentialStateRepository.findByJti(jti) == null ||
-                credentialStateRepository.findByJtiAndStateEquals(jti, CredentialStateEnum.REVOKE) != null ||
-                credentialStateRepository.findByJtiAndStateEquals(jti, CredentialStateEnum.LOGOUT) != null;
+    public boolean isLogged(String jti) {
+        return  credentialStateRepository.findByJtiAndStateEquals(jti, CredentialStateEnum.LOGIN) != null;
     }
 
     public CredentialState save(String jti, String username, CredentialStateEnum credentialStateEnum) {
 
-        CredentialState credentialState = new CredentialState();
+        CredentialState credentialState = findOne(jti);
 
-        CredentialState found = credentialStateRepository.findByJti(jti);
-
-        if (found != null) {
-            credentialState = found;
-        } else {
+        if (credentialState == null) {
+            credentialState =  new CredentialState();
             credentialState.setJti(jti);
         }
 
@@ -73,7 +68,7 @@ public class CredentialStateService {
         payloadAsString = new String(Base64.getDecoder().decode(payloadAsString));
         JSONObject payload = new JSONObject(payloadAsString);
         final String jti = payload.getString("jti");
-        if (!verifyIfTokenIsRevokeOrLogout(jti)) {
+        if (isLogged(jti)) {
             final String user = payload.getString("sub");
             save(jti, user, CredentialStateEnum.LOGOUT);
         }

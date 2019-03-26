@@ -247,6 +247,8 @@ export default {
         'available_privileges': 'Available privileges',
         'attributed_privileges': 'Attributed privileges',
         'default_plan_this_api': 'Default',
+        'failed_to_get_privileges_this_user': 'Failed to get privileges this user',
+        'session_expired': 'Session expired',
         'change_password': 'Change password',
         'current_password': 'Current password',
         'please_input_current_password': 'Please, input the current password',

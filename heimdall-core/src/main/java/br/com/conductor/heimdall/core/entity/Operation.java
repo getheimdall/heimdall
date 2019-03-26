@@ -80,9 +80,9 @@ public class Operation implements Serializable {
      @JsonManagedReference
      private Resource resource;
 
-     @JsonIgnore
-     @ManyToMany(fetch = FetchType.EAGER, mappedBy="operations")
-     private Set<Scope> scopes;
+//     @JsonIgnore
+//     @ManyToMany(fetch = FetchType.EAGER, mappedBy="operations")
+//     private Set<Scope> scopes;
 
      /**
       * Adjust the path to not permit the save or update with "/" or spaces in the end of path.
@@ -96,13 +96,13 @@ public class Operation implements Serializable {
           }
      }
 
-     @JsonIgnore
-     public Set<Long> getScopesIds() {
-          return this.scopes != null ? this.scopes.stream().map(Scope::getId).collect(Collectors.toSet()) : Collections.EMPTY_SET;
-     }
-
-     @PreRemove
-     private void removeFromScopes() {
-          scopes.forEach(scope -> scope.removeOperation(this));
-     }
+//     @JsonIgnore
+//     public Set<Long> getScopesIds() {
+//          return this.scopes != null ? this.scopes.stream().map(Scope::getId).collect(Collectors.toSet()) : Collections.EMPTY_SET;
+//     }
+//
+//     @PreRemove
+//     private void removeFromScopes() {
+//          scopes.forEach(scope -> scope.removeOperation(this));
+//     }
 }

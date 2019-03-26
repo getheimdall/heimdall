@@ -21,6 +21,7 @@ package br.com.conductor.heimdall.gateway.filter.helper;
  */
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -30,12 +31,13 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
-import com.fasterxml.jackson.core.JsonParser;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -64,7 +66,7 @@ public class JsonImpl implements Json {
 		try {
 			String json = mapper().writeValueAsString(body);
 
-			return json;
+			return StringEscapeUtils.unescapeJava(json);
 		} catch (JsonProcessingException e) {
 
 			log.error(e.getMessage(), e);
@@ -78,7 +80,7 @@ public class JsonImpl implements Json {
 
 			JSONObject jsonObject = new JSONObject(string);
 
-			return jsonObject.toString();
+			return StringEscapeUtils.unescapeJava(jsonObject.toString());
 		} catch (JSONException e) {
 			try {
 				JSONArray array = new JSONArray(string);
@@ -99,7 +101,7 @@ public class JsonImpl implements Json {
 
 			String jsonInString = mapper().writeValueAsString(object);
 
-			return jsonInString;
+			return StringEscapeUtils.unescapeJava(jsonInString);
 		} catch (Exception e) {
 
 			log.error(e.getMessage(), e);
@@ -112,22 +114,20 @@ public class JsonImpl implements Json {
 		try {
 			@SuppressWarnings("unchecked")
 			T obj = (T) mapper().readValue(json, classType);
-			
-			Set<ConstraintViolation<T>> violations = validator().validate(obj);
 
-			if (!violations.isEmpty()) {
-			     
-			     String jsonViolations = parse(violations.stream().map(v -> {
-			          return new BeanValidationErrorDTO(v.getPropertyPath().toString(), v.getMessage());
-			     }).collect(Collectors.toList()));
-			     
-			     throw new BeanValidationException("Bean validation error.", jsonViolations);
+			List<BeanValidationErrorDTO> errors = beanValidation(obj);
+
+			if (!errors.isEmpty()) {
+
+				String jsonViolations = parse(errors);
+
+				throw new BeanValidationException("Bean validation error.", jsonViolations);
 			}
-			
+
 			return obj;
 		} catch (BeanValidationException e) {
-		     log.debug(e.getMessage(), e);
-		     throw e;
+			log.debug(e.getMessage(), e);
+			throw e;
 		} catch (Exception e) {
 
 			log.error(e.getMessage(), e);
@@ -137,26 +137,24 @@ public class JsonImpl implements Json {
 
 	@Override
 	public <T> T parse(String json, TypeReference<T> type) throws BeanValidationException {
-	     try {
-	          mapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		try {
+			mapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 			@SuppressWarnings("unchecked")
 			T obj = (T) mapper().readValue(json, type);
-			
-			Set<ConstraintViolation<T>> violations = validator().validate(obj);
-			
-			if (!violations.isEmpty()) {
-                    
-                    String jsonViolations = parse(violations.stream().map(v -> {
-                         return new BeanValidationErrorDTO(v.getPropertyPath().toString(), v.getMessage());
-                    }).collect(Collectors.toList()));
-                    
-                    throw new BeanValidationException("Bean validation error.", jsonViolations);
-               }
-			
+
+			List<BeanValidationErrorDTO> errors = beanValidation(obj);
+
+			if (!errors.isEmpty()) {
+
+				String jsonViolations = parse(errors);
+
+				throw new BeanValidationException("Bean validation error.", jsonViolations);
+			}
+
 			return obj;
-	     } catch (BeanValidationException e) {
-               log.debug(e.getMessage(), e);
-               throw e;
+		} catch (BeanValidationException e) {
+			log.debug(e.getMessage(), e);
+			throw e;
 		} catch (Exception e) {
 
 			log.error(e.getMessage(), e);
@@ -169,22 +167,20 @@ public class JsonImpl implements Json {
 		try {
 			@SuppressWarnings("unchecked")
 			T obj = (T) mapper().readValue(json, TypeFactory.defaultInstance().constructParametricType(parametrized, parameterClasses));
+
+			List<BeanValidationErrorDTO> errors = beanValidation(obj);
 			
-			Set<ConstraintViolation<T>> violations = validator().validate(obj);
-               
-			if (!violations.isEmpty()) {
-                    
-                    String jsonViolations = parse(violations.stream().map(v -> {
-                         return new BeanValidationErrorDTO(v.getPropertyPath().toString(), v.getMessage());
-                    }).collect(Collectors.toList()));
-                    
-                    throw new BeanValidationException("Bean validation error.", jsonViolations);
-               }
-               
-               return obj;
-          } catch (BeanValidationException e) {
-               log.error(e.getMessage(), e);
-               throw e;
+			if (!errors.isEmpty()) {
+
+				String jsonViolations = parse(errors);
+
+				throw new BeanValidationException("Bean validation error.", jsonViolations);
+			}
+
+			return obj;
+		} catch (BeanValidationException e) {
+			log.error(e.getMessage(), e);
+			throw e;
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 			return null;
@@ -231,10 +227,16 @@ public class JsonImpl implements Json {
 		return mapper;
 	}
 	
-	private Validator validator() {
+	private <T> List<BeanValidationErrorDTO> beanValidation(T bean) {
 
-          ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-          Validator validator = factory.getValidator();
-          return validator;
-     }
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+        	Validator validator = factory.getValidator();
+        	
+        	Set<ConstraintViolation<T>> violations = validator.validate(bean);
+        	
+        	return violations.stream().map(v -> {
+				return new BeanValidationErrorDTO(v.getPropertyPath().toString(), v.getMessage());
+			}).collect(Collectors.toList());
+        }
+   }
 }
