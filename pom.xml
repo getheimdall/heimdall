@@ -144,6 +144,16 @@
 		    	<role>Front-end Developer</role>
 		    </roles>
 	  	</developer>
+		<developer>
+			<id>pedro.feitosa</id>
+			<name>Pedro Feitosa</name>
+			<email>pedro.feitosa at conductor.com.br</email>
+			<organization>Conductor Tecnologia SA</organization>
+			<organizationUrl>http://www.conductor.com.br</organizationUrl>
+			<roles>
+				<role>Developer</role>
+			</roles>
+		</developer>
 	</developers>
 
 	<properties>
