@@ -43,6 +43,7 @@ import SingleRole from "../containers/SingleRole";
 import SingleLdap from "../containers/SingleLdap";
 import Providers from "../containers/Providers";
 import SingleProvider from "../containers/SingleProvider";
+import UsersChangePassword from "../containers/UsersChangePassword";
 import SingleApiSwaggerEditor from "../components/apis/SingleApiSwaggerEditor"
 
 const routes = ({ history }) => (
@@ -72,6 +73,7 @@ const routes = ({ history }) => (
         <AppRoute layout={MainLayout} history={history} exact path="/tokens/new" component={Authorization([privileges.PRIVILEGE_CREATE_ACCESSTOKEN, privileges.PRIVILEGE_UPDATE_ACCESSTOKEN])(FadeIn(SingleAccessToken))} />
         <AppRoute layout={MainLayout} history={history} exact path="/tokens/:id" component={Authorization([privileges.PRIVILEGE_READ_ACCESSTOKEN])(FadeIn(SingleAccessToken))} />
         <AppRoute layout={MainLayout} history={history} exact path="/users" component={Authorization([privileges.PRIVILEGE_READ_USER])(FadeIn(Users))} />
+        <AppRoute layout={MainLayout} history={history} exact path="/users/change-password" component={FadeIn(UsersChangePassword)} />
         <AppRoute layout={MainLayout} history={history} exact path="/users/new" component={Authorization([privileges.PRIVILEGE_CREATE_USER, privileges.PRIVILEGE_UPDATE_USER])(FadeIn(SingleUser))} />
         <AppRoute layout={MainLayout} history={history} exact path="/users/:id" component={Authorization([privileges.PRIVILEGE_READ_USER])(FadeIn(SingleUser))} />
         <AppRoute layout={MainLayout} history={history} exact path="/traces" component={Authorization([privileges.PRIVILEGE_READ_TRACES])(FadeIn(Traces))} />

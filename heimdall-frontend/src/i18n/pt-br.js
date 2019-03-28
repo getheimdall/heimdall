@@ -247,6 +247,21 @@ export default {
         'available_privileges': 'Papéis disponíveis',
         'attributed_privileges': 'Papéis atribuídos',
         'default_plan_this_api': 'Plano padrão',
+        'failed_to_get_privileges_this_user': 'Falha ao obter os privilégios do usuário!',
+        'session_expired': 'Sessão expirada',
+        'change_password': 'Alterar senha',
+        'current_password': 'Senha atual',
+        'please_input_current_password': 'Por favor, digite a senha atual!',
+        'max_16_characters_to_current_password': 'A senha atual permite até 16 caracteres!',
+        'new_password': 'Nova senha',
+        'please_input_new_password': 'Por favor, digite a nova senha!',
+        'max_16_characters_to_new_password': 'Limite de 16 caracteres para a nova senha!',
+        'confirm_new_password': 'Confirmar senha nova',
+        'please_input_confirm_new_password': 'Por favor, confirme a senha nova!',
+        'max_16_characters_to_confirm_new_password': 'Limite de 16 caracteres para a confirmação da nova senha!',
+        'min_5_characters_to_current_password': 'A senha atual deve conter no mínimo 5 caracteres!',
+        'min_5_characters_to_new_password': 'A nova senha deve conter no mínimo 5 caracteres!',
+        'min_5_characters_to_confirm_new_password': 'A confirmação da senha deve conter no mínimo 5 caracteres!'
         'swagger-editor': 'Editor do Swagger'
     }
 }

@@ -227,6 +227,13 @@ export const ScopeConstants = {
     FORM_LOADING: 'FORM_LOADING'
 }
 
+export const SessionConstants = {
+    SESSION_RENEW_TIME: 'SESSION_RENEW_TIME',
+    SESSION_CLEAR_TIME_TOKEN: 'SESSION_CLEAR_TIME_TOKEN',
+    SESSION_OPEN_MODAL: 'SESSION_OPEN_MODAL',
+    SESSION_CLOSE_MODAL: 'SESSION_CLOSE_MODAL',
+}
+
 export const NavbarConstants = {
     UPDATE_MENU_KEYS: 'UPDATE_MENU_KEYS'
 }

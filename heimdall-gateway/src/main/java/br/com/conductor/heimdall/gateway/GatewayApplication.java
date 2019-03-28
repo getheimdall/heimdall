@@ -36,7 +36,7 @@ import br.com.conductor.heimdall.core.environment.Property;
 import br.com.conductor.heimdall.core.util.RabbitQueueUtils;
 
 /**
- * This is the main Heimdall Gateway Application class. <br/>
+ * This is the main Heimdall Gateway Application class. <br>
  * Heimdall Gateway is a SpringBoot based application that uses RabbitMQ as a message broker
  * This class starts the RabbitQueue then runs the Gateway Application as a SpringBoot application.
  *
