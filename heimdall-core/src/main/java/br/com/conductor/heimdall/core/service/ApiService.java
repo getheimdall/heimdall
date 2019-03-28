@@ -21,7 +21,7 @@ package br.com.conductor.heimdall.core.service;
  * ==========================LICENSE_END===================================
  */
 
-import br.com.conductor.heimdall.core.converter.ApiMap;
+//import br.com.conductor.heimdall.core.converter.ApiMap;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.ApiDTO;
 import br.com.conductor.heimdall.core.dto.PageDTO;
@@ -144,7 +144,7 @@ public class ApiService {
           HeimdallException.checkThrow(isBlank(apiDTO.getBasePath()), API_BASEPATH_EMPTY);
           HeimdallException.checkThrow(validateInboundsEnvironments(apiDTO.getEnvironments()), API_CANT_ENVIRONMENT_INBOUND_URL_EQUALS);
 
-          Api api = GenericConverter.mapperWithMapping(apiDTO, Api.class, new ApiMap());
+          Api api = GenericConverter.mapper(apiDTO, Api.class);
           api.setBasePath(StringUtils.removeMultipleSlashes(api.getBasePath()));
 
           api = apiRepository.save(api);
@@ -171,7 +171,7 @@ public class ApiService {
           HeimdallException.checkThrow(isBlank(apiDTO.getBasePath()), API_BASEPATH_EMPTY);
           HeimdallException.checkThrow(validateInboundsEnvironments(apiDTO.getEnvironments()), API_CANT_ENVIRONMENT_INBOUND_URL_EQUALS);
 
-          api = GenericConverter.mapperWithMapping(apiDTO, api, new ApiMap());
+          api = GenericConverter.mapper(apiDTO, api);
           api.setBasePath(StringUtils.removeMultipleSlashes(api.getBasePath()));
 
           api = apiRepository.save(api);

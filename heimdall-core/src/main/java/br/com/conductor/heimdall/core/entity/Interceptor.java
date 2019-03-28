@@ -122,36 +122,29 @@ public class Interceptor implements Serializable {
           joinColumns = @JoinColumn(name = "INTERCEPTOR_ID", referencedColumnName = "ID"), 
           inverseJoinColumns = @JoinColumn(name = "OPERATION_ID", referencedColumnName = "ID"))
      private List<Operation> ignoredOperations;
-     
+
+     @ManyToOne(fetch = FetchType.LAZY)
+     @JoinColumn(name = "API_ID")
      @JsonIgnore
-     @ManyToOne(fetch = FetchType.EAGER)
+     private Api api;
+
+     @JsonIgnore
+     @ManyToOne(fetch = FetchType.LAZY)
      @JoinColumn(name = "PLAN_ID")
      private Plan plan;
 
      @JsonIgnore
-     @ManyToOne(fetch = FetchType.EAGER)
+     @ManyToOne(fetch = FetchType.LAZY)
      @JoinColumn(name = "RESOURCE_ID")
      private Resource resource;
 
      @JsonIgnore
-     @ManyToOne(fetch = FetchType.EAGER)
+     @ManyToOne(fetch = FetchType.LAZY)
      @JoinColumn(name = "OPERATION_ID")
      private Operation operation;
-     
-     @JsonIgnore
-     @ManyToMany
-     @JoinTable(name = "MIDDLEWARES_INTERCEPTORS", 
-          joinColumns = @JoinColumn(name = "INTERCEPTOR_ID", referencedColumnName = "ID"), 
-          inverseJoinColumns = @JoinColumn(name = "MIDDLEWARE_ID", referencedColumnName = "ID"))
-     private List<Middleware> middlewares;
-     
+
      @Transient
      private Long referenceId;
-     
-     @ManyToOne(fetch = FetchType.EAGER)
-     @JoinColumn(name = "API_ID")
-     @JsonIgnore
-     private Api api;
 
      @Column(name = "STATUS", nullable = false)
      private Boolean status;

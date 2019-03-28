@@ -93,7 +93,7 @@ public class ScopesFilterTest {
         plan.setApi(api);
 
         Operation operation = new Operation(1111L, null, null,null, null);
-        Scope scope = new Scope(1000L, null, null, null, null, null);
+        Scope scope = new Scope(1000L, null, null, null, null);
 
         app.setPlans(Lists.newArrayList(plan));
         plan.setScopes(Sets.newHashSet(scope));
@@ -128,7 +128,7 @@ public class ScopesFilterTest {
         plan.setApi(api);
 
         Operation operation = new Operation(1111L, null, null,null, null);
-        Scope scope = new Scope(1000L, null, null, null, null, null);
+        Scope scope = new Scope(1000L, null, null, null, null);
 
         app.setPlans(Lists.newArrayList(plan));
         plan.setScopes(Sets.newHashSet(scope));
@@ -232,8 +232,8 @@ public class ScopesFilterTest {
         Operation operation1 = new Operation(1111L, null, null,null, null);
         Operation operation2 = new Operation(2222L, null, null,null, null);
 
-        Scope scope1 = new Scope(123L, null, null, null, Sets.newHashSet(operation1), Sets.newHashSet(plan1));
-        Scope scope2 = new Scope(321L, null, null, null, Sets.newHashSet(operation2), Sets.newHashSet(plan2));
+        Scope scope1 = new Scope(123L, null, null, null, Sets.newHashSet(operation1) );
+        Scope scope2 = new Scope(321L, null, null, null, Sets.newHashSet(operation2));
 
         plan1.setScopes(Sets.newHashSet(scope1));
         plan2.setScopes(Sets.newHashSet(scope2));
@@ -283,8 +283,8 @@ public class ScopesFilterTest {
         Operation operation2 = new Operation(2222L, null, null,null, null);
         Operation operation3 = new Operation(3333L, null, null,null, null);
 
-        Scope scope1 = new Scope(123L, null, null, null, Sets.newHashSet(operation1, operation3), Sets.newHashSet(plan1));
-        Scope scope2 = new Scope(321L, null, null, null, Sets.newHashSet(operation2, operation3), Sets.newHashSet(plan2));
+        Scope scope1 = new Scope(123L, null, null, null, Sets.newHashSet(operation1, operation3));
+        Scope scope2 = new Scope(321L, null, null, null, Sets.newHashSet(operation2, operation3));
 
         plan1.setScopes(Sets.newHashSet(scope1));
         plan2.setScopes(Sets.newHashSet(scope2));
@@ -329,8 +329,8 @@ public class ScopesFilterTest {
         Operation operation2 = new Operation(2222L, null, null,null, null);
         Operation operation3 = new Operation(3333L, null, null,null, null);
 
-        Scope scope1 = new Scope(123L, null, null, null, Sets.newHashSet(operation1, operation3), Sets.newHashSet(plan1));
-        Scope scope2 = new Scope(321L, null, null, null, Sets.newHashSet(operation2, operation3), Sets.newHashSet(plan2));
+        Scope scope1 = new Scope(123L, null, null, null, Sets.newHashSet(operation1, operation3));
+        Scope scope2 = new Scope(321L, null, null, null, Sets.newHashSet(operation2, operation3));
 
         plan1.setScopes(Sets.newHashSet(scope1));
         plan2.setScopes(Sets.newHashSet(scope2));
@@ -363,7 +363,7 @@ public class ScopesFilterTest {
         plan.setApi(api);
 
         Operation operation = new Operation(1111L, null, null,null, null);
-        Scope scope = new Scope(1000L, null, null, null, null, null);
+        Scope scope = new Scope(1000L, null, null, null, null);
 
         app.setPlans(Lists.newArrayList(plan));
         plan.setScopes(Sets.newHashSet(scope));
@@ -389,7 +389,7 @@ public class ScopesFilterTest {
         api.setId(1L);
 
         Operation operation = new Operation(1111L, null, null,null, null);
-        Scope scope = new Scope(1000L, null, null, null, null, null);
+        Scope scope = new Scope(1000L, null, null, null, null);
 
         scope.setOperations(Sets.newHashSet(operation));
 
@@ -415,7 +415,7 @@ public class ScopesFilterTest {
         app.setClientId(clientId1);
 
         Operation operation = new Operation(1111L, null, null,null, null);
-        Scope scope = new Scope(1000L, null, null, null, null, null);
+        Scope scope = new Scope(1000L, null, null, null, null);
 
         scope.setOperations(Sets.newHashSet(operation));
 
@@ -472,7 +472,7 @@ public class ScopesFilterTest {
         plan.setApi(api);
 
         Operation operation = new Operation(1111L, null, null,null, null);
-        Scope scope = new Scope(1000L, null, null, null, null, null);
+        Scope scope = new Scope(1000L, null, null, null, null);
 
         app.setPlans(Lists.newArrayList(plan));
         plan.setScopes(Sets.newHashSet(scope));

@@ -33,8 +33,6 @@ import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.configuration.HeimdallHandlerMapping;
 import br.com.conductor.heimdall.gateway.service.InterceptorFileService;
 import br.com.conductor.heimdall.gateway.util.HeimdallFilterFileManager;
-import br.com.twsoftware.alfred.io.Arquivo;
-import br.com.twsoftware.alfred.object.Objeto;
 import com.netflix.zuul.FilterLoader;
 import com.netflix.zuul.groovy.GroovyCompiler;
 import com.netflix.zuul.groovy.GroovyFileFilter;
@@ -48,10 +46,12 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.*;
@@ -166,7 +166,7 @@ public class StartServer implements ServletContextListener {
      private void createInterceptors() {
           
           List<Interceptor> interceptors = interceptorRepository.findAll();
-          if (Objeto.notBlank(interceptors)) {
+          if (interceptors != null && !interceptors.isEmpty()) {
                
                interceptors.forEach(interceptor -> interceptorFileService.createFileInterceptor(interceptor.getId()));
 
@@ -181,7 +181,7 @@ public class StartServer implements ServletContextListener {
      public void createMiddlewaresInterceptor(Long middlewareId) {
 
           Middleware middleware = middlewareRepository.findOne(middlewareId);
-          if (Objeto.notBlank(middleware) && Objeto.notBlank(middleware.getInterceptors())) {
+          if (middleware != null && (middleware.getInterceptors() != null && !middleware.getInterceptors().isEmpty())) {
 
                middleware.getInterceptors().forEach(interceptor -> interceptorFileService.createFileInterceptor(interceptor.getId()));
           }
@@ -194,11 +194,7 @@ public class StartServer implements ServletContextListener {
       */
      private void cleanFilesFolder(String root) {
           
-          File interceptorsFolder = new File(root);
-          Collection<File> files = Arquivo.listarArquivos(interceptorsFolder,
-                  (dir, name) -> name.contains(".groovy") || name.contains(".java") || name.contains(".jar"),
-                  true);
-          
+          Set<File> files = listAllFiles(root);
           files.forEach(f -> {
                try {
                     
@@ -267,7 +263,7 @@ public class StartServer implements ServletContextListener {
                
                Middleware middleware = middlewareRepository.findOne(middlewareId);
                
-               if (Objeto.notBlank(middleware)) {
+               if (middleware != null) {
                
                     if (Status.ACTIVE.equals(middleware.getStatus())) {
                          
@@ -307,5 +303,18 @@ public class StartServer implements ServletContextListener {
      public void addApiDirectoryToPath(Api api) {
           File apiFolder = new File(zuulFilterRoot, MIDDLEWARE_API_ROOT + File.separator + api.getId().toString());
           HeimdallFilterFileManager.getInstance().addNewDirectory(apiFolder.getAbsolutePath());
+     }
+
+     private Set<File> listAllFiles(String interceptorFolder) {
+          try (Stream<Path> walk = Files.walk(Paths.get(interceptorFolder))) {
+
+               return walk.filter(Files::isRegularFile)
+                       .filter(path -> path.endsWith(".jar") || path.endsWith(".groovy") || path.endsWith(".java"))
+                       .map(Path::toFile)
+                       .collect(Collectors.toSet());
+          } catch (IOException e) {
+               return Collections.emptySet();
+          }
+
      }
 }

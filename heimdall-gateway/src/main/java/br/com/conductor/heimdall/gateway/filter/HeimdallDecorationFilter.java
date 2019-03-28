@@ -22,11 +22,7 @@ package br.com.conductor.heimdall.gateway.filter;
  */
 
 import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
-import static br.com.conductor.heimdall.gateway.util.ConstantsContext.API_ID;
-import static br.com.conductor.heimdall.gateway.util.ConstantsContext.API_NAME;
-import static br.com.conductor.heimdall.gateway.util.ConstantsContext.OPERATION_ID;
-import static br.com.conductor.heimdall.gateway.util.ConstantsContext.PATTERN;
-import static br.com.conductor.heimdall.gateway.util.ConstantsContext.RESOURCE_ID;
+import static br.com.conductor.heimdall.gateway.util.ConstantsContext.*;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.FORWARD_LOCATION_PREFIX;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.FORWARD_TO_KEY;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.HTTPS_PORT;

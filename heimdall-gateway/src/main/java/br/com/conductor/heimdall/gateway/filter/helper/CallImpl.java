@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import br.com.conductor.heimdall.gateway.util.ConstantsContext;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -321,18 +322,16 @@ public class CallImpl implements Call {
                     String[] b = requestURIText.split(separator);
 
                     String value = null;
-                    if (a != null && b != null) {
-                         
-                         for (int i = 0; i < a.length; i++) {
-                              
-                              if (a[i].equals(name) && !a[i].equals(b[i])) {
-                                   
-                                   value = b[i];
-                                   break;
-                              }
+
+                    for (int i = 0; i < a.length; i++) {
+
+                         if (a[i].equals(name) && !a[i].equals(b[i])) {
+
+                              value = b[i];
+                              break;
                          }
                     }
-                    
+
                     return value;
                } else {
                     
@@ -558,9 +557,9 @@ public class CallImpl implements Call {
           @SuppressWarnings("unchecked")
           public EnvironmentImpl() {
 
-               if (Objeto.notBlank(context.get("environmentVariables"))) {
+               if (Objeto.notBlank(context.get(ConstantsContext.ENVIRONMENT_VARIABLES))) {
                     
-                    currentVariables = (Map<String, String>) context.get("environmentVariables");
+                    currentVariables = (Map<String, String>) context.get(ConstantsContext.ENVIRONMENT_VARIABLES);
                }
                
           }

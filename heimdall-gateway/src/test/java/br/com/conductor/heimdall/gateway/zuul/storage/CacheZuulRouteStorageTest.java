@@ -53,7 +53,7 @@ public class CacheZuulRouteStorageTest {
           Environment environment = new Environment();
           environment.setInboundURL("dns.production.com.br");
           environment.setOutboundURL("dns.production.com.br");
-          Api api = new Api(10L, "foo", "v1", "fooDescription", "/foo", false, LocalDateTime.now(), new HashSet<>(), Status.ACTIVE, null, null, environments, null, null);
+          Api api = new Api(10L, "foo", "v1", "fooDescription", "/foo", false, LocalDateTime.now(), new HashSet<>(), Status.ACTIVE, environments, null);
           
           List<Resource> res = new LinkedList<>();
           
