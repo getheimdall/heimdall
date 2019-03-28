@@ -67,13 +67,17 @@ public class HttpImpl implements Http {
     private RestTemplate restTemplate;
 
     private boolean enableHandler;
+    
+    private MultiValueMap<String, String> queryParams;
 
     public HttpImpl() {
-        this.enableHandler = false;
+        this(false);
+    
     }
 
     public HttpImpl(boolean enableHandler) {
         this.enableHandler = enableHandler;
+        queryParams = new LinkedMultiValueMap<>();
     }
 
     @Override
@@ -110,8 +114,7 @@ public class HttpImpl implements Http {
     public HttpImpl queryParam(String name, String value) {
 
         if (Objects.nonNull(value)) {
-
-            uriComponentsBuilder.queryParam(name, value);
+            queryParams.add(name, value);
         }
 
         return this;
@@ -149,7 +152,8 @@ public class HttpImpl implements Http {
 
         setUIDFromInterceptor();
         ResponseEntity<String> entity;
-
+    
+        updateQueryParams();
         if (headers.isEmpty()) {
 
             entity = rest().getForEntity(uriComponentsBuilder.build().encode().toUri(), String.class);
@@ -171,6 +175,8 @@ public class HttpImpl implements Http {
 
         setUIDFromInterceptor();
         ResponseEntity<String> entity;
+    
+        updateQueryParams();
         if (headers.isEmpty()) {
 
             requestBody = new HttpEntity<>(body);
@@ -204,6 +210,8 @@ public class HttpImpl implements Http {
 
         setUIDFromInterceptor();
         ResponseEntity<String> entity;
+    
+        updateQueryParams();
         if (headers.isEmpty()) {
 
             requestBody = new HttpEntity<>(body);
@@ -233,7 +241,8 @@ public class HttpImpl implements Http {
 
         setUIDFromInterceptor();
         ResponseEntity<String> entity;
-
+    
+        updateQueryParams();
         if (headers.isEmpty()) {
             entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.DELETE, null,
                     String.class);
@@ -254,7 +263,8 @@ public class HttpImpl implements Http {
     public ApiResponseImpl sendPatch() {
 
         ResponseEntity<String> entity;
-
+    
+        updateQueryParams();
         if (headers.isEmpty()) {
             requestBody = new HttpEntity<>(body);
             entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PATCH, requestBody,
@@ -307,5 +317,10 @@ public class HttpImpl implements Http {
             headers.add(IDENTIFIER_ID, context.getZuulRequestHeaders().get(IDENTIFIER_ID));
         }
     }
-
+    
+    private void updateQueryParams() {
+        if (uriComponentsBuilder != null && queryParams != null && !queryParams.isEmpty()) {
+            uriComponentsBuilder.queryParams(queryParams);
+        }
+    }
 }
