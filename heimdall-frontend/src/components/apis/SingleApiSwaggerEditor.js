@@ -48,10 +48,8 @@ class SingleApiSwaggerEditor extends React.Component {
     }
 
     componentWillUpdate(nextProps, nextState) {
-        if (nextState.swagger !== this.state.swagger) {
-            const {swagger} = nextState
-            this.updateSwaggerUI(swagger)
-        }
+        const {swagger} = nextState
+        this.updateSwaggerUI(swagger)
     }
 
     componentWillReceiveProps(nextProps) {
@@ -92,9 +90,9 @@ class SingleApiSwaggerEditor extends React.Component {
     }
 
     handleOnChangeSwaggerEditor = swaggerEdit => {
-        if (swaggerEdit !== this.state.swagger) {
+        if (swaggerEdit !== this.state.swagger && this.swaggerIsValid(swaggerEdit)) {
             this.props.dispatch(initLoading())
-            this.setState({...this.state, swagger: swaggerEdit })
+            this.setState({...this.state, swagger: JSON.stringify(JSON.parse(swaggerEdit), null, '\t') })
         }
     }
 
@@ -150,6 +148,8 @@ class SingleApiSwaggerEditor extends React.Component {
 
         const { loading } = this.props
         const {swagger} = this.state
+
+        console.log(swagger)
 
         const display = !loading ? 'block' : 'none'
 
