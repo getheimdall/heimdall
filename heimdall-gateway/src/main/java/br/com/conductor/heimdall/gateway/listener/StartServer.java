@@ -43,13 +43,14 @@ import org.springframework.beans.factory.annotation.Value;
 import com.netflix.zuul.FilterLoader;
 import com.netflix.zuul.groovy.GroovyCompiler;
 import com.netflix.zuul.groovy.GroovyFileFilter;
+
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.entity.Middleware;
 import br.com.conductor.heimdall.core.enums.Status;
-import br.com.conductor.heimdall.core.repository.ApiRepository;
 import br.com.conductor.heimdall.core.repository.InterceptorRepository;
-import br.com.conductor.heimdall.core.repository.MiddlewareRepository;
+import br.com.conductor.heimdall.core.repository.jdbc.ApiJDBCRepository;
+import br.com.conductor.heimdall.core.repository.jdbc.MiddlewareJDBCRepository;
 import br.com.conductor.heimdall.core.service.FileService;
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.configuration.HeimdallHandlerMapping;
@@ -77,12 +78,12 @@ public class StartServer implements ServletContextListener {
 
 	@Autowired
 	private InterceptorRepository interceptorRepository;
-
+	
 	@Autowired
-	private ApiRepository apiRepository;
-
+	private ApiJDBCRepository apiJDBCRepository;
+	
 	@Autowired
-	private MiddlewareRepository middlewareRepository;
+	private MiddlewareJDBCRepository middlewareJDBCRepository;
 
 	@Autowired
 	private FileService fileService;
@@ -96,7 +97,7 @@ public class StartServer implements ServletContextListener {
 	@Value("${zuul.filter.interval}")
 	private int zuulFilterInterval;
 
-	private List<Api> apis;
+	private List<Long> apiIds;
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
@@ -138,8 +139,8 @@ public class StartServer implements ServletContextListener {
 			filesAbsolutePath.add(folder.getAbsolutePath());
 		}
 
-		for (Api api : apis) {
-			File apiFolder = new File(zuulFilterRoot, MIDDLEWARE_API_ROOT + File.separator + api.getId().toString());
+		for (Long id : apiIds) {
+			File apiFolder = new File(zuulFilterRoot, MIDDLEWARE_API_ROOT + File.separator + id);
 			filesAbsolutePath.add(apiFolder.getAbsolutePath());
 		}
 
@@ -230,11 +231,10 @@ public class StartServer implements ServletContextListener {
 			}
 		}
 
-		apis = apiRepository.findAll();
-		for (Api api : apis) {
+		apiIds = apiJDBCRepository.findAllIds();
+		for (Long id : apiIds) {
 
-			File apiFolder = new File(zuulFilterRoot, MIDDLEWARE_API_ROOT + File.separator + api.getId().toString()
-					+ File.separator + Constants.MIDDLEWARE_ROOT);
+			File apiFolder = new File(zuulFilterRoot, MIDDLEWARE_API_ROOT + File.separator + id + File.separator + Constants.MIDDLEWARE_ROOT);
 			if (!apiFolder.exists()) {
 				apiFolder.mkdirs();
 			}
@@ -247,7 +247,7 @@ public class StartServer implements ServletContextListener {
 	private void loadAllMiddlewareFiles() {
 		try {
 
-			List<Middleware> middlewares = middlewareRepository.findByStatus(Status.ACTIVE);
+			List<Middleware> middlewares = middlewareJDBCRepository.findAllActive();
 
 			for (Middleware middleware : middlewares) {
 

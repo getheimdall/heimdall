@@ -23,6 +23,7 @@ package br.com.conductor.heimdall.core.repository;
 
 import java.util.List;
 
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import br.com.conductor.heimdall.core.entity.Api;
@@ -39,6 +40,10 @@ import br.com.conductor.heimdall.core.enums.TypeInterceptor;
  * @author Marcelo Aguiar Rodrigues
  */
 public interface InterceptorRepository extends JpaRepository<Interceptor, Long> {
+	
+	@EntityGraph(attributePaths={"ignoredResources", "ignoredOperations"})
+	@Override
+	List<Interceptor> findAll();
 
     /**
      * Finds a List of Interceptors by Interceptor type and {@link Api} Id.
