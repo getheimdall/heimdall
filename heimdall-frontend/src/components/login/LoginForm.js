@@ -10,7 +10,7 @@ class LoginForm extends Component {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                this.props.submit(values.userName, values.password)
+                this.props.submit(values.userName, values.password, true)
             }
         });
     }
@@ -25,7 +25,7 @@ class LoginForm extends Component {
                             {getFieldDecorator('userName', {
                                 rules: [{ required: true, message: i18n.t('insert_username') }],
                             })(
-                                <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder={i18n.t('username')} />
+                                <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder={i18n.t('username')} autoFocus/>
                             )}
                         </FormItem>
                     </Col>

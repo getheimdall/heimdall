@@ -237,7 +237,7 @@ class Interceptors extends Component {
     }
 
     handleFilterOperation = (input, option) => {
-        const path = option.props.children[2]
+        const path = option.props.title
         try {
             const reg = new RegExp(input, 'i')
             return path.match(reg) !== null
@@ -418,7 +418,7 @@ class Interceptors extends Component {
                                     <Select showSearch value={this.state.operationId} onChange={this.handleSelectChange('OP')} disabled={!this.props.operations} className="heimdall-select-filter-complete" filterOption={this.handleFilterOperation}>
                                         <Option value={0}>{i18n.t('all')}</Option>
                                         {this.props.operations && this.props.operations.map((op, index) => (
-                                            <Option key={index} value={op.id}>
+                                            <Option key={index} value={op.id} title={op.method + " " + op.path}>
                                                 <Badge title="Numbers of interceptors" className="heimdall-badge-interceptors-count" count={countInterceptorsByCycle(interceptors && interceptors.content, 'OPERATION', op.id)}/>
                                                 <Tag color={ColorUtils.getColorMethod(op.method)}>{op.method}</Tag> {op.path}
                                             </Option>

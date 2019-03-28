@@ -26,6 +26,16 @@ export default (state = {}, action) => {
             return { ...state, fetching: false }
         case ApiConstants.API_NOTIFICATION:
             return { ...state, notification: action.notification }
+        case ApiConstants.GET_SWAGGER_API:
+            return { ...state, swagger: action.swagger }
+        case ApiConstants.SAVE_SWAGGER_API:
+            return { ...state, api: action.api }
+        case ApiConstants.CLEAR_SWAGGER_API:
+            return { ...state, swagger: {} }
+        case ApiConstants.API_LOADING:
+            return { ...state, loading: true }
+        case ApiConstants.API_LOADING_FINISH:
+            return { ...state, loading: false}
         default:
             return state
     }

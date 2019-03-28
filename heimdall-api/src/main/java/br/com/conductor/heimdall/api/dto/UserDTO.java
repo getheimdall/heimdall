@@ -59,7 +59,7 @@ public class UserDTO implements Serializable {
      private String email;
 
      @NotNull
-     @Size(max = 16)
+     @Size(min = 5, max = 16)
      private String password;
      
      @NotNull

@@ -3,6 +3,7 @@ import { push } from 'connected-react-router'
 import i18n from "../i18n/i18n"
 import { UserConstants } from '../constants/actions-types'
 import { userService } from '../services'
+import { logout } from '../actions/auth'
 
 export const initLoading = () => dispatch => {
     dispatch({ type: UserConstants.USER_LOADING })
@@ -66,6 +67,20 @@ export const update = user => dispatch => {
         .catch(error => {
             console.log(error)
             if (error.response && error.response.status === 400) {
+                dispatch(sendNotification({ type: 'error', message: i18n.t('error'), description: error.response.data.message }))
+            }
+            dispatch(finishLoading())
+        })
+}
+
+export const updatePassword = userPasswords => dispatch => {
+    userService.updatePassword(userPasswords)
+        .then(data => {
+            dispatch(logout())
+        })
+        .catch(error => {
+            console.log(error)
+            if (error.response && (error.response.status === 400 || error.response.status === 401)) {
                 dispatch(sendNotification({ type: 'error', message: i18n.t('error'), description: error.response.data.message }))
             }
             dispatch(finishLoading())
