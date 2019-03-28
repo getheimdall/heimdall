@@ -20,6 +20,7 @@
 package br.com.conductor.heimdall.gateway.failsafe;
 
 import br.com.conductor.heimdall.core.environment.Property;
+import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.gateway.util.ConstantsContext;
 import com.netflix.zuul.context.RequestContext;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +32,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.text.MessageFormat;
 import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -60,14 +62,9 @@ public class CircuitBreakerManager {
 		if (circuitBreaker.isOpen()) {
 			return Failsafe.with(circuitBreaker)
 					.withFallback(() ->  {
-						log.warn("CircuitBreaker ENABLED | Operation: {}, Exception: {}",
+						String body = logAndCreateBody("CircuitBreaker ENABLED | Operation: {0}, Exception: {1}",
 								operationPath,
 								circuitBreakerHolder.getThrowable().getCause().getMessage());
-
-						String body = "{" +
-								"\"" + HttpStatus.SERVICE_UNAVAILABLE.getReasonPhrase() + "\": \"" + operationPath + "\"," +
-								"\"message\": \"" + circuitBreakerHolder.getThrowable().getCause().getMessage() + "\"" +
-								"}";
 
 						RequestContext context = RequestContext.getCurrentContext();
 						context.setSendZuulResponse(false);
@@ -91,14 +88,9 @@ public class CircuitBreakerManager {
 		if (circuitBreaker.isOpen()) {
 			return Failsafe.with(circuitBreaker)
 					.withFallback(() -> {
-						log.warn("CircuitBreaker ENABLED | URL: {}, Exception: {}",
+						String body = logAndCreateBody("CircuitBreaker ENABLED | URL: {0}, Exception: {1}",
 								url,
 								circuitBreakerHolder.getThrowable().getCause().getMessage());
-
-						String body = "{" +
-								"\"" + HttpStatus.SERVICE_UNAVAILABLE.getReasonPhrase() + "\": \"" + url + "\"," +
-								"\"message\": \"" + circuitBreakerHolder.getThrowable().getCause().getMessage() + "\"" +
-								"}";
 
 						return ResponseEntity
 								.status(HttpStatus.SERVICE_UNAVAILABLE.value())
@@ -144,6 +136,18 @@ public class CircuitBreakerManager {
 		}
 
 		return breakerHolder;
+	}
+
+	private String logAndCreateBody(String message, String... args) {
+		String finalMessage = new MessageFormat(message).format(args);
+
+		log.info(finalMessage);
+		TraceContextHolder.getInstance().getActualTrace().trace("CircuitBreaker Enabled" , finalMessage);
+
+		return "{" +
+				"\"" + HttpStatus.SERVICE_UNAVAILABLE.getReasonPhrase() + "\": \"" + args[0] + "\"," +
+				"\"message\": \"" + args[1] + "\"" +
+				"}";
 	}
 
 }
