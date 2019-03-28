@@ -261,7 +261,7 @@ export default {
         'max_16_characters_to_confirm_new_password': 'Max of 16 characters in confirm the new password',
         'min_5_characters_to_current_password': 'Mix of 5 characters to current password',
         'min_5_characters_to_new_password': 'Mix of 5 characters to new password',
-        'min_5_characters_to_confirm_new_password': 'Mix of 5 characters to confirm new password'
+        'min_5_characters_to_confirm_new_password': 'Mix of 5 characters to confirm new password',
         'swagger-editor': 'Swagger Editor'
     }
 }
