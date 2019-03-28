@@ -38,6 +38,24 @@ let collect = (connect, monitor) => {
     }
 }
 
+const labelStyle = {
+    backgroundColor: 'grey',
+    borderRadius: '10px',
+    color: '#fff',
+    fontSize: '12px',
+    fontWeight: 'normal',
+    height: '20px',
+    lineHeight: '20px',
+    position: 'absolute',
+    right: 'initial',
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    top: '-10px',
+    whiteSpace: 'nowrap',
+    width: 100,
+    zIndex: '10'
+};
+
 class DropClientInterceptors extends Component {
 
     moveInterceptors = (dragIndex, newIndex, lifeCycleDrag, referenceDrag) => {
@@ -71,7 +89,7 @@ class DropClientInterceptors extends Component {
             <div>
                 <Row id="drop-client-interceptors" className="draggable-pane" style={style}>
                     <Row type="flex" justify="center">
-                        <sup className="ant-scroll-number ant-badge-count" style={{backgroundColor: 'grey', width: 100, textTransform: 'uppercase'}}>{description}</sup>
+                        <sup className="ant-scroll-number" style={labelStyle}>{description}</sup>
                     </Row>
                     {!this.props.interceptors && <Loading />}
                     {this.props.interceptors && this.props.interceptors.map((interceptor, index) => {
