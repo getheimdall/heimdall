@@ -27,19 +27,16 @@ import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import static br.com.conductor.heimdall.gateway.util.ConstantsContext.CLIENT_ID;
-import static br.com.conductor.heimdall.gateway.util.ConstantsContext.OPERATION_ID;
+import static br.com.conductor.heimdall.gateway.util.ConstantsContext.*;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 
 /**
@@ -78,7 +75,7 @@ public class ScopesFilter extends ZuulFilter {
             detail.setStatus(Constants.SUCCESS);
         } catch (Throwable e) {
             detail.setStatus(Constants.FAILED);
-            TraceContextHolder.getInstance().getActualTrace().setStackTrace(new StackTraceImpl(e.getClass().getName(), e.getMessage(), ExceptionUtils.getStackTrace(e)));
+            TraceContextHolder.getInstance().getActualTrace().setStackTrace(new StackTraceImpl(e.getClass().getName(), e.getMessage()));
         } finally {
             long endTime = System.currentTimeMillis();
 
@@ -97,17 +94,19 @@ public class ScopesFilter extends ZuulFilter {
         final String client_id = context.getRequest().getHeader(CLIENT_ID);
 
         if (client_id != null) {
-            final HttpServletRequest req = context.getRequest();
+
+            App app = appRepository.findByClientId(client_id);
+            if (app == null || app.getPlans() == null) return;
+
+            Set<Long> apis = app.getPlans().stream().map(plan -> plan.getApi().getId()).collect(Collectors.toSet());
+            Long apiId = (Long) context.get(API_ID);
+            if (!apis.contains(apiId)) return;
 
             final Set<Long> allowedOperations = new HashSet<>();
-            final App app = appRepository.findByClientId(req.getHeader(CLIENT_ID));
-
-            if (Objects.isNull(app)) return;
-            if (Objects.isNull(app.getPlans())) return;
 
             app.getPlans()
                     .forEach(plan -> {
-                        if (plan != null)
+                        if (plan != null && plan.getApi().getId().equals(apiId))
                             plan.getScopes()
                                     .forEach(scope -> {
                                         if (scope != null)
@@ -117,7 +116,10 @@ public class ScopesFilter extends ZuulFilter {
 
             final Long operation = (Long) context.get(OPERATION_ID);
 
-            if (Objects.isNull(operation)) return;
+            if (operation == null) return;
+
+            // If the allowedOperations is empty it means that Scopes are not set
+            if (allowedOperations.isEmpty()) return;
 
             if (!allowedOperations.contains(operation)) {
                 context.setSendZuulResponse(false);

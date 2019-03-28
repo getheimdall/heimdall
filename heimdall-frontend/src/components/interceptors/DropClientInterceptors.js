@@ -65,7 +65,7 @@ class DropClientInterceptors extends Component {
 
         const style = {
             backgroundColor: backgroundColor,
-            padding: 20
+            padding: 10
         };
         return connectDropTarget(
             <div>
@@ -75,21 +75,11 @@ class DropClientInterceptors extends Component {
                     </Row>
                     {!this.props.interceptors && <Loading />}
                     {this.props.interceptors && this.props.interceptors.map((interceptor, index) => {
-                        let color
-                        if (interceptor.lifeCycle === 'API') {
-                            color = '#ffa613'
-                        } else if (interceptor.lifeCycle === 'PLAN') {
-                            color = '#c3cc93'
-                        } else if (interceptor.lifeCycle === 'RESOURCE') {
-                            color = '#8edce0'
-                        } else if (interceptor.lifeCycle === 'OPERATION') {
-                            color = '#607d8b'
-                        }
+
                         return <DnDInterceptor
                             key={index}
                             type={interceptor.type}
                             icon='code-o'
-                            color={color}
                             interceptor={interceptor}
                             order={interceptor.order ? interceptor.order : this.props.interceptors.length}
                             moveInterceptors={this.moveInterceptors}

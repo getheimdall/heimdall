@@ -246,6 +246,7 @@ export default {
         'min_4_characters_to_name': 'Min of 4 Characters to name!',
         'available_privileges': 'Available privileges',
         'attributed_privileges': 'Attributed privileges',
+        'default_plan_this_api': 'Default',
         'swagger-editor': 'Swagger Editor'
     }
 }

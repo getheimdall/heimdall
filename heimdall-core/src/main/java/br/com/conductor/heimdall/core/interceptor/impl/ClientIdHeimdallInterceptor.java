@@ -61,8 +61,6 @@ public class ClientIdHeimdallInterceptor implements HeimdallInterceptor {
     public HashMap<String, Object> buildParameters(Object objectCustom, HashMap<String, Object> parameters, Interceptor interceptor) {
 
         AccessTokenClientIdDTO accessTokenClientIdDTO = (AccessTokenClientIdDTO) objectCustom;
-        parameters.put("apiId", interceptor.getApi().getId());
-        parameters.put("name", accessTokenClientIdDTO.getName());
         parameters.put("location", accessTokenClientIdDTO.getLocation());
 
         return parameters;

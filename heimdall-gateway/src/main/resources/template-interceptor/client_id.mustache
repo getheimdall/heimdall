@@ -1,115 +1,82 @@
+/*-
+ * =========================LICENSE_START==================================
+ * heimdall-gateway
+ * ========================================================================
+ * Copyright (C) 2018 Conductor Tecnologia SA
+ * ========================================================================
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ==========================LICENSE_END===================================
+ */
 
-import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
-
-import java.util.*;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.util.DigestUtils;
-
-import com.google.common.collect.Sets;
-import com.netflix.zuul.context.RequestContext;
-
-import br.com.conductor.heimdall.gateway.filter.helper.*;
-import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.enums.Location;
 import br.com.conductor.heimdall.gateway.service.LifeCycleService;
 import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
-import br.com.conductor.heimdall.gateway.service.SecurityService;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import br.com.conductor.heimdall.gateway.service.ClientIdInterceptorService;
 import br.com.conductor.heimdall.core.util.BeanManager;
-import br.com.conductor.heimdall.core.util.ConstantsInterceptors;
-import br.com.conductor.heimdall.core.util.DigestUtils;
-import br.com.conductor.heimdall.middleware.spec.*;
-import br.com.twsoftware.alfred.object.Objeto;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class ClientIdInterceptor extends HeimdallFilter {
 
-     private static Set<String> pathsAllowed;
+    private static Set<Long> ignoredOperations;
+    private static Set<Long> ignoredResources;
+    private static Long referenceId;
+    private static Long apiId;
+    private static boolean status;
 
-     private static Set<String> pathsNotAllowed;
+    public ClientIdInterceptor() {
+        ignoredOperations = new HashSet<>();
+        {{#ignoredOperations}}
+        ignoredOperations.add({{.}});
+        {{/ignoredOperations}}
 
-     private SecurityService securityService;
+        ignoredResources = new HashSet<>();
+        {{#ignoredResources}}
+        ignoredResources.add({{.}});
+        {{/ignoredResources}}
 
-     private static String inboundURL;
+        referenceId = {{referenceId}};
+        apiId = {{apiId}};
+        status = {{interceptorStatus}};
+    }
 
-     private static String method;
+    @Override
+    public int filterOrder() {
+        return {{order}};
+    }
 
-     private static Long referenceId;
+    @Override
+    public String filterType() {
+        return "{{executionPoint}}";
+    }
 
-     private Helper helper;
-
-     public ClientIdInterceptor() {
-
-          method = "{{method}}";
-
-          pathsAllowed = Sets.newHashSet();
-     {{#pathsAllowed}}
-          pathsAllowed.add("{{.}}");
-     {{/pathsAllowed}}      
-
-          pathsNotAllowed = Sets.newHashSet();
-     {{#pathsNotAllowed}}
-          pathsNotAllowed.add("{{.}}");
-     {{/pathsNotAllowed}}           
-
-          inboundURL = "{{inboundURL}}";
-          
-          referenceId = {{referenceId}};
-     }
-
-     @Override
-     public int filterOrder() {
-
-          return {{order}};
-     }
-
-     @Override
-     public String filterType() {
-
-          return "{{executionPoint}}";
-     }
-
-     @Override
-     public boolean should() {
-
+    @Override
+    public boolean should() {
         LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
-        return lifeCycleService.validateClientId(RequestContext.getCurrentContext().getRequest(),
-                                                    getApiId(),
-                                                    Location.valueOf("{{location}}"),
-                                                    "{{name}}");
-     }
-     
-     @Override
-     public String getName() {
-     	return "{{name}}"
-     }
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredResources, ignoredOperations, status);
+    }
 
-     public Long getApiId() {
-          return {{apiId}};
-     }
+    @Override
+    public String getName() {
+        return "{{name}}"
+    }
 
-     @Override
-     public void execute() throws Throwable {
-			this.helper = (Helper) BeanManager.getBean(Helper.class);
-//          securityService = (SecurityService) BeanManager.getBean(SecurityService.class);
-//          RequestContext ctx = RequestContext.getCurrentContext();
-//          HttpServletRequest request = ctx.getRequest();
-//
-//          String clientId = null;
-//          Location location = Location.valueOf("{{location}}");
-//          String name = "{{name}}";
-//          if (Location.HEADER.equals(location)) {
-//
-//               clientId = helper.call().request().header().get(name);
-//          }else {
-//
-//               clientId = request.getParameter(name);
-//          }
-//
-//          securityService.validadeClientId(ctx, getApiId(), clientId);
-     }
-     
+    @Override
+    public void execute() throws Throwable {
+        ClientIdInterceptorService clientIdInterceptorService = (ClientIdInterceptorService) BeanManager.getBean(ClientIdInterceptorService.class);
+        clientIdInterceptorService.validate(apiId, Location.valueOf("{{location}}"));
+    }
+
 }
