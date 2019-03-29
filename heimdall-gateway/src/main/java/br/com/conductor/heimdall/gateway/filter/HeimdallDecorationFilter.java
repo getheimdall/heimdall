@@ -51,6 +51,7 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
+import br.com.conductor.heimdall.gateway.util.ConstantsContext;
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
@@ -287,6 +288,9 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                             Optional<Credential> first = credentials.stream().findFirst();
                             if (first.get().isCors()) {
                             	credential = first.get();
+                                ctx.put(ConstantsContext.CORS_FILTER_DEFAULT, false);
+                            } else {
+                                ctx.put(ConstantsContext.CORS_FILTER_DEFAULT, true);
                             }
                         }
 
