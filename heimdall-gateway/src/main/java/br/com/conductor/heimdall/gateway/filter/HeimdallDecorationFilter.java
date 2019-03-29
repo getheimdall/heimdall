@@ -319,7 +319,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
 
                             if (environment.isPresent()) {
                                 location = environment.get().getOutboundURL();
-                                ctx.put("environmentVariables", environment.get().getVariables());
+                                ctx.put(ENVIRONMENT_VARIABLES, environment.get().getVariables());
                             }
                         }
                         Route route = new Route(zuulRoute.getId(), requestURI, location, "", zuulRoute.getRetryable() != null ? zuulRoute.getRetryable() : false, zuulRoute.isCustomSensitiveHeaders() ? zuulRoute.getSensitiveHeaders() : null);
