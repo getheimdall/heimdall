@@ -52,7 +52,8 @@ class AppForm extends Component {
     }
 
     checkClientId = (rule, value, callback) => {
-        if (value !== value.trim()) {
+
+        if (value && value !== value.trim()) {
             callback(i18n.t('please_check_client_id_spacing'))
         }
         callback()
