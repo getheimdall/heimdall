@@ -21,14 +21,17 @@ package br.com.conductor.heimdall.gateway.filter;
  * ==========================LICENSE_END===================================
  */
 
+import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.service.CORSInterceptorService;
+import br.com.conductor.heimdall.gateway.trace.FilterDetail;
+import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.gateway.util.ConstantsContext;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -37,55 +40,65 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 /**
  * Api Interceptor without cors.
  *
- * @author marcos.filho
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 
 @Component
+@Slf4j
 public class CorsPostFilter extends ZuulFilter {
+
+    private static final int SEND_CORS_RESPONSE_FILTER_ORDER = 999;
 
     @Autowired
     private CORSInterceptorService corsInterceptorService;
 
-	private Map<String, String> cors;
+    private FilterDetail detail = new FilterDetail();
 
-	public CorsPostFilter() {
-		this.cors = new HashMap<>();
-		this.cors.put("Access-Control-Allow-Origin", "*");
-		this.cors.put("Access-Control-Allow-Credentials", "true");
-		this.cors.put("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, DELETE, OPTIONS");
-		this.cors.put("Access-Control-Allow-Headers", "origin, content-type, accept, authorization, x-requested-with, X-AUTH-TOKEN, access_token, client_id, device_id, credential");
-		this.cors.put("Access-Control-Max-Age", "3600");
-	}
-	
-	@Override
-	public boolean shouldFilter() {
-        return true;
+    @Override
+    public String filterType() {
+        return POST_TYPE;
     }
 
-	@Override
-	public Object run() {
-		RequestContext ctx = RequestContext.getCurrentContext();
+    @Override
+    public int filterOrder() {
+        return SEND_CORS_RESPONSE_FILTER_ORDER;
+    }
 
-        Map<String, String> corsByInterceptorMustache = (Map<String, String>) ctx.get(ConstantsContext.CORS_FILTER);
+    @Override
+    public boolean shouldFilter() {
+        RequestContext ctx = RequestContext.getCurrentContext();
 
-        if (Objects.nonNull(corsByInterceptorMustache)) {
-            corsInterceptorService.executeCorsPostFilter(corsByInterceptorMustache);
-        } else {
-            corsInterceptorService.executeCorsPostFilter(cors);
+        return Objects.nonNull(ctx.get(ConstantsContext.CORS_FILTER));
+    }
+
+    @Override
+    public Object run() {
+        long startTime = System.currentTimeMillis();
+
+        try {
+            process();
+            detail.setStatus(Constants.SUCCESS);
+        } catch (Exception e) {
+            detail.setStatus(Constants.FAILED);
+            log.error("Error during CORSPostFilter", e);
+        } finally {
+
+            long endTime = System.currentTimeMillis();
+            long duration = (endTime - startTime);
+
+            detail.setTimeInMillisRun(duration);
+            detail.setName(this.getClass().getSimpleName());
+            TraceContextHolder.getInstance().getActualTrace().addFilter(detail);
         }
 
-		return null;
-	}
+        return null;
+    }
 
-	@Override
-	public int filterOrder() {
-		return 101;
-	}
+    private void process() {
+        RequestContext requestContext = RequestContext.getCurrentContext();
 
-	@Override
-	public String filterType() {
-		return POST_TYPE;
-	}
+        Map<String, String> cors = (Map<String, String>) requestContext.get(ConstantsContext.CORS_FILTER);
+        corsInterceptorService.executeCorsPostFilter(cors);
+    }
 	
 }
