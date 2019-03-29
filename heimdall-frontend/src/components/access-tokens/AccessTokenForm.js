@@ -52,7 +52,7 @@ class AccessTokenForm extends Component {
     checkApp = (rule, value, callback) => {
         if (this.props.appSource.some(app => app.id === value)) {
             const app = this.props.appSource.filter(app => app.id === value)[0];
-            if (app.plans == undefined || app.plans.length == 0) {
+            if (app.plans === undefined || app.plans.length === 0) {
                 callback(i18n.t('app_plans_invalid'))
             }
             this.setState({...this.state, plans: app.plans})
