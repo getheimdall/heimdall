@@ -36,4 +36,4 @@ The documentation for Heimdall can be found at this repository's wiki.
 Heimdall received the [Relatório Bancário 2018](http://cantarinobrasileiro.com.br/) award for the best `Cloud Solution` in the Brazilian financial sector for 2018.
 
 ### Other
-Heimdall took part of QCon 2018 São Paulo. During that event we had a [[Challenge|QConSP 2018 Challenge]] ([[Português|Desafio QCon São Paulo 2018]]) for the attenders.
+Heimdall took part of QCon 2018 São Paulo. During that event we had a [QConSP 2018 Challenge](https://github.com/getheimdall/heimdall/wiki/QConSP-2018-Challenge) ([Português](https://github.com/getheimdall/heimdall/wiki/Desafio-QCon-S%C3%A3o-Paulo-2018)) for the attenders.
