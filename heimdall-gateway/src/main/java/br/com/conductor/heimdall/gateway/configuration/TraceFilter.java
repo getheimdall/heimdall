@@ -84,21 +84,12 @@ public class TraceFilter implements Filter {
 		try {
 
 			trace = TraceContextHolder.getInstance().init(prop.getTrace().isPrintAllTrace(), profile, request,
-					prop.getMongo().getEnabled(), prop.getLogstash().getEnabled(), buildProperties.getVersion());
+			prop.getMongo().getEnabled(), prop.getLogstash().getEnabled(), buildProperties.getVersion());
 			if (shouldDisableTrace(request)) {
 				trace.setShouldPrint(false);
 			}
 
-			if ("OPTIONS".equalsIgnoreCase(((HttpServletRequest) request).getMethod())) {
-				response.setHeader("Access-Control-Allow-Origin", "*");
-				response.setHeader("Access-Control-Allow-Credentials", "true");
-				response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, DELETE, OPTIONS");
-				response.setHeader("Access-Control-Allow-Headers", "origin, content-type, accept, authorization, x-requested-with, X-AUTH-TOKEN, access_token, client_id, device_id, credential");
-				response.setHeader("Access-Control-Max-Age", "3600");
-				response.setStatus(200);
-			} else {			
-				chain.doFilter(request, response);
-			}
+			chain.doFilter(request, response);
 
 		} catch (Exception e) {
 

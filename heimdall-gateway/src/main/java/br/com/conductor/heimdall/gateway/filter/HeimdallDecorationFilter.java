@@ -291,7 +291,9 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                         }
 
                         if (Objects.isNull(credential)) {
-                        	credential = credentials.stream().filter(o -> o.getMethod().equals(HttpMethod.ALL.name()) || method.equals(o.getMethod().toUpperCase())).findFirst().orElse(null);
+                        	credential = credentials.stream()
+                                    .filter(o -> o.getMethod().equals(HttpMethod.ALL.name()) || method.equals(o.getMethod().toUpperCase()))
+                                    .findFirst().orElse(null);
                         }
                     }
 

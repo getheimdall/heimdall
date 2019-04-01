@@ -162,9 +162,9 @@ public class InterceptorService {
 
         validateTemplate(interceptor.getType(), interceptor.getContent());
 
-//        if (TypeInterceptor.CORS.equals(interceptor.getType())) {
-//            validateFilterCors(interceptor);
-//        }
+        if (TypeInterceptor.CORS.equals(interceptor.getType())) {
+            validateFilterCors(interceptor);
+        }
 
         List<Long> ignoredResources = ignoredValidate(interceptorDTO.getIgnoredResources(), resourceRepository);
         HeimdallException.checkThrow(Objeto.notBlank(ignoredResources), INTERCEPTOR_IGNORED_INVALID, ignoredResources.toString());
@@ -180,11 +180,11 @@ public class InterceptorService {
 
         interceptor = interceptorRepository.save(interceptor);
 
-//        if (TypeInterceptor.CORS.equals(interceptor.getType())) {
-//            Api api = apiRepository.findOne(interceptor.getApi().getId());
-//            api.setCors(true);
-//            apiRepository.save(api);
-//        }
+        if (TypeInterceptor.CORS.equals(interceptor.getType())) {
+            Api api = apiRepository.findOne(interceptor.getApi().getId());
+            api.setCors(true);
+            apiRepository.save(api);
+        }
 
         if (TypeInterceptor.MIDDLEWARE.equals(interceptor.getType())) {
 
@@ -233,9 +233,9 @@ public class InterceptorService {
         HeimdallException.checkThrow(isBlank(interceptor), GLOBAL_RESOURCE_NOT_FOUND);
         interceptor = GenericConverter.mapperWithMapping(interceptorDTO, interceptor, new InterceptorMap());
 
-//        if (TypeInterceptor.CORS.equals(interceptor.getType())) {
-//            HeimdallException.checkThrow(interceptor.getLifeCycle() != InterceptorLifeCycle.API, ExceptionMessage.CORS_INTERCEPTOR_NOT_API_LIFE_CYCLE);
-//        }
+        if (TypeInterceptor.CORS.equals(interceptor.getType())) {
+            HeimdallException.checkThrow(interceptor.getLifeCycle() != InterceptorLifeCycle.API, ExceptionMessage.CORS_INTERCEPTOR_NOT_API_LIFE_CYCLE);
+        }
 
         interceptor = validateLifeCycle(interceptor);
 
@@ -278,12 +278,12 @@ public class InterceptorService {
             pathName = String.join("/", zuulFilterRoot, MIDDLEWARE_API_ROOT, api, fileName);
         }
 
-        interceptorRepository.delete(interceptor);
+        if (TypeInterceptor.CORS.equals(interceptor.getType())) {
+            interceptor.getApi().setCors(false);
+            apiRepository.save(interceptor.getApi());
+        }
 
-//        if (TypeInterceptor.CORS.equals(interceptor.getType())) {
-//            interceptor.getApi().setCors(false);
-//            apiRepository.save(interceptor.getApi());
-//        }
+        interceptorRepository.delete(interceptor);
 
         amqpInterceptorService.dispatchRemoveInterceptors(new InterceptorFileDTO(interceptor.getId(), pathName));
     }

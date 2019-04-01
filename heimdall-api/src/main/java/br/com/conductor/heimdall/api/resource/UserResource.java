@@ -24,12 +24,15 @@ package br.com.conductor.heimdall.api.resource;
 import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_USERS;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
 import br.com.conductor.heimdall.api.dto.UserEditDTO;
+import br.com.conductor.heimdall.api.dto.UserPasswordDTO;
+import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -59,6 +62,7 @@ import io.swagger.annotations.ApiOperation;
  * Uses a {@link UserService} to provide methods to create, read, update and delete a {@link User}.
  *
  * @author Marcos Filho
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
 @io.swagger.annotations.Api(value = PATH_USERS, produces = MediaType.APPLICATION_JSON_VALUE, tags = { ConstantsTag.TAG_USERS })
@@ -152,7 +156,24 @@ public class UserResource {
 
           return ResponseEntity.ok(user);
      }
-     
+
+     /**
+      * Updates a password of the {@link User}.
+      *
+      * @param principal           {@link Principal}
+      * @param userPasswordDTO     {@link UserPasswordDTO}
+      * @return                    {@link ResponseEntity}
+      */
+     @ResponseBody
+     @ApiOperation(value = "Update password of the User")
+     @PutMapping(value = "/password")
+     public ResponseEntity<?> updatePassword(@ApiParam(hidden = true) Principal principal, @RequestBody @Valid UserPasswordDTO userPasswordDTO) {
+
+          userService.updatePassword(principal, userPasswordDTO.getCurrentPassword(), userPasswordDTO.getNewPassword(), userPasswordDTO.getConfirmNewPassword());
+
+          return ResponseEntity.ok().build();
+     }
+
      /**
       * Deletes a {@link User}.
       * 

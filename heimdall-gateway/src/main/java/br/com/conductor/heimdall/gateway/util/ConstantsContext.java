@@ -31,6 +31,7 @@ public final class ConstantsContext {
     public static final String PATTERN = "pattern";
     public static final String SCOPES = "scopes";
     public static final String CORS_FILTER = "run-cors-post-filter";
+    public static final String CORS_FILTER_DEFAULT = "run-cors-filter-default";
 
     public static final String CLIENT_ID = "client_id";
     public static final String ACCESS_TOKEN = "access_token";
