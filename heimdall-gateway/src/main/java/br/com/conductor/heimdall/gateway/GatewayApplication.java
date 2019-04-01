@@ -51,7 +51,6 @@ import br.com.conductor.heimdall.core.util.RabbitQueueUtils;
 @EntityScan("br.com.conductor.heimdall.core.entity")
 @EnableJpaRepositories("br.com.conductor.heimdall.core.repository")
 @EnableCaching
-@EnableScheduling
 public class GatewayApplication extends SpringBootServletInitializer  {
      
      public static void main(String[] args) {
