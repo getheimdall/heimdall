@@ -31,13 +31,12 @@ import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
 import br.com.conductor.heimdall.core.environment.Property;
 import br.com.conductor.heimdall.core.util.RabbitQueueUtils;
 
 /**
- * This is the main Heimdall Gateway Application class. <br/>
+ * This is the main Heimdall Gateway Application class. <br>
  * Heimdall Gateway is a SpringBoot based application that uses RabbitMQ as a message broker
  * This class starts the RabbitQueue then runs the Gateway Application as a SpringBoot application.
  *
