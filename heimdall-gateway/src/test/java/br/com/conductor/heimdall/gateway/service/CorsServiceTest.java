@@ -21,7 +21,6 @@ package br.com.conductor.heimdall.gateway.service;
  */
 
 import br.com.conductor.heimdall.core.enums.HttpMethod;
-import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.util.ConstantsContext;
 import com.netflix.util.Pair;
 import com.netflix.zuul.context.RequestContext;
