@@ -29,7 +29,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -48,6 +47,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import br.com.conductor.heimdall.core.enums.Status;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 /**
  *  The Access Token is required for a safe connection to be established.
@@ -84,7 +85,8 @@ public class AccessToken implements Serializable {
      @Column(name = "CREATION_DATE", nullable = false)
      private LocalDateTime creationDate;
      
-     @ManyToMany(fetch = FetchType.EAGER)
+     @ManyToMany
+     @LazyCollection(LazyCollectionOption.FALSE)
      @JoinTable(name = "ACCESS_TOKENS_PLANS", 
           joinColumns = @JoinColumn(name = "ACCESS_TOKEN_ID", referencedColumnName = "ID"), 
           inverseJoinColumns = @JoinColumn(name = "PLAN_ID", referencedColumnName = "ID"))

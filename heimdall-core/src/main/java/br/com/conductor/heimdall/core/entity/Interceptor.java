@@ -23,9 +23,7 @@ package br.com.conductor.heimdall.core.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -38,8 +36,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.PostLoad;
 import javax.persistence.PrePersist;
@@ -48,8 +44,6 @@ import javax.persistence.Transient;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -110,25 +104,11 @@ public class Interceptor implements Serializable {
      
      @Column(name = "CREATION_DATE", nullable = false)
      private LocalDateTime creationDate;
-     
-//     @ManyToMany
-//     @LazyCollection(LazyCollectionOption.FALSE)
-//     @JoinTable(name = "IGNORED_INTERCEPTORS_RESOURCES",
-//     joinColumns = @JoinColumn(name = "INTERCEPTOR_ID", referencedColumnName = "ID"),
-//     inverseJoinColumns = @JoinColumn(name = "RESOURCE_ID", referencedColumnName = "ID"))
-//     private List<Resource> ignoredResources;
 
      @ElementCollection(fetch=FetchType.EAGER)
      @CollectionTable(name="IGNORED_INTERCEPTORS_RESOURCES", joinColumns = @JoinColumn(name = "INTERCEPTOR_ID", referencedColumnName = "ID"))
      @Column(name="RESOURCE_ID")
      private Set<Long> ignoredResources;
-
-//     @ManyToMany
-//     @LazyCollection(LazyCollectionOption.FALSE)
-//     @JoinTable(name = "IGNORED_INTERCEPTORS_OPERATIONS",
-//          joinColumns = @JoinColumn(name = "INTERCEPTOR_ID", referencedColumnName = "ID"),
-//          inverseJoinColumns = @JoinColumn(name = "OPERATION_ID", referencedColumnName = "ID"))
-//     private List<Operation> ignoredOperations;
 
      @ElementCollection(fetch=FetchType.EAGER)
      @CollectionTable(name="IGNORED_INTERCEPTORS_OPERATIONS", joinColumns = @JoinColumn(name = "INTERCEPTOR_ID", referencedColumnName = "ID"))
@@ -136,17 +116,17 @@ public class Interceptor implements Serializable {
      private Set<Long> ignoredOperations;
      
      @JsonIgnore
-     @ManyToOne(fetch = FetchType.LAZY)
+     @ManyToOne(fetch = FetchType.EAGER)
      @JoinColumn(name = "PLAN_ID")
      private Plan plan;
 
      @JsonIgnore
-     @ManyToOne(fetch = FetchType.LAZY)
+     @ManyToOne(fetch = FetchType.EAGER)
      @JoinColumn(name = "RESOURCE_ID")
      private Resource resource;
 
      @JsonIgnore
-     @ManyToOne(fetch = FetchType.LAZY)
+     @ManyToOne(fetch = FetchType.EAGER)
      @JoinColumn(name = "OPERATION_ID")
      private Operation operation;
 
@@ -209,12 +189,4 @@ public class Interceptor implements Serializable {
           }
      }
 
-//     public Set<Long> getIgnoredResourcesIds() {
-//          return ignoredResources.stream().map(Resource::getId).collect(Collectors.toSet());
-//     }
-//
-//     public Set<Long> getIgnoredOperationsIds() {
-//          return ignoredOperations.stream().map(Operation::getId).collect(Collectors.toSet());
-//     }
-     
 }
