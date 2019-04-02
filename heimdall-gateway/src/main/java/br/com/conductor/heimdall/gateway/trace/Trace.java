@@ -259,6 +259,8 @@ public class Trace {
       */
      private void prepareLog(Integer statusCode) throws JsonProcessingException {
 
+          String url = Objects.nonNull(getUrl()) ? getUrl() : "";
+
           if (printAllTrace) {
 
                if (isInfo(statusCode)) {
@@ -270,6 +272,17 @@ public class Trace {
                } else {
 
                     log.error(" [HEIMDALL-TRACE] - {} ", new ObjectMapper().writeValueAsString(this));
+               }
+          } else {
+               if (isInfo(statusCode)) {
+
+                    log.info(append("call", this), " [HEIMDALL-TRACE] - " + url);
+               } else if (isWarn(statusCode)) {
+
+                    log.warn(append("call", this), " [HEIMDALL-TRACE] - " + url);
+               } else {
+
+                    log.error(append("call", this), " [HEIMDALL-TRACE] - " + url);
                }
           }
 
@@ -284,20 +297,14 @@ public class Trace {
 
      private void printInLogger(Logger logger, Integer statusCode) throws JsonProcessingException {
 
-          String url = Objects.nonNull(getUrl()) ? getUrl() : "";
-
           if (isInfo(statusCode)) {
-
-               log.info(append("call", this), " [HEIMDALL-TRACE] - " + url);
 
                logger.info(new ObjectMapper().writeValueAsString(this));
           } else if (isWarn(statusCode)) {
 
-               log.warn(append("call", this), " [HEIMDALL-TRACE] - " + url);
                logger.warn(new ObjectMapper().writeValueAsString(this));
           } else {
 
-               log.error(append("call", this), " [HEIMDALL-TRACE] - " + url);
                logger.error(new ObjectMapper().writeValueAsString(this));
           }
      }
