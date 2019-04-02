@@ -40,6 +40,9 @@ class NavBar extends Component {
             case 'logout':
                 this.props.logout()
                 break;
+            case 'heimdall:1':
+                this.props.history.push('/users/change-password')
+                break;
             case 'heimdall:2':
                 this.props.initLoading()
                 this.props.clearCaches()
@@ -85,7 +88,10 @@ class NavBar extends Component {
                             }
                         </SubMenu>
                         <SubMenu title={<span><Icon type="user" /> {this.props.user.username} </span>}>
-                            {/* <Menu.Item key="heimdall:1">Edit profile</Menu.Item> */}
+                            {
+                                PrivilegeUtils.verifyTypeUser('DATABASE')
+                                && <Menu.Item key="heimdall:1">{t('change_password')}</Menu.Item>
+                            }
                             <Menu.Item key="logout">{t('sign_out')}</Menu.Item>
                         </SubMenu>
                     </Menu>

@@ -170,6 +170,31 @@ public class ResourceService {
      }
 
      /**
+      * Saves a {@link Resource} to the repository.
+      *
+      * @param 	apiId						The {@link Api} Id
+      * @param 	resource					The {@link Resource}
+      * @return								The saved {@link Resource}
+      * @throws NotFoundException			Resource not found
+      * @throws BadRequestException			Only one resource per api
+      */
+     public Resource save(Long apiId, Resource resource) {
+
+          Api api = apiRepository.findOne(apiId);
+          HeimdallException.checkThrow(isBlank(api), GLOBAL_RESOURCE_NOT_FOUND);
+
+          Resource resData = resourceRepository.findByApiIdAndName(apiId, resource.getName());
+          HeimdallException.checkThrow(notBlank(resData) && (resData.getApi().getId() == api.getId()), ONLY_ONE_RESOURCE_PER_API);
+          resource.setApi(api);
+
+          resource = resourceRepository.save(resource);
+
+          amqpRoute.dispatchRoutes();
+
+          return resource;
+     }
+
+     /**
       * Updates a {@link Resource} by its Id and {@link Api} Id
       * 
       * @param 	apiId						The {@link Api} Id

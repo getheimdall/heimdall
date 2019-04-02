@@ -27,7 +27,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -109,25 +111,30 @@ public class Interceptor implements Serializable {
      @Column(name = "CREATION_DATE", nullable = false)
      private LocalDateTime creationDate;
      
-     @ManyToMany
-     @LazyCollection(LazyCollectionOption.FALSE)
-     @JoinTable(name = "IGNORED_INTERCEPTORS_RESOURCES", 
-     joinColumns = @JoinColumn(name = "INTERCEPTOR_ID", referencedColumnName = "ID"), 
-     inverseJoinColumns = @JoinColumn(name = "RESOURCE_ID", referencedColumnName = "ID"))
-     private List<Resource> ignoredResources;
+//     @ManyToMany
+//     @LazyCollection(LazyCollectionOption.FALSE)
+//     @JoinTable(name = "IGNORED_INTERCEPTORS_RESOURCES",
+//     joinColumns = @JoinColumn(name = "INTERCEPTOR_ID", referencedColumnName = "ID"),
+//     inverseJoinColumns = @JoinColumn(name = "RESOURCE_ID", referencedColumnName = "ID"))
+//     private List<Resource> ignoredResources;
 
-     @ManyToMany
-     @LazyCollection(LazyCollectionOption.FALSE)
-     @JoinTable(name = "IGNORED_INTERCEPTORS_OPERATIONS", 
-          joinColumns = @JoinColumn(name = "INTERCEPTOR_ID", referencedColumnName = "ID"), 
-          inverseJoinColumns = @JoinColumn(name = "OPERATION_ID", referencedColumnName = "ID"))
-     private List<Operation> ignoredOperations;
+     @ElementCollection(fetch=FetchType.EAGER)
+     @CollectionTable(name="IGNORED_INTERCEPTORS_RESOURCES", joinColumns = @JoinColumn(name = "INTERCEPTOR_ID", referencedColumnName = "ID"))
+     @Column(name="RESOURCE_ID")
+     private Set<Long> ignoredResources;
 
-     @ManyToOne(fetch = FetchType.LAZY)
-     @JoinColumn(name = "API_ID")
-     @JsonIgnore
-     private Api api;
+//     @ManyToMany
+//     @LazyCollection(LazyCollectionOption.FALSE)
+//     @JoinTable(name = "IGNORED_INTERCEPTORS_OPERATIONS",
+//          joinColumns = @JoinColumn(name = "INTERCEPTOR_ID", referencedColumnName = "ID"),
+//          inverseJoinColumns = @JoinColumn(name = "OPERATION_ID", referencedColumnName = "ID"))
+//     private List<Operation> ignoredOperations;
 
+     @ElementCollection(fetch=FetchType.EAGER)
+     @CollectionTable(name="IGNORED_INTERCEPTORS_OPERATIONS", joinColumns = @JoinColumn(name = "INTERCEPTOR_ID", referencedColumnName = "ID"))
+     @Column(name="OPERATION_ID")
+     private Set<Long> ignoredOperations;
+     
      @JsonIgnore
      @ManyToOne(fetch = FetchType.LAZY)
      @JoinColumn(name = "PLAN_ID")
@@ -145,6 +152,11 @@ public class Interceptor implements Serializable {
 
      @Transient
      private Long referenceId;
+     
+     @ManyToOne(fetch = FetchType.EAGER)
+     @JoinColumn(name = "API_ID")
+     @JsonIgnore
+     private Api api;
 
      @Column(name = "STATUS", nullable = false)
      private Boolean status;
@@ -197,12 +209,12 @@ public class Interceptor implements Serializable {
           }
      }
 
-     public Set<Long> getIgnoredResourcesIds() {
-          return ignoredResources.stream().map(Resource::getId).collect(Collectors.toSet());
-     }
-
-     public Set<Long> getIgnoredOperationsIds() {
-          return ignoredOperations.stream().map(Operation::getId).collect(Collectors.toSet());
-     }
+//     public Set<Long> getIgnoredResourcesIds() {
+//          return ignoredResources.stream().map(Resource::getId).collect(Collectors.toSet());
+//     }
+//
+//     public Set<Long> getIgnoredOperationsIds() {
+//          return ignoredOperations.stream().map(Operation::getId).collect(Collectors.toSet());
+//     }
      
 }

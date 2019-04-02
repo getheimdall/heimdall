@@ -68,7 +68,7 @@ public class Resource implements Serializable {
      @JoinColumn(name = "API_ID", nullable = false)
      private Api api;
 
-     @OneToMany(fetch = FetchType.EAGER, cascade = { CascadeType.REMOVE }, orphanRemoval = true, mappedBy = "resource")
+     @OneToMany(fetch = FetchType.EAGER, cascade = { CascadeType.REMOVE, CascadeType.MERGE }, orphanRemoval = true, mappedBy = "resource")
      @JsonBackReference
      private List<Operation> operations;
 
