@@ -150,8 +150,8 @@ public class HttpImpl implements Http {
     public ApiResponseImpl sendGet() {
 
         setUIDFromInterceptor();
-        ResponseEntity<String> entity;
         String url = "GET:" + uriComponentsBuilder.build().encode().toUri().toString();
+        ResponseEntity<String> entity;
 
         updateQueryParams();
         if (headers.isEmpty()) {
@@ -175,8 +175,8 @@ public class HttpImpl implements Http {
     public ApiResponseImpl sendPost() {
 
         setUIDFromInterceptor();
-        ResponseEntity<String> entity;
         String url = "POST:" + uriComponentsBuilder.build().encode().toUri().toString();
+        ResponseEntity<String> entity;
 
         updateQueryParams();
         if (headers.isEmpty()) {
@@ -214,8 +214,8 @@ public class HttpImpl implements Http {
     public ApiResponseImpl sendPut() {
 
         setUIDFromInterceptor();
-        ResponseEntity<String> entity;
         String url = "PUT:" + uriComponentsBuilder.build().encode().toUri().toString();
+        ResponseEntity<String> entity;
 
         updateQueryParams();
         if (headers.isEmpty()) {
