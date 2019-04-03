@@ -56,7 +56,7 @@ public class CircuitBreakerManager {
 	private static final ConcurrentHashMap<String, CircuitBreakerHolder> middlewareCircuits = new ConcurrentHashMap<>();
 
 	public <T> T failsafe(Callable<T> callable, Long operationId, String operationPath) {
-		CircuitBreakerHolder circuitBreakerHolder = getCircuitHolder(operationId);
+		CircuitBreakerHolder circuitBreakerHolder = getCircuitHolder(operationId, circuits);
 		CircuitBreaker circuitBreaker = circuitBreakerHolder.getCircuitBreaker();
 		
 		if (circuitBreaker.isOpen()) {
@@ -82,7 +82,7 @@ public class CircuitBreakerManager {
 	}
 
 	public <T> T failsafe(Callable<T> callable, String url) {
-		CircuitBreakerHolder circuitBreakerHolder = getCircuitHolder(url);
+		CircuitBreakerHolder circuitBreakerHolder = getCircuitHolder(url, middlewareCircuits);
 		CircuitBreaker circuitBreaker = circuitBreakerHolder.getCircuitBreaker();
 
 		if (circuitBreaker.isOpen()) {
@@ -105,23 +105,7 @@ public class CircuitBreakerManager {
 				.get(callable);
 	}
 
-	/*
-	 * Retrieves a CircuitBreaker for the HTTP requests
-	 */
-	private CircuitBreakerHolder getCircuitHolder(Long operationId) {
-
-		return getHolder(operationId, circuits);
-	}
-
-	/*
-	 * Retrieves a CircuitBreaker for the middleware requests
-	 */
-	private CircuitBreakerHolder getCircuitHolder(String url) {
-
-		return getHolder(url, middlewareCircuits);
-	}
-
-	private <T> CircuitBreakerHolder getHolder(T key, ConcurrentHashMap<T, CircuitBreakerHolder> concurrentHashMap) {
+	private <T> CircuitBreakerHolder getCircuitHolder(T key, ConcurrentHashMap<T, CircuitBreakerHolder> concurrentHashMap) {
 
 		CircuitBreakerHolder breakerHolder = concurrentHashMap.get(key);
 
