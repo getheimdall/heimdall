@@ -18,18 +18,35 @@
  * ==========================LICENSE_END===================================
  */
 
-package br.com.conductor.heimdall.api.repository;
+package br.com.conductor.heimdall.api.dto;
 
-import br.com.conductor.heimdall.api.entity.Ldap;
-import br.com.conductor.heimdall.core.enums.Status;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
 
 /**
- * LDAP Repository.
+ * Data transference object class that represents updates in password to a Heimdall User.
  *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
-public interface LdapRepository extends JpaRepository<Ldap, Long> {
+@Data
+public class UserPasswordDTO implements Serializable {
 
-    Ldap findByStatus(Status status);
+    @NotNull
+    @Size(min = 5, max = 16)
+    @JsonProperty("current_password")
+    private String currentPassword;
+
+    @NotNull
+    @Size(min = 5, max = 16)
+    @JsonProperty("new_password")
+    private String newPassword;
+
+    @NotNull
+    @Size(min = 5, max = 16)
+    @JsonProperty("confirm_new_password")
+    private String confirmNewPassword;
 }

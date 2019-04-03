@@ -69,11 +69,14 @@ public class HttpImpl implements Http {
 
     private boolean enableHandler;
 
+    private MultiValueMap<String, String> queryParams;
+
     private CircuitBreakerManager circuitBreakerManager;
 
     public HttpImpl(boolean enableHandler, CircuitBreakerManager circuitBreakerManager) {
         this.enableHandler = enableHandler;
         this.circuitBreakerManager = circuitBreakerManager;
+        this.queryParams = new LinkedMultiValueMap<>();
     }
 
     @Override
@@ -110,8 +113,7 @@ public class HttpImpl implements Http {
     public HttpImpl queryParam(String name, String value) {
 
         if (Objects.nonNull(value)) {
-
-            uriComponentsBuilder.queryParam(name, value);
+            queryParams.add(name, value);
         }
 
         return this;
@@ -151,6 +153,7 @@ public class HttpImpl implements Http {
         ResponseEntity<String> entity;
         String url = "GET:" + uriComponentsBuilder.build().encode().toUri().toString();
 
+        updateQueryParams();
         if (headers.isEmpty()) {
 
             entity = circuitBreakerManager.failsafe(
@@ -174,6 +177,8 @@ public class HttpImpl implements Http {
         setUIDFromInterceptor();
         ResponseEntity<String> entity;
         String url = "POST:" + uriComponentsBuilder.build().encode().toUri().toString();
+
+        updateQueryParams();
         if (headers.isEmpty()) {
 
             requestBody = new HttpEntity<>(body);
@@ -211,6 +216,8 @@ public class HttpImpl implements Http {
         setUIDFromInterceptor();
         ResponseEntity<String> entity;
         String url = "PUT:" + uriComponentsBuilder.build().encode().toUri().toString();
+
+        updateQueryParams();
         if (headers.isEmpty()) {
 
             requestBody = new HttpEntity<>(body);
@@ -247,6 +254,7 @@ public class HttpImpl implements Http {
         String url = "DELETE:" + uriComponentsBuilder.build().encode().toUri().toString();
         ResponseEntity<String> entity;
 
+        updateQueryParams();
         if (headers.isEmpty()) {
             entity = circuitBreakerManager.failsafe(
                     () -> rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.DELETE, null, String.class),
@@ -269,6 +277,7 @@ public class HttpImpl implements Http {
         String url = "PATCH:" + uriComponentsBuilder.build().encode().toUri().toString();
         ResponseEntity<String> entity;
 
+        updateQueryParams();
         if (headers.isEmpty()) {
             requestBody = new HttpEntity<>(body);
             entity = circuitBreakerManager.failsafe(
@@ -320,6 +329,12 @@ public class HttpImpl implements Http {
 
         if (context.getZuulRequestHeaders().get(IDENTIFIER_ID) != null) {
             headers.add(IDENTIFIER_ID, context.getZuulRequestHeaders().get(IDENTIFIER_ID));
+        }
+    }
+
+    private void updateQueryParams() {
+        if (uriComponentsBuilder != null && queryParams != null && !queryParams.isEmpty()) {
+            uriComponentsBuilder.queryParams(queryParams);
         }
     }
 

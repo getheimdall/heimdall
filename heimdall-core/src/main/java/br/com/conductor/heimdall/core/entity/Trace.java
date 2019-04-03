@@ -53,4 +53,6 @@ public class Trace {
 
     private String profile;
 
+    private Boolean cache;
+
 }

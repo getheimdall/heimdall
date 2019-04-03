@@ -20,10 +20,12 @@ package br.com.conductor.heimdall.api.service;
  * ==========================LICENSE_END===================================
  */
 
+import br.com.conductor.heimdall.api.dto.UserAuthenticateResponse;
 import br.com.conductor.heimdall.api.entity.Ldap;
 import br.com.conductor.heimdall.api.entity.Role;
 import br.com.conductor.heimdall.api.entity.User;
 import br.com.conductor.heimdall.api.enums.CredentialStateEnum;
+import br.com.conductor.heimdall.api.enums.TypeUser;
 import br.com.conductor.heimdall.api.environment.JwtProperty;
 import br.com.conductor.heimdall.api.security.AccountCredentials;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
@@ -34,7 +36,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -55,6 +58,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+import org.springframework.security.core.AuthenticationException;
 
 /**
  * Data class that holds tha JTW properties.
@@ -70,6 +74,9 @@ public class TokenAuthenticationService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private PrivilegeService privilegeService;
 
     @Autowired
     private CredentialStateService credentialStateService;
@@ -90,24 +97,26 @@ public class TokenAuthenticationService {
 
     private static final String HEIMDALL_AUTHORIZATION_NAME = "Authorization";
 
-    public void login(AccountCredentials accountCredentials, HttpServletResponse response) {
+    public UserAuthenticateResponse login(AccountCredentials accountCredentials, HttpServletResponse response) {
         UsernamePasswordAuthenticationToken userFound = new UsernamePasswordAuthenticationToken(
                 accountCredentials.getUsername(),
                 accountCredentials.getPassword(),
                 Collections.emptyList());
         Authentication authenticate = null;
+        UserAuthenticateResponse userAuthenticateResponse = new UserAuthenticateResponse();
+        userAuthenticateResponse.setUsername(accountCredentials.getUsername());
         try {
             authenticate = authenticationManager.authenticate(userFound);
-        } catch (Exception ex) {
-            log.error(ex.getMessage(), ex);
-
+            userAuthenticateResponse.setType(TypeUser.DATABASE);
+        } catch (AuthenticationException ex) {
             Ldap ldapActive = ldapService.getLdapActive();
 
             if (Objects.nonNull(ldapActive)){
                 try {
                     authenticateManagerBuilder.authenticationProvider(ldapProvider(ldapActive));
                     authenticate = ldapProvider(ldapActive).authenticate(userFound);
-                } catch (Exception exception) {
+                    userAuthenticateResponse.setType(TypeUser.LDAP);
+                } catch (AuthenticationException exception) {
                     log.error(exception.getMessage(), exception);
                 }
             }
@@ -116,14 +125,12 @@ public class TokenAuthenticationService {
         if (Objects.nonNull(authenticate)){
             addAuthentication(response, accountCredentials.getUsername(), null);
             response.setStatus(200);
-            try {
-                response.getWriter().write("{ \"Login with success!\" }");
-            } catch (IOException e) {
-                log.error(e.getMessage(), e);
-            }
-        } else {
-            HeimdallException.checkThrow(true, ExceptionMessage.USERNAME_OR_PASSWORD_INCORRECT);
+            userAuthenticateResponse.setPrivileges(privilegeService.list(accountCredentials.getUsername()));
+            return userAuthenticateResponse;
         }
+
+        HeimdallException.checkThrow(true, ExceptionMessage.USERNAME_OR_PASSWORD_INCORRECT);
+        return userAuthenticateResponse;
     }
 
     private void addAuthentication(HttpServletResponse response, String username, String jti) {
@@ -156,7 +163,6 @@ public class TokenAuthenticationService {
 
         if (token != null && !token.isEmpty()) {
             token = token.replace(TOKEN_PREFIX, "");
-            // faz parse do token
             try {
                 Claims claims = Jwts.parser()
                         .setSigningKey(jwtProperty.getSecret())
@@ -165,16 +171,21 @@ public class TokenAuthenticationService {
                 String user = claims.getSubject();
 
                 if (user != null) {
-                    if (!credentialStateService.verifyIfTokenIsRevokeOrLogout(claims.getId())) {
+                    if (credentialStateService.isLogged(claims.getId())) {
                         User userFound = userService.findByUsername(user);
                         addAuthentication(response, user, claims.getId());
                         return new UsernamePasswordAuthenticationToken(userFound.getUserName(), userFound.getPassword(), getAuthoritiesByRoles(userFound.getRoles()));
                     }
-                    return null;
                 }
             } catch (ExpiredJwtException ex) {
                 credentialStateService.logout(token);
-                ExceptionMessage.TOKEN_EXPIRED.raise();
+                response.setStatus(HttpStatus.FORBIDDEN.value());
+                response.addHeader(HttpHeaders.CONTENT_TYPE, "application/json");
+                try {
+                    response.getWriter().write("{ \"error\": \"Token expired\" }");
+                } catch (IOException e) {
+                    log.error(e.getMessage(), e);
+                }
             }
         }
 
@@ -184,9 +195,7 @@ public class TokenAuthenticationService {
     private Collection<? extends GrantedAuthority> getAuthoritiesByRoles(Set<Role> roles) {
         Set<GrantedAuthority> authorities = new HashSet<>();
 
-        roles.forEach(role -> {
-            role.getPrivileges().forEach(privilege -> authorities.add(new SimpleGrantedAuthority(privilege.getName())));
-        });
+        roles.forEach(role -> role.getPrivileges().forEach(privilege -> authorities.add(new SimpleGrantedAuthority(privilege.getName()))));
 
         return authorities;
     }
