@@ -22,7 +22,9 @@ package br.com.conductor.heimdall.core.entity;
  */
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -44,8 +46,6 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-//import com.google.common.collect.Lists;
-import com.google.common.collect.Lists;
 
 import br.com.twsoftware.alfred.object.Objeto;
 import lombok.AllArgsConstructor;
@@ -103,8 +103,7 @@ public class Resource implements Serializable {
 
           if (Objeto.notBlank(tag)) {
 
-               tags = Lists.newArrayList(tag.split(";"));
-               // tags = Arrays.asList(tag.split(";"));
+               tags = Arrays.stream(tag.split(";")).collect(Collectors.toList());
           }
      }
 

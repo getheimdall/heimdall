@@ -24,8 +24,7 @@ package br.com.conductor.heimdall.core.service;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import br.com.conductor.heimdall.core.converter.AppPersistMap;
 import br.com.conductor.heimdall.core.dto.persist.AppPersist;
@@ -36,8 +35,6 @@ import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.google.common.collect.Lists;
 
 import br.com.conductor.heimdall.core.converter.AppMap;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
@@ -245,7 +242,7 @@ public class AppService {
 
                Plan plan = planRepository.findOne(1L);
                if (Objeto.notBlank(plan)) {
-                    app.setPlans(Lists.newArrayList(plan));
+                    app.setPlans(new ArrayList<>(Collections.singletonList(plan)));
                }
           }
 

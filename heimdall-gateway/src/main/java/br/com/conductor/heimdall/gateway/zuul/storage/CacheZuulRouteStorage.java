@@ -21,14 +21,14 @@ package br.com.conductor.heimdall.gateway.zuul.storage;
  * ==========================LICENSE_END===================================
  */
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties.ZuulRoute;
-
-import com.google.common.collect.Sets;
 
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Operation;
@@ -113,7 +113,7 @@ public class CacheZuulRouteStorage implements ZuulRouteStorage {
                                    
                                    route = new ZuulRoute(resource.getApi().getBasePath() + operation.getPath(), destination);
                                    route.setStripPrefix(false);
-                                   route.setSensitiveHeaders(Sets.newConcurrentHashSet());
+                                   route.setSensitiveHeaders(Collections.newSetFromMap(new ConcurrentHashMap<>()));
                                    routes.add(route);
                               }
                          }

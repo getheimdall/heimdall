@@ -27,7 +27,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -40,7 +39,9 @@ import org.hibernate.annotations.LazyCollectionOption;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class represents a App registered to the system.
@@ -121,8 +122,7 @@ public class App implements Serializable {
 
         if (Objeto.notBlank(tag)) {
 
-            tags = Lists.newArrayList(tag.split(";"));
-//               tags = Arrays.asList(tag.split(";"));
+            tags = Arrays.stream(tag.split(";")).collect(Collectors.toList());
         }
     }
 

@@ -27,11 +27,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.GZIPInputStream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -42,8 +39,6 @@ import javax.servlet.http.HttpServletResponseWrapper;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.netflix.zuul.context.RequestContext;
 
 import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
@@ -104,7 +99,7 @@ public class CallImpl implements Call {
                     HttpServletRequest r = context.getRequest();
                     List<String> names = Collections.list(r.getHeaderNames());
                     
-                    Map<String, String> headers = Maps.newHashMap();
+                    Map<String, String> headers = new HashMap<>();
                     names.forEach(name -> {
                          
                          if (Objeto.notBlank(r.getHeader(name))) {
@@ -187,7 +182,7 @@ public class CallImpl implements Call {
                     HttpServletRequest r = context.getRequest();
                     List<String> names = Collections.list(r.getParameterNames());
                     
-                    Map<String, String> params = Maps.newHashMap();
+                    Map<String, String> params = new HashMap<>();
                     names.forEach(name -> {
                          if (Objeto.notBlank(r.getParameter(name))) {
                               params.put(name, r.getParameter(name));
@@ -222,7 +217,7 @@ public class CallImpl implements Call {
 
                          if (Objeto.isBlank(params)) {
 
-                              params = Maps.newConcurrentMap();
+                              params = new ConcurrentHashMap<>();
                          }
                          params.put(name, Arrays.asList(value));
                          context.setRequestQueryParams(params);
@@ -377,9 +372,9 @@ public class CallImpl implements Call {
                public Map<String, String> getAll() {
 
                     HttpServletResponse r = context.getResponse();
-                    List<String> names = Lists.newArrayList(r.getHeaderNames());
+                    List<String> names = new ArrayList<>(r.getHeaderNames());
                     
-                    Map<String, String> headers = Maps.newHashMap();
+                    Map<String, String> headers = new HashMap<>();
                     names.forEach(name -> {
                          
                          if (Objeto.notBlank(r.getHeader(name))) {

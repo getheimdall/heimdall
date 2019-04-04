@@ -7,10 +7,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.REQUEST_URI_KEY;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.assertj.core.util.Lists;
@@ -27,7 +25,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import com.google.common.collect.Sets;
 import com.netflix.zuul.context.RequestContext;
 
 import br.com.conductor.heimdall.core.entity.Environment;
@@ -92,7 +89,7 @@ public class HeimdallDecorationFilterTest {
         this.request.setRequestURI("/v2/api/foo/1");
         this.request.setMethod(HttpMethod.GET.name());
         Map<String, ZuulRoute> routes = new LinkedHashMap<>();
-        ZuulRoute route = new ZuulRoute("idFoo", "/v2/api/foo/{id}", null, "my.dns.com.br", true, null, Sets.newConcurrentHashSet());
+        ZuulRoute route = new ZuulRoute("idFoo", "/v2/api/foo/{id}", null, "my.dns.com.br", true, null, Collections.newSetFromMap(new ConcurrentHashMap<>()));
         routes.put("/v2/api/foo/{id}", route);
 
         Environment environment = new Environment();
@@ -123,7 +120,7 @@ public class HeimdallDecorationFilterTest {
         this.request.addHeader("host", "some-path.com");
 
         Map<String, ZuulRoute> routes = new LinkedHashMap<>();
-        ZuulRoute route = new ZuulRoute("idFoo", "/path/api/foo", null, "my.dns.com.br", true, null, Sets.newConcurrentHashSet());
+        ZuulRoute route = new ZuulRoute("idFoo", "/path/api/foo", null, "my.dns.com.br", true, null, Collections.newSetFromMap(new ConcurrentHashMap<>()));
         routes.put("/path/api/foo", route);
 
         Environment env1 = new Environment();
@@ -158,7 +155,7 @@ public class HeimdallDecorationFilterTest {
         this.request.setRequestURI("/v2/api/foo/1");
         this.request.setMethod(HttpMethod.DELETE.name());
         Map<String, ZuulRoute> routes = new LinkedHashMap<>();
-        ZuulRoute route = new ZuulRoute("idFoo", "/v2/api/foo/{id}", null, "my.dns.com.br", true, null, Sets.newConcurrentHashSet());
+        ZuulRoute route = new ZuulRoute("idFoo", "/v2/api/foo/{id}", null, "my.dns.com.br", true, null, Collections.newSetFromMap(new ConcurrentHashMap<>()));
         routes.put("/v2/api/foo/{id}", route);
 
         Credential opGet = new Credential(HttpMethod.GET.name(), "/api/foo/{id}", "/path", "apiName", 10L, 88L, 10L, false);
@@ -177,7 +174,7 @@ public class HeimdallDecorationFilterTest {
     public void testCallMethodAll() {
 
         Map<String, ZuulRoute> routes = new LinkedHashMap<>();
-        ZuulRoute route = new ZuulRoute("idFoo", "/v2/api/foo", null, "my.dns.com.br", true, null, Sets.newConcurrentHashSet());
+        ZuulRoute route = new ZuulRoute("idFoo", "/v2/api/foo", null, "my.dns.com.br", true, null, Collections.newSetFromMap(new ConcurrentHashMap<>()));
         routes.put("/v2/api/foo", route);
 
         Credential opPost = new Credential(HttpMethod.POST.name(), "/api/foo/{id}", "/v2", "apiName", 10L, 88L, 10L, false);
@@ -198,7 +195,7 @@ public class HeimdallDecorationFilterTest {
         this.request.setRequestURI("/v2/api/foo");
         this.request.setMethod(HttpMethod.GET.name());
         Map<String, ZuulRoute> routes = new LinkedHashMap<>();
-        ZuulRoute route = new ZuulRoute("idFoo", "/v2/api/foo", null, "my.dns.com.br", true, null, Sets.newConcurrentHashSet());
+        ZuulRoute route = new ZuulRoute("idFoo", "/v2/api/foo", null, "my.dns.com.br", true, null, Collections.newSetFromMap(new ConcurrentHashMap<>()));
         routes.put("/v2/api/foo", route);
 
         Credential opPost = new Credential(HttpMethod.POST.name(), "/api/foo", "/v2", "apiName", 10L, 88L, 10L, false);
@@ -219,7 +216,7 @@ public class HeimdallDecorationFilterTest {
         this.request.setRequestURI("/v2/api/foo");
         this.request.setMethod(HttpMethod.OPTIONS.name());
         Map<String, ZuulRoute> routes = new LinkedHashMap<>();
-        ZuulRoute route = new ZuulRoute("idFoo", "/v2/api/foo", null, "my.dns.com.br", true, null, Sets.newConcurrentHashSet());
+        ZuulRoute route = new ZuulRoute("idFoo", "/v2/api/foo", null, "my.dns.com.br", true, null, Collections.newSetFromMap(new ConcurrentHashMap<>()));
         routes.put("/v2/api/foo", route);
 
         Credential opPost = new Credential(HttpMethod.POST.name(), "/api/foo", "/v2", "apiName", 11L, 88L, 10L, true);
@@ -239,7 +236,7 @@ public class HeimdallDecorationFilterTest {
         this.request.setRequestURI("/v2/api/foo");
         this.request.setMethod(HttpMethod.OPTIONS.name());
         Map<String, ZuulRoute> routes = new LinkedHashMap<>();
-        ZuulRoute route = new ZuulRoute("idFoo", "/v2/api/foo", null, "my.dns.com.br", true, null, Sets.newConcurrentHashSet());
+        ZuulRoute route = new ZuulRoute("idFoo", "/v2/api/foo", null, "my.dns.com.br", true, null, Collections.newSetFromMap(new ConcurrentHashMap<>()));
         routes.put("/v2/api/foo", route);
 
 
@@ -260,7 +257,7 @@ public class HeimdallDecorationFilterTest {
         this.request.setRequestURI("/v2/api/foo");
         this.request.setMethod(HttpMethod.OPTIONS.name());
         Map<String, ZuulRoute> routes = new LinkedHashMap<>();
-        ZuulRoute route = new ZuulRoute("idFoo", "/v2/api/foo", null, "my.dns.com.br", true, null, Sets.newConcurrentHashSet());
+        ZuulRoute route = new ZuulRoute("idFoo", "/v2/api/foo", null, "my.dns.com.br", true, null, Collections.newSetFromMap(new ConcurrentHashMap<>()));
         routes.put("/v2/api/foo", route);
 
         Credential opPost = new Credential(HttpMethod.POST.name(), "/api/foo", "/v2", "apiName", 10L, 88L, 10L, false);
