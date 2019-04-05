@@ -24,7 +24,6 @@ import javax.annotation.PostConstruct;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 
 import br.com.conductor.heimdall.core.entity.RateLimit;

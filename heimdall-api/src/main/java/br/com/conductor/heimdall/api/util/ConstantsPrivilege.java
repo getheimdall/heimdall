@@ -100,14 +100,8 @@ public class ConstantsPrivilege {
      
      public static final String PRIVILEGE_READ_PROVIDER = "hasAuthority('READ_PROVIDER')";
      public static final String PRIVILEGE_CREATE_PROVIDER = "hasAuthority('CREATE_PROVIDER')";
-     public static final String PRIVILEGE_UPDATE_PROVIDER = "hasAuthority('UPDATE_PROVIDER')";
-     public static final String PRIVILEGE_DELETE_PROVIDER = "hasAuthority('DELETE_PROVIDER')";
-     
-     public static final String PRIVILEGE_READ_TRACES = "hasAuthority('READ_TRACES')";
-     public static final String PRIVILEGE_CREATE_TRACES = "hasAuthority('CREATE_TRACES')";
-     public static final String PRIVILEGE_UPDATE_TRACES = "hasAuthority('UPDATE_TRACES')";
-     public static final String PRIVILEGE_DELETE_TRACES = "hasAuthority('DELETE_TRACES')";
 
+     public static final String PRIVILEGE_READ_TRACES = "hasAuthority('READ_TRACES')";
 
      public static final String PRIVILEGE_READ_LDAP = "hasAuthority('READ_LDAP')";
      public static final String PRIVILEGE_UPDATE_LDAP = "hasAuthority('UPDATE_LDAP')";

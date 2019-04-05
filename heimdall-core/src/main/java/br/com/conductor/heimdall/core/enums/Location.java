@@ -29,5 +29,5 @@ package br.com.conductor.heimdall.core.enums;
  */
 public enum Location {
 
-     HEADER, QUERY_PARAM;
+     HEADER, QUERY_PARAM
 }

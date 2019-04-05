@@ -22,8 +22,6 @@ package br.com.conductor.heimdall.core.entity;
  */
 
 import br.com.conductor.heimdall.core.enums.Status;
-import br.com.twsoftware.alfred.object.Objeto;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -39,9 +37,7 @@ import org.hibernate.annotations.LazyCollectionOption;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This class represents a App registered to the system.
@@ -99,31 +95,13 @@ public class App implements Serializable {
     @JsonIgnoreProperties({"api"})
     private List<Plan> plans;
 
-    @JsonIgnore
-    @Column(name = "TAGS", length = 2000)
-    private String tag;
-
-    @Transient
-    private List<String> tags;
-
     @PrePersist
     private void initValuesPersist() {
 
-        if (Objeto.isBlank(status)) {
-
-            status = Status.ACTIVE;
-        }
+        status = (status == null) ? Status.ACTIVE : status;
 
         creationDate = LocalDateTime.now();
     }
 
-    @PostLoad
-    private void loadMethods() {
-
-        if (Objeto.notBlank(tag)) {
-
-            tags = Arrays.stream(tag.split(";")).collect(Collectors.toList());
-        }
-    }
 
 }

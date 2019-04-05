@@ -21,24 +21,20 @@ package br.com.conductor.heimdall.gateway.zuul.storage;
  * ==========================LICENSE_END===================================
  */
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties.ZuulRoute;
 
-import br.com.conductor.heimdall.core.entity.Api;
-import br.com.conductor.heimdall.core.entity.Operation;
-import br.com.conductor.heimdall.core.entity.Resource;
-import br.com.conductor.heimdall.core.enums.Status;
-import br.com.conductor.heimdall.core.repository.ApiRepository;
-import br.com.conductor.heimdall.core.repository.ResourceRepository;
+import com.google.common.collect.Sets;
+
+import br.com.conductor.heimdall.core.repository.jdbc.ApiJDBCRepository;
+import br.com.conductor.heimdall.core.repository.jdbc.OperationJDBCRepository;
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.util.RouteSort;
-import br.com.twsoftware.alfred.object.Objeto;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -50,78 +46,59 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CacheZuulRouteStorage implements ZuulRouteStorage {
 
-     private static final String ENABLE_ALL_METHODS = "**";
+	@Autowired
+	private ApiJDBCRepository apiJDBCRepository;
 
-     @Autowired
-     private ApiRepository repository;
+	@Autowired
+	private OperationJDBCRepository operationJDBCRepository;
 
-     @Autowired
-     private ResourceRepository resourceRepository;
+	@Value("${info.app.profile}")
+	private String profile;
 
-     @Value("${info.app.profile}")
-     private String profile;
+	@Value("${heimdall.retryable}")
+	private boolean retryable;
 
-     @Value("${heimdall.retryable}")
-     private boolean retryable;
+	@Override
+	public List<ZuulRoute> findAll() {
 
-     @Override
-     public List<ZuulRoute> findAll() {
+		return init();
+	}
 
-          return init();
-     }
+	/**
+	 * Gets a ordered List of {@link ZuulRoute}.
+	 *
+	 * @return A ordered List of {@link ZuulRoute}
+	 */
+	public List<ZuulRoute> init() {
 
-     /**
-      * Gets a ordered List of {@link ZuulRoute}.
-      * 
-      * @return 	A ordered List of {@link ZuulRoute}
-      */
-     public List<ZuulRoute> init() {
+		log.info("Initialize routes from profiles: " + profile);
+		List<ZuulRoute> routes = new LinkedList<>();
+		List<Long> apiIds = apiJDBCRepository.findAllIds();
+		boolean production = Constants.PRODUCTION.equals(profile);
 
-          log.info("Initialize routes from profiles: " + profile);
-          List<ZuulRoute> routes = new LinkedList<>();
-          List<Api> findAll = repository.findByStatus(Status.ACTIVE);
-          boolean production = Constants.PRODUCTION.equals(profile);
+		String destination;
 
-          String destination;
-          
-          if (production) {
-               destination = "producao";
-          } else {
-               destination = "sandbox";
-          }
-          
-          for (Api api : findAll) {
+		if (production) {
+			destination = "producao";
+		} else {
+			destination = "sandbox";
+		}
 
-               ZuulRoute route = new ZuulRoute();
-               route.setRetryable(retryable);
-          
-               if (api.getBasePath().contains(ENABLE_ALL_METHODS)) {
+		List<String> apiPathConcatWithOperationPaths = operationJDBCRepository.findOperationsFromAllApis(apiIds);
 
-                    route = new ZuulRoute(api.getBasePath(), destination);
-                    route.setStripPrefix(false);
-                    routes.add(route);
+		if (Objects.nonNull(apiPathConcatWithOperationPaths) && !apiPathConcatWithOperationPaths.isEmpty()) {
 
-               } else {
+			for (String completePath : apiPathConcatWithOperationPaths) {
 
-                    List<Resource> resources = resourceRepository.findByApiId(api.getId());
+				ZuulRoute route = new ZuulRoute(completePath, destination);
+				route.setStripPrefix(false);
+				route.setSensitiveHeaders(Sets.newConcurrentHashSet());
+				route.setRetryable(retryable);
+				routes.add(route);
+			}
+		}
 
-                    for (Resource resource : resources) {
-                         
-                         if (Objeto.notBlank(resource.getOperations())) {
-                              
-                              for (Operation operation : resource.getOperations()) {
-                                   
-                                   route = new ZuulRoute(resource.getApi().getBasePath() + operation.getPath(), destination);
-                                   route.setStripPrefix(false);
-                                   route.setSensitiveHeaders(Collections.newSetFromMap(new ConcurrentHashMap<>()));
-                                   routes.add(route);
-                              }
-                         }
-                    }
-               }
-          }
-
-          routes.sort(new RouteSort());
-          return routes;
-     }
+		routes.sort(new RouteSort());
+		return routes;
+	}
 }

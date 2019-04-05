@@ -21,37 +21,18 @@ package br.com.conductor.heimdall.core.entity;
  * ==========================LICENSE_END===================================
  */
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.PostLoad;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-import javax.persistence.UniqueConstraint;
-
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
-
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import br.com.twsoftware.alfred.object.Objeto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
+import javax.persistence.*;
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * This class represents a Resource registered to the system.
@@ -90,21 +71,5 @@ public class Resource implements Serializable {
      @OneToMany(fetch = FetchType.EAGER, cascade = { CascadeType.REMOVE, CascadeType.MERGE }, orphanRemoval = true, mappedBy = "resource")
      @JsonBackReference
      private List<Operation> operations;
-
-     @JsonIgnore
-     @Column(name = "TAGS", length = 2000)
-     private String tag;
-
-     @Transient
-     private List<String> tags;
-
-     @PostLoad
-     private void loadMethods() {
-
-          if (Objeto.notBlank(tag)) {
-
-               tags = Arrays.stream(tag.split(";")).collect(Collectors.toList());
-          }
-     }
 
 }

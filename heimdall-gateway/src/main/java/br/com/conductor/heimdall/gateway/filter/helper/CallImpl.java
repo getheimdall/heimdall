@@ -27,6 +27,13 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.GZIPInputStream;
@@ -36,6 +43,8 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import br.com.conductor.heimdall.gateway.util.ConstantsContext;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -316,18 +325,16 @@ public class CallImpl implements Call {
                     String[] b = requestURIText.split(separator);
 
                     String value = null;
-                    if (a != null && b != null) {
-                         
-                         for (int i = 0; i < a.length; i++) {
-                              
-                              if (a[i].equals(name) && !a[i].equals(b[i])) {
-                                   
-                                   value = b[i];
-                                   break;
-                              }
+
+                    for (int i = 0; i < a.length; i++) {
+
+                         if (a[i].equals(name) && !a[i].equals(b[i])) {
+
+                              value = b[i];
+                              break;
                          }
                     }
-                    
+
                     return value;
                } else {
                     
@@ -552,10 +559,9 @@ public class CallImpl implements Call {
           
           @SuppressWarnings("unchecked")
           public EnvironmentImpl() {
-
-               if (Objeto.notBlank(context.get("environmentVariables"))) {
-                    
-                    currentVariables = (Map<String, String>) context.get("environmentVariables");
+        	  currentVariables = (Map<String, String>) context.get(ConstantsContext.ENVIRONMENT_VARIABLES);
+        	  if (Objects.isNull(currentVariables)) {
+                    currentVariables = new HashMap<>();
                }
                
           }
@@ -570,7 +576,7 @@ public class CallImpl implements Call {
           public String getVariable(String key) {
 
                String value = currentVariables.get(key);
-               if (Objeto.isBlank(value)) {
+               if (StringUtils.isBlank(value)) {
                     
                     TraceContextHolder.getInstance().getActualTrace().trace("Environment variable with key '" + key + "' not exist.");
                }

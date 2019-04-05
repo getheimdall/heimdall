@@ -44,7 +44,6 @@ import org.hibernate.annotations.DynamicUpdate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import br.com.conductor.heimdall.core.enums.Status;
-import br.com.twsoftware.alfred.object.Objeto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -93,10 +92,8 @@ public class Developer implements Serializable {
      @PrePersist
      private void initValuesPersist() {
 
-          if (Objeto.isBlank(status)) {
+          status = (status == null) ? Status.ACTIVE : status;
 
-               status = Status.ACTIVE;
-          }
           creationDate = LocalDateTime.now();
      }
 }
