@@ -36,16 +36,16 @@ heimdall:
         initializationFailFast: false
         appName: HEIMDALL
         databaseName: heimdall
-        portNumber: 5433
-        serverName: 192.168.10.201
+        portNumber: 5432
+        serverName: 127.0.0.1
         username: postgres
         password: 123456
         runLiquibase: true
         sendStringParametersAsUnicode: false
     mongo:
-        enabled: true
-#        serverName:
-        url: mongodb://admin:123456@192.168.10.201:27018
+        enabled: false
+        #        serverName:
+        url: mongodb://admin:admin@localhost
         port: 27017
         dataBase: logging
         collection: logs
@@ -55,8 +55,8 @@ heimdall:
         discardingThreshold: 0
         zoneId: America/Sao_Paulo
     redis:
-        host: 192.168.10.201
-        port: 6380
+        host: 127.0.0.1
+        port: 6379
         maxTotal: 128
         maxIdle: 128
         minIdle: 16
@@ -71,7 +71,7 @@ heimdall:
     security:
         enabled: true
         jwt:
-            expiration-time: 60000
+            expiration-time: 600
             secret: secretKey
     middlewares:
         allowInactive: 0
@@ -95,9 +95,9 @@ spring:
             INDENT_OUTPUT: true
             WRITE-DATES-AS-TIMESTAMPS: false
     rabbitmq:
-        host: 192.168.10.200
+        host: 127.0.0.1
         port: 5672
-        virtual-host: dev
+        #virtual-host: dev
         requested-heartbeat: 10
     cache:
         type: redis
@@ -141,7 +141,7 @@ management:
 
 zuul:
     filter:
-        root: /tmp/interceptors
+        root: /tmp/interceptores
         interval: 8
 
 security:
