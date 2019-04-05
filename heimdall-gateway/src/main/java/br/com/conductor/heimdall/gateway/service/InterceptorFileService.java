@@ -71,11 +71,10 @@ public class InterceptorFileService {
      * @param id The {@link Interceptor} Id
      */
     @Transactional(readOnly = true)
-    public void createFileInterceptor(Long id) {
+    public void createFileInterceptor(Interceptor interceptor) {
 
         try {
 
-            Interceptor interceptor = interceptorRepository.findOne(id);
             HeimdallException.checkThrow(interceptor == null, ExceptionMessage.INTERCEPTOR_NOT_EXIST);
 
             File file = templateInterceptor(interceptor.getType(), interceptor.getExecutionPoint());
@@ -102,8 +101,8 @@ public class InterceptorFileService {
             HashMap<String, Object> parameters = new HashMap<>();
             parameters.put("order", StringUtils.generateOrder(definePrefixOrder(interceptor.getLifeCycle()), interceptor.getOrder()));
             parameters.put("executionPoint", interceptor.getExecutionPoint().getFilterType());
-            parameters.put("ignoredOperations", interceptor.getIgnoredOperationsIds());
-            parameters.put("ignoredResources", interceptor.getIgnoredResourcesIds());
+            parameters.put("ignoredOperations", interceptor.getIgnoredOperations());
+            parameters.put("ignoredResources", interceptor.getIgnoredResources());
             parameters.put("lifeCycle", interceptor.getLifeCycle().name());
             parameters.put("name", StringUtils.concatCamelCase(interceptor.getLifeCycle().name(), interceptor.getType().name(), interceptor.getExecutionPoint().getFilterType(), interceptor.getId().toString()));
             parameters.put("zuulFilterRoot", zuulFilterRoot);

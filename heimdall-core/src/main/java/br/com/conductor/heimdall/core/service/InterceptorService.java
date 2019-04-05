@@ -22,7 +22,6 @@ package br.com.conductor.heimdall.core.service;
  */
 
 import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.converter.InterceptorMap;
 import br.com.conductor.heimdall.core.dto.*;
 import br.com.conductor.heimdall.core.dto.interceptor.RateLimitDTO;
 import br.com.conductor.heimdall.core.dto.page.InterceptorPage;
@@ -231,7 +230,7 @@ public class InterceptorService {
 
         Interceptor interceptor = interceptorRepository.findOne(id);
         HeimdallException.checkThrow(isBlank(interceptor), GLOBAL_RESOURCE_NOT_FOUND);
-        interceptor = GenericConverter.mapperWithMapping(interceptorDTO, interceptor, new InterceptorMap());
+        interceptor = GenericConverter.mapper(interceptorDTO, interceptor);
 
         if (TypeInterceptor.CORS.equals(interceptor.getType())) {
             HeimdallException.checkThrow(interceptor.getLifeCycle() != InterceptorLifeCycle.API, ExceptionMessage.CORS_INTERCEPTOR_NOT_API_LIFE_CYCLE);

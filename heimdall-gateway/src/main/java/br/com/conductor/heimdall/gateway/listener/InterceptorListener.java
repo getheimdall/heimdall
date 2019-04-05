@@ -1,6 +1,8 @@
 
 package br.com.conductor.heimdall.gateway.listener;
 
+import java.util.Objects;
+
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -32,7 +34,6 @@ import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.repository.InterceptorRepository;
 import br.com.conductor.heimdall.core.util.RabbitConstants;
 import br.com.conductor.heimdall.gateway.service.InterceptorFileService;
-import br.com.twsoftware.alfred.object.Objeto;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -69,10 +70,10 @@ public class InterceptorListener {
 
 
           Interceptor interceptor = interceptorRepository.findOne(interceptorId);
-          if (Objeto.notBlank(interceptor)) {
+          if (Objects.nonNull(interceptor)) {
                
                log.info("Updating/Creating Interceptor id: " + interceptorId);
-               interceptorFileService.createFileInterceptor(interceptorId);
+               interceptorFileService.createFileInterceptor(interceptor);
           } else {
                
                log.info("It was not possible Updating/Creating Interceptor id: " + interceptorId);

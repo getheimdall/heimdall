@@ -6,6 +6,8 @@ import static org.junit.Assert.assertNotNull;
 import java.time.LocalDateTime;
 import java.util.*;
 
+import br.com.conductor.heimdall.core.repository.jdbc.ApiJDBCRepository;
+import br.com.conductor.heimdall.core.repository.jdbc.OperationJDBCRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,7 +42,13 @@ public class CacheZuulRouteStorageTest {
 
      @Mock
      private ResourceRepository resourceRepository;
-     
+
+     @Mock
+     private ApiJDBCRepository apiJDBCRepository;
+
+     @Mock
+     private OperationJDBCRepository operationJDBCRepository;
+
      @Before
      public void setup() {
           MockitoAnnotations.initMocks(this);
@@ -53,8 +61,8 @@ public class CacheZuulRouteStorageTest {
           Environment environment = new Environment();
           environment.setInboundURL("dns.production.com.br");
           environment.setOutboundURL("dns.production.com.br");
-          Api api = new Api(10L, "foo", "v1", "fooDescription", "/foo", false, LocalDateTime.now(), new HashSet<>(), Status.ACTIVE, null, null, environments, null, null);
-          
+          Api api = new Api(10L, "foo", "v1", "fooDescription", "/foo", false, LocalDateTime.now(), new HashSet<>(), Status.ACTIVE, environments, null);
+
           List<Resource> res = new LinkedList<>();
           
           Resource resource = new Resource();
@@ -63,8 +71,8 @@ public class CacheZuulRouteStorageTest {
           resource.setOperations(new ArrayList<>());
           
           Operation opPost = new Operation(10L, HttpMethod.POST, "/api/foo", "POST description", resource);
-          Operation opGet = new Operation(10L, HttpMethod.GET, "/api/foo/{id}", "GET description", resource);
-          Operation opDelete = new Operation(10L, HttpMethod.DELETE, "/api/foo/{id}", "DELETE description", resource);
+          Operation opGet = new Operation(11L, HttpMethod.GET, "/api/foo/{id}", "GET description", resource);
+          Operation opDelete = new Operation(12L, HttpMethod.DELETE, "/api/foo/{id}", "DELETE description", resource);
           resource.getOperations().addAll(Arrays.asList(opDelete, opGet, opPost));
           
           res.add(resource);
@@ -73,6 +81,8 @@ public class CacheZuulRouteStorageTest {
           
           Mockito.when(repository.findByStatus(Status.ACTIVE)).thenReturn(apis);
           Mockito.when(resourceRepository.findByApiId(Mockito.anyLong())).thenReturn(res);
+          Mockito.when(apiJDBCRepository.findAllIds()).thenReturn(Collections.singletonList(10L));
+          Mockito.when(operationJDBCRepository.findOperationsFromAllApis(Collections.singletonList(10L))).thenReturn(Arrays.asList("/api/foo", "/api/foo/{id}", "/api/foo/{id}"));
           ReflectionTestUtils.setField(this.storage, "profile", Constants.PRODUCTION);
           
           List<ZuulRoute> zuulRoutes = storage.findAll();

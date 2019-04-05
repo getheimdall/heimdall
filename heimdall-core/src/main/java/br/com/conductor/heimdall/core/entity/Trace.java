@@ -55,4 +55,6 @@ public class Trace {
 
     private Boolean cache;
 
+    private String version;
+
 }

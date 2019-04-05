@@ -68,8 +68,8 @@ public class MiddlewareListener {
                     
                     log.info("Updating/Creating middleware id: " + middlewareId);
                     startServer.addApiDirectoryToPath(middleware.getApi());
-                    startServer.createMiddlewaresInterceptor(middlewareId);
-                    startServer.loadMiddlewareFiles(middlewareId);
+                    startServer.createMiddlewaresInterceptor(middleware);
+                    startServer.loadMiddlewareFiles(middleware);
                } else {
                     
                     log.info("It was not possible Updating/Creating middleware id: " + middlewareId);
