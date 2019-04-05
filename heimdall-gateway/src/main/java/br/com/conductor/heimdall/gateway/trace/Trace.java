@@ -48,6 +48,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 
 import static net.logstash.logback.marker.Markers.append;
 
@@ -158,13 +159,13 @@ public class Trace {
           Enumeration<String> headers = request.getHeaders("x-forwarded-for");
           if (Objeto.notBlank(headers)) {
 
-               List<String> listaIPs = Lists.newArrayList();
+               List<String> listIps = Lists.newArrayList();
                while (headers.hasMoreElements()) {
                     String ip = headers.nextElement();
-                    listaIPs.add(ip);
+                    listIps.add(ip);
                }
 
-               setReceivedFromAddress(Joiner.on(",").join(listaIPs.toArray()));
+               setReceivedFromAddress(Joiner.on(",").join(listIps.toArray()));
 
           }
 
@@ -258,6 +259,8 @@ public class Trace {
       */
      private void prepareLog(Integer statusCode) throws JsonProcessingException {
 
+          String url = Objects.nonNull(getUrl()) ? getUrl() : "";
+
           if (printAllTrace) {
 
                if (isInfo(statusCode)) {
@@ -270,41 +273,39 @@ public class Trace {
 
                     log.error(" [HEIMDALL-TRACE] - {} ", new ObjectMapper().writeValueAsString(this));
                }
-          } else if (printMongo) {
-
-               String url = (Objeto.notBlank(getUrl())) ? getUrl() : "";
-
+          } else {
                if (isInfo(statusCode)) {
 
                     log.info(append("call", this), " [HEIMDALL-TRACE] - " + url);
-
-                    if (printMongo) logMongo.info(new ObjectMapper().writeValueAsString(this));
                } else if (isWarn(statusCode)) {
 
                     log.warn(append("call", this), " [HEIMDALL-TRACE] - " + url);
-                    if (printMongo) logMongo.warn(new ObjectMapper().writeValueAsString(this));
                } else {
 
                     log.error(append("call", this), " [HEIMDALL-TRACE] - " + url);
-                    if (printMongo) logMongo.error(new ObjectMapper().writeValueAsString(this));
                }
-          } else if (printLogstash) {
-        	  String url = (Objeto.notBlank(getUrl())) ? getUrl() : "";
+          }
 
-              if (isInfo(statusCode)) {
+          if (printMongo) {
+               printInLogger(logMongo, statusCode);
+          }
 
-                   log.info(append("call", this), " [HEIMDALL-TRACE] - " + url);
+          if (printLogstash) {
+        	  printInLogger(logstash, statusCode);
+          }
+     }
 
-                   if (printLogstash) logstash.info(new ObjectMapper().writeValueAsString(this));
-              } else if (isWarn(statusCode)) {
+     private void printInLogger(Logger logger, Integer statusCode) throws JsonProcessingException {
 
-                   log.warn(append("call", this), " [HEIMDALL-TRACE] - " + url);
-                   if (printLogstash) logstash.warn(new ObjectMapper().writeValueAsString(this));
-              } else {
+          if (isInfo(statusCode)) {
 
-                   log.error(append("call", this), " [HEIMDALL-TRACE] - " + url);
-                   if (printLogstash) logstash.error(new ObjectMapper().writeValueAsString(this));
-              }
+               logger.info(new ObjectMapper().writeValueAsString(this));
+          } else if (isWarn(statusCode)) {
+
+               logger.warn(new ObjectMapper().writeValueAsString(this));
+          } else {
+
+               logger.error(new ObjectMapper().writeValueAsString(this));
           }
      }
 

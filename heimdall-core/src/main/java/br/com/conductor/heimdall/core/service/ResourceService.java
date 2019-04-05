@@ -37,7 +37,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.converter.ResourceMap;
 import br.com.conductor.heimdall.core.dto.PageDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.ResourceDTO;
@@ -160,7 +159,7 @@ public class ResourceService {
           Resource resData = resourceRepository.findByApiIdAndName(apiId, resourceDTO.getName());
           HeimdallException.checkThrow(notBlank(resData) && (resData.getApi().getId() == api.getId()), ONLY_ONE_RESOURCE_PER_API);
           
-          Resource resource = GenericConverter.mapperWithMapping(resourceDTO, Resource.class, new ResourceMap());
+          Resource resource = GenericConverter.mapper(resourceDTO, Resource.class);
           resource.setApi(api);
           
           resource = resourceRepository.save(resource);
@@ -213,7 +212,7 @@ public class ResourceService {
           Resource resData = resourceRepository.findByApiIdAndName(apiId, resourceDTO.getName());
           HeimdallException.checkThrow(notBlank(resData) && (resData.getApi().getId() == resource.getApi().getId()) && (resData.getId() != resource.getId()), ONLY_ONE_RESOURCE_PER_API);
           
-          resource = GenericConverter.mapperWithMapping(resourceDTO, resource, new ResourceMap());
+          resource = GenericConverter.mapper(resourceDTO, resource);
           
           resource = resourceRepository.save(resource);
           

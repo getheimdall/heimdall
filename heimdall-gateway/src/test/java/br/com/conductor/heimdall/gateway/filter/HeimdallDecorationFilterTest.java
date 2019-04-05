@@ -1,18 +1,17 @@
 
 package br.com.conductor.heimdall.gateway.filter;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.REQUEST_URI_KEY;
-
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
-
+import br.com.conductor.heimdall.core.enums.HttpMethod;
+import br.com.conductor.heimdall.gateway.router.Credential;
+import br.com.conductor.heimdall.gateway.router.CredentialRepository;
+import br.com.conductor.heimdall.gateway.router.EnvironmentInfo;
+import br.com.conductor.heimdall.gateway.router.EnvironmentInfoRepository;
+import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import br.com.conductor.heimdall.gateway.util.RequestHelper;
+import br.com.conductor.heimdall.gateway.zuul.route.HeimdallRoute;
+import br.com.conductor.heimdall.gateway.zuul.route.ProxyRouteLocator;
+import com.google.common.collect.Sets;
+import com.netflix.zuul.context.RequestContext;
 import org.assertj.core.util.Lists;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,18 +26,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
-import com.google.common.collect.Sets;
-import com.netflix.zuul.context.RequestContext;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
-import br.com.conductor.heimdall.core.entity.Environment;
-import br.com.conductor.heimdall.core.enums.HttpMethod;
-import br.com.conductor.heimdall.core.repository.EnvironmentRepository;
-import br.com.conductor.heimdall.gateway.router.Credential;
-import br.com.conductor.heimdall.gateway.router.CredentialRepository;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
-import br.com.conductor.heimdall.gateway.util.RequestHelper;
-import br.com.conductor.heimdall.gateway.zuul.route.HeimdallRoute;
-import br.com.conductor.heimdall.gateway.zuul.route.ProxyRouteLocator;
+import static org.junit.Assert.*;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.REQUEST_URI_KEY;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HeimdallDecorationFilterTest {
@@ -49,8 +43,8 @@ public class HeimdallDecorationFilterTest {
     private ProxyRouteLocator routeLocator;
 
     @Mock
-    private EnvironmentRepository environmentRepository;
-    
+    private EnvironmentInfoRepository environmentInfoRepository;
+
     @Mock
     private CredentialRepository credentialRepository;
 
@@ -70,7 +64,7 @@ public class HeimdallDecorationFilterTest {
     @Before
     public void init() {
 
-        this.filter = new HeimdallDecorationFilter(routeLocator, "/", properties, proxyRequestHelper, requestHelper, credentialRepository, environmentRepository);
+        this.filter = new HeimdallDecorationFilter(routeLocator, "/", properties, proxyRequestHelper, requestHelper, credentialRepository, environmentInfoRepository);
         this.ctx = RequestContext.getCurrentContext();
         this.ctx.clear();
         this.ctx.setRequest(this.request);
@@ -95,12 +89,10 @@ public class HeimdallDecorationFilterTest {
         ZuulRoute route = new ZuulRoute("idFoo", "/v2/api/foo/{id}", null, "my.dns.com.br", true, null, Sets.newConcurrentHashSet());
         routes.put("/v2/api/foo/{id}", route);
 
-        Environment environment = new Environment();
-        environment.setInboundURL("http://localhost");
-        environment.setOutboundURL("http://outbound:8080");
-        environment.setVariables(new HashMap<>());
-        List<Environment> environments = Lists.newArrayList();
-        environments.add(environment);
+        EnvironmentInfo environmentInfo = new EnvironmentInfo();
+        environmentInfo.setId(1L);
+        environmentInfo.setOutboundURL("http://outbound:8080");
+        environmentInfo.setVariables(new HashMap<>());
 
         Credential opPost = new Credential(HttpMethod.POST.name(), "/api/foo", "/v2", "apiName", 10L, 88L, 10L, false);
         Credential opGet = new Credential(HttpMethod.GET.name(), "/api/foo/{id}", "/v2", "apiName", 10L, 88L, 10L, false);
@@ -108,12 +100,12 @@ public class HeimdallDecorationFilterTest {
 
         Mockito.when(routeLocator.getAtomicRoutes()).thenReturn(new AtomicReference<>(routes));
         Mockito.when(credentialRepository.findByPattern("/v2/api/foo/{id}")).thenReturn(Lists.newArrayList(opPost, opGet, opDelete));
-        Mockito.when(environmentRepository.findByApiId(10L)).thenReturn(environments);
+        Mockito.when(environmentInfoRepository.findByApiIdAndEnvironmentInboundURL(10L, "http://localhost/v2/api/foo/1")).thenReturn(environmentInfo);
 
         this.filter.run();
 
         assertEquals("/api/foo/1", this.ctx.get(REQUEST_URI_KEY));
-        assertEquals(true, this.ctx.sendZuulResponse());
+        assertTrue(this.ctx.sendZuulResponse());
     }
 
     @Test
@@ -126,26 +118,17 @@ public class HeimdallDecorationFilterTest {
         ZuulRoute route = new ZuulRoute("idFoo", "/path/api/foo", null, "my.dns.com.br", true, null, Sets.newConcurrentHashSet());
         routes.put("/path/api/foo", route);
 
-        Environment env1 = new Environment();
-        env1.setInboundURL("https://some-path.com");
-        env1.setOutboundURL("https://some-path.com");
-        env1.setVariables(new HashMap<>());
-
-        Environment env2 = new Environment();
-        env2.setInboundURL("https://other-path.com");
-        env2.setOutboundURL("https://other-path.com");
-        env2.setVariables(new HashMap<>());
-
-        List<Environment> environments = Lists.newArrayList();
-        environments.add(env1);
-        environments.add(env2);
+        EnvironmentInfo environmentInfo = new EnvironmentInfo();
+        environmentInfo.setId(1L);
+        environmentInfo.setOutboundURL("https://some-path.com");
+        environmentInfo.setVariables(new HashMap<>());
 
         Credential opGet = new Credential(HttpMethod.GET.name(), "/api/foo", "/path", "apiName", 10L, 88L, 10L, false);
         Credential opDelete = new Credential(HttpMethod.DELETE.name(), "/api/foo", "/path", "apiName", 10L, 88L, 10L, false);
 
         Mockito.when(routeLocator.getAtomicRoutes()).thenReturn(new AtomicReference<>(routes));
         Mockito.when(credentialRepository.findByPattern("/path/api/foo")).thenReturn(Lists.newArrayList(opGet, opDelete));
-        Mockito.when(environmentRepository.findByApiId(10L)).thenReturn(environments);
+        Mockito.when(environmentInfoRepository.findByApiIdAndEnvironmentInboundURL(10L, "some-path.com")).thenReturn(environmentInfo);
 
         this.filter.run();
 
@@ -183,7 +166,7 @@ public class HeimdallDecorationFilterTest {
         Credential opPost = new Credential(HttpMethod.POST.name(), "/api/foo/{id}", "/v2", "apiName", 10L, 88L, 10L, false);
         Credential opDelete = new Credential(HttpMethod.DELETE.name(), "/api/foo/{id}", "/v2", "apiName", 11L, 88L, 10L, false);
         Credential opAll = new Credential(HttpMethod.ALL.name(), "/api/foo/{id}", "/v2", "apiName", 12L, 88L, 10L, false);
-        
+
         Mockito.when(routeLocator.getAtomicRoutes()).thenReturn(new AtomicReference<>(routes));
         Mockito.when(credentialRepository.findByPattern("/v2/api/foo")).thenReturn(Lists.newArrayList(opPost, opDelete, opAll));
 

@@ -44,7 +44,6 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import br.com.conductor.heimdall.core.enums.Status;
-import br.com.twsoftware.alfred.object.Objeto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -97,10 +96,8 @@ public class Environment implements Serializable {
      @PrePersist
      private void initValuesPersist() {
 
-          if (Objeto.isBlank(status)) {
-               
-               status = Status.ACTIVE;
-          }
+          status = (status == null) ? Status.ACTIVE : status;
+
           creationDate = LocalDateTime.now();
      }
 

@@ -38,7 +38,7 @@ import org.springframework.cloud.netflix.zuul.filters.route.SimpleHostRoutingFil
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import br.com.conductor.heimdall.core.repository.EnvironmentRepository;
+import br.com.conductor.heimdall.gateway.router.EnvironmentInfoRepository;
 import br.com.conductor.heimdall.gateway.failsafe.CircuitBreakerManager;
 import br.com.conductor.heimdall.gateway.filter.CustomHostRoutingFilter;
 import br.com.conductor.heimdall.gateway.filter.CustomSendErrorFilter;
@@ -70,7 +70,7 @@ public class ZuulConfiguration extends ZuulProxyAutoConfiguration {
 	private ServerProperties server;
 
 	@Autowired
-	private EnvironmentRepository environmentRepository;
+	private EnvironmentInfoRepository environmentInfoRepository;
 
 	@Autowired
 	private RequestHelper requestHelper;
@@ -96,7 +96,7 @@ public class ZuulConfiguration extends ZuulProxyAutoConfiguration {
 	public PreDecorationFilter preDecorationFilter(RouteLocator routeLocator, ProxyRequestHelper proxyRequestHelper) {
 
 		return new HeimdallDecorationFilter(proxyRouteLocator(), this.server.getServletPrefix(), zuulProperties,
-				proxyRequestHelper, requestHelper, credentialRepository, environmentRepository);
+				proxyRequestHelper, requestHelper, credentialRepository, environmentInfoRepository);
 	}
 
 	@Bean
