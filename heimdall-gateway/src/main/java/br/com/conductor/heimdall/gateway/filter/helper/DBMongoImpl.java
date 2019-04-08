@@ -1,8 +1,3 @@
-
-package br.com.conductor.heimdall.gateway.filter.helper;
-
-import java.io.IOException;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -12,9 +7,9 @@ import java.io.IOException;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,13 +17,20 @@ import java.io.IOException;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.filter.helper;
 
-import java.lang.reflect.Field;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import br.com.conductor.heimdall.middleware.spec.DB;
+import br.com.conductor.heimdall.middleware.spec.DBMongo;
+import br.com.conductor.heimdall.middleware.spec.Json;
+import br.com.conductor.heimdall.middleware.util.Page;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
+import com.mongodb.MongoClient;
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.mongodb.morphia.Datastore;
@@ -37,20 +39,12 @@ import org.mongodb.morphia.annotations.Id;
 import org.mongodb.morphia.query.FindOptions;
 import org.mongodb.morphia.query.Query;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
-import com.mongodb.MongoClient;
-import com.mongodb.client.FindIterable;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
-
-import br.com.conductor.heimdall.middleware.spec.DB;
-import br.com.conductor.heimdall.middleware.spec.DBMongo;
-import br.com.conductor.heimdall.middleware.spec.Json;
-import br.com.conductor.heimdall.middleware.util.Page;
-import br.com.twsoftware.alfred.object.Objeto;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Implements the {@link DB} interface.
@@ -210,7 +204,7 @@ public class DBMongoImpl implements DBMongo {
 
           if (page > 0 && limit > 0) {
 
-               if (Objeto.notBlank(filters)) {
+               if (filters != null) {
 
                     documents = collection.find(Filters.and(filters)).limit(limit).skip(page * limit);
                } else {
@@ -219,7 +213,7 @@ public class DBMongoImpl implements DBMongo {
                }
           } else if (page == 0 && limit > 0) {
 
-               if (Objeto.notBlank(filters)) {
+               if (filters == null) {
 
                     documents = collection.find().limit(limit);
                } else {
@@ -228,7 +222,7 @@ public class DBMongoImpl implements DBMongo {
                }
           } else if (limit > 0) {
 
-               if (Objeto.notBlank(filters)) {
+               if (filters == null) {
 
                     documents = collection.find().limit(limit);
                } else {
@@ -237,7 +231,7 @@ public class DBMongoImpl implements DBMongo {
                }
           } else {
 
-               if (Objeto.notBlank(filters)) {
+               if (filters != null) {
 
                     documents = collection.find(Filters.and(filters)).limit(LIMIT);
                } else {
@@ -250,7 +244,7 @@ public class DBMongoImpl implements DBMongo {
 
           List<T> list = Lists.newArrayList();
           for (Document document : documents) {
-            T parse = null;
+            T parse;
 			try {
 				parse = new ObjectMapper().readValue(document.toJson(), classType);
 			} catch (IOException e) {

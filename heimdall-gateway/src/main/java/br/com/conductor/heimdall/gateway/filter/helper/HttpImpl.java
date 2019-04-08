@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.gateway.filter.helper;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -20,11 +17,11 @@ package br.com.conductor.heimdall.gateway.filter.helper;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.filter.helper;
 
 import br.com.conductor.heimdall.gateway.filter.helper.http.HeimdallResponseErrorHandler;
 import br.com.conductor.heimdall.middleware.spec.Http;
 import br.com.conductor.heimdall.middleware.spec.Json;
-import br.com.twsoftware.alfred.object.Objeto;
 import com.google.common.collect.Lists;
 import com.netflix.zuul.context.RequestContext;
 import org.apache.http.entity.ContentType;
@@ -83,7 +80,7 @@ public class HttpImpl implements Http {
     @Override
     public HttpImpl header(String name, String value) {
 
-        if (Objeto.notBlank(value)) {
+        if (value != null) {
 
             headers.add(name, value);
         }
@@ -183,7 +180,7 @@ public class HttpImpl implements Http {
             entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.POST, requestBody, String.class);
         } else {
 
-            if (Objeto.notBlank(formData)) {
+            if (formData != null) {
 
                 HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
                 entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.POST, request, String.class);
@@ -218,7 +215,7 @@ public class HttpImpl implements Http {
             entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PUT, requestBody, String.class);
         } else {
 
-            if (Objeto.notBlank(formData)) {
+            if (formData != null) {
 
                 HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
                 entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PUT, request, String.class);
@@ -270,7 +267,7 @@ public class HttpImpl implements Http {
             entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PATCH, requestBody,
                     String.class);
         } else {
-            if (Objeto.notBlank(formData)) {
+            if (formData != null) {
                 HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
                 entity = rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PATCH, request,
                         String.class);

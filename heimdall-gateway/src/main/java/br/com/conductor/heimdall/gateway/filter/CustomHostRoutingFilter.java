@@ -1,8 +1,3 @@
-
-package br.com.conductor.heimdall.gateway.filter;
-
-import static br.com.conductor.heimdall.gateway.util.ConstantsContext.OPERATION_ID;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -12,9 +7,9 @@ import static br.com.conductor.heimdall.gateway.util.ConstantsContext.OPERATION_
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,24 +17,24 @@ import static br.com.conductor.heimdall.gateway.util.ConstantsContext.OPERATION_
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-
-import java.net.URL;
-import java.util.concurrent.Callable;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.apache.http.HttpHost;
-import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
-import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
-import org.springframework.cloud.netflix.zuul.filters.route.SimpleHostRoutingFilter;
-
-import com.netflix.zuul.context.RequestContext;
+package br.com.conductor.heimdall.gateway.filter;
 
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.failsafe.CircuitBreakerManager;
 import br.com.conductor.heimdall.gateway.trace.FilterDetail;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import com.netflix.zuul.context.RequestContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpHost;
+import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
+import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
+import org.springframework.cloud.netflix.zuul.filters.route.SimpleHostRoutingFilter;
+
+import javax.servlet.http.HttpServletRequest;
+import java.net.URL;
+import java.util.concurrent.Callable;
+
+import static br.com.conductor.heimdall.gateway.util.ConstantsContext.OPERATION_ID;
 
 /**
  * Creates a custom routing filter.

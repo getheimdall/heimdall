@@ -1,8 +1,6 @@
-package br.com.conductor.heimdall.gateway.appender;
-
 /*-
  * =========================LICENSE_START==================================
- * heimdall-core
+ * heimdall-gateway
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
@@ -19,6 +17,7 @@ package br.com.conductor.heimdall.gateway.appender;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.appender;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;
