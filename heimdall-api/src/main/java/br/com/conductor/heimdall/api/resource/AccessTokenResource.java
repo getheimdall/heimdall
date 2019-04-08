@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.api.resource;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-api
@@ -10,9 +7,9 @@ package br.com.conductor.heimdall.api.resource;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +17,7 @@ package br.com.conductor.heimdall.api.resource;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.api.resource;
 
 import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_ACCESS_TOKENS;
 
@@ -51,7 +49,6 @@ import br.com.conductor.heimdall.core.dto.request.AccessTokenRequest;
 import br.com.conductor.heimdall.core.entity.AccessToken;
 import br.com.conductor.heimdall.core.service.AccessTokenService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
-import br.com.twsoftware.alfred.object.Objeto;
 import io.swagger.annotations.ApiOperation;
 
 /**
@@ -98,7 +95,7 @@ public class AccessTokenResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_ACCESSTOKEN)
      public ResponseEntity<?> findAll(@ModelAttribute AccessTokenRequest accessTokenRequest, @ModelAttribute PageableDTO pageableDTO) {
           
-          if (Objeto.notBlank(pageableDTO)) {
+          if (pageableDTO != null) {
                
                AccessTokenPage accessTokenPage = accessTokenService.list(accessTokenRequest, pageableDTO);      
                return ResponseEntity.ok(accessTokenPage);

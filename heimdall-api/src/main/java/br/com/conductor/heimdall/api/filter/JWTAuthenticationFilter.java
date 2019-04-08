@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.api.filter;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-api
@@ -19,6 +17,7 @@ package br.com.conductor.heimdall.api.filter;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.api.filter;
 
 import br.com.conductor.heimdall.api.service.TokenAuthenticationService;
 import org.springframework.security.core.Authentication;

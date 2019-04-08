@@ -17,7 +17,6 @@
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-
 package br.com.conductor.heimdall.api.repository;
 
 import br.com.conductor.heimdall.api.entity.Ldap;
