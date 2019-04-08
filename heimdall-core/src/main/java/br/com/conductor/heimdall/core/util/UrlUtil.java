@@ -21,13 +21,11 @@ package br.com.conductor.heimdall.core.util;
  * ==========================LICENSE_END===================================
  */
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.http.HttpServletRequest;
-
-import br.com.twsoftware.alfred.object.Objeto;
-import lombok.extern.slf4j.Slf4j;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * This class provides methods to handle {@link URL}s.
@@ -51,7 +49,7 @@ public class UrlUtil {
                URL url = new URL(request.getRequestURL().toString());
 
                String query = request.getQueryString();
-               if (Objeto.notBlank(url) && Objeto.notBlank(query)) {
+               if (query != null) {
 
                     return url.toString() + "?" + query;
                } else {

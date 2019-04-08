@@ -26,8 +26,6 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ACCESS_T
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.APP_NOT_EXIST;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.SOME_PLAN_NOT_PRESENT_IN_APP;
-import static br.com.twsoftware.alfred.object.Objeto.isBlank;
-import static br.com.twsoftware.alfred.object.Objeto.notBlank;
 
 import java.util.Collections;
 import java.util.List;
@@ -60,7 +58,6 @@ import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.repository.PlanRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 import br.com.conductor.heimdall.core.util.Pageable;
-import br.com.twsoftware.alfred.object.Objeto;
 import net.bytebuddy.utility.RandomString;
 
 /**
@@ -92,13 +89,12 @@ public class AccessTokenService {
       *
       * @param 	id 						The id of the {@link AccessToken}
       * @return  						The {@link AccessToken} found
-      * @throws NotFoundException 		Resource not found
       */
      @Transactional(readOnly = true)
      public AccessToken find(Long id) {
 
           AccessToken accessToken = accessTokenRepository.findOne(id);
-          HeimdallException.checkThrow(isBlank(accessToken), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(accessToken == null, GLOBAL_RESOURCE_NOT_FOUND);
 
           return accessToken;
      }
@@ -149,8 +145,6 @@ public class AccessTokenService {
       *
       * @param 	accessTokenPersist 		{@link AccessTokenPersist}
       * @return 						The {@link AccessToken} that was saved to the repository
-      * @throws BadRequestException		App not exist.
-      * @throws BadRequestException		Token already exists.
       */
      @Transactional
      public AccessToken save(AccessTokenPersist accessTokenPersist) {
@@ -158,14 +152,14 @@ public class AccessTokenService {
           AccessToken accessToken = GenericConverter.mapper(accessTokenPersist, AccessToken.class);
 
           App appRecover = appRespository.findOne(accessTokenPersist.getApp().getId());
-          HeimdallException.checkThrow(isBlank(appRecover), APP_NOT_EXIST);
+          HeimdallException.checkThrow(appRecover == null, APP_NOT_EXIST);
           HeimdallException.checkThrow(!verifyIfPlansContainsInApp(appRecover, accessTokenPersist.getPlans()), SOME_PLAN_NOT_PRESENT_IN_APP);
 
-          AccessToken existAccessToken = null;
-          if (notBlank(accessToken.getCode())) {
+          AccessToken existAccessToken;
+          if (accessToken.getCode() != null) {
 
                existAccessToken = accessTokenRepository.findByCode(accessToken.getCode());
-               HeimdallException.checkThrow(notBlank(existAccessToken), ACCESS_TOKEN_ALREADY_EXISTS);
+               HeimdallException.checkThrow(existAccessToken != null, ACCESS_TOKEN_ALREADY_EXISTS);
           } else {
 
                RandomString randomString = new RandomString(12);
@@ -189,17 +183,15 @@ public class AccessTokenService {
       * @param 	id 						The ID of the {@link AccessToken} to be updated
       * @param 	accessTokenPersist 		{@link AccessTokenPersist} The request for {@link AccessToken}
       * @return 						The {@link AccessToken} updated
-      * @throws NotFoundException 		Resource not found
-      * @throws BadRequestException		App not exist
       */
      @Transactional
      public AccessToken update(Long id, AccessTokenPersist accessTokenPersist) {
 
           AccessToken accessToken = accessTokenRepository.findOne(id);
-          HeimdallException.checkThrow(isBlank(accessToken), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(accessToken == null, GLOBAL_RESOURCE_NOT_FOUND);
 
           App appRecover = appRespository.findOne(accessTokenPersist.getApp().getId());
-          HeimdallException.checkThrow(isBlank(appRecover), APP_NOT_EXIST);
+          HeimdallException.checkThrow(appRecover == null, APP_NOT_EXIST);
           HeimdallException.checkThrow(!verifyIfPlansContainsInApp(appRecover, accessTokenPersist.getPlans()), SOME_PLAN_NOT_PRESENT_IN_APP);
 
           accessToken = GenericConverter.mapper(accessTokenPersist, accessToken);
@@ -214,13 +206,12 @@ public class AccessTokenService {
       * Deletes a {@link AccessToken} by its ID.
       *
       * @param 	id 						The ID of the {@link AccessToken} to be deleted
-      * @throws NotFoundException 		Resource not found
       */
      @Transactional
      public void delete(Long id) {
 
           AccessToken accessToken = accessTokenRepository.findOne(id);
-          HeimdallException.checkThrow(isBlank(accessToken), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(accessToken == null, GLOBAL_RESOURCE_NOT_FOUND);
 
           amqpCacheService.dispatchClean();
 
@@ -232,26 +223,24 @@ public class AccessTokenService {
       *
       * @param reqBody					The {@link AccessTokenDTO}
       * @return							The {@link AccessToken} saved
-      * @throws BadRequestException		Access token not defined
-      * @throws BadRequestException		Token already exists
       */
      @Transactional
      public AccessToken save(AccessTokenDTO reqBody) {
 
           AccessToken accessToken = GenericConverter.mapper(reqBody, AccessToken.class);
-          HeimdallException.checkThrow(isBlank(accessToken.getCode()), ACCESS_TOKEN_NOT_DEFINED);
+          HeimdallException.checkThrow(accessToken.getCode() == null, ACCESS_TOKEN_NOT_DEFINED);
 
           App app = appService.save(reqBody.getApp());
 
-          AccessToken existAccessToken = null;
+          AccessToken existAccessToken;
 
           existAccessToken = accessTokenRepository.findByCode(accessToken.getCode());
-          HeimdallException.checkThrow(notBlank(existAccessToken), ACCESS_TOKEN_ALREADY_EXISTS);
+          HeimdallException.checkThrow(existAccessToken != null, ACCESS_TOKEN_ALREADY_EXISTS);
 
           accessToken.setApp(app);
 
-          Plan plan = planRepository.findOne(1l);
-          if (Objeto.notBlank(plan)) {
+          Plan plan = planRepository.findOne(1L);
+          if (plan != null) {
 
                accessToken.setPlans(Lists.newArrayList(plan));
 //               accessToken.setPlans(Arrays.asList(plan));

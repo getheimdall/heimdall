@@ -23,7 +23,6 @@ package br.com.conductor.heimdall.core.util;
 
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
-import br.com.twsoftware.alfred.object.Objeto;
 
 /**
  * This class provides a methods to format {@link String}s to be used by Heimdall. 
@@ -62,7 +61,7 @@ public abstract class StringUtils {
                String[] splits = string.split("_");
                for (String split : splits) {
                     
-                    if (Objeto.notBlank(split)) {
+                    if (split != null && !split.isEmpty()) {
                          
                          value.append(split.substring(0, 1).toUpperCase()).append(split.substring(1).toLowerCase());
                     }

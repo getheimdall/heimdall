@@ -26,7 +26,6 @@ import br.com.conductor.heimdall.core.enums.Periods;
 import br.com.conductor.heimdall.core.dto.metrics.Metric;
 import br.com.conductor.heimdall.core.entity.LogTrace;
 import br.com.conductor.heimdall.core.environment.Property;
-import br.com.twsoftware.alfred.object.Objeto;
 import com.mongodb.*;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -356,7 +355,7 @@ public class MongoLogConnector implements Serializable {
           pageResponse.totalElements = totalElements;
           pageResponse.hasPreviousPage = page > 0;
           pageResponse.hasNextPage = page < (pageResponse.totalPages - 1);
-          pageResponse.hasContent = Objeto.notBlank(list);
+          pageResponse.hasContent = list != null && !list.isEmpty();
           pageResponse.first = page == 0;
           pageResponse.last = page == (pageResponse.totalPages - 1);
           pageResponse.nextPage = page == (pageResponse.totalPages - 1) ? page : page + 1;
@@ -368,7 +367,7 @@ public class MongoLogConnector implements Serializable {
 
      private void createMongoClient() {
 
-          if (Objeto.notBlank(property.getMongo().getUrl())) {
+          if (property.getMongo().getUrl() != null) {
 
                MongoClientURI uri = new MongoClientURI(property.getMongo().getUrl());
                this.client = new MongoClient(uri);

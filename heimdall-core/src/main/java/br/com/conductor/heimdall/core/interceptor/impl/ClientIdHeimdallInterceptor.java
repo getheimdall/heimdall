@@ -51,7 +51,7 @@ public class ClientIdHeimdallInterceptor implements HeimdallInterceptor {
             return JsonUtils.convertJsonToObject(content, AccessTokenClientIdDTO.class);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(TypeInterceptor.ACCESS_TOKEN.name(), TemplateUtils.TEMPLATE_ACCESS_TOKEN);
+            ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(TypeInterceptor.CLIENT_ID.name(), TemplateUtils.TEMPLATE_CLIENT_ID);
         }
 
         return null;
