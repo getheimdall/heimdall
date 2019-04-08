@@ -82,7 +82,7 @@ public class PrivilegeResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_PRIVILEGE)
      public ResponseEntity<?> findAll(@ModelAttribute PrivilegeDTO privilegeDTO, @ModelAttribute PageableDTO pageableDTO) {
 
-          if (pageableDTO != null) {
+          if (!pageableDTO.isEmpty()) {
 
                PrivilegePage apiPage = privilegeService.list(privilegeDTO, pageableDTO);
                return ResponseEntity.ok(apiPage);

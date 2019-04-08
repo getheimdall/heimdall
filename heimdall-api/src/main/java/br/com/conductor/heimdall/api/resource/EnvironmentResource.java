@@ -87,7 +87,7 @@ public class EnvironmentResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_ENVIRONMENT)
      public ResponseEntity<?> findAll(@ModelAttribute EnvironmentDTO environmentDTO, @ModelAttribute PageableDTO pageableDTO) {
           
-          if (pageableDTO != null) {
+          if (!pageableDTO.isEmpty()) {
                
                EnvironmentPage environmentPage = environmentService.list(environmentDTO, pageableDTO);      
                return ResponseEntity.ok(environmentPage);

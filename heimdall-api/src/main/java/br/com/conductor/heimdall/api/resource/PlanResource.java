@@ -83,7 +83,7 @@ public class PlanResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_PLAN)
      public ResponseEntity<?> findAll(@ModelAttribute PlanDTO planDTO, @ModelAttribute PageableDTO pageableDTO) {
           
-          if (pageableDTO != null) {
+          if (!pageableDTO.isEmpty()) {
                
                PlanPage planPage = planService.list(planDTO, pageableDTO);      
                return ResponseEntity.ok(planPage);

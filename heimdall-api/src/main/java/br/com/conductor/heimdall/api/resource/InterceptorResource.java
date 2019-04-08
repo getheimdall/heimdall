@@ -92,7 +92,7 @@ public class InterceptorResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_INTERCEPTOR)
      public ResponseEntity<?> findAll(@ModelAttribute InterceptorDTO interceptorDTO, @ModelAttribute PageableDTO pageableDTO) {
           
-          if (pageableDTO != null) {
+          if (pageableDTO != null && !pageableDTO.isEmpty()) {
                
                InterceptorPage interceptorPage = interceptorService.list(interceptorDTO, pageableDTO);      
                return ResponseEntity.ok(interceptorPage);

@@ -98,7 +98,7 @@ public class OperationResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_OPERATION)
      public ResponseEntity<?> findAll(@PathVariable("apiId") Long apiId, @PathVariable("resourceId") Long resourceId, @ModelAttribute OperationDTO operationDTO, @ModelAttribute PageableDTO pageableDTO) {
 
-          if (pageableDTO != null) {
+          if (!pageableDTO.isEmpty()) {
 
                OperationPage operationPage = operationService.list(apiId, resourceId, operationDTO, pageableDTO);
                return ResponseEntity.ok(operationPage);

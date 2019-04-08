@@ -86,7 +86,7 @@ public class AppResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_APP)
      public ResponseEntity<?> findAll(@ModelAttribute AppRequestDTO appDTO, @ModelAttribute PageableDTO pageableDTO) {
           
-          if (pageableDTO != null) {
+          if (!pageableDTO.isEmpty()) {
                
                AppPage appPage = appService.list(appDTO, pageableDTO);
                

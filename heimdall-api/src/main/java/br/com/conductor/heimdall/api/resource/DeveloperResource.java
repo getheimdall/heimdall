@@ -99,7 +99,7 @@ public class DeveloperResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_DEVELOPER)
      public ResponseEntity<?> findAll(@ModelAttribute DeveloperDTO developerDTO, @ModelAttribute PageableDTO pageableDTO) {
           
-          if (pageableDTO != null) {
+          if (!pageableDTO.isEmpty()) {
                
                DeveloperPage developerPage = developerService.list(developerDTO, pageableDTO);      
                return ResponseEntity.ok(developerPage);

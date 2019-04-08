@@ -89,7 +89,7 @@ public class ResourceResource {
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_RESOURCE)
     public ResponseEntity<?> findAll(@PathVariable("apiId") Long apiId, @ModelAttribute ResourceDTO resourceDTO, @ModelAttribute PageableDTO pageableDTO) {
 
-        if (pageableDTO != null) {
+        if (!pageableDTO.isEmpty()) {
 
             ResourcePage resourcePage = resourceService.list(apiId, resourceDTO, pageableDTO);
             return ResponseEntity.ok(resourcePage);

@@ -103,7 +103,7 @@ public class ApiResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_API)
      public ResponseEntity<?> findAll(@ModelAttribute ApiDTO apiDTO, @ModelAttribute PageableDTO pageableDTO) {
           
-          if (pageableDTO != null) {
+          if (!pageableDTO.isEmpty()) {
                
                ApiPage apiPage = apiService.list(apiDTO, pageableDTO);      
                return ResponseEntity.ok(apiPage);

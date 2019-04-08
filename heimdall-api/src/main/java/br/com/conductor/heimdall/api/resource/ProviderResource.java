@@ -79,7 +79,7 @@ public class ProviderResource {
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_PROVIDER)
     public ResponseEntity<?> findAll(@ModelAttribute ProviderDTO providerDTO, @ModelAttribute PageableDTO pageableDTO) {
 
-        if (pageableDTO != null) {
+        if (!pageableDTO.isEmpty()) {
 
             ProviderPage providerPage = providerService.listWithPageableAndFilter(providerDTO, pageableDTO);
             return ResponseEntity.ok(providerPage);

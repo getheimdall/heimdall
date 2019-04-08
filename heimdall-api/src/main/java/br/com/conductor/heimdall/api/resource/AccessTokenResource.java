@@ -95,7 +95,7 @@ public class AccessTokenResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_ACCESSTOKEN)
      public ResponseEntity<?> findAll(@ModelAttribute AccessTokenRequest accessTokenRequest, @ModelAttribute PageableDTO pageableDTO) {
           
-          if (pageableDTO != null) {
+          if (!pageableDTO.isEmpty()) {
                
                AccessTokenPage accessTokenPage = accessTokenService.list(accessTokenRequest, pageableDTO);      
                return ResponseEntity.ok(accessTokenPage);

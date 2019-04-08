@@ -106,7 +106,7 @@ public class UserResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_USER)
      public ResponseEntity<?> findAll(@ModelAttribute UserDTO userDTO, @ModelAttribute PageableDTO pageableDTO) {
           
-          if (pageableDTO != null) {
+          if (!pageableDTO.isEmpty()) {
                
                UserPage userPage = userService.list(userDTO, pageableDTO);
                if (!userPage.getContent().isEmpty()) {

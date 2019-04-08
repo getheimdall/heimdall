@@ -89,7 +89,7 @@ public class MiddlewareResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_MIDDLEWARE)
      public ResponseEntity<?> findAll(@PathVariable("apiId") Long apiId, @ModelAttribute MiddlewareDTO middlewareDTO, @ModelAttribute PageableDTO pageableDTO) {
 
-          if (pageableDTO != null) {
+          if (!pageableDTO.isEmpty()) {
 
                MiddlewarePage middlewarePage = middlewareService.list(apiId, middlewareDTO, pageableDTO);
                return ResponseEntity.ok(middlewarePage);

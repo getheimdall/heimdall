@@ -100,7 +100,7 @@ public class RoleResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_ROLE)
      public ResponseEntity<?> findAll(@ModelAttribute RoleDTO roleDTO, @ModelAttribute PageableDTO pageableDTO) {
           
-          if (pageableDTO != null) {
+          if (!pageableDTO.isEmpty()) {
                
                RolePage resourcePage = roleService.list(roleDTO, pageableDTO);      
                return ResponseEntity.ok(resourcePage);
