@@ -383,16 +383,16 @@ public class InterceptorService {
         HeimdallException.checkThrow(interceptor.getApi().isCors(), ExceptionMessage.CORS_INTERCEPTOR_ALREADY_ASSIGNED_TO_THIS_API);
     }
 
-    private List<Long> ignoredValidate(List<ReferenceIdDTO> referenceIdDTOs, JpaRepository<?, Long> repository) {
+    private List<Long> ignoredValidate(List<Long> ignoredList, JpaRepository<?, Long> repository) {
 
         List<Long> invalids = Lists.newArrayList();
-        if (Objeto.notBlank(referenceIdDTOs)) {
+        if (ignoredList != null && !ignoredList.isEmpty()) {
 
-            for (ReferenceIdDTO ignored : referenceIdDTOs) {
+            for (Long ignored : ignoredList) {
 
-                Object o = repository.findOne(ignored.getId());
-                if (Objeto.isBlank(o)) {
-                    invalids.add(ignored.getId());
+                Object o = repository.findOne(ignored);
+                if (o == null) {
+                    invalids.add(ignored);
                 }
             }
         }
