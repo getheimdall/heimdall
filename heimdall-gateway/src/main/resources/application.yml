@@ -80,6 +80,15 @@ heimdall:
         sucessNumber: 4
         delayTimeSeconds: 30
 
+sentry:
+    enabled: false
+    dsn: http://127.0.0.1:9000
+    environment: developer
+    release: @project.version@
+    tags: heimdall-gateway
+    profiles:
+        active: dev
+
 spring:
     pid:
         fail-on-write-error: false
