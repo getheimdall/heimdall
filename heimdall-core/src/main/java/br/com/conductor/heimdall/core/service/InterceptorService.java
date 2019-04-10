@@ -38,7 +38,6 @@ import br.com.conductor.heimdall.core.util.Pageable;
 import br.com.conductor.heimdall.core.util.StringUtils;
 import br.com.conductor.heimdall.core.util.TemplateUtils;
 import br.com.twsoftware.alfred.object.Objeto;
-import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,6 +50,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
@@ -197,11 +198,11 @@ public class InterceptorService {
                     List<Interceptor> interceptors = middleware.getInterceptors();
                     if (Objeto.notBlank(interceptors)) {
 
-                        interceptors.addAll(Lists.newArrayList(interceptor));
+                        interceptors.add(interceptor);
                         middleware.setInterceptors(interceptors);
                     } else {
 
-                        interceptors = Lists.newArrayList(interceptor);
+                        interceptors = new ArrayList<>(Collections.singletonList(interceptor));
                         middleware.setInterceptors(interceptors);
                     }
                 }
@@ -385,7 +386,7 @@ public class InterceptorService {
 
     private List<Long> ignoredValidate(List<Long> ignoredList, JpaRepository<?, Long> repository) {
 
-        List<Long> invalids = Lists.newArrayList();
+        List<Long> invalids = new ArrayList<>();
         if (ignoredList != null && !ignoredList.isEmpty()) {
 
             for (Long ignored : ignoredList) {

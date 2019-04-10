@@ -33,8 +33,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -46,6 +44,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
@@ -110,10 +109,10 @@ public class Trace {
      private StackTrace stackTrace;
 
      @Getter
-     private List<GeneralTrace> traces = Lists.newArrayList();
+     private List<GeneralTrace> traces = new ArrayList<>();
      
      @Getter
-     private List<FilterDetail> filters = Lists.newArrayList();
+     private List<FilterDetail> filters = new ArrayList<>();
 
      private String profile;
      
@@ -159,13 +158,13 @@ public class Trace {
           Enumeration<String> headers = request.getHeaders("x-forwarded-for");
           if (Objeto.notBlank(headers)) {
 
-               List<String> listIps = Lists.newArrayList();
+               List<String> listIps = new ArrayList<>();
                while (headers.hasMoreElements()) {
                     String ip = headers.nextElement();
                     listIps.add(ip);
                }
 
-               setReceivedFromAddress(Joiner.on(",").join(listIps.toArray()));
+               setReceivedFromAddress(String.join(",", listIps));
 
           }
 

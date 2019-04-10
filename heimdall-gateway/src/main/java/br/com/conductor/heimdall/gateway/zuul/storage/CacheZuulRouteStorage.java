@@ -1,3 +1,4 @@
+
 package br.com.conductor.heimdall.gateway.zuul.storage;
 
 /*-
@@ -65,7 +66,7 @@ public class CacheZuulRouteStorage implements ZuulRouteStorage {
 
 	/**
 	 * Gets a ordered List of {@link ZuulRoute}.
-	 * 
+	 *
 	 * @return A ordered List of {@link ZuulRoute}
 	 */
 	public List<ZuulRoute> init() {

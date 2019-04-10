@@ -29,22 +29,22 @@ import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.InterceptorRepository;
 import br.com.conductor.heimdall.core.util.*;
-import com.google.common.base.Charsets;
-import com.google.common.collect.Lists;
-import com.google.common.io.Files;
 import com.netflix.zuul.FilterLoader;
 import com.netflix.zuul.filters.FilterRegistry;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ReflectionUtils;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
 
@@ -73,30 +73,21 @@ public class InterceptorFileService {
     @Transactional(readOnly = true)
     public void createFileInterceptor(Interceptor interceptor) {
 
-        try {
+        HeimdallException.checkThrow(interceptor == null, ExceptionMessage.INTERCEPTOR_NOT_EXIST);
 
-            HeimdallException.checkThrow(interceptor == null, ExceptionMessage.INTERCEPTOR_NOT_EXIST);
-
-            File file = templateInterceptor(interceptor.getType(), interceptor.getExecutionPoint());
-
-            String template = Files.toString(file, Charsets.UTF_8);
-            generateFileInterceptor(interceptor, template, buildParametersFile(interceptor, file));
-
-        } catch (IOException e) {
-
-            log.error(e.getMessage(), e);
-        }
+        String template = templateInterceptor(interceptor.getType(), interceptor.getExecutionPoint());
+        generateFileInterceptor(interceptor, template, buildParametersFile(interceptor, template));
 
     }
 
     /*
      * Constructs a parameter file from a Interceptor.
      */
-    private HashMap<String, Object> buildParametersFile(Interceptor interceptor, File file) {
+    private HashMap<String, Object> buildParametersFile(Interceptor interceptor, String template) {
 
-        Long INVALID_REFERENCE_ID = -1L;
+        final Long INVALID_REFERENCE_ID = -1L;
 
-        if (file != null) {
+        if (template != null) {
 
             HashMap<String, Object> parameters = new HashMap<>();
             parameters.put("order", StringUtils.generateOrder(definePrefixOrder(interceptor.getLifeCycle()), interceptor.getOrder()));
@@ -160,19 +151,26 @@ public class InterceptorFileService {
     }
 
     /*
-     * Creates a File that represents the Interceptor type. If its a type Log, adds the execution point
+     * Recovers the String representation of the template for the interceptor
      */
-    private File templateInterceptor(TypeInterceptor type, TypeExecutionPoint executionPoint) {
+    private String templateInterceptor(TypeInterceptor type, TypeExecutionPoint executionPoint) {
 
-        File file = null;
+        String result = null;
         String filePath = "template-interceptor";
-        try {
-            file = ResourceUtils.getFile(filePath + File.separator + type.getHeimdallInterceptor().getFile(executionPoint));
+        try (
+                InputStream inputStream = new ClassPathResource(
+                        filePath +
+                        File.separator +
+                        type.getHeimdallInterceptor().getFile(executionPoint)).getInputStream();
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader)
+        ) {
+            result = bufferedReader.lines().collect(Collectors.joining(System.lineSeparator()));
         } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
 
-        return file;
+        return result;
     }
 
     /*
@@ -201,7 +199,7 @@ public class InterceptorFileService {
                 if (TypeInterceptor.ACCESS_TOKEN.equals(interceptor.getType())) {
 
                     InterceptorLifeCycle lifeCycle = interceptor.getLifeCycle();
-                    List<Interceptor> interceptors = Lists.newArrayList();
+                    List<Interceptor> interceptors = new ArrayList<>();
                     switch (lifeCycle) {
                         case API:
                             interceptors = interceptorRepository.findByTypeAndApiId(TypeInterceptor.CLIENT_ID, interceptor.getApi().getId());
@@ -259,7 +257,7 @@ public class InterceptorFileService {
             }
             File file = new File(pathName);
 
-            Files.write(codeInterceptor, file, Charsets.UTF_8);
+            FileUtils.writeStringToFile(file, codeInterceptor, StandardCharsets.UTF_8);
         } catch (IOException e) {
 
             log.error(e.getMessage(), e);
