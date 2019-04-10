@@ -24,7 +24,6 @@ import br.com.conductor.heimdall.middleware.spec.DBMongo;
 import br.com.conductor.heimdall.middleware.spec.Json;
 import br.com.conductor.heimdall.middleware.util.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
@@ -164,7 +163,7 @@ public class DBMongoImpl implements DBMongo {
 
 		try {
 
-			List<Document> ts = Lists.newArrayList();
+			List<Document> ts = new ArrayList<>();
 			for (T t : objects) {
 
 				ts.add(Document.parse(json.parse(t)));
@@ -242,7 +241,7 @@ public class DBMongoImpl implements DBMongo {
 
           Long totalElements = collection.count();
 
-          List<T> list = Lists.newArrayList();
+          List<T> list = new ArrayList<>();
           for (Document document : documents) {
             T parse;
 			try {

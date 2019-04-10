@@ -19,8 +19,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties.ZuulRoute;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.google.common.collect.Lists;
-
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Environment;
 import br.com.conductor.heimdall.core.entity.Operation;
@@ -57,7 +55,7 @@ public class CacheZuulRouteStorageTest {
      @Test
      public void testLoadOneApiWithTwoResources() {
           List<Api> apis = new LinkedList<>();
-          List<Environment> environments = Lists.newArrayList();
+          List<Environment> environments = new ArrayList<>();
           Environment environment = new Environment();
           environment.setInboundURL("dns.production.com.br");
           environment.setOutboundURL("dns.production.com.br");

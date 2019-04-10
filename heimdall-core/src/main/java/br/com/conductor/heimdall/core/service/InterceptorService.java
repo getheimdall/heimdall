@@ -37,7 +37,6 @@ import br.com.conductor.heimdall.core.util.JsonUtils;
 import br.com.conductor.heimdall.core.util.Pageable;
 import br.com.conductor.heimdall.core.util.StringUtils;
 import br.com.conductor.heimdall.core.util.TemplateUtils;
-import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,6 +50,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
@@ -383,12 +383,12 @@ public class InterceptorService {
         HeimdallException.checkThrow(interceptor.getApi().isCors(), ExceptionMessage.CORS_INTERCEPTOR_ALREADY_ASSIGNED_TO_THIS_API);
     }
 
-    private List<Long> ignoredValidate(List<Long> ignoredIds, JpaRepository<?, Long> repository) {
+    private List<Long> ignoredValidate(List<Long> ignoredList, JpaRepository<?, Long> repository) {
 
-        List<Long> invalids = Lists.newArrayList();
-        if (ignoredIds != null && !ignoredIds.isEmpty()) {
+        List<Long> invalids = new ArrayList<>();
+        if (ignoredList != null && !ignoredList.isEmpty()) {
 
-            for (Long ignored : ignoredIds) {
+            for (Long ignored : ignoredList) {
 
                 Object o = repository.findOne(ignored);
                 if (o == null) {

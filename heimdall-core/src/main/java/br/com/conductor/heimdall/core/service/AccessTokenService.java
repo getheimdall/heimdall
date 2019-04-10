@@ -27,6 +27,7 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.APP_NOT_
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.SOME_PLAN_NOT_PRESENT_IN_APP;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -39,8 +40,6 @@ import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.google.common.collect.Lists;
 
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.PageDTO;
@@ -242,8 +241,7 @@ public class AccessTokenService {
           Plan plan = planRepository.findOne(1L);
           if (plan != null) {
 
-               accessToken.setPlans(Lists.newArrayList(plan));
-//               accessToken.setPlans(Arrays.asList(plan));
+               accessToken.setPlans(new ArrayList<>(Collections.singletonList(plan)));
           }
 
           accessToken = accessTokenRepository.save(accessToken);

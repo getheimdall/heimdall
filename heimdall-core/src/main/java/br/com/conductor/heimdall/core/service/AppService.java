@@ -23,6 +23,8 @@ package br.com.conductor.heimdall.core.service;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -37,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Lists;
 
+//import br.com.conductor.heimdall.core.converter.AppMap;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.AppDTO;
 import br.com.conductor.heimdall.core.dto.PageDTO;
@@ -241,7 +244,7 @@ public class AppService {
 
                Plan plan = planRepository.findOne(1L);
                if (plan != null) {
-                    app.setPlans(Lists.newArrayList(plan));
+                    app.setPlans(new ArrayList<>(Collections.singletonList(plan)));
                }
           }
 

@@ -22,7 +22,6 @@ package br.com.conductor.heimdall.gateway.configuration;
 import br.com.conductor.heimdall.core.exception.*;
 import br.com.conductor.heimdall.core.util.UrlUtil;
 import br.com.conductor.heimdall.gateway.configuration.GlobalExceptionHandler.BindExceptionInfo.BindError;
-import com.google.common.collect.Lists;
 import com.netflix.zuul.exception.ZuulException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -282,7 +281,7 @@ public class GlobalExceptionHandler {
      public @ResponseBody BindExceptionInfo validationBindException(HttpServletResponse response, HttpServletRequest request, BindException exception) {
 
           BindExceptionInfo bindException = new BindExceptionInfo();
-          List<BindError> errors = Lists.newArrayList();
+          List<BindError> errors = new ArrayList<>();
           List<ObjectError> objectsError = exception.getBindingResult().getAllErrors();
 
           objectsError.forEach(objectError -> {
@@ -333,7 +332,7 @@ public class GlobalExceptionHandler {
      public @ResponseBody BindExceptionInfo validationMethodArgumentNotValidException(HttpServletResponse response, HttpServletRequest request, MethodArgumentNotValidException exception) {
           
           BindExceptionInfo bindException = new BindExceptionInfo();
-          List<BindError> errors = Lists.newArrayList();
+          List<BindError> errors = new ArrayList<>();
           List<ObjectError> objectsError = exception.getBindingResult().getAllErrors();
           
           objectsError.forEach(objectError -> {

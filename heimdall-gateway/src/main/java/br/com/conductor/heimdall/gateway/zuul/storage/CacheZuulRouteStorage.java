@@ -23,7 +23,6 @@ import br.com.conductor.heimdall.core.repository.jdbc.ApiJDBCRepository;
 import br.com.conductor.heimdall.core.repository.jdbc.OperationJDBCRepository;
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.util.RouteSort;
-import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,7 +61,7 @@ public class CacheZuulRouteStorage implements ZuulRouteStorage {
 
 	/**
 	 * Gets a ordered List of {@link ZuulRoute}.
-	 * 
+	 *
 	 * @return A ordered List of {@link ZuulRoute}
 	 */
 	public List<ZuulRoute> init() {

@@ -19,7 +19,6 @@
  */
 package br.com.conductor.heimdall.api.configuration;
 
-import com.google.common.collect.Lists;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -92,6 +91,6 @@ public class SwaggerConfiguration {
         AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessNothing");
         AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
         authorizationScopes[0] = authorizationScope;
-        return Lists.newArrayList(new SecurityReference("authorization", authorizationScopes));
+        return Collections.singletonList(new SecurityReference("authorization", authorizationScopes));
     }
 }

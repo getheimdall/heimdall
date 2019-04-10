@@ -86,7 +86,7 @@ public class CallImpl implements Call {
                     HttpServletRequest r = context.getRequest();
                     List<String> names = Collections.list(r.getHeaderNames());
                     
-                    Map<String, String> headers = Maps.newHashMap();
+                    Map<String, String> headers = new HashMap<>();
                     names.forEach(name -> {
                          
                          if (r.getHeader(name) != null) {
@@ -166,7 +166,7 @@ public class CallImpl implements Call {
                     HttpServletRequest r = context.getRequest();
                     List<String> names = Collections.list(r.getParameterNames());
                     
-                    Map<String, String> params = Maps.newHashMap();
+                    Map<String, String> params = new HashMap<>();
                     names.forEach(name -> {
                          if (r.getParameter(name) != null) {
                               params.put(name, r.getParameter(name));
@@ -201,7 +201,7 @@ public class CallImpl implements Call {
 
                          if (params == null) {
 
-                              params = Maps.newConcurrentMap();
+                              params = new ConcurrentHashMap<>();
                          }
                          params.put(name, Arrays.asList(value));
                          context.setRequestQueryParams(params);
@@ -353,9 +353,9 @@ public class CallImpl implements Call {
                public Map<String, String> getAll() {
 
                     HttpServletResponse r = context.getResponse();
-                    List<String> names = Lists.newArrayList(r.getHeaderNames());
+                    List<String> names = new ArrayList<>(r.getHeaderNames());
                     
-                    Map<String, String> headers = Maps.newHashMap();
+                    Map<String, String> headers = new HashMap<>();
                     names.forEach(name -> {
                          
                          if (r.getHeader(name) != null) {
