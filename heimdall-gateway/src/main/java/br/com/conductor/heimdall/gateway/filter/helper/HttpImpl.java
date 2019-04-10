@@ -26,7 +26,6 @@ import br.com.conductor.heimdall.gateway.filter.helper.http.HeimdallResponseErro
 import br.com.conductor.heimdall.middleware.spec.Http;
 import br.com.conductor.heimdall.middleware.spec.Json;
 import br.com.twsoftware.alfred.object.Objeto;
-import com.google.common.collect.Lists;
 import com.netflix.zuul.context.RequestContext;
 import org.apache.http.entity.ContentType;
 import org.springframework.http.HttpEntity;
@@ -39,6 +38,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -126,7 +126,8 @@ public class HttpImpl implements Http {
                 && headers.get("Content-Type").get(0).equals(ContentType.APPLICATION_FORM_URLENCODED.getMimeType())) {
             formData = new LinkedMultiValueMap<>();
             params.forEach((key, value) -> {
-                List<String> values = Lists.newArrayList(value.toString());
+                List<String> values = new ArrayList<>();
+                values.add(value.toString());
                 formData.put(key, values);
             });
         } else {

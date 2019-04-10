@@ -32,7 +32,7 @@ public final class ConstantsContext {
     public static final String PATTERN = "pattern";
     public static final String CORS_FILTER = "run-cors-post-filter";
     public static final String CIRCUIT_BREAKER_ENABLED = "Circuit-Breaker";
-
+    public static final String ENVIRONMENT_VARIABLES = "environment-variables";
     public static final String CLIENT_ID = "client_id";
     public static final String ACCESS_TOKEN = "access_token";
 

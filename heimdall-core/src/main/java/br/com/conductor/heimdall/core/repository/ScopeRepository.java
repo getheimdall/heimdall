@@ -33,5 +33,4 @@ public interface ScopeRepository extends JpaRepository<Scope, Long> {
 
     Scope findByApiIdAndName(Long apiId, String name);
 
-    Scope findByApiIdAndNameAndId(Long apiId, String name, Long id);
 }
