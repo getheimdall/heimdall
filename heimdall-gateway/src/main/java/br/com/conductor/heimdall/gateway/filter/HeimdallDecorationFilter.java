@@ -302,6 +302,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                         ctx.put(API_ID, credential.getApiId());
                         ctx.put(RESOURCE_ID, credential.getResourceId());
                         ctx.put(OPERATION_ID, credential.getOperationId());
+                        ctx.put(OPERATION_PATH, credential.getOperationPath());
 
                         String host = ctx.getRequest().getHeader("Host");
 
