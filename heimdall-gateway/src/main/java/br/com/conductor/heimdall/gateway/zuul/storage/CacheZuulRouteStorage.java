@@ -28,9 +28,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties.ZuulRoute;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Represents the place that will fill the ZuulRoutes
@@ -87,7 +89,7 @@ public class CacheZuulRouteStorage implements ZuulRouteStorage {
 
 				ZuulRoute route = new ZuulRoute(completePath, destination);
 				route.setStripPrefix(false);
-				route.setSensitiveHeaders(Sets.newConcurrentHashSet());
+				route.setSensitiveHeaders(Collections.newSetFromMap(new ConcurrentHashMap<>()));
 				route.setRetryable(retryable);
 				routes.add(route);
 			}

@@ -23,10 +23,7 @@ import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.gateway.util.ConstantsContext;
 import br.com.conductor.heimdall.middleware.spec.*;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.netflix.zuul.context.RequestContext;
-import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.StreamUtils;
@@ -41,6 +38,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.GZIPInputStream;
 
 /**

@@ -27,7 +27,6 @@ import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Middleware;
 import br.com.conductor.heimdall.core.service.MiddlewareService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
-import com.google.common.net.HttpHeaders;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
