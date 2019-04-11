@@ -264,7 +264,6 @@ export default {
         'min_5_characters_to_new_password': 'A nova senha deve conter no mínimo 5 caracteres!',
         'min_5_characters_to_confirm_new_password': 'A confirmação da senha deve conter no mínimo 5 caracteres!',
         'swagger-editor': 'Editor do Swagger',
-        'default_plan_this_api': 'Plano padrão',
         'time': 'Tempo',
         'details': 'Detalhes'
     }

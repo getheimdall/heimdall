@@ -247,7 +247,6 @@ export default {
         'min_6_characters_to_name': 'Name must be at least 6 characters long!',
         'available_privileges': 'Available privileges',
         'attributed_privileges': 'Attributed privileges',
-        'default_plan_this_api': 'Default',
         'failed_to_get_privileges_this_user': 'Failed to get privileges this user',
         'session_expired': 'Session expired',
         'change_password': 'Change password',
