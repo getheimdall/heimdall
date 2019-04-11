@@ -26,7 +26,6 @@ public class MongoConfiguration {
 	private Property property;
 
 	@Bean
-	@ConditionalOnProperty(name="heimdall.mongo.enabled", havingValue="true")
 	public MongoClient createMongoClient() {
 
 		MongoClient client;

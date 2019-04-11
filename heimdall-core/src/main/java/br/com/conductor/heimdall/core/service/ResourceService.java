@@ -37,7 +37,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.converter.ResourceMap;
 import br.com.conductor.heimdall.core.dto.PageDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.ResourceDTO;
@@ -160,13 +159,38 @@ public class ResourceService {
           Resource resData = resourceRepository.findByApiIdAndName(apiId, resourceDTO.getName());
           HeimdallException.checkThrow(notBlank(resData) && (resData.getApi().getId() == api.getId()), ONLY_ONE_RESOURCE_PER_API);
           
-          Resource resource = GenericConverter.mapperWithMapping(resourceDTO, Resource.class, new ResourceMap());
+          Resource resource = GenericConverter.mapper(resourceDTO, Resource.class);
           resource.setApi(api);
           
           resource = resourceRepository.save(resource);
           
           amqpRoute.dispatchRoutes();
           
+          return resource;
+     }
+
+     /**
+      * Saves a {@link Resource} to the repository.
+      *
+      * @param 	apiId						The {@link Api} Id
+      * @param 	resource					The {@link Resource}
+      * @return								The saved {@link Resource}
+      * @throws NotFoundException			Resource not found
+      * @throws BadRequestException			Only one resource per api
+      */
+     public Resource save(Long apiId, Resource resource) {
+
+          Api api = apiRepository.findOne(apiId);
+          HeimdallException.checkThrow(isBlank(api), GLOBAL_RESOURCE_NOT_FOUND);
+
+          Resource resData = resourceRepository.findByApiIdAndName(apiId, resource.getName());
+          HeimdallException.checkThrow(notBlank(resData) && (resData.getApi().getId() == api.getId()), ONLY_ONE_RESOURCE_PER_API);
+          resource.setApi(api);
+
+          resource = resourceRepository.save(resource);
+
+          amqpRoute.dispatchRoutes();
+
           return resource;
      }
 
@@ -188,7 +212,7 @@ public class ResourceService {
           Resource resData = resourceRepository.findByApiIdAndName(apiId, resourceDTO.getName());
           HeimdallException.checkThrow(notBlank(resData) && (resData.getApi().getId() == resource.getApi().getId()) && (resData.getId() != resource.getId()), ONLY_ONE_RESOURCE_PER_API);
           
-          resource = GenericConverter.mapperWithMapping(resourceDTO, resource, new ResourceMap());
+          resource = GenericConverter.mapper(resourceDTO, resource);
           
           resource = resourceRepository.save(resource);
           

@@ -1,18 +1,15 @@
-
-package br.com.conductor.heimdall.core.util;
-
 /*-
  * =========================LICENSE_START==================================
- * heimdall-core
+ * heimdall-gateway
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,35 +17,21 @@ package br.com.conductor.heimdall.core.util;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.failsafe;
 
-import java.io.File;
-import java.io.IOException;
-
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
-
-import lombok.extern.slf4j.Slf4j;
+import lombok.Data;
+import net.jodah.failsafe.CircuitBreaker;
 
 /**
- * This class provides a method to write files on disk.
- * 
- * @author Filipe Germano
+ * Circuit Breaker entity
  *
+ * @author Marcelo Rodrigues
  */
-@Slf4j
-public class FileUtils {
+@Data
+public class CircuitBreakerHolder {
 
-	 /**
-	  * Saves a file to disk with UTF-8 formating.
-	  * 
-	  * @param  content		The String content of the file
-	  * @param  file		The {@link File} object to be saved
-	  */
-     public static void write(String content, File file) {
-          try {
-               Files.write(content, file, Charsets.UTF_8);
-          } catch (IOException e) {
-               log.error(e.getMessage(), e);
-          }
-     }
+    private CircuitBreaker circuitBreaker;
+
+    private Throwable throwable;
+
 }
