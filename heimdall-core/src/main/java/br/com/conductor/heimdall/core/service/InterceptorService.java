@@ -22,7 +22,6 @@ package br.com.conductor.heimdall.core.service;
  */
 
 import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.converter.InterceptorMap;
 import br.com.conductor.heimdall.core.dto.*;
 import br.com.conductor.heimdall.core.dto.interceptor.RateLimitDTO;
 import br.com.conductor.heimdall.core.dto.page.InterceptorPage;
@@ -39,7 +38,6 @@ import br.com.conductor.heimdall.core.util.Pageable;
 import br.com.conductor.heimdall.core.util.StringUtils;
 import br.com.conductor.heimdall.core.util.TemplateUtils;
 import br.com.twsoftware.alfred.object.Objeto;
-import com.google.common.collect.Lists;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,6 +50,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
@@ -198,11 +198,11 @@ public class InterceptorService {
                     List<Interceptor> interceptors = middleware.getInterceptors();
                     if (Objeto.notBlank(interceptors)) {
 
-                        interceptors.addAll(Lists.newArrayList(interceptor));
+                        interceptors.add(interceptor);
                         middleware.setInterceptors(interceptors);
                     } else {
 
-                        interceptors = Lists.newArrayList(interceptor);
+                        interceptors = new ArrayList<>(Collections.singletonList(interceptor));
                         middleware.setInterceptors(interceptors);
                     }
                 }
@@ -231,7 +231,7 @@ public class InterceptorService {
 
         Interceptor interceptor = interceptorRepository.findOne(id);
         HeimdallException.checkThrow(isBlank(interceptor), GLOBAL_RESOURCE_NOT_FOUND);
-        interceptor = GenericConverter.mapperWithMapping(interceptorDTO, interceptor, new InterceptorMap());
+        interceptor = GenericConverter.mapper(interceptorDTO, interceptor);
 
         if (TypeInterceptor.CORS.equals(interceptor.getType())) {
             HeimdallException.checkThrow(interceptor.getLifeCycle() != InterceptorLifeCycle.API, ExceptionMessage.CORS_INTERCEPTOR_NOT_API_LIFE_CYCLE);
@@ -384,16 +384,16 @@ public class InterceptorService {
         HeimdallException.checkThrow(interceptor.getApi().isCors(), ExceptionMessage.CORS_INTERCEPTOR_ALREADY_ASSIGNED_TO_THIS_API);
     }
 
-    private List<Long> ignoredValidate(List<ReferenceIdDTO> referenceIdDTOs, JpaRepository<?, Long> repository) {
+    private List<Long> ignoredValidate(List<Long> ignoredList, JpaRepository<?, Long> repository) {
 
-        List<Long> invalids = Lists.newArrayList();
-        if (Objeto.notBlank(referenceIdDTOs)) {
+        List<Long> invalids = new ArrayList<>();
+        if (ignoredList != null && !ignoredList.isEmpty()) {
 
-            for (ReferenceIdDTO ignored : referenceIdDTOs) {
+            for (Long ignored : ignoredList) {
 
-                Object o = repository.findOne(ignored.getId());
-                if (Objeto.isBlank(o)) {
-                    invalids.add(ignored.getId());
+                Object o = repository.findOne(ignored);
+                if (o == null) {
+                    invalids.add(ignored);
                 }
             }
         }

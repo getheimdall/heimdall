@@ -83,7 +83,7 @@ class RoleForm extends Component {
                                         initialValue: role && role.name,
                                         rules: [
                                             {required: true, message: i18n.t('please_input_role_name')},
-                                            {min: 4, message: i18n.t('min_4_characters_to_name')}
+                                            {min: 6, message: i18n.t('min_6_characters_to_name')}
                                         ]
                                     })(<Input required
                                               disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_ROLE, privileges.PRIVILEGE_UPDATE_ROLE])}/>)

@@ -10,9 +10,9 @@ package br.com.conductor.heimdall.core.entity;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -48,7 +48,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import br.com.conductor.heimdall.core.enums.Status;
-import br.com.twsoftware.alfred.object.Objeto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -79,7 +78,7 @@ public class Middleware implements Serializable {
      @Column(name = "VERSION", length = 20, nullable = false)
      private String version;
      
-     @Column(name = "PATH", length = 255, nullable = false)
+     @Column(name = "PATH", nullable = false)
      private String path;    
 
      @Column(name = "TYPE", length = 20, nullable = false)
@@ -89,7 +88,7 @@ public class Middleware implements Serializable {
      @JsonIgnore
      private byte[] file;
      
-     @ManyToOne(fetch = FetchType.EAGER)
+     @ManyToOne(fetch = FetchType.LAZY)
      @JoinColumn(name = "API_ID", nullable = false)
      @JsonManagedReference
      private Api api;
@@ -111,10 +110,8 @@ public class Middleware implements Serializable {
      @PrePersist
      private void initValuesPersist() {
 
-          if (Objeto.isBlank(status)) {
+          status = (status == null) ? Status.ACTIVE : status;
 
-               status = Status.ACTIVE;
-          }
           creationDate = LocalDateTime.now();
           
           name = api.getId().toString() + "." + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddhhmmss"));

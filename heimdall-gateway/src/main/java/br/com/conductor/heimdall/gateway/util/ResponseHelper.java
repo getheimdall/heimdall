@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public class ResponseHandler {
+public class ResponseHelper {
 
     public static Map<String, String> getResponseHeaders(RequestContext context) {
 

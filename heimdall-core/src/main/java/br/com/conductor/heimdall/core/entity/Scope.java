@@ -78,21 +78,8 @@ public class Scope implements Serializable {
     private Set<Operation> operations;
 
     @JsonIgnore
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy="scopes")
-    private Set<Plan> plans;
-
-    @JsonIgnore
     public Set<Long> getOperationsIds() {
-        return this.operations != null ? this.operations.stream().map(Operation::getId).collect(Collectors.toSet()) : Collections.EMPTY_SET;
-    }
-
-    @PreRemove
-    private void removeFromPlans() {
-        this.plans.forEach(plan -> plan.removeScope(this));
-    }
-
-    public void removeOperation(Operation operation) {
-        this.operations.remove(operation);
+        return this.operations != null ? this.operations.stream().map(Operation::getId).collect(Collectors.toSet()) : Collections.emptySet();
     }
 
 }

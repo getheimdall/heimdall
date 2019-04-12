@@ -21,13 +21,13 @@ package br.com.conductor.heimdall.core.service;
  * ==========================LICENSE_END===================================
  */
 
-import com.google.common.io.Files;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * This class provides a simple way to save a {@link MultipartFile} to the file system.
@@ -73,7 +73,7 @@ public class FileService {
 
                try {
 
-                    Files.write(file, new File(pathname));
+                   Files.write(Paths.get(pathname), file);
                } catch (IOException e) {
                     log.error(e.getMessage(), e);
                }
