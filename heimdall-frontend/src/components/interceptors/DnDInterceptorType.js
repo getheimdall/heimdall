@@ -82,7 +82,7 @@ class DnDInterceptorType extends Component {
                     <Modal title={i18n.t('add_interceptor')}
                         footer={[
                             <Button id="cancelInterceptorTypeModal" key="back" onClick={this.handleCancel}>{i18n.t('cancel')}</Button>,
-                            <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_INTERCEPTOR, privileges.PRIVILEGE_UPDATE_INTERCEPTOR]}>
+                            <ComponentAuthority key={1} privilegesAllowed={[privileges.PRIVILEGE_CREATE_INTERCEPTOR, privileges.PRIVILEGE_UPDATE_INTERCEPTOR]}>
                                 <Button id="saveInterceptorTypeModal" key="submit" type="primary" onClick={this.handleSave}>
                                     {i18n.t('save')}
                                 </Button>
@@ -90,6 +90,8 @@ class DnDInterceptorType extends Component {
                         ]}
                         visible={this.state.showModal}
                         onCancel={this.handleCancel}
+                        width={600}
+                        maskClosable={false}
                         destroyOnClose >
                         <InterceptorForm
                             onRef={ref => (this.interceptorForm = ref)}
