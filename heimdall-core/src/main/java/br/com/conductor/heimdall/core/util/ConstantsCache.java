@@ -40,6 +40,8 @@ public class ConstantsCache {
      
      public static final String ACCESS_TOKENS_ACTIVE_CACHE = "ACCESS_TOKENS_ACTIVE_CACHE";
 
+     public static final String ENVIRONMENT_ACTIVE_CACHE = "ENVIRONMENT_ACTIVE_CACHE";
+
      public static final String APPS_ACTIVE_CACHE = "APPS_ACTIVE_CACHE";
 
      public static final String APPS_CLIENT_ID = "APPS_CLIENT_ID";

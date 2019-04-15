@@ -29,6 +29,7 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.SOME_PLA
 import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 import static br.com.twsoftware.alfred.object.Objeto.notBlank;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -41,8 +42,6 @@ import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.google.common.collect.Lists;
 
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.PageDTO;
@@ -92,7 +91,6 @@ public class AccessTokenService {
       *
       * @param 	id 						The id of the {@link AccessToken}
       * @return  						The {@link AccessToken} found
-      * @throws NotFoundException 		Resource not found
       */
      @Transactional(readOnly = true)
      public AccessToken find(Long id) {
@@ -149,8 +147,6 @@ public class AccessTokenService {
       *
       * @param 	accessTokenPersist 		{@link AccessTokenPersist}
       * @return 						The {@link AccessToken} that was saved to the repository
-      * @throws BadRequestException		App not exist.
-      * @throws BadRequestException		Token already exists.
       */
      @Transactional
      public AccessToken save(AccessTokenPersist accessTokenPersist) {
@@ -189,8 +185,6 @@ public class AccessTokenService {
       * @param 	id 						The ID of the {@link AccessToken} to be updated
       * @param 	accessTokenPersist 		{@link AccessTokenPersist} The request for {@link AccessToken}
       * @return 						The {@link AccessToken} updated
-      * @throws NotFoundException 		Resource not found
-      * @throws BadRequestException		App not exist
       */
      @Transactional
      public AccessToken update(Long id, AccessTokenPersist accessTokenPersist) {
@@ -214,7 +208,6 @@ public class AccessTokenService {
       * Deletes a {@link AccessToken} by its ID.
       *
       * @param 	id 						The ID of the {@link AccessToken} to be deleted
-      * @throws NotFoundException 		Resource not found
       */
      @Transactional
      public void delete(Long id) {
@@ -232,8 +225,6 @@ public class AccessTokenService {
       *
       * @param reqBody					The {@link AccessTokenDTO}
       * @return							The {@link AccessToken} saved
-      * @throws BadRequestException		Access token not defined
-      * @throws BadRequestException		Token already exists
       */
      @Transactional
      public AccessToken save(AccessTokenDTO reqBody) {
@@ -253,8 +244,7 @@ public class AccessTokenService {
           Plan plan = planRepository.findOne(1l);
           if (Objeto.notBlank(plan)) {
 
-               accessToken.setPlans(Lists.newArrayList(plan));
-//               accessToken.setPlans(Arrays.asList(plan));
+               accessToken.setPlans(new ArrayList<>(Collections.singletonList(plan)));
           }
 
           accessToken = accessTokenRepository.save(accessToken);

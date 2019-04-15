@@ -105,7 +105,18 @@ public class AppResource {
                
                if (!appPage.getContent().isEmpty()) {
                     List<App> apps = appPage.getContent();
-                    apps = apps.stream().map(app -> new App(app.getId(), app.getClientId(), app.getName(), app.getDescription(), app.getDeveloper(), app.getCreationDate(), app.getStatus(), null, app.getPlans(), null, app.getTags())).collect(Collectors.toList());
+                    apps = apps.stream()
+                            .map(app -> new App(
+                                    app.getId(),
+                                    app.getClientId(),
+                                    app.getName(),
+                                    app.getDescription(),
+                                    app.getDeveloper(),
+                                    app.getCreationDate(),
+                                    app.getStatus(),
+                                    null,
+                                    app.getPlans()))
+                            .collect(Collectors.toList());
                     appPage.setContent(apps);
                }
                return ResponseEntity.ok(appPage);
@@ -114,7 +125,18 @@ public class AppResource {
                List<App> apps = appService.list(appDTO);
                
                if (!apps.isEmpty()) {
-                    apps = apps.stream().map(app -> new App(app.getId(), app.getClientId(), app.getName(), app.getDescription(), app.getDeveloper(), app.getCreationDate(), app.getStatus(), null, app.getPlans(), null, app.getTags())).collect(Collectors.toList());
+                    apps = apps.stream()
+                            .map(app -> new App(
+                                    app.getId(),
+                                    app.getClientId(),
+                                    app.getName(),
+                                    app.getDescription(),
+                                    app.getDeveloper(),
+                                    app.getCreationDate(),
+                                    app.getStatus(),
+                                    null,
+                                    app.getPlans()))
+                            .collect(Collectors.toList());
                }
                return ResponseEntity.ok(apps);
           }
