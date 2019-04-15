@@ -34,4 +34,16 @@ public class CircuitBreakerHolder {
 
     private Throwable throwable;
 
+    public String getMessage() {
+        if (this.throwable == null)
+            return "No Exception captured";
+
+        if (this.throwable.getCause() == null)
+            return  "No Exception cause captured";
+
+        return (this.throwable.getCause().getMessage() != null) ?
+                this.throwable.getCause().getMessage() :
+                "No message available";
+
+    }
 }
