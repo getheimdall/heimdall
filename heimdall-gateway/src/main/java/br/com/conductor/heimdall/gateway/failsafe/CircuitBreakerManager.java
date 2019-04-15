@@ -88,9 +88,21 @@ public class CircuitBreakerManager {
 		if (circuitBreaker.isOpen()) {
 			return Failsafe.with(circuitBreaker)
 					.withFallback(() -> {
+
+						String message;
+						if (circuitBreakerHolder.getThrowable() == null) {
+							message = "No Exception captured";
+						} else if (circuitBreakerHolder.getThrowable().getCause() == null) {
+							message = "No Exception cause captured";
+						} else {
+							message = (circuitBreakerHolder.getThrowable().getCause().getMessage() != null) ?
+									circuitBreakerHolder.getThrowable().getCause().getMessage() :
+									"No message available";
+						}
+
 						String body = logAndCreateBody("CircuitBreaker ENABLED | URL: {0}, Exception: {1}",
 								url,
-								circuitBreakerHolder.getThrowable().getMessage());
+								message);
 
 						return ResponseEntity
 								.status(HttpStatus.SERVICE_UNAVAILABLE.value())
