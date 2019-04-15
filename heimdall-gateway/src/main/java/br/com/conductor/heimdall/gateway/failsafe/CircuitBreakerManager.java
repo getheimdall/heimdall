@@ -64,7 +64,7 @@ public class CircuitBreakerManager {
 					.withFallback(() ->  {
 						String body = logAndCreateBody("CircuitBreaker ENABLED | Operation: {0}, Exception: {1}",
 								operationPath,
-								circuitBreakerHolder.getThrowable().getCause().getMessage());
+                                circuitBreakerHolder.getMessage());
 
 						RequestContext context = RequestContext.getCurrentContext();
 						context.setSendZuulResponse(false);
@@ -89,20 +89,9 @@ public class CircuitBreakerManager {
 			return Failsafe.with(circuitBreaker)
 					.withFallback(() -> {
 
-						String message;
-						if (circuitBreakerHolder.getThrowable() == null) {
-							message = "No Exception captured";
-						} else if (circuitBreakerHolder.getThrowable().getCause() == null) {
-							message = "No Exception cause captured";
-						} else {
-							message = (circuitBreakerHolder.getThrowable().getCause().getMessage() != null) ?
-									circuitBreakerHolder.getThrowable().getCause().getMessage() :
-									"No message available";
-						}
-
 						String body = logAndCreateBody("CircuitBreaker ENABLED | URL: {0}, Exception: {1}",
 								url,
-								message);
+                                circuitBreakerHolder.getMessage());
 
 						return ResponseEntity
 								.status(HttpStatus.SERVICE_UNAVAILABLE.value())
