@@ -90,7 +90,7 @@ public class CircuitBreakerManager {
 					.withFallback(() -> {
 						String body = logAndCreateBody("CircuitBreaker ENABLED | URL: {0}, Exception: {1}",
 								url,
-								circuitBreakerHolder.getThrowable().getCause().getMessage());
+								circuitBreakerHolder.getThrowable().getMessage());
 
 						return ResponseEntity
 								.status(HttpStatus.SERVICE_UNAVAILABLE.value())
