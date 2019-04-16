@@ -1,8 +1,4 @@
 const cacheContent = content => {
-    console.log('-------------------------------------------------------------')
-    console.log('---------------------- CACHE CONTENT ------------------------')
-    console.log('-------------------------------------------------------------')
-
     if (content) {
         const { headers, queryParams } = content
 
@@ -31,10 +27,6 @@ const cacheContent = content => {
 }
 
 const ipsContent = content => {
-    console.log('-------------------------------------------------------------')
-    console.log('----------------------- IPS CONTENT -------------------------')
-    console.log('-------------------------------------------------------------')
-
     if (content) {
         const { ips } = content
 
@@ -50,10 +42,6 @@ const ipsContent = content => {
 }
 
 const logMaskerContent = content => {
-    console.log('-------------------------------------------------------------')
-    console.log('------------------- LOG MASKER CONTENT ----------------------')
-    console.log('-------------------------------------------------------------')
-
     if (content) {
 
         const { ignoredHeaders } = content
@@ -70,10 +58,6 @@ const logMaskerContent = content => {
 }
 
 const defaultContent = content => {
-    console.log('-------------------------------------------------------------')
-    console.log('--------------------- DEFAULT CONTENT -----------------------')
-    console.log('-------------------------------------------------------------')
-
     if (content) {
         return JSON.stringify(content)
     }
