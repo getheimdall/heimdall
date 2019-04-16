@@ -1,5 +1,4 @@
 import React from 'react'
-import PropType from 'prop-types'
 import { Form, Input, Col, Select } from 'antd'
 
 import i18n from "../../../i18n/i18n"
@@ -49,10 +48,6 @@ class Ratting extends React.Component {
             </React.Fragment>
         )
     }
-}
-
-Ratting.defaultProps = {
-    form: PropType.object.required
 }
 
 export default Ratting

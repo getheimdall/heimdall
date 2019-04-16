@@ -1,5 +1,4 @@
 import React from 'react'
-import PropType from 'prop-types'
 import { Form, Input, Col } from 'antd'
 
 import i18n from "../../../i18n/i18n"
@@ -30,10 +29,6 @@ class Default extends React.Component {
             </Col>
         )
     }
-}
-
-Default.defaultProps = {
-    form: PropType.object.required
 }
 
 export default Default

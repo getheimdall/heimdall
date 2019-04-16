@@ -1,5 +1,4 @@
 import React from 'react'
-import PropType from 'prop-types'
 import { Form, Input, Col } from 'antd'
 
 import i18n from "../../../i18n/i18n"
@@ -11,7 +10,7 @@ const FormItem = Form.Item
 class Cache extends React.Component {
 
     render() {
-
+        const { content } = this.props
         const { getFieldDecorator } = this.props.form
 
         return(
@@ -20,7 +19,7 @@ class Cache extends React.Component {
                     <FormItem label={i18n.t('cache_name')}>
                         {
                             getFieldDecorator('content.cache', {
-                                initialValue: 'cache-name',
+                                initialValue: content ? content.cache : 'cache-name',
                                 rules:[
                                     { required: true, message: i18n.t('please_input_cache_name') }
                                 ]
@@ -33,8 +32,5 @@ class Cache extends React.Component {
     }
 }
 
-Cache.defaultProps = {
-    form: PropType.object.required
-}
 
 export default Cache

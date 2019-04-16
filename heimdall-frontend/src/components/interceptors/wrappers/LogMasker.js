@@ -1,5 +1,4 @@
 import React from 'react'
-import PropType from 'prop-types'
 import { Form, Input, Col, Switch, Row } from 'antd'
 
 import i18n from "../../../i18n/i18n"
@@ -80,10 +79,6 @@ class LogMasker extends React.Component {
             </React.Fragment>
         )
     }
-}
-
-LogMasker.defaultProps = {
-    form: PropType.object.required
 }
 
 export default LogMasker

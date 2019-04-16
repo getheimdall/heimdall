@@ -1,5 +1,4 @@
 import React from 'react'
-import PropType from 'prop-types'
 import { Form, Input, Col } from 'antd'
 
 import i18n from "../../../i18n/i18n"
@@ -21,7 +20,7 @@ class Cache extends React.Component {
                     <FormItem label={i18n.t('cache_name')}>
                         {
                             getFieldDecorator('content.cache', {
-                                initialValue: content && content.cache ? content.cache : 'cache-name',
+                                initialValue: content ? content.cache : 'cache-name',
                                 rules:[
                                     { required: true, message: i18n.t('please_input_cache_name') }
                                 ]
@@ -33,7 +32,7 @@ class Cache extends React.Component {
                     <FormItem label={i18n.t('time_to_live')}>
                         {
                             getFieldDecorator('content.timeToLive', {
-                                initialValue: content && content.timeToLive ? content.timeToLive : 10000,
+                                initialValue: content ? content.timeToLive : 10000,
                                 rules:[
                                     { required: true, message: i18n.t('please_input_time_to_live') }
                                 ]
@@ -45,7 +44,7 @@ class Cache extends React.Component {
                     <FormItem label={i18n.t('headers')}>
                         {
                             getFieldDecorator('content.headers', {
-                                initialValue: content && content.headers ? content.headers : 'header1, header2'
+                                initialValue: content ? content.headers : 'header1, header2'
                             })(<TextArea required disabled={!(PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR]))} />)
                         }
                     </FormItem>
@@ -54,7 +53,7 @@ class Cache extends React.Component {
                     <FormItem label={i18n.t('query_params')}>
                         {
                             getFieldDecorator('content.queryParams', {
-                                initialValue: content && content.queryParams ? content.queryParams : 'queryParam1, queryParam2'
+                                initialValue: content ? content.queryParams : 'queryParam1, queryParam2'
                             })(<TextArea required disabled={!(PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR]))} />)
                         }
                     </FormItem>
@@ -64,8 +63,5 @@ class Cache extends React.Component {
     }
 }
 
-Cache.defaultProps = {
-    form: PropType.object.required
-}
 
 export default Cache

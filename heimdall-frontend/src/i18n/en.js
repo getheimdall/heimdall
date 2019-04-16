@@ -310,5 +310,6 @@ export default {
         'ignored_headers': 'Ignored Headers',
         'param_name': 'Param Name',
         'param_value': 'Param Value',
+        'add_new_param': 'Add new param'
     }
 }

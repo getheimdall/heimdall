@@ -1,5 +1,4 @@
 import React from 'react'
-import PropType from 'prop-types'
 import { Form, Input, Col } from 'antd'
 
 import i18n from "../../../i18n/i18n"
@@ -14,7 +13,6 @@ class AccessToken extends React.Component {
         const { content } = this.props
         const { getFieldDecorator } = this.props.form
 
-        console.log(content)
         return(
             <React.Fragment>
                 {
@@ -26,7 +24,7 @@ class AccessToken extends React.Component {
                     <FormItem label={i18n.t('access_token_name')}>
                         {
                             getFieldDecorator('content.name', {
-                                initialValue: content && content.name ? content.name : 'access_token',
+                                initialValue: content ? content.name : 'access_token',
                                 rules:[
                                     { required: true, message: i18n.t('please_input_access_token_name') }
                                 ]
@@ -37,10 +35,6 @@ class AccessToken extends React.Component {
             </React.Fragment>
         )
     }
-}
-
-AccessToken.defaultProps = {
-    form: PropType.object.required
 }
 
 export default AccessToken

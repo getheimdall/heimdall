@@ -1,5 +1,4 @@
 import React from 'react'
-import PropType from 'prop-types'
 import { Form, Input, Col,  } from 'antd'
 
 import i18n from "../../../i18n/i18n"
@@ -12,7 +11,7 @@ const { TextArea } = Input
 class Mock extends React.Component {
 
     render() {
-
+        const { content } = this.props
         const { getFieldDecorator } = this.props.form
 
         return(
@@ -21,7 +20,7 @@ class Mock extends React.Component {
                     <FormItem label={i18n.t('body')}>
                         {
                             getFieldDecorator('content.body', {
-                                initialValue: "{'name': 'Mock Example'}",
+                                initialValue: content ? content.body : "{'name': 'Mock Example'}",
                                 rules:[
                                     { required: true, message: i18n.t('please_input_body') }
                                 ]
@@ -33,7 +32,7 @@ class Mock extends React.Component {
                     <FormItem label={i18n.t('status')}>
                         {
                             getFieldDecorator('content.status', {
-                                initialValue: 200,
+                                initialValue: content ? content.status : 200,
                                 rules:[
                                     { required: true, message: i18n.t('please_input_status') }
                                 ]
@@ -44,10 +43,6 @@ class Mock extends React.Component {
             </React.Fragment>
         )
     }
-}
-
-Mock.defaultProps = {
-    form: PropType.object.required
 }
 
 export default Mock

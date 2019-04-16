@@ -1,5 +1,4 @@
 import React from 'react'
-import PropType from 'prop-types'
 import { Form, Input, Col } from 'antd'
 
 import i18n from "../../../i18n/i18n"
@@ -25,7 +24,7 @@ class ClientId extends React.Component {
                     <FormItem label={i18n.t('client_id_name')}>
                         {
                             getFieldDecorator('content.name', {
-                                initialValue: content && content.name ? content.name : 'client_id',
+                                initialValue: content ? content.name : 'client_id',
                                 rules:[
                                     { required: true, message: i18n.t('please_input_client_id_name') }
                                 ]
@@ -36,10 +35,6 @@ class ClientId extends React.Component {
             </React.Fragment>
         )
     }
-}
-
-ClientId.defaultProps = {
-    form: PropType.object.required
 }
 
 export default ClientId
