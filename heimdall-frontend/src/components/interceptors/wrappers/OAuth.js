@@ -13,6 +13,14 @@ class OAuth extends React.Component {
         isAuthorize: true
     }
 
+    componentDidMount() {
+        const { content } = this.props
+
+        if (content) {
+            this.setState({ ...this.state, isAuthorize: content.typeOAuth === 'AUTHORIZE' })
+        }
+    }
+
     handleOnChangeTypeOAuth = value => {
 
         if (value === 'AUTHORIZE' && !this.state.isAuthorize) {
@@ -25,7 +33,7 @@ class OAuth extends React.Component {
     }
 
     render() {
-
+        const { content } = this.props
         const { getFieldDecorator } = this.props.form
 
         return(
@@ -34,7 +42,7 @@ class OAuth extends React.Component {
                     <FormItem label={i18n.t('type_oauth')}>
                         {
                             getFieldDecorator('content.typeOAuth', {
-                                initialValue: 'AUTHORIZE',
+                                initialValue: content ? content.typeOAuth : 'AUTHORIZE',
                                 rules:[
                                     { required: true, message: i18n.t('please_input_type_oauth') }
                                 ]
@@ -49,7 +57,7 @@ class OAuth extends React.Component {
                     <FormItem label={i18n.t('private_key')}>
                         {
                             getFieldDecorator('content.privateKey', {
-                                initialValue: 'privateKey',
+                                initialValue: content ? content.privateKey : 'privateKey',
                                 rules:[
                                     { required: true, message: i18n.t('please_input_private_key') }
                                 ]
@@ -64,7 +72,7 @@ class OAuth extends React.Component {
                             <FormItem label={i18n.t('provider_id')}>
                                 {
                                     getFieldDecorator('content.providerId', {
-                                        initialValue: 1,
+                                        initialValue: content ? content.providerId : 1,
                                     })(<Input type="number" disabled={!(PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR]))} />)
                                 }
                             </FormItem>
@@ -73,7 +81,7 @@ class OAuth extends React.Component {
                             <FormItem label={i18n.t('time_access_token')}>
                                 {
                                     getFieldDecorator('content.timeAccessToken', {
-                                        initialValue: 20
+                                        initialValue: content ? content.timeAccessToken : 20
                                     })(<Input type="number" required disabled={!(PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR]))} />)
                                 }
                             </FormItem>
@@ -82,7 +90,7 @@ class OAuth extends React.Component {
                             <FormItem label={i18n.t('time_refresh_token')}>
                                 {
                                     getFieldDecorator('content.timeRefreshToken', {
-                                        initialValue: 20
+                                        initialValue: content ? content.timeRefreshToken : 20
                                     })(<Input type="number" required disabled={!(PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR]))} />)
                                 }
                             </FormItem>

@@ -11,7 +11,7 @@ const TextArea = Input.TextArea
 class Ips extends React.Component {
 
     render() {
-
+        const { content } = this.props
         const { getFieldDecorator } = this.props.form
 
         return(
@@ -19,7 +19,7 @@ class Ips extends React.Component {
                 <FormItem label={i18n.t('ips')}>
                     {
                         getFieldDecorator('content.ips', {
-                            initialValue: '127.0.0.0, 127.0.0.1',
+                            initialValue: content ? content.ips : '127.0.0.0, 127.0.0.1',
                             rules:[
                                 { required: true, message: i18n.t('please_input_ips') }
                             ]

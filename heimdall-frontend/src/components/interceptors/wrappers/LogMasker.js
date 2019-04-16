@@ -13,13 +13,20 @@ class LogMasker extends React.Component {
         header: true
     }
 
+    componentDidMount() {
+        const { content } = this.props
+
+        if (content) {
+            this.setState({ ...this.state, header: content.headers })
+        }
+    }
+
     toggleHeader = () => {
-        console.log('toggleHeader')
         this.setState({ ...this.state, header: !this.state.header })
     }
 
     render() {
-
+        const { content } = this.props
         const { getFieldDecorator } = this.props.form
 
         return(
@@ -30,11 +37,11 @@ class LogMasker extends React.Component {
                             <FormItem label={i18n.t('body')}>
                                 {
                                     getFieldDecorator('content.body', {
-                                        initialValue: true,
+                                        initialValue: content ? content.body : true,
                                         rules:[
                                             { required: true, message: i18n.t('please_input_type_oauth') }
                                         ]
-                                    })(<Switch required disabled={!(PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR]))} defaultChecked/>)
+                                    })(<Switch required disabled={!(PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR]))} defaultChecked={content ? content.body : true}/>)
                                 }
                             </FormItem>
                         </Col>
@@ -42,11 +49,11 @@ class LogMasker extends React.Component {
                             <FormItem label={i18n.t('uri')}>
                                 {
                                     getFieldDecorator('content.uri', {
-                                        initialValue: true,
+                                        initialValue: content ? content.uri : true,
                                         rules:[
                                             { required: true, message: i18n.t('please_input_type_oauth') }
                                         ]
-                                    })(<Switch disabled={!(PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR]))} defaultChecked/>)
+                                    })(<Switch disabled={!(PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR]))} defaultChecked={content ? content.uri : true}/>)
                                 }
                             </FormItem>
                         </Col>
@@ -54,11 +61,11 @@ class LogMasker extends React.Component {
                             <FormItem label={i18n.t('headers')}>
                                 {
                                     getFieldDecorator('content.headers', {
-                                        initialValue: true,
+                                        initialValue: content ? content.headers : true,
                                         rules:[
                                             { required: true, message: i18n.t('please_input_type_oauth') }
                                         ]
-                                    })(<Switch onChange={this.toggleHeader} disabled={!(PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR]))} defaultChecked/>)
+                                    })(<Switch onChange={this.toggleHeader} disabled={!(PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR]))} defaultChecked={content ? content.headers : true}/>)
                                 }
                             </FormItem>
                         </Col>
@@ -70,7 +77,7 @@ class LogMasker extends React.Component {
                         <FormItem label={i18n.t('ignored_headers')}>
                             {
                                 getFieldDecorator('content.ignoredHeaders', {
-                                    initialValue: 'someHeader, anotherHeader',
+                                    initialValue: content ? content.ignoredHeaders : 'someHeader, anotherHeader',
                                 })(<Input.TextArea disabled={!(PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR]))} />)
                             }
                         </FormItem>

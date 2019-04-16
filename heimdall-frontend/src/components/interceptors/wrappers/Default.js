@@ -11,7 +11,7 @@ const TextArea = Input.TextArea
 class Default extends React.Component {
 
     render() {
-
+        const { content } = this.props
         const { getFieldDecorator } = this.props.form
 
         return(
@@ -19,7 +19,7 @@ class Default extends React.Component {
                 <FormItem label={i18n.t('content')}>
                     {
                         getFieldDecorator('content', {
-                            initialValue: '',
+                            initialValue: content ? content : '',
                             rules:[
                                 { required: true, message: i18n.t('please_input_content') }
                             ]
