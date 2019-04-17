@@ -68,7 +68,7 @@ public class HttpImpl implements Http {
     private RestTemplate restTemplate;
 
     private boolean enableHandler;
-
+    
     private MultiValueMap<String, String> queryParams;
 
     private CircuitBreakerManager circuitBreakerManager;
@@ -153,7 +153,7 @@ public class HttpImpl implements Http {
         setUIDFromInterceptor();
         String url = "GET:" + uriComponentsBuilder.build().encode().toUri().toString();
         ResponseEntity<String> entity;
-
+    
         updateQueryParams();
         if (headers.isEmpty()) {
 
@@ -178,7 +178,7 @@ public class HttpImpl implements Http {
         setUIDFromInterceptor();
         String url = "POST:" + uriComponentsBuilder.build().encode().toUri().toString();
         ResponseEntity<String> entity;
-
+    
         updateQueryParams();
         if (headers.isEmpty()) {
 
@@ -217,7 +217,7 @@ public class HttpImpl implements Http {
         setUIDFromInterceptor();
         String url = "PUT:" + uriComponentsBuilder.build().encode().toUri().toString();
         ResponseEntity<String> entity;
-
+    
         updateQueryParams();
         if (headers.isEmpty()) {
 
@@ -254,7 +254,7 @@ public class HttpImpl implements Http {
         setUIDFromInterceptor();
         String url = "DELETE:" + uriComponentsBuilder.build().encode().toUri().toString();
         ResponseEntity<String> entity;
-
+    
         updateQueryParams();
         if (headers.isEmpty()) {
             entity = circuitBreakerManager.failsafe(
@@ -277,7 +277,7 @@ public class HttpImpl implements Http {
         setUIDFromInterceptor();
         String url = "PATCH:" + uriComponentsBuilder.build().encode().toUri().toString();
         ResponseEntity<String> entity;
-
+    
         updateQueryParams();
         if (headers.isEmpty()) {
             requestBody = new HttpEntity<>(body);
