@@ -64,7 +64,7 @@ public class CircuitBreakerManager {
 					.withFallback(() ->  {
 						String body = logAndCreateBody("CircuitBreaker ENABLED | Operation: {0}, Exception: {1}",
 								operationPath,
-								circuitBreakerHolder.getThrowable().getCause().getMessage());
+                                circuitBreakerHolder.getMessage());
 
 						RequestContext context = RequestContext.getCurrentContext();
 						context.setSendZuulResponse(false);
@@ -88,9 +88,10 @@ public class CircuitBreakerManager {
 		if (circuitBreaker.isOpen()) {
 			return Failsafe.with(circuitBreaker)
 					.withFallback(() -> {
+
 						String body = logAndCreateBody("CircuitBreaker ENABLED | URL: {0}, Exception: {1}",
 								url,
-								circuitBreakerHolder.getThrowable().getCause().getMessage());
+                                circuitBreakerHolder.getMessage());
 
 						return ResponseEntity
 								.status(HttpStatus.SERVICE_UNAVAILABLE.value())
