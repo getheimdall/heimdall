@@ -80,7 +80,7 @@ public class HeimdallDecorationFilterTest {
         this.ctx.clear();
         this.ctx.setRequest(this.request);
         this.ctx.setResponse(this.response);
-        TraceContextHolder.getInstance().init(true, "developer", this.request, false, false, "");
+        TraceContextHolder.getInstance().init(true, "developer", this.request, false, false, false,"");
     }
 
     @Test

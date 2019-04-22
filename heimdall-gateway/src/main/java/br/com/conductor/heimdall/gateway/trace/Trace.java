@@ -65,6 +65,8 @@ public class Trace {
 	 
 	 private static final Logger logstash = LoggerFactory.getLogger("logstash");
 
+	 private static final Logger traceLog = LoggerFactory.getLogger("trace");
+
      private String method;
 
      private String url;
@@ -126,6 +128,9 @@ public class Trace {
      
      @JsonIgnore
      private boolean printLogstash;
+
+     @JsonIgnore
+     private boolean traceInFile;
      
      private String version;
      
@@ -141,13 +146,14 @@ public class Trace {
       * @param printMongo
       * @param printLogstash
       */
-     public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printMongo, boolean printLogstash){
+     public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printMongo, boolean printLogstash, boolean traceInFile){
 
           this.shouldPrint = true;
           this.profile = profile;
           this.printAllTrace = printAllTrace;
           this.printMongo = printMongo;
           this.printLogstash = printLogstash;
+          this.traceInFile = traceInFile;
           HttpServletRequest request = (HttpServletRequest) servletRequest;
           HeimdallException.checkThrow(request == null, ExceptionMessage.GLOBAL_REQUEST_NOT_FOUND);
 
@@ -180,8 +186,8 @@ public class Trace {
       * @param printLogstash
       * @param version
       */
-     public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printMongo, boolean printLogstash, String version) {
-    	 this(printAllTrace, profile, servletRequest, printMongo, printLogstash);
+     public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printMongo, boolean printLogstash, boolean traceInFile, String version) {
+    	 this(printAllTrace, profile, servletRequest, printMongo, printLogstash, traceInFile);
     	 this.version = version;
      }
 
@@ -291,6 +297,10 @@ public class Trace {
 
           if (printLogstash) {
         	  printInLogger(logstash, statusCode);
+          }
+
+          if (traceInFile) {
+               printInLogger(traceLog, statusCode);
           }
      }
 

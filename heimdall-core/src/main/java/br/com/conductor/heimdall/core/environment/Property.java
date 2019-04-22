@@ -162,7 +162,15 @@ public class Property {
      @Data
      public class Trace {
           private boolean printAllTrace = false;
+          private File file = new File();
           private List<String> sanitizes = new ArrayList<>();
+     }
+
+     @Data
+     public class File {
+          private boolean enabled = true;
+          private String pattern = "%m%n%rEx";
+          private String path = "/tmp/logs/trace.log";
      }
      
      private Middlewares middlewares = new Middlewares();

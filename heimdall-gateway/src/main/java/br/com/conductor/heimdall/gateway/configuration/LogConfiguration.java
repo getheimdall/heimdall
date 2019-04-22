@@ -21,11 +21,11 @@ package br.com.conductor.heimdall.gateway.configuration;
 
 import br.com.conductor.heimdall.core.environment.Property;
 import br.com.conductor.heimdall.gateway.appender.MongoDBAppender;
-import ch.qos.logback.classic.AsyncAppender;
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.*;
+import ch.qos.logback.classic.filter.ThresholdFilter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
+import ch.qos.logback.core.FileAppender;
 import net.logstash.logback.appender.LogstashTcpSocketAppender;
 import net.logstash.logback.encoder.LogstashEncoder;
 import org.slf4j.LoggerFactory;
@@ -105,6 +105,36 @@ public class LogConfiguration {
 
 			logger.addAppender(appender);
 
+		}
+
+		if (property.getTrace().getFile().isEnabled()) {
+
+			Logger logger = (Logger) LoggerFactory.getLogger("trace");
+			logger.setAdditive(false);
+
+			ThresholdFilter filter = new ThresholdFilter();
+			filter.setLevel(Level.ALL.levelStr);
+			filter.start();
+
+			PatternLayout layout = new PatternLayout();
+			layout.setOutputPatternAsHeader(false);
+			layout.setPattern(property.getTrace().getFile().getPattern());
+			layout.setContext(lc);
+			layout.start();
+
+			FileAppender<ILoggingEvent> fileAppender = new FileAppender<>();
+			fileAppender.setFile(property.getTrace().getFile().getPath());
+			fileAppender.setContext(lc);
+			fileAppender.setLayout(layout);
+			fileAppender.start();
+
+			final AsyncAppender asyncAppender = new AsyncAppender();
+			asyncAppender.setContext(lc);
+			asyncAppender.addAppender(fileAppender);
+			asyncAppender.addFilter(filter);
+			asyncAppender.start();
+
+			logger.addAppender(asyncAppender);
 		}
 	}
 
