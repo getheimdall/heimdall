@@ -59,7 +59,6 @@ heimdall:
             enabled: true
             pattern: "%-5level %d{dd/MM/yyyy HH:mm:ss.SSS} [%t] - %msg%n%rEx"
             path: /tmp/logs/trace.log
-        pattern:
         sanitizes:
             - access_token
             - client_id
