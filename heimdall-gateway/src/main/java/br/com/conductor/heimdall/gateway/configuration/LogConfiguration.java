@@ -94,10 +94,10 @@ public class LogConfiguration {
 			Logger logger = (Logger) LoggerFactory.getLogger("logstash");
 			logger.setAdditive(false);
 
-			LogstashTcpSocketAppender appender = new net.logstash.logback.appender.LogstashTcpSocketAppender();
+			LogstashTcpSocketAppender appender = new LogstashTcpSocketAppender();
 			appender.addDestination(property.getLogstash().getDestination());
 
-			LogstashEncoder encoder = new net.logstash.logback.encoder.LogstashEncoder();
+			LogstashEncoder encoder = new LogstashEncoder();
 
 			appender.setEncoder(encoder);
 			appender.setContext(lc);
