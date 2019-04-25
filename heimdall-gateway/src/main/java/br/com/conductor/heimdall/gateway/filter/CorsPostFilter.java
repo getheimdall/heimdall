@@ -87,8 +87,7 @@ public class CorsPostFilter extends ZuulFilter {
             long duration = (endTime - startTime);
 
             detail.setTimeInMillisRun(duration);
-            detail.setName(this.getClass().getSimpleName());
-            TraceContextHolder.getInstance().getActualTrace().addFilter(detail);
+            TraceContextHolder.getInstance().getActualTrace().addFilter(this.getClass().getSimpleName(), detail);
         }
 
         return null;
