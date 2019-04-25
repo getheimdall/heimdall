@@ -38,10 +38,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.net.URI;
+import java.util.*;
 
 import static br.com.conductor.heimdall.core.util.ConstantsInterceptors.IDENTIFIER_ID;
 
@@ -50,6 +48,7 @@ import static br.com.conductor.heimdall.core.util.ConstantsInterceptors.IDENTIFI
  *
  * @author Filipe Germano
  * @author Marcelo Aguiar Rodrigues
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 public class HttpImpl implements Http {
 
@@ -73,9 +72,12 @@ public class HttpImpl implements Http {
 
     private CircuitBreakerManager circuitBreakerManager;
 
-    public HttpImpl(boolean enableHandler, CircuitBreakerManager circuitBreakerManager) {
+    private boolean isFailSafeEnabled;
+
+    public HttpImpl(boolean enableHandler, CircuitBreakerManager circuitBreakerManager, boolean isFailSafeEnabled) {
         this.enableHandler = enableHandler;
         this.circuitBreakerManager = circuitBreakerManager;
+        this.isFailSafeEnabled = isFailSafeEnabled;
         this.queryParams = new LinkedMultiValueMap<>();
     }
 
@@ -151,22 +153,13 @@ public class HttpImpl implements Http {
     public ApiResponseImpl sendGet() {
 
         setUIDFromInterceptor();
-        String url = "GET:" + uriComponentsBuilder.build().encode().toUri().toString();
         ResponseEntity<String> entity;
     
         updateQueryParams();
         if (headers.isEmpty()) {
-
-            entity = circuitBreakerManager.failsafe(
-                    () -> rest().getForEntity(uriComponentsBuilder.build().encode().toUri(), String.class),
-                    url
-            );
+            entity = sendRequest(uriComponentsBuilder.build().encode().toUri(), HttpMethod.GET, new HttpEntity(new HttpHeaders()), String.class);
         } else {
-
-            entity = circuitBreakerManager.failsafe(
-                    () -> rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.GET, new HttpEntity<>(headers), String.class),
-                    url
-            );
+            entity = sendRequest(uriComponentsBuilder.build().encode().toUri(), HttpMethod.GET, new HttpEntity<>(headers), String.class);
         }
 
         return buildResponse(entity);
@@ -176,33 +169,23 @@ public class HttpImpl implements Http {
     public ApiResponseImpl sendPost() {
 
         setUIDFromInterceptor();
-        String url = "POST:" + uriComponentsBuilder.build().encode().toUri().toString();
         ResponseEntity<String> entity;
     
         updateQueryParams();
         if (headers.isEmpty()) {
 
             requestBody = new HttpEntity<>(body);
-            entity = circuitBreakerManager.failsafe(
-                    () -> rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.POST, requestBody, String.class),
-                    url
-            );
+            entity = sendRequest(uriComponentsBuilder.build().encode().toUri(), HttpMethod.POST, requestBody, String.class);
         } else {
 
             if (Objeto.notBlank(formData)) {
 
                 HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
-                entity = circuitBreakerManager.failsafe(
-                        () -> rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.POST, request, String.class),
-                        url
-                );
+                entity = sendRequest(uriComponentsBuilder.build().encode().toUri(), HttpMethod.POST, request, String.class);
             } else {
 
                 requestBody = new HttpEntity<>(body, headers);
-                entity = circuitBreakerManager.failsafe(
-                        () -> rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.POST, requestBody, String.class),
-                        url
-                );
+                entity = sendRequest(uriComponentsBuilder.build().encode().toUri(), HttpMethod.POST, requestBody, String.class);
             }
 
             requestBody = new HttpEntity<>(body, headers);
@@ -215,33 +198,23 @@ public class HttpImpl implements Http {
     public ApiResponseImpl sendPut() {
 
         setUIDFromInterceptor();
-        String url = "PUT:" + uriComponentsBuilder.build().encode().toUri().toString();
         ResponseEntity<String> entity;
     
         updateQueryParams();
         if (headers.isEmpty()) {
 
             requestBody = new HttpEntity<>(body);
-            entity = circuitBreakerManager.failsafe(
-                    () -> rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PUT, requestBody, String.class),
-                    url
-            );
+            entity = sendRequest(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PUT, requestBody, String.class);
         } else {
 
             if (Objeto.notBlank(formData)) {
 
                 HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
-                entity = circuitBreakerManager.failsafe(
-                        () -> rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PUT, request, String.class),
-                        url
-                );
+                entity = sendRequest(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PUT, request, String.class);
             } else {
 
                 requestBody = new HttpEntity<>(body, headers);
-                entity = circuitBreakerManager.failsafe(
-                        () -> rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PUT, requestBody, String.class),
-                        url
-                );
+                entity = sendRequest(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PUT, requestBody, String.class);
             }
         }
 
@@ -252,20 +225,13 @@ public class HttpImpl implements Http {
     public ApiResponseImpl sendDelete() {
 
         setUIDFromInterceptor();
-        String url = "DELETE:" + uriComponentsBuilder.build().encode().toUri().toString();
         ResponseEntity<String> entity;
     
         updateQueryParams();
         if (headers.isEmpty()) {
-            entity = circuitBreakerManager.failsafe(
-                    () -> rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.DELETE, null, String.class),
-                    url
-            );
+            entity = sendRequest(uriComponentsBuilder.build().encode().toUri(), HttpMethod.DELETE, null, String.class);
         } else {
-            entity = circuitBreakerManager.failsafe(
-                    () -> rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.DELETE, new HttpEntity<>(headers), String.class),
-                    url
-            );
+            entity = sendRequest(uriComponentsBuilder.build().encode().toUri(), HttpMethod.DELETE, new HttpEntity<>(headers), String.class);
         }
 
         return buildResponse(entity);
@@ -275,33 +241,39 @@ public class HttpImpl implements Http {
     public ApiResponseImpl sendPatch() {
 
         setUIDFromInterceptor();
-        String url = "PATCH:" + uriComponentsBuilder.build().encode().toUri().toString();
         ResponseEntity<String> entity;
     
         updateQueryParams();
         if (headers.isEmpty()) {
             requestBody = new HttpEntity<>(body);
-            entity = circuitBreakerManager.failsafe(
-                    () -> rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PATCH, requestBody, String.class),
-                    url
-            );
+            entity = sendRequest(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PATCH, requestBody, String.class);
         } else {
             if (Objeto.notBlank(formData)) {
                 HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(formData, headers);
-                entity = circuitBreakerManager.failsafe(
-                        () -> rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PATCH, request, String.class),
-                        url
-                );
+                entity = sendRequest(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PATCH, request, String.class);
             } else {
                 requestBody = new HttpEntity<>(body, headers);
-                entity = circuitBreakerManager.failsafe(
-                        () -> rest().exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PATCH, requestBody, String.class),
-                        url
-                );
+                entity = sendRequest(uriComponentsBuilder.build().encode().toUri(), HttpMethod.PATCH, requestBody, String.class);
             }
         }
 
         return buildResponse(entity);
+    }
+
+    private <T> ResponseEntity<T> sendRequest(URI uri, HttpMethod method, HttpEntity httpEntity, Class<T> responseType) {
+
+        if (isFailSafeEnabled) {
+
+            String url = method.name() + ":" + uri.toString();
+
+            return circuitBreakerManager.failsafe(
+                    () -> rest().exchange(uri, method, httpEntity, responseType),
+                    url
+            );
+        }
+
+        return rest().exchange(uri, method, httpEntity, responseType);
+
     }
 
     @Override

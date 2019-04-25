@@ -43,6 +43,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author Marcos Filho
  * @author Marcelo Rodrigues
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Component
 @Slf4j
@@ -114,7 +115,7 @@ public class CircuitBreakerManager {
 			breakerHolder = new CircuitBreakerHolder();
 			breakerHolder.setCircuitBreaker(new CircuitBreaker()
 					.withFailureThreshold(property.getFailsafe().getFailureNumber())
-					.withSuccessThreshold(property.getFailsafe().getSucessNumber())
+					.withSuccessThreshold(property.getFailsafe().getSuccessNumber())
 					.withDelay(property.getFailsafe().getDelayTimeSeconds(), TimeUnit.SECONDS));
 
 			concurrentHashMap.put(key, breakerHolder);

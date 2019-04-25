@@ -21,7 +21,7 @@ import static junit.framework.TestCase.assertNotNull;
 public class HttpImplTest {
      
      @InjectMocks
-     private HttpImpl subject = new HttpImpl(false, new CircuitBreakerManager());
+     private HttpImpl subject = new HttpImpl(false, new CircuitBreakerManager(), true);
 
      @Mock
      private CircuitBreakerManager circuitBreakerManager;
