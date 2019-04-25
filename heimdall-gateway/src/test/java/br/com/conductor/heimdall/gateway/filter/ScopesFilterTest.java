@@ -62,6 +62,7 @@ public class ScopesFilterTest {
 
     private final String clientId1 = "client_id_1";
     private final String clientId2 = "client_id_2";
+    private final String SCOPES_FILTER = "ScopesFilter";
 
     @BeforeClass
     public static void setUp() {
@@ -107,7 +108,7 @@ public class ScopesFilterTest {
         Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(app);
 
         this.filter.run();
-        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(SCOPES_FILTER);
 
         assertEquals(HttpStatus.OK.value(), context.getResponseStatusCode());
         assertEquals(Constants.SUCCESS, filterDetail.getStatus());
@@ -142,7 +143,7 @@ public class ScopesFilterTest {
         Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(app);
 
         this.filter.run();
-        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(SCOPES_FILTER);
 
         assertEquals(HttpStatus.OK.value(), context.getResponseStatusCode());
         assertEquals(Constants.SUCCESS, filterDetail.getStatus());
@@ -197,7 +198,7 @@ public class ScopesFilterTest {
 
         this.filter.run();
 
-        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(SCOPES_FILTER);
 
         assertEquals(HttpStatus.OK.value(), context.getResponseStatusCode());
         assertEquals(Constants.SUCCESS, filterDetail.getStatus());
@@ -248,7 +249,7 @@ public class ScopesFilterTest {
 
         this.filter.run();
 
-        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(SCOPES_FILTER);
 
         assertEquals(HttpStatus.FORBIDDEN.value(), context.getResponseStatusCode());
         assertEquals(Constants.SUCCESS, filterDetail.getStatus());
@@ -308,7 +309,7 @@ public class ScopesFilterTest {
 
         this.filter.run();
 
-        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(SCOPES_FILTER);
 
         assertEquals(HttpStatus.OK.value(), context.getResponseStatusCode());
         assertEquals(Constants.SUCCESS, filterDetail.getStatus());
@@ -363,7 +364,7 @@ public class ScopesFilterTest {
 
         this.filter.run();
 
-        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(SCOPES_FILTER);
 
         assertEquals(HttpStatus.FORBIDDEN.value(), context.getResponseStatusCode());
         assertEquals(Constants.SUCCESS, filterDetail.getStatus());
@@ -394,7 +395,7 @@ public class ScopesFilterTest {
         context.set(API_ID, api.getId());
 
         this.filter.run();
-        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(SCOPES_FILTER);
 
         assertEquals(HttpStatus.OK.value(), context.getResponseStatusCode());
         assertEquals(Constants.SUCCESS, filterDetail.getStatus());
@@ -420,7 +421,7 @@ public class ScopesFilterTest {
         Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(null);
 
         this.filter.run();
-        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(SCOPES_FILTER);
 
         assertEquals(HttpStatus.OK.value(), context.getResponseStatusCode());
         assertEquals(Constants.SUCCESS, filterDetail.getStatus());
@@ -445,7 +446,7 @@ public class ScopesFilterTest {
         Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(app);
 
         this.filter.run();
-        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(SCOPES_FILTER);
 
         assertEquals(HttpStatus.OK.value(), context.getResponseStatusCode());
         assertEquals(Constants.SUCCESS, filterDetail.getStatus());
@@ -470,7 +471,7 @@ public class ScopesFilterTest {
         Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(app);
 
         this.filter.run();
-        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(SCOPES_FILTER);
 
         assertEquals(HttpStatus.OK.value(), context.getResponseStatusCode());
         assertEquals(Constants.SUCCESS, filterDetail.getStatus());
@@ -502,7 +503,7 @@ public class ScopesFilterTest {
         Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(app);
 
         this.filter.run();
-        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(SCOPES_FILTER);
 
         assertEquals(HttpStatus.OK.value(), context.getResponseStatusCode());
         assertEquals(Constants.SUCCESS, filterDetail.getStatus());
