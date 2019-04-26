@@ -141,7 +141,7 @@ management:
 
 zuul:
     filter:
-        root: /tmp/interceptores
+        root: /tmp/interceptors
         interval: 8
 
 security:

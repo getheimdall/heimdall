@@ -82,9 +82,8 @@ public class LogResponseFilter extends ZuulFilter {
 
             long duration = (endTime - startTime);
 
-            detail.setName(this.getClass().getSimpleName());
             detail.setTimeInMillisRun(duration);
-            TraceContextHolder.getInstance().getActualTrace().addFilter(detail);
+            TraceContextHolder.getInstance().getActualTrace().addFilter(this.getClass().getSimpleName(), detail);
         }
         return null;
     }
