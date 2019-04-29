@@ -56,6 +56,7 @@ class NavBar extends Component {
             case 'heimdall:3':
                 this.props.initLoadingInterceptors()
                 this.props.refreshInterceptors()
+                break;
             default:
                 break;
         }
