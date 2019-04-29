@@ -9,6 +9,7 @@ import { logout, getUser } from '../../actions/auth'
 import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
 import {privileges} from "../../constants/privileges-types"
 import { clearCaches, initLoading } from '../../actions/cache'
+import { initLoading as initLoadingInterceptors, refreshInterceptors } from '../../actions/interceptors'
 
 const SubMenu = Menu.SubMenu
 const MenuItemGroup = Menu.ItemGroup
@@ -22,6 +23,11 @@ class NavBar extends Component {
     componentWillReceiveProps(newProps) {
         if (newProps.notification && newProps.notification !== this.props.notification) {
             const { type, message, description } = newProps.notification
+            notification[type]({ message, description })
+        }
+
+        if (newProps.notificationInterceptor && newProps.notificationInterceptor !== this.props.notificationInterceptor) {
+            const { type, message, description } = newProps.notificationInterceptor
             notification[type]({ message, description })
         }
     }
@@ -47,6 +53,9 @@ class NavBar extends Component {
                 this.props.initLoading()
                 this.props.clearCaches()
                 break;
+            case 'heimdall:3':
+                this.props.initLoadingInterceptors()
+                this.props.refreshInterceptors()
             default:
                 break;
         }
@@ -66,6 +75,9 @@ class NavBar extends Component {
                             <MenuItemGroup title={t('heimdall_project')}>
                                 {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_DELETE_CACHES]) &&
                                 <Menu.Item key="heimdall:2">{t('clear_cache')}</Menu.Item>
+                                }
+                                {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR]) &&
+                                <Menu.Item key="heimdall:3">{t('refresh_interceptors')}</Menu.Item>
                                 }
                                 {/* <Menu.Item key="heimdall:2">About</Menu.Item> */}
                                 <Menu.Item key="heimdall:4">{t('license')}</Menu.Item>
@@ -104,7 +116,8 @@ class NavBar extends Component {
 const mapStateToProps = (state) => {
     return {
         user: state.auth.user,
-        notification: state.caches.notification
+        notification: state.caches.notification,
+        notificationInterceptor: state.interceptors.notification
     }
 }
 
@@ -113,7 +126,9 @@ const mapDispatchToProps = (dispatch) => {
         logout: bindActionCreators(logout, dispatch),
         getUser: bindActionCreators(getUser, dispatch),
         clearCaches: bindActionCreators(clearCaches, dispatch),
-        initLoading: bindActionCreators(initLoading, dispatch)
+        refreshInterceptors: bindActionCreators(refreshInterceptors, dispatch),
+        initLoadingInterceptors: bindActionCreators(initLoadingInterceptors, dispatch),
+        initLoading: bindActionCreators(initLoading, dispatch),
     }
 }
 
