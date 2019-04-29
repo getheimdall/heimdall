@@ -89,7 +89,6 @@ class InterceptorForm extends Component {
             this.setState({ ...this.state, ignoredOperations: this.state.ignoredOperations.filter(ignored => ignored !== interceptor.candidateToIgnoreId) })
         }
 
-        console.log("as")
     }
 
     render() {
