@@ -33,6 +33,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * Since Heimdall is a SpringBoot application, this is a {@link SpringBootServletInitializer}.
@@ -46,6 +47,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @ComponentScan(basePackages = { "br.com.conductor.heimdall.api", "br.com.conductor.heimdall.core" })
 @EntityScan({"br.com.conductor.heimdall.core.entity", "br.com.conductor.heimdall.api.entity"})
 @EnableJpaRepositories({"br.com.conductor.heimdall.core.repository", "br.com.conductor.heimdall.api.repository"})
+@EnableScheduling
 public class ApiApplication extends SpringBootServletInitializer  {
 
      public static void main(String[] args) {
