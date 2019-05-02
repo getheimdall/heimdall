@@ -183,4 +183,14 @@ public class Property {
     	private int delayTimeSeconds = 30;
      }
 
+     @Data
+     public class Interceptor {
+        private Groovy groovy = new Groovy();
+     }
+
+     @Data
+     public class Groovy {
+          private Long fixedRate;
+     }
+
 }

@@ -18,15 +18,20 @@
  * ==========================LICENSE_END===================================
  */
 
-package br.com.conductor.heimdall.api.task;
+package br.com.conductor.heimdall.gateway.task;
 
 import br.com.conductor.heimdall.core.dto.InterceptorDTO;
 import br.com.conductor.heimdall.core.entity.Interceptor;
+import br.com.conductor.heimdall.core.enums.TypeInterceptor;
 import br.com.conductor.heimdall.core.service.InterceptorService;
+import br.com.conductor.heimdall.core.util.StringUtils;
+import br.com.conductor.heimdall.gateway.service.InterceptorFileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -38,12 +43,40 @@ public class ScheduledInterceptors {
     @Autowired
     private InterceptorService interceptorService;
 
-    @Scheduled(fixedRate = 5000)
+    @Autowired
+    private InterceptorFileService interceptorFileService;
+
+    @Value("${zuul.filter.root}")
+    private String path;
+
+    @Scheduled(fixedRateString = "${heimdall.interceptor.groovy.fixedRate}")
     public void checkFilesInterceptors() {
         List<Interceptor> interceptors = interceptorService.list(new InterceptorDTO());
 
         interceptors.forEach(interceptor -> {
-
+            if (!checkInterceptorInDisk(interceptor)) {
+                interceptorFileService.createFileInterceptor(interceptor);
+            }
         });
     }
+
+    private boolean checkInterceptorInDisk(Interceptor interceptor) {
+
+        String filename = StringUtils.concatCamelCase(interceptor.getLifeCycle().name(), interceptor.getType().name(), interceptor.getExecutionPoint().getFilterType(), interceptor.getId().toString()) + ".groovy";
+
+        String path = this.path;
+
+        if (interceptor.getType() == TypeInterceptor.MIDDLEWARE) {
+            path = path.concat(File.separator + "api" + File.separator + interceptor.getApi().getId());
+        } else {
+            path = path.concat(File.separator + interceptor.getExecutionPoint().getFilterType());
+        }
+
+        path = path.concat(File.separator + filename);
+
+        File file = new File(path);
+
+        return file.exists();
+    }
+
 }
