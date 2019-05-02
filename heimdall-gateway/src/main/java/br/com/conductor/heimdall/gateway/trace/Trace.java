@@ -23,9 +23,12 @@ package br.com.conductor.heimdall.gateway.trace;
 
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
+import br.com.conductor.heimdall.core.trace.FilterDetail;
+import br.com.conductor.heimdall.core.trace.GeneralTrace;
+import br.com.conductor.heimdall.core.trace.RequestResponseParser;
 import br.com.conductor.heimdall.core.util.LocalDateTimeSerializer;
 import br.com.conductor.heimdall.core.util.UrlUtil;
-import br.com.conductor.heimdall.middleware.spec.StackTrace;
+import br.com.conductor.heimdall.core.trace.StackTrace;
 import br.com.twsoftware.alfred.object.Objeto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -101,9 +104,6 @@ public class Trace {
      private String pattern;
 
      private Boolean cache;
-     
-     @JsonInclude(Include.NON_NULL)
-     private StackTrace stackTrace;
 
      @Getter
      private List<GeneralTrace> traces = new ArrayList<>();

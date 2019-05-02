@@ -37,13 +37,13 @@ public class TraceMock implements Trace {
     @Override
     public void addStackTrace(String clazz, String message, String stack) {
 
-        this.stackTrace = new StackTraceMock(clazz, message, stack);
+//        this.stackTrace = new StackTraceMock(clazz, message, stack);
     }
 
-    @Override
-    public StackTrace getStackTrace() {
-        return this.stackTrace;
-    }
+//    @Override
+//    public StackTrace getStackTrace() {
+//        return this.stackTrace;
+//    }
 
     @Override
     public void addTrace(String trace) {

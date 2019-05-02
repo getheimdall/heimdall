@@ -23,7 +23,7 @@ package br.com.conductor.heimdall.gateway.filter;
 
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.filter.helper.ApiResponseImpl;
-import br.com.conductor.heimdall.gateway.trace.FilterDetail;
+import br.com.conductor.heimdall.core.trace.FilterDetail;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.gateway.util.ResponseHelper;
 import br.com.conductor.heimdall.middleware.spec.ApiResponse;

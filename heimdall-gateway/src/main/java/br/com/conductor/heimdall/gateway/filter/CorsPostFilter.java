@@ -23,7 +23,7 @@ package br.com.conductor.heimdall.gateway.filter;
 
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.service.CORSInterceptorService;
-import br.com.conductor.heimdall.gateway.trace.FilterDetail;
+import br.com.conductor.heimdall.core.trace.FilterDetail;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.gateway.util.ConstantsContext;
 import com.netflix.zuul.ZuulFilter;

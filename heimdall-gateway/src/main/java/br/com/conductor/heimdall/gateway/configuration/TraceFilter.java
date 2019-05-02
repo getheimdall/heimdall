@@ -40,7 +40,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import br.com.conductor.heimdall.core.environment.Property;
-import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
+import br.com.conductor.heimdall.core.trace.StackTrace;
 import br.com.conductor.heimdall.gateway.trace.Trace;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import lombok.extern.slf4j.Slf4j;
@@ -94,7 +94,6 @@ public class TraceFilter implements Filter {
 		} catch (Exception e) {
 
 			log.error("Error {} during request {} exception {}", e.getMessage(),((HttpServletRequest) request).getRequestURL(), e.getStackTrace());
-			trace.setStackTrace(new StackTraceImpl(e.getClass().getName(), e.getMessage(), ExceptionUtils.getStackTrace(e)));
 			throw e;
 		} finally {
 

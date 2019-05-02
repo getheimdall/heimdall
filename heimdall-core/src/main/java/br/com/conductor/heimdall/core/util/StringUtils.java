@@ -31,7 +31,9 @@ import br.com.twsoftware.alfred.object.Objeto;
  * @author Filipe Germano
  *
  */
-public abstract class StringUtils {
+public class StringUtils {
+
+     private StringUtils() {}
 
 	/**
 	 * Creates a String that represents a order. It adds leading zeros ("0").
@@ -70,31 +72,6 @@ public abstract class StringUtils {
           }
           
           return value.toString();
-     }
-
-     /**
-      * Concatenates multiple strings.
-      * 
-      * @param  strings				Multiple String parameters 
-      * @return						The concatenated String
-      */
-     public static String join(String... strings) {
-          
-          return org.apache.commons.lang.StringUtils.join(strings);
-          
-     }
-
-     /**
-      * Concatenates multiple strings with a specific separator.
-      * 
-      * @param 	separator			The separator to be used.
-      * @param  strings				Multiple String parameters 
-      * @return						The concatenated String
-      */
-     public static String join(String separator, String... strings) {
-          
-          return org.apache.commons.lang.StringUtils.join(strings, separator);
-          
      }
 
     /**

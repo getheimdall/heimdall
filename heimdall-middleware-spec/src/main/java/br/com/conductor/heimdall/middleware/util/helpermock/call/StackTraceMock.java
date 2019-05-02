@@ -21,7 +21,7 @@ package br.com.conductor.heimdall.middleware.util.helpermock.call;
  * ==========================LICENSE_END===================================
  */
 
-import br.com.conductor.heimdall.middleware.spec.StackTrace;
+//import br.com.conductor.heimdall.middleware.spec.StackTrace;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,7 +34,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class StackTraceMock implements StackTrace {
+public class StackTraceMock {
 
     public String clazz;
 

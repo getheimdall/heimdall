@@ -69,7 +69,7 @@ import br.com.conductor.heimdall.core.util.ConstantsPath;
 import br.com.conductor.heimdall.core.util.UrlUtil;
 import br.com.conductor.heimdall.gateway.router.Credential;
 import br.com.conductor.heimdall.gateway.router.CredentialRepository;
-import br.com.conductor.heimdall.gateway.trace.FilterDetail;
+import br.com.conductor.heimdall.core.trace.FilterDetail;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.gateway.util.RequestHelper;
 import br.com.conductor.heimdall.gateway.zuul.route.HeimdallRoute;

@@ -21,9 +21,8 @@ package br.com.conductor.heimdall.gateway.filter;
 
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.core.util.UrlUtil;
-import br.com.conductor.heimdall.gateway.trace.FilterDetail;
-import br.com.conductor.heimdall.gateway.trace.RequestResponseParser;
-import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
+import br.com.conductor.heimdall.core.trace.FilterDetail;
+import br.com.conductor.heimdall.core.trace.RequestResponseParser;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.gateway.util.ResponseHelper;
 import br.com.conductor.heimdall.middleware.spec.Helper;
@@ -76,7 +75,6 @@ public class LogResponseFilter extends ZuulFilter {
             detail.setStatus(Constants.SUCCESS);
         } catch (Throwable e) {
             detail.setStatus(Constants.FAILED);
-            TraceContextHolder.getInstance().getActualTrace().setStackTrace(new StackTraceImpl(e.getClass().getName(), e.getMessage(), ExceptionUtils.getStackTrace(e)));
         } finally {
             long endTime = System.currentTimeMillis();
 

@@ -43,24 +43,16 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import br.com.conductor.heimdall.core.trace.GeneralTrace;
 import br.com.conductor.heimdall.gateway.util.ConstantsContext;
+import br.com.conductor.heimdall.middleware.spec.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.netflix.zuul.context.RequestContext;
 
-import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
-import br.com.conductor.heimdall.middleware.spec.Call;
-import br.com.conductor.heimdall.middleware.spec.Environment;
-import br.com.conductor.heimdall.middleware.spec.Header;
-import br.com.conductor.heimdall.middleware.spec.Info;
-import br.com.conductor.heimdall.middleware.spec.Query;
-import br.com.conductor.heimdall.middleware.spec.Request;
-import br.com.conductor.heimdall.middleware.spec.Response;
-import br.com.conductor.heimdall.middleware.spec.StackTrace;
-import br.com.conductor.heimdall.middleware.spec.Trace;
 import br.com.twsoftware.alfred.object.Objeto;
 import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
@@ -517,28 +509,23 @@ public class CallImpl implements Call {
      }
      
      public class TraceImpl implements Trace {
-          
-          public void setStackTrace(StackTrace stackTrace) {
-               
-               TraceContextHolder.getInstance().getActualTrace().setStackTrace(stackTrace);
-          }
-          
+
           @Override
           public void addStackTrace(String clazz, String message, String stack) {
-               
-               TraceContextHolder.getInstance().getActualTrace().setStackTrace(new StackTraceImpl(clazz, message, stack));
-          }
-          
-          public StackTrace getStackTrace() {
-               
-               return TraceContextHolder.getInstance().getActualTrace().getStackTrace();
+               Map<String, String> stackTrace = new HashMap<>();
+               stackTrace.put("class", clazz);
+               stackTrace.put("message", message);
+               stackTrace.put("stack", stack);
+               this.addTrace("middleware-stacktrace", stackTrace);
           }
 
+          @Override
           public void addTrace(String trace) {
 
                TraceContextHolder.getInstance().getActualTrace().trace(trace);
           }
 
+          @Override
           public void addTrace(String trace, Object object) {
                
                TraceContextHolder.getInstance().getActualTrace().trace(trace, object);

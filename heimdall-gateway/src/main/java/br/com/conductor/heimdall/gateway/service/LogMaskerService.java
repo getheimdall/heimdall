@@ -19,7 +19,7 @@
  */
 package br.com.conductor.heimdall.gateway.service;
 
-import br.com.conductor.heimdall.gateway.trace.RequestResponseParser;
+import br.com.conductor.heimdall.core.trace.RequestResponseParser;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import org.springframework.stereotype.Service;
 

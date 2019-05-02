@@ -37,7 +37,7 @@ import com.netflix.zuul.context.RequestContext;
 import br.com.conductor.heimdall.core.environment.Property;
 import br.com.conductor.heimdall.core.util.DigestUtils;
 import br.com.conductor.heimdall.core.util.UrlUtil;
-import br.com.conductor.heimdall.gateway.trace.RequestResponseParser;
+import br.com.conductor.heimdall.core.trace.RequestResponseParser;
 import br.com.conductor.heimdall.middleware.spec.Request;
 import br.com.twsoftware.alfred.object.Objeto;
 import lombok.extern.slf4j.Slf4j;

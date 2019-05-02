@@ -51,11 +51,27 @@ public class FilterDetail {
 
      /**
       * Returns the total time in milliseconds.
-      * 
+      *
       * @return Time in milliseconds
       */
      public long getTotalTimeInMillis() {
 
           return timeInMillisRun + timeInMillisShould;
+     }
+
+     public void clear() {
+          this.timeInMillisRun = 0;
+          this.timeInMillisShould = 0;
+          this.status = null;
+          this.totalTimeInMillis = 0;
+          this.stackTrace = null;
+     }
+
+     public void setStackTrace(String clazz, String message) {
+          this.stackTrace = new StackTrace(clazz, message, null);
+     }
+
+     public void setStackTrace(String clazz, String message, String stack) {
+          this.stackTrace = new StackTrace(clazz, message, stack);
      }
 }

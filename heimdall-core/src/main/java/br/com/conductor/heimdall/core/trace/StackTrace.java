@@ -19,6 +19,7 @@
  */
 package br.com.conductor.heimdall.core.trace;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
@@ -27,6 +28,7 @@ import lombok.Data;
  * log.
  */
 @Data
+@AllArgsConstructor
 public class StackTrace {
 
     public String clazz;

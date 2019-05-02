@@ -110,7 +110,7 @@ public class InterceptorFileService {
         } else {
 
             String[] message = {ExceptionMessage.INTERCEPTOR_TEMPLATE_NOT_EXIST.getMessage(), interceptor.getId().toString(), interceptor.getType().name(), interceptor.getExecutionPoint().name()};
-            String error = StringUtils.join(", ", message);
+            String error = String.join(", ", message);
             log.error(error);
 
             return null;
