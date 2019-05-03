@@ -20,8 +20,9 @@
 
 package br.com.conductor.heimdall.gateway.task;
 
-import br.com.conductor.heimdall.core.dto.InterceptorSimplified;
+import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.enums.TypeInterceptor;
+import br.com.conductor.heimdall.core.repository.jdbc.InterceptorJDBCRepository;
 import br.com.conductor.heimdall.core.service.InterceptorService;
 import br.com.conductor.heimdall.core.util.StringUtils;
 import br.com.conductor.heimdall.gateway.service.InterceptorFileService;
@@ -40,17 +41,20 @@ import java.util.List;
 public class ScheduledInterceptors {
 
     @Autowired
+    private InterceptorFileService interceptorFileService;
+
+    @Autowired
     private InterceptorService interceptorService;
 
     @Autowired
-    private InterceptorFileService interceptorFileService;
+    private InterceptorJDBCRepository interceptorJDBCRepository;
 
     @Value("${zuul.filter.root}")
     private String path;
 
     @Scheduled(fixedRateString = "${heimdall.interceptor.health.fixedRate}")
     public void checkFilesInterceptors() {
-        List<InterceptorSimplified> interceptors = interceptorService.listInterceptorSimplified();
+        List<Interceptor> interceptors = interceptorJDBCRepository.findAllInterceptorsSimplified();
 
         interceptors.forEach(interceptor -> {
             if (!checkInterceptorInDisk(interceptor)) {
@@ -59,14 +63,14 @@ public class ScheduledInterceptors {
         });
     }
 
-    private boolean checkInterceptorInDisk(InterceptorSimplified interceptor) {
+    private boolean checkInterceptorInDisk(Interceptor interceptor) {
 
         String filename = StringUtils.concatCamelCase(interceptor.getLifeCycle().name(), interceptor.getType().name(), interceptor.getExecutionPoint().getFilterType(), interceptor.getId().toString()) + ".groovy";
 
         String path = this.path;
 
         if (interceptor.getType() == TypeInterceptor.MIDDLEWARE) {
-            path = path.concat(File.separator + "api" + File.separator + interceptor.getApiId());
+            path = path.concat(File.separator + "api" + File.separator + interceptor.getApi().getId());
         } else {
             path = path.concat(File.separator + interceptor.getExecutionPoint().getFilterType());
         }
