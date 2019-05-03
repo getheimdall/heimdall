@@ -31,7 +31,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
@@ -40,9 +39,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import br.com.conductor.heimdall.core.environment.Property;
-import br.com.conductor.heimdall.core.trace.StackTrace;
-import br.com.conductor.heimdall.gateway.trace.Trace;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import br.com.conductor.heimdall.core.trace.Trace;
+import br.com.conductor.heimdall.core.trace.TraceContextHolder;
 import lombok.extern.slf4j.Slf4j;
 
 /**

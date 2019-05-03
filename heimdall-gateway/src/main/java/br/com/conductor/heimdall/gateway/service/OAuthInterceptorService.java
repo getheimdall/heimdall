@@ -29,7 +29,7 @@ import br.com.conductor.heimdall.core.exception.UnauthorizedException;
 import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.service.OAuthService;
 import br.com.conductor.heimdall.core.util.JwtUtils;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import br.com.conductor.heimdall.core.trace.TraceContextHolder;
 import br.com.conductor.heimdall.middleware.enums.HttpStatus;
 import br.com.conductor.heimdall.middleware.enums.HttpStatus.Series;
 import br.com.conductor.heimdall.middleware.spec.Http;

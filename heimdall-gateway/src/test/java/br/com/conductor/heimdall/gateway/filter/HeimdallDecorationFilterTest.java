@@ -2,15 +2,14 @@
 package br.com.conductor.heimdall.gateway.filter;
 
 import br.com.conductor.heimdall.core.enums.HttpMethod;
+import br.com.conductor.heimdall.core.trace.TraceContextHolder;
 import br.com.conductor.heimdall.gateway.router.Credential;
 import br.com.conductor.heimdall.gateway.router.CredentialRepository;
 import br.com.conductor.heimdall.gateway.router.EnvironmentInfo;
 import br.com.conductor.heimdall.gateway.router.EnvironmentInfoRepository;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.gateway.util.RequestHelper;
 import br.com.conductor.heimdall.gateway.zuul.route.HeimdallRoute;
 import br.com.conductor.heimdall.gateway.zuul.route.ProxyRouteLocator;
-import com.google.common.collect.Sets;
 import com.netflix.zuul.context.RequestContext;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

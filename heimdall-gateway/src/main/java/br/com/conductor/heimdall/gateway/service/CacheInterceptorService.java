@@ -19,7 +19,7 @@
  */
 package br.com.conductor.heimdall.gateway.service;
 
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import br.com.conductor.heimdall.core.trace.TraceContextHolder;
 import br.com.conductor.heimdall.middleware.spec.ApiResponse;
 import br.com.conductor.heimdall.middleware.spec.Helper;
 import com.netflix.zuul.context.RequestContext;

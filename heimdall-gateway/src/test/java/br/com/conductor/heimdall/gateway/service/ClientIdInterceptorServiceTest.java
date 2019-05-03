@@ -25,7 +25,7 @@ import br.com.conductor.heimdall.core.entity.Developer;
 import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.enums.Location;
 import br.com.conductor.heimdall.core.repository.AppRepository;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import br.com.conductor.heimdall.core.trace.TraceContextHolder;
 import com.netflix.zuul.context.RequestContext;
 import org.junit.Before;
 import org.junit.Test;

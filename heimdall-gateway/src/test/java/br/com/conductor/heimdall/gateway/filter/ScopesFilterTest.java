@@ -23,7 +23,7 @@ import br.com.conductor.heimdall.core.entity.*;
 import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.core.trace.FilterDetail;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import br.com.conductor.heimdall.core.trace.TraceContextHolder;
 import com.netflix.zuul.context.RequestContext;
 import org.junit.Before;
 import org.junit.BeforeClass;

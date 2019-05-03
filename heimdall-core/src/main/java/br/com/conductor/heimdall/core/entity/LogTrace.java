@@ -23,6 +23,7 @@ package br.com.conductor.heimdall.core.entity;
 import java.io.Serializable;
 import java.util.Date;
 
+import br.com.conductor.heimdall.core.trace.Trace;
 import org.bson.types.ObjectId;
 import org.mongodb.morphia.annotations.Entity;
 import org.mongodb.morphia.annotations.Id;

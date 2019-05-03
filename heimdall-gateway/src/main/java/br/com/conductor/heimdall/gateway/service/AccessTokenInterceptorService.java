@@ -25,7 +25,7 @@ import br.com.conductor.heimdall.core.enums.Location;
 import br.com.conductor.heimdall.core.repository.AccessTokenRepository;
 import br.com.conductor.heimdall.core.util.ConstantsInterceptors;
 import br.com.conductor.heimdall.core.util.DigestUtils;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import br.com.conductor.heimdall.core.trace.TraceContextHolder;
 import com.netflix.zuul.context.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

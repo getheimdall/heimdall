@@ -22,7 +22,7 @@ package br.com.conductor.heimdall.core.dto.logs;
  */
 
 import br.com.conductor.heimdall.core.entity.LogTrace;
-import br.com.conductor.heimdall.core.entity.Trace;
+import br.com.conductor.heimdall.core.trace.Trace;
 import lombok.Data;
 
 import java.util.Date;

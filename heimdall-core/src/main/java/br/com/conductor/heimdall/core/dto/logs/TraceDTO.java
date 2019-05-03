@@ -23,7 +23,7 @@ package br.com.conductor.heimdall.core.dto.logs;
 
 import java.io.Serializable;
 
-import br.com.conductor.heimdall.core.entity.Trace;
+import br.com.conductor.heimdall.core.trace.Trace;
 import br.com.conductor.heimdall.core.enums.HttpMethod;
 import lombok.Data;
 
