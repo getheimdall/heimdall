@@ -23,6 +23,7 @@ package br.com.conductor.heimdall.core.repository;
 
 import java.util.List;
 
+import br.com.conductor.heimdall.core.dto.InterceptorSimplified;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -32,6 +33,7 @@ import br.com.conductor.heimdall.core.entity.Operation;
 import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.entity.Resource;
 import br.com.conductor.heimdall.core.enums.TypeInterceptor;
+import org.springframework.data.jpa.repository.Query;
 
 /**
  * Provides methods to access a {@link Interceptor}
@@ -105,4 +107,13 @@ public interface InterceptorRepository extends JpaRepository<Interceptor, Long> 
      */
     List<Interceptor> findByResourceId(Long resourceId);
 
+    /**
+     * Finds Interceptors Simplified
+     *
+     * @return The List of {@link InterceptorSimplified}
+     */
+    @Query("SELECT " +
+            "new br.com.conductor.heimdall.core.dto.InterceptorSimplified(i.id, i.api.id, i.executionPoint, i.lifeCycle, i.type) " +
+            "FROM Interceptor i")
+    List<InterceptorSimplified> findInterceptorsSimplified();
 }

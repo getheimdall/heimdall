@@ -308,6 +308,11 @@ public class InterceptorService {
         List<Interceptor> interceptors = interceptorRepository.findByResourceId(resourceId);
         interceptors.forEach(interceptor -> this.delete(interceptor.getId()));
     }
+
+    public List<InterceptorSimplified> listInterceptorSimplified() {
+        return interceptorRepository.findInterceptorsSimplified();
+    }
+
     /**
      * Creates the ratelimts in Redis.
      *

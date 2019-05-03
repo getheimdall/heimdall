@@ -14,7 +14,7 @@ heimdall:
     excludeRabbit: true
     retryable: false
     interceptor:
-        groovy:
+        health:
             fixedRate: 600000
     logstash:
         enabled: true

@@ -185,11 +185,11 @@ public class Property {
 
      @Data
      public class Interceptor {
-        private Groovy groovy = new Groovy();
+        private Health health = new Health();
      }
 
      @Data
-     public class Groovy {
+     public class Health {
           private Long fixedRate;
      }
 

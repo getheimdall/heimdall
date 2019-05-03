@@ -20,8 +20,7 @@
 
 package br.com.conductor.heimdall.gateway.task;
 
-import br.com.conductor.heimdall.core.dto.InterceptorDTO;
-import br.com.conductor.heimdall.core.entity.Interceptor;
+import br.com.conductor.heimdall.core.dto.InterceptorSimplified;
 import br.com.conductor.heimdall.core.enums.TypeInterceptor;
 import br.com.conductor.heimdall.core.service.InterceptorService;
 import br.com.conductor.heimdall.core.util.StringUtils;
@@ -49,25 +48,25 @@ public class ScheduledInterceptors {
     @Value("${zuul.filter.root}")
     private String path;
 
-    @Scheduled(fixedRateString = "${heimdall.interceptor.groovy.fixedRate}")
+    @Scheduled(fixedRateString = "${heimdall.interceptor.health.fixedRate}")
     public void checkFilesInterceptors() {
-        List<Interceptor> interceptors = interceptorService.list(new InterceptorDTO());
+        List<InterceptorSimplified> interceptors = interceptorService.listInterceptorSimplified();
 
         interceptors.forEach(interceptor -> {
             if (!checkInterceptorInDisk(interceptor)) {
-                interceptorFileService.createFileInterceptor(interceptor);
+                interceptorFileService.createFileInterceptor(interceptorService.find(interceptor.getId()));
             }
         });
     }
 
-    private boolean checkInterceptorInDisk(Interceptor interceptor) {
+    private boolean checkInterceptorInDisk(InterceptorSimplified interceptor) {
 
         String filename = StringUtils.concatCamelCase(interceptor.getLifeCycle().name(), interceptor.getType().name(), interceptor.getExecutionPoint().getFilterType(), interceptor.getId().toString()) + ".groovy";
 
         String path = this.path;
 
         if (interceptor.getType() == TypeInterceptor.MIDDLEWARE) {
-            path = path.concat(File.separator + "api" + File.separator + interceptor.getApi().getId());
+            path = path.concat(File.separator + "api" + File.separator + interceptor.getApiId());
         } else {
             path = path.concat(File.separator + interceptor.getExecutionPoint().getFilterType());
         }
