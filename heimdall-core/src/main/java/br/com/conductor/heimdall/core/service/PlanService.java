@@ -21,11 +21,13 @@ package br.com.conductor.heimdall.core.service;
  * ==========================LICENSE_END===================================
  */
 
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.DEFAULT_PLAN_ALREADY_EXIST_TO_THIS_API;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
 import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 
 import java.util.List;
 
+import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -45,9 +47,10 @@ import br.com.conductor.heimdall.core.repository.PlanRepository;
 import br.com.conductor.heimdall.core.util.Pageable;
 
 /**
- * This class provides methos to create, read, update and delete a {@link Plan} resource.
+ * This class provides methods to create, read, update and delete a {@link Plan} resource.
  * 
  * @author Filipe Germano
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
 @Service
@@ -55,6 +58,12 @@ public class PlanService {
 
      @Autowired
      private PlanRepository planRepository;
+
+     @Autowired
+     private ApiService apiService;
+
+     @Autowired
+     private AMQPCacheService amqpCacheService;
 
      @Transactional(readOnly = true)
      public Plan find(Long id) {
@@ -77,7 +86,7 @@ public class PlanService {
 
           Plan plan = GenericConverter.mapper(planDTO, Plan.class);
           
-          Example<Plan> example = Example.of(plan, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+          Example<Plan> example = Example.of(plan, ExampleMatcher.matching().withIgnorePaths("defaultPlan").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
           
           Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
           Page<Plan> page = planRepository.findAll(example, pageable);
@@ -98,7 +107,7 @@ public class PlanService {
           
           Plan plan = GenericConverter.mapper(planDTO, Plan.class);
           
-          Example<Plan> example = Example.of(plan, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+          Example<Plan> example = Example.of(plan, ExampleMatcher.matching().withIgnorePaths("defaultPlan").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
           
           List<Plan> plans = planRepository.findAll(example);
           
@@ -114,8 +123,16 @@ public class PlanService {
      public Plan save(PlanDTO planDTO) {
 
           Plan plan = GenericConverter.mapper(planDTO, Plan.class);
+
+          if (plan.isDefaultPlan()) {
+               List<Plan> plans = apiService.plansByApi(plan.getApi().getId());
+               HeimdallException.checkThrow(plans.stream().anyMatch(Plan::isDefaultPlan), DEFAULT_PLAN_ALREADY_EXIST_TO_THIS_API);
+          }
+
           plan = planRepository.save(plan);
-          
+
+          amqpCacheService.dispatchClean();
+
           return plan;
      }
 
@@ -125,7 +142,6 @@ public class PlanService {
       * @param 	id							The {@link Plan} Id
       * @param 	planDTO						The {@link PlanDTO}
       * @return								The updated {@link Plan}
-      * @throws NotFoundException			Resource not found
       */
      public Plan update(Long id, PlanDTO planDTO) {
 
@@ -133,8 +149,18 @@ public class PlanService {
           HeimdallException.checkThrow(isBlank(plan), GLOBAL_RESOURCE_NOT_FOUND);
           
           plan = GenericConverter.mapper(planDTO, plan);
+
+          final Long planId = plan.getId();
+
+          if (plan.isDefaultPlan()) {
+               List<Plan> plans = apiService.plansByApi(plan.getApi().getId());
+               HeimdallException.checkThrow(plans.stream().anyMatch(p -> !p.getId().equals(planId) && p.isDefaultPlan()), DEFAULT_PLAN_ALREADY_EXIST_TO_THIS_API);
+          }
+
           plan = planRepository.save(plan);
-          
+
+          amqpCacheService.dispatchClean();
+
           return plan;
      }
      
@@ -142,7 +168,6 @@ public class PlanService {
       * Deletes a {@link Plan} by its Id.
       * 
       * @param 	id						The {@link Plan} Id
-      * @throws NotFoundException		Resource not found
       */
      public void delete(Long id) {
 
@@ -150,6 +175,8 @@ public class PlanService {
           HeimdallException.checkThrow(isBlank(plan), GLOBAL_RESOURCE_NOT_FOUND);
           
           planRepository.delete(plan);
+
+          amqpCacheService.dispatchClean();
      }
 
 }

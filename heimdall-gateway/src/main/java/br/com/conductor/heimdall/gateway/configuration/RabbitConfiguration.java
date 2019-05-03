@@ -72,6 +72,9 @@ public class RabbitConfiguration implements RabbitListenerConfigurer {
      @Value("${heimdall.queue.remove-middlewares}")
      private String queueRemoveMiddlewares;
 
+     @Value("${heimdall.queue.clean-interceptors-cache}")
+     private String queueCleanInterceptorsCache;
+
      @Bean
      public FanoutExchange exchangeFanoutRemoveInterceptors() {
 
@@ -115,6 +118,12 @@ public class RabbitConfiguration implements RabbitListenerConfigurer {
      }
 
      @Bean
+     public FanoutExchange exchangeFanoutCleanInterceptorsCache() {
+
+          return new FanoutExchange(RabbitConstants.EXCHANGE_FANOUT_HEIMDALL_CLEAN_INTERCEPTORS_CACHE, false, true);
+     }
+
+     @Bean
      public Queue queueRemoveInterceptors() {
           
           return new Queue(queueRemoveInterceptors, false, false, true);
@@ -125,12 +134,6 @@ public class RabbitConfiguration implements RabbitListenerConfigurer {
      public Queue queueRoutes() {
 
           return new Queue(queueRoutes, false, false, true);
-     }
-
-     @Bean
-     public Binding bindingRoutes() {
-
-          return BindingBuilder.bind(queueRoutes()).to(exchangeFanoutRoutes());
      }
 
      @Bean
@@ -167,7 +170,21 @@ public class RabbitConfiguration implements RabbitListenerConfigurer {
           return new Queue(queueRemoveMiddlewares, false, false, true);
           
      }
-     
+
+     @Bean
+     public Queue queueCleanInterceptorsCache() {
+
+          return new Queue(queueCleanInterceptorsCache, false, false, true);
+
+     }
+
+     @Bean
+     public Binding bindingRoutes() {
+
+          return BindingBuilder.bind(queueRoutes()).to(exchangeFanoutRoutes());
+     }
+
+
      @Bean
      public Binding bindingRemoveInterceptors() {
           
@@ -203,6 +220,12 @@ public class RabbitConfiguration implements RabbitListenerConfigurer {
      public Binding bindingRemoveMiddlewares() {
           
           return BindingBuilder.bind(queueRemoveMiddlewares()).to(exchangeFanoutRemoveMiddlewares());
+     }
+
+     @Bean
+     public Binding bindingCleanInterceptorsCache() {
+
+          return BindingBuilder.bind(queueCleanInterceptorsCache()).to(exchangeFanoutCleanInterceptorsCache());
      }
 
      @Bean

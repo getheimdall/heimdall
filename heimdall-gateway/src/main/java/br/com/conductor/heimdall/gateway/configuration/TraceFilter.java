@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -65,6 +66,9 @@ public class TraceFilter implements Filter {
 
 	@Autowired
 	private Property prop;
+	
+	@Autowired
+	private BuildProperties buildProperties;
 
 	@Override
 	public void destroy() {
@@ -80,22 +84,13 @@ public class TraceFilter implements Filter {
 		try {
 
 			trace = TraceContextHolder.getInstance().init(prop.getTrace().isPrintAllTrace(), profile, request,
-					prop.getMongo().getEnabled());
+			prop.getMongo().getEnabled(), prop.getLogstash().getEnabled(), buildProperties.getVersion());
 			if (shouldDisableTrace(request)) {
 				trace.setShouldPrint(false);
 			}
 
-			if ("OPTIONS".equalsIgnoreCase(((HttpServletRequest) request).getMethod())) {
-				response.setHeader("Access-Control-Allow-Origin", "*");
-				response.setHeader("Access-Control-Allow-Credentials", "true");
-				response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, DELETE, OPTIONS");
-				response.setHeader("Access-Control-Allow-Headers", "origin, content-type, accept, authorization, x-requested-with, X-AUTH-TOKEN, access_token, client_id, device_id, credential");
-				response.setHeader("Access-Control-Max-Age", "3600");
-				response.setStatus(200);
-			} else {			
-				chain.doFilter(request, response);
-			}
-			
+			chain.doFilter(request, response);
+
 		} catch (Exception e) {
 
 			log.error("Error {} during request {} exception {}", e.getMessage(),((HttpServletRequest) request).getRequestURL(), e.getStackTrace());

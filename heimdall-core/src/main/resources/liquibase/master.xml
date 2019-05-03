@@ -5,7 +5,7 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
     
     <property name="now" value="now()" dbms="mysql,h2"/>
-    <property name="now" value="current_timestamp" dbms="postgresql"/>
+    <property name="now" value="now()" dbms="postgresql"/>
     <property name="now" value="GETDATE()" dbms="mssql" />
     <property name="now" value="sysdate" dbms="oracle"/>
 
@@ -16,8 +16,12 @@
     <property name="floatType" value="float" dbms="mysql, oracle"/>
     <property name="booleanType" value="varchar(6)" dbms="h2"/>
     <property name="booleanType" value="varchar(1)" dbms="mssql"/>
-    
-    
+
+    <property name="true" value="1" dbms="mssql, oracle" />
+    <property name="false" value="0" dbms="mssql, oracle" />
+    <property name="true" value="true" dbms="postgresql, h2, mysql" />
+    <property name="false" value="false" dbms="postgresql, h2, mysql" />
+
     <property name="inteiro" value="bigint" dbms="mssql, h2, oracle"/>
     
     <include file="changelog/20180501121201-initial-core-schemes.xml" relativeToChangelogFile="true"/>
@@ -28,5 +32,14 @@
     <include file="changelog/20180718175848-update-column-token-in-oauth-authorizes.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20180719142230-add_columns-grantType-expirationDate-expirationTime-in-oauth-authorizes.xml" relativeToChangelogFile="true"/>
     <include file="changelog/20181008152933-delete-rows-log-interceptors.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20181129141113-remove-null-constraints-from-value-in-provider-param.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20181203115559-update-table-provider-with-provider-default.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20181112113200-added-scopes-structure.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20181112120123-add-column-cors-enabled-in-api.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20180905160326-add-column-password-in-developer.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20190121145232-add-column-default-plan-in-plan.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20190128114155-recreate-table-oauth-authorizes.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20190219164000-add-column-status-interceptor-table.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/20190222142000-recreate-default-plan-column.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

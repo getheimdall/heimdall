@@ -1,8 +1,7 @@
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-
 import {Button, Col, Form, Input, Modal, Row, Tooltip, Transfer} from 'antd'
-import ComponentAuthority from "../ComponentAuthority";
+import ComponentAuthority from "../policy/ComponentAuthority";
 import {PrivilegeUtils} from "../../utils/PrivilegeUtils";
 import {privileges} from "../../constants/privileges-types";
 import Loading from "../ui/Loading";
@@ -43,7 +42,6 @@ class RoleForm extends Component {
                 payload.privileges = this.state.privilegesRole.map(p => {
                     return {id: p}
                 })
-                // console.log(payload)
                 this.props.handleSubmit(payload)
             }
         });
@@ -79,13 +77,13 @@ class RoleForm extends Component {
                     {role && getFieldDecorator('id', {initialValue: role.id})(<Input type='hidden'/>)}
                     <Row gutter={24} type="flex" justify="space-around" align="top">
                         <Col sm={24} md={8}>
-                            <FormItem label={i18n.t('label')}>
+                            <FormItem label={i18n.t('name')}>
                                 {
                                     getFieldDecorator('name', {
                                         initialValue: role && role.name,
                                         rules: [
                                             {required: true, message: i18n.t('please_input_role_name')},
-                                            {min: 4, message: i18n.t('min_4_characters_to_name')}
+                                            {min: 6, message: i18n.t('min_6_characters_to_name')}
                                         ]
                                     })(<Input required
                                               disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_ROLE, privileges.PRIVILEGE_UPDATE_ROLE])}/>)

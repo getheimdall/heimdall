@@ -1,10 +1,16 @@
 export const TEMPLATE_ACCESS_TOKEN = "{\"location\": \"HEADER\", \"name\": \"access_token\"}";
+export const TEMPLATE_CLIENT_ID = "{\"location\": \"HEADER\", \"name\": \"client_id\"}";
 export const TEMPLATE_MOCK = "{\"body\": \"{'name': 'Mock Example'}\", \"status\": \"200\"}";
 export const TEMPLATE_RATTING = "{\"calls\":20,\"interval\":\"MINUTES\"}";
 export const TEMPLATE_IPS = "{\"ips\": [ \"127.0.0.0\", \"127.0.0.1\" ]}";
 export const TEMPLATE_CACHE = "{\"cache\":\"cache-name\", \"timeToLive\": 10000, \"headers\": [\"header1\", \"header2\"], \"queryParams\": [\"queryParam1\", \"queryParam2\"]}";
 export const TEMPLATE_CACHE_CLEAR = "{\"cache\":\"cache-name\"}";
 export const TEMPLATE_IDENTIFIER = "{}";
+export const TEMPLATE_CORS = "{\"Access-Control-Allow-Origin\": \"*\", " +
+    "\"Access-Control-Allow-Credentials\": \"true\", " +
+    "\"Access-Control-Allow-Methods\": \"POST, GET, PUT, PATCH, DELETE, OPTIONS\", " +
+    "\"Access-Control-Allow-Headers\": \"origin, content-type, accept, authorization, x-requested-with, X-AUTH-TOKEN, access_token, client_id, device_id, credential\", " +
+    "\"Access-Control-Max-Age\": \"3600\"}";
 
 export const getTemplate = (type) => {
     if (type === 'ACCESS_TOKEN') {
@@ -12,7 +18,7 @@ export const getTemplate = (type) => {
     }
 
     if (type === 'CLIENT_ID') {
-        return TEMPLATE_ACCESS_TOKEN
+        return TEMPLATE_CLIENT_ID
     }
 
     if (type === 'MOCK') {
@@ -39,6 +45,9 @@ export const getTemplate = (type) => {
         return TEMPLATE_IDENTIFIER
     }
 
+    if (type === 'CORS') {
+        return TEMPLATE_CORS
+    }
 
 }
 

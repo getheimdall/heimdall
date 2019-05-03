@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react'
 import {connect} from 'react-redux'
 import {userService} from '../../services'
-import ComponentAuthority from "../ComponentAuthority";
+import ComponentAuthority from "../policy/ComponentAuthority";
 // Authorization HOC
 const Authorization = (privilegesAllowed) => (WrappedComponent) => {
     class WithAuthorization extends PureComponent {
@@ -19,7 +19,6 @@ const Authorization = (privilegesAllowed) => (WrappedComponent) => {
                     <WrappedComponent {...this.props} />
                 </ComponentAuthority>
             )
-
         }
 
     }

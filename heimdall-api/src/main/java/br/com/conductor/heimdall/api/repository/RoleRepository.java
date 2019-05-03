@@ -23,6 +23,10 @@ package br.com.conductor.heimdall.api.repository;
 
 import java.util.Set;
 
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -47,4 +51,8 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
      
      @Query(value = "select roles.* FROM ROLES roles, USERS_ROLES ur WHERE roles.ID = ur.ROLE_ID and ur.USER_ID = :id", nativeQuery = true)
      Set<Role> findRolesByUserId(@Param("id") Long id);
+	
+     @EntityGraph(attributePaths = {"privileges"})
+	@Override
+	<S extends Role> Page<S> findAll(Example<S> example, Pageable pageable);
 }

@@ -22,12 +22,9 @@ package br.com.conductor.heimdall.core.entity;
  */
 
 import br.com.conductor.heimdall.core.enums.Status;
-import br.com.twsoftware.alfred.object.Objeto;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.google.common.collect.Lists;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -98,32 +95,13 @@ public class App implements Serializable {
     @JsonIgnoreProperties({"api"})
     private List<Plan> plans;
 
-    @JsonIgnore
-    @Column(name = "TAGS", length = 2000)
-    private String tag;
-
-    @Transient
-    private List<String> tags;
-
     @PrePersist
     private void initValuesPersist() {
 
-        if (Objeto.isBlank(status)) {
-
-            status = Status.ACTIVE;
-        }
+        status = (status == null) ? Status.ACTIVE : status;
 
         creationDate = LocalDateTime.now();
     }
 
-    @PostLoad
-    private void loadMethods() {
-
-        if (Objeto.notBlank(tag)) {
-
-            tags = Lists.newArrayList(tag.split(";"));
-//               tags = Arrays.asList(tag.split(";"));
-        }
-    }
 
 }

@@ -2,7 +2,7 @@ import React, {Component} from 'react'
 import { Form, Input, Row, Col, Checkbox, Switch, Tooltip, Button, Modal } from 'antd'
 
 import i18n from "../../i18n/i18n"
-import ComponentAuthority from "../ComponentAuthority"
+import ComponentAuthority from "../policy/ComponentAuthority"
 import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
 import { privileges } from '../../constants/privileges-types'
 
@@ -116,7 +116,7 @@ class ApiDefinition extends Component {
                                     <FormItem label={i18n.t('base_path')}>
                                         {
                                             getFieldDecorator('basePath', {
-                                                initialValue: api.basePath.replace("/", ""),
+                                                initialValue: api && api.basePath && api.basePath.replace("/", ""),
                                                 rules: [{required: true, message: i18n.t('please_input_your_api_base_path') }]
                                             })(<Input addonBefore={"/"} disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_API])}/>)
                                         }

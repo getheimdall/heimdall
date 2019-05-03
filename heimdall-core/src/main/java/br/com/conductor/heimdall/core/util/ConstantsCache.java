@@ -34,9 +34,13 @@ public class ConstantsCache {
 
      public static final String OPERATION_ACTIVE_FROM_ENDPOINT = "OPERATION_ACTIVE_FROM_ENDPOINT";
      
+     public static final String CREDENTIAL_ACTIVE_FROM_ENDPOINT = "CREDENTIAL_ACTIVE_FROM_ENDPOINT";
+     
      public static final String API_ACTIVE_FROM_ACCESS_TOKEN = "API_ACTIVE_FROM_ACCESS_TOKEN";
      
      public static final String ACCESS_TOKENS_ACTIVE_CACHE = "ACCESS_TOKENS_ACTIVE_CACHE";
+
+     public static final String ENVIRONMENT_ACTIVE_CACHE = "ENVIRONMENT_ACTIVE_CACHE";
 
      public static final String APPS_ACTIVE_CACHE = "APPS_ACTIVE_CACHE";
 

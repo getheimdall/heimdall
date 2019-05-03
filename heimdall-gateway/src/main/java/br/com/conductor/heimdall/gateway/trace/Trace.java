@@ -33,8 +33,6 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -46,8 +44,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 
 import static net.logstash.logback.marker.Markers.append;
 
@@ -62,6 +59,8 @@ import static net.logstash.logback.marker.Markers.append;
 public class Trace {
 	
 	 private static final Logger logMongo = LoggerFactory.getLogger("mongo");
+	 
+	 private static final Logger logstash = LoggerFactory.getLogger("logstash");
 
      private String method;
 
@@ -100,15 +99,17 @@ public class Trace {
      private RequestResponseParser response;
 
      private String pattern;
+
+     private Boolean cache;
      
      @JsonInclude(Include.NON_NULL)
      private StackTrace stackTrace;
 
      @Getter
-     private List<GeneralTrace> traces = Lists.newArrayList();
+     private List<GeneralTrace> traces = new ArrayList<>();
      
      @Getter
-     private List<FilterDetail> filters = Lists.newArrayList();
+     private Map<String, FilterDetail> filters = new LinkedHashMap<>();
 
      private String profile;
      
@@ -120,23 +121,30 @@ public class Trace {
      @JsonIgnore
      private boolean shouldPrint;
      
+     @JsonIgnore
+     private boolean printLogstash;
+
+     private String version;
+     
      public Trace() {
     	 
      }
 
      /**
-      * Creates a Trace.
-      * 
-      * @param printAllTrace	boolean, should print all trace
-      * @param profile			String, profile
-      * @param servletRequest	{@link ServletRequest}
+      * Create a Trace.
+      * @param printAllTrace
+      * @param profile
+      * @param servletRequest
+      * @param printMongo
+      * @param printLogstash
       */
-     public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printMongo){
+     public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printMongo, boolean printLogstash){
 
           this.shouldPrint = true;
           this.profile = profile;
           this.printAllTrace = printAllTrace;
           this.printMongo = printMongo;
+          this.printLogstash = printLogstash;
           HttpServletRequest request = (HttpServletRequest) servletRequest;
           HeimdallException.checkThrow(request == null, ExceptionMessage.GLOBAL_REQUEST_NOT_FOUND);
 
@@ -147,25 +155,40 @@ public class Trace {
           Enumeration<String> headers = request.getHeaders("x-forwarded-for");
           if (Objeto.notBlank(headers)) {
 
-               List<String> listaIPs = Lists.newArrayList();
+               List<String> listIps = new ArrayList<>();
                while (headers.hasMoreElements()) {
                     String ip = headers.nextElement();
-                    listaIPs.add(ip);
+                    listIps.add(ip);
                }
 
-               setReceivedFromAddress(Joiner.on(",").join(listaIPs.toArray()));
+               setReceivedFromAddress(String.join(",", listIps));
 
           }
 
      }
      
      /**
+      * Create a Trace.
+      * 
+      * @param printAllTrace
+      * @param profile
+      * @param servletRequest
+      * @param printMongo
+      * @param printLogstash
+      * @param version
+      */
+     public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printMongo, boolean printLogstash, String version) {
+    	 this(printAllTrace, profile, servletRequest, printMongo, printLogstash);
+    	 this.version = version;
+     }
+
+	/**
       * Adds a {@link FilterDetail} to the List.
       * 
       * @param detail {@link FilterDetail}
       */
-     public void addFilter(FilterDetail detail) {
-          filters.add(detail);
+     public void addFilter(String name, FilterDetail detail) {
+          filters.put(name, detail);
      }
 
      /**
@@ -232,36 +255,55 @@ public class Trace {
       */
      private void prepareLog(Integer statusCode) throws JsonProcessingException {
 
+          String url = Objects.nonNull(getUrl()) ? getUrl() : "";
+          ObjectMapper mapper = new ObjectMapper();
+
           if (printAllTrace) {
 
                if (isInfo(statusCode)) {
 
-                    log.info(" [HEIMDALL-TRACE] - {} ", new ObjectMapper().writeValueAsString(this));
+                    log.info(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
                } else if (isWarn(statusCode)) {
 
-                    log.warn(" [HEIMDALL-TRACE] - {} ", new ObjectMapper().writeValueAsString(this));
+                    log.warn(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
                } else {
 
-                    log.error(" [HEIMDALL-TRACE] - {} ", new ObjectMapper().writeValueAsString(this));
+                    log.error(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
                }
           } else {
-
-               String url = (Objeto.notBlank(getUrl())) ? getUrl() : "";
-
                if (isInfo(statusCode)) {
 
                     log.info(append("call", this), " [HEIMDALL-TRACE] - " + url);
-
-                    if (printMongo) logMongo.info(new ObjectMapper().writeValueAsString(this));
                } else if (isWarn(statusCode)) {
 
                     log.warn(append("call", this), " [HEIMDALL-TRACE] - " + url);
-                    if (printMongo) logMongo.warn(new ObjectMapper().writeValueAsString(this));
                } else {
 
                     log.error(append("call", this), " [HEIMDALL-TRACE] - " + url);
-                    if (printMongo) logMongo.error(new ObjectMapper().writeValueAsString(this));
                }
+          }
+
+          if (printMongo) {
+               printInLogger(logMongo, statusCode);
+          }
+
+          if (printLogstash) {
+        	  printInLogger(logstash, statusCode);
+          }
+     }
+
+     private void printInLogger(Logger logger, Integer statusCode) throws JsonProcessingException {
+          ObjectMapper mapper = new ObjectMapper();
+
+          if (isInfo(statusCode)) {
+
+               logger.info(mapper.writeValueAsString(this));
+          } else if (isWarn(statusCode)) {
+
+               logger.warn(mapper.writeValueAsString(this));
+          } else {
+
+               logger.error(mapper.writeValueAsString(this));
           }
      }
 

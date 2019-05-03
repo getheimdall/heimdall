@@ -25,6 +25,7 @@ import br.com.twsoftware.alfred.object.Objeto;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -34,7 +35,8 @@ import static org.springframework.http.HttpStatus.*;
  * @author Filipe Germano
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  * @author Marcelo Aguiar Rodrigues
- *
+ * @author <a href="https://github.com/felipe-brito" target="_blank" >Felipe Brito</a>
+ * 
  */
 @Slf4j
 public enum ExceptionMessage {
@@ -46,6 +48,8 @@ public enum ExceptionMessage {
     GLOBAL_RESOURCE_NOT_FOUND(NOT_FOUND.value(), "Resource not found", NotFoundException.class),
 
     GLOBAL_JSON_INVALID_FORMAT(BAD_REQUEST.value(), "Json invalid format", BadRequestException.class),
+
+    GLOBAL_SWAGGER_JSON_INVALID_FORMAT(BAD_REQUEST.value(), "SwaggerJson invalid format", BadRequestException.class),
 
     GLOBAL_TIMEOUT(REQUEST_TIMEOUT.value(), REQUEST_TIMEOUT.getReasonPhrase(), TimeoutException.class),
 
@@ -65,9 +69,11 @@ public enum ExceptionMessage {
 
     INTERCEPTOR_IGNORED_INVALID(BAD_REQUEST.value(), "Reference operations invalid: {}", BadRequestException.class),
 
+    INTERCEPTOR_INVALID_LIFECYCLE(BAD_REQUEST.value(), "{} interceptor can not be attached to the Plan life cycle", BadRequestException.class),
+
     MIDDLEWARE_UNSUPPORTED_TYPE(BAD_REQUEST.value(), "File type differs from .jar not supported", BadRequestException.class),
 
-    MIDDLEWARE_CONTAINS_INTERCEOPTORS(BAD_REQUEST.value(), "Middleware still contains interceptors associated", BadRequestException.class),
+    MIDDLEWARE_CONTAINS_INTERCEPTORS(BAD_REQUEST.value(), "Middleware still contains interceptors associated", BadRequestException.class),
 
     MIDDLEWARE_INVALID_FILE(BAD_REQUEST.value(), "Invalid file", BadRequestException.class),
 
@@ -82,6 +88,8 @@ public enum ExceptionMessage {
     RESOURCE_METHOD_NOT_ACCEPT(BAD_REQUEST.value(), "method not accepted please use: GET, POST, PUT, PATH or DELETE", BadRequestException.class),
 
     APP_NOT_EXIST(BAD_REQUEST.value(), "App does not exist", BadRequestException.class),
+
+    API_NOT_EXIST(BAD_REQUEST.value(), "Api does not exist", BadRequestException.class),
 
     API_BASEPATH_EXIST(BAD_REQUEST.value(), "The basepath defined exist", BadRequestException.class),
 
@@ -105,15 +113,19 @@ public enum ExceptionMessage {
 
     ENVIRONMENT_ATTACHED_TO_API(BAD_REQUEST.value(), "Environment attached to Api", BadRequestException.class),
 
-    ENVIRONMENT_INBOUND_DNS_PATTERN(BAD_REQUEST.value(), "Environment inbound URL has to follow the pattern http[s]://host.domain[:port] or www.host.domain[:port]", BadRequestException.class),PROVIDER_NOT_FOUND(BAD_REQUEST.value(), "Provider not found", BadRequestException.class),
+    ENVIRONMENT_INBOUND_DNS_PATTERN(BAD_REQUEST.value(), "Environment inbound URL has to follow the pattern http[s]://host.domain[:port] or www.host.domain[:port]", BadRequestException.class),
+    
+    PROVIDER_NOT_FOUND(BAD_REQUEST.value(), "Provider not found", BadRequestException.class),
      
     PROVIDER_USER_UNAUTHORIZED(UNAUTHORIZED.value(), "User provided unauthorized", UnauthorizedException.class),
      
     TOKEN_EXPIRED(UNAUTHORIZED.value(), "Token expired", UnauthorizedException.class),
 
-    TOKEN_INVALID(UNAUTHORIZED.value(), "Token not valid", ForbiddenException.class),
+    TOKEN_INVALID(FORBIDDEN.value(), "Token not valid", ForbiddenException.class),
 
-    TOKEN_NOT_GENERATE(INTERNAL_SERVER_ERROR.value(), "Error to generate token", ForbiddenException.class),
+    SIGNATURE_DOES_NOT_MATCH(UNAUTHORIZED.value(), "JWT signature does not match locally computed signature.", UnauthorizedException.class),
+
+    TOKEN_NOT_GENERATE(FORBIDDEN.value(), "Error to generate token", ForbiddenException.class),
 
     CODE_NOT_FOUND(UNAUTHORIZED.value(), "Code already used to generate token or not defined", UnauthorizedException.class),
 
@@ -148,22 +160,50 @@ public enum ExceptionMessage {
     AUTHORIZATION_NOT_FOUND(UNAUTHORIZED.value(), "Authorization not found in header", UnauthorizedException.class),
 
     RESPONSE_TYPE_NOT_FOUND(BAD_REQUEST.value(), "response_type not found", BadRequestException.class),
-  
+
+    DEFAULT_PROVIDER_CAN_NOT_UPDATED_OR_REMOVED(FORBIDDEN.value(), "Default Provider can't to be updated or removed!", ForbiddenException.class),
+
     ROLE_ALREADY_EXIST(BAD_REQUEST.value(), "Role already exist!", BadRequestException.class),
-    
-    CIRCUIT_BREAK_ACTIVE(SERVICE_UNAVAILABLE.value(), "Circuit break enabled", ServerErrorException.class);
+
+    SCOPE_INVALID_OPERATION(BAD_REQUEST.value(), "Operation with id '{}' does not exist", BadRequestException.class),
+
+    SCOPE_INVALID_PLAN(BAD_REQUEST.value(), "Plan id with '{}' does not exist", BadRequestException.class),
+
+    SCOPE_OPERATION_NOT_IN_API(BAD_REQUEST.value(), "Operation '{}' not in Api '{}'", BadRequestException.class),
+
+    SCOPE_PLAN_NOT_IN_API(BAD_REQUEST.value(), "Plan '{}' not in Api '{}'", BadRequestException.class),
+
+    SCOPE_INVALID_NAME(BAD_REQUEST.value(), "A Scope with the provided name already exists", BadRequestException.class),
+
+    SCOPE_NO_OPERATION_FOUND(BAD_REQUEST.value(), "A Scope must have at least one Operation", BadRequestException.class),
+  
+    CORS_INTERCEPTOR_NOT_API_LIFE_CYCLE(BAD_REQUEST.value(), "The CORS Interceptor only allowed for API LifeCycle", BadRequestException.class),
+
+    CORS_INTERCEPTOR_ALREADY_ASSIGNED_TO_THIS_API(BAD_REQUEST.value(), "A CORS Interceptor already assigned to this API", BadRequestException.class),
+
+    USER_NEW_PASSWORD_EQUALS_CURRENT_PASSWORD(BAD_REQUEST.value(), "New password must different from the current password!", BadRequestException.class),
+
+    USER_CURRENT_PASSWORD_NOT_MATCHING(BAD_REQUEST.value(), "Current password not matching!", BadRequestException.class),
+
+    USER_NEW_PASSWORD_NOT_MATCHING(BAD_REQUEST.value(), "New password not matching!", BadRequestException.class),
+
+    USER_UNAUTHORIZED_TO_CHANGE_PASSWORD(UNAUTHORIZED.value(), "You can't change the password!", UnauthorizedException.class),
+
+    USER_LDAP_UNAUTHORIZED_TO_CHANGE_PASSWORD(UNAUTHORIZED.value(), "User from LDAP can't change the password!", UnauthorizedException.class),
+
+    DEFAULT_PLAN_ALREADY_EXIST_TO_THIS_API(BAD_REQUEST.value(), "Default plan already exist to this Api", BadRequestException.class);
 
     @Getter
-    private Integer httpCode;
+    private final Integer httpCode;
 
     @Getter
     @Setter
     private String message;
 
-    private String defaultMessage;
+    private final String defaultMessage;
 
     @Getter
-    private Class<? extends HeimdallException> klass;
+    private final Class<? extends HeimdallException> klass;
 
     ExceptionMessage(int httpCode, String message, Class<? extends HeimdallException> klass) {
 
@@ -188,26 +228,23 @@ public enum ExceptionMessage {
 
         this.message = Objeto.isBlank(this.message) ? this.defaultMessage.replace("{}", "") : this.message;
 
-        if (this.badRequest()) {
-
-            throw new BadRequestException(this);
-        } else if (this.unauthorized()) {
-
-            throw new UnauthorizedException(this);
-        } else if (this.forbidden()) {
-
-            throw new ForbiddenException(this);
-        } else if (this.notFound()) {
-
-            throw new NotFoundException(this);
-        } else if (this.timeout()) {
-
-            throw new TimeoutException(this);
-        } else if (this.serverError()) {
-
-            throw new ServerErrorException(this);
+        switch(HttpStatus.valueOf(this.httpCode)){
+            case BAD_REQUEST:
+                throw new BadRequestException(this);
+            case UNAUTHORIZED:
+                throw new UnauthorizedException(this);
+            case FORBIDDEN:
+                throw new ForbiddenException(this);
+            case NOT_FOUND:
+                throw new NotFoundException(this);
+            case REQUEST_TIMEOUT:
+                throw new TimeoutException(this);
+            case INTERNAL_SERVER_ERROR:
+                throw new ServerErrorException(this);
+            default:
+                throw new ServerErrorException(this);
         }
-
+        
     }
 
     /**
@@ -224,7 +261,7 @@ public enum ExceptionMessage {
 
         if (dynamicText != null && dynamicText.length > 0) {
 
-            Integer count = 0;
+            int count = 0;
             String baseMessage = messageDefault;
             while (baseMessage.contains("{}")) {
 
@@ -243,55 +280,6 @@ public enum ExceptionMessage {
             }
         }
         raise();
-    }
-
-
-    /**
-     * Method responsible for validation of error codes with code 400.
-     */
-    private Boolean badRequest() {
-
-        return this.httpCode == BAD_REQUEST.value();
-    }
-
-    /**
-     * Method responsible for validation of error codes with code 401.
-     */
-    private Boolean unauthorized() {
-
-        return this.httpCode == UNAUTHORIZED.value();
-    }
-
-    /**
-     * Method responsible for validation of error codes with code 403.
-     */
-    private Boolean forbidden() {
-
-        return this.httpCode == FORBIDDEN.value();
-    }
-
-    /**
-     * Method responsible for validation of error codes with code 404.
-     */
-    private Boolean notFound() {
-
-        return this.httpCode == NOT_FOUND.value();
-    }
-
-    /**
-     * Method responsible for validation of error codes with code 408.
-     */
-    private Boolean timeout() {
-
-        return this.httpCode == REQUEST_TIMEOUT.value();
-    }
-
-    /**
-     * Method responsible for validation of error codes with code 500.
-     */
-    private Boolean serverError() {
-
-        return this.httpCode == INTERNAL_SERVER_ERROR.value();
     }
 
 }

@@ -1,69 +1,55 @@
-
+/*-
+ * =========================LICENSE_START==================================
+ * heimdall-gateway
+ * ========================================================================
+ * Copyright (C) 2018 Conductor Tecnologia SA
+ * ========================================================================
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ==========================LICENSE_END===================================
+ */
 package br.com.conductor.heimdall.gateway.filter.helper;
 
-/*-
- * =========================LICENSE_START==================================
- * heimdall-gateway
- * ========================================================================
- * Copyright (C) 2018 Conductor Tecnologia SA
- * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * ==========================LICENSE_END===================================
- */
-
+import br.com.conductor.heimdall.core.environment.Property;
+import br.com.conductor.heimdall.gateway.failsafe.CircuitBreakerManager;
 import br.com.conductor.heimdall.middleware.enums.DBType;
-
-/*-
- * =========================LICENSE_START==================================
- * heimdall-gateway
- * ========================================================================
- * Copyright (C) 2018 Conductor Tecnologia SA
- * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * ==========================LICENSE_END===================================
- */
-
-import br.com.conductor.heimdall.middleware.spec.ApiResponse;
-import br.com.conductor.heimdall.middleware.spec.Call;
-import br.com.conductor.heimdall.middleware.spec.DB;
-import br.com.conductor.heimdall.middleware.spec.DBMongo;
-import br.com.conductor.heimdall.middleware.spec.Helper;
-import br.com.conductor.heimdall.middleware.spec.Http;
-import br.com.conductor.heimdall.middleware.spec.Json;
-import br.com.conductor.heimdall.middleware.spec.Xml;
+import br.com.conductor.heimdall.middleware.spec.*;
+import com.mongodb.MongoClient;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Implementation of the {@link Helper} interface.
  *
  * @author Filipe Germano
- *
+ * @author marcos.filho
  */
 public class HelperImpl implements Helper {
+	
+	@Autowired(required = false)
+	private MongoClient mongoClient;
+	
+	private ThreadLocal<byte[]> buffers;
 
 	private boolean enableHandler;
 
+	@Autowired
+	private Property property;
+
+	@Autowired
+	private CircuitBreakerManager circuitBreakerManager;
+
 	public HelperImpl() {
 		enableHandler = false;
+		buffers = ThreadLocal.withInitial(() -> new byte[8192]);
 	}
 
 	@Override
@@ -76,8 +62,7 @@ public class HelperImpl implements Helper {
 	@Override
 	public Call call() {
 
-		Call call = new CallImpl();
-		return call;
+		return new CallImpl(buffers);
 	}
 
 	@Override
@@ -90,9 +75,9 @@ public class HelperImpl implements Helper {
 
 		switch (type) {
 		case MONGODB:
-			return new DBMongoImpl(databaseName);
+			return new DBMongoImpl(databaseName, mongoClient);
 		default:
-			return new DBMongoImpl(databaseName);
+			return new DBMongoImpl(databaseName, mongoClient);
 		}
 	}
 
@@ -104,9 +89,7 @@ public class HelperImpl implements Helper {
 
 	@Override
 	public Http http() {
-
-		Http http = new HttpImpl(enableHandler);
-		return http;
+		return new HttpImpl(enableHandler, circuitBreakerManager, property.getFailsafe().isEnabled());
 	}
 
 	@Override

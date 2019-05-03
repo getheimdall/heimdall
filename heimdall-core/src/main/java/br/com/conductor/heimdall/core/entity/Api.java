@@ -9,9 +9,9 @@ package br.com.conductor.heimdall.core.entity;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,6 +23,7 @@ package br.com.conductor.heimdall.core.entity;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -58,7 +59,6 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 
 import br.com.conductor.heimdall.core.enums.Status;
 import br.com.conductor.heimdall.core.util.ConstantsPath;
-import br.com.twsoftware.alfred.object.Objeto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -99,6 +99,9 @@ public class Api implements Serializable {
      @Column(name = "BASE_PATH", length = 80, nullable = false, unique = true)
      private String basePath;
 
+     @Column(name = "CORS", nullable = false)
+     private boolean cors;
+
      @Column(name = "CREATION_DATE", nullable = false)
      @DateTimeFormat(iso = ISO.DATE_TIME)
      @JsonDeserialize(using = LocalDateTimeDeserializer.class)
@@ -106,21 +109,14 @@ public class Api implements Serializable {
      private LocalDateTime creationDate;
 
      @JsonIgnore
-     @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH})
+     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH})
      @JoinColumn(name = "API_ID")
-     private List<Resource> resources;
+     private Set<Resource> resources;
 
      @Column(name = "STATUS", length = 10, nullable = false)
      @Enumerated(EnumType.STRING)
      private Status status;
 
-     @JsonIgnore
-     @Column(name = "TAGS", length = 2000)
-     private String tag;
-     
-     @Transient
-     private List<String> tags;
-     
      @ManyToMany
      @LazyCollection(LazyCollectionOption.FALSE)
      @JoinTable(name = "APIS_ENVIRONMENTS", 
@@ -131,11 +127,7 @@ public class Api implements Serializable {
      @OneToMany(mappedBy = "api", fetch=FetchType.LAZY)
      @JsonIgnore
      private List<Plan> plans;
-     
-     @OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.REMOVE }, orphanRemoval = true, mappedBy = "resource")
-     @JsonIgnore
-     private List<Interceptor> interceptors;
-     
+
      @PrePersist
      private void callPrePersists() {
           initValuesPersist();
@@ -149,10 +141,7 @@ public class Api implements Serializable {
      
      private void initValuesPersist() {
 
-          if (Objeto.isBlank(status)) {
-
-               status = Status.ACTIVE;
-          }
+          status = (status == null) ? Status.ACTIVE : status;
           
           creationDate = LocalDateTime.now();
      }

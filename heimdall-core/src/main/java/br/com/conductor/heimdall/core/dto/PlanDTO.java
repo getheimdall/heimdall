@@ -22,6 +22,7 @@ package br.com.conductor.heimdall.core.dto;
  */
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -34,7 +35,7 @@ import lombok.Data;
  * Class is a Data Transfer Object for the {@link Plan}.
  *
  * @author Filipe Germano
- *
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Data
 public class PlanDTO implements Serializable {
@@ -50,7 +51,12 @@ public class PlanDTO implements Serializable {
      
      @NotNull
      private ReferenceIdDTO api;
-     
+
+     @NotNull
+     private boolean defaultPlan;
+
+     private List<ReferenceIdDTO> scopes;
+
      private Status status;
      
 }

@@ -22,9 +22,9 @@ package br.com.conductor.heimdall.gateway.trace;
  */
 
 import br.com.conductor.heimdall.middleware.spec.StackTrace;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * Data class that represents a custom Stack Trace.
@@ -35,13 +35,16 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class StackTraceImpl implements StackTrace {
 
      public String clazz;
 
      public String message;
 
+     @JsonInclude(JsonInclude.Include.NON_NULL)
      public String stack;
 
+     public StackTraceImpl(String clazz, String message) {
+          this(clazz, message, null);
+     }
 }

@@ -4,7 +4,7 @@ import {Button, Col, Form, Input, Row, Switch, Tooltip} from 'antd'
 import PropTypes from "prop-types";
 import {PrivilegeUtils} from "../../utils/PrivilegeUtils";
 import {privileges} from "../../constants/privileges-types";
-import ComponentAuthority from "../ComponentAuthority";
+import ComponentAuthority from "../policy/ComponentAuthority";
 
 const FormItem = Form.Item
 
@@ -79,7 +79,7 @@ class LdapForm extends Component {
                                         rules: [
                                             { required: true,  message: 'Please input the password!' }
                                         ]
-                                    })(<Input required
+                                    })(<Input required type="password"
                                               disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_LDAP])}/>)
                                 }
                             </FormItem>

@@ -11,8 +11,8 @@ import HeimdallCollapse from '../components/collapse'
 import {PrivilegeUtils} from "../utils/PrivilegeUtils"
 import {privileges} from '../constants/privileges-types'
 import ResourceForm from '../components/resources/ResourceForm'
-import ComponentAuthority from "../components/ComponentAuthority"
-import {clearResources, getAllResourcesByApi, remove, toggleModal} from '../actions/resources'
+import ComponentAuthority from "../components/policy/ComponentAuthority"
+import {clearResources, getAllResourcesByApi, remove, resetResource, toggleModal} from '../actions/resources'
 
 const HeimdallPanel = HeimdallCollapse.Panel;
 const ButtonGroup = Button.Group;
@@ -73,9 +73,10 @@ class Resources extends Component {
     }
 
     handleSave(e) {
-
         this.addResource.onSubmitResource()
         this.props.clearResources()
+        this.props.resetResource()
+        this.setState({...this.state, resourceSelected: 0});
     }
 
     handleCancel(e) {
@@ -186,6 +187,7 @@ const mapDispatchToProps = dispatch => {
     return {
         getResourcesByApi: bindActionCreators(getAllResourcesByApi, dispatch),
         clearResources: bindActionCreators(clearResources, dispatch),
+        resetResource: bindActionCreators(resetResource, dispatch),
         toggleModal: bindActionCreators(toggleModal, dispatch),
         remove: bindActionCreators(remove, dispatch)
     }

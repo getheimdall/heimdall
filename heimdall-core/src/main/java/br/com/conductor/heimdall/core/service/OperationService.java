@@ -28,11 +28,12 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.OPERATIO
 import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 import static br.com.twsoftware.alfred.object.Objeto.notBlank;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import br.com.conductor.heimdall.core.entity.Interceptor;
-import br.com.conductor.heimdall.core.repository.InterceptorRepository;
+import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -75,6 +76,9 @@ public class OperationService {
 
      @Autowired
      private InterceptorService interceptorService;
+
+     @Autowired
+     private ApiService apiService;
 
      @Autowired
      private AMQPRouteService amqpRoute;
@@ -146,6 +150,28 @@ public class OperationService {
 
           return operationRepository.findAll(example);
      }
+
+     /**
+      * Lists all {@link Operation} from one {@link Api}
+      *
+      * @param apiId The {@link Api} Id
+      * @return The complete list of all {@link Operation} from the {@link Api}
+      */
+     public List<Operation> list(final Long apiId) {
+          final Api api = apiService.find(apiId);
+
+          final List<Operation> operations = new ArrayList<>();
+
+          final OperationDTO operationDTO = new OperationDTO();
+
+          api.getResources().forEach(resource -> operations.addAll(this.list(apiId, resource.getId(), operationDTO)));
+
+          if (!operations.isEmpty()) {
+               return operations.stream().map(op -> new Operation(op.getId(), op.getMethod(), op.getPath(), null, null)).collect(Collectors.toList());
+          }
+
+          return new ArrayList<>();
+     }
      
      /**
       * Saves a {@link Operation} to the repository.
@@ -175,6 +201,36 @@ public class OperationService {
           
           amqpRoute.dispatchRoutes();
           
+          return operation;
+     }
+
+     /**
+      * Saves a {@link Operation} to the repository.
+      *
+      * @param  apiId						The {@link br.com.conductor.heimdall.core.entity.Api} Id
+      * @param 	resourceId					The {@link Resource} Id
+      * @param 	operationDTO				The {@link Operation}
+      * @return								The saved {@link Operation}
+      */
+     @Transactional
+     public Operation save(Long apiId, Long resourceId, Operation operation) {
+
+          Resource resource = resourceRepository.findByApiIdAndId(apiId, resourceId);
+          HeimdallException.checkThrow(isBlank(resource), GLOBAL_RESOURCE_NOT_FOUND);
+
+          Operation resData = operationRepository.findByResourceApiIdAndMethodAndPath(apiId, operation.getMethod(), operation.getPath());
+          HeimdallException.checkThrow(notBlank(resData) && (resData.getResource().getId() == resource.getId()), ONLY_ONE_OPERATION_PER_RESOURCE);
+
+          operation.setResource(resource);
+          operation.setPath(StringUtils.removeMultipleSlashes(operation.getPath()));
+
+          HeimdallException.checkThrow(validateSingleWildCardOperationPath(operation), OPERATION_CANT_HAVE_SINGLE_WILDCARD);
+          HeimdallException.checkThrow(validateDoubleWildCardOperationPath(operation), OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END);
+
+          operation = operationRepository.save(operation);
+
+          amqpRoute.dispatchRoutes();
+
           return operation;
      }
 

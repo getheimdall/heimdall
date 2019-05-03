@@ -30,7 +30,6 @@ import net.logstash.logback.appender.LogstashTcpSocketAppender;
 import net.logstash.logback.encoder.LogstashEncoder;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
@@ -47,75 +46,66 @@ import java.time.ZoneId;
 @Configuration
 public class LogConfiguration {
 
-     private static final int DEFAULT_QUEUE_SIZE = 500;
+	private static final int DEFAULT_QUEUE_SIZE = 500;
 
-     private static final String DEFAULT_ZONE_ID = ZoneId.systemDefault().getId();
+	private static final String DEFAULT_ZONE_ID = ZoneId.systemDefault().getId();
 
-     @Autowired
-     private Property property;
-     
-     @PostConstruct
-     public void onStartUp() {
-    	 if (property.getMongo().getEnabled()) {
-    		 
-             LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-             Logger logger = (Logger) LoggerFactory.getLogger("mongo");
-             logger.setAdditive(false);
+	@Autowired
+	private Property property;
 
-             String zoneId = property.getMongo().getZoneId() != null ? property.getMongo().getZoneId() : DEFAULT_ZONE_ID;
+	@PostConstruct
+	public void onStartUp() {
 
-             // Creating custom MongoDBAppender
-             Appender<ILoggingEvent> appender;
-             if (property.getMongo().getUrl() != null) {
-          	     appender = new MongoDBAppender(property.getMongo().getUrl(), property.getMongo().getDataBase(), property.getMongo().getCollection(), zoneId);
-             } else {
-          	     appender = new MongoDBAppender(property.getMongo().getServerName(), property.getMongo().getPort(), property.getMongo().getDataBase(), property.getMongo().getCollection(), zoneId);
-             }
-             appender.setContext(lc);
-             appender.start();
+		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
 
-             // Creating AsyncAppender
-             int queueSize = (property.getMongo().getQueueSize() != null) ? property.getMongo().getQueueSize().intValue() : DEFAULT_QUEUE_SIZE;
+		if (property.getMongo().getEnabled()) {
 
-             AsyncAppender asyncAppender = new AsyncAppender();
-             asyncAppender.setQueueSize(queueSize);
-             if (property.getMongo().getDiscardingThreshold() != null) {            	 
-            	 asyncAppender.setDiscardingThreshold(property.getMongo().getDiscardingThreshold().intValue());
-             }
-             asyncAppender.addAppender(appender);
-             asyncAppender.start();
+			Logger logger = (Logger) LoggerFactory.getLogger("mongo");
+			logger.setAdditive(false);
 
-             logger.addAppender(asyncAppender);
-        }
-     }
+			String zoneId = property.getMongo().getZoneId() != null ? property.getMongo().getZoneId() : DEFAULT_ZONE_ID;
 
-     /**
-      * Returns the proper logging strategy.
-      * @return		
-      */
-     @Bean
-     public Logger loggerTrace() {
+			// Creating custom MongoDBAppender
+			Appender<ILoggingEvent> appender;
+			if (property.getMongo().getUrl() != null) {
+				appender = new MongoDBAppender(property.getMongo().getUrl(), property.getMongo().getDataBase(), property.getMongo().getCollection(), zoneId);
+			} else {
+				appender = new MongoDBAppender(property.getMongo().getServerName(), property.getMongo().getPort(), property.getMongo().getDataBase(), property.getMongo().getCollection(), zoneId);
+			}
+			appender.setContext(lc);
+			appender.start();
 
-          if (property.getSplunk().getEnabled()) {
+			// Creating AsyncAppender
+			int queueSize = (property.getMongo().getQueueSize() != null) ? property.getMongo().getQueueSize().intValue() : DEFAULT_QUEUE_SIZE;
 
-               LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-               Logger logger = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME);
+			AsyncAppender asyncAppender = new AsyncAppender();
+			asyncAppender.setQueueSize(queueSize);
+			if (property.getMongo().getDiscardingThreshold() != null) {
+				asyncAppender.setDiscardingThreshold(property.getMongo().getDiscardingThreshold().intValue());
+			}
+			asyncAppender.addAppender(appender);
+			asyncAppender.start();
 
-               LogstashTcpSocketAppender appender = new net.logstash.logback.appender.LogstashTcpSocketAppender();
-               appender.addDestination(property.getSplunk().getDestination());
+			logger.addAppender(asyncAppender);
+		}
 
-               LogstashEncoder encoder = new net.logstash.logback.encoder.LogstashEncoder();
+		if (property.getLogstash().getEnabled()) {
 
-               appender.setEncoder(encoder);
-               appender.setContext(lc);
-               appender.start();
+			Logger logger = (Logger) LoggerFactory.getLogger("logstash");
+			logger.setAdditive(false);
 
-               logger.addAppender(appender);
+			LogstashTcpSocketAppender appender = new LogstashTcpSocketAppender();
+			appender.addDestination(property.getLogstash().getDestination());
 
-          }
+			LogstashEncoder encoder = new LogstashEncoder();
 
-          return null;
+			appender.setEncoder(encoder);
+			appender.setContext(lc);
+			appender.start();
 
-     }
+			logger.addAppender(appender);
+
+		}
+	}
 
 }

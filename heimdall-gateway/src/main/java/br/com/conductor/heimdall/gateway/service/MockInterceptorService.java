@@ -19,11 +19,12 @@
  */
 package br.com.conductor.heimdall.gateway.service;
 
-import br.com.conductor.heimdall.core.util.ConstantsInterceptors;
-import br.com.conductor.heimdall.gateway.filter.helper.HelperImpl;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.middleware.spec.Helper;
 import com.netflix.zuul.context.RequestContext;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -33,6 +34,9 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class MockInterceptorService {
+	
+	@Autowired
+    private Helper helper;
 
     /**
      * Creates a response to the user with the body content.
@@ -40,28 +44,41 @@ public class MockInterceptorService {
      * @param status HttpStatus to be sent back
      * @param body   Response body
      */
-    public void execute(Integer status, String body) {
+    public void execute(int status, String body) {
 
-        Helper helper = new HelperImpl();
         RequestContext ctx = RequestContext.getCurrentContext();
 
-        String response;
-        if (helper.json().isJson(body)) {
-            response = helper.json().parse(body);
-
+        if (isJson(body)) {
             helper.call().response().header().add("Content-Type", "application/json");
         } else {
-
-            response = body;
 
             helper.call().response().header().add("Content-Type", "text/plain");
         }
 
-        helper.call().response().setBody(response);
+        helper.call().response().setBody(body);
 
         ctx.setSendZuulResponse(false);
         ctx.setResponseStatusCode(status);
 
-        TraceContextHolder.getInstance().getActualTrace().trace(ConstantsInterceptors.GLOBAL_MOCK_INTERCEPTOR_LOCALIZED, response);
     }
+
+    private boolean isJson(String string) {
+        boolean valid;
+        try {
+
+            new JSONObject(string);
+            valid = true;
+        } catch (JSONException e) {
+
+            try {
+                new JSONArray(string);
+                valid = true;
+            } catch (JSONException ex1) {
+                valid = false;
+            }
+        }
+
+        return valid;
+    }
+
 }

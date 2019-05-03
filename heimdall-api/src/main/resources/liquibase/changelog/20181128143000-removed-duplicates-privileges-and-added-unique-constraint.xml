@@ -1,0 +1,41 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="conductor\ewerton.araujo" id="1">
+        <preConditions>
+            <tableExists tableName="PRIVILEGES"/>
+            <tableExists tableName="ROLES_PRIVILEGES"/>
+        </preConditions>
+        <sql>
+            DELETE FROM roles_privileges
+            WHERE privilege_id NOT IN (
+                        SELECT min(id)
+                        FROM PRIVILEGES
+                        GROUP BY name
+                    );
+
+            DELETE FROM privileges
+            WHERE id NOT IN (
+                        SELECT min(id)
+                        FROM PRIVILEGES
+                        GROUP BY name
+                    );
+        </sql>
+    </changeSet>
+
+    <changeSet author="conductor\marcelo.rodrigues" id="2">
+        <preConditions>
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE constraint_name='uq_privileges_name'
+            </sqlCheck>
+        </preConditions>
+        <addUniqueConstraint tableName="PRIVILEGES" columnNames="name"
+                             constraintName="uq_privileges_name"/>
+        <rollback>
+            <dropUniqueConstraint tableName="PRIVILEGES" constraintName="uq_privileges_name"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

@@ -53,7 +53,7 @@ public class ConstantsPath {
 
      public static final String PATH_MIDDLEWARES = PATH_APIS + "/{apiId}" + "/middlewares";
      
-     public static final String PATH_OPERATIONS = PATH_RESOURCES + "/{resourceId}" + "/operations";
+     public static final String PATH_OPERATIONS = PATH_APIS + "/{apiId}";
 
      public static final String PATH_ACCESS_TOKENS = PATH_API + "/access_tokens";
 
@@ -82,5 +82,7 @@ public class ConstantsPath {
      public static final String PATH_LDAP = PATH_API + "/ldap";
 
      public static final String PATH_METRICS = PATH_API + "/metrics";
+
+     public static final String PATH_SCOPES = PATH_APIS + "/{apiId}" + "/scopes";
 
 }
