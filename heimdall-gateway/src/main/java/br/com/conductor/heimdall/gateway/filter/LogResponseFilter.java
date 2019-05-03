@@ -28,7 +28,6 @@ import br.com.conductor.heimdall.gateway.util.ResponseHelper;
 import br.com.conductor.heimdall.middleware.spec.Helper;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -44,6 +43,8 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 @Component
 public class LogResponseFilter extends ZuulFilter {
 
+    private static final int LOG_RESPONSE_FILTER = 99;
+
     private FilterDetail detail = new FilterDetail();
 
     @Autowired
@@ -52,7 +53,7 @@ public class LogResponseFilter extends ZuulFilter {
     @Override
     public int filterOrder() {
 
-        return 102;
+        return LOG_RESPONSE_FILTER;
     }
 
     @Override

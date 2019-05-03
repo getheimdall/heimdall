@@ -23,14 +23,8 @@ import br.com.conductor.heimdall.core.util.BeanManager;
 import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
 import br.com.conductor.heimdall.gateway.service.LifeCycleService;
 import br.com.conductor.heimdall.gateway.service.LogMaskerService;
-import br.com.conductor.heimdall.gateway.trace.RequestResponseParser;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
-import com.netflix.zuul.context.RequestContext;
 
 import java.util.*;
-
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 
 public class LogIgnoreInterceptor extends HeimdallFilter {
 
