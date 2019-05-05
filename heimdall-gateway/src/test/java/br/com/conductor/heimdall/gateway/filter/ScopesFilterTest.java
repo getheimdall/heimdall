@@ -24,8 +24,6 @@ import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.trace.FilterDetail;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 import com.netflix.zuul.context.RequestContext;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -38,6 +36,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 
 import static br.com.conductor.heimdall.gateway.util.ConstantsContext.*;
 import static org.junit.Assert.assertEquals;
@@ -59,6 +62,7 @@ public class ScopesFilterTest {
 
     private final String clientId1 = "client_id_1";
     private final String clientId2 = "client_id_2";
+    private final String SCOPES_FILTER = "ScopesFilter";
 
     @BeforeClass
     public static void setUp() {
@@ -93,18 +97,18 @@ public class ScopesFilterTest {
         plan.setApi(api);
 
         Operation operation = new Operation(1111L, null, null,null, null);
-        Scope scope = new Scope(1000L, null, null, null, null, null);
+        Scope scope = new Scope(1000L, null, null, null, null);
 
-        app.setPlans(Lists.newArrayList(plan));
-        plan.setScopes(Sets.newHashSet(scope));
-        scope.setOperations(Sets.newHashSet(operation));
+        app.setPlans(Collections.singletonList(plan));
+        plan.setScopes(new HashSet<>(Collections.singletonList(scope)));
+        scope.setOperations(new HashSet<>(Collections.singletonList(operation)));
 
         context.set(OPERATION_ID, operation.getId() + 1);
 
         Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(app);
 
         this.filter.run();
-        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(SCOPES_FILTER);
 
         assertEquals(HttpStatus.OK.value(), context.getResponseStatusCode());
         assertEquals(Constants.SUCCESS, filterDetail.getStatus());
@@ -128,18 +132,18 @@ public class ScopesFilterTest {
         plan.setApi(api);
 
         Operation operation = new Operation(1111L, null, null,null, null);
-        Scope scope = new Scope(1000L, null, null, null, null, null);
+        Scope scope = new Scope(1000L, null, null, null, null);
 
-        app.setPlans(Lists.newArrayList(plan));
-        plan.setScopes(Sets.newHashSet(scope));
-        scope.setOperations(Sets.newHashSet(operation));
+        app.setPlans(Collections.singletonList(plan));
+        plan.setScopes(new HashSet<>(Collections.singletonList(scope)));
+        scope.setOperations(new HashSet<>(Collections.singletonList(operation)));
 
         context.set(OPERATION_ID, operation.getId());
 
         Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(app);
 
         this.filter.run();
-        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(SCOPES_FILTER);
 
         assertEquals(HttpStatus.OK.value(), context.getResponseStatusCode());
         assertEquals(Constants.SUCCESS, filterDetail.getStatus());
@@ -167,26 +171,26 @@ public class ScopesFilterTest {
         App app1 = new App();
         app1.setId(10L);
         app1.setClientId(clientId1);
-        app1.setPlans(Lists.newArrayList(plan1));
+        app1.setPlans(Collections.singletonList(plan1));
 
         App app2 = new App();
         app2.setId(20L);
         app2.setClientId(clientId2);
-        app2.setPlans(Lists.newArrayList(plan2));
+        app2.setPlans(Collections.singletonList(plan2));
 
         Operation operation1 = new Operation(1111L, null, null,null, null);
         Operation operation2 = new Operation(2222L, null, null,null, null);
 
         Scope scope1 = new Scope();
         scope1.setId(123L);
-        scope1.setOperations(Sets.newHashSet(operation1));
+        scope1.setOperations(new HashSet<>(Collections.singletonList(operation1)));
 
         Scope scope2 = new Scope();
         scope2.setId(321L);
-        scope2.setOperations(Sets.newHashSet(operation2));
+        scope2.setOperations(new HashSet<>(Collections.singletonList(operation2)));
 
-        plan1.setScopes(Sets.newHashSet(scope1));
-        plan2.setScopes(Sets.newHashSet(scope2));
+        plan1.setScopes(new HashSet<>(Collections.singletonList(scope1)));
+        plan2.setScopes(new HashSet<>(Collections.singletonList(scope2)));
 
         context.set(OPERATION_ID, operation1.getId());
 
@@ -194,7 +198,7 @@ public class ScopesFilterTest {
 
         this.filter.run();
 
-        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(SCOPES_FILTER);
 
         assertEquals(HttpStatus.OK.value(), context.getResponseStatusCode());
         assertEquals(Constants.SUCCESS, filterDetail.getStatus());
@@ -222,21 +226,21 @@ public class ScopesFilterTest {
         App app1 = new App();
         app1.setId(10L);
         app1.setClientId(clientId1);
-        app1.setPlans(Lists.newArrayList(plan1));
+        app1.setPlans(Collections.singletonList(plan1));
 
         App app2 = new App();
         app2.setId(20L);
         app2.setClientId(clientId2);
-        app2.setPlans(Lists.newArrayList(plan2));
+        app2.setPlans(Collections.singletonList(plan2));
 
         Operation operation1 = new Operation(1111L, null, null,null, null);
         Operation operation2 = new Operation(2222L, null, null,null, null);
 
-        Scope scope1 = new Scope(123L, null, null, null, Sets.newHashSet(operation1), Sets.newHashSet(plan1));
-        Scope scope2 = new Scope(321L, null, null, null, Sets.newHashSet(operation2), Sets.newHashSet(plan2));
+        Scope scope1 = new Scope(123L, null, null, null, new HashSet<>(Collections.singletonList(operation1)));
+        Scope scope2 = new Scope(321L, null, null, null, new HashSet<>(Collections.singletonList(operation2)));
 
-        plan1.setScopes(Sets.newHashSet(scope1));
-        plan2.setScopes(Sets.newHashSet(scope2));
+        plan1.setScopes(new HashSet<>(Collections.singletonList(scope1)));
+        plan2.setScopes(new HashSet<>(Collections.singletonList(scope2)));
 
         context.set(OPERATION_ID, operation1.getId());
         context.set(API_ID, api2.getId());
@@ -245,7 +249,7 @@ public class ScopesFilterTest {
 
         this.filter.run();
 
-        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(SCOPES_FILTER);
 
         assertEquals(HttpStatus.FORBIDDEN.value(), context.getResponseStatusCode());
         assertEquals(Constants.SUCCESS, filterDetail.getStatus());
@@ -272,22 +276,31 @@ public class ScopesFilterTest {
         App app1 = new App();
         app1.setId(10L);
         app1.setClientId(clientId1);
-        app1.setPlans(Lists.newArrayList(plan1));
+        app1.setPlans(Collections.singletonList(plan1));
 
         App app2 = new App();
         app2.setId(20L);
         app2.setClientId(clientId2);
-        app2.setPlans(Lists.newArrayList(plan2));
+        app2.setPlans(Collections.singletonList(plan2));
 
         Operation operation1 = new Operation(1111L, null, null,null, null);
         Operation operation2 = new Operation(2222L, null, null,null, null);
         Operation operation3 = new Operation(3333L, null, null,null, null);
 
-        Scope scope1 = new Scope(123L, null, null, null, Sets.newHashSet(operation1, operation3), Sets.newHashSet(plan1));
-        Scope scope2 = new Scope(321L, null, null, null, Sets.newHashSet(operation2, operation3), Sets.newHashSet(plan2));
+        List<Operation> operations1 = new ArrayList<>();
+        List<Operation> operations2 = new ArrayList<>();
 
-        plan1.setScopes(Sets.newHashSet(scope1));
-        plan2.setScopes(Sets.newHashSet(scope2));
+        operations1.add(operation1);
+        operations1.add(operation3);
+
+        operations2.add(operation2);
+        operations2.add(operation3);
+
+        Scope scope1 = new Scope(123L, null, null, null, new HashSet<>(operations1));
+        Scope scope2 = new Scope(321L, null, null, null, new HashSet<>(operations2));
+
+        plan1.setScopes(new HashSet<>(Collections.singletonList(scope1)));
+        plan2.setScopes(new HashSet<>(Collections.singletonList(scope2)));
 
         context.set(OPERATION_ID, operation3.getId());
         context.set(API_ID, api1.getId());
@@ -296,7 +309,7 @@ public class ScopesFilterTest {
 
         this.filter.run();
 
-        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(SCOPES_FILTER);
 
         assertEquals(HttpStatus.OK.value(), context.getResponseStatusCode());
         assertEquals(Constants.SUCCESS, filterDetail.getStatus());
@@ -323,17 +336,26 @@ public class ScopesFilterTest {
         App app1 = new App();
         app1.setId(10L);
         app1.setClientId(clientId1);
-        app1.setPlans(Lists.newArrayList(plan1));
+        app1.setPlans(Collections.singletonList(plan1));
 
         Operation operation1 = new Operation(1111L, null, null,null, null);
         Operation operation2 = new Operation(2222L, null, null,null, null);
         Operation operation3 = new Operation(3333L, null, null,null, null);
 
-        Scope scope1 = new Scope(123L, null, null, null, Sets.newHashSet(operation1, operation3), Sets.newHashSet(plan1));
-        Scope scope2 = new Scope(321L, null, null, null, Sets.newHashSet(operation2, operation3), Sets.newHashSet(plan2));
+        List<Operation> operations1 = new ArrayList<>();
+        List<Operation> operations2 = new ArrayList<>();
 
-        plan1.setScopes(Sets.newHashSet(scope1));
-        plan2.setScopes(Sets.newHashSet(scope2));
+        operations1.add(operation1);
+        operations1.add(operation3);
+
+        operations2.add(operation2);
+        operations2.add(operation3);
+
+        Scope scope1 = new Scope(123L, null, null, null, new HashSet<>(operations1));
+        Scope scope2 = new Scope(321L, null, null, null, new HashSet<>(operations2));
+
+        plan1.setScopes(new HashSet<>(Collections.singletonList(scope1)));
+        plan2.setScopes(new HashSet<>(Collections.singletonList(scope2)));
 
         context.set(OPERATION_ID, operation2.getId());
         context.set(API_ID, api1.getId());
@@ -342,7 +364,7 @@ public class ScopesFilterTest {
 
         this.filter.run();
 
-        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(SCOPES_FILTER);
 
         assertEquals(HttpStatus.FORBIDDEN.value(), context.getResponseStatusCode());
         assertEquals(Constants.SUCCESS, filterDetail.getStatus());
@@ -363,17 +385,17 @@ public class ScopesFilterTest {
         plan.setApi(api);
 
         Operation operation = new Operation(1111L, null, null,null, null);
-        Scope scope = new Scope(1000L, null, null, null, null, null);
+        Scope scope = new Scope(1000L, null, null, null, null);
 
-        app.setPlans(Lists.newArrayList(plan));
-        plan.setScopes(Sets.newHashSet(scope));
-        scope.setOperations(Sets.newHashSet(operation));
+        app.setPlans(Collections.singletonList(plan));
+        plan.setScopes(new HashSet<>(Collections.singletonList(scope)));
+        scope.setOperations(new HashSet<>(Collections.singletonList(operation)));
 
         context.set(OPERATION_ID, operation.getId());
         context.set(API_ID, api.getId());
 
         this.filter.run();
-        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(SCOPES_FILTER);
 
         assertEquals(HttpStatus.OK.value(), context.getResponseStatusCode());
         assertEquals(Constants.SUCCESS, filterDetail.getStatus());
@@ -389,9 +411,9 @@ public class ScopesFilterTest {
         api.setId(1L);
 
         Operation operation = new Operation(1111L, null, null,null, null);
-        Scope scope = new Scope(1000L, null, null, null, null, null);
+        Scope scope = new Scope(1000L, null, null, null, null);
 
-        scope.setOperations(Sets.newHashSet(operation));
+        scope.setOperations(new HashSet<>(Collections.singletonList(operation)));
 
         context.set(OPERATION_ID, operation.getId());
         context.set(API_ID, api.getId());
@@ -399,7 +421,7 @@ public class ScopesFilterTest {
         Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(null);
 
         this.filter.run();
-        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(SCOPES_FILTER);
 
         assertEquals(HttpStatus.OK.value(), context.getResponseStatusCode());
         assertEquals(Constants.SUCCESS, filterDetail.getStatus());
@@ -415,16 +437,16 @@ public class ScopesFilterTest {
         app.setClientId(clientId1);
 
         Operation operation = new Operation(1111L, null, null,null, null);
-        Scope scope = new Scope(1000L, null, null, null, null, null);
+        Scope scope = new Scope(1000L, null, null, null, null);
 
-        scope.setOperations(Sets.newHashSet(operation));
+        scope.setOperations(new HashSet<>(Collections.singletonList(operation)));
 
         context.set(OPERATION_ID, operation.getId());
 
         Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(app);
 
         this.filter.run();
-        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(SCOPES_FILTER);
 
         assertEquals(HttpStatus.OK.value(), context.getResponseStatusCode());
         assertEquals(Constants.SUCCESS, filterDetail.getStatus());
@@ -449,7 +471,7 @@ public class ScopesFilterTest {
         Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(app);
 
         this.filter.run();
-        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(SCOPES_FILTER);
 
         assertEquals(HttpStatus.OK.value(), context.getResponseStatusCode());
         assertEquals(Constants.SUCCESS, filterDetail.getStatus());
@@ -472,16 +494,16 @@ public class ScopesFilterTest {
         plan.setApi(api);
 
         Operation operation = new Operation(1111L, null, null,null, null);
-        Scope scope = new Scope(1000L, null, null, null, null, null);
+        Scope scope = new Scope(1000L, null, null, null, null);
 
-        app.setPlans(Lists.newArrayList(plan));
-        plan.setScopes(Sets.newHashSet(scope));
-        scope.setOperations(Sets.newHashSet(operation));
+        app.setPlans(Collections.singletonList(plan));
+        plan.setScopes(new HashSet<>(Collections.singletonList(scope)));
+        scope.setOperations(new HashSet<>(Collections.singletonList(operation)));
 
         Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(app);
 
         this.filter.run();
-        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(0);
+        final FilterDetail filterDetail = TraceContextHolder.getInstance().getActualTrace().getFilters().get(SCOPES_FILTER);
 
         assertEquals(HttpStatus.OK.value(), context.getResponseStatusCode());
         assertEquals(Constants.SUCCESS, filterDetail.getStatus());

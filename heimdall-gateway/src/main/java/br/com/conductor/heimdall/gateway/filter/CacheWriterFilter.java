@@ -25,7 +25,7 @@ import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.filter.helper.ApiResponseImpl;
 import br.com.conductor.heimdall.gateway.trace.FilterDetail;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
-import br.com.conductor.heimdall.gateway.util.ResponseHandler;
+import br.com.conductor.heimdall.gateway.util.ResponseHelper;
 import br.com.conductor.heimdall.middleware.spec.ApiResponse;
 import br.com.conductor.heimdall.middleware.spec.Helper;
 import lombok.extern.slf4j.Slf4j;
@@ -34,7 +34,6 @@ import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import org.redisson.api.RBucket;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletResponse;
@@ -93,9 +92,8 @@ public class CacheWriterFilter extends ZuulFilter {
 
             long duration = (endTime - startTime);
 
-            detail.setName(this.getClass().getSimpleName());
             detail.setTimeInMillisRun(duration);
-            TraceContextHolder.getInstance().getActualTrace().addFilter(detail);
+            TraceContextHolder.getInstance().getActualTrace().addFilter(this.getClass().getSimpleName(), detail);
         }
 
         return null;
@@ -108,11 +106,11 @@ public class CacheWriterFilter extends ZuulFilter {
 
         HttpServletResponse response = context.getResponse();
 
-        Map<String, String> headers = ResponseHandler.getResponseHeaders(context);
+        Map<String, String> headers = ResponseHelper.getResponseHeaders(context);
 
         ApiResponse apiResponse = new ApiResponseImpl();
         apiResponse.setHeaders(headers);
-        apiResponse.setBody(ResponseHandler.getResponseBody(context, headers, helper));
+        apiResponse.setBody(ResponseHelper.getResponseBody(context, headers, helper));
         apiResponse.setStatus(response.getStatus());
 
         Long timeToLive = (Long) context.get(CACHE_TIME_TO_LIVE);

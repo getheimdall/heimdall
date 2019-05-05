@@ -1,6 +1,7 @@
 package br.com.conductor.heimdall.core.entity;
 
 import java.util.List;
+import java.util.Map;
 
 import br.com.conductor.heimdall.core.trace.FilterDetail;
 import br.com.conductor.heimdall.core.trace.GeneralTrace;
@@ -49,8 +50,12 @@ public class Trace {
 
     private List<GeneralTrace> traces;
     
-    private List<FilterDetail> filters;
+    private Map<String, FilterDetail> filters;
 
     private String profile;
+
+    private Boolean cache;
+
+    private String version;
 
 }

@@ -30,8 +30,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.GZIPInputStream;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,11 +43,11 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import br.com.conductor.heimdall.gateway.util.ConstantsContext;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.netflix.zuul.context.RequestContext;
 
 import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
@@ -104,7 +108,7 @@ public class CallImpl implements Call {
                     HttpServletRequest r = context.getRequest();
                     List<String> names = Collections.list(r.getHeaderNames());
                     
-                    Map<String, String> headers = Maps.newHashMap();
+                    Map<String, String> headers = new HashMap<>();
                     names.forEach(name -> {
                          
                          if (Objeto.notBlank(r.getHeader(name))) {
@@ -187,7 +191,7 @@ public class CallImpl implements Call {
                     HttpServletRequest r = context.getRequest();
                     List<String> names = Collections.list(r.getParameterNames());
                     
-                    Map<String, String> params = Maps.newHashMap();
+                    Map<String, String> params = new HashMap<>();
                     names.forEach(name -> {
                          if (Objeto.notBlank(r.getParameter(name))) {
                               params.put(name, r.getParameter(name));
@@ -222,7 +226,7 @@ public class CallImpl implements Call {
 
                          if (Objeto.isBlank(params)) {
 
-                              params = Maps.newConcurrentMap();
+                              params = new ConcurrentHashMap<>();
                          }
                          params.put(name, Arrays.asList(value));
                          context.setRequestQueryParams(params);
@@ -321,18 +325,16 @@ public class CallImpl implements Call {
                     String[] b = requestURIText.split(separator);
 
                     String value = null;
-                    if (a != null && b != null) {
-                         
-                         for (int i = 0; i < a.length; i++) {
-                              
-                              if (a[i].equals(name) && !a[i].equals(b[i])) {
-                                   
-                                   value = b[i];
-                                   break;
-                              }
+
+                    for (int i = 0; i < a.length; i++) {
+
+                         if (a[i].equals(name) && !a[i].equals(b[i])) {
+
+                              value = b[i];
+                              break;
                          }
                     }
-                    
+
                     return value;
                } else {
                     
@@ -377,9 +379,9 @@ public class CallImpl implements Call {
                public Map<String, String> getAll() {
 
                     HttpServletResponse r = context.getResponse();
-                    List<String> names = Lists.newArrayList(r.getHeaderNames());
+                    List<String> names = new ArrayList<>(r.getHeaderNames());
                     
-                    Map<String, String> headers = Maps.newHashMap();
+                    Map<String, String> headers = new HashMap<>();
                     names.forEach(name -> {
                          
                          if (Objeto.notBlank(r.getHeader(name))) {
@@ -557,10 +559,9 @@ public class CallImpl implements Call {
           
           @SuppressWarnings("unchecked")
           public EnvironmentImpl() {
-
-               if (Objeto.notBlank(context.get("environmentVariables"))) {
-                    
-                    currentVariables = (Map<String, String>) context.get("environmentVariables");
+        	  currentVariables = (Map<String, String>) context.get(ConstantsContext.ENVIRONMENT_VARIABLES);
+        	  if (Objects.isNull(currentVariables)) {
+                    currentVariables = new HashMap<>();
                }
                
           }
@@ -575,7 +576,7 @@ public class CallImpl implements Call {
           public String getVariable(String key) {
 
                String value = currentVariables.get(key);
-               if (Objeto.isBlank(value)) {
+               if (StringUtils.isBlank(value)) {
                     
                     TraceContextHolder.getInstance().getActualTrace().trace("Environment variable with key '" + key + "' not exist.");
                }

@@ -69,9 +69,9 @@ public class InterceptorDTO implements Serializable {
      @NotNull
      private Long referenceId;
      
-     private List<ReferenceIdDTO> ignoredResources;
+     private List<Long> ignoredResources;
 
-     private List<ReferenceIdDTO> ignoredOperations;
+     private List<Long> ignoredOperations;
      
      private ReferenceIdDTO api;
 

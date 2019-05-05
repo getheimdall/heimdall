@@ -22,6 +22,7 @@ package br.com.conductor.heimdall.api.configuration;
  */
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,7 +46,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.core.JsonParseException;
-import com.google.common.collect.Lists;
 
 import br.com.conductor.heimdall.api.configuration.GlobalExceptionHandler.BindExceptionInfo.BindError;
 import br.com.conductor.heimdall.core.exception.BadRequestException;
@@ -234,7 +234,7 @@ public class GlobalExceptionHandler{
      public @ResponseBody BindExceptionInfo validationBindException(HttpServletResponse response, HttpServletRequest request, BindException exception) {
 
           BindExceptionInfo bindException = new BindExceptionInfo();
-          List<BindError> errors = Lists.newArrayList();
+          List<BindError> errors = new ArrayList<>();
           List<ObjectError> objectsError = exception.getBindingResult().getAllErrors();
 
           objectsError.forEach(objectError -> {
@@ -285,7 +285,7 @@ public class GlobalExceptionHandler{
      public @ResponseBody BindExceptionInfo validationMethodArgumentNotValidException(HttpServletResponse response, HttpServletRequest request, MethodArgumentNotValidException exception) {
 
           BindExceptionInfo bindException = new BindExceptionInfo();
-          List<BindError> errors = Lists.newArrayList();
+          List<BindError> errors = new ArrayList<>();
           List<ObjectError> objectsError = exception.getBindingResult().getAllErrors();
 
           objectsError.forEach(objectError -> {
