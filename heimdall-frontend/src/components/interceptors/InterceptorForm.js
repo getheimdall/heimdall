@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Row, Form, Input, Col, Select, Switch } from 'antd'
+import { Row, Form, Input, Col, Select, Switch, Button } from 'antd'
 
 import i18n from "../../i18n/i18n"
 import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
@@ -12,8 +12,21 @@ const { TextArea } = Input
 
 class InterceptorForm extends Component {
 
+    state = {
+        ignoredOperations: []
+    }
+
     componentDidMount() {
         this.props.onRef(this)
+
+        const { interceptor } = this.props
+
+        if (interceptor) {
+            this.setState({
+                ...this.state,
+                ignoredOperations: interceptor.ignoredOperations
+            })
+        }
     }
 
     componentWillUnmount() {
@@ -55,6 +68,27 @@ class InterceptorForm extends Component {
 
     formatContent = (type) => {
         return getTemplate(type)
+    }
+
+    isIgnore = () => {
+        const { interceptor } = this.props
+
+        if (!interceptor) {
+            return false
+        }
+
+        return !!(interceptor.candidateToIgnoreId && this.state.ignoredOperations.find(operation => operation === interceptor.candidateToIgnoreId))
+    }
+
+    handleOnChangeCandidateToIgnore = value => {
+        const { interceptor } = this.props
+
+        if (value) {
+            this.setState({ ...this.state, ignoredOperations: this.state.ignoredOperations.concat([interceptor.candidateToIgnoreId]) })
+        } else {
+            this.setState({ ...this.state, ignoredOperations: this.state.ignoredOperations.filter(ignored => ignored !== interceptor.candidateToIgnoreId) })
+        }
+
     }
 
     render() {
@@ -116,9 +150,10 @@ class InterceptorForm extends Component {
                     {getFieldDecorator('order', { initialValue: interceptor && interceptor.order ? interceptor.order : this.props.order})(<Input type='hidden' />)}
                     {getFieldDecorator('type', { initialValue: type})(<Input type='hidden' />)}
                     {getFieldDecorator('executionPoint', { initialValue: executionPoint })(<Input type='hidden' />)}
+                    {getFieldDecorator('ignoredOperations', { initialValue: this.state.ignoredOperations })(<Input type='hidden' />)}
 
                     <Row gutter={24}>
-                        <Col sm={24} md={20} >
+                        <Col sm={24} md={interceptor && interceptor.candidateToIgnoreId ? 15 : 20} >
                             <FormItem label={i18n.t('name')}>
                                 {
                                     getFieldDecorator('name', {
@@ -142,6 +177,14 @@ class InterceptorForm extends Component {
                                 }
                             </FormItem>
                         </Col>
+                        {
+                            interceptor && interceptor.candidateToIgnoreId &&
+                            <Col sm={24} md={5}>
+                                <FormItem label=" " colon={false}>
+                                    <Button className={this.isIgnore() ? 'button-ignored': 'button-not-ignored'} onClick={() => this.handleOnChangeCandidateToIgnore(!this.isIgnore())}>{i18n.t(this.isIgnore() ? 'ignored' : 'ignore')}</Button>
+                                </FormItem>
+                            </Col>
+                        }
                         <Col sm={24} md={24} >
                             <FormItem label={i18n.t('description')}>
                                 {

@@ -264,6 +264,8 @@ export default {
         'min_5_characters_to_new_password': 'Mix of 5 characters to new password',
         'min_5_characters_to_confirm_new_password': 'Mix of 5 characters to confirm new password',
         'swagger-editor': 'Swagger Editor',
+        'ignored': 'Ignored',
+        'ignore': 'Ignore',
         'refresh_interceptors': 'Refresh Interceptors',
         'interceptors_refreshed' : 'Interceptors refreshed'
     }
