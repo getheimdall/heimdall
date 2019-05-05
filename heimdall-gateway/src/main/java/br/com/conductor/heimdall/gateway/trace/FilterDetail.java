@@ -35,8 +35,6 @@ import lombok.Setter;
 @Data
 public class FilterDetail {
 
-     private String name;
-
      private long timeInMillisRun;
 
      private long timeInMillisShould;
@@ -61,7 +59,6 @@ public class FilterDetail {
      }
 
      public void clear() {
-          this.name = null;
           this.timeInMillisRun = 0;
           this.timeInMillisShould = 0;
           this.status = null;

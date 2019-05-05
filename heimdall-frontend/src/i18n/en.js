@@ -266,5 +266,7 @@ export default {
         'swagger-editor': 'Swagger Editor',
         'ignored': 'Ignored',
         'ignore': 'Ignore',
+        'refresh_interceptors': 'Refresh Interceptors',
+        'interceptors_refreshed' : 'Interceptors refreshed'
     }
 }

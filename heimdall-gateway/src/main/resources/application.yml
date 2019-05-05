@@ -76,8 +76,9 @@ heimdall:
         allowInactive: 0
         deleteDeprecated: false
     failsafe:
+        enabled: false
         failureNumber: 4
-        sucessNumber: 4
+        successNumber: 4
         delayTimeSeconds: 30
 
 sentry:
