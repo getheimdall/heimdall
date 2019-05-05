@@ -263,6 +263,8 @@ export default {
         'min_5_characters_to_current_password': 'A senha atual deve conter no mínimo 5 caracteres!',
         'min_5_characters_to_new_password': 'A nova senha deve conter no mínimo 5 caracteres!',
         'min_5_characters_to_confirm_new_password': 'A confirmação da senha deve conter no mínimo 5 caracteres!',
-        'swagger-editor': 'Editor do Swagger'
+        'swagger-editor': 'Editor do Swagger',
+        'refresh_interceptors': 'Atualizar interceptadores',
+        'interceptors_refreshed' : 'Interceptadores atualizados'
     }
 }
