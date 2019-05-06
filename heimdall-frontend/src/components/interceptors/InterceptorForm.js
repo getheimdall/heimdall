@@ -4,11 +4,10 @@ import { Row, Form, Input, Col, Select, Switch, Button } from 'antd'
 
 import i18n from "../../i18n/i18n"
 import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
-import { getTemplate } from '../../utils/InterceptorUtils'
+import {TEMPLATES, CONTENTS} from '../../utils/InterceptorUtils'
 import {privileges} from "../../constants/privileges-types"
 
 const FormItem = Form.Item
-const { TextArea } = Input
 
 class InterceptorForm extends Component {
 
@@ -36,10 +35,8 @@ class InterceptorForm extends Component {
     onSubmitForm = () => {
         this.props.form.validateFieldsAndScroll((err, payload) => {
             if (!err) {
-                // if (payload.plans) {
-                //     const plans = payload.plans;
-                //     payload.plans = plans.map((planId) => ({ id: planId }))
-                // }
+                payload.content = CONTENTS(payload.content, this.props.type)
+
                 if (payload.environment) {
                     payload.environment = { id: payload.environment }
                 }
@@ -64,10 +61,6 @@ class InterceptorForm extends Component {
         this.props.form.setFieldsValue({
             referenceId: referenceValue,
         });
-    }
-
-    formatContent = (type) => {
-        return getTemplate(type)
     }
 
     isIgnore = () => {
@@ -161,7 +154,7 @@ class InterceptorForm extends Component {
                                         rules: [
                                             { required: true, message: i18n.t('please_define_name') }
                                         ]
-                                    })(<Input required disabled={!(PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR]) && status)}/>)
+                                    })(<Input autoFocus required disabled={!(PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR]) && status)}/>)
                                 }
                             </FormItem>
                         </Col>
@@ -211,18 +204,8 @@ class InterceptorForm extends Component {
                                 }
                             </FormItem>
                         </Col>
-                        <Col sm={24} md={24} >
-                            <FormItem label={i18n.t('content')}>
-                                {
-                                    getFieldDecorator('content', {
-                                        initialValue: interceptor ? interceptor.content : this.formatContent(type),
-                                        rules: [
-                                            { required: true, message: i18n.t('please_input_content') }
-                                        ]
-                                    })(<TextArea rows={8} required disabled={!(PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR]) && status)}/>)
-                                }
-                            </FormItem>
-                        </Col>
+                        { interceptor && interceptor.content && TEMPLATES(this.props.form, JSON.parse(interceptor.content))[type] }
+                        { (!interceptor || !interceptor.content) && TEMPLATES(this.props.form, undefined )[type] }
                     </Row>
                 </Form>
             </Row >
