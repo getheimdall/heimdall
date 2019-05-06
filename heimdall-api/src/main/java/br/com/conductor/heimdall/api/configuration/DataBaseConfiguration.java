@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.api.configuration;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-api
@@ -20,6 +17,7 @@ package br.com.conductor.heimdall.api.configuration;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.api.configuration;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -42,7 +40,6 @@ import com.zaxxer.hikari.HikariDataSource;
 import br.com.conductor.heimdall.core.environment.Property;
 import br.com.twsoftware.alfred.object.Objeto;
 import liquibase.integration.spring.SpringLiquibase;
-import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -64,8 +61,6 @@ public class DataBaseConfiguration implements EnvironmentAware {
      private String database;
 
      private RelaxedPropertyResolver liquiBasePropertyResolver;
-
-//     private SpringLiquibase liquibase;
 
      @Override
      public void setEnvironment(Environment environment) {
@@ -180,15 +175,10 @@ public class DataBaseConfiguration implements EnvironmentAware {
       */
      public void clearLiquibaseCheckSums(DataSource ds) {
 
-          try {
+    	 try (Connection con = ds.getConnection(); Statement st = con.createStatement();) {
 
                log.info("Clear Liquibase ChecksSums");
 
-               @Cleanup
-               Connection con = ds.getConnection();
-
-               @Cleanup
-               Statement st = con.createStatement();
                st.executeUpdate("UPDATE DATABASECHANGELOG SET MD5SUM=NULL");
 
                con.commit();
