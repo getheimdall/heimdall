@@ -65,7 +65,7 @@ public class DataBaseConfiguration implements EnvironmentAware {
 
      private RelaxedPropertyResolver liquiBasePropertyResolver;
 
-     private SpringLiquibase liquibase;
+//     private SpringLiquibase liquibase;
 
      @Override
      public void setEnvironment(Environment environment) {
@@ -136,47 +136,42 @@ public class DataBaseConfiguration implements EnvironmentAware {
       * @param dataSource		{@link DataSource}
       * @return					{@link SpringLiquibase}
       */
-     @Bean
-     public SpringLiquibase liquibase(DataSource dataSource) {
+	@Bean
+	public SpringLiquibase liquibase(DataSource dataSource) {
 
-          liquibase = new SpringLiquibase();
-          liquibase.setDataSource(dataSource);
-          liquibase.setChangeLog("classpath:liquibase/master.xml");
-          liquibase.setContexts(liquiBasePropertyResolver.getProperty("context"));
-          liquibase.setShouldRun(property.getDatasource().isRunLiquibase());
+		SpringLiquibase liquibase = new SpringLiquibase();
+		liquibase.setDataSource(dataSource);
+		liquibase.setChangeLog("classpath:liquibase/master.xml");
+		liquibase.setContexts(liquiBasePropertyResolver.getProperty("context"));
+		liquibase.setShouldRun(property.getDatasource().isRunLiquibase());
 
-          releaseLiquibaseLocks(dataSource);
-          clearLiquibaseCheckSums(dataSource);
+		releaseLiquibaseLocks(dataSource);
+		clearLiquibaseCheckSums(dataSource);
 
-          log.debug("Configuring Liquibase and versioning the database ... Please wait!");
+		log.debug("Configuring Liquibase and versioning the database ... Please wait!");
 
-          return liquibase;
-     }
+		return liquibase;
+	}
 
-     /**
-      * Release all Liquibase locks from a {@link DataSource}.
-      * 
-      * @param ds			{@link DataSource}
-      */
-     public void releaseLiquibaseLocks(DataSource ds) {
+	/**
+	 * Release all Liquibase locks from a {@link DataSource}.
+	 * 
+	 * @param ds {@link DataSource}
+	 */
+	public void releaseLiquibaseLocks(DataSource ds) {
 
-          try {
+		try (Connection con = ds.getConnection(); Statement st = con.createStatement();) {
 
-               log.info("Releasing Liquibase Locks");
+			log.info("Releasing Liquibase Locks");
 
-               @Cleanup
-               Connection con = ds.getConnection();
+			st.executeUpdate("DELETE FROM DATABASECHANGELOGLOCK");
 
-               @Cleanup
-               Statement st = con.createStatement();
-               st.executeUpdate("DELETE FROM DATABASECHANGELOGLOCK");
+			con.commit();
 
-               con.commit();
-
-          } catch (SQLException e) {
-               log.info("Error while trying to delete DATABASECHANGELOGLOCK");
-          }
-     }
+		} catch (SQLException e) {
+			log.info("Error while trying to delete DATABASECHANGELOGLOCK");
+		}
+	}
 
      /**
       * Clears all Liquibase checksums from a {@link DataSource}.
