@@ -11,6 +11,7 @@ import org.springframework.util.StreamUtils;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
@@ -40,7 +41,7 @@ public class ResponseHelper {
         return headers;
     }
 
-    public static String getResponseBody(RequestContext context, Map<String, String> headers, Helper helper) throws Throwable {
+    public static String getResponseBody(RequestContext context, Map<String, String> headers) throws Throwable {
         String content = headers.get(HttpHeaders.CONTENT_TYPE);
         String response = null;
 
@@ -55,9 +56,9 @@ public class ResponseHelper {
 
             response = StreamUtils.copyToString(stream, StandardCharsets.UTF_8);
 
-            if (response.isEmpty() && helper.call().response().getBody() != null) {
+            if (response.isEmpty() && context.getResponseBody() != null) {
 
-                response = helper.call().response().getBody();
+                response = context.getResponseBody();
             }
 
             if (Objects.isNull(response) || response.isEmpty()) {

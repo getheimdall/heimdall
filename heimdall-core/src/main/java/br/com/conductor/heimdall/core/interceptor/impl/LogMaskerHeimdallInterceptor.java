@@ -53,7 +53,8 @@ public class LogMaskerHeimdallInterceptor implements HeimdallInterceptor {
             ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(TypeInterceptor.LOG_MASKER.name(), TemplateUtils.TEMPLATE_LOG_MASKER);
         }
 
-        return null;    }
+        return null;
+    }
 
     @Override
     public HashMap<String, Object> buildParameters(Object objectCustom, HashMap<String, Object> parameters, Interceptor interceptor) {

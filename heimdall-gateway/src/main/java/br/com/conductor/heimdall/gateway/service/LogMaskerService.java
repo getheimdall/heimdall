@@ -20,7 +20,7 @@
 package br.com.conductor.heimdall.gateway.service;
 
 import br.com.conductor.heimdall.core.trace.RequestResponseParser;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import br.com.conductor.heimdall.core.trace.TraceContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,7 +30,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
 
 /**
- * Log Mask Service provides a method to mask the information from the {@link br.com.conductor.heimdall.gateway.trace.Trace}.
+ * Log Mask Service provides a method to mask the information from the {@link br.com.conductor.heimdall.core.trace.Trace}.
  *
  * @author Marcelo Aguiar Rodrigues
  */
@@ -38,7 +38,7 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 public class LogMaskerService {
 
     /**
-     * Given the filter type it removes the information passed from the {@link br.com.conductor.heimdall.gateway.trace.Trace}.
+     * Given the filter type it removes the information passed from the {@link br.com.conductor.heimdall.core.trace.Trace}.
      *
      * @param filterType     {@link org.springframework.cloud.netflix.zuul.filters.support.FilterConstants}
      * @param deleteBody     should delete the request body

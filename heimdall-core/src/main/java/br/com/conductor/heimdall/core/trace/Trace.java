@@ -23,15 +23,12 @@ package br.com.conductor.heimdall.core.trace;
 
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
-import br.com.conductor.heimdall.core.util.LocalDateTimeSerializer;
 import br.com.conductor.heimdall.core.util.UrlUtil;
-import br.com.twsoftware.alfred.object.Objeto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +39,6 @@ import org.springframework.http.HttpStatus;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.time.LocalDateTime;
 import java.util.*;
 
 import static net.logstash.logback.marker.Markers.append;
@@ -73,9 +69,6 @@ public class Trace {
 
     private Long durationMillis;
 
-    @JsonSerialize(using = LocalDateTimeSerializer.class)
-    private LocalDateTime insertedOnDate = LocalDateTime.now();
-
     private Long apiId;
 
     private String apiName;
@@ -104,12 +97,13 @@ public class Trace {
     private List<GeneralTrace> traces;
 
     @Getter
-    private Map<String, FilterDetail> filters = new LinkedHashMap<>();
+    private Map<String, FilterDetail> filters;
 
     private String profile;
 
     @JsonIgnore
     private boolean printAllTrace;
+
     @JsonIgnore
     private boolean printMongo;
 
@@ -149,16 +143,11 @@ public class Trace {
         this.url = UrlUtil.getCurrentUrl(request);
 
         Enumeration<String> headers = request.getHeaders("x-forwarded-for");
-        if (Objeto.notBlank(headers)) {
 
-            List<String> listIps = new ArrayList<>();
-            while (headers.hasMoreElements()) {
-                String ip = headers.nextElement();
-                listIps.add(ip);
-            }
-
-            this.receivedFromAddress = String.join(",", listIps);
-
+        if (headers != null) {
+            List<String> listIps = Collections.list(headers);
+            String received = String.join(",", listIps);
+            this.receivedFromAddress = "".equals(received) ? null : received;
         }
 
     }
@@ -184,6 +173,8 @@ public class Trace {
      * @param detail {@link FilterDetail}
      */
     public void addFilter(String name, FilterDetail detail) {
+        if (this.filters == null) this.filters = new LinkedHashMap<>();
+
         filters.put(name, detail);
     }
 
@@ -228,7 +219,11 @@ public class Trace {
             this.resultStatus = response.getStatus();
             this.durationMillis = System.currentTimeMillis() - getInitialTime();
 
-            prepareLog();
+            if (!this.profile.equals("developer")) {
+                this.filters = null;
+            }
+
+            writeTrace();
 
         } catch (Exception e) {
 
@@ -249,9 +244,8 @@ public class Trace {
      *   * 3xx~4xx = WARN
      *   * OTHER   = ERROR
      */
-    private void prepareLog() throws JsonProcessingException {
+    private void writeTrace() throws JsonProcessingException {
 
-        String url = Objects.nonNull(getUrl()) ? getUrl() : "";
         ObjectMapper mapper = new ObjectMapper();
 
         if (this.printAllTrace) {
@@ -267,6 +261,8 @@ public class Trace {
                 log.error(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
             }
         } else {
+            String url = Objects.nonNull(this.url) ? this.url : "";
+
             if (isInfo(this.resultStatus)) {
 
                 log.info(append("call", this), " [HEIMDALL-TRACE] - " + url);
@@ -284,6 +280,7 @@ public class Trace {
         }
 
         if (this.printLogstash) {
+            this.version = null;
             printInLogger(logstash);
         }
     }

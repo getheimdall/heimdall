@@ -20,7 +20,7 @@
 package br.com.conductor.heimdall.gateway.service;
 
 import br.com.conductor.heimdall.core.trace.RequestResponseParser;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import br.com.conductor.heimdall.core.trace.TraceContextHolder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
