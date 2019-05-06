@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.api.configuration;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -19,6 +17,7 @@ package br.com.conductor.heimdall.api.configuration;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.api.configuration;
 
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.annotation.RabbitListenerConfigurer;

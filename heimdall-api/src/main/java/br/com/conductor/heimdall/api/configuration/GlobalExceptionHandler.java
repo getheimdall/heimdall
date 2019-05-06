@@ -1,4 +1,3 @@
-
 package br.com.conductor.heimdall.api.configuration;
 
 /*-
@@ -7,7 +6,7 @@ package br.com.conductor.heimdall.api.configuration;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -456,27 +455,27 @@ public class GlobalExceptionHandler{
          /**
           * TImestamp from the moment that the exception was created.
           */
-         public LocalDateTime timestamp;
+         private LocalDateTime timestamp;
 
          /**
           * Exception identifier.
           */
-         public Integer code;
+         private Integer code;
 
          /**
           * Exception class name.
           */
-         public String exception;
+         private String exception;
 
          /**
           * Exception description.
           */
-         public String message;
+         private String message;
 
          /**
           * Path that generated the request that caused the exception.
           */
-         public String path;
+         private String path;
 
      }
 
