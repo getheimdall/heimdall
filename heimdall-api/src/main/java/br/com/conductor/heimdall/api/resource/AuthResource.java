@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.api.resource;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-api
@@ -19,7 +17,9 @@ package br.com.conductor.heimdall.api.resource;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.api.resource;
 
+import br.com.conductor.heimdall.api.dto.UserAuthenticateResponse;
 import br.com.conductor.heimdall.api.entity.CredentialState;
 import br.com.conductor.heimdall.api.security.AccountCredentials;
 import br.com.conductor.heimdall.api.service.CredentialStateService;
@@ -55,8 +55,10 @@ public class AuthResource {
 
     @ApiOperation(value = "Login Authentication")
     @PostMapping(ConstantsPath.PATH_LOGIN)
-    public void login(@RequestBody AccountCredentials accountCredentials, HttpServletResponse response) {
-        tokenAuthenticationService.login(accountCredentials, response);
+    public ResponseEntity<?> login(@RequestBody AccountCredentials accountCredentials, HttpServletResponse response) {
+        UserAuthenticateResponse userLogged = tokenAuthenticationService.login(accountCredentials, response);
+
+        return ResponseEntity.ok(userLogged);
     }
 
     @ResponseBody

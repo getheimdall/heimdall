@@ -1,53 +1,48 @@
-export const TEMPLATE_ACCESS_TOKEN = "{\"location\": \"HEADER\", \"name\": \"access_token\"}";
-export const TEMPLATE_MOCK = "{\"body\": \"{'name': 'Mock Example'}\", \"status\": \"200\"}";
-export const TEMPLATE_RATTING = "{\"calls\":20,\"interval\":\"MINUTES\"}";
-export const TEMPLATE_IPS = "{\"ips\": [ \"127.0.0.0\", \"127.0.0.1\" ]}";
-export const TEMPLATE_CACHE = "{\"cache\":\"cache-name\", \"timeToLive\": 10000, \"headers\": [\"header1\", \"header2\"], \"queryParams\": [\"queryParam1\", \"queryParam2\"]}";
-export const TEMPLATE_CACHE_CLEAR = "{\"cache\":\"cache-name\"}";
-export const TEMPLATE_IDENTIFIER = "{}";
-export const TEMPLATE_CORS = "{\"Access-Control-Allow-Origin\": \"*\", " +
-    "\"Access-Control-Allow-Credentials\": \"true\", " +
-    "\"Access-Control-Allow-Methods\": \"POST, GET, PUT, PATCH, DELETE, OPTIONS\", " +
-    "\"Access-Control-Allow-Headers\": \"origin, content-type, accept, authorization, x-requested-with, X-AUTH-TOKEN, access_token, client_id, device_id, credential\", " +
-    "\"Access-Control-Max-Age\": \"3600\"}";
+import React from 'react'
+import ClientId from '../components/interceptors/wrappers/ClientId'
+import Mock from '../components/interceptors/wrappers/Mock'
+import Ratting from '../components/interceptors/wrappers/Ratting'
+import Ips from '../components/interceptors/wrappers/Ips'
+import Cache from '../components/interceptors/wrappers/Cache'
+import CacheClear from '../components/interceptors/wrappers/CacheClear'
+import Cors from '../components/interceptors/wrappers/Cors'
+import Default from '../components/interceptors/wrappers/Default'
+import AccessToken from '../components/interceptors/wrappers/AccessToken'
+import OAuth from '../components/interceptors/wrappers/OAuth'
+import Identifier from '../components/interceptors/wrappers/Identifier'
+import LogMasker from '../components/interceptors/wrappers/LogMasker'
+import { InterceptorContent } from './InterceptorContentUtils'
 
-export const getTemplate = (type) => {
-    if (type === 'ACCESS_TOKEN') {
-        return TEMPLATE_ACCESS_TOKEN
+export const TEMPLATES = (form, content) => ({
+    ACCESS_TOKEN: <AccessToken form={form} content={content}/>,
+    CLIENT_ID: <ClientId form={form} content={content} />,
+    MOCK: <Mock form={form} content={content} />,
+    RATTING: <Ratting form={form} content={content} />,
+    BLACKLIST: <Ips form={form} content={content} />,
+    WHITELIST: <Ips form={form} content={content} />,
+    CACHE: <Cache form={form} content={content} />,
+    CACHE_CLEAR: <CacheClear form={form} content={content} />,
+    CORS: <Cors form={form} content={content} />,
+    CUSTOM: <Default form={form} content={content}/>,
+    LOG_MASKER: <LogMasker form={form} content={content}/>,
+    OAUTH: <OAuth form={form} content={content}/>,
+    IDENTIFIER: <Identifier form={form} content={content}/>,
+    MIDDLEWARE: <Default form={form} content={content}/>,
+})
+
+export const CONTENTS = (content, type) => {
+
+    switch (type) {
+        case 'BLACKLIST':
+        case 'WHITELIST':
+            return InterceptorContent.ipsContent(content)
+        case 'CACHE':
+            return InterceptorContent.cacheContent(content)
+        case 'LOG_MASKER':
+            return InterceptorContent.logMaskerContent(content)
+        default:
+            return InterceptorContent.defaultContent(content)
     }
-
-    if (type === 'CLIENT_ID') {
-        return TEMPLATE_ACCESS_TOKEN
-    }
-
-    if (type === 'MOCK') {
-        return TEMPLATE_MOCK
-    }
-
-    if (type === 'RATTING') {
-        return TEMPLATE_RATTING
-    }
-
-    if (type === 'BLACKLIST' || type === 'WHITELIST'){
-        return TEMPLATE_IPS
-    }
-
-    if (type === 'CACHE') {
-        return TEMPLATE_CACHE
-    }
-
-    if (type === 'CACHE_CLEAR') {
-        return TEMPLATE_CACHE_CLEAR
-    }
-
-    if (type === 'IDENTIFIER'){
-        return TEMPLATE_IDENTIFIER
-    }
-
-    if (type === 'CORS') {
-        return TEMPLATE_CORS
-    }
-
 }
 
 export const interceptorSort = (first, second) => {

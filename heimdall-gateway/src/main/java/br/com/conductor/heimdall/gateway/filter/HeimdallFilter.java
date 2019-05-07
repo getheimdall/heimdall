@@ -92,9 +92,8 @@ public abstract class HeimdallFilter extends ZuulFilter {
 
                long duration = (endTime - startTime);
 
-               detail.setName(getName());
                detail.setTimeInMillisRun(duration);
-               TraceContextHolder.getInstance().getActualTrace().addFilter(detail);
+               TraceContextHolder.getInstance().getActualTrace().addFilter(getName(), detail);
           }
           return null;
      }     

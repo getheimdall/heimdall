@@ -11,6 +11,11 @@ const verifyPrivileges = (privilegesAllowed) => {
     return false
 }
 
+const verifyTypeUser = type => {
+    return localStorage.getItem('type') === type
+}
+
 export const PrivilegeUtils = {
-    verifyPrivileges
+    verifyPrivileges,
+    verifyTypeUser
 }

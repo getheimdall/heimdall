@@ -25,7 +25,7 @@ import br.com.conductor.heimdall.gateway.trace.FilterDetail;
 import br.com.conductor.heimdall.gateway.trace.RequestResponseParser;
 import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
-import br.com.conductor.heimdall.gateway.util.ResponseHandler;
+import br.com.conductor.heimdall.gateway.util.ResponseHelper;
 import br.com.conductor.heimdall.middleware.spec.Helper;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
@@ -82,9 +82,8 @@ public class LogResponseFilter extends ZuulFilter {
 
             long duration = (endTime - startTime);
 
-            detail.setName(this.getClass().getSimpleName());
             detail.setTimeInMillisRun(duration);
-            TraceContextHolder.getInstance().getActualTrace().addFilter(detail);
+            TraceContextHolder.getInstance().getActualTrace().addFilter(this.getClass().getSimpleName(), detail);
         }
         return null;
     }
@@ -95,10 +94,10 @@ public class LogResponseFilter extends ZuulFilter {
         RequestResponseParser r = new RequestResponseParser();
         r.setUri(UrlUtil.getCurrentUrl(ctx.getRequest()));
 
-        Map<String, String> headers = ResponseHandler.getResponseHeaders(ctx);
+        Map<String, String> headers = ResponseHelper.getResponseHeaders(ctx);
         r.setHeaders(headers);
 
-        String body = ResponseHandler.getResponseBody(ctx, headers, helper);
+        String body = ResponseHelper.getResponseBody(ctx, headers, helper);
         r.setBody(body);
 
         TraceContextHolder.getInstance().getActualTrace().setResponse(r);

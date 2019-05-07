@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.gateway.filter;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -20,37 +17,23 @@ package br.com.conductor.heimdall.gateway.filter;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.filter;
 
-import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
-import static br.com.conductor.heimdall.gateway.util.ConstantsContext.API_ID;
-import static br.com.conductor.heimdall.gateway.util.ConstantsContext.API_NAME;
-import static br.com.conductor.heimdall.gateway.util.ConstantsContext.OPERATION_ID;
-import static br.com.conductor.heimdall.gateway.util.ConstantsContext.PATTERN;
-import static br.com.conductor.heimdall.gateway.util.ConstantsContext.RESOURCE_ID;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.FORWARD_LOCATION_PREFIX;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.FORWARD_TO_KEY;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.HTTPS_PORT;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.HTTPS_SCHEME;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.HTTP_PORT;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.HTTP_SCHEME;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PROXY_KEY;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.REQUEST_URI_KEY;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.RETRYABLE_KEY;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SERVICE_HEADER;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SERVICE_ID_HEADER;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SERVICE_ID_KEY;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_FOR_HEADER;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_HOST_HEADER;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_PORT_HEADER;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_PROTO_HEADER;
-
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Optional;
-
-import javax.servlet.http.HttpServletRequest;
-
+import br.com.conductor.heimdall.core.enums.HttpMethod;
+import br.com.conductor.heimdall.core.util.Constants;
+import br.com.conductor.heimdall.core.util.ConstantsPath;
+import br.com.conductor.heimdall.core.util.UrlUtil;
+import br.com.conductor.heimdall.gateway.router.Credential;
+import br.com.conductor.heimdall.gateway.router.CredentialRepository;
+import br.com.conductor.heimdall.gateway.router.EnvironmentInfo;
+import br.com.conductor.heimdall.gateway.router.EnvironmentInfoRepository;
+import br.com.conductor.heimdall.gateway.trace.FilterDetail;
+import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import br.com.conductor.heimdall.gateway.util.RequestHelper;
+import br.com.conductor.heimdall.gateway.zuul.route.HeimdallRoute;
+import br.com.conductor.heimdall.gateway.zuul.route.ProxyRouteLocator;
+import com.netflix.zuul.context.RequestContext;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
@@ -65,22 +48,15 @@ import org.springframework.util.PathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UrlPathHelper;
 
-import com.netflix.zuul.context.RequestContext;
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
 
-import br.com.conductor.heimdall.core.entity.Environment;
-import br.com.conductor.heimdall.core.enums.HttpMethod;
-import br.com.conductor.heimdall.core.repository.EnvironmentRepository;
-import br.com.conductor.heimdall.core.util.Constants;
-import br.com.conductor.heimdall.core.util.ConstantsPath;
-import br.com.conductor.heimdall.core.util.UrlUtil;
-import br.com.conductor.heimdall.gateway.router.Credential;
-import br.com.conductor.heimdall.gateway.router.CredentialRepository;
-import br.com.conductor.heimdall.gateway.trace.FilterDetail;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
-import br.com.conductor.heimdall.gateway.util.RequestHelper;
-import br.com.conductor.heimdall.gateway.zuul.route.HeimdallRoute;
-import br.com.conductor.heimdall.gateway.zuul.route.ProxyRouteLocator;
-import lombok.extern.slf4j.Slf4j;
+import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
+import static br.com.conductor.heimdall.gateway.util.ConstantsContext.*;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.*;
 
 /**
  * Extends the {@link PreDecorationFilter}.
@@ -112,9 +88,9 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
     
     private CredentialRepository credentialRepository;
     
-    private EnvironmentRepository environmentRepository;
+    private EnvironmentInfoRepository environmentInfoRepository;
 
-    public HeimdallDecorationFilter(ProxyRouteLocator routeLocator, String dispatcherServletPath, ZuulProperties properties, ProxyRequestHelper proxyRequestHelper, RequestHelper requestHelper, CredentialRepository credentialRepository, EnvironmentRepository environmentRepository) {
+    public HeimdallDecorationFilter(ProxyRouteLocator routeLocator, String dispatcherServletPath, ZuulProperties properties, ProxyRequestHelper proxyRequestHelper, RequestHelper requestHelper, CredentialRepository credentialRepository, EnvironmentInfoRepository environmentInfoRepository) {
 
         super(routeLocator, dispatcherServletPath, properties, proxyRequestHelper);
         this.routeLocator = routeLocator;
@@ -125,7 +101,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
         this.zuulServletPath = properties.getServletPath();
         this.requestHelper = requestHelper;
         this.credentialRepository = credentialRepository;
-        this.environmentRepository = environmentRepository;
+        this.environmentInfoRepository = environmentInfoRepository;
     }
 
     @Override
@@ -157,9 +133,8 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
 
             long duration = (endTime - startTime);
 
-            detail.setName(this.getClass().getSimpleName());
             detail.setTimeInMillisRun(duration);
-            TraceContextHolder.getInstance().getActualTrace().addFilter(detail);
+            TraceContextHolder.getInstance().getActualTrace().addFilter(this.getClass().getSimpleName(), detail);
         }
 
         return null;
@@ -291,7 +266,9 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                         }
 
                         if (Objects.isNull(credential)) {
-                        	credential = credentials.stream().filter(o -> o.getMethod().equals(HttpMethod.ALL.name()) || method.equals(o.getMethod().toUpperCase())).findFirst().orElse(null);
+                        	credential = credentials.stream()
+                                    .filter(o -> o.getMethod().equals(HttpMethod.ALL.name()) || method.equals(o.getMethod().toUpperCase()))
+                                    .findFirst().orElse(null);
                         }
                     }
 
@@ -306,27 +283,29 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                         ctx.put(API_ID, credential.getApiId());
                         ctx.put(RESOURCE_ID, credential.getResourceId());
                         ctx.put(OPERATION_ID, credential.getOperationId());
+                        ctx.put(OPERATION_PATH, credential.getOperationPath());
 
-                        List<Environment> environments = environmentRepository.findByApiId(credential.getApiId());
+                        String host = ctx.getRequest().getHeader("Host");
 
+                        EnvironmentInfo environment;
                         String location = null;
-                        if (environments != null) {
-
-                            String host = ctx.getRequest().getHeader("Host");
-
-                            Optional<Environment> environment;
-                            if (host != null && !host.isEmpty()) {
-                                environment = environments.stream().filter(e -> e.getInboundURL().toLowerCase().contains(host.toLowerCase())).findFirst();
-                            } else {
-                                environment = environments.stream().filter(e -> ctx.getRequest().getRequestURL().toString().toLowerCase().contains(e.getInboundURL().toLowerCase())).findFirst();
-                            }
-
-                            if (environment.isPresent()) {
-                                location = environment.get().getOutboundURL();
-                                ctx.put("environmentVariables", environment.get().getVariables());
-                            }
+                        if (host != null && !host.isEmpty()) {
+                            environment = environmentInfoRepository.findByApiIdAndEnvironmentInboundURL(credential.getApiId(), host.toLowerCase());
+                        } else {
+                            environment = environmentInfoRepository.findByApiIdAndEnvironmentInboundURL(credential.getApiId(), ctx.getRequest().getRequestURL().toString().toLowerCase());
                         }
-                        Route route = new Route(zuulRoute.getId(), requestURI, location, "", zuulRoute.getRetryable() != null ? zuulRoute.getRetryable() : false, zuulRoute.isCustomSensitiveHeaders() ? zuulRoute.getSensitiveHeaders() : null);
+
+                        if (environment != null) {
+                            location = environment.getOutboundURL();
+                            ctx.put(ENVIRONMENT_VARIABLES, environment.getVariables());
+                        }
+
+                        Route route = new Route(zuulRoute.getId(),
+                                requestURI,
+                                location,
+                                "",
+                                zuulRoute.getRetryable() != null ? zuulRoute.getRetryable() : false,
+                                zuulRoute.isCustomSensitiveHeaders() ? zuulRoute.getSensitiveHeaders() : null);
 
                         TraceContextHolder traceContextHolder = TraceContextHolder.getInstance();
 

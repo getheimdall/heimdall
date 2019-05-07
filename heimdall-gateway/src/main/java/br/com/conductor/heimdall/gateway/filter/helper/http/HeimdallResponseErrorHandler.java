@@ -17,7 +17,6 @@
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-
 package br.com.conductor.heimdall.gateway.filter.helper.http;
 
 import java.io.IOException;

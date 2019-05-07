@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.gateway.listener;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -10,9 +7,9 @@ package br.com.conductor.heimdall.gateway.listener;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,18 +17,17 @@ package br.com.conductor.heimdall.gateway.listener;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.listener;
 
+import br.com.conductor.heimdall.core.entity.Middleware;
+import br.com.conductor.heimdall.core.repository.MiddlewareRepository;
+import br.com.conductor.heimdall.core.util.RabbitConstants;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import br.com.conductor.heimdall.core.entity.Middleware;
-import br.com.conductor.heimdall.core.repository.MiddlewareRepository;
-import br.com.conductor.heimdall.core.util.RabbitConstants;
-import br.com.twsoftware.alfred.object.Objeto;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Listener that controls the {@link Middleware} repository.
@@ -64,12 +60,12 @@ public class MiddlewareListener {
                Long middlewareId = (Long) rabbitTemplate.getMessageConverter().fromMessage(message);
      
                Middleware middleware = middlewareRepository.findOne(middlewareId);
-               if (Objeto.notBlank(middleware)) {
+               if (middleware != null) {
                     
                     log.info("Updating/Creating middleware id: " + middlewareId);
                     startServer.addApiDirectoryToPath(middleware.getApi());
-                    startServer.createMiddlewaresInterceptor(middlewareId);
-                    startServer.loadMiddlewareFiles(middlewareId);
+                    startServer.createMiddlewaresInterceptor(middleware);
+                    startServer.loadMiddlewareFiles(middleware);
                } else {
                     
                     log.info("It was not possible Updating/Creating middleware id: " + middlewareId);
@@ -91,13 +87,13 @@ public class MiddlewareListener {
           try {
                String path = (String) rabbitTemplate.getMessageConverter().fromMessage(message);
                
-               if (Objeto.notBlank(path)) {
+               if (path != null) {
                     
                     log.info("Remove Middleware in: " + path);
                     startServer.removeMiddlewareFiles(path);
                } else {
                     
-                    log.info("It was not possible Remove middleware in: " + path);
+                    log.info("It was not possible Remove middleware.");
                }
           } catch (Exception e) {
                log.error(e.getMessage(), e);

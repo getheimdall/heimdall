@@ -43,7 +43,7 @@ heimdall:
         sendStringParametersAsUnicode: false
     mongo:
         enabled: false
-#        serverName:
+        #        serverName:
         url: mongodb://admin:admin@localhost
         port: 27017
         dataBase: logging
@@ -60,7 +60,7 @@ heimdall:
             - client_id
     redis:
         host: 127.0.0.1
-        port: 6379 
+        port: 6379
         maxTotal: 128
         maxIdle: 128
         minIdle: 16
@@ -76,9 +76,19 @@ heimdall:
         allowInactive: 0
         deleteDeprecated: false
     failsafe:
+        enabled: false
         failureNumber: 4
-        sucessNumber: 4
+        successNumber: 4
         delayTimeSeconds: 30
+
+sentry:
+    enabled: false
+    dsn: http://127.0.0.1:9000
+    environment: developer
+    release: @project.version@
+    tags: heimdall-gateway
+    profiles:
+        active: dev
 
 spring:
     pid:
@@ -136,15 +146,15 @@ management:
 zuul:
     ignoredPatterns: /manager/**
     include-debug-header: false
-    debug: 
+    debug:
         parameter: debug
         request: false
     filter:
         root: /tmp/interceptors
         interval: 8
-    host: 
+    host:
         socket-timeout-millis: 40000
-        connect-timeout-millis: 40000  
+        connect-timeout-millis: 40000
 
 security:
     basic:

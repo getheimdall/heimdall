@@ -105,7 +105,7 @@ public class ScopeResource {
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_SCOPE)
     public ResponseEntity<?> findAll(@PathVariable("apiId") Long apiId, @ModelAttribute ScopeDTO scopeDTO, @ModelAttribute PageableDTO pageableDTO) {
 
-        if (pageableDTO.getLimit() != null && pageableDTO.getOffset() != null) {
+        if (!pageableDTO.isEmpty()) {
 
             ScopePage scopePage = scopeService.list(apiId, scopeDTO, pageableDTO);
             return ResponseEntity.ok(scopePage);

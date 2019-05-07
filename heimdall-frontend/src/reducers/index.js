@@ -20,6 +20,7 @@ import privileges from './Privileges'
 import ldap from './Ldap'
 import providers from './Providers'
 import scopes from './Scopes'
+import session from './Session'
 import navbar from './Navbar'
 
 export default combineReducers({
@@ -43,5 +44,6 @@ export default combineReducers({
     ldap,
     providers,
     scopes,
+    session,
     navbar
 })

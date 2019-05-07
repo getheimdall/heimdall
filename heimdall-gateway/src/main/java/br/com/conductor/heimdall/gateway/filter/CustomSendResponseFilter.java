@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.gateway.filter;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -10,9 +7,9 @@ package br.com.conductor.heimdall.gateway.filter;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,15 +17,14 @@ package br.com.conductor.heimdall.gateway.filter;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-
-import org.springframework.cloud.netflix.zuul.filters.post.SendResponseFilter;
-
-import com.netflix.zuul.context.RequestContext;
+package br.com.conductor.heimdall.gateway.filter;
 
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.trace.FilterDetail;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import com.netflix.zuul.context.RequestContext;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.netflix.zuul.filters.post.SendResponseFilter;
 
 /**
  * Extends the {@link SendResponseFilter} to add a timelimit to the response
@@ -74,9 +70,8 @@ public class CustomSendResponseFilter extends SendResponseFilter {
 
 			long duration = (endTime - startTime);
 
-			detail.setName(this.getClass().getSimpleName());
 			detail.setTimeInMillisRun(duration);
-			TraceContextHolder.getInstance().getActualTrace().addFilter(detail);
+			TraceContextHolder.getInstance().getActualTrace().addFilter(this.getClass().getSimpleName(), detail);
 		}
 	}
 }

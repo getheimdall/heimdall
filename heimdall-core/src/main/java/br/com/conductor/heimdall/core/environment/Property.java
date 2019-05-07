@@ -32,7 +32,7 @@ import lombok.Data;
  * 
  * @author Filipe Germano
  * @author Marcelo Aguiar Rodrigues
- *
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Data
 @ConfigurationProperties(prefix = "heimdall", ignoreUnknownFields = true)
@@ -177,8 +177,9 @@ public class Property {
      
      @Data
      public class FailSafe {
+        private boolean enabled = true;
     	private int failureNumber = 3;
-    	private int sucessNumber = 3;
+    	private int successNumber = 3;
     	private int delayTimeSeconds = 30;
      }
 

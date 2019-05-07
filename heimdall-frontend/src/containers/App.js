@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { ConnectedRouter } from 'connected-react-router'
 import Routes from '../routes'
+import ModalSession from "./ModalSession"
 
 class App extends Component {
 
@@ -10,7 +11,10 @@ class App extends Component {
 
 		return (
 			<ConnectedRouter history={history}>
-				<Routes history={history} />
+				<div>
+                    <Routes history={history} />
+                    <ModalSession history={history}/>
+				</div>
 				{/* {routes} */}
 			</ConnectedRouter>
 		)

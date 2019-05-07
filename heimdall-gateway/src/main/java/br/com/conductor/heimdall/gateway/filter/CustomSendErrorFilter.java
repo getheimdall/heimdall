@@ -50,9 +50,9 @@ public class CustomSendErrorFilter extends SendErrorFilter {
 			HttpServletRequest request = ctx.getRequest();
 
 			if (exception.getCause() != null) {
-				log.error("Error catched", exception.getCause().getMessage());
+				log.error("Error catched: {}", exception.getCause().getMessage());
 			} else {
-				log.error("Error during filtering", exception.getMessage());
+				log.error("Error during filtering: {}", exception.getMessage());
 			}
 
 			String message = null;

@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.api.resource;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-api
@@ -10,9 +7,9 @@ package br.com.conductor.heimdall.api.resource;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,30 +17,7 @@ package br.com.conductor.heimdall.api.resource;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-
-import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_APIS;
-
-import java.net.URI;
-import java.util.List;
-
-import javax.validation.Valid;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
+package br.com.conductor.heimdall.api.resource;
 
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
 import br.com.conductor.heimdall.core.dto.ApiDTO;
@@ -52,8 +26,20 @@ import br.com.conductor.heimdall.core.dto.page.ApiPage;
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.service.ApiService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
-import br.com.twsoftware.alfred.object.Objeto;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.models.Swagger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.validation.Valid;
+import java.net.URI;
+import java.util.List;
+
+import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_APIS;
 
 /**
  * Uses a {@link ApiService} to provide methods to create, read, update and delete a {@link Api}.
@@ -65,6 +51,7 @@ import io.swagger.annotations.ApiOperation;
 @io.swagger.annotations.Api(value = PATH_APIS, produces = MediaType.APPLICATION_JSON_VALUE, tags = { ConstantsTag.TAG_APIS })
 @RestController
 @RequestMapping(value = PATH_APIS)
+
 public class ApiResource {
 
      @Autowired
@@ -83,8 +70,24 @@ public class ApiResource {
      public ResponseEntity<?> findById(@PathVariable("apiId") Long id) {
 
           Api api = apiService.find(id);
-
           return ResponseEntity.ok(api);
+     }
+
+     /**
+      * Get {@link Swagger} by {@link Api} its Id.
+      *
+      * @param id					The Api Id
+      * @return						{@link ResponseEntity}
+      */
+     @ResponseBody
+     @ApiOperation(value = "Get SwaggerJson by Api Id", response = Api.class)
+     @GetMapping(value = "/{apiId}/swagger")
+     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_API)
+     public ResponseEntity<?> getSwaggerByApiId(@PathVariable("apiId") Long id) {
+
+          Swagger swagger = apiService.findSwaggerByApi(id);
+
+          return ResponseEntity.ok(swagger);
      }
 
      /**
@@ -100,7 +103,7 @@ public class ApiResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_API)
      public ResponseEntity<?> findAll(@ModelAttribute ApiDTO apiDTO, @ModelAttribute PageableDTO pageableDTO) {
           
-          if (Objeto.notBlank(pageableDTO)) {
+          if (!pageableDTO.isEmpty()) {
                
                ApiPage apiPage = apiService.list(apiDTO, pageableDTO);      
                return ResponseEntity.ok(apiPage);
@@ -183,4 +186,11 @@ public class ApiResource {
           return ResponseEntity.noContent().build();
      }
 
+     @ApiOperation(value = "Update API by Swagger JSON")
+     @PutMapping("/{apiId}/swagger")
+     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_API)
+     public ResponseEntity<?> updateApiBySwaggerJSON(@PathVariable("apiId") Long id, @RequestBody String swagger, boolean override) {
+          Api api = apiService.updateBySwagger(id, swagger, override);
+          return ResponseEntity.ok(api);
+     }
 }

@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.api.util;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-api
@@ -10,9 +7,9 @@ package br.com.conductor.heimdall.api.util;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +17,7 @@ package br.com.conductor.heimdall.api.util;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.api.util;
 
 /**
  * Class that holds the Privilege constants.
@@ -100,14 +98,8 @@ public class ConstantsPrivilege {
      
      public static final String PRIVILEGE_READ_PROVIDER = "hasAuthority('READ_PROVIDER')";
      public static final String PRIVILEGE_CREATE_PROVIDER = "hasAuthority('CREATE_PROVIDER')";
-     public static final String PRIVILEGE_UPDATE_PROVIDER = "hasAuthority('UPDATE_PROVIDER')";
-     public static final String PRIVILEGE_DELETE_PROVIDER = "hasAuthority('DELETE_PROVIDER')";
-     
-     public static final String PRIVILEGE_READ_TRACES = "hasAuthority('READ_TRACES')";
-     public static final String PRIVILEGE_CREATE_TRACES = "hasAuthority('CREATE_TRACES')";
-     public static final String PRIVILEGE_UPDATE_TRACES = "hasAuthority('UPDATE_TRACES')";
-     public static final String PRIVILEGE_DELETE_TRACES = "hasAuthority('DELETE_TRACES')";
 
+     public static final String PRIVILEGE_READ_TRACES = "hasAuthority('READ_TRACES')";
 
      public static final String PRIVILEGE_READ_LDAP = "hasAuthority('READ_LDAP')";
      public static final String PRIVILEGE_UPDATE_LDAP = "hasAuthority('UPDATE_LDAP')";

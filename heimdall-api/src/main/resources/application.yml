@@ -44,7 +44,7 @@ heimdall:
         sendStringParametersAsUnicode: false
     mongo:
         enabled: false
-#        serverName:
+        #        serverName:
         url: mongodb://admin:admin@localhost
         port: 27017
         dataBase: logging
@@ -141,7 +141,7 @@ management:
 
 zuul:
     filter:
-        root: /tmp/interceptores
+        root: /tmp/interceptors
         interval: 8
 
 security:

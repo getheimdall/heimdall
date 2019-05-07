@@ -22,7 +22,6 @@ import br.com.conductor.heimdall.core.repository.AccessTokenRepository;
 import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 @RunWith(MockitoJUnitRunner.class)

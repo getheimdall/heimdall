@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.gateway.filter.helper;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -9,9 +7,9 @@ package br.com.conductor.heimdall.gateway.filter.helper;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,47 +17,29 @@ package br.com.conductor.heimdall.gateway.filter.helper;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Map;
-import java.util.zip.GZIPInputStream;
+package br.com.conductor.heimdall.gateway.filter.helper;
+
+import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
+import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import br.com.conductor.heimdall.gateway.util.ConstantsContext;
+import br.com.conductor.heimdall.middleware.spec.*;
+import com.netflix.zuul.context.RequestContext;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.StreamUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
-
-import org.springframework.util.StreamUtils;
-import org.springframework.web.util.UriComponentsBuilder;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.netflix.zuul.context.RequestContext;
-
-import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
-import br.com.conductor.heimdall.middleware.spec.Call;
-import br.com.conductor.heimdall.middleware.spec.Environment;
-import br.com.conductor.heimdall.middleware.spec.Header;
-import br.com.conductor.heimdall.middleware.spec.Info;
-import br.com.conductor.heimdall.middleware.spec.Query;
-import br.com.conductor.heimdall.middleware.spec.Request;
-import br.com.conductor.heimdall.middleware.spec.Response;
-import br.com.conductor.heimdall.middleware.spec.StackTrace;
-import br.com.conductor.heimdall.middleware.spec.Trace;
-import br.com.twsoftware.alfred.object.Objeto;
-import lombok.Cleanup;
-import lombok.extern.slf4j.Slf4j;
+import java.io.*;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Implementation of the {@link Call} interface.
@@ -104,10 +84,10 @@ public class CallImpl implements Call {
                     HttpServletRequest r = context.getRequest();
                     List<String> names = Collections.list(r.getHeaderNames());
                     
-                    Map<String, String> headers = Maps.newHashMap();
+                    Map<String, String> headers = new HashMap<>();
                     names.forEach(name -> {
                          
-                         if (Objeto.notBlank(r.getHeader(name))) {
+                         if (r.getHeader(name) != null) {
                               
                               headers.put(name, r.getHeader(name));
                          }
@@ -122,7 +102,7 @@ public class CallImpl implements Call {
                     HttpServletRequest r = context.getRequest();
                     
                     String value = r.getHeader(name);
-                    if (Objeto.isBlank(value)) {
+                    if (value != null) {
                          
                          value = context.getZuulRequestHeaders().get(name);
                     }
@@ -133,7 +113,7 @@ public class CallImpl implements Call {
                @Override
                public void set(String name, String value) {
                     
-                    if (Objeto.notBlank(name) && Objeto.notBlank(value)) {
+                    if (name != null && value != null) {
 
                          context.addZuulRequestHeader(name, value);
                     }
@@ -142,10 +122,7 @@ public class CallImpl implements Call {
                @Override
                public void add(String name, String value) {
 
-                    if (Objeto.notBlank(name) && Objeto.notBlank(value)) {
-
-                         context.addZuulRequestHeader(name, value);
-                    }
+                    this.set(name, value);
                }
 
                @Override
@@ -157,7 +134,7 @@ public class CallImpl implements Call {
                @Override
                public void remove(String name) {
 
-                    if (Objeto.notBlank(name)) {
+                    if (name != null) {
 
                          HttpServletRequestWrapper requestWrapper = removeRequestHeaderWrapper(context.getRequest(), name);
                          context.setRequest(requestWrapper);
@@ -187,9 +164,9 @@ public class CallImpl implements Call {
                     HttpServletRequest r = context.getRequest();
                     List<String> names = Collections.list(r.getParameterNames());
                     
-                    Map<String, String> params = Maps.newHashMap();
+                    Map<String, String> params = new HashMap<>();
                     names.forEach(name -> {
-                         if (Objeto.notBlank(r.getParameter(name))) {
+                         if (r.getParameter(name) != null) {
                               params.put(name, r.getParameter(name));
                          }
                     });
@@ -214,15 +191,15 @@ public class CallImpl implements Call {
                @Override
                public void add(String name, String value) {
 
-                    if (Objeto.notBlank(value)) {
+                    if (value != null) {
 
                          RequestContext context = RequestContext.getCurrentContext();
 
                          Map<String, List<String>> params = context.getRequestQueryParams();
 
-                         if (Objeto.isBlank(params)) {
+                         if (params == null) {
 
-                              params = Maps.newConcurrentMap();
+                              params = new ConcurrentHashMap<>();
                          }
                          params.put(name, Arrays.asList(value));
                          context.setRequestQueryParams(params);
@@ -236,7 +213,7 @@ public class CallImpl implements Call {
 
                     Map<String, List<String>> params = context.getRequestQueryParams();
 
-                    if (Objeto.notBlank(params)) {
+                    if (params != null) {
 
                          params.remove(name);
                     }
@@ -249,15 +226,14 @@ public class CallImpl implements Call {
           @Override
           public String getBody() {
                
-               try {
-                    
-            	    @Cleanup
-                    InputStream in = (InputStream) context.get("requestEntity");
-                    if (in == null) {
-                         in = context.getRequest().getInputStream();
+               try (InputStream in = (InputStream) context.get("requestEntity")) {
+                    String bodyText;
+            	    if (in == null) {
+                         bodyText = StreamUtils.copyToString(context.getRequest().getInputStream(), Charset.forName("UTF-8"));
+                    } else {
+                         bodyText = StreamUtils.copyToString(in, Charset.forName("UTF-8"));
                     }
-                    String bodyText = StreamUtils.copyToString(in, Charset.forName("UTF-8"));
-                    
+
                     return bodyText;
                } catch (Exception e) {
 
@@ -293,7 +269,7 @@ public class CallImpl implements Call {
                     log.error(e.getMessage(), e);
                }
                
-               if (Objeto.notBlank(url)) {
+               if (url != null) {
                     
                     context.setRouteHost(urlParse);
                     context.set("requestURI", "");
@@ -308,7 +284,7 @@ public class CallImpl implements Call {
           @Override
           public String pathParam(String name) {
                
-               if (Objeto.notBlank(name)) {
+               if (name != null) {
                     Object requestURI = context.get("requestURI");
                     Object pattern = context.get("pattern");
 
@@ -321,18 +297,16 @@ public class CallImpl implements Call {
                     String[] b = requestURIText.split(separator);
 
                     String value = null;
-                    if (a != null && b != null) {
-                         
-                         for (int i = 0; i < a.length; i++) {
-                              
-                              if (a[i].equals(name) && !a[i].equals(b[i])) {
-                                   
-                                   value = b[i];
-                                   break;
-                              }
+
+                    for (int i = 0; i < a.length; i++) {
+
+                         if (a[i].equals(name) && !a[i].equals(b[i])) {
+
+                              value = b[i];
+                              break;
                          }
                     }
-                    
+
                     return value;
                } else {
                     
@@ -377,12 +351,12 @@ public class CallImpl implements Call {
                public Map<String, String> getAll() {
 
                     HttpServletResponse r = context.getResponse();
-                    List<String> names = Lists.newArrayList(r.getHeaderNames());
+                    List<String> names = new ArrayList<>(r.getHeaderNames());
                     
-                    Map<String, String> headers = Maps.newHashMap();
+                    Map<String, String> headers = new HashMap<>();
                     names.forEach(name -> {
                          
-                         if (Objeto.notBlank(r.getHeader(name))) {
+                         if (r.getHeader(name) != null) {
                               
                               headers.put(name, r.getHeader(name));
                          }
@@ -425,7 +399,7 @@ public class CallImpl implements Call {
                @Override
                public void remove(String name) {
                     
-                    if (Objeto.notBlank(name)) {
+                    if (name != null) {
 
                          HttpServletResponseWrapper responseWrapper = removeResponseHeaderWrapper(context.getResponse(), name);
 
@@ -557,10 +531,9 @@ public class CallImpl implements Call {
           
           @SuppressWarnings("unchecked")
           public EnvironmentImpl() {
-
-               if (Objeto.notBlank(context.get("environmentVariables"))) {
-                    
-                    currentVariables = (Map<String, String>) context.get("environmentVariables");
+        	  currentVariables = (Map<String, String>) context.get(ConstantsContext.ENVIRONMENT_VARIABLES);
+        	  if (Objects.isNull(currentVariables)) {
+                    currentVariables = new HashMap<>();
                }
                
           }
@@ -575,7 +548,7 @@ public class CallImpl implements Call {
           public String getVariable(String key) {
 
                String value = currentVariables.get(key);
-               if (Objeto.isBlank(value)) {
+               if (StringUtils.isBlank(value)) {
                     
                     TraceContextHolder.getInstance().getActualTrace().trace("Environment variable with key '" + key + "' not exist.");
                }
@@ -672,7 +645,7 @@ public class CallImpl implements Call {
                public String getHeader(String nameHeader) {
 
                     String valueHeader = null;
-                    if (Objeto.notBlank(name) && !name.equalsIgnoreCase(nameHeader)) {
+                    if (name != null && !name.equalsIgnoreCase(nameHeader)) {
 
                          valueHeader = super.getHeader(nameHeader);
                     }
@@ -684,7 +657,7 @@ public class CallImpl implements Call {
 
                     List<String> names = Collections.list(super.getHeaderNames());
                     
-                    if (Objeto.notBlank(name) && names.stream().anyMatch(s -> s.equalsIgnoreCase(name))) {
+                    if (name != null && names.stream().anyMatch(s -> s.equalsIgnoreCase(name))) {
                          
                          names.remove(name);
                     }

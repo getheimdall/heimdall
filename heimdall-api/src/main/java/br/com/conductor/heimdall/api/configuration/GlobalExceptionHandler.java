@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.api.configuration;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-api
@@ -20,8 +17,10 @@ package br.com.conductor.heimdall.api.configuration;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.api.configuration;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,7 +44,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import com.fasterxml.jackson.core.JsonParseException;
-import com.google.common.collect.Lists;
 
 import br.com.conductor.heimdall.api.configuration.GlobalExceptionHandler.BindExceptionInfo.BindError;
 import br.com.conductor.heimdall.core.exception.BadRequestException;
@@ -56,7 +54,6 @@ import br.com.conductor.heimdall.core.exception.NotFoundException;
 import br.com.conductor.heimdall.core.exception.ServerErrorException;
 import br.com.conductor.heimdall.core.exception.UnauthorizedException;
 import br.com.conductor.heimdall.core.util.UrlUtil;
-import br.com.twsoftware.alfred.object.Objeto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -234,7 +231,7 @@ public class GlobalExceptionHandler{
      public @ResponseBody BindExceptionInfo validationBindException(HttpServletResponse response, HttpServletRequest request, BindException exception) {
 
           BindExceptionInfo bindException = new BindExceptionInfo();
-          List<BindError> errors = Lists.newArrayList();
+          List<BindError> errors = new ArrayList<>();
           List<ObjectError> objectsError = exception.getBindingResult().getAllErrors();
 
           objectsError.forEach(objectError -> {
@@ -256,7 +253,7 @@ public class GlobalExceptionHandler{
                bindException.exception = "BindExceptionPIER";
 
                BindError error = bindException.new BindError();
-               error.defaultMessage = Objeto.notBlank(message) ? message : fieldError.getDefaultMessage();
+               error.defaultMessage = message != null ? message : fieldError.getDefaultMessage();
                error.objectName = fieldError.getObjectName();
                error.field = fieldError.getField();
                error.code = fieldError.getCode();
@@ -285,7 +282,7 @@ public class GlobalExceptionHandler{
      public @ResponseBody BindExceptionInfo validationMethodArgumentNotValidException(HttpServletResponse response, HttpServletRequest request, MethodArgumentNotValidException exception) {
 
           BindExceptionInfo bindException = new BindExceptionInfo();
-          List<BindError> errors = Lists.newArrayList();
+          List<BindError> errors = new ArrayList<>();
           List<ObjectError> objectsError = exception.getBindingResult().getAllErrors();
 
           objectsError.forEach(objectError -> {

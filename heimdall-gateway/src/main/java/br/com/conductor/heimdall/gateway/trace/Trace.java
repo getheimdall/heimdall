@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.gateway.trace;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -10,9 +7,9 @@ package br.com.conductor.heimdall.gateway.trace;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,21 +17,19 @@ package br.com.conductor.heimdall.gateway.trace;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.trace;
 
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.util.LocalDateTimeSerializer;
 import br.com.conductor.heimdall.core.util.UrlUtil;
 import br.com.conductor.heimdall.middleware.spec.StackTrace;
-import br.com.twsoftware.alfred.object.Objeto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -46,8 +41,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
 
 import static net.logstash.logback.marker.Markers.append;
 
@@ -109,10 +103,10 @@ public class Trace {
      private StackTrace stackTrace;
 
      @Getter
-     private List<GeneralTrace> traces = Lists.newArrayList();
+     private List<GeneralTrace> traces = new ArrayList<>();
      
      @Getter
-     private List<FilterDetail> filters = Lists.newArrayList();
+     private Map<String, FilterDetail> filters = new LinkedHashMap<>();
 
      private String profile;
      
@@ -126,7 +120,7 @@ public class Trace {
      
      @JsonIgnore
      private boolean printLogstash;
-     
+
      private String version;
      
      public Trace() {
@@ -156,15 +150,15 @@ public class Trace {
           setUrl(UrlUtil.getCurrentUrl(request));
 
           Enumeration<String> headers = request.getHeaders("x-forwarded-for");
-          if (Objeto.notBlank(headers)) {
+          if (headers != null) {
 
-               List<String> listaIPs = Lists.newArrayList();
+               List<String> listIps = new ArrayList<>();
                while (headers.hasMoreElements()) {
                     String ip = headers.nextElement();
-                    listaIPs.add(ip);
+                    listIps.add(ip);
                }
 
-               setReceivedFromAddress(Joiner.on(",").join(listaIPs.toArray()));
+               setReceivedFromAddress(String.join(",", listIps));
 
           }
 
@@ -190,8 +184,8 @@ public class Trace {
       * 
       * @param detail {@link FilterDetail}
       */
-     public void addFilter(FilterDetail detail) {
-          filters.add(detail);
+     public void addFilter(String name, FilterDetail detail) {
+          filters.put(name, detail);
      }
 
      /**
@@ -258,53 +252,55 @@ public class Trace {
       */
      private void prepareLog(Integer statusCode) throws JsonProcessingException {
 
+          String url = Objects.nonNull(getUrl()) ? getUrl() : "";
+          ObjectMapper mapper = new ObjectMapper();
+
           if (printAllTrace) {
 
                if (isInfo(statusCode)) {
 
-                    log.info(" [HEIMDALL-TRACE] - {} ", new ObjectMapper().writeValueAsString(this));
+                    log.info(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
                } else if (isWarn(statusCode)) {
 
-                    log.warn(" [HEIMDALL-TRACE] - {} ", new ObjectMapper().writeValueAsString(this));
+                    log.warn(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
                } else {
 
-                    log.error(" [HEIMDALL-TRACE] - {} ", new ObjectMapper().writeValueAsString(this));
+                    log.error(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
                }
-          } else if (printMongo) {
-
-               String url = (Objeto.notBlank(getUrl())) ? getUrl() : "";
-
+          } else {
                if (isInfo(statusCode)) {
 
                     log.info(append("call", this), " [HEIMDALL-TRACE] - " + url);
-
-                    if (printMongo) logMongo.info(new ObjectMapper().writeValueAsString(this));
                } else if (isWarn(statusCode)) {
 
                     log.warn(append("call", this), " [HEIMDALL-TRACE] - " + url);
-                    if (printMongo) logMongo.warn(new ObjectMapper().writeValueAsString(this));
                } else {
 
                     log.error(append("call", this), " [HEIMDALL-TRACE] - " + url);
-                    if (printMongo) logMongo.error(new ObjectMapper().writeValueAsString(this));
                }
-          } else if (printLogstash) {
-        	  String url = (Objeto.notBlank(getUrl())) ? getUrl() : "";
+          }
 
-              if (isInfo(statusCode)) {
+          if (printMongo) {
+               printInLogger(logMongo, statusCode);
+          }
 
-                   log.info(append("call", this), " [HEIMDALL-TRACE] - " + url);
+          if (printLogstash) {
+        	  printInLogger(logstash, statusCode);
+          }
+     }
 
-                   if (printLogstash) logstash.info(new ObjectMapper().writeValueAsString(this));
-              } else if (isWarn(statusCode)) {
+     private void printInLogger(Logger logger, Integer statusCode) throws JsonProcessingException {
+          ObjectMapper mapper = new ObjectMapper();
 
-                   log.warn(append("call", this), " [HEIMDALL-TRACE] - " + url);
-                   if (printLogstash) logstash.warn(new ObjectMapper().writeValueAsString(this));
-              } else {
+          if (isInfo(statusCode)) {
 
-                   log.error(append("call", this), " [HEIMDALL-TRACE] - " + url);
-                   if (printLogstash) logstash.error(new ObjectMapper().writeValueAsString(this));
-              }
+               logger.info(mapper.writeValueAsString(this));
+          } else if (isWarn(statusCode)) {
+
+               logger.warn(mapper.writeValueAsString(this));
+          } else {
+
+               logger.error(mapper.writeValueAsString(this));
           }
      }
 

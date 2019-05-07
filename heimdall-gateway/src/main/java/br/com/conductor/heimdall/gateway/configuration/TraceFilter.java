@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.gateway.configuration;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -9,9 +7,9 @@ package br.com.conductor.heimdall.gateway.configuration;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,6 +17,7 @@ package br.com.conductor.heimdall.gateway.configuration;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.configuration;
 
 import java.io.IOException;
 
@@ -84,21 +83,12 @@ public class TraceFilter implements Filter {
 		try {
 
 			trace = TraceContextHolder.getInstance().init(prop.getTrace().isPrintAllTrace(), profile, request,
-					prop.getMongo().getEnabled(), prop.getLogstash().getEnabled(), buildProperties.getVersion());
+			prop.getMongo().getEnabled(), prop.getLogstash().getEnabled(), buildProperties.getVersion());
 			if (shouldDisableTrace(request)) {
 				trace.setShouldPrint(false);
 			}
 
-			if ("OPTIONS".equalsIgnoreCase(((HttpServletRequest) request).getMethod())) {
-				response.setHeader("Access-Control-Allow-Origin", "*");
-				response.setHeader("Access-Control-Allow-Credentials", "true");
-				response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, DELETE, OPTIONS");
-				response.setHeader("Access-Control-Allow-Headers", "origin, content-type, accept, authorization, x-requested-with, X-AUTH-TOKEN, access_token, client_id, device_id, credential");
-				response.setHeader("Access-Control-Max-Age", "3600");
-				response.setStatus(200);
-			} else {			
-				chain.doFilter(request, response);
-			}
+			chain.doFilter(request, response);
 
 		} catch (Exception e) {
 

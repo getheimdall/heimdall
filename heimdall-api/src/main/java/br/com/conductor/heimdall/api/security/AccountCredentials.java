@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.api.security;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-api
@@ -19,7 +17,7 @@ package br.com.conductor.heimdall.api.security;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-
+package br.com.conductor.heimdall.api.security;
 
 import lombok.Data;
 

@@ -82,6 +82,8 @@ class Interceptors extends Component {
         })
     }
 
+    // filterByPlan
+
     orderInterceptor = interceptors => {
         return interceptors.sort(interceptorSort)
     }
@@ -237,7 +239,7 @@ class Interceptors extends Component {
     }
 
     handleFilterOperation = (input, option) => {
-        const path = option.props.children[2]
+        const path = option.props.title
         try {
             const reg = new RegExp(input, 'i')
             return path.match(reg) !== null
@@ -267,6 +269,14 @@ class Interceptors extends Component {
         if (this.state.candidatesToSave.length > 0) this.props.dispatch(saveAll(this.state.candidatesToSave))
         if (this.state.candidatesToUpdate.length > 0) this.props.dispatch(updateAll(this.state.candidatesToUpdate))
         if (this.state.candidatesToDelete.length > 0) this.props.dispatch(removeAll(this.state.candidatesToDelete))
+    }
+
+    addedOperationCandidateToIgnore = interceptor => {
+        if (interceptor.lifeCycle !== 'OPERATION') {
+            interceptor.candidateToIgnoreId = this.state.operationId
+        }
+
+        return interceptor
     }
 
     render() {
@@ -301,7 +311,9 @@ class Interceptors extends Component {
         if (this.props.interceptors) {
             allInterceptors = interceptors.content
             allInterceptors = this.filterByLifeCycle(allInterceptors)
-            allInterceptors.concat(interceptors.content.filter(interceptor => interceptor.lifeCycle === 'API'))
+            if (this.state.planSelected || this.state.resourceSelected || this.state.operationSelected) {
+                allInterceptors = allInterceptors.concat(interceptors.content.filter(item => item.lifeCycle === 'API'))
+            }
 
             if (this.state.candidatesToSave.length > 0) {
                 allInterceptors = allInterceptors.concat(this.state.candidatesToSave)
@@ -316,41 +328,14 @@ class Interceptors extends Component {
                 allInterceptors = allInterceptors.filter(item => !this.state.candidatesToDelete.some(updatable => updatable.id === item.id))
             }
 
-            let interceptorsFirst = this.filterByExecutionPoint(allInterceptors, 'FIRST')
-            let interceptorsSecond = this.filterByExecutionPoint(allInterceptors, 'SECOND')
+            const interceptorsFirst = this.filterByExecutionPoint(allInterceptors, 'FIRST')
+            const interceptorsSecond = this.filterByExecutionPoint(allInterceptors, 'SECOND')
             let interceptorsPreOrdered = this.orderInterceptor(interceptorsFirst)
             let interceptorsPostOrdered = this.orderInterceptor(interceptorsSecond)
 
-            if (this.state.environmentId !== 0) {
-                const environmentsPreFiltered = interceptorsPreOrdered.filter(item => (item.environment && item.environment.id === this.state.environmentId) || item.environment === null)
-                const environmentsPostFiltered = interceptorsPostOrdered.filter(item => (item.environment && item.environment.id === this.state.environmentId) || item.environment === null)
-
-                interceptorsPreOrdered = environmentsPreFiltered
-                interceptorsPostOrdered = environmentsPostFiltered
-            }
-
-            if (this.state.planId !== 0) {
-                const plansPreFiltered = interceptorsPreOrdered.filter(item => (item.lifeCycle === 'PLAN' && item.referenceId === this.state.planId) || (item.lifeCycle !== 'PLAN'))
-                const plansPostFiltered = interceptorsPostOrdered.filter(item => (item.lifeCycle === 'PLAN' && item.referenceId === this.state.planId) || (item.lifeCycle !== 'PLAN'))
-
-                interceptorsPreOrdered = plansPreFiltered
-                interceptorsPostOrdered = plansPostFiltered
-            }
-
-            if (this.state.resourceId !== 0) {
-                const resourcesPreFiltered = interceptorsPreOrdered.filter(item => (item.lifeCycle === 'RESOURCE' && item.referenceId === this.state.resourceId) || (item.lifeCycle !== 'RESOURCE'))
-                const resourcesPostFiltered = interceptorsPostOrdered.filter(item => (item.lifeCycle === 'RESOURCE' && item.referenceId === this.state.resourceId) || (item.lifeCycle !== 'RESOURCE'))
-
-                interceptorsPreOrdered = resourcesPreFiltered
-                interceptorsPostOrdered = resourcesPostFiltered
-            }
-
-            if (this.state.operationId !== 0) {
-                const operationsPreFiltered = interceptorsPreOrdered.filter(item => (item.lifeCycle === 'OPERATION' && item.referenceId === this.state.operationId) || (item.lifeCycle !== 'OPERATION'))
-                const operationsPostFiltered = interceptorsPostOrdered.filter(item => (item.lifeCycle === 'OPERATION' && item.referenceId === this.state.operationId) || (item.lifeCycle !== 'OPERATION'))
-
-                interceptorsPreOrdered = operationsPreFiltered
-                interceptorsPostOrdered = operationsPostFiltered
+            if (this.state.operationSelected) {
+                interceptorsPreOrdered = interceptorsPreOrdered.map(interceptor => this.addedOperationCandidateToIgnore(interceptor))
+                interceptorsPostOrdered = interceptorsPostOrdered.map(interceptor => this.addedOperationCandidateToIgnore(interceptor))
             }
 
             interceptorsPreFiltered = interceptorsPreOrdered
@@ -418,7 +403,7 @@ class Interceptors extends Component {
                                     <Select showSearch value={this.state.operationId} onChange={this.handleSelectChange('OP')} disabled={!this.props.operations} className="heimdall-select-filter-complete" filterOption={this.handleFilterOperation}>
                                         <Option value={0}>{i18n.t('all')}</Option>
                                         {this.props.operations && this.props.operations.map((op, index) => (
-                                            <Option key={index} value={op.id}>
+                                            <Option key={index} value={op.id} title={op.method + " " + op.path}>
                                                 <Badge title="Numbers of interceptors" className="heimdall-badge-interceptors-count" count={countInterceptorsByCycle(interceptors && interceptors.content, 'OPERATION', op.id)}/>
                                                 <Tag color={ColorUtils.getColorMethod(op.method)}>{op.method}</Tag> {op.path}
                                             </Option>
