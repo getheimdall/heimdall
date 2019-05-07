@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.api.resource;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-api
@@ -10,9 +7,9 @@ package br.com.conductor.heimdall.api.resource;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +17,7 @@ package br.com.conductor.heimdall.api.resource;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.api.resource;
 
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
 import br.com.conductor.heimdall.core.dto.ApiDTO;
@@ -28,7 +26,6 @@ import br.com.conductor.heimdall.core.dto.page.ApiPage;
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.service.ApiService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
-import br.com.twsoftware.alfred.object.Objeto;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.models.Swagger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,7 +103,7 @@ public class ApiResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_API)
      public ResponseEntity<?> findAll(@ModelAttribute ApiDTO apiDTO, @ModelAttribute PageableDTO pageableDTO) {
           
-          if (Objeto.notBlank(pageableDTO)) {
+          if (!pageableDTO.isEmpty()) {
                
                ApiPage apiPage = apiService.list(apiDTO, pageableDTO);      
                return ResponseEntity.ok(apiPage);

@@ -21,7 +21,6 @@ package br.com.conductor.heimdall.core.service;
  * ==========================LICENSE_END===================================
  */
 
-//import br.com.conductor.heimdall.core.converter.ApiMap;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.*;
 import br.com.conductor.heimdall.core.dto.page.ApiPage;
@@ -51,8 +50,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
-import static br.com.twsoftware.alfred.object.Objeto.isBlank;
-import static br.com.twsoftware.alfred.object.Objeto.notBlank;
 
 /**
  * This class provides methods to create, read, update and delete the {@link Api} resource.
@@ -91,7 +88,7 @@ public class ApiService {
     public Api find(Long id) {
 
         Api api = apiRepository.findOne(id);
-        HeimdallException.checkThrow(isBlank(api), GLOBAL_RESOURCE_NOT_FOUND);
+        HeimdallException.checkThrow(api == null, GLOBAL_RESOURCE_NOT_FOUND);
 
         return api;
     }
@@ -160,9 +157,9 @@ public class ApiService {
     public Api save(ApiDTO apiDTO) {
 
         Api validateApi = apiRepository.findByBasePath(apiDTO.getBasePath());
-        HeimdallException.checkThrow(notBlank(validateApi), API_BASEPATH_EXIST);
+        HeimdallException.checkThrow(validateApi != null, API_BASEPATH_EXIST);
         HeimdallException.checkThrow(validateBasepath(apiDTO), API_BASEPATH_MALFORMED);
-        HeimdallException.checkThrow(isBlank(apiDTO.getBasePath()), API_BASEPATH_EMPTY);
+        HeimdallException.checkThrow(apiDTO.getBasePath() == null || apiDTO.getBasePath().isEmpty(), API_BASEPATH_EMPTY);
         HeimdallException.checkThrow(validateInboundsEnvironments(apiDTO.getEnvironments()), API_CANT_ENVIRONMENT_INBOUND_URL_EQUALS);
 
           Api api = GenericConverter.mapper(apiDTO, Api.class);
@@ -184,12 +181,12 @@ public class ApiService {
     public Api update(Long id, ApiDTO apiDTO) {
 
         Api api = apiRepository.findOne(id);
-        HeimdallException.checkThrow(isBlank(api), GLOBAL_RESOURCE_NOT_FOUND);
+        HeimdallException.checkThrow(api == null, GLOBAL_RESOURCE_NOT_FOUND);
 
         Api validateApi = apiRepository.findByBasePath(apiDTO.getBasePath());
-        HeimdallException.checkThrow(notBlank(validateApi) && !Objects.equals(validateApi.getId(), api.getId()), API_BASEPATH_EXIST);
+        HeimdallException.checkThrow(validateApi != null && !Objects.equals(validateApi.getId(), api.getId()), API_BASEPATH_EXIST);
         HeimdallException.checkThrow(validateBasepath(apiDTO), API_BASEPATH_MALFORMED);
-        HeimdallException.checkThrow(isBlank(apiDTO.getBasePath()), API_BASEPATH_EMPTY);
+        HeimdallException.checkThrow(apiDTO.getBasePath() == null || apiDTO.getBasePath().isEmpty(), API_BASEPATH_EMPTY);
         HeimdallException.checkThrow(validateInboundsEnvironments(apiDTO.getEnvironments()), API_CANT_ENVIRONMENT_INBOUND_URL_EQUALS);
 
           api = GenericConverter.mapper(apiDTO, api);
@@ -211,12 +208,12 @@ public class ApiService {
     public Api updateBySwagger(Long id, String swagger, boolean override) {
 
         Api api = apiRepository.findOne(id);
-        HeimdallException.checkThrow(isBlank(api), GLOBAL_RESOURCE_NOT_FOUND);
+        HeimdallException.checkThrow(api == null, GLOBAL_RESOURCE_NOT_FOUND);
 
         try {
             api = swaggerService.importApiFromSwaggerJSON(api, swagger, override);
         } catch (IOException e) {
-            HeimdallException.checkThrow(isBlank(api), GLOBAL_SWAGGER_JSON_INVALID_FORMAT);
+            HeimdallException.checkThrow(api == null, GLOBAL_SWAGGER_JSON_INVALID_FORMAT);
         }
 
         api = apiRepository.save(api);
@@ -233,7 +230,7 @@ public class ApiService {
     public void delete(Long id) {
 
         Api api = apiRepository.findOne(id);
-        HeimdallException.checkThrow(isBlank(api), GLOBAL_RESOURCE_NOT_FOUND);
+        HeimdallException.checkThrow(api == null, GLOBAL_RESOURCE_NOT_FOUND);
 
         resourceService.deleteAllFromApi(id);
         middlewareService.deleteAll(id);

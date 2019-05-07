@@ -67,46 +67,11 @@ public abstract class GenericConverter {
           return destination;
      }
 
-     /**
-      * Converts a source to a type destination.
-      * 
-      * @param source				The souce object
-      * @param typeDestination		The type destination 
-      * @param mapping				The properties for the mapping process
-      * @return						The object created
-      */
-     public static <T, E> E mapperWithMapping(T source, Class<E> typeDestination, PropertyMap<T, E> mapping) {
-
-          ModelMapper modelMapper = new ModelMapper();
-          modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-          modelMapper.addMappings(mapping);
-
-          return modelMapper.map(source, typeDestination);
-     }
 
      /**
       * Converts a source to a type destination.
       * 
       * @param source				The souce object
-      * @param destination			The destination object
-      * @param mapping				The properties for the mapping process
-      * @return						The object created
-      */
-     public static <T, E> E mapperWithMapping(T source, E destination, PropertyMap<T, E> mapping) {
-          
-          ModelMapper modelMapper = new ModelMapper();
-          modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-          modelMapper.addMappings(mapping);
-          modelMapper.map(source, destination);
-          
-          return destination; 
-     }
-     
-     /**
-      * Converts a source to a type destination.
-      * 
-      * @param source				The souce object
-      * @param typeDestination		The type destination 
       * @return						The object created
       */
      public static <E, T> List<E> mapper(List<T> source, Type destinationType) {

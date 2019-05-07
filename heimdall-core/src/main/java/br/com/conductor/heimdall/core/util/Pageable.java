@@ -23,7 +23,6 @@ package br.com.conductor.heimdall.core.util;
 
 import org.springframework.data.domain.PageRequest;
 
-import br.com.twsoftware.alfred.object.Objeto;
 import org.springframework.data.domain.Sort;
 
 /**

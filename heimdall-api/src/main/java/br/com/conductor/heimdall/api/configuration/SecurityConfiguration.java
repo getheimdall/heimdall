@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.api.configuration;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-api
@@ -19,6 +17,7 @@ package br.com.conductor.heimdall.api.configuration;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.api.configuration;
 
 import br.com.conductor.heimdall.api.filter.JWTAuthenticationFilter;
 import br.com.conductor.heimdall.api.service.TokenAuthenticationService;
