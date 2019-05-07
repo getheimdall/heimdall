@@ -19,6 +19,8 @@
  */
 package br.com.conductor.heimdall.gateway.filter.helper;
 
+import br.com.conductor.heimdall.core.environment.Property;
+import br.com.conductor.heimdall.gateway.failsafe.CircuitBreakerManager;
 import br.com.conductor.heimdall.middleware.enums.DBType;
 import br.com.conductor.heimdall.middleware.spec.*;
 import com.mongodb.MongoClient;
@@ -38,6 +40,12 @@ public class HelperImpl implements Helper {
 	private ThreadLocal<byte[]> buffers;
 
 	private boolean enableHandler;
+
+	@Autowired
+	private Property property;
+
+	@Autowired
+	private CircuitBreakerManager circuitBreakerManager;
 
 	public HelperImpl() {
 		enableHandler = false;
@@ -81,9 +89,7 @@ public class HelperImpl implements Helper {
 
 	@Override
 	public Http http() {
-
-		Http http = new HttpImpl(enableHandler);
-		return http;
+		return new HttpImpl(enableHandler, circuitBreakerManager, property.getFailsafe().isEnabled());
 	}
 
 	@Override

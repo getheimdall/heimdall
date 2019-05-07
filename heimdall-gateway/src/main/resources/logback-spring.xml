@@ -6,6 +6,8 @@
 	<springProperty scope="context" name="app_name" source="info.app.name" />	
 	<springProperty scope="context" name="app_version" source="info.app.version"/>
 	<springProperty scope="context" name="app_profile" source="info.app.profile"/>
+	<springProperty scope="context" name="sentry_enabled" source="sentry.enabled"/>
+
 
 	<logger name="org.apache.catalina.startup.DigesterFactory" level="ERROR"/>
 	<logger name="org.apache.catalina.util.LifecycleBase" level="ERROR"/>
@@ -24,15 +26,23 @@
 	<logger name="org.springframework.cloud.netflix.zuul" level="INFO"/>
 	<logger name="io.sentry" level="OFF" />
 
-	<appender name="APPENDER_SENTRY_LOGS" class="io.sentry.logback.SentryAppender">
-		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-			<level>ERROR</level>
-		</filter>
-	</appender>
-    
+	<if condition='"true".equals(p("sentry_enabled"))'>
+		<then>
+			<appender name="APPENDER_SENTRY_LOGS" class="io.sentry.logback.SentryAppender">
+				<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+					<level>ERROR</level>
+				</filter>
+			</appender>
+		</then>
+	</if>
+
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="APPENDER_SENTRY_LOGS"/> 
-    </root>	
+		<if condition='"true".equals(p("sentry_enabled"))'>
+			<then>
+				<appender-ref ref="APPENDER_SENTRY_LOGS"/>
+			</then>
+		</if>
+    </root>
 
 </configuration>

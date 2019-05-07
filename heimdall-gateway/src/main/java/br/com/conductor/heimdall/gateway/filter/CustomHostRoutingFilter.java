@@ -31,10 +31,10 @@ import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
 import org.springframework.cloud.netflix.zuul.filters.route.SimpleHostRoutingFilter;
 
 import javax.servlet.http.HttpServletRequest;
-import java.net.URL;
 import java.util.concurrent.Callable;
 
 import static br.com.conductor.heimdall.gateway.util.ConstantsContext.OPERATION_ID;
+import static br.com.conductor.heimdall.gateway.util.ConstantsContext.OPERATION_PATH;
 
 /**
  * Creates a custom routing filter.
@@ -44,8 +44,7 @@ import static br.com.conductor.heimdall.gateway.util.ConstantsContext.OPERATION_
  */
 @Slf4j
 public class CustomHostRoutingFilter extends SimpleHostRoutingFilter {
-     
-     private ProxyRequestHelper helper;
+
      private FilterDetail detail = new FilterDetail();
      private final CircuitBreakerManager circuitBreakerManager;
 
@@ -57,7 +56,6 @@ public class CustomHostRoutingFilter extends SimpleHostRoutingFilter {
       */
      public CustomHostRoutingFilter(ProxyRequestHelper helper, ZuulProperties properties, CircuitBreakerManager circuitBreakerManager) {
           super(helper, properties);
-          this.helper = helper;
           this.circuitBreakerManager = circuitBreakerManager;
      }
      
@@ -86,16 +84,17 @@ public class CustomHostRoutingFilter extends SimpleHostRoutingFilter {
 
 		RequestContext context = RequestContext.getCurrentContext();
 		HttpServletRequest request = context.getRequest();
-		String verb = getVerb(request);
-		String uri = this.helper.buildZuulRequestURI(request);
-		URL host = RequestContext.getCurrentContext().getRouteHost();
-		HttpHost httpHost = getHttpHost(host);
+		HttpHost httpHost = new HttpHost(
+				context.getRouteHost().getHost(),
+				context.getRouteHost().getPort(),
+				context.getRouteHost().getProtocol());
 
 		Long operationId = (Long) context.get(OPERATION_ID);
+		String operationPath = (String) context.get(OPERATION_PATH);
 
 		try {
-			Callable<Object> callable = () -> super.run();
-			Object obj = circuitBreakerManager.failsafe(callable, operationId);
+			Callable<Object> callable = super::run;
+			Object obj = circuitBreakerManager.failsafe(callable, operationId, operationPath);
 			detail.setStatus(Constants.SUCCESS);
 			return obj;
 		} catch (Exception e) {
@@ -103,8 +102,9 @@ public class CustomHostRoutingFilter extends SimpleHostRoutingFilter {
 			log.error("Exception: {} - Message: {} - during routing request to (hostPath + uri): {} - Verb: {} - HostName: {} - Port: {} - SchemeName: {}",
 					e.getClass().getName(), 
 					e.getMessage(), 
-					request.getRequestURI(), 
-					verb, httpHost.getHostName(),
+					request.getRequestURI(),
+					request.getMethod().toUpperCase(),
+					httpHost.getHostName(),
 					httpHost.getPort(), 
 					httpHost.getSchemeName());
 			throw e;
@@ -113,20 +113,9 @@ public class CustomHostRoutingFilter extends SimpleHostRoutingFilter {
 
 			long duration = (endTime - startTime);
 
-			detail.setName(this.getClass().getSimpleName());
 			detail.setTimeInMillisRun(duration);
-			TraceContextHolder.getInstance().getActualTrace().addFilter(detail);
+			TraceContextHolder.getInstance().getActualTrace().addFilter(this.getClass().getSimpleName(), detail);
 		}
 	}
-     
-     private String getVerb(HttpServletRequest request) {
-          String sMethod = request.getMethod();
-          return sMethod.toUpperCase();
-     }
-     
-     private HttpHost getHttpHost(URL host) {
-          HttpHost httpHost = new HttpHost(host.getHost(), host.getPort(), host.getProtocol());
-          return httpHost;
-     }
 
 }

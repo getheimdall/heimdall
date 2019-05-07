@@ -142,6 +142,16 @@ class DnDInterceptor extends Component {
         this.props.handleDelete(this.props.interceptor);
     }
 
+    isIgnored = () => {
+        const { interceptor } = this.props
+
+        if (!interceptor) {
+            return false
+        }
+
+        return !!(interceptor.candidateToIgnoreId && interceptor.ignoredOperations.find(operation => operation === interceptor.candidateToIgnoreId))
+    }
+
     render() {
         const {type, interceptor, icon, isDragging, connectDragSource, connectDropTarget, isOver, canDrop} = this.props
 
@@ -177,7 +187,7 @@ class DnDInterceptor extends Component {
         if (isDragging) {
             opacity = 0.4
         } else {
-            if (!interceptor.status) {
+            if (!interceptor.status || this.isIgnored()) {
                 opacity = 0.3
             }
         }
@@ -233,7 +243,7 @@ class DnDInterceptor extends Component {
                         <Modal title={i18n.t('edit_interceptor')}
                             footer={[
                                 <Button id="cancelInterceptorModal" key="back" onClick={this.handleCancel}>{i18n.t('cancel')}</Button>,
-                                <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_INTERCEPTOR, privileges.PRIVILEGE_UPDATE_INTERCEPTOR]}>
+                                <ComponentAuthority key="component-submit" privilegesAllowed={[privileges.PRIVILEGE_CREATE_INTERCEPTOR, privileges.PRIVILEGE_UPDATE_INTERCEPTOR]}>
                                     <Button id="saveInterceptorModal" key="submit" type="primary" onClick={this.handleSave}>
                                         {i18n.t('save')}
                                     </Button>
@@ -241,6 +251,8 @@ class DnDInterceptor extends Component {
                             ]}
                             visible={this.state.showModal}
                             onCancel={this.handleCancel}
+                            width={600}
+                            maskClosable={false}
                             destroyOnClose >
                             <InterceptorForm
                                 onRef={ref => (this.interceptorForm = ref)}

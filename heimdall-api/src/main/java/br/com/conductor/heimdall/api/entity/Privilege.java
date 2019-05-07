@@ -55,6 +55,6 @@ public class Privilege {
      private String name;
 
      @JsonBackReference
-     @ManyToMany(mappedBy = "privileges", fetch = FetchType.EAGER)
+     @ManyToMany(mappedBy = "privileges", fetch = FetchType.LAZY)
      private Set<Role> roles;
 }

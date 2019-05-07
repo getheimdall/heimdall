@@ -41,10 +41,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static net.logstash.logback.marker.Markers.append;
 
@@ -109,7 +106,7 @@ public class Trace {
      private List<GeneralTrace> traces = new ArrayList<>();
      
      @Getter
-     private List<FilterDetail> filters = new ArrayList<>();
+     private Map<String, FilterDetail> filters = new LinkedHashMap<>();
 
      private String profile;
      
@@ -123,7 +120,7 @@ public class Trace {
      
      @JsonIgnore
      private boolean printLogstash;
-     
+
      private String version;
      
      public Trace() {
@@ -187,8 +184,8 @@ public class Trace {
       * 
       * @param detail {@link FilterDetail}
       */
-     public void addFilter(FilterDetail detail) {
-          filters.add(detail);
+     public void addFilter(String name, FilterDetail detail) {
+          filters.put(name, detail);
      }
 
      /**
@@ -256,18 +253,19 @@ public class Trace {
      private void prepareLog(Integer statusCode) throws JsonProcessingException {
 
           String url = Objects.nonNull(getUrl()) ? getUrl() : "";
+          ObjectMapper mapper = new ObjectMapper();
 
           if (printAllTrace) {
 
                if (isInfo(statusCode)) {
 
-                    log.info(" [HEIMDALL-TRACE] - {} ", new ObjectMapper().writeValueAsString(this));
+                    log.info(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
                } else if (isWarn(statusCode)) {
 
-                    log.warn(" [HEIMDALL-TRACE] - {} ", new ObjectMapper().writeValueAsString(this));
+                    log.warn(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
                } else {
 
-                    log.error(" [HEIMDALL-TRACE] - {} ", new ObjectMapper().writeValueAsString(this));
+                    log.error(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
                }
           } else {
                if (isInfo(statusCode)) {
@@ -292,16 +290,17 @@ public class Trace {
      }
 
      private void printInLogger(Logger logger, Integer statusCode) throws JsonProcessingException {
+          ObjectMapper mapper = new ObjectMapper();
 
           if (isInfo(statusCode)) {
 
-               logger.info(new ObjectMapper().writeValueAsString(this));
+               logger.info(mapper.writeValueAsString(this));
           } else if (isWarn(statusCode)) {
 
-               logger.warn(new ObjectMapper().writeValueAsString(this));
+               logger.warn(mapper.writeValueAsString(this));
           } else {
 
-               logger.error(new ObjectMapper().writeValueAsString(this));
+               logger.error(mapper.writeValueAsString(this));
           }
      }
 

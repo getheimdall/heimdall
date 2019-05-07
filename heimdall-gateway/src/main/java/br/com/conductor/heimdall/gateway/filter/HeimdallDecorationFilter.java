@@ -133,9 +133,8 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
 
             long duration = (endTime - startTime);
 
-            detail.setName(this.getClass().getSimpleName());
             detail.setTimeInMillisRun(duration);
-            TraceContextHolder.getInstance().getActualTrace().addFilter(detail);
+            TraceContextHolder.getInstance().getActualTrace().addFilter(this.getClass().getSimpleName(), detail);
         }
 
         return null;
@@ -284,6 +283,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                         ctx.put(API_ID, credential.getApiId());
                         ctx.put(RESOURCE_ID, credential.getResourceId());
                         ctx.put(OPERATION_ID, credential.getOperationId());
+                        ctx.put(OPERATION_PATH, credential.getOperationPath());
 
                         String host = ctx.getRequest().getHeader("Host");
 
