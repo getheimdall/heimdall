@@ -28,7 +28,6 @@ import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.interceptor.HeimdallInterceptor;
 import br.com.conductor.heimdall.core.util.JsonUtils;
 import br.com.conductor.heimdall.core.util.TemplateUtils;
-import br.com.twsoftware.alfred.object.Objeto;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
@@ -62,9 +61,9 @@ public class OAuthHeimdallInterceptor implements HeimdallInterceptor {
     public HashMap<String, Object> buildParameters(Object objectCustom, HashMap<String, Object> parameters, Interceptor interceptor) {
         OAuthDTO oAuthDTO = (OAuthDTO) objectCustom;
 
-        parameters.put("providerId", Objeto.isBlank(oAuthDTO.getProviderId()) ? 0L : oAuthDTO.getProviderId());
-        parameters.put("timeAccessToken", Objeto.isBlank(oAuthDTO.getTimeAccessToken()) ? 0 : oAuthDTO.getTimeAccessToken());
-        parameters.put("timeRefreshToken", Objeto.isBlank(oAuthDTO.getTimeRefreshToken()) ? 1800 : oAuthDTO.getTimeRefreshToken());
+        parameters.put("providerId", oAuthDTO.getProviderId() == null ? 0L : oAuthDTO.getProviderId());
+        parameters.put("timeAccessToken", oAuthDTO.getTimeAccessToken() == null ? 0 : oAuthDTO.getTimeAccessToken());
+        parameters.put("timeRefreshToken", oAuthDTO.getTimeRefreshToken() == null ? 1800 : oAuthDTO.getTimeRefreshToken());
         parameters.put("typeOAuth", oAuthDTO.getTypeOAuth());
         parameters.put("privateKey", oAuthDTO.getPrivateKey());
 

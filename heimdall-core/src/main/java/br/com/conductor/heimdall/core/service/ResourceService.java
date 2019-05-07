@@ -23,10 +23,9 @@ package br.com.conductor.heimdall.core.service;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ONLY_ONE_RESOURCE_PER_API;
-import static br.com.twsoftware.alfred.object.Objeto.isBlank;
-import static br.com.twsoftware.alfred.object.Objeto.notBlank;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -81,13 +80,12 @@ public class ResourceService {
       * @param 	apiId						The {@link Api} Id
       * @param 	resourceId					The {@link Resource} Id
       * @return								The {@link Resource} found
-      * @throws NotFoundException			Resource not found
       */
      @Transactional(readOnly = true)
      public Resource find(Long apiId, Long resourceId) {
           
           Resource resource = resourceRepository.findByApiIdAndId(apiId, resourceId);      
-          HeimdallException.checkThrow(isBlank(resource), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(resource == null, GLOBAL_RESOURCE_NOT_FOUND);
                               
           return resource;
      }
@@ -99,12 +97,11 @@ public class ResourceService {
       * @param 	resourceDTO					The {@link ResourceDTO}
       * @param 	pageableDTO					The {@link PageableDTO}
       * @return								The paged {@link Resource} list as a {@link ResourcePage} object
-      * @throws NotFoundException			Resource not found
       */
      public ResourcePage list(Long apiId, ResourceDTO resourceDTO, PageableDTO pageableDTO) {
 
           Api api = apiRepository.findOne(apiId);
-          HeimdallException.checkThrow(isBlank(api), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(api == null, GLOBAL_RESOURCE_NOT_FOUND);
           
           Resource resource = GenericConverter.mapper(resourceDTO, Resource.class);
           resource.setApi(api);
@@ -125,12 +122,11 @@ public class ResourceService {
       * @param 	apiId						The {@link Api} Id
       * @param 	resourceDTO					The {@link ResourceDTO}
       * @return								The List of {@link Resource}
-      * @throws NotFoundException			Resource not found
       */
      public List<Resource> list(Long apiId, ResourceDTO resourceDTO) {
           
           Api api = apiRepository.findOne(apiId);
-          HeimdallException.checkThrow(isBlank(api), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(api == null, GLOBAL_RESOURCE_NOT_FOUND);
           
           Resource resource = GenericConverter.mapper(resourceDTO, Resource.class);
           resource.setApi(api);
@@ -148,16 +144,15 @@ public class ResourceService {
       * @param 	apiId						The {@link Api} Id
       * @param 	resourceDTO					The {@link ResourceDTO}
       * @return								The saved {@link Resource}
-      * @throws NotFoundException			Resource not found
-      * @throws BadRequestException			Only one resource per api
       */
      public Resource save(Long apiId, ResourceDTO resourceDTO) {
 
           Api api = apiRepository.findOne(apiId);
-          HeimdallException.checkThrow(isBlank(api), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(api == null, GLOBAL_RESOURCE_NOT_FOUND);
                     
           Resource resData = resourceRepository.findByApiIdAndName(apiId, resourceDTO.getName());
-          HeimdallException.checkThrow(notBlank(resData) && (resData.getApi().getId() == api.getId()), ONLY_ONE_RESOURCE_PER_API);
+          HeimdallException.checkThrow(resData != null &&
+                  Objects.equals(resData.getApi().getId(), api.getId()), ONLY_ONE_RESOURCE_PER_API);
           
           Resource resource = GenericConverter.mapper(resourceDTO, Resource.class);
           resource.setApi(api);
@@ -175,16 +170,16 @@ public class ResourceService {
       * @param 	apiId						The {@link Api} Id
       * @param 	resource					The {@link Resource}
       * @return								The saved {@link Resource}
-      * @throws NotFoundException			Resource not found
-      * @throws BadRequestException			Only one resource per api
       */
      public Resource save(Long apiId, Resource resource) {
 
           Api api = apiRepository.findOne(apiId);
-          HeimdallException.checkThrow(isBlank(api), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(api == null, GLOBAL_RESOURCE_NOT_FOUND);
 
           Resource resData = resourceRepository.findByApiIdAndName(apiId, resource.getName());
-          HeimdallException.checkThrow(notBlank(resData) && (resData.getApi().getId() == api.getId()), ONLY_ONE_RESOURCE_PER_API);
+          HeimdallException.checkThrow(resData != null &&
+                  Objects.equals(resData.getApi().getId(), api.getId()), ONLY_ONE_RESOURCE_PER_API);
+
           resource.setApi(api);
 
           resource = resourceRepository.save(resource);
@@ -201,16 +196,16 @@ public class ResourceService {
       * @param 	resourceId					The {@link Resource} Id
       * @param 	resourceDTO					The {@link ResourceDTO}
       * @return								The updated {@link Resource}
-      * @throws NotFoundException			Resource not found
-      * @throws BadRequestException			Only one resource per api
       */
      public Resource update(Long apiId, Long resourceId, ResourceDTO resourceDTO) {
 
           Resource resource = resourceRepository.findByApiIdAndId(apiId, resourceId);
-          HeimdallException.checkThrow(isBlank(resource), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(resource == null, GLOBAL_RESOURCE_NOT_FOUND);
           
           Resource resData = resourceRepository.findByApiIdAndName(apiId, resourceDTO.getName());
-          HeimdallException.checkThrow(notBlank(resData) && (resData.getApi().getId() == resource.getApi().getId()) && (resData.getId() != resource.getId()), ONLY_ONE_RESOURCE_PER_API);
+          HeimdallException.checkThrow(resData != null &&
+                  Objects.equals(resData.getApi().getId(), resource.getApi().getId()) &&
+                  !Objects.equals(resData.getId(), resource.getId()), ONLY_ONE_RESOURCE_PER_API);
           
           resource = GenericConverter.mapper(resourceDTO, resource);
           
@@ -226,12 +221,11 @@ public class ResourceService {
       * 
       * @param 	apiId						The {@link Api} Id
       * @param 	resourceId					The {@link Resource} Id
-      * @throws NotFoundException			Resource not found
       */
      public void delete(Long apiId, Long resourceId) {
 
           Resource resource = resourceRepository.findByApiIdAndId(apiId, resourceId);
-          HeimdallException.checkThrow(isBlank(resource), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(resource == null, GLOBAL_RESOURCE_NOT_FOUND);
 
           // Deletes all operations attached to the Resource
           operationService.deleteAllfromResource(apiId, resourceId);

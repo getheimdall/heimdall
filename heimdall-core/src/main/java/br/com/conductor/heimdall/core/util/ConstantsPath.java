@@ -34,8 +34,6 @@ public class ConstantsPath {
      public static final String PATH_ROOT = "/";
      
      public static final String PATH_API = "/v1/api";
-     
-     public static final String PATH_HEIMDALL_PATTERN = "/heimdall/**";
 
      public static final String PATH_MANAGER_PATTERN = "/manager/**";
      
@@ -44,8 +42,6 @@ public class ConstantsPath {
      public static final String PATH_APPS = PATH_API + "/apps";
 
      public static final String PATH_DEVELOPERS = PATH_API + "/developers";
-
-     public static final String PATH_HTTP_METHODS = PATH_API + "/http-methods";
 
      public static final String PATH_PLANS = PATH_API + "/plans";
 

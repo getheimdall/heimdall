@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.api.environment;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-api
@@ -19,6 +17,7 @@ package br.com.conductor.heimdall.api.environment;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.api.environment;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

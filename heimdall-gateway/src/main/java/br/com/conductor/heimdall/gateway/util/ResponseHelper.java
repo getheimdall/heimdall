@@ -1,10 +1,27 @@
+/*-
+ * =========================LICENSE_START==================================
+ * heimdall-gateway
+ * ========================================================================
+ * Copyright (C) 2018 Conductor Tecnologia SA
+ * ========================================================================
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ==========================LICENSE_END===================================
+ */
 package br.com.conductor.heimdall.gateway.util;
 
 import br.com.conductor.heimdall.core.util.ContentTypeUtils;
 import br.com.conductor.heimdall.middleware.spec.Helper;
-import br.com.twsoftware.alfred.object.Objeto;
 import com.netflix.zuul.context.RequestContext;
-import lombok.Cleanup;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.StreamUtils;
 
@@ -17,7 +34,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * Provides static methods to properly handle request body and headers
+ *
+ * @author Marcelo Aguiar Rodrigues
+ */
 public class ResponseHelper {
+
+    private ResponseHelper() {}
 
     public static Map<String, String> getResponseHeaders(RequestContext context) {
 
@@ -45,27 +69,27 @@ public class ResponseHelper {
         String response = null;
 
         // if the content type is not defined by api server then permit to read the body. Prevent NPE
-        if (Objeto.isBlank(content)) content = "";
+        if (content == null || content.isEmpty()) content = "";
 
         String[] types = content.split(";");
 
         if (!ContentTypeUtils.belongsToBlackList(types)) {
-            @Cleanup
-            InputStream stream = context.getResponseDataStream();
 
-            response = StreamUtils.copyToString(stream, StandardCharsets.UTF_8);
+            try (InputStream stream = context.getResponseDataStream()) {
 
-            if (response.isEmpty() && helper.call().response().getBody() != null) {
+                response = StreamUtils.copyToString(stream, StandardCharsets.UTF_8);
 
-                response = helper.call().response().getBody();
+                if (response.isEmpty() && helper.call().response().getBody() != null) {
+
+                    response = helper.call().response().getBody();
+                }
+
+                if (Objects.isNull(response) || response.isEmpty()) {
+
+                    response = "";
+                }
+                context.setResponseDataStream(new ByteArrayInputStream(response.getBytes(StandardCharsets.UTF_8)));
             }
-
-            if (Objects.isNull(response) || response.isEmpty()) {
-
-                response = "";
-            }
-            context.setResponseDataStream(new ByteArrayInputStream(response.getBytes(StandardCharsets.UTF_8)));
-
         }
         return response;
     }

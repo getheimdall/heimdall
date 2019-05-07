@@ -30,6 +30,5 @@ public class ConstantsOAuth {
     public final static String GRANT_TYPE_PASSWORD = "PASSWORD";
     public final static String GRANT_TYPE_REFRESH_TOKEN = "REFRESH_TOKEN";
     public final static String GRANT_TYPE_IMPLICIT = "IMPLICIT";
-    public final static String CODE = "code";
-    public final static String TOKEN = "token";
+
 }

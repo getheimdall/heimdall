@@ -22,7 +22,6 @@ package br.com.conductor.heimdall.core.service;
  */
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
-import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 
 import java.util.List;
 
@@ -63,12 +62,11 @@ public class DeveloperService {
       * 
       * @param  id 						The ID of the {@link Developer} 
       * @return 						The {@link Developer} found
-      * @throws NotFoundException		Resource not found
       */
      public Developer find(Long id) {
           
           Developer developer = developerRepository.findOne(id);      
-          HeimdallException.checkThrow(isBlank(developer), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(developer == null, GLOBAL_RESOURCE_NOT_FOUND);
                               
           return developer;
      }
@@ -143,13 +141,12 @@ public class DeveloperService {
       * @param  id						The ID of the {@link Developer} to be updated
       * @param  developerDTO 			The {@link DeveloperDTO}
       * @return							The updated {@link Developer}
-      * @throws NotFoundException		Resource not found
       */
      @Transactional
      public Developer update(Long id, DeveloperDTO developerDTO) {
 
           Developer developer = developerRepository.findOne(id);
-          HeimdallException.checkThrow(isBlank(developer), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(developer == null, GLOBAL_RESOURCE_NOT_FOUND);
           
           developer = GenericConverter.mapper(developerDTO, developer);
           developer = developerRepository.save(developer);
@@ -160,13 +157,12 @@ public class DeveloperService {
      /**
       * Deletes a {@link Developer} by its ID.
       * @param  id						The ID of the {@link Developer} to be deleted
-      * @throws NotFoundException		Resource not found
       */
      @Transactional
      public void delete(Long id) {
 
           Developer developer = developerRepository.findOne(id);
-          HeimdallException.checkThrow(isBlank(developer), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(developer == null, GLOBAL_RESOURCE_NOT_FOUND);
           
           developerRepository.delete(developer);
      }

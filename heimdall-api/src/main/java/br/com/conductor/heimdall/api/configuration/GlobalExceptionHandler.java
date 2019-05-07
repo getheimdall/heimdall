@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.api.configuration;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-api
@@ -19,6 +17,7 @@ package br.com.conductor.heimdall.api.configuration;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.api.configuration;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -55,7 +54,6 @@ import br.com.conductor.heimdall.core.exception.NotFoundException;
 import br.com.conductor.heimdall.core.exception.ServerErrorException;
 import br.com.conductor.heimdall.core.exception.UnauthorizedException;
 import br.com.conductor.heimdall.core.util.UrlUtil;
-import br.com.twsoftware.alfred.object.Objeto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -255,7 +253,7 @@ public class GlobalExceptionHandler{
                bindException.exception = "BindExceptionPIER";
 
                BindError error = bindException.new BindError();
-               error.defaultMessage = Objeto.notBlank(message) ? message : fieldError.getDefaultMessage();
+               error.defaultMessage = message != null ? message : fieldError.getDefaultMessage();
                error.objectName = fieldError.getObjectName();
                error.field = fieldError.getField();
                error.code = fieldError.getCode();
