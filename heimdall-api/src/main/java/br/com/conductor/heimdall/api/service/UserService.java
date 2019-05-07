@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.api.service;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-api
@@ -10,9 +7,9 @@ package br.com.conductor.heimdall.api.service;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +17,7 @@ package br.com.conductor.heimdall.api.service;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.api.service;
 
 import br.com.conductor.heimdall.api.dto.UserDTO;
 import br.com.conductor.heimdall.api.dto.UserEditDTO;
@@ -48,7 +46,6 @@ import java.util.List;
 import java.util.Set;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
-import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 
 /**
  * Provides methods to create, read, update and delete a {@link User}.
@@ -101,12 +98,11 @@ public class UserService {
       * 
       * @param id		The User Id
       * @return			{@link User}
-      * @throws NotFoundException
       */
      public User find(Long id) {
 
           User user = userRepository.findOne(id);          
-          HeimdallException.checkThrow(isBlank(user), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(user == null, GLOBAL_RESOURCE_NOT_FOUND);
           
           user.setRoles(roleRepository.findRolesByUserId(id));
 
@@ -157,13 +153,12 @@ public class UserService {
       * Deletes a {@link User}.
       * 
       * @param userId		The User Id
-      * @throws NotFoundException
       */
      @Transactional
      public void delete(Long userId) {
 
           User user = userRepository.findOne(userId);
-          HeimdallException.checkThrow(isBlank(user), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(user == null, GLOBAL_RESOURCE_NOT_FOUND);
           
           userRepository.delete(user.getId());
      }
@@ -174,13 +169,12 @@ public class UserService {
       * @param userId		The User Id
       * @param userDTO		{@link UserDTO}
       * @return				{@link User}
-      * @throws NotFoundException
       */
      @Transactional
      public User update(Long userId, UserEditDTO userDTO) {
 
           User user = userRepository.findOne(userId);
-          HeimdallException.checkThrow(isBlank(user), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(user == null, GLOBAL_RESOURCE_NOT_FOUND);
           
           user = GenericConverter.mapper(userDTO, user);
           user = userRepository.save(user);
@@ -201,8 +195,8 @@ public class UserService {
          final String username = principal.getName();
          User userLogged = userRepository.findByUserName(username);
 
-         HeimdallException.checkThrow(userLogged.getType().equals(TypeUser.LDAP), USER_LDAP_UNAUTHORIZED_TO_CHANGE_PASSWORD);
-         HeimdallException.checkThrow(isBlank(userLogged), GLOBAL_RESOURCE_NOT_FOUND);
+         HeimdallException.checkThrow(userLogged == null, GLOBAL_RESOURCE_NOT_FOUND);
+         HeimdallException.checkThrow(TypeUser.LDAP.equals(userLogged.getType()), USER_LDAP_UNAUTHORIZED_TO_CHANGE_PASSWORD);
          HeimdallException.checkThrow(!passwordEncoder.matches(currentPassword, userLogged.getPassword()), USER_CURRENT_PASSWORD_NOT_MATCHING);
          HeimdallException.checkThrow(passwordEncoder.matches(newPassword, userLogged.getPassword()), USER_NEW_PASSWORD_EQUALS_CURRENT_PASSWORD);
          HeimdallException.checkThrow(!newPassword.equals(confirmNewPassword), USER_NEW_PASSWORD_NOT_MATCHING);

@@ -25,12 +25,11 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_R
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ONLY_ONE_OPERATION_PER_RESOURCE;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.OPERATION_CANT_HAVE_SINGLE_WILDCARD;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END;
-import static br.com.twsoftware.alfred.object.Objeto.isBlank;
-import static br.com.twsoftware.alfred.object.Objeto.notBlank;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import br.com.conductor.heimdall.core.entity.Api;
@@ -98,7 +97,7 @@ public class OperationService {
      public Operation find(Long apiId, Long resourceId, Long operationId) {
           
           Operation operation = operationRepository.findByResourceApiIdAndResourceIdAndId(apiId, resourceId, operationId);      
-          HeimdallException.checkThrow(isBlank(operation), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(operation == null, GLOBAL_RESOURCE_NOT_FOUND);
                               
           return operation;
      }
@@ -116,7 +115,7 @@ public class OperationService {
      public OperationPage list(Long apiId, Long resourceId, OperationDTO operationDTO, PageableDTO pageableDTO) {
 
           Resource resource = resourceRepository.findByApiIdAndId(apiId, resourceId);
-          HeimdallException.checkThrow(isBlank(resource), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(resource == null, GLOBAL_RESOURCE_NOT_FOUND);
 
           Operation operation = GenericConverter.mapper(operationDTO, Operation.class);
           operation.setResource(resource);
@@ -141,7 +140,7 @@ public class OperationService {
      public List<Operation> list(Long apiId, Long resourceId, OperationDTO operationDTO) {
           
           Resource resource = resourceRepository.findByApiIdAndId(apiId, resourceId);
-          HeimdallException.checkThrow(isBlank(resource), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(resource == null, GLOBAL_RESOURCE_NOT_FOUND);
           
           Operation operation = GenericConverter.mapper(operationDTO, Operation.class);
           operation.setResource(resource);
@@ -185,10 +184,11 @@ public class OperationService {
      public Operation save(Long apiId, Long resourceId, OperationDTO operationDTO) {
 
           Resource resource = resourceRepository.findByApiIdAndId(apiId, resourceId);
-          HeimdallException.checkThrow(isBlank(resource), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(resource == null, GLOBAL_RESOURCE_NOT_FOUND);
                     
           Operation resData = operationRepository.findByResourceApiIdAndMethodAndPath(apiId, operationDTO.getMethod(), operationDTO.getPath());
-          HeimdallException.checkThrow(notBlank(resData) && (resData.getResource().getId() == resource.getId()), ONLY_ONE_OPERATION_PER_RESOURCE);
+          HeimdallException.checkThrow(resData != null &&
+                  Objects.equals(resData.getResource().getId(), resource.getId()), ONLY_ONE_OPERATION_PER_RESOURCE);
 
           Operation operation = GenericConverter.mapper(operationDTO, Operation.class);
           operation.setResource(resource);
@@ -209,17 +209,17 @@ public class OperationService {
       *
       * @param  apiId						The {@link br.com.conductor.heimdall.core.entity.Api} Id
       * @param 	resourceId					The {@link Resource} Id
-      * @param 	operationDTO				The {@link Operation}
       * @return								The saved {@link Operation}
       */
      @Transactional
      public Operation save(Long apiId, Long resourceId, Operation operation) {
 
           Resource resource = resourceRepository.findByApiIdAndId(apiId, resourceId);
-          HeimdallException.checkThrow(isBlank(resource), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(resource  == null, GLOBAL_RESOURCE_NOT_FOUND);
 
           Operation resData = operationRepository.findByResourceApiIdAndMethodAndPath(apiId, operation.getMethod(), operation.getPath());
-          HeimdallException.checkThrow(notBlank(resData) && (resData.getResource().getId() == resource.getId()), ONLY_ONE_OPERATION_PER_RESOURCE);
+          HeimdallException.checkThrow(resData != null &&
+                  Objects.equals(resData.getResource().getId(), resource.getId()), ONLY_ONE_OPERATION_PER_RESOURCE);
 
           operation.setResource(resource);
           operation.setPath(StringUtils.removeMultipleSlashes(operation.getPath()));
@@ -247,10 +247,12 @@ public class OperationService {
      public Operation update(Long apiId, Long resourceId, Long operationId, OperationDTO operationDTO) {
 
           Operation operation = operationRepository.findByResourceApiIdAndResourceIdAndId(apiId, resourceId, operationId);
-          HeimdallException.checkThrow(isBlank(operation), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(operation == null, GLOBAL_RESOURCE_NOT_FOUND);
           
           Operation resData = operationRepository.findByResourceApiIdAndMethodAndPath(apiId, operationDTO.getMethod(), operationDTO.getPath());
-          HeimdallException.checkThrow(notBlank(resData) && (resData.getResource().getId().equals(operation.getResource().getId())) && (!resData.getId().equals(operation.getId())), ONLY_ONE_OPERATION_PER_RESOURCE);
+          HeimdallException.checkThrow(resData != null &&
+                  resData.getResource().getId().equals(operation.getResource().getId()) &&
+                  !resData.getId().equals(operation.getId()), ONLY_ONE_OPERATION_PER_RESOURCE);
           
           operation = GenericConverter.mapper(operationDTO, operation);
           operation.setPath(StringUtils.removeMultipleSlashes(operation.getPath()));
@@ -278,7 +280,7 @@ public class OperationService {
      public void delete(Long apiId, Long resourceId, Long operationId) {
 
           Operation operation = operationRepository.findByResourceApiIdAndResourceIdAndId(apiId, resourceId, operationId);
-          HeimdallException.checkThrow(isBlank(operation), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(operation == null, GLOBAL_RESOURCE_NOT_FOUND);
 
           // Deletes all interceptors attached to the Operation
           interceptorService.deleteAllfromOperation(operationId);

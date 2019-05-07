@@ -31,8 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
-
 import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
 import static br.com.conductor.heimdall.gateway.util.ConstantsContext.CLIENT_ID;
 
@@ -53,13 +51,16 @@ public class ClientIdInterceptorService {
      */
     public void validate(Long apiId, Location location) {
 
-        HttpServletRequest req = RequestContext.getCurrentContext().getRequest();
+        RequestContext context = RequestContext.getCurrentContext();
 
         String clientId;
-        if (Location.HEADER.equals(location))
-            clientId = req.getHeader(CLIENT_ID);
+        if (Location.HEADER.equals(location)) {
+            clientId = context.getZuulRequestHeaders().get(CLIENT_ID);
+
+            if (clientId == null) clientId = context.getRequest().getHeader(CLIENT_ID);
+        }
         else
-            clientId = req.getParameter(CLIENT_ID);
+            clientId = context.getRequest().getParameter(CLIENT_ID);
 
         this.validateClientId(apiId, clientId);
     }

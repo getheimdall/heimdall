@@ -24,8 +24,6 @@ package br.com.conductor.heimdall.core.service;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ENVIRONMENT_INBOUND_DNS_PATTERN;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ENVIRONMENT_ATTACHED_TO_API;
-import static br.com.twsoftware.alfred.object.Objeto.isBlank;
-import static br.com.twsoftware.alfred.object.Objeto.notBlank;
 
 import java.util.List;
 import java.util.Objects;
@@ -66,12 +64,11 @@ public class EnvironmentService {
      *
      * @param id The id of the {@link Environment}
      * @return The {@link Environment} that was found
-     * @throws NotFoundException Resource not found
      */
     public Environment find(Long id) {
 
         Environment environment = environmentRepository.findOne(id);
-        HeimdallException.checkThrow(isBlank(environment), GLOBAL_RESOURCE_NOT_FOUND);
+        HeimdallException.checkThrow(environment == null, GLOBAL_RESOURCE_NOT_FOUND);
 
         return environment;
     }
@@ -114,7 +111,6 @@ public class EnvironmentService {
      * Saves a {@link Environment} in the repository.
      *
      * @param environmentDTO The {@link EnvironmentDTO}
-     * @throws BadRequestException Inbound URL already exists
      * @return The saved {@link Environment}
      */
     @Transactional
@@ -123,7 +119,7 @@ public class EnvironmentService {
         List<Environment> environments = environmentRepository.findByInboundURL(environmentDTO.getInboundURL());
 
         Environment environmentEqual = environments.stream().filter(e -> e.getOutboundURL().equals(environmentDTO.getOutboundURL())).findFirst().orElse(null);
-        HeimdallException.checkThrow(notBlank(environmentEqual), ExceptionMessage.ENVIRONMENT_ALREADY_EXISTS);
+        HeimdallException.checkThrow(environmentEqual != null, ExceptionMessage.ENVIRONMENT_ALREADY_EXISTS);
 
         Environment environment = GenericConverter.mapper(environmentDTO, Environment.class);
         HeimdallException.checkThrow(!validateInboundURL(environment.getInboundURL()), ENVIRONMENT_INBOUND_DNS_PATTERN);
@@ -138,20 +134,18 @@ public class EnvironmentService {
      *
      * @param id             The id of the {@link Environment}
      * @param environmentDTO The {@link EnvironmentDTO}
-     * @throws NotFoundException   Resource not found
-     * @throws BadRequestException Inbound URL already exists
      * @return The updated {@link Environment}
      */
     @Transactional
     public Environment update(Long id, EnvironmentDTO environmentDTO) {
 
         Environment environment = environmentRepository.findOne(id);
-        HeimdallException.checkThrow(isBlank(environment), GLOBAL_RESOURCE_NOT_FOUND);
+        HeimdallException.checkThrow(environment == null, GLOBAL_RESOURCE_NOT_FOUND);
 
         List<Environment> environments = environmentRepository.findByInboundURL(environmentDTO.getInboundURL());
 
         Environment environmentEqual = environments.stream().filter(e -> e.getOutboundURL().equals(environmentDTO.getOutboundURL())).findFirst().orElse(null);
-        HeimdallException.checkThrow(notBlank(environmentEqual) && !Objects.requireNonNull(environmentEqual).getId().equals(environment.getId()), ExceptionMessage.ENVIRONMENT_ALREADY_EXISTS);
+        HeimdallException.checkThrow(environmentEqual != null && !Objects.requireNonNull(environmentEqual).getId().equals(environment.getId()), ExceptionMessage.ENVIRONMENT_ALREADY_EXISTS);
 
         Integer apis = environmentRepository.findApiWithOtherEnvironmentEqualsInbound(environment.getId(), environmentDTO.getInboundURL());
         HeimdallException.checkThrow(apis > 0, ExceptionMessage.API_CANT_ENVIRONMENT_INBOUND_URL_EQUALS);
@@ -168,13 +162,12 @@ public class EnvironmentService {
       * Deletes a {@link Environment} by its ID.
       *
       * @param 	id 						The id of the {@link Environment}
-      * @throws NotFoundException		Resource not found
       */
      @Transactional
      public void delete(Long id) {
 
         Environment environment = environmentRepository.findOne(id);
-        HeimdallException.checkThrow(isBlank(environment), GLOBAL_RESOURCE_NOT_FOUND);
+        HeimdallException.checkThrow(environment == null, GLOBAL_RESOURCE_NOT_FOUND);
 
         Integer totalEnvironmentsAttached = environmentRepository.findApisWithEnvironment(id);
         HeimdallException.checkThrow(totalEnvironmentsAttached > 0, ENVIRONMENT_ATTACHED_TO_API);

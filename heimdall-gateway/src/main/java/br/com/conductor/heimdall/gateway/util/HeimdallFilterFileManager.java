@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.gateway.util;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -19,6 +17,7 @@ package br.com.conductor.heimdall.gateway.util;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.util;
 
 import com.netflix.zuul.FilterLoader;
 import org.slf4j.Logger;

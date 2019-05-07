@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.api.repository;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-api
@@ -20,6 +17,7 @@ package br.com.conductor.heimdall.api.repository;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.api.repository;
 
 import java.util.Set;
 

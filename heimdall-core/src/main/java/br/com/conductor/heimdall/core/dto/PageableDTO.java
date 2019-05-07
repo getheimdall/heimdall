@@ -47,4 +47,7 @@ public class PageableDTO implements Serializable {
      @Max(100)
      private Integer limit;
 
+     public boolean isEmpty() {
+          return this.offset == null && this.limit == null;
+     }
 }
