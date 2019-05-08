@@ -1,3 +1,6 @@
+
+package br.com.conductor.heimdall.gateway.filter;
+
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -7,9 +10,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *      http://www.apache.org/licenses/LICENSE-2.0
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +20,6 @@
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-package br.com.conductor.heimdall.gateway.filter;
 
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.service.CORSInterceptorService;
@@ -36,13 +38,14 @@ import java.util.Objects;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
 
 /**
- * Filter responsible to update the CORS headers.
+ * Api Interceptor without cors.
  *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
+
 @Component
 @Slf4j
-public class CORSPostFilter extends ZuulFilter {
+public class CorsPostFilter extends ZuulFilter {
 
     private static final int SEND_CORS_RESPONSE_FILTER_ORDER = 999;
 
@@ -84,8 +87,7 @@ public class CORSPostFilter extends ZuulFilter {
             long duration = (endTime - startTime);
 
             detail.setTimeInMillisRun(duration);
-            detail.setName(this.getClass().getSimpleName());
-            TraceContextHolder.getInstance().getActualTrace().addFilter(detail);
+            TraceContextHolder.getInstance().getActualTrace().addFilter(this.getClass().getSimpleName(), detail);
         }
 
         return null;
@@ -97,4 +99,5 @@ public class CORSPostFilter extends ZuulFilter {
         Map<String, String> cors = (Map<String, String>) requestContext.get(ConstantsContext.CORS_FILTER);
         corsInterceptorService.executeCorsPostFilter(cors);
     }
+	
 }

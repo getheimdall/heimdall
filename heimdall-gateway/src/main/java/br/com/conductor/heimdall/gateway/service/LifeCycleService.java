@@ -47,7 +47,10 @@ public class LifeCycleService {
                           Long referenceId,
                           Long apiId,
                           Set<Integer> ignoredResources,
-                          Set<Integer> ignoredOperations) {
+                          Set<Integer> ignoredOperations,
+                          Boolean status) {
+
+        if (!status) return false;
 
         if (referenceId == null) return false;
         RequestContext context = RequestContext.getCurrentContext();

@@ -21,12 +21,9 @@
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.enums.TypeOAuth;
 import br.com.conductor.heimdall.core.util.BeanManager;
-import br.com.conductor.heimdall.gateway.filter.helper.Helper;
 import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
-import br.com.conductor.heimdall.gateway.filter.helper.HelperImpl;
 import br.com.conductor.heimdall.gateway.service.LifeCycleService;
 import br.com.conductor.heimdall.gateway.service.OAuthInterceptorService;
-import br.com.conductor.heimdall.middleware.spec.Helper;
 
 import com.netflix.zuul.context.RequestContext;
 
@@ -39,11 +36,11 @@ public class OAuthInterceptor extends HeimdallFilter {
     private static Set<Long> ignoredResources;
     private static Long referenceId;
     private static Long apiId;
-    private Helper helper;
     private Long providerId;
     private int timeAccessToken;
     private int timeRefreshToken;
     private String privateKey;
+    private static boolean status;
 
     public OAuthInterceptor() {
         ignoredOperations = new HashSet<>();
@@ -62,6 +59,7 @@ public class OAuthInterceptor extends HeimdallFilter {
         timeAccessToken = {{timeAccessToken}};
         timeRefreshToken = {{timeRefreshToken}};
         privateKey = "{{privateKey}}";
+        status = {{interceptorStatus}};
     }
 
     @Override
@@ -82,14 +80,13 @@ public class OAuthInterceptor extends HeimdallFilter {
     @Override
     public boolean should() {
         LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
-        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredResources, ignoredOperations);
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredResources, ignoredOperations, status);
     }
 
     @Override
     public void execute() throws Throwable {
-		this.helper = (Helper) BeanManager.getBean(Helper.class);
-        OAuthInterceptorService oAuthInterceptorService = (OAuthInterceptorService) BeanManager.getBean(OAuthInterceptorService.class);
-        oAuthInterceptorService.execute(TypeOAuth.{{typeOAuth}}, privateKey, timeAccessToken, timeRefreshToken, providerId, helper);
+		OAuthInterceptorService oAuthInterceptorService = (OAuthInterceptorService) BeanManager.getBean(OAuthInterceptorService.class);
+        oAuthInterceptorService.execute(TypeOAuth.{{typeOAuth}}, privateKey, timeAccessToken, timeRefreshToken, providerId);
     }
 
 }

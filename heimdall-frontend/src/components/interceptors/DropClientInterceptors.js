@@ -38,6 +38,24 @@ let collect = (connect, monitor) => {
     }
 }
 
+const labelStyle = {
+    backgroundColor: 'grey',
+    borderRadius: '10px',
+    color: '#fff',
+    fontSize: '12px',
+    fontWeight: 'normal',
+    height: '20px',
+    lineHeight: '20px',
+    position: 'absolute',
+    right: 'initial',
+    textAlign: 'center',
+    textTransform: 'uppercase',
+    top: '-10px',
+    whiteSpace: 'nowrap',
+    width: 100,
+    zIndex: '10'
+};
+
 class DropClientInterceptors extends Component {
 
     moveInterceptors = (dragIndex, newIndex, lifeCycleDrag, referenceDrag) => {
@@ -65,31 +83,21 @@ class DropClientInterceptors extends Component {
 
         const style = {
             backgroundColor: backgroundColor,
-            padding: 20
+            padding: 10
         };
         return connectDropTarget(
             <div>
                 <Row id="drop-client-interceptors" className="draggable-pane" style={style}>
                     <Row type="flex" justify="center">
-                        <sup className="ant-scroll-number ant-badge-count" style={{backgroundColor: 'grey', width: 100, textTransform: 'uppercase'}}>{description}</sup>
+                        <sup className="ant-scroll-number" style={labelStyle}>{description}</sup>
                     </Row>
                     {!this.props.interceptors && <Loading />}
                     {this.props.interceptors && this.props.interceptors.map((interceptor, index) => {
-                        let color
-                        if (interceptor.lifeCycle === 'API') {
-                            color = '#ffa613'
-                        } else if (interceptor.lifeCycle === 'PLAN') {
-                            color = '#c3cc93'
-                        } else if (interceptor.lifeCycle === 'RESOURCE') {
-                            color = '#8edce0'
-                        } else if (interceptor.lifeCycle === 'OPERATION') {
-                            color = '#607d8b'
-                        }
+
                         return <DnDInterceptor
                             key={index}
                             type={interceptor.type}
                             icon='code-o'
-                            color={color}
                             interceptor={interceptor}
                             order={interceptor.order ? interceptor.order : this.props.interceptors.length}
                             moveInterceptors={this.moveInterceptors}

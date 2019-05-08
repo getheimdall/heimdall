@@ -167,7 +167,7 @@ public class OperationService {
           api.getResources().forEach(resource -> operations.addAll(this.list(apiId, resource.getId(), operationDTO)));
 
           if (!operations.isEmpty()) {
-               return operations.stream().map(op -> new Operation(op.getId(), op.getMethod(), op.getPath(), null, null, null)).collect(Collectors.toList());
+               return operations.stream().map(op -> new Operation(op.getId(), op.getMethod(), op.getPath(), null, null)).collect(Collectors.toList());
           }
 
           return new ArrayList<>();
@@ -201,6 +201,36 @@ public class OperationService {
           
           amqpRoute.dispatchRoutes();
           
+          return operation;
+     }
+
+     /**
+      * Saves a {@link Operation} to the repository.
+      *
+      * @param  apiId						The {@link br.com.conductor.heimdall.core.entity.Api} Id
+      * @param 	resourceId					The {@link Resource} Id
+      * @param 	operationDTO				The {@link Operation}
+      * @return								The saved {@link Operation}
+      */
+     @Transactional
+     public Operation save(Long apiId, Long resourceId, Operation operation) {
+
+          Resource resource = resourceRepository.findByApiIdAndId(apiId, resourceId);
+          HeimdallException.checkThrow(isBlank(resource), GLOBAL_RESOURCE_NOT_FOUND);
+
+          Operation resData = operationRepository.findByResourceApiIdAndMethodAndPath(apiId, operation.getMethod(), operation.getPath());
+          HeimdallException.checkThrow(notBlank(resData) && (resData.getResource().getId() == resource.getId()), ONLY_ONE_OPERATION_PER_RESOURCE);
+
+          operation.setResource(resource);
+          operation.setPath(StringUtils.removeMultipleSlashes(operation.getPath()));
+
+          HeimdallException.checkThrow(validateSingleWildCardOperationPath(operation), OPERATION_CANT_HAVE_SINGLE_WILDCARD);
+          HeimdallException.checkThrow(validateDoubleWildCardOperationPath(operation), OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END);
+
+          operation = operationRepository.save(operation);
+
+          amqpRoute.dispatchRoutes();
+
           return operation;
      }
 

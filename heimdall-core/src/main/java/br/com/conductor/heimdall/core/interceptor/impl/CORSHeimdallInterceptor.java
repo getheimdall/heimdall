@@ -47,8 +47,7 @@ public class CORSHeimdallInterceptor implements HeimdallInterceptor {
     @Override
     public Object parseContent(String content) {
         try {
-            Map<String, String> map = (Map<String, String>) JsonUtils.convertJsonToObject(content, Map.class);
-            return map;
+            return (Map<String, String>) JsonUtils.convertJsonToObject(content, Map.class);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(TypeInterceptor.CORS.name(), TemplateUtils.TEMPLATE_CORS);

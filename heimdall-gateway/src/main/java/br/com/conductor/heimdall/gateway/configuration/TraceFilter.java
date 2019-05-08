@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -65,6 +66,9 @@ public class TraceFilter implements Filter {
 
 	@Autowired
 	private Property prop;
+	
+	@Autowired
+	private BuildProperties buildProperties;
 
 	@Override
 	public void destroy() {
@@ -80,7 +84,7 @@ public class TraceFilter implements Filter {
 		try {
 
 			trace = TraceContextHolder.getInstance().init(prop.getTrace().isPrintAllTrace(), profile, request,
-					prop.getMongo().getEnabled(), prop.getLogstash().getEnabled());
+			prop.getMongo().getEnabled(), prop.getLogstash().getEnabled(), buildProperties.getVersion());
 			if (shouldDisableTrace(request)) {
 				trace.setShouldPrint(false);
 			}

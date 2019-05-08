@@ -27,7 +27,6 @@ import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
 import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -76,15 +75,14 @@ public class ScopesFilter extends ZuulFilter {
             detail.setStatus(Constants.SUCCESS);
         } catch (Throwable e) {
             detail.setStatus(Constants.FAILED);
-            TraceContextHolder.getInstance().getActualTrace().setStackTrace(new StackTraceImpl(e.getClass().getName(), e.getMessage(), ExceptionUtils.getStackTrace(e)));
+            TraceContextHolder.getInstance().getActualTrace().setStackTrace(new StackTraceImpl(e.getClass().getName(), e.getMessage()));
         } finally {
             long endTime = System.currentTimeMillis();
 
             long duration = (endTime - startTime);
 
-            detail.setName(this.getClass().getSimpleName());
             detail.setTimeInMillisRun(duration);
-            TraceContextHolder.getInstance().getActualTrace().addFilter(detail);
+            TraceContextHolder.getInstance().getActualTrace().addFilter(this.getClass().getSimpleName(), detail);
         }
         return null;
     }
@@ -107,7 +105,7 @@ public class ScopesFilter extends ZuulFilter {
 
             app.getPlans()
                     .forEach(plan -> {
-                        if (plan != null)
+                        if (plan != null && plan.getApi().getId().equals(apiId))
                             plan.getScopes()
                                     .forEach(scope -> {
                                         if (scope != null)

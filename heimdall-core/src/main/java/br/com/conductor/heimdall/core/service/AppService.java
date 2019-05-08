@@ -24,10 +24,11 @@ package br.com.conductor.heimdall.core.service;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import br.com.conductor.heimdall.core.converter.AppPersistMap;
 import br.com.conductor.heimdall.core.dto.persist.AppPersist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -37,9 +38,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.Lists;
-
-import br.com.conductor.heimdall.core.converter.AppMap;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.AppDTO;
 import br.com.conductor.heimdall.core.dto.PageDTO;
@@ -163,7 +161,7 @@ public class AppService {
                appDTO.setClientId(token);
           }
 
-          App app = GenericConverter.mapperWithMapping(appDTO, App.class, new AppPersistMap());
+          App app = GenericConverter.mapper(appDTO, App.class);
 
           Developer dev = devRepository.findOne(app.getDeveloper().getId());
           HeimdallException.checkThrow(isBlank(dev), DEVELOPER_NOT_EXIST);
@@ -188,7 +186,7 @@ public class AppService {
           HeimdallException.checkThrow(isBlank(app), GLOBAL_RESOURCE_NOT_FOUND);
           
           app.setAccessTokens(accessTokenRepository.findByAppId(app.getId()));
-          app = GenericConverter.mapperWithMapping(appDTO, app, new AppMap());
+          app = GenericConverter.mapper(appDTO, app);
           app = appRepository.save(app);
           
           amqpCacheService.dispatchClean();
@@ -245,7 +243,7 @@ public class AppService {
 
                Plan plan = planRepository.findOne(1L);
                if (Objeto.notBlank(plan)) {
-                    app.setPlans(Lists.newArrayList(plan));
+                    app.setPlans(new ArrayList<>(Collections.singletonList(plan)));
                }
           }
 

@@ -12,7 +12,7 @@
 
 	<groupId>br.com.conductor.heimdall</groupId>
 	<artifactId>heimdall</artifactId>
-	<version>2.0.2-SNAPSHOT</version>
+	<version>2.3.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Heimdall</name>
@@ -94,6 +94,16 @@
 		    	<role>Developer</role>
 		    </roles>
 	  	</developer>
+		<developer>
+			<id>manoel.filho</id>
+			<name>Manoel Dijalma</name>
+			<email>manoel.filho at conductor.com.br</email>
+			<organization>Conductor Tecnologia SA</organization>
+			<organizationUrl>http://www.conductor.com.br</organizationUrl>
+			<roles>
+				<role>Developer</role>
+			</roles>
+		</developer>
 	  	<developer>
 		   	<id>marcelo.rodrigues</id>
 		    <name>Marcelo Rodrigues</name>
@@ -134,6 +144,16 @@
 		    	<role>Front-end Developer</role>
 		    </roles>
 	  	</developer>
+		<developer>
+			<id>pedro.feitosa</id>
+			<name>Pedro Feitosa</name>
+			<email>pedro.feitosa at conductor.com.br</email>
+			<organization>Conductor Tecnologia SA</organization>
+			<organizationUrl>http://www.conductor.com.br</organizationUrl>
+			<roles>
+				<role>Developer</role>
+			</roles>
+		</developer>
 	</developers>
 
 	<properties>
@@ -253,12 +273,12 @@
 			<dependency>
 				<groupId>br.com.conductor.heimdall</groupId>
 				<artifactId>heimdall-core</artifactId>
-				<version>2.0.2-SNAPSHOT</version>
+				<version>2.3.2-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>br.com.conductor.heimdall</groupId>
 				<artifactId>heimdall-middleware-spec</artifactId>
-				<version>2.0.2-SNAPSHOT</version>
+				<version>2.3.2-SNAPSHOT</version>
 			</dependency>
 			<dependency>
 				<groupId>org.mongodb</groupId>

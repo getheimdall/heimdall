@@ -19,27 +19,20 @@
  */
 package br.com.conductor.heimdall.core.entity;
 
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.persistence.*;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import org.apache.commons.lang.StringUtils;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
-
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-
 import br.com.conductor.heimdall.core.enums.HttpMethod;
 import br.com.conductor.heimdall.core.util.ConstantsPath;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
+import javax.persistence.*;
+import java.io.Serializable;
 
 /**
  * This class represents a Operation registered to the system.
@@ -80,10 +73,6 @@ public class Operation implements Serializable {
      @JsonManagedReference
      private Resource resource;
 
-     @JsonIgnore
-     @ManyToMany(fetch = FetchType.EAGER, mappedBy="operations")
-     private Set<Scope> scopes;
-
      /**
       * Adjust the path to not permit the save or update with "/" or spaces in the end of path.
       */
@@ -96,13 +85,4 @@ public class Operation implements Serializable {
           }
      }
 
-     @JsonIgnore
-     public Set<Long> getScopesIds() {
-          return this.scopes != null ? this.scopes.stream().map(Scope::getId).collect(Collectors.toSet()) : Collections.EMPTY_SET;
-     }
-
-     @PreRemove
-     private void removeFromScopes() {
-          scopes.forEach(scope -> scope.removeOperation(this));
-     }
 }
