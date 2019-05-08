@@ -156,6 +156,7 @@ public class OperationService {
       * @param apiId The {@link Api} Id
       * @return The complete list of all {@link Operation} from the {@link Api}
       */
+     @Transactional(readOnly = true)
      public List<Operation> list(final Long apiId) {
           final Api api = apiService.find(apiId);
 
