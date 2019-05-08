@@ -4,7 +4,7 @@
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -57,8 +57,6 @@ public class DataBaseConfiguration implements EnvironmentAware {
      private String database;
 
      private RelaxedPropertyResolver liquiBasePropertyResolver;
-
-     private SpringLiquibase liquibase;
 
      @Override
      public void setEnvironment(Environment environment) {
@@ -123,28 +121,28 @@ public class DataBaseConfiguration implements EnvironmentAware {
           return dataSource;
      }
      
-     /**
-      * Configures a {@link SpringLiquibase} based on a {@link DataSource}.
-      * 
-      * @param dataSource		{@link DataSource}
-      * @return					{@link SpringLiquibase}
-      */
-     @Bean
-     public SpringLiquibase liquibase(DataSource dataSource) {
+	/**
+	 * Configures a {@link SpringLiquibase} based on a {@link DataSource}.
+	 * 
+	 * @param dataSource {@link DataSource}
+	 * @return {@link SpringLiquibase}
+	 */
+	@Bean
+	public SpringLiquibase liquibase(DataSource dataSource) {
 
-          liquibase = new SpringLiquibase();
-          liquibase.setDataSource(dataSource);
-          liquibase.setChangeLog("classpath:liquibase/master.xml");
-          liquibase.setContexts(liquiBasePropertyResolver.getProperty("context"));
-          liquibase.setShouldRun(property.getDatasource().isRunLiquibase());
+		SpringLiquibase liquibase = new SpringLiquibase();
+		liquibase.setDataSource(dataSource);
+		liquibase.setChangeLog("classpath:liquibase/master.xml");
+		liquibase.setContexts(liquiBasePropertyResolver.getProperty("context"));
+		liquibase.setShouldRun(property.getDatasource().isRunLiquibase());
 
-          releaseLiquibaseLocks(dataSource);
-          clearLiquibaseCheckSums(dataSource);
+		releaseLiquibaseLocks(dataSource);
+		clearLiquibaseCheckSums(dataSource);
 
-          log.debug("Configuring Liquibase and versioning the database ... Please wait!");
+		log.debug("Configuring Liquibase and versioning the database ... Please wait!");
 
-          return liquibase;
-     }
+		return liquibase;
+	}
 
      /**
       * Release all Liquibase locks from a {@link DataSource}.
@@ -153,8 +151,7 @@ public class DataBaseConfiguration implements EnvironmentAware {
       */
      public void releaseLiquibaseLocks(DataSource ds) {
 
-          try (Connection con = ds.getConnection();
-               Statement st = con.createStatement()) {
+          try (Connection con = ds.getConnection(); Statement st = con.createStatement()) {
 
                log.info("Releasing Liquibase Locks");
 
@@ -174,8 +171,7 @@ public class DataBaseConfiguration implements EnvironmentAware {
       */
      public void clearLiquibaseCheckSums(DataSource ds) {
 
-          try (Connection con = ds.getConnection();
-               Statement st = con.createStatement()) {
+          try (Connection con = ds.getConnection(); Statement st = con.createStatement()) {
 
                log.info("Clear Liquibase ChecksSums");
 
