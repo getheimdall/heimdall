@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.gateway.filter.helper;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -9,9 +7,9 @@ package br.com.conductor.heimdall.gateway.filter.helper;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,22 +17,11 @@ package br.com.conductor.heimdall.gateway.filter.helper;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.filter.helper;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import br.com.conductor.heimdall.core.dto.BeanValidationErrorDTO;
+import br.com.conductor.heimdall.middleware.exception.BeanValidationException;
+import br.com.conductor.heimdall.middleware.spec.Json;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -44,12 +31,20 @@ import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-
-import br.com.conductor.heimdall.core.dto.BeanValidationErrorDTO;
-import br.com.conductor.heimdall.middleware.exception.BeanValidationException;
-import br.com.conductor.heimdall.middleware.spec.Json;
-import br.com.twsoftware.alfred.object.Objeto;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of the {@link Json} interface.
@@ -85,7 +80,7 @@ public class JsonImpl implements Json {
 				JSONArray array = new JSONArray(string);
 				return array.toString();
 			} catch (JSONException ex1) {
-				if (Objeto.notBlank(string)) {
+				if (string != null && !string.isEmpty()) {
 					return string;
 				}
 			}

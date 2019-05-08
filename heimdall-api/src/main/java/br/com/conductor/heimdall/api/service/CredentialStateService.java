@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.api.service;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-api
@@ -19,6 +17,7 @@ package br.com.conductor.heimdall.api.service;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.api.service;
 
 import br.com.conductor.heimdall.api.entity.CredentialState;
 import br.com.conductor.heimdall.api.enums.CredentialStateEnum;

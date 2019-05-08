@@ -44,7 +44,7 @@ import static br.com.conductor.heimdall.gateway.util.ConstantsContext.OPERATION_
  */
 @Slf4j
 public class CustomHostRoutingFilter extends SimpleHostRoutingFilter {
-     
+
      private FilterDetail detail = new FilterDetail();
      private final CircuitBreakerManager circuitBreakerManager;
 

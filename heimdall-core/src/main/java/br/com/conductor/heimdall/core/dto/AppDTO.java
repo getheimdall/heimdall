@@ -56,5 +56,7 @@ public class AppDTO implements Serializable {
      
      private Status status;
      
+     @NotNull
+     @Size(min = 1)
      private List<ReferenceIdDTO> plans;
 }

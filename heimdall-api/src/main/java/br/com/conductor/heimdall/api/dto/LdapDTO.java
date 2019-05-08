@@ -17,7 +17,6 @@
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-
 package br.com.conductor.heimdall.api.dto;
 
 import br.com.conductor.heimdall.core.enums.Status;

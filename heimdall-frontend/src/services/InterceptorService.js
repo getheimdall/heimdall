@@ -82,11 +82,24 @@ const remove = (interceptorId) => {
         })
 }
 
+const refresh = () => {
+    return HTTPv1.post('/interceptors/refresh')
+        .then(res => Promise.resolve(res.data))
+        .catch(error => {
+            console.log('Error: ', error)
+            if (error.response && error.response.status === 404) {
+                return null;
+            }
+            throw error;
+        })
+}
+
 export const interceptorService = {
     getInterceptors,
     getInterceptorTypes,
     getInterceptor,
     save,
     update,
-    remove
+    remove,
+    refresh,
 }

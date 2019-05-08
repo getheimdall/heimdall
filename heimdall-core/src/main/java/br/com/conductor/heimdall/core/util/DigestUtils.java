@@ -21,8 +21,6 @@ package br.com.conductor.heimdall.core.util;
  * ==========================LICENSE_END===================================
  */
 
-import br.com.twsoftware.alfred.object.Objeto;
-
 /**
  * DigestMD5 wrapper class
  * 
@@ -39,7 +37,7 @@ public abstract class DigestUtils {
 	  */
      public static String digestMD5(String value) {
 
-          if (Objeto.notBlank(value)) {
+          if (value != null && !value.isEmpty()) {
 
                return org.springframework.util.DigestUtils.md5DigestAsHex(value.getBytes());
           } else {
