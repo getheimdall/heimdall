@@ -42,19 +42,19 @@ public class AccessTokenPage extends PageDTO<AccessToken> implements Serializabl
 
      public AccessTokenPage(PageDTO<AccessToken> p){
           super(p.getNumber(), 
-                    p.size, 
-                    p.totalPages, 
-                    p.numberOfElements, 
-                    p.totalElements, 
-                    p.firstPage, 
-                    p.hasPreviousPage, 
-                    p.hasNextPage, 
-                    p.hasContent, 
-                    p.first, 
-                    p.last, 
-                    p.nextPage, 
-                    p.previousPage, 
-                    p.content);          
+                    p.getSize(), 
+                    p.getTotalPages(), 
+                    p.getNumberOfElements(), 
+                    p.getTotalElements(), 
+                    p.isFirstPage(), 
+                    p.isHasPreviousPage(), 
+                    p.isHasNextPage(), 
+                    p.isHasContent(), 
+                    p.isFirst(), 
+                    p.isLast(), 
+                    p.getNextPage(), 
+                    p.getPreviousPage(), 
+                    p.getContent());          
      }
 
 }

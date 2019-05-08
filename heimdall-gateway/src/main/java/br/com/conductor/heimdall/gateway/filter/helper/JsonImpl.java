@@ -199,8 +199,7 @@ public class JsonImpl implements Json {
 
 	public boolean isJson(String string) {
 
-		try {
-			JsonParser parser = new ObjectMapper().getFactory().createParser(string);
+		try (JsonParser parser = new ObjectMapper().getFactory().createParser(string)) {
 
 			while (parser.nextToken() != null) {}
 

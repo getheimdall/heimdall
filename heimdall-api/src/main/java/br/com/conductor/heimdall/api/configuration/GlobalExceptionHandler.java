@@ -55,6 +55,7 @@ import br.com.conductor.heimdall.core.exception.ServerErrorException;
 import br.com.conductor.heimdall.core.exception.UnauthorizedException;
 import br.com.conductor.heimdall.core.util.UrlUtil;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartException;
@@ -448,7 +449,7 @@ public class GlobalExceptionHandler{
       */
      @AllArgsConstructor
      @Getter
-     public class ErroInfo{
+     public class ErroInfo {
 
          /**
           * TImestamp from the moment that the exception was created.
@@ -483,29 +484,30 @@ public class GlobalExceptionHandler{
       * @author Filipe Germano
       *
       */
-     public class BindExceptionInfo{
+     public class BindExceptionInfo {
 
           @Getter
-          public LocalDateTime timestamp;
+          private LocalDateTime timestamp;
 
           @Getter
-          public Integer status;
+          private Integer status;
 
           @Getter
-          public String exception;
+          private String exception;
 
           @Getter
-          public List<BindError> erros;
+          private List<BindError> erros;
 
-          public class BindError{
+          @Data
+          public class BindError {
 
-               public String defaultMessage;
+        	  private String defaultMessage;
 
-               public String objectName;
+        	  private String objectName;
 
-               public String field;
+        	  private String field;
 
-               public String code;
+        	  private String code;
           }
 
      }

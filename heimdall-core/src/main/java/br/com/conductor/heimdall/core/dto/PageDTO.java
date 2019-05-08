@@ -45,45 +45,45 @@ import lombok.NoArgsConstructor;
 public class PageDTO<T> {
      
      @JsonInclude(Include.ALWAYS)
-     public int number;
+     private int number;
 
      @JsonInclude(Include.ALWAYS)
-     public int size;
+     private int size;
 
      @JsonInclude(Include.ALWAYS)
-     public int totalPages;
+     private int totalPages;
 
      @JsonInclude(Include.ALWAYS)
-     public int numberOfElements;
+     private int numberOfElements;
 
      @JsonInclude(Include.ALWAYS)
-     public long totalElements;
+     private long totalElements;
 
      @JsonInclude(Include.ALWAYS)
-     public boolean firstPage;
+     private boolean firstPage;
 
      @JsonInclude(Include.ALWAYS)
-     public boolean hasPreviousPage;
+     private boolean hasPreviousPage;
 
      @JsonInclude(Include.ALWAYS)
-     public boolean hasNextPage;
+     private boolean hasNextPage;
 
      @JsonInclude(Include.ALWAYS)
-     public boolean hasContent;
+     private boolean hasContent;
 
      @JsonInclude(Include.ALWAYS)
-     public boolean first;
+     private boolean first;
 
      @JsonInclude(Include.ALWAYS)
-     public boolean last;
+     private boolean last;
 
      @JsonInclude(Include.ALWAYS)
-     public int nextPage;
+     private int nextPage;
 
      @JsonInclude(Include.ALWAYS)
-     public int previousPage;
+     private int previousPage;
 
-     public List<T> content;
+     private List<T> content;
      
      public static <T> PageDTO<T> build(Page<T> p) {
          if (p == null){
