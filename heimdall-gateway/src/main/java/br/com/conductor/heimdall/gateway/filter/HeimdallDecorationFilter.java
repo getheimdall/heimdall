@@ -260,7 +260,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
 
                         if (method.equals(HttpMethod.OPTIONS.name())) {
                             Optional<Credential> first = credentials.stream().findFirst();
-                            if (first.get().isCors()) {
+                            if (first.isPresent() && first.get().isCors()) {
                             	credential = first.get();
                             }
                         }

@@ -467,7 +467,7 @@ public class CallImpl implements Call {
              } catch (UnsupportedEncodingException e) {
                  log.error(e.getMessage(), e);
              } catch (IOException e) {
-                 e.printStackTrace();
+                 log.error(e.getMessage(), e);
              }
 
          }

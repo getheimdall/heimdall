@@ -37,7 +37,7 @@ public class ContentTypeUtils {
 	 /**
 	  * The list of blacklisted types
 	  */
-	 public static final String[] blackList = new String[] { 
+	 private static final String[] blackList = new String[] { 
     		 MediaType.APPLICATION_PDF_VALUE,
     		 MediaType.IMAGE_GIF_VALUE,
     		 MediaType.IMAGE_JPEG_VALUE,

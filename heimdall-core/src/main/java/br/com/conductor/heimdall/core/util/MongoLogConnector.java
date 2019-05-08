@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.util;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -50,8 +50,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 /**
- * This class creates a connection fo the MongoDB used by Heimdall
- * to save its logs.
+ * This class creates a connection fo the MongoDB used by Heimdall to save its
+ * logs.
  * 
  * @author Marcelo Aguiar Rodrigues
  *
@@ -61,347 +61,363 @@ import java.util.*;
 @NoArgsConstructor
 public class MongoLogConnector implements Serializable {
 
-	 private static final long serialVersionUID = 8125889338220953042L;
+	private static final String LAST = "last";
 
-     private String databaseName;
+	private static final String FIRST = "first";
 
-     private String collection;
+	private static final String METRIC = "metric";
 
-     @Autowired
-     private Property property;
+	private static final String VALUE = "value";
 
-     private final static Integer PAGE = 0;
+	private static final long serialVersionUID = 8125889338220953042L;
 
-     private final static Integer LIMIT = 100;
+	private String databaseName;
 
-     private MongoClient client;
-     
-     @PostConstruct
-     public void init() {
-    	 this.databaseName = property.getMongo().getDataBase();
-    	 this.collection = property.getMongo().getCollection();
-     }
+	private String collection;
 
-     /**
-      * Initializes the database connection by name.
-      * 
-      * @param databaseName
-      * @param collection
-      * Database names
-      */
-     public MongoLogConnector(String databaseName, String collection) {
+	@Autowired
+	private Property property;
 
-         this.databaseName = databaseName;
-         this.collection = collection;
+	private static final Integer PAGE = 0;
 
-     }
+	private static final Integer LIMIT = 100;
 
-    /**
-     * Finds one specific trace.
-     *
-     * @param object LogTraceDTO
-     * @return Trace found
-     */
-     public LogTrace findOne(LogTrace object) {
+	private MongoClient client;
 
-         Object idMongo = getValueId(object);
-         return this.datastore().get(this.collection, object.getClass(), idMongo);
-     }
+	@PostConstruct
+	public void init() {
+		this.databaseName = property.getMongo().getDataBase();
+		this.collection = property.getMongo().getCollection();
+	}
 
-    /**
-     * Creates a paged result of the filters informed.
-     *
-     * @param filtersDTOS Filters for the search
-     * @param page Page wanted
-     * @param limit Number of records per page
-     * @return Paged list of traces
-     */
-     public Page<LogTrace> find(List<FiltersDTO> filtersDTOS, Integer page, Integer  limit) {
-         Query<LogTrace> query = this.prepareQuery(filtersDTOS);
+	/**
+	 * Initializes the database connection by name.
+	 * 
+	 * @param databaseName
+	 * @param collection
+	 *                         Database names
+	 */
+	public MongoLogConnector(String databaseName, String collection) {
 
-         return preparePage(query, page, limit);
-     }
+		this.databaseName = databaseName;
+		this.collection = collection;
 
-    /**
-     * Creates a descending list of metrics for a specified period of time.
-     *
-     * @param id Trace field wanted
-     * @param size max number of elements to return
-     * @param period period of time wanted
-     * @return List of metrics
-     */
-     public List<Metric> findByTop(String id, int size, Periods period) {
-         final AdvancedDatastore datastore = this.datastore();
-         Query<LogTrace> query = prepareRange(datastore.createQuery(this.collection, LogTrace.class), period);
+	}
 
-         query.field(id).notEqual(null);
+	/**
+	 * Finds one specific trace.
+	 *
+	 * @param object
+	 *                   LogTraceDTO
+	 * @return Trace found
+	 */
+	public LogTrace findOne(LogTrace object) {
 
-         final AggregationPipeline pipeline = datastore.createAggregation(this.collection, LogTrace.class)
-                 .match(query)
-                 .group(id,
-                         Group.grouping("metric", Group.last(id)),
-                         Group.grouping("value", Accumulator.accumulator("$sum", 1)))
-                 .sort(Sort.descending("value"))
-                 .limit(size);
+		Object idMongo = getValueId(object);
+		return this.datastore().get(this.collection, object.getClass(), idMongo);
+	}
 
-         final Iterator<Metric> aggregate = pipeline.aggregate(Metric.class);
+	/**
+	 * Creates a paged result of the filters informed.
+	 *
+	 * @param filtersDTOS
+	 *                        Filters for the search
+	 * @param page
+	 *                        Page wanted
+	 * @param limit
+	 *                        Number of records per page
+	 * @return Paged list of traces
+	 */
+	public Page<LogTrace> find(List<FiltersDTO> filtersDTOS, Integer page, Integer limit) {
+		Query<LogTrace> query = this.prepareQuery(filtersDTOS);
 
-         List<Metric> list = new ArrayList<>();
-         aggregate.forEachRemaining(list::add);
+		return preparePage(query, page, limit);
+	}
 
-         return list;
-     }
+	/**
+	 * Creates a descending list of metrics for a specified period of time.
+	 *
+	 * @param id
+	 *                   Trace field wanted
+	 * @param size
+	 *                   max number of elements to return
+	 * @param period
+	 *                   period of time wanted
+	 * @return List of metrics
+	 */
+	public List<Metric> findByTop(String id, int size, Periods period) {
+		final AdvancedDatastore datastore = this.datastore();
+		Query<LogTrace> query = prepareRange(datastore.createQuery(this.collection, LogTrace.class), period);
 
-     public List<Metric> findByMetricBySum(String id, String source, String metric, Periods period) {
-         final AdvancedDatastore datastore = this.datastore();
-         Query<LogTrace> query = prepareRange(datastore.createQuery(this.collection, LogTrace.class), period);
+		query.field(id).notEqual(null);
 
-         query.field(source).equal(id);
+		final AggregationPipeline pipeline = datastore.createAggregation(this.collection, LogTrace.class).match(query)
+				.group(id, Group.grouping(METRIC, Group.last(id)),
+						Group.grouping(VALUE, Accumulator.accumulator("$sum", 1)))
+				.sort(Sort.descending(VALUE)).limit(size);
 
-         final AggregationPipeline aggregation = datastore.createAggregation(this.collection, LogTrace.class)
-                 .match(query)
-                 .group(metric,
-                         Group.grouping("metric", Group.last(metric)),
-                         Group.grouping("value", Accumulator.accumulator("$sum", 1)));
+		final Iterator<Metric> aggregate = pipeline.aggregate(Metric.class);
 
-         final Iterator<Metric> aggregate = aggregation.aggregate(Metric.class);
+		List<Metric> list = new ArrayList<>();
+		aggregate.forEachRemaining(list::add);
 
-         List<Metric> list = new ArrayList<>();
-         aggregate.forEachRemaining(list::add);
+		return list;
+	}
 
-         return list;
-     }
+	public List<Metric> findByMetricBySum(String id, String source, String metric, Periods period) {
+		final AdvancedDatastore datastore = this.datastore();
+		Query<LogTrace> query = prepareRange(datastore.createQuery(this.collection, LogTrace.class), period);
 
-     public List<Metric> findByMetricByAvg(String id, String source, String metric, Periods period) {
+		query.field(source).equal(id);
 
-         final AdvancedDatastore datastore = this.datastore();
-         Query<LogTrace> query = prepareRange(datastore.createQuery(this.collection, LogTrace.class), period);
+		final AggregationPipeline aggregation = datastore.createAggregation(this.collection, LogTrace.class)
+				.match(query).group(metric, Group.grouping(METRIC, Group.last(metric)),
+						Group.grouping(VALUE, Accumulator.accumulator("$sum", 1)));
 
-         query.field(source).equal(id);
+		final Iterator<Metric> aggregate = aggregation.aggregate(Metric.class);
 
-         final AggregationPipeline aggregation = datastore.createAggregation(this.collection, LogTrace.class)
-                 .match(query)
-                 .group(source,
-                         Group.grouping("metric", Group.last(source)),
-                         Group.grouping("value", Accumulator.accumulator("$avg", metric)));
+		List<Metric> list = new ArrayList<>();
+		aggregate.forEachRemaining(list::add);
 
-         final Iterator<Metric> aggregate = aggregation.aggregate(Metric.class);
+		return list;
+	}
 
-         List<Metric> list = new ArrayList<>();
-         aggregate.forEachRemaining(list::add);
+	public List<Metric> findByMetricByAvg(String id, String source, String metric, Periods period) {
 
-         return list;
-     }
+		final AdvancedDatastore datastore = this.datastore();
+		Query<LogTrace> query = prepareRange(datastore.createQuery(this.collection, LogTrace.class), period);
 
-     private Query<LogTrace> prepareRange(Query<LogTrace> query, Periods date) {
-         String insertedOnDate = "ts";
-         switch(date) {
-             case TODAY: {
-                 query.field(insertedOnDate).containsIgnoreCase(LocalDate.now().format(DateTimeFormatter.ISO_DATE));
-             }
-             case YESTERDAY: {
-                 query.field(insertedOnDate).containsIgnoreCase(LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_DATE));
-             }
-             case THIS_WEEK: {
-                 Map<String, LocalDate> week = CalendarUtils.firstAndLastDaysOfWeek(LocalDate.now());
-                 query.field(insertedOnDate).greaterThanOrEq(week.get("first").format(DateTimeFormatter.ISO_DATE));
-                 query.field(insertedOnDate).lessThanOrEq(week.get("last").format(DateTimeFormatter.ISO_DATE));
-                 break;
-             }
-             case LAST_WEEK: {
-                 Map<String, LocalDate> week = CalendarUtils.firstAndLastDaysOfWeek(LocalDate.now().minusWeeks(1));
-                 query.field(insertedOnDate).greaterThanOrEq(week.get("first").format(DateTimeFormatter.ISO_DATE));
-                 query.field(insertedOnDate).lessThanOrEq(week.get("last").format(DateTimeFormatter.ISO_DATE));
-                 break;
-             }
-             case THIS_MONTH: {
-                 query.field(insertedOnDate).containsIgnoreCase(CalendarUtils.yearAndMonth(LocalDate.now()));
-                 break;
-             }
-             case LAST_MONTH: {
-                 query.field(insertedOnDate).containsIgnoreCase(CalendarUtils.yearAndMonth(LocalDate.now().minusMonths(1)));
-                 break;
-             }
-         }
-         return query;
-     }
+		query.field(source).equal(id);
 
-     private Query<LogTrace> prepareQuery(List<FiltersDTO> filtersDTOs) {
-         Query<LogTrace> query = this.datastore().createQuery(this.collection, LogTrace.class);
+		final AggregationPipeline aggregation = datastore.createAggregation(this.collection, LogTrace.class)
+				.match(query).group(source, Group.grouping(METRIC, Group.last(source)),
+						Group.grouping(VALUE, Accumulator.accumulator("$avg", metric)));
 
-         filtersDTOs.forEach(filtersDTO -> {
+		final Iterator<Metric> aggregate = aggregation.aggregate(Metric.class);
 
-             Object value1, value2;
+		List<Metric> list = new ArrayList<>();
+		aggregate.forEachRemaining(list::add);
 
-             try {
-                 value1 = Integer.parseInt(filtersDTO.getFirstValue());
-             } catch (NumberFormatException e) {
-                 value1 = filtersDTO.getFirstValue();
-             }
+		return list;
+	}
 
-             try {
-                 value2 = Integer.parseInt(filtersDTO.getSecondValue());
-             }catch (NumberFormatException e) {
-                 value2 = filtersDTO.getSecondValue();
-             }
+	private Query<LogTrace> prepareRange(Query<LogTrace> query, Periods date) {
+		String insertedOnDate = "ts";
+		switch (date) {
+		case TODAY: {
+			query.field(insertedOnDate).containsIgnoreCase(LocalDate.now().format(DateTimeFormatter.ISO_DATE));
+			break;
+		}
+		case YESTERDAY: {
+			query.field(insertedOnDate)
+					.containsIgnoreCase(LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_DATE));
+			break;
+		}
+		case THIS_WEEK: {
+			Map<String, LocalDate> week = CalendarUtils.firstAndLastDaysOfWeek(LocalDate.now());
+			query.field(insertedOnDate).greaterThanOrEq(week.get(FIRST).format(DateTimeFormatter.ISO_DATE));
+			query.field(insertedOnDate).lessThanOrEq(week.get(LAST).format(DateTimeFormatter.ISO_DATE));
+			break;
+		}
+		case LAST_WEEK: {
+			Map<String, LocalDate> week = CalendarUtils.firstAndLastDaysOfWeek(LocalDate.now().minusWeeks(1));
+			query.field(insertedOnDate).greaterThanOrEq(week.get(FIRST).format(DateTimeFormatter.ISO_DATE));
+			query.field(insertedOnDate).lessThanOrEq(week.get(LAST).format(DateTimeFormatter.ISO_DATE));
+			break;
+		}
+		case THIS_MONTH: {
+			query.field(insertedOnDate).containsIgnoreCase(CalendarUtils.yearAndMonth(LocalDate.now()));
+			break;
+		}
+		case LAST_MONTH: {
+			query.field(insertedOnDate).containsIgnoreCase(CalendarUtils.yearAndMonth(LocalDate.now().minusMonths(1)));
+			break;
+		}
+		}
+		return query;
+	}
 
-             switch (filtersDTO.getOperationSelected()) {
-                 case EQUALS: {
-                     query.field(filtersDTO.getName()).equal(value1);
-                     break;
-                 }
-                 case NOT_EQUALS: {
-                     query.field(filtersDTO.getName()).notEqual(value1);
-                     break;
-                 }
-                 case CONTAINS: {
-                     query.field(filtersDTO.getName()).containsIgnoreCase(value1.toString());
-                     break;
-                 }
-                 case BETWEEN: {
-                     query.field(filtersDTO.getName()).greaterThanOrEq(value1);
-                     query.field(filtersDTO.getName()).lessThanOrEq(value2);
-                     break;
-                 }
-                 case LESS_THAN: {
-                     query.field(filtersDTO.getName()).lessThan(value1);
-                     break;
-                 }
-                 case LESS_THAN_EQUALS: {
-                     query.field(filtersDTO.getName()).lessThanOrEq(value1);
-                     break;
-                 }
-                 case GREATER_THAN: {
-                     query.field(filtersDTO.getName()).greaterThan(value1);
-                     break;
-                 }
-                 case GREATER_THAN_EQUALS: {
-                     query.field(filtersDTO.getName()).greaterThanOrEq(value1);
-                     break;
-                 }
-                 case ALL: {
-                     query.field(filtersDTO.getName()).exists();
-                     break;
-                 }
-                 case NONE: {
-                     query.field(filtersDTO.getName()).doesNotExist();
-                     break;
-                 }
-                 case TODAY: {
-                     query.field(filtersDTO.getName())
-                             .containsIgnoreCase(LocalDate.now().format(DateTimeFormatter.ISO_DATE));
-                     break;
-                 }
-                 case YESTERDAY: {
-                     query.field(filtersDTO.getName())
-                             .containsIgnoreCase(LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_DATE));
-                     break;
-                 }
-                 case THIS_WEEK: {
-                     Map<String, LocalDate> week = CalendarUtils.firstAndLastDaysOfWeek(LocalDate.now());
-                     query.field(filtersDTO.getName()).greaterThanOrEq(week.get("first").format(DateTimeFormatter.ISO_DATE));
-                     query.field(filtersDTO.getName()).lessThanOrEq(week.get("last").format(DateTimeFormatter.ISO_DATE));
-                     break;
-                 }
-                 case LAST_WEEK: {
-                     Map<String, LocalDate> week = CalendarUtils.firstAndLastDaysOfWeek(LocalDate.now().minusWeeks(1));
-                     query.field(filtersDTO.getName()).greaterThanOrEq(week.get("first").format(DateTimeFormatter.ISO_DATE));
-                     query.field(filtersDTO.getName()).lessThanOrEq(week.get("last").format(DateTimeFormatter.ISO_DATE));
-                     break;
-                 }
-                 case THIS_MONTH: {
-                     query.field(filtersDTO.getName()).containsIgnoreCase(CalendarUtils.yearAndMonth(LocalDate.now()));
-                     break;
-                 }
-                 case LAST_MONTH: {
-                     query.field(filtersDTO.getName()).containsIgnoreCase(CalendarUtils.yearAndMonth(LocalDate.now().minusMonths(1)));
-                     break;
-                 }
-                 case THIS_YEAR: {
-                     query.field(filtersDTO.getName()).containsIgnoreCase(CalendarUtils.year(LocalDate.now()));
-                     break;
-                 }
-             }
-         });
+	private Query<LogTrace> prepareQuery(List<FiltersDTO> filtersDTOs) {
+		Query<LogTrace> query = this.datastore().createQuery(this.collection, LogTrace.class);
 
-         return query;
-     }
+		filtersDTOs.forEach(filtersDTO -> {
 
-     private Page<LogTrace> preparePage(Query<LogTrace> query, Integer page, Integer limit) {
-         List<LogTrace> list;
-         Long totalElements = query.count();
+			Object value1, value2;
 
-         query = query.order("-ts");
+			try {
+				value1 = Integer.parseInt(filtersDTO.getFirstValue());
+			} catch (NumberFormatException e) {
+				value1 = filtersDTO.getFirstValue();
+			}
 
-         page = page == null ? PAGE : page;
-         limit = limit == null || limit > LIMIT ? LIMIT : limit;
+			try {
+				value2 = Integer.parseInt(filtersDTO.getSecondValue());
+			} catch (NumberFormatException e) {
+				value2 = filtersDTO.getSecondValue();
+			}
 
-         if (page >= 1 && limit > 0) {
-             list = query.asList(new FindOptions().limit(limit).skip(page * limit));
-         } else {
-             list = query.asList(new FindOptions().limit(limit));
-         }
+			switch (filtersDTO.getOperationSelected()) {
+			case EQUALS: {
+				query.field(filtersDTO.getName()).equal(value1);
+				break;
+			}
+			case NOT_EQUALS: {
+				query.field(filtersDTO.getName()).notEqual(value1);
+				break;
+			}
+			case CONTAINS: {
+				query.field(filtersDTO.getName()).containsIgnoreCase(value1.toString());
+				break;
+			}
+			case BETWEEN: {
+				query.field(filtersDTO.getName()).greaterThanOrEq(value1);
+				query.field(filtersDTO.getName()).lessThanOrEq(value2);
+				break;
+			}
+			case LESS_THAN: {
+				query.field(filtersDTO.getName()).lessThan(value1);
+				break;
+			}
+			case LESS_THAN_EQUALS: {
+				query.field(filtersDTO.getName()).lessThanOrEq(value1);
+				break;
+			}
+			case GREATER_THAN: {
+				query.field(filtersDTO.getName()).greaterThan(value1);
+				break;
+			}
+			case GREATER_THAN_EQUALS: {
+				query.field(filtersDTO.getName()).greaterThanOrEq(value1);
+				break;
+			}
+			case ALL: {
+				query.field(filtersDTO.getName()).exists();
+				break;
+			}
+			case NONE: {
+				query.field(filtersDTO.getName()).doesNotExist();
+				break;
+			}
+			case TODAY: {
+				query.field(filtersDTO.getName())
+						.containsIgnoreCase(LocalDate.now().format(DateTimeFormatter.ISO_DATE));
+				break;
+			}
+			case YESTERDAY: {
+				query.field(filtersDTO.getName())
+						.containsIgnoreCase(LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_DATE));
+				break;
+			}
+			case THIS_WEEK: {
+				Map<String, LocalDate> week = CalendarUtils.firstAndLastDaysOfWeek(LocalDate.now());
+				query.field(filtersDTO.getName()).greaterThanOrEq(week.get(FIRST).format(DateTimeFormatter.ISO_DATE));
+				query.field(filtersDTO.getName()).lessThanOrEq(week.get(LAST).format(DateTimeFormatter.ISO_DATE));
+				break;
+			}
+			case LAST_WEEK: {
+				Map<String, LocalDate> week = CalendarUtils.firstAndLastDaysOfWeek(LocalDate.now().minusWeeks(1));
+				query.field(filtersDTO.getName()).greaterThanOrEq(week.get(FIRST).format(DateTimeFormatter.ISO_DATE));
+				query.field(filtersDTO.getName()).lessThanOrEq(week.get(LAST).format(DateTimeFormatter.ISO_DATE));
+				break;
+			}
+			case THIS_MONTH: {
+				query.field(filtersDTO.getName()).containsIgnoreCase(CalendarUtils.yearAndMonth(LocalDate.now()));
+				break;
+			}
+			case LAST_MONTH: {
+				query.field(filtersDTO.getName())
+						.containsIgnoreCase(CalendarUtils.yearAndMonth(LocalDate.now().minusMonths(1)));
+				break;
+			}
+			case THIS_YEAR: {
+				query.field(filtersDTO.getName()).containsIgnoreCase(CalendarUtils.year(LocalDate.now()));
+				break;
+			}
+			}
+		});
 
-         return buildPage(list, page, limit, totalElements);
-     }
+		return query;
+	}
 
-     private Page<LogTrace> buildPage(List<LogTrace> list, Integer page, Integer limit, Long totalElements) {
+	private Page<LogTrace> preparePage(Query<LogTrace> query, Integer page, Integer limit) {
+		List<LogTrace> list;
+		Long totalElements = query.count();
 
-          Page<LogTrace> pageResponse = new Page<>();
+		query = query.order("-ts");
 
-          pageResponse.number = page;
-          pageResponse.totalPages = new BigDecimal(totalElements).divide(new BigDecimal(limit), BigDecimal.ROUND_UP, 0).intValue();
-          pageResponse.numberOfElements = limit;
-          pageResponse.totalElements = totalElements;
-          pageResponse.hasPreviousPage = page > 0;
-          pageResponse.hasNextPage = page < (pageResponse.totalPages - 1);
-          pageResponse.hasContent = list != null && !list.isEmpty();
-          pageResponse.first = page == 0;
-          pageResponse.last = page == (pageResponse.totalPages - 1);
-          pageResponse.nextPage = page == (pageResponse.totalPages - 1) ? page : page + 1;
-          pageResponse.previousPage = page == 0 ? 0 : page - 1;
-          pageResponse.content = list;
+		page = page == null ? PAGE : page;
+		limit = limit == null || limit > LIMIT ? LIMIT : limit;
 
-          return pageResponse;
-     }
+		if (page >= 1 && limit > 0) {
+			list = query.asList(new FindOptions().limit(limit).skip(page * limit));
+		} else {
+			list = query.asList(new FindOptions().limit(limit));
+		}
 
-     private void createMongoClient() {
+		return buildPage(list, page, limit, totalElements);
+	}
 
-          if (property.getMongo().getUrl() != null) {
+	private Page<LogTrace> buildPage(List<LogTrace> list, Integer page, Integer limit, Long totalElements) {
 
-               MongoClientURI uri = new MongoClientURI(property.getMongo().getUrl());
-               this.client = new MongoClient(uri);
-          } else {
-               ServerAddress address = new ServerAddress(property.getMongo().getServerName(), property.getMongo().getPort().intValue());
-               MongoCredential mongoCredential = MongoCredential.createCredential(property.getMongo().getUsername(), property.getMongo().getUsername(), property.getMongo().getPassword().toCharArray());
-               MongoClientOptions mongoClientOptions = MongoClientOptions.builder().build();
-               this.client = new MongoClient(address, mongoCredential, mongoClientOptions);
-          }
-     }
+		Page<LogTrace> pageResponse = new Page<>();
 
-     private AdvancedDatastore datastore() {
+		pageResponse.setNumber(page);
+		pageResponse.setTotalPages(
+				new BigDecimal(totalElements).divide(new BigDecimal(limit), BigDecimal.ROUND_UP, 0).intValue());
+		pageResponse.setNumberOfElements(limit);
+		pageResponse.setTotalElements(totalElements);
+		pageResponse.setHasPreviousPage(page > 0);
+		pageResponse.setHasNextPage(page < (pageResponse.getTotalPages() - 1));
+		pageResponse.setHasContent(list != null && !list.isEmpty());
+		pageResponse.setFirst(page == 0);
+		pageResponse.setLast(page == (pageResponse.getTotalPages() - 1));
+		pageResponse.setNextPage(page == (pageResponse.getTotalPages() - 1) ? page : page + 1);
+		pageResponse.setPreviousPage(page == 0 ? 0 : page - 1);
+		pageResponse.setContent(list);
 
-          Morphia morphia = new Morphia();
+		return pageResponse;
+	}
 
-          if (this.client == null) {
-              this.createMongoClient();
-          }
+	private void createMongoClient() {
 
-          return (AdvancedDatastore) morphia.createDatastore(this.client, this.databaseName);
-     }
+		if (property.getMongo().getUrl() != null) {
 
-     private <T> Object getValueId(T object) {
+			MongoClientURI uri = new MongoClientURI(property.getMongo().getUrl());
+			this.client = new MongoClient(uri);
+		} else {
+			ServerAddress address = new ServerAddress(property.getMongo().getServerName(),
+					property.getMongo().getPort().intValue());
+			MongoCredential mongoCredential = MongoCredential.createCredential(property.getMongo().getUsername(),
+					property.getMongo().getUsername(), property.getMongo().getPassword().toCharArray());
+			MongoClientOptions mongoClientOptions = MongoClientOptions.builder().build();
+			this.client = new MongoClient(address, mongoCredential, mongoClientOptions);
+		}
+	}
 
-          Field id = Arrays.stream(object.getClass().getDeclaredFields()).filter(field -> field.getAnnotation(Id.class) != null).findFirst().orElse(null);
-          if (id != null) {
-               id.setAccessible(true);
-               try {
-                    return id.get(object);
-               } catch (IllegalArgumentException | IllegalAccessException e) {
-                    log.error(e.getMessage(), e);
-               }
-          }
-          return null;
-     }
+	private AdvancedDatastore datastore() {
+
+		Morphia morphia = new Morphia();
+
+		if (this.client == null) {
+			this.createMongoClient();
+		}
+
+		return (AdvancedDatastore) morphia.createDatastore(this.client, this.databaseName);
+	}
+
+	private <T> Object getValueId(T object) {
+
+		Field id = Arrays.stream(object.getClass().getDeclaredFields())
+				.filter(field -> field.getAnnotation(Id.class) != null).findFirst().orElse(null);
+		if (id != null) {
+			id.setAccessible(true);
+			try {
+				return id.get(object);
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+				log.error(e.getMessage(), e);
+			}
+		}
+		return null;
+	}
 
 }

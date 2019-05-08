@@ -93,7 +93,7 @@ public class TraceFilter implements Filter {
 		} catch (Exception e) {
 
 			log.error("Error {} during request {} exception {}", e.getMessage(),((HttpServletRequest) request).getRequestURL(), e.getStackTrace());
-			trace.setStackTrace(new StackTraceImpl(e.getClass().getName(), e.getMessage(), ExceptionUtils.getStackTrace(e)));
+			if (trace != null) trace.setStackTrace(new StackTraceImpl(e.getClass().getName(), e.getMessage(), ExceptionUtils.getStackTrace(e)));
 			throw e;
 		} finally {
 

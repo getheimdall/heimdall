@@ -91,23 +91,23 @@ public class TraceService {
 
         Page<LogTraceDTO> p = new Page<>();
 
-        p.first = page.first;
-        p.hasContent = page.hasContent;
-        p.hasNextPage = page.hasNextPage;
-        p.hasPreviousPage = page.hasPreviousPage;
-        p.last = page.last;
-        p.nextPage = page.nextPage;
-        p.number = page.number;
-        p.numberOfElements = page.numberOfElements;
-        p.previousPage = page.previousPage;
-        p.totalElements = page.totalElements;
-        p.totalPages = page.totalPages;
+        p.setFirst(page.isFirst());
+        p.setHasContent(page.isHasContent());
+        p.setHasNextPage(page.isHasNextPage());
+        p.setHasPreviousPage(page.isHasPreviousPage());
+        p.setLast(page.isLast());
+        p.setNextPage(page.getNextPage());
+        p.setNumber(page.getNumber());
+        p.setNumberOfElements(page.getNumberOfElements());
+        p.setPreviousPage(page.getPreviousPage());
+        p.setTotalElements(page.getTotalElements());
+        p.setTotalPages(page.getTotalPages());;
 
         List<LogTraceDTO> logTraces = new ArrayList<>();
 
-	    page.content.forEach(logTrace -> logTraces.add(new LogTraceDTO(logTrace)));
+	    page.getContent().forEach(logTrace -> logTraces.add(new LogTraceDTO(logTrace)));
 
-	    p.content = logTraces;
+	    p.setContent(logTraces);
 
 	    return p;
     }

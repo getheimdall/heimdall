@@ -74,8 +74,6 @@ public class HelperImpl implements Helper {
 	private DB db(String databaseName, DBType type) {
 
 		switch (type) {
-		case MONGODB:
-			return new DBMongoImpl(databaseName, mongoClient);
 		default:
 			return new DBMongoImpl(databaseName, mongoClient);
 		}

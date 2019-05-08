@@ -29,10 +29,10 @@ import lombok.Data;
 @Data
 public class StackTrace {
 
-    public String clazz;
+    private String clazz;
 
-    public String message;
+    private String message;
 
-    public String stack;
+    private String stack;
 
 }

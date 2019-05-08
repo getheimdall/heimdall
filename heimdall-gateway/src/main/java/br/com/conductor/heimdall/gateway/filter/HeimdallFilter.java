@@ -51,10 +51,10 @@ public abstract class HeimdallFilter extends ZuulFilter {
           
           RequestContext ctx = RequestContext.getCurrentContext();
           if (ctx == null || ctx.getRequest() == null) {
-               should =  false;
+               should = false;
           }
           
-          if (!ctx.sendZuulResponse()) {
+          if (ctx != null && !ctx.sendZuulResponse()) {
                return false;
           }
           
