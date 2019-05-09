@@ -4,7 +4,7 @@
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -19,11 +19,13 @@
  */
 package br.com.conductor.heimdall.gateway.filter;
 
-import br.com.conductor.heimdall.core.exception.ExceptionMessage;
-import br.com.conductor.heimdall.core.exception.HeimdallException;
-import com.netflix.zuul.context.RequestContext;
-import com.netflix.zuul.exception.ZuulException;
-import lombok.extern.slf4j.Slf4j;
+import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.json.JSONObject;
 import org.springframework.cloud.netflix.zuul.filters.post.SendErrorFilter;
 import org.springframework.cloud.netflix.zuul.util.ZuulRuntimeException;
@@ -32,11 +34,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.time.LocalDateTime;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import com.netflix.zuul.context.RequestContext;
+import com.netflix.zuul.exception.ZuulException;
+
+import br.com.conductor.heimdall.core.exception.ExceptionMessage;
+import br.com.conductor.heimdall.core.exception.HeimdallException;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CustomSendErrorFilter extends SendErrorFilter {
@@ -45,7 +48,7 @@ public class CustomSendErrorFilter extends SendErrorFilter {
 	public Object run() {
 		try {
 			RequestContext ctx = RequestContext.getCurrentContext();
-			ZuulException exception = findZuulException(ctx.getThrowable());
+			ZuulException exception = getZuulException(ctx.getThrowable());
 
 			HttpServletRequest request = ctx.getRequest();
 
@@ -95,8 +98,7 @@ public class CustomSendErrorFilter extends SendErrorFilter {
 		return null;
 	}
 
-	
-	public ZuulException findZuulException(Throwable throwable) {
+	public ZuulException getZuulException(Throwable throwable) {
 
 		if (throwable.getCause() instanceof ZuulRuntimeException) {
 			// this was a failure initiated by one of the local filters
