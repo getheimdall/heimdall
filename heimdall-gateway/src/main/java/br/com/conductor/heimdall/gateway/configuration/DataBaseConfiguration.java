@@ -4,7 +4,7 @@
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -19,12 +19,12 @@
  */
 package br.com.conductor.heimdall.gateway.configuration;
 
-import br.com.conductor.heimdall.core.environment.Property;
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-import liquibase.integration.spring.SpringLiquibase;
-import lombok.Cleanup;
-import lombok.extern.slf4j.Slf4j;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,10 +35,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 
-import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
+import br.com.conductor.heimdall.core.environment.Property;
+import liquibase.integration.spring.SpringLiquibase;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This class is responsible for managing the database connection.
@@ -59,8 +61,6 @@ public class DataBaseConfiguration implements EnvironmentAware {
      private String database;
 
      private RelaxedPropertyResolver liquiBasePropertyResolver;
-     
-     private SpringLiquibase liquibase;
      
      @Override
      public void setEnvironment(Environment environment) {
@@ -131,22 +131,22 @@ public class DataBaseConfiguration implements EnvironmentAware {
       * @param dataSource		The {@link DataSource} that will be used to create the {@link SpringLiquibase} instance
       * @return					The {@link SpringLiquibase} instance created
       */
-     @Bean
-     public SpringLiquibase liquibase(@Qualifier("dataSource") DataSource dataSource) {
+	@Bean
+	public SpringLiquibase liquibase(@Qualifier("dataSource") DataSource dataSource) {
 
-          liquibase = new SpringLiquibase();
-          liquibase.setDataSource(dataSource);
-          liquibase.setChangeLog("classpath:liquibase/master.xml");
-          liquibase.setContexts(liquiBasePropertyResolver.getProperty("context"));
-          liquibase.setShouldRun(property.getDatasource().isRunLiquibase());
+		SpringLiquibase liquibase = new SpringLiquibase();
+		liquibase.setDataSource(dataSource);
+		liquibase.setChangeLog("classpath:liquibase/master.xml");
+		liquibase.setContexts(liquiBasePropertyResolver.getProperty("context"));
+		liquibase.setShouldRun(property.getDatasource().isRunLiquibase());
 
-          releaseLiquibaseLocks(dataSource);
-          clearLiquibaseCheckSums(dataSource);
+		releaseLiquibaseLocks(dataSource);
+		clearLiquibaseCheckSums(dataSource);
 
-          log.debug("Configuring Liquibase and versioning the database ... Please wait!");
+		log.debug("Configuring Liquibase and versioning the database ... Please wait!");
 
-          return liquibase;
-     }
+		return liquibase;
+	}
 
      /**
       * Release all Liquibase locks from a {@link DataSource}.
@@ -155,15 +155,10 @@ public class DataBaseConfiguration implements EnvironmentAware {
       */
      public void releaseLiquibaseLocks(DataSource ds) {
 
-          try {
+          try (Connection con = ds.getConnection(); Statement st = con.createStatement()) {
 
                log.info("Releasing Liquibase Locks");
 
-               @Cleanup
-               Connection con = ds.getConnection();
-
-               @Cleanup
-               Statement st = con.createStatement();
                st.executeUpdate("DELETE FROM DATABASECHANGELOGLOCK");
 
                con.commit();
@@ -180,15 +175,10 @@ public class DataBaseConfiguration implements EnvironmentAware {
       */
      public void clearLiquibaseCheckSums(DataSource ds) {
 
-          try {
+    	 try (Connection con = ds.getConnection(); Statement st = con.createStatement()) {
 
                log.info("Clear Liquibase ChecksSums");
 
-               @Cleanup
-               Connection con = ds.getConnection();
-
-               @Cleanup
-               Statement st = con.createStatement();
                st.executeUpdate("UPDATE DATABASECHANGELOG SET MD5SUM=NULL");
 
                con.commit();

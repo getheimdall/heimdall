@@ -4,7 +4,7 @@
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -35,12 +35,12 @@ import lombok.Data;
 @AllArgsConstructor
 public class StackTraceImpl implements StackTrace {
 
-     public String clazz;
+     private String clazz;
 
-     public String message;
+     private String message;
 
      @JsonInclude(JsonInclude.Include.NON_NULL)
-     public String stack;
+     private String stack;
 
      public StackTraceImpl(String clazz, String message) {
           this(clazz, message, null);

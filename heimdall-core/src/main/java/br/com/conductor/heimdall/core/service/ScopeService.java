@@ -4,7 +4,7 @@
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -82,6 +82,7 @@ public class ScopeService {
      * @param pageableDTO The {@link PageableDTO}
      * @return The paged {@link Scope} list as a {@link ScopePage} object
      */
+    @Transactional(readOnly = true)
     public ScopePage list(final Long apiId, final ScopeDTO scopeDTO, final PageableDTO pageableDTO) {
 
         Api api = apiService.find(apiId);
@@ -104,6 +105,7 @@ public class ScopeService {
      * @param scopeDTO The {@link ScopeDTO}
      * @return The List of {@link Scope}
      */
+    @Transactional(readOnly = true)
     public List<Scope> list(final Long apiId, final ScopeDTO scopeDTO) {
 
         Api api = apiService.find(apiId);
@@ -183,6 +185,7 @@ public class ScopeService {
      * @param scope   The {@link Scope}
      * @return The updated {@link Scope}
      */
+    @Transactional
     public Scope update(final Long apiId, final Long scopeId, Scope scope) {
 
         Api api = apiService.find(apiId);
