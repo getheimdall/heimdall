@@ -130,7 +130,7 @@ class AccessTokenForm extends Component {
                                 {
                                     getFieldDecorator('plans', {
                                         initialValue: accessToken && accessToken.plans.map(plan => plan.id)
-                                    })(<Checkbox.Group className='checkbox-conductor'>
+                                    })(<Checkbox.Group className='checkbox-conductor checkbox-conductor-plans'>
                                         {plans && plans.map((plan, index) => {
                                             return <Checkbox key={index} value={plan.id}
                                                              disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_ACCESSTOKEN, privileges.PRIVILEGE_UPDATE_ACCESSTOKEN])}>{plan.name}</Checkbox>

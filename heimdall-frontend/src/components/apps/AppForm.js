@@ -158,7 +158,7 @@ class AppForm extends Component {
                                     {
                                         getFieldDecorator('plans', {
                                             initialValue: app && app.plans.map(plan => plan.id)
-                                        })(<Checkbox.Group className='checkbox-conductor'>
+                                        })(<Checkbox.Group className='checkbox-conductor checkbox-conductor-plans'>
                                             {this.props.plans && this.props.plans.content.map((plan, index) => {
                                                 return <Checkbox key={index} value={plan.id}
                                                                  disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_APP, privileges.PRIVILEGE_UPDATE_APP])}>{plan.name}</Checkbox>

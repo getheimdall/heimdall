@@ -100,7 +100,7 @@ class NewApiOverview extends Component {
                                     {
                                         getFieldDecorator('environments', {
                                             rules: [{ required: true, message: i18n.t('please_select_an_environment') }]
-                                        })(<Checkbox.Group className='checkbox-conductor' options={this.props.environments} />)
+                                        })(<Checkbox.Group className='checkbox-conductor checkbox-conductor-environments' options={this.props.environments} />)
                                     }
                                 </FormItem>
                             </Col>
