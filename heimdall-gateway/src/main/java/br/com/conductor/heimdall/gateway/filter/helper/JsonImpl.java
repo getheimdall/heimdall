@@ -4,7 +4,7 @@
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -199,8 +199,7 @@ public class JsonImpl implements Json {
 
 	public boolean isJson(String string) {
 
-		try {
-			JsonParser parser = new ObjectMapper().getFactory().createParser(string);
+		try (JsonParser parser = new ObjectMapper().getFactory().createParser(string)) {
 
 			while (parser.nextToken() != null) {}
 

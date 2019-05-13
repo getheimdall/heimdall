@@ -1,13 +1,10 @@
-
-package br.com.conductor.heimdall.middleware.util.helpermock.call;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-middleware-spec
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -20,6 +17,7 @@ package br.com.conductor.heimdall.middleware.util.helpermock.call;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.middleware.util.helpermock.call;
 
 import br.com.conductor.heimdall.middleware.spec.Header;
 import br.com.conductor.heimdall.middleware.spec.Query;
@@ -100,7 +98,7 @@ public class RequestMock implements Request {
 
     @Override
     public void setSendResponse(boolean value) {
-        boolean sendResponse = value;
+        //do nothing on Mock
     }
 
     /**

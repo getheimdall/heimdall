@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.service;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -156,6 +156,7 @@ public class OperationService {
       * @param apiId The {@link Api} Id
       * @return The complete list of all {@link Operation} from the {@link Api}
       */
+     @Transactional(readOnly = true)
      public List<Operation> list(final Long apiId) {
           final Api api = apiService.find(apiId);
 

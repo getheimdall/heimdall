@@ -4,7 +4,7 @@
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -34,6 +34,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
@@ -62,7 +63,7 @@ public class HeimdallErrorController implements ErrorController {
       * @param request		The {@link HttpServletRequest}
       * @return				{@link ResponseEntity}
       */
-     @RequestMapping(value = "${error.path:/error}", produces = MediaType.APPLICATION_JSON_VALUE)
+     @RequestMapping(value = "${error.path:/error}", produces = MediaType.APPLICATION_JSON_VALUE, method=RequestMethod.GET)
      public @ResponseBody ResponseEntity<Map<String, Object>> error(HttpServletRequest request) {
           Map<String, Object> errorAttributes = new LinkedHashMap<String, Object>();
           errorAttributes.put("timestamp", LocalDateTime.now());
