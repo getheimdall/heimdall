@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.util;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -33,8 +33,6 @@ public class ConstantsInterceptors {
 
      public static final String GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND = "Could not find a required %s or it is not valid";
 
-     public static final String GLOBAL_MOCK_INTERCEPTOR_LOCALIZED = "Localized mock interceptor";
-     
      public static final String GLOBAL_ACCESS_NOT_ALLOWED_API = "Access not allowed for this API";
 
      public static final String IDENTIFIER_ID = "identifier_id";

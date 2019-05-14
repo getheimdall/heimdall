@@ -1,12 +1,10 @@
-package br.com.conductor.heimdall.gateway.util;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -19,8 +17,12 @@ package br.com.conductor.heimdall.gateway.util;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.util;
 
 import com.netflix.zuul.FilterLoader;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +41,7 @@ import java.util.Set;
  * @author Marcelo Aguiar Rodrigues
  * @see com.netflix.zuul.FilterFileManager
  */
+@Slf4j
 public class HeimdallFilterFileManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(HeimdallFilterFileManager.class);
@@ -96,7 +99,7 @@ public class HeimdallFilterFileManager {
                         sleep(pollingIntervalSeconds * 1000);
                         manageFiles();
                     } catch (Exception e) {
-                        e.printStackTrace();
+                    	log.error(e.getMessage(), e);
                     }
                 }
             }

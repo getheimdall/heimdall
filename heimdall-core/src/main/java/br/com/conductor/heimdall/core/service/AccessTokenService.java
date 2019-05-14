@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.service;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -26,8 +26,6 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ACCESS_T
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.APP_NOT_EXIST;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.SOME_PLAN_NOT_PRESENT_IN_APP;
-import static br.com.twsoftware.alfred.object.Objeto.isBlank;
-import static br.com.twsoftware.alfred.object.Objeto.notBlank;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,7 +57,6 @@ import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.repository.PlanRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 import br.com.conductor.heimdall.core.util.Pageable;
-import br.com.twsoftware.alfred.object.Objeto;
 import net.bytebuddy.utility.RandomString;
 
 /**
@@ -96,7 +93,7 @@ public class AccessTokenService {
      public AccessToken find(Long id) {
 
           AccessToken accessToken = accessTokenRepository.findOne(id);
-          HeimdallException.checkThrow(isBlank(accessToken), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(accessToken == null, GLOBAL_RESOURCE_NOT_FOUND);
 
           return accessToken;
      }
@@ -154,14 +151,14 @@ public class AccessTokenService {
           AccessToken accessToken = GenericConverter.mapper(accessTokenPersist, AccessToken.class);
 
           App appRecover = appRespository.findOne(accessTokenPersist.getApp().getId());
-          HeimdallException.checkThrow(isBlank(appRecover), APP_NOT_EXIST);
+          HeimdallException.checkThrow(appRecover == null, APP_NOT_EXIST);
           HeimdallException.checkThrow(!verifyIfPlansContainsInApp(appRecover, accessTokenPersist.getPlans()), SOME_PLAN_NOT_PRESENT_IN_APP);
 
-          AccessToken existAccessToken = null;
-          if (notBlank(accessToken.getCode())) {
+          AccessToken existAccessToken;
+          if (accessToken.getCode() != null) {
 
                existAccessToken = accessTokenRepository.findByCode(accessToken.getCode());
-               HeimdallException.checkThrow(notBlank(existAccessToken), ACCESS_TOKEN_ALREADY_EXISTS);
+               HeimdallException.checkThrow(existAccessToken != null, ACCESS_TOKEN_ALREADY_EXISTS);
           } else {
 
                RandomString randomString = new RandomString(12);
@@ -190,10 +187,10 @@ public class AccessTokenService {
      public AccessToken update(Long id, AccessTokenPersist accessTokenPersist) {
 
           AccessToken accessToken = accessTokenRepository.findOne(id);
-          HeimdallException.checkThrow(isBlank(accessToken), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(accessToken == null, GLOBAL_RESOURCE_NOT_FOUND);
 
           App appRecover = appRespository.findOne(accessTokenPersist.getApp().getId());
-          HeimdallException.checkThrow(isBlank(appRecover), APP_NOT_EXIST);
+          HeimdallException.checkThrow(appRecover == null, APP_NOT_EXIST);
           HeimdallException.checkThrow(!verifyIfPlansContainsInApp(appRecover, accessTokenPersist.getPlans()), SOME_PLAN_NOT_PRESENT_IN_APP);
 
           accessToken = GenericConverter.mapper(accessTokenPersist, accessToken);
@@ -213,7 +210,7 @@ public class AccessTokenService {
      public void delete(Long id) {
 
           AccessToken accessToken = accessTokenRepository.findOne(id);
-          HeimdallException.checkThrow(isBlank(accessToken), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(accessToken == null, GLOBAL_RESOURCE_NOT_FOUND);
 
           amqpCacheService.dispatchClean();
 
@@ -230,19 +227,19 @@ public class AccessTokenService {
      public AccessToken save(AccessTokenDTO reqBody) {
 
           AccessToken accessToken = GenericConverter.mapper(reqBody, AccessToken.class);
-          HeimdallException.checkThrow(isBlank(accessToken.getCode()), ACCESS_TOKEN_NOT_DEFINED);
+          HeimdallException.checkThrow(accessToken.getCode() == null, ACCESS_TOKEN_NOT_DEFINED);
 
           App app = appService.save(reqBody.getApp());
 
-          AccessToken existAccessToken = null;
+          AccessToken existAccessToken;
 
           existAccessToken = accessTokenRepository.findByCode(accessToken.getCode());
-          HeimdallException.checkThrow(notBlank(existAccessToken), ACCESS_TOKEN_ALREADY_EXISTS);
+          HeimdallException.checkThrow(existAccessToken != null, ACCESS_TOKEN_ALREADY_EXISTS);
 
           accessToken.setApp(app);
 
-          Plan plan = planRepository.findOne(1l);
-          if (Objeto.notBlank(plan)) {
+          Plan plan = planRepository.findOne(1L);
+          if (plan != null) {
 
                accessToken.setPlans(new ArrayList<>(Collections.singletonList(plan)));
           }

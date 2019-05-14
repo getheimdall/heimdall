@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.util;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -35,14 +35,11 @@ public class ConstantsTag {
      public static final String TAG_MIDDLEWARES = "Middlewares";
      public static final String TAG_APPS = "Apps";
      public static final String TAG_DEVELOPERS = "Developers";
-     public static final String TAG_HTTP_METHODS = "Http Methods";
      public static final String TAG_PLANS = "Plans";
      public static final String TAG_RESOURCES = "Resources";
      public static final String TAG_OPERATIONS = "Operations";
      public static final String TAG_ACCESS_TOKENS = "AccessTokens";
      public static final String TAG_INTERCEPTORS = "Interceptors";
-     public static final String TAG_INTERCEPTORS_PLANS = "Plans Interceptors";
-     public static final String TAG_INTERCEPTORS_RESOURCES = "Resources Interceptors";
      public static final String TAG_ENVIRONMENTS = "Environments";
      public static final String TAG_CACHES = "Caches";     
      public static final String TAG_USERS = "Users";

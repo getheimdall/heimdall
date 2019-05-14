@@ -6,7 +6,7 @@ package br.com.conductor.heimdall.core.interceptor.impl;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -51,7 +51,7 @@ public class ClientIdHeimdallInterceptor implements HeimdallInterceptor {
             return JsonUtils.convertJsonToObject(content, AccessTokenClientIdDTO.class);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(TypeInterceptor.ACCESS_TOKEN.name(), TemplateUtils.TEMPLATE_ACCESS_TOKEN);
+            ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(TypeInterceptor.CLIENT_ID.name(), TemplateUtils.TEMPLATE_CLIENT_ID);
         }
 
         return null;

@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.service;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -22,7 +22,6 @@ package br.com.conductor.heimdall.core.service;
  */
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
-import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,6 +37,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.collect.Lists;
+
+//import br.com.conductor.heimdall.core.converter.AppMap;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.AppDTO;
 import br.com.conductor.heimdall.core.dto.PageDTO;
@@ -55,7 +57,6 @@ import br.com.conductor.heimdall.core.repository.DeveloperRepository;
 import br.com.conductor.heimdall.core.repository.PlanRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 import br.com.conductor.heimdall.core.util.Pageable;
-import br.com.twsoftware.alfred.object.Objeto;
 import net.bytebuddy.utility.RandomString;
 
 /**
@@ -92,7 +93,7 @@ public class AppService {
      public App find(Long id) {
 
           App app = appRepository.findOne(id);
-          HeimdallException.checkThrow(isBlank(app), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(app == null, GLOBAL_RESOURCE_NOT_FOUND);
           app.setAccessTokens(accessTokenRepository.findByAppId(app.getId()));
 
           return app;
@@ -147,7 +148,7 @@ public class AppService {
       */
      public App save(AppPersist appDTO) {
 
-          if (Objeto.notBlank(appDTO.getClientId())) {
+          if (appDTO.getClientId() != null) {
                App app = appRepository.findByClientId(appDTO.getClientId());
                HeimdallException.checkThrow(Objects.nonNull(app), CLIENT_ID_ALREADY);
           } else {
@@ -164,7 +165,7 @@ public class AppService {
           App app = GenericConverter.mapper(appDTO, App.class);
 
           Developer dev = devRepository.findOne(app.getDeveloper().getId());
-          HeimdallException.checkThrow(isBlank(dev), DEVELOPER_NOT_EXIST);
+          HeimdallException.checkThrow(dev == null, DEVELOPER_NOT_EXIST);
 
           amqpCacheService.dispatchClean();
 
@@ -183,7 +184,7 @@ public class AppService {
      public App update(Long id, AppDTO appDTO) {
 
           App app = appRepository.findOne(id);
-          HeimdallException.checkThrow(isBlank(app), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(app == null, GLOBAL_RESOURCE_NOT_FOUND);
           
           app.setAccessTokens(accessTokenRepository.findByAppId(app.getId()));
           app = GenericConverter.mapper(appDTO, app);
@@ -203,7 +204,7 @@ public class AppService {
      public void delete(Long id) {
 
           App app = appRepository.findOne(id);
-          HeimdallException.checkThrow(isBlank(app), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(app == null, GLOBAL_RESOURCE_NOT_FOUND);
 
           amqpCacheService.dispatchClean();
 
@@ -222,9 +223,9 @@ public class AppService {
           App app = appRepository.findByClientId(reqBody.getCode());
 
           Developer dev = devRepository.findByEmail(reqBody.getDeveloper());
-          HeimdallException.checkThrow(isBlank(dev), DEVELOPER_NOT_EXIST);
+          HeimdallException.checkThrow(dev == null, DEVELOPER_NOT_EXIST);
 
-          if (isBlank(app)) {
+          if (app == null) {
 
                app = new App();
 
@@ -242,7 +243,7 @@ public class AppService {
           if (app.getPlans() != null && app.getPlans().isEmpty()) {
 
                Plan plan = planRepository.findOne(1L);
-               if (Objeto.notBlank(plan)) {
+               if (plan != null) {
                     app.setPlans(new ArrayList<>(Collections.singletonList(plan)));
                }
           }

@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.dto;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -47,4 +47,7 @@ public class PageableDTO implements Serializable {
      @Max(100)
      private Integer limit;
 
+     public boolean isEmpty() {
+          return this.offset == null && this.limit == null;
+     }
 }
