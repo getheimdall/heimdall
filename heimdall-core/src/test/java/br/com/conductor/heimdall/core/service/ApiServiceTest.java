@@ -20,8 +20,6 @@ package br.com.conductor.heimdall.core.service;
  * ==========================LICENSE_END===================================
  */
 
-import static org.junit.Assert.assertEquals;
-
 import br.com.conductor.heimdall.core.dto.ApiDTO;
 import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
 import br.com.conductor.heimdall.core.entity.Api;
@@ -31,7 +29,6 @@ import br.com.conductor.heimdall.core.exception.BadRequestException;
 import br.com.conductor.heimdall.core.repository.ApiRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -43,6 +40,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
