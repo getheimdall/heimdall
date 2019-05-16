@@ -101,6 +101,7 @@ public class App implements Serializable {
         status = (status == null) ? Status.ACTIVE : status;
 
         creationDate = LocalDateTime.now();
+        clientId = clientId.trim();
     }
 
 

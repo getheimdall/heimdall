@@ -51,6 +51,15 @@ class AppForm extends Component {
         callback(i18n.t('you_need_select_developer'));
     }
 
+    checkClientId = (rule, value, callback) => {
+
+        if (value && value !== value.trim()) {
+            callback(i18n.t('please_check_client_id_spacing'))
+        }
+        callback()
+        return
+    }
+
     render() {
         const {getFieldDecorator} = this.props.form
 
@@ -108,7 +117,8 @@ class AppForm extends Component {
                                     getFieldDecorator('clientId', {
                                         initialValue: app && app.clientId,
                                         rules: [
-                                            {min: 6, message: i18n.t('min_6_characters_to_client_id')}
+                                            {min: 6, message: i18n.t('min_6_characters_to_client_id')},
+                                            {validator: this.checkClientId}
                                         ]
                                     })(<Input
                                         disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_APP, privileges.PRIVILEGE_UPDATE_APP])}/>)
@@ -157,7 +167,10 @@ class AppForm extends Component {
                                 <FormItem label={i18n.t('plans')}>
                                     {
                                         getFieldDecorator('plans', {
-                                            initialValue: app && app.plans.map(plan => plan.id)
+                                            initialValue: app && app.plans.map(plan => plan.id),
+                                            rules: [
+                                                {required: true, message: i18n.t('please_pick_plan')}
+                                            ]
                                         })(<Checkbox.Group className='checkbox-conductor'>
                                             {this.props.plans && this.props.plans.content.map((plan, index) => {
                                                 return <Checkbox key={index} value={plan.id}
