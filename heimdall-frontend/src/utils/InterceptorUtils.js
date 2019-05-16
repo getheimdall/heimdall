@@ -13,22 +13,37 @@ import Identifier from '../components/interceptors/wrappers/Identifier'
 import LogMasker from '../components/interceptors/wrappers/LogMasker'
 import { InterceptorContent } from './InterceptorContentUtils'
 
-export const TEMPLATES = (form, content) => ({
-    ACCESS_TOKEN: <AccessToken form={form} content={content}/>,
-    CLIENT_ID: <ClientId form={form} content={content} />,
-    MOCK: <Mock form={form} content={content} />,
-    RATTING: <Ratting form={form} content={content} />,
-    BLACKLIST: <Ips form={form} content={content} />,
-    WHITELIST: <Ips form={form} content={content} />,
-    CACHE: <Cache form={form} content={content} />,
-    CACHE_CLEAR: <CacheClear form={form} content={content} />,
-    CORS: <Cors form={form} content={content} />,
-    CUSTOM: <Default form={form} content={content}/>,
-    LOG_MASKER: <LogMasker form={form} content={content}/>,
-    OAUTH: <OAuth form={form} content={content}/>,
-    IDENTIFIER: <Identifier form={form} content={content}/>,
-    MIDDLEWARE: <Default form={form} content={content}/>,
+export const TEMPLATES = (form, content, type) => ({
+    ACCESS_TOKEN: <AccessToken form={form} content={parseContentByType(content, type)}/>,
+    CLIENT_ID: <ClientId form={form} content={parseContentByType(content, type)} />,
+    MOCK: <Mock form={form} content={parseContentByType(content, type)} />,
+    RATTING: <Ratting form={form} content={parseContentByType(content, type)} />,
+    BLACKLIST: <Ips form={form} content={parseContentByType(content, type)} />,
+    WHITELIST: <Ips form={form} content={parseContentByType(content, type)} />,
+    CACHE: <Cache form={form} content={parseContentByType(content, type)} />,
+    CACHE_CLEAR: <CacheClear form={form} content={parseContentByType(content, type)} />,
+    CORS: <Cors form={form} content={parseContentByType(content, type)} />,
+    CUSTOM: <Default form={form} content={parseContentByType(content, type)}/>,
+    LOG_MASKER: <LogMasker form={form} content={parseContentByType(content, type)}/>,
+    OAUTH: <OAuth form={form} content={parseContentByType(content, type)}/>,
+    IDENTIFIER: <Identifier form={form} content={parseContentByType(content, type)}/>,
+    MIDDLEWARE: <Default form={form} content={parseContentByType(content, type)}/>,
 })
+
+const parseContentByType = (content, type) => {
+
+    if (!content) {
+        return content
+    }
+
+    switch (type) {
+        case 'MIDDLEWARE':
+        case 'CUSTOM':
+            return content
+        default:
+            return JSON.parse(content)
+    }
+}
 
 export const CONTENTS = (content, type) => {
 
