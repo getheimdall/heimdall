@@ -1,5 +1,3 @@
-package br.com.conductor.heimdall.core.service;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -20,18 +18,21 @@ package br.com.conductor.heimdall.core.service;
  * ==========================LICENSE_END===================================
  */
 
+
+package br.com.conductor.heimdall.core.service;
+
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.ScopeDTO;
 import br.com.conductor.heimdall.core.dto.page.ScopePage;
-import br.com.conductor.heimdall.core.entity.Api;
-import br.com.conductor.heimdall.core.entity.Operation;
-import br.com.conductor.heimdall.core.entity.Resource;
-import br.com.conductor.heimdall.core.entity.Scope;
+import br.com.conductor.heimdall.core.entity.*;
+import br.com.conductor.heimdall.core.enums.HttpMethod;
 import br.com.conductor.heimdall.core.enums.Status;
+import br.com.conductor.heimdall.core.exception.BadRequestException;
+import br.com.conductor.heimdall.core.exception.NotFoundException;
 import br.com.conductor.heimdall.core.repository.OperationRepository;
 import br.com.conductor.heimdall.core.repository.ScopeRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
-import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
+import br.com.conductor.heimdall.core.util.Pageable;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,194 +42,389 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author <a href="https://github.com/cassioesp" target="_blank">Cássio Espíndola/a>
- */
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ **/
 @RunWith(MockitoJUnitRunner.class)
 public class ScopeServiceTest {
 
-     @InjectMocks
-     private ScopeService scopeService;
+    @InjectMocks
+    private ScopeService scopeService;
 
-     @Mock
-     private ApiService apiService;
+    @Mock
+    private ScopeRepository scopeRepository;
 
-     @Mock
-     private ScopeRepository scopeRepository;
+    @Mock
+    private ApiService apiService;
 
-     @Mock
-     private OperationRepository operationRepository;
+    @Mock
+    private OperationRepository operationRepository;
 
-     @Mock
-     private AMQPRouteService amqpRoute;
+    @Mock
+    private AMQPCacheService amqpCacheService;
 
-     @Mock
-     private AMQPCacheService amqpCacheService;
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
-     @Rule
-     public ExpectedException thrown = ExpectedException.none();
+    private Scope scope;
 
-     private ScopeDTO scopeDTO;
+    private Operation operation;
+    private Operation operation2;
+    private Operation operation3;
 
-     private Scope scope;
+    @Before
+    public void before() {
 
-     private Api api;
+        Api api = new Api();
+        api.setId(1L);
+        api.setBasePath("/api");
+        api.setStatus(Status.ACTIVE);
 
-     private Set<Operation> operations;
+        List<Plan> plans = new ArrayList<>();
 
-     private Operation operation;
+        Plan plan = new Plan();
+        plan.setName("plan");
+        plan.setDefaultPlan(true);
+        plan.setApi(api);
+        plans.add(plan);
 
-     private Operation operation2;
+        api.setPlans(plans);
 
-     private Resource resource;
+        Resource resource = new Resource();
+        resource.setId(1L);
+        resource.setApi(api);
+        resource.setName("resource");
 
-     @Before
-     public void initAttributes() {
+        operation = new Operation();
+        operation.setId(1L);
+        operation.setResource(resource);
+        operation.setPath("/operation-1");
+        operation.setMethod(HttpMethod.GET);
 
-          api = new Api();
-          api.setId(1L);
-          api.setBasePath("/test");
-          api.setName("test");
-          api.setDescription("test");
-          api.setVersion("1.0.0");
-          api.setStatus(Status.ACTIVE);
+        operation2 = new Operation();
+        operation2.setId(2L);
+        operation2.setResource(resource);
+        operation2.setPath("/operation-2");
+        operation2.setMethod(HttpMethod.POST);
 
-          scope = new Scope();
-          scope.setId(1L);
-          scope.setName("My Plan");
-          scope.setDescription("My Plan Description");
-          operations = new HashSet<>();
-          operation = new Operation();
-          resource = new Resource();
-          resource.setId(1L);
-          resource.setApi(api);
-          operation.setId(1L);
-          operation.setResource(resource);
-          operation2 = new Operation();
-          operation2.setId(2L);
-          operation2.setResource(resource);
-          operations.add(operation);
-          operations.add(operation2);
-          scope.setOperations(operations);
-          scope.setApi(api);
+        operation3 = new Operation();
+        operation3.setId(3L);
+        operation3.setResource(resource);
+        operation3.setPath("/operation-3");
+        operation3.setMethod(HttpMethod.GET);
 
-          scopeDTO = new ScopeDTO();
-          scopeDTO.setName("My Plan");
-          scopeDTO.setDescription("My Plan Description");
-     }
+        List<Operation> operations = new ArrayList<>();
+        operations.add(operation);
+        operations.add(operation2);
+        operations.add(operation3);
 
-     @Test
-     public void saveScope() {
+        Set<Operation> operationsSet = new HashSet<>();
+        operationsSet.add(operation);
+        operationsSet.add(operation2);
 
-          Mockito.when(apiService.find(1L)).thenReturn(api);
+        resource.setOperations(operations);
 
-          Mockito.when(scopeRepository.save(Mockito.any(Scope.class))).thenReturn(scope);
-          Mockito.when(operationRepository.findOne(Mockito.anyLong())).thenReturn(operation);
-          Mockito.when(scopeRepository.findByApiIdAndName(Mockito.any(Long.class), Mockito.anyString()))
-                 .thenReturn(null);
+        Set<Resource> resources = new HashSet<>();
+        resources.add(resource);
+        api.setResources(resources);
 
-          Scope saved = scopeService.save(api.getId(), scope);
+        scope = new Scope();
+        scope.setId(1L);
+        scope.setApi(api);
+        scope.setDescription("Scope description");
+        scope.setName("Scope");
+        scope.setOperations(operationsSet);
+    }
 
-          assertEquals(saved.getId(), scope.getId());
-     }
+    @Test
+    public void findTest() {
+        Mockito.when(scopeRepository.findByApiIdAndId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(scope);
+        Scope scopeActual = scopeService.find(this.scope.getApi().getId(), this.scope.getId());
 
-     @Test
-     public void findScope() {
+        assertEquals(scope, scopeActual);
+    }
 
-          Mockito.when(scopeRepository.findOne(Mockito.any(Long.class))).thenReturn(scope);
-          Mockito.when(scopeRepository.findByApiIdAndId(Mockito.anyLong(), Mockito.anyLong()))
-                 .thenReturn(scope);
-          Scope scopeResp = scopeService.find(1L, 1L);
-          assertEquals(scopeResp.getId(), scope.getId());
-          Mockito.verify(this.scopeRepository, Mockito.times(1))
-                 .findByApiIdAndId(Mockito.anyLong(), Mockito.anyLong());
-     }
+    @Test
+    public void findWithNotFoundTest() {
+        thrown.expect(NotFoundException.class);
+        thrown.expectMessage("Resource not found");
 
-     @Test
-     public void listScopes() {
+        Mockito.when(scopeRepository.findByApiIdAndId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(null);
+        Scope scopeActual = scopeService.find(this.scope.getApi().getId(), this.scope.getId());
 
-          this.scope.setName("Scope Name");
+        assertEquals(scope, scopeActual);
+    }
 
-          List<Scope> scopes = new ArrayList<>();
-          scopes.add(scope);
+    @Test
+    public void listTest() {
+        ScopeDTO scopeDTO = new ScopeDTO();
+        scopeDTO.setName("Scope");
+        scopeDTO.setDescription("Scope description");
 
-          Mockito.when(this.scopeRepository.findAll(Mockito.any(Example.class))).thenReturn(scopes);
+        List<Scope> scopesExpected = new ArrayList<>();
+        scopesExpected.add(scope);
 
-          List<Scope> planResp = this.scopeService.list(1L, this.scopeDTO);
+        Mockito.when(apiService.find(Mockito.anyLong())).thenReturn(scope.getApi());
+        Mockito.when(scopeRepository.findAll(Mockito.any(Example.class))).thenReturn(scopesExpected);
 
-          assertEquals(scopes.size(), planResp.size());
-          Mockito.verify(this.scopeRepository, Mockito.times(1)).findAll(Mockito.any(Example.class));
-     }
+        List<Scope> listScopes = scopeService.list(scope.getApi().getId(), scopeDTO);
 
-     @Test
-     public void listScopesWithPageable() {
+        assertEquals(scopesExpected, listScopes);
+    }
 
-          PageableDTO pageableDTO = new PageableDTO();
-          pageableDTO.setLimit(10);
-          pageableDTO.setOffset(0);
+    @Test
+    public void listPageTest() {
+        ScopeDTO scopeDTO = new ScopeDTO();
+        scopeDTO.setName("Scope");
+        scopeDTO.setDescription("Scope description");
+        List<Scope> scopesExpected = new ArrayList<>();
+        scopesExpected.add(scope);
 
-          ArrayList<Scope> listScopes = new ArrayList<>();
+        Page<Scope> scopes = createPageScope(scopesExpected);
 
-          scope.setName("Scope Name");
+        PageableDTO pageableDTO = new PageableDTO();
+        pageableDTO.setLimit(10);
+        pageableDTO.setOffset(0);
 
-          listScopes.add(scope);
+        Mockito.when(apiService.find(Mockito.anyLong())).thenReturn(scope.getApi());
+        Mockito.when(scopeRepository.findAll(Mockito.any(Example.class), Mockito.any(Pageable.class))).thenReturn(scopes);
 
-          Page<Scope> page = new PageImpl<>(listScopes);
+        ScopePage scopePage = scopeService.list(scope.getApi().getId(), scopeDTO, pageableDTO);
 
-          Mockito.when(this.scopeRepository.findAll(Mockito.any(Example.class), Mockito.any(Pageable.class)))
-                 .thenReturn(page);
+        assertEquals(scopes.getContent(), scopePage.getContent());
+    }
 
-          ScopePage scopePageResp = this.scopeService.list(1L, this.scopeDTO, pageableDTO);
+    @Test
+    public void saveTest() {
 
-          assertEquals(1L, scopePageResp.getTotalElements());
-          Mockito.verify(this.scopeRepository, Mockito.times(1))
-                 .findAll(Mockito.any(Example.class), Mockito.any(Pageable.class));
-     }
+        Mockito.when(apiService.find(Mockito.anyLong())).thenReturn(scope.getApi());
+        Mockito.when(scopeRepository.findByApiIdAndName(Mockito.anyLong(), Mockito.anyString())).thenReturn(null);
+        Mockito.when(scopeRepository.save(Mockito.any(Scope.class))).thenReturn(scope);
+        Mockito.when(operationRepository.findOne(1L)).thenReturn(operation);
+        Mockito.when(operationRepository.findOne(2L)).thenReturn(operation2);
+        Mockito.when(operationRepository.findOne(3L)).thenReturn(operation3);
 
-     @Test
-     public void updateScope() {
+        Scope scopeSaved = scopeService.save(scope.getApi().getId(), scope);
 
-          Api api = new Api();
-          api.setId(1L);
-          api.setBasePath("/test");
-          api.setName("test");
-          api.setDescription("test");
-          api.setVersion("1.0.0");
-          api.setStatus(Status.ACTIVE);
-          Mockito.when(apiService.find(1L)).thenReturn(api);
-          Mockito.when(scopeRepository.findOne(Mockito.anyLong())).thenReturn(scope);
-          Mockito.when(scopeRepository.save(Mockito.any(Scope.class))).thenReturn(scope);
-          Mockito.when(scopeRepository.findByApiIdAndId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(scope);
-          Mockito.when(scopeRepository.findByApiIdAndName(Mockito.any(Long.class), Mockito.anyString())).thenReturn(null);
-          Mockito.when(operationRepository.findOne(Mockito.anyLong())).thenReturn(operation);
+        assertEquals(scope, scopeSaved);
+    }
 
-          Scope saved = scopeService.save(1L, scope);
+    @Test
+    public void saveWithApiNotFoundTest() {
 
-          Scope update = scopeService.update(1L, 1L, scope);
+        thrown.expect(NotFoundException.class);
+        thrown.expectMessage("Resource not found");
 
-          assertEquals(update.getId(), scope.getId());
-     }
+        Mockito.when(apiService.find(Mockito.anyLong())).thenReturn(null);
 
-     @Test
-     public void deleteScope() {
+        scopeService.save(scope.getApi().getId(), scope);
+    }
 
-          Mockito.when(scopeRepository.findByApiIdAndId(Mockito.anyLong(), Mockito.anyLong()))
-                 .thenReturn(scope);
-          Mockito.when(scopeRepository.findOne(Mockito.anyLong())).thenReturn(scope);
-          this.scopeService.delete(1L, 1L);
-          Mockito.verify(this.scopeRepository, Mockito.times(1)).delete(scope);
+    @Test
+    public void saveWithNameAlreadyExistTest() {
 
-     }
+        thrown.expect(BadRequestException.class);
+        thrown.expectMessage("A Scope with the provided name already exists");
+
+        Mockito.when(apiService.find(Mockito.anyLong())).thenReturn(scope.getApi());
+        Mockito.when(scopeRepository.findByApiIdAndName(Mockito.anyLong(), Mockito.anyString())).thenReturn(scope);
+
+        scopeService.save(scope.getApi().getId(), scope);
+    }
+
+    @Test
+    public void saveWithoutOperationTest() {
+        thrown.expect(BadRequestException.class);
+        thrown.expectMessage("A Scope must have at least one Operation");
+
+        scope.setOperations(null);
+        Mockito.when(apiService.find(Mockito.anyLong())).thenReturn(scope.getApi());
+        Mockito.when(scopeRepository.findByApiIdAndName(Mockito.anyLong(), Mockito.anyString())).thenReturn(null);
+
+        scopeService.save(scope.getApi().getId(), scope);
+    }
+
+    @Test
+    public void saveWithOperationNullTest() {
+
+        thrown.expect(BadRequestException.class);
+        thrown.expectMessage("Operation with id '1' does not exist");
+
+        Mockito.when(apiService.find(Mockito.anyLong())).thenReturn(scope.getApi());
+        Mockito.when(scopeRepository.findByApiIdAndName(Mockito.anyLong(), Mockito.anyString())).thenReturn(null);
+        Mockito.when(operationRepository.findOne(Mockito.anyLong())).thenReturn(null);
+
+        scopeService.save(scope.getApi().getId(), scope);
+    }
+
+    @Test
+    public void saveWithOperationNotInApi() {
+        thrown.expect(BadRequestException.class);
+        thrown.expectMessage("Operation '1' not in Api '1'");
+
+        Set<Operation> operations = new HashSet<>();
+        Set<Resource> resources = new HashSet<>();
+
+        Resource resource = new Resource();
+        Operation operation = new Operation();
+        operation.setId(1L);
+        operation.setResource(resource);
+
+        resources.add(resource);
+
+        Api api = new Api();
+        api.setId(2L);
+        api.setResources(resources);
+        resource.setApi(api);
+        operations.add(operation);
+        scope.setOperations(operations);
+
+        Mockito.when(apiService.find(Mockito.anyLong())).thenReturn(scope.getApi());
+        Mockito.when(scopeRepository.findByApiIdAndName(Mockito.anyLong(), Mockito.anyString())).thenReturn(null);
+        Mockito.when(operationRepository.findOne(Mockito.anyLong())).thenReturn(operation);
+
+        scopeService.save(scope.getApi().getId(), scope);
+    }
+
+
+    @Test
+    public void deleteTest() {
+
+        Mockito.when(scopeRepository.findByApiIdAndId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(scope);
+
+        scopeService.delete(scope.getApi().getId(), scope.getId());
+
+        Mockito.verify(scopeRepository, Mockito.times(1)).findByApiIdAndId(Mockito.anyLong(), Mockito.anyLong());
+    }
+
+    @Test
+    public void deleteWithNotFoundTest() {
+
+        thrown.expect(NotFoundException.class);
+        thrown.expectMessage("Resource not found");
+        Mockito.when(scopeRepository.findByApiIdAndId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(null);
+        scopeService.delete(scope.getApi().getId(), scope.getId());
+    }
+
+    @Test
+    public void updateTest() {
+
+        Mockito.when(apiService.find(Mockito.anyLong())).thenReturn(scope.getApi());
+        Mockito.when(scopeRepository.findByApiIdAndId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(scope);
+
+        scope.setName("Scope new name");
+        Mockito.when(scopeRepository.save(scope)).thenReturn(scope);
+        Scope updated = scopeService.update(scope.getApi().getId(), scope.getId(), scope);
+
+        assertEquals(scope.getName(), updated.getName());
+    }
+
+    @Test
+    public void updateTestWithNotFoundTest() {
+
+        thrown.expect(NotFoundException.class);
+        thrown.expectMessage("Resource not found");
+
+        Mockito.when(apiService.find(Mockito.anyLong())).thenReturn(scope.getApi());
+        Mockito.when(scopeRepository.findByApiIdAndId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(null);
+
+        scope.setName("Scope new name");
+        Mockito.when(scopeRepository.save(scope)).thenReturn(scope);
+        Scope updated = scopeService.update(scope.getApi().getId(), scope.getId(), scope);
+
+        assertEquals(scope.getName(), updated.getName());
+    }
+
+    private Page<Scope> createPageScope(List<Scope> scopes) {
+        return new Page<Scope>() {
+            @Override
+            public int getTotalPages() {
+                return 1;
+            }
+
+            @Override
+            public long getTotalElements() {
+                return 1;
+            }
+
+            @Override
+            public <S> Page<S> map(Converter<? super Scope, ? extends S> converter) {
+                return null;
+            }
+
+            @Override
+            public int getNumber() {
+                return 0;
+            }
+
+            @Override
+            public int getSize() {
+                return 1;
+            }
+
+            @Override
+            public int getNumberOfElements() {
+                return 1;
+            }
+
+            @Override
+            public List<Scope> getContent() {
+                return scopes;
+            }
+
+            @Override
+            public boolean hasContent() {
+                return true;
+            }
+
+            @Override
+            public Sort getSort() {
+                return null;
+            }
+
+            @Override
+            public boolean isFirst() {
+                return false;
+            }
+
+            @Override
+            public boolean isLast() {
+                return false;
+            }
+
+            @Override
+            public boolean hasNext() {
+                return false;
+            }
+
+            @Override
+            public boolean hasPrevious() {
+                return false;
+            }
+
+            @Override
+            public Pageable nextPageable() {
+                return null;
+            }
+
+            @Override
+            public Pageable previousPageable() {
+                return null;
+            }
+
+            @Override
+            public Iterator<Scope> iterator() {
+                return null;
+            }
+        };
+    }
 }
