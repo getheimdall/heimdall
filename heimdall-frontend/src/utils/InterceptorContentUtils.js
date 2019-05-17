@@ -58,10 +58,6 @@ const logMaskerContent = content => {
 }
 
 const defaultContent = content => {
-    if (content) {
-        return JSON.stringify(content)
-    }
-
     return content
 }
 

@@ -52,11 +52,22 @@ class AccessTokenForm extends Component {
     checkApp = (rule, value, callback) => {
         if (this.props.appSource.some(app => app.id === value)) {
             const app = this.props.appSource.filter(app => app.id === value)[0];
+            if (app.plans === undefined || app.plans.length === 0) {
+                callback(i18n.t('app_plans_invalid'))
+            }
             this.setState({...this.state, plans: app.plans})
             callback();
             return
         }
         callback(i18n.t('you_need_select_app'));
+    }
+
+    checkToken = (rule, value, callback) => {
+        if (value !== value.trim()) {
+            callback(i18n.t('please_check_token_spacing'))
+        }
+        callback()
+        return
     }
 
     render() {
@@ -79,7 +90,8 @@ class AccessTokenForm extends Component {
                                     getFieldDecorator('code', {
                                         initialValue: accessToken && accessToken.code,
                                         rules: [
-                                            {min: 6, message: i18n.t('min_6_characters_to_token')}
+                                            {min: 6, message: i18n.t('min_6_characters_to_token')},
+                                            {validator: this.checkToken}
                                         ]
                                     })(<Input
                                         disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_ACCESSTOKEN, privileges.PRIVILEGE_UPDATE_ACCESSTOKEN])}/>)
@@ -129,7 +141,10 @@ class AccessTokenForm extends Component {
                             <FormItem label={i18n.t('plans')}>
                                 {
                                     getFieldDecorator('plans', {
-                                        initialValue: accessToken && accessToken.plans.map(plan => plan.id)
+                                        initialValue: accessToken && accessToken.plans.map(plan => plan.id),
+                                        rules: [
+                                            {required: true, message: i18n.t('please_pick_plan')}
+                                        ]
                                     })(<Checkbox.Group className='checkbox-conductor'>
                                         {plans && plans.map((plan, index) => {
                                             return <Checkbox key={index} value={plan.id}

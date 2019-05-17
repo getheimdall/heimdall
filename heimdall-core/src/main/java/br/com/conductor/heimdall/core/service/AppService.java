@@ -22,13 +22,17 @@ package br.com.conductor.heimdall.core.service;
  */
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
+import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
+import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
 import br.com.conductor.heimdall.core.dto.persist.AppPersist;
+import br.com.conductor.heimdall.core.entity.AccessToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -37,9 +41,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.Lists;
 
-//import br.com.conductor.heimdall.core.converter.AppMap;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.AppDTO;
 import br.com.conductor.heimdall.core.dto.PageDTO;
@@ -184,7 +186,9 @@ public class AppService {
      public App update(Long id, AppDTO appDTO) {
 
           App app = appRepository.findOne(id);
-          HeimdallException.checkThrow(app == null, GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(isBlank(app), GLOBAL_RESOURCE_NOT_FOUND);
+     
+          updateTokensPlansByApp(id, appDTO.getPlans().stream().map(ReferenceIdDTO::getId).collect(Collectors.toList()));
           
           app.setAccessTokens(accessTokenRepository.findByAppId(app.getId()));
           app = GenericConverter.mapper(appDTO, app);
@@ -193,6 +197,26 @@ public class AppService {
           amqpCacheService.dispatchClean();
           
           return app;
+     }
+     
+     /**
+      * Updates app's access tokens.
+      * This is used for removing the access token to plan association, only if an app removes one of it's plans. 
+      * 
+      * @param appId The ID of the {@link App}
+      * @param plansIds List of {@link Plan}'s IDs 
+      */
+     private void updateTokensPlansByApp(Long appId, List<Long> plansIds) {
+          List<AccessToken> accessTokenList = accessTokenRepository.findByAppId(appId);
+          if (Objects.nonNull(accessTokenList)) {
+               accessTokenList.forEach(accessToken -> {
+                    if (Objects.nonNull(accessToken.getPlans()) && !accessToken.getPlans().isEmpty()) {
+                         List<Plan> planList = accessToken.getPlans().stream().filter(plan -> plansIds.contains(plan.getId())).collect(Collectors.toList());
+                         accessToken.setPlans(planList);
+                         accessTokenRepository.save(accessToken);
+                    }
+               });
+          }
      }
      
      /**

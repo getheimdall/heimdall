@@ -23,6 +23,7 @@ package br.com.conductor.heimdall.core.service;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.DEFAULT_PLAN_ALREADY_EXIST_TO_THIS_API;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.PLAN_ATTACHED_TO_APPS;
 
 import java.util.List;
 
@@ -173,6 +174,9 @@ public class PlanService {
           Plan plan = planRepository.findOne(id);
           HeimdallException.checkThrow(plan == null, GLOBAL_RESOURCE_NOT_FOUND);
           
+          Integer totalAppsAttached = planRepository.findAppsWithPlan(id);
+          HeimdallException.checkThrow(totalAppsAttached > 0, PLAN_ATTACHED_TO_APPS);
+
           planRepository.delete(plan);
 
           amqpCacheService.dispatchClean();

@@ -204,8 +204,8 @@ class InterceptorForm extends Component {
                                 }
                             </FormItem>
                         </Col>
-                        { interceptor && interceptor.content && TEMPLATES(this.props.form, JSON.parse(interceptor.content))[type] }
-                        { (!interceptor || !interceptor.content) && TEMPLATES(this.props.form, undefined )[type] }
+                        { interceptor && interceptor.content && TEMPLATES(this.props.form, interceptor.content, type)[type] }
+                        { (!interceptor || !interceptor.content) && TEMPLATES(this.props.form, undefined, type )[type] }
                     </Row>
                 </Form>
             </Row >
