@@ -312,7 +312,6 @@ export default {
         'param_name': 'Nome do parâmetro',
         'param_value': 'Valor do parâmetro',
         'add_new_param': 'Adicionar novo paramêtro',
-        'default_plan_this_api': 'Plano padrão',
         'app_plans_invalid': 'Planos do App são invalidos!',
         'please_check_token_spacing': 'Por favor, verificar espaçamentos no Token!',
         'please_check_client_id_spacing': 'Por favor, verificar espaçamentos no Client ID!'

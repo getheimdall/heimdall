@@ -312,7 +312,6 @@ export default {
         'param_name': 'Param Name',
         'param_value': 'Param Value',
         'add_new_param': 'Add new param',
-        'default_plan_this_api': 'Default',
         'app_plans_invalid': 'App\'s plans are invalid!',
         'please_check_token_spacing': 'Please check token\'s spacing!',
         'please_check_client_id_spacing': 'Please check Client ID\'s spacing!'   
