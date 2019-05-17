@@ -133,6 +133,8 @@ public class ScopeService {
 
         final Api api = apiService.find(apiId);
 
+        HeimdallException.checkThrow(api == null, GLOBAL_RESOURCE_NOT_FOUND);
+
         final Scope scopeData = scopeRepository.findByApiIdAndName(apiId, scope.getName());
         HeimdallException.checkThrow(scopeData != null, SCOPE_INVALID_NAME);
 
