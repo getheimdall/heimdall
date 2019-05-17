@@ -137,6 +137,9 @@ public class SwaggerService {
     }
 
     private Resource findResourceByTagOrCreate(Tag tag, List<Resource> resources) {
+        if (resources.isEmpty()) {
+            return createResourceByTag(tag);
+        }
         return resources.stream().filter(r -> r.getName().equalsIgnoreCase(tag.getName())).findFirst().orElse(createResourceByTag(tag));
     }
 

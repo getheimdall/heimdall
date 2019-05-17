@@ -22,6 +22,7 @@ package br.com.conductor.heimdall.core.service;
 
 import br.com.conductor.heimdall.core.dto.DeveloperDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
+import br.com.conductor.heimdall.core.dto.page.DeveloperPage;
 import br.com.conductor.heimdall.core.dto.request.DeveloperLogin;
 import br.com.conductor.heimdall.core.entity.Developer;
 import br.com.conductor.heimdall.core.enums.Status;
@@ -37,6 +38,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 
@@ -137,7 +139,6 @@ public class DeveloperServiceTest {
         PageableDTO pageableDTO = new PageableDTO();
         pageableDTO.setLimit(10);
         pageableDTO.setOffset(0);
-
         List<Developer> developers = new ArrayList<>();
         developers.add(developer);
 
@@ -145,6 +146,67 @@ public class DeveloperServiceTest {
 
         Mockito.when(developerRepository.findAll(Mockito.any(), Mockito.any(Pageable.class))).thenReturn(page);
 
-        developerService.list(developerDTO, pageableDTO);
+        DeveloperPage list = developerService.list(developerDTO, pageableDTO);
+
+        List<Developer> content = list.getContent();
+
+        assertEquals(developers, content);
+    }
+
+    @Test
+    public void listArray() {
+        PageableDTO pageableDTO = new PageableDTO();
+        pageableDTO.setLimit(10);
+        pageableDTO.setOffset(0);
+        List<Developer> developers = new ArrayList<>();
+        developers.add(developer);
+
+        Mockito.when(developerRepository.findAll(Mockito.any(Example.class))).thenReturn(developers);
+        List<Developer> developersResult = developerService.list(developerDTO);
+
+        assertEquals(developers, developersResult);
+    }
+
+    @Test
+    public void updateWithSuccess() {
+        developerDTO.setName("Developer Updated");
+        Mockito.when(developerRepository.findOne(developer.getId())).thenReturn(developer);
+        developer.setName("Developer Updated");
+        Mockito.when(developerRepository.save(Mockito.any(Developer.class))).thenReturn(developer);
+
+        Developer updated = developerService.update(developer.getId(), developerDTO);
+
+        assertEquals(developer, updated);
+    }
+
+    @Test
+    public void updateWithDeveloperNotFound() {
+
+        thrown.expect(NotFoundException.class);
+        thrown.expectMessage("Resource not found");
+
+        Mockito.when(developerRepository.findOne(developer.getId())).thenReturn(null);
+
+        developerService.update(developer.getId(), developerDTO);
+    }
+
+    @Test
+    public void deleteWithSuccess() {
+
+        Mockito.when(developerRepository.findOne(Mockito.anyLong())).thenReturn(developer);
+
+        developerService.delete(developer.getId());
+
+        Mockito.verify(developerRepository, Mockito.times(1)).findOne(Mockito.anyLong());
+    }
+
+    @Test
+    public void deleteWithDeveloperNotFound() {
+
+        thrown.expect(NotFoundException.class);
+        thrown.expectMessage("Resource not found");
+
+        Mockito.when(developerRepository.findOne(Mockito.anyLong())).thenReturn(null);
+        developerService.delete(developer.getId());
     }
 }
