@@ -78,5 +78,12 @@ export const remove = planId => dispatch => {
             dispatch(getAllPlans())
             dispatch(sendNotification({ type: 'success', message: i18n.t('plan_removed') }))
         })
+        .catch(error => {
+            if (error.response && error.response.status === 400) {
+                dispatch(sendNotification({ type: 'error', message: i18n.t('error'), description: error.response.data.message }))
+            }
+            dispatch(getAllPlans())
+            dispatch(finishLoading())
+        })
 }
 
