@@ -55,8 +55,11 @@ export const CONTENTS = (content, type) => {
             return InterceptorContent.cacheContent(content)
         case 'LOG_MASKER':
             return InterceptorContent.logMaskerContent(content)
+        case 'MIDDLEWARE':
+        case 'CUSTOM':
+            return InterceptorContent.simpleContent(content)
         default:
-            return InterceptorContent.defaultContent(content)
+            return InterceptorContent.stringifyContent(content)
     }
 }
 

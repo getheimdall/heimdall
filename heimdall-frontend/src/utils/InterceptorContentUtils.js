@@ -57,7 +57,15 @@ const logMaskerContent = content => {
     return content
 }
 
-const defaultContent = content => {
+const stringifyContent = content => {
+    if (content) {
+        return JSON.stringify(content)
+    }
+
+    return content
+}
+
+const simpleContent = content => {
     return content
 }
 
@@ -66,5 +74,6 @@ export const InterceptorContent = {
     cacheContent,
     ipsContent,
     logMaskerContent,
-    defaultContent
+    stringifyContent,
+    simpleContent
 }
