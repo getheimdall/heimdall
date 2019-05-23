@@ -6,7 +6,7 @@ package br.com.conductor.heimdall.core.service;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -31,7 +31,6 @@ import br.com.conductor.heimdall.core.exception.*;
 import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.repository.OAuthAuthorizeRepository;
 import br.com.conductor.heimdall.core.util.JwtUtils;
-import br.com.twsoftware.alfred.object.Objeto;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +71,7 @@ public class OAuthService {
      */
     public TokenOAuth generateTokenOAuth(OAuthRequest oAuthRequest, String clientId, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsObject) throws HeimdallException {
 
-        if (Objeto.isBlank(oAuthRequest.getGrantType())) {
+        if (oAuthRequest.getGrantType() == null) {
             throw new BadRequestException(ExceptionMessage.GRANT_TYPE_NOT_FOUND);
         }
 
@@ -101,7 +100,7 @@ public class OAuthService {
 
                 return tokenOAuth;
             case GRANT_TYPE_REFRESH_TOKEN:
-                if (Objeto.isBlank(oAuthRequest.getRefreshToken())) {
+                if (oAuthRequest.getRefreshToken() == null) {
                     throw new BadRequestException(ExceptionMessage.REFRESH_TOKEN_NOT_FOUND);
                 }
                 //validate token
@@ -218,7 +217,7 @@ public class OAuthService {
      */
     public Provider getProvider(Long providerId) throws ProviderException {
         Provider provider = providerService.findOne(providerId);
-        if (Objeto.isBlank(provider)) {
+        if (provider == null) {
             throw new ProviderException(ExceptionMessage.PROVIDER_NOT_FOUND);
         }
         return provider;
@@ -234,7 +233,7 @@ public class OAuthService {
 
         OAuthAuthorize found = oAuthAuthorizeRepository.findByClientIdAndExpirationDateIsNull(clientId);
 
-        if (Objeto.isBlank(found)) {
+        if (found == null) {
             OAuthAuthorize oAuthAuthorize = new OAuthAuthorize(clientId);
             return this.oAuthAuthorizeRepository.save(oAuthAuthorize).getTokenAuthorize();
         }

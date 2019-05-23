@@ -6,7 +6,7 @@ package br.com.conductor.heimdall.core.dto.persist;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -56,6 +56,8 @@ public class AppPersist implements Serializable {
 
     private Status status;
 
+    @NotNull
+    @Size(min = 1)
     private List<ReferenceIdDTO> plans;
 
     private String clientId;

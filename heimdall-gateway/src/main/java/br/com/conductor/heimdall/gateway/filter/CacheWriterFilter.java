@@ -1,13 +1,10 @@
-
-package br.com.conductor.heimdall.gateway.filter;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -20,6 +17,7 @@ package br.com.conductor.heimdall.gateway.filter;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.filter;
 
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.filter.helper.ApiResponseImpl;
@@ -28,10 +26,9 @@ import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.gateway.util.ResponseHelper;
 import br.com.conductor.heimdall.middleware.spec.ApiResponse;
 import br.com.conductor.heimdall.middleware.spec.Helper;
-import lombok.extern.slf4j.Slf4j;
-
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -42,7 +39,6 @@ import java.util.concurrent.TimeUnit;
 
 import static br.com.conductor.heimdall.core.util.ConstantsCache.CACHE_BUCKET;
 import static br.com.conductor.heimdall.core.util.ConstantsCache.CACHE_TIME_TO_LIVE;
-
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SEND_FORWARD_FILTER_ORDER;
 
@@ -92,9 +88,8 @@ public class CacheWriterFilter extends ZuulFilter {
 
             long duration = (endTime - startTime);
 
-            detail.setName(this.getClass().getSimpleName());
             detail.setTimeInMillisRun(duration);
-            TraceContextHolder.getInstance().getActualTrace().addFilter(detail);
+            TraceContextHolder.getInstance().getActualTrace().addFilter(this.getClass().getSimpleName(), detail);
         }
 
         return null;

@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.util;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -20,8 +20,6 @@ package br.com.conductor.heimdall.core.util;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-
-import br.com.twsoftware.alfred.object.Objeto;
 
 /**
  * DigestMD5 wrapper class
@@ -39,7 +37,7 @@ public abstract class DigestUtils {
 	  */
      public static String digestMD5(String value) {
 
-          if (Objeto.notBlank(value)) {
+          if (value != null && !value.isEmpty()) {
 
                return org.springframework.util.DigestUtils.md5DigestAsHex(value.getBytes());
           } else {

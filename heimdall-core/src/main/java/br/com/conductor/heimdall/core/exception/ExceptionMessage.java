@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.exception;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -21,7 +21,6 @@ package br.com.conductor.heimdall.core.exception;
  * ==========================LICENSE_END===================================
  */
 
-import br.com.twsoftware.alfred.object.Objeto;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -112,6 +111,8 @@ public enum ExceptionMessage {
     ACCESS_DENIED(UNAUTHORIZED.value(), "Access Denied", UnauthorizedException.class),
 
     ENVIRONMENT_ATTACHED_TO_API(BAD_REQUEST.value(), "Environment attached to Api", BadRequestException.class),
+
+    PLAN_ATTACHED_TO_APPS(BAD_REQUEST.value(), "Plan attached to App", BadRequestException.class),
 
     ENVIRONMENT_INBOUND_DNS_PATTERN(BAD_REQUEST.value(), "Environment inbound URL has to follow the pattern http[s]://host.domain[:port] or www.host.domain[:port]", BadRequestException.class),
     
@@ -210,7 +211,7 @@ public enum ExceptionMessage {
         this.httpCode = httpCode;
         this.defaultMessage = message;
         this.klass = klass;
-        this.message = Objeto.isBlank(this.message) ? this.defaultMessage.replace("{}", "") : this.message;
+        this.message = (this.message == null || this.message.isEmpty()) ? this.defaultMessage.replace("{}", "") : this.message;
     }
 
     /**
@@ -226,7 +227,7 @@ public enum ExceptionMessage {
 
         log.debug("Raising error: {}", this);
 
-        this.message = Objeto.isBlank(this.message) ? this.defaultMessage.replace("{}", "") : this.message;
+        this.message = (this.message == null || this.message.isEmpty()) ? this.defaultMessage.replace("{}", "") : this.message;
 
         switch(HttpStatus.valueOf(this.httpCode)){
             case BAD_REQUEST:

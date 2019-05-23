@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.service;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -28,8 +28,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
+import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
 import br.com.conductor.heimdall.core.dto.persist.AppPersist;
+import br.com.conductor.heimdall.core.entity.AccessToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -37,6 +40,7 @@ import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.AppDTO;
@@ -55,7 +59,6 @@ import br.com.conductor.heimdall.core.repository.DeveloperRepository;
 import br.com.conductor.heimdall.core.repository.PlanRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 import br.com.conductor.heimdall.core.util.Pageable;
-import br.com.twsoftware.alfred.object.Objeto;
 import net.bytebuddy.utility.RandomString;
 
 /**
@@ -92,7 +95,7 @@ public class AppService {
      public App find(Long id) {
 
           App app = appRepository.findOne(id);
-          HeimdallException.checkThrow(isBlank(app), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(app == null, GLOBAL_RESOURCE_NOT_FOUND);
           app.setAccessTokens(accessTokenRepository.findByAppId(app.getId()));
 
           return app;
@@ -147,7 +150,7 @@ public class AppService {
       */
      public App save(AppPersist appDTO) {
 
-          if (Objeto.notBlank(appDTO.getClientId())) {
+          if (appDTO.getClientId() != null) {
                App app = appRepository.findByClientId(appDTO.getClientId());
                HeimdallException.checkThrow(Objects.nonNull(app), CLIENT_ID_ALREADY);
           } else {
@@ -164,7 +167,7 @@ public class AppService {
           App app = GenericConverter.mapper(appDTO, App.class);
 
           Developer dev = devRepository.findOne(app.getDeveloper().getId());
-          HeimdallException.checkThrow(isBlank(dev), DEVELOPER_NOT_EXIST);
+          HeimdallException.checkThrow(dev == null, DEVELOPER_NOT_EXIST);
 
           amqpCacheService.dispatchClean();
 
@@ -184,6 +187,8 @@ public class AppService {
 
           App app = appRepository.findOne(id);
           HeimdallException.checkThrow(isBlank(app), GLOBAL_RESOURCE_NOT_FOUND);
+     
+          updateTokensPlansByApp(id, appDTO.getPlans().stream().map(ReferenceIdDTO::getId).collect(Collectors.toList()));
           
           app.setAccessTokens(accessTokenRepository.findByAppId(app.getId()));
           app = GenericConverter.mapper(appDTO, app);
@@ -195,6 +200,26 @@ public class AppService {
      }
      
      /**
+      * Updates app's access tokens.
+      * This is used for removing the access token to plan association, only if an app removes one of it's plans. 
+      * 
+      * @param appId The ID of the {@link App}
+      * @param plansIds List of {@link Plan}'s IDs 
+      */
+     private void updateTokensPlansByApp(Long appId, List<Long> plansIds) {
+          List<AccessToken> accessTokenList = accessTokenRepository.findByAppId(appId);
+          if (Objects.nonNull(accessTokenList)) {
+               accessTokenList.forEach(accessToken -> {
+                    if (Objects.nonNull(accessToken.getPlans()) && !accessToken.getPlans().isEmpty()) {
+                         List<Plan> planList = accessToken.getPlans().stream().filter(plan -> plansIds.contains(plan.getId())).collect(Collectors.toList());
+                         accessToken.setPlans(planList);
+                         accessTokenRepository.save(accessToken);
+                    }
+               });
+          }
+     }
+     
+     /**
       * Deletes a {@link App} by its ID.
       * 
       * @param  id						The ID of the {@link App}
@@ -203,7 +228,7 @@ public class AppService {
      public void delete(Long id) {
 
           App app = appRepository.findOne(id);
-          HeimdallException.checkThrow(isBlank(app), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(app == null, GLOBAL_RESOURCE_NOT_FOUND);
 
           amqpCacheService.dispatchClean();
 
@@ -222,9 +247,9 @@ public class AppService {
           App app = appRepository.findByClientId(reqBody.getCode());
 
           Developer dev = devRepository.findByEmail(reqBody.getDeveloper());
-          HeimdallException.checkThrow(isBlank(dev), DEVELOPER_NOT_EXIST);
+          HeimdallException.checkThrow(dev == null, DEVELOPER_NOT_EXIST);
 
-          if (isBlank(app)) {
+          if (app == null) {
 
                app = new App();
 
@@ -242,7 +267,7 @@ public class AppService {
           if (app.getPlans() != null && app.getPlans().isEmpty()) {
 
                Plan plan = planRepository.findOne(1L);
-               if (Objeto.notBlank(plan)) {
+               if (plan != null) {
                     app.setPlans(new ArrayList<>(Collections.singletonList(plan)));
                }
           }

@@ -1,13 +1,10 @@
-
-package br.com.conductor.heimdall.api.configuration;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-api
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -20,6 +17,7 @@ package br.com.conductor.heimdall.api.configuration;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.api.configuration;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -56,8 +54,8 @@ import br.com.conductor.heimdall.core.exception.NotFoundException;
 import br.com.conductor.heimdall.core.exception.ServerErrorException;
 import br.com.conductor.heimdall.core.exception.UnauthorizedException;
 import br.com.conductor.heimdall.core.util.UrlUtil;
-import br.com.twsoftware.alfred.object.Objeto;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartException;
@@ -256,7 +254,7 @@ public class GlobalExceptionHandler{
                bindException.exception = "BindExceptionPIER";
 
                BindError error = bindException.new BindError();
-               error.defaultMessage = Objeto.notBlank(message) ? message : fieldError.getDefaultMessage();
+               error.defaultMessage = message != null ? message : fieldError.getDefaultMessage();
                error.objectName = fieldError.getObjectName();
                error.field = fieldError.getField();
                error.code = fieldError.getCode();
@@ -451,32 +449,32 @@ public class GlobalExceptionHandler{
       */
      @AllArgsConstructor
      @Getter
-     public class ErroInfo{
+     public class ErroInfo {
 
          /**
           * TImestamp from the moment that the exception was created.
           */
-         public LocalDateTime timestamp;
+         private LocalDateTime timestamp;
 
          /**
           * Exception identifier.
           */
-         public Integer code;
+         private Integer code;
 
          /**
           * Exception class name.
           */
-         public String exception;
+         private String exception;
 
          /**
           * Exception description.
           */
-         public String message;
+         private String message;
 
          /**
           * Path that generated the request that caused the exception.
           */
-         public String path;
+         private String path;
 
      }
 
@@ -486,29 +484,30 @@ public class GlobalExceptionHandler{
       * @author Filipe Germano
       *
       */
-     public class BindExceptionInfo{
+     public class BindExceptionInfo {
 
           @Getter
-          public LocalDateTime timestamp;
+          private LocalDateTime timestamp;
 
           @Getter
-          public Integer status;
+          private Integer status;
 
           @Getter
-          public String exception;
+          private String exception;
 
           @Getter
-          public List<BindError> erros;
+          private List<BindError> erros;
 
-          public class BindError{
+          @Data
+          public class BindError {
 
-               public String defaultMessage;
+        	  private String defaultMessage;
 
-               public String objectName;
+        	  private String objectName;
 
-               public String field;
+        	  private String field;
 
-               public String code;
+        	  private String code;
           }
 
      }

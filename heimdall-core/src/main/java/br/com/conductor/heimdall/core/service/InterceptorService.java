@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.service;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -37,7 +37,6 @@ import br.com.conductor.heimdall.core.util.JsonUtils;
 import br.com.conductor.heimdall.core.util.Pageable;
 import br.com.conductor.heimdall.core.util.StringUtils;
 import br.com.conductor.heimdall.core.util.TemplateUtils;
-import br.com.twsoftware.alfred.object.Objeto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -56,7 +55,6 @@ import java.util.List;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
-import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 
 /**
  * This class provides methods to create, read, update and delete a {@link Interceptor} resource.<br/>
@@ -106,7 +104,7 @@ public class InterceptorService {
     public Interceptor find(Long id) {
 
         Interceptor interceptor = interceptorRepository.findOne(id);
-        HeimdallException.checkThrow(isBlank(interceptor), GLOBAL_RESOURCE_NOT_FOUND);
+        HeimdallException.checkThrow(interceptor == null, GLOBAL_RESOURCE_NOT_FOUND);
 
         return interceptor;
     }
@@ -167,10 +165,10 @@ public class InterceptorService {
         }
 
         List<Long> ignoredResources = ignoredValidate(interceptorDTO.getIgnoredResources(), resourceRepository);
-        HeimdallException.checkThrow(Objeto.notBlank(ignoredResources), INTERCEPTOR_IGNORED_INVALID, ignoredResources.toString());
+        HeimdallException.checkThrow(!ignoredResources.isEmpty(), INTERCEPTOR_IGNORED_INVALID, ignoredResources.toString());
 
         List<Long> ignoredOperations = ignoredValidate(interceptorDTO.getIgnoredOperations(), operationRepository);
-        HeimdallException.checkThrow(Objeto.notBlank(ignoredOperations), INTERCEPTOR_IGNORED_INVALID, ignoredOperations.toString());
+        HeimdallException.checkThrow(!ignoredOperations.isEmpty(), INTERCEPTOR_IGNORED_INVALID, ignoredOperations.toString());
 
         HeimdallException.checkThrow((TypeInterceptor.CLIENT_ID.equals(interceptor.getType()) && InterceptorLifeCycle.PLAN.equals(interceptor.getLifeCycle())), INTERCEPTOR_INVALID_LIFECYCLE, interceptor.getType().name());
 
@@ -189,20 +187,21 @@ public class InterceptorService {
         if (TypeInterceptor.MIDDLEWARE.equals(interceptor.getType())) {
 
             Operation operation = operationRepository.findOne(interceptor.getReferenceId());
-            if (Objeto.notBlank(operation)) {
+            if (operation != null) {
                 Api api = operation.getResource().getApi();
 
                 List<Middleware> middlewares = middlewareRepository.findByStatusAndApiId(Status.ACTIVE, api.getId());
                 for (Middleware middleware : middlewares) {
 
                     List<Interceptor> interceptors = middleware.getInterceptors();
-                    if (Objeto.notBlank(interceptors)) {
+                    if (interceptors != null && !interceptors.isEmpty()) {
 
                         interceptors.add(interceptor);
                         middleware.setInterceptors(interceptors);
                     } else {
 
-                        interceptors = new ArrayList<>(Collections.singletonList(interceptor));
+                        interceptors = new ArrayList<>();
+                        interceptors.add(interceptor);
                         middleware.setInterceptors(interceptors);
                     }
                 }
@@ -216,8 +215,8 @@ public class InterceptorService {
         return interceptor;
     }
 
-    private Object validateTemplate(TypeInterceptor type, String content) {
-        return type.getHeimdallInterceptor().parseContent(content);
+    private void validateTemplate(TypeInterceptor type, String content) {
+        type.getHeimdallInterceptor().parseContent(content);
     }
 
     /**
@@ -230,7 +229,7 @@ public class InterceptorService {
     public Interceptor update(Long id, InterceptorDTO interceptorDTO) {
 
         Interceptor interceptor = interceptorRepository.findOne(id);
-        HeimdallException.checkThrow(isBlank(interceptor), GLOBAL_RESOURCE_NOT_FOUND);
+        HeimdallException.checkThrow(interceptor == null, GLOBAL_RESOURCE_NOT_FOUND);
         interceptor = GenericConverter.mapper(interceptorDTO, interceptor);
 
         if (TypeInterceptor.CORS.equals(interceptor.getType())) {
@@ -260,7 +259,7 @@ public class InterceptorService {
     public void delete(Long id) {
 
         Interceptor interceptor = interceptorRepository.findOne(id);
-        HeimdallException.checkThrow(isBlank(interceptor), GLOBAL_RESOURCE_NOT_FOUND);
+        HeimdallException.checkThrow(interceptor == null, GLOBAL_RESOURCE_NOT_FOUND);
 
         String fileName = StringUtils.concatCamelCase(interceptor.getLifeCycle().name(), interceptor.getType().name(), interceptor.getExecutionPoint().getFilterType(), interceptor.getId().toString()) + ".groovy";
         String pathName = String.join(File.separator, zuulFilterRoot, interceptor.getExecutionPoint().getFilterType(), fileName);
@@ -276,6 +275,7 @@ public class InterceptorService {
 
             String api = interceptor.getOperation().getResource().getApi().getId().toString();
             pathName = String.join("/", zuulFilterRoot, MIDDLEWARE_API_ROOT, api, fileName);
+            middlewareRepository.detachFromInterceptor(id);
         }
 
         if (TypeInterceptor.CORS.equals(interceptor.getType())) {
@@ -342,7 +342,7 @@ public class InterceptorService {
         switch (interceptor.getLifeCycle()) {
             case API:
                 Api api = apiRepository.findOne(interceptor.getReferenceId());
-                HeimdallException.checkThrow(isBlank(api), INTERCEPTOR_REFERENCE_NOT_FOUND);
+                HeimdallException.checkThrow(api == null, INTERCEPTOR_REFERENCE_NOT_FOUND);
                 interceptor.setResource(null);
                 interceptor.setOperation(null);
                 interceptor.setPlan(null);
@@ -350,7 +350,7 @@ public class InterceptorService {
                 break;
             case PLAN:
                 Plan plan = planRepository.findOne(interceptor.getReferenceId());
-                HeimdallException.checkThrow(isBlank(plan), INTERCEPTOR_REFERENCE_NOT_FOUND);
+                HeimdallException.checkThrow(plan == null, INTERCEPTOR_REFERENCE_NOT_FOUND);
                 interceptor.setResource(null);
                 interceptor.setOperation(null);
                 interceptor.setPlan(plan);
@@ -358,7 +358,7 @@ public class InterceptorService {
                 break;
             case RESOURCE:
                 Resource resource = resourceRepository.findOne(interceptor.getReferenceId());
-                HeimdallException.checkThrow(isBlank(resource), INTERCEPTOR_REFERENCE_NOT_FOUND);
+                HeimdallException.checkThrow(resource == null, INTERCEPTOR_REFERENCE_NOT_FOUND);
                 interceptor.setOperation(null);
                 interceptor.setPlan(null);
                 interceptor.setResource(resource);
@@ -366,7 +366,7 @@ public class InterceptorService {
                 break;
             case OPERATION:
                 Operation operation = operationRepository.findOne(interceptor.getReferenceId());
-                HeimdallException.checkThrow(isBlank(operation), INTERCEPTOR_REFERENCE_NOT_FOUND);
+                HeimdallException.checkThrow(operation == null, INTERCEPTOR_REFERENCE_NOT_FOUND);
                 interceptor.setResource(null);
                 interceptor.setPlan(null);
                 interceptor.setOperation(operation);

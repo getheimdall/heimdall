@@ -1,18 +1,15 @@
-
-package br.com.conductor.heimdall.gateway.trace;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,13 +17,13 @@ package br.com.conductor.heimdall.gateway.trace;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.trace;
 
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.util.LocalDateTimeSerializer;
 import br.com.conductor.heimdall.core.util.UrlUtil;
 import br.com.conductor.heimdall.middleware.spec.StackTrace;
-import br.com.twsoftware.alfred.object.Objeto;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -44,10 +41,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 import static net.logstash.logback.marker.Markers.append;
 
@@ -112,7 +106,7 @@ public class Trace {
      private List<GeneralTrace> traces = new ArrayList<>();
      
      @Getter
-     private List<FilterDetail> filters = new ArrayList<>();
+     private Map<String, FilterDetail> filters = new LinkedHashMap<>();
 
      private String profile;
      
@@ -126,7 +120,7 @@ public class Trace {
      
      @JsonIgnore
      private boolean printLogstash;
-     
+
      private String version;
      
      public Trace() {
@@ -156,7 +150,7 @@ public class Trace {
           setUrl(UrlUtil.getCurrentUrl(request));
 
           Enumeration<String> headers = request.getHeaders("x-forwarded-for");
-          if (Objeto.notBlank(headers)) {
+          if (headers != null) {
 
                List<String> listIps = new ArrayList<>();
                while (headers.hasMoreElements()) {
@@ -190,8 +184,8 @@ public class Trace {
       * 
       * @param detail {@link FilterDetail}
       */
-     public void addFilter(FilterDetail detail) {
-          filters.add(detail);
+     public void addFilter(String name, FilterDetail detail) {
+          filters.put(name, detail);
      }
 
      /**
@@ -259,18 +253,19 @@ public class Trace {
      private void prepareLog(Integer statusCode) throws JsonProcessingException {
 
           String url = Objects.nonNull(getUrl()) ? getUrl() : "";
+          ObjectMapper mapper = new ObjectMapper();
 
           if (printAllTrace) {
 
                if (isInfo(statusCode)) {
 
-                    log.info(" [HEIMDALL-TRACE] - {} ", new ObjectMapper().writeValueAsString(this));
+                    log.info(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
                } else if (isWarn(statusCode)) {
 
-                    log.warn(" [HEIMDALL-TRACE] - {} ", new ObjectMapper().writeValueAsString(this));
+                    log.warn(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
                } else {
 
-                    log.error(" [HEIMDALL-TRACE] - {} ", new ObjectMapper().writeValueAsString(this));
+                    log.error(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
                }
           } else {
                if (isInfo(statusCode)) {
@@ -295,16 +290,17 @@ public class Trace {
      }
 
      private void printInLogger(Logger logger, Integer statusCode) throws JsonProcessingException {
+          ObjectMapper mapper = new ObjectMapper();
 
           if (isInfo(statusCode)) {
 
-               logger.info(new ObjectMapper().writeValueAsString(this));
+               logger.info(mapper.writeValueAsString(this));
           } else if (isWarn(statusCode)) {
 
-               logger.warn(new ObjectMapper().writeValueAsString(this));
+               logger.warn(mapper.writeValueAsString(this));
           } else {
 
-               logger.error(new ObjectMapper().writeValueAsString(this));
+               logger.error(mapper.writeValueAsString(this));
           }
      }
 

@@ -4,7 +4,7 @@
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -26,6 +26,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Repository
@@ -48,12 +49,18 @@ public class EnvironmentInfoRepository {
         sql.append(inboundURL);
         sql.append("%'");
 
-        EnvironmentInfo environment = jdbcTemplate.query(sql.toString(), (resultSet, ignored) -> {
+        final List<EnvironmentInfo> environmentInfos = jdbcTemplate.query(sql.toString(), (resultSet, ignored) -> {
             EnvironmentInfo env = new EnvironmentInfo();
             env.setId(resultSet.getLong("id"));
             env.setOutboundURL(resultSet.getString("outboundURL"));
             return env;
-        }).get(0);
+        });
+
+        EnvironmentInfo environment = null;
+
+        if (!environmentInfos.isEmpty()) {
+            environment = environmentInfos.get(0);
+        }
 
         if (environment != null) {
 

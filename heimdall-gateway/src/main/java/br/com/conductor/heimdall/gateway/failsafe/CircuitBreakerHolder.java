@@ -4,7 +4,7 @@
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -34,16 +34,26 @@ public class CircuitBreakerHolder {
 
     private Throwable throwable;
 
+    /**
+     * Returns the message that of the error that cause the circuit to open.
+     *
+     * First tries to get the message from the cause of the {@link Throwable},
+     * if it does not exist tries to get the message from the {@link Throwable}
+     * itself.
+     *
+     * @return message of the exception that cause the circuit to open
+     */
     public String getMessage() {
         if (this.throwable == null)
             return "No Exception captured";
 
-        if (this.throwable.getCause() == null)
-            return  "No Exception cause captured";
+        if (this.throwable.getCause() != null && this.throwable.getCause().getMessage() != null)
+            return this.throwable.getCause().getMessage();
 
-        return (this.throwable.getCause().getMessage() != null) ?
-                this.throwable.getCause().getMessage() :
-                "No message available";
+        if (this.throwable.getMessage() != null)
+            return this.throwable.getMessage();
+
+        return "No error message found";
 
     }
 }

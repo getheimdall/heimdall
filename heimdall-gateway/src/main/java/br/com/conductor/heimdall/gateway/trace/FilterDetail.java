@@ -4,7 +4,7 @@
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -35,8 +35,6 @@ import lombok.Setter;
 @Data
 public class FilterDetail {
 
-     private String name;
-
      private long timeInMillisRun;
 
      private long timeInMillisShould;
@@ -61,7 +59,6 @@ public class FilterDetail {
      }
 
      public void clear() {
-          this.name = null;
           this.timeInMillisRun = 0;
           this.timeInMillisShould = 0;
           this.status = null;
