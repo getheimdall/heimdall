@@ -1,8 +1,10 @@
 FROM node:alpine
 
 WORKDIR /app
+
 COPY package.json .
-COPY pagkage.lock .
+
+COPY package-lock.json .
 
 RUN npm install
 COPY . .
