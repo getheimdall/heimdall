@@ -1,6 +1,14 @@
 FROM node:alpine
 
-COPY build/ /home/build
+WORKDIR /app
+COPY package.json .
+COPY pagkage.lock .
+
+RUN npm install
+COPY . .
+RUN npm run build
+
+RUN cp -r build /home/build
 
 WORKDIR /home/build
 
@@ -11,6 +19,6 @@ RUN apk add --no-cache bash
 
 RUN chmod +x env.sh
 
-RUN yarn global add serve
+RUN npm install -g serve
 
 CMD ["/bin/bash", "-c", "./env.sh && serve -s"]
