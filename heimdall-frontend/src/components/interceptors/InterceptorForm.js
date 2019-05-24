@@ -94,8 +94,7 @@ class InterceptorForm extends Component {
             resourceId,
             operationId,
             executionPoint,
-            type,
-            environmentId
+            type
         } = this.props
 
 
@@ -139,7 +138,7 @@ class InterceptorForm extends Component {
                     {interceptor && getFieldDecorator('id', { initialValue: interceptor.id })(<Input type='hidden' />)}
                     {interceptor && interceptor.uuid && getFieldDecorator('uuid', { initialValue: interceptor.uuid })(<Input type='hidden' />)}
                     {getFieldDecorator('referenceId', { initialValue: interceptor ? interceptor.referenceId : referenceId })(<Input type='hidden' />)}
-                    {environmentId && getFieldDecorator('environment', { initialValue: environmentId })(<Input type='hidden' />)}
+                    {interceptor && interceptor.environment && getFieldDecorator('environment', { initialValue: interceptor.environment.id })(<Input type='hidden' />)}
                     {getFieldDecorator('order', { initialValue: interceptor && interceptor.order ? interceptor.order : this.props.order})(<Input type='hidden' />)}
                     {getFieldDecorator('type', { initialValue: type})(<Input type='hidden' />)}
                     {getFieldDecorator('executionPoint', { initialValue: executionPoint })(<Input type='hidden' />)}
