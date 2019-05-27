@@ -14,7 +14,7 @@ RUN cp -r build /home/build
 
 WORKDIR /home/build
 
-COPY env.sh .
+COPY env.js .
 COPY .env .
 
 RUN apk add --no-cache bash
@@ -23,4 +23,4 @@ RUN chmod +x env.sh
 RUN npm config set unsafe-perm true
 RUN npm install -g serve
 
-CMD ["/bin/bash", "-c", "./env.sh && serve -s"]
+CMD ["/bin/bash", "-c", "node ./env.js ./index.html && serve -s"]
