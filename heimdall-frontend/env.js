@@ -27,12 +27,9 @@ readInterface.on('close', () => {
     fs.appendFileSync('./env-config.js', '}')
 
     const pathIndex = process.argv.slice(2)[0]
-    console.log(pathIndex)
     if (pathIndex) {
         let indexHtml = fs.readFileSync(pathIndex, 'utf8')
         const indexContentFinal = indexHtml.replace(/(.+)(env-config\.js)(\?\d+)?(.+)/, `$1$2?${new Date().getTime()}$4`)
-        console.log(indexContentFinal)
         fs.writeFileSync(pathIndex, indexContentFinal)
-        console.log('updated index')
     }
 })
