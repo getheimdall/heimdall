@@ -12,7 +12,7 @@ class App extends Component {
 		return (
 			<ConnectedRouter history={history}>
 				<div>
-                    <Routes history={history} />
+				    <Routes history={history} />
                     <ModalSession history={history}/>
 				</div>
 				{/* {routes} */}
