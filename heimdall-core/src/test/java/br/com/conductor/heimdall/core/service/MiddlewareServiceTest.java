@@ -341,6 +341,35 @@ public class MiddlewareServiceTest {
 		assertEquals(middlewareList, middlewareListActual);
 	}
 
+	@Test
+	public void deleteTest() {
+		Mockito.when(middlewareRepository.findByApiIdAndId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(middleware);
+		service.delete(1L, 1L);
+
+		Mockito.verify(middlewareRepository, Mockito.times(1)).findByApiIdAndId(Mockito.anyLong(), Mockito.anyLong());
+	}
+
+	@Test
+	public void deleteAllTest() {
+		Mockito.when(middlewareRepository.findByApiIdAndId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(middleware);
+		Mockito.when(middlewareRepository.findByApiId(Mockito.anyLong())).thenReturn(middlewareList);
+		service.deleteAll(1L);
+
+		Mockito.verify(middlewareRepository, Mockito.times(1)).findByApiId(Mockito.anyLong());
+	}
+
+	@Test
+	public void updateTest() {
+		Mockito.when(middlewareRepository.findByApiIdAndId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(middleware);
+		Mockito.when(middlewareRepository.findByApiIdAndVersion(Mockito.anyLong(), Mockito.anyString())).thenReturn(null);
+		middleware.setVersion("0.0.2");
+		Mockito.when(middlewareRepository.save(Mockito.any(Middleware.class))).thenReturn(middleware);
+		Middleware updated = service.update(1L, 1L, middlewareDTO);
+
+		assertEquals(middleware, updated);
+
+	}
+
 	private Page<Middleware> getPageMiddleware() {
 		return new Page<Middleware>() {
 			@Override
