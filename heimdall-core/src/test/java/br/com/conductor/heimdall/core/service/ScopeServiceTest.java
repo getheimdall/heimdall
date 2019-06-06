@@ -21,22 +21,14 @@ package br.com.conductor.heimdall.core.service;
  */
 
 import br.com.conductor.heimdall.core.dto.PageableDTO;
-import br.com.conductor.heimdall.core.dto.PlanDTO;
-import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
 import br.com.conductor.heimdall.core.dto.ScopeDTO;
-import br.com.conductor.heimdall.core.dto.page.PlanPage;
 import br.com.conductor.heimdall.core.dto.page.ScopePage;
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Operation;
-import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.entity.Resource;
 import br.com.conductor.heimdall.core.entity.Scope;
 import br.com.conductor.heimdall.core.enums.Status;
-import br.com.conductor.heimdall.core.exception.BadRequestException;
-import br.com.conductor.heimdall.core.exception.ExceptionMessage;
-import br.com.conductor.heimdall.core.repository.ApiRepository;
 import br.com.conductor.heimdall.core.repository.OperationRepository;
-import br.com.conductor.heimdall.core.repository.PlanRepository;
 import br.com.conductor.heimdall.core.repository.ScopeRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
@@ -229,12 +221,14 @@ public class ScopeServiceTest {
           assertEquals(update.getId(), scope.getId());
      }
 
-          @Test
-          public void deleteScope() {
-               Mockito.when(scopeRepository.findByApiIdAndId(Mockito.anyLong(), Mockito.anyLong())).thenReturn(scope);
-               Mockito.when(scopeRepository.findOne(Mockito.anyLong())).thenReturn(scope);
-               this.scopeService.delete(1L, 1L);
-               Mockito.verify(this.scopeRepository, Mockito.times(1)).delete(scope);
+     @Test
+     public void deleteScope() {
 
-          }
+          Mockito.when(scopeRepository.findByApiIdAndId(Mockito.anyLong(), Mockito.anyLong()))
+                 .thenReturn(scope);
+          Mockito.when(scopeRepository.findOne(Mockito.anyLong())).thenReturn(scope);
+          this.scopeService.delete(1L, 1L);
+          Mockito.verify(this.scopeRepository, Mockito.times(1)).delete(scope);
+
+     }
 }
