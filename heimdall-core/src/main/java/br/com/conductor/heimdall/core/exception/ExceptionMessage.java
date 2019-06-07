@@ -146,6 +146,8 @@ public enum ExceptionMessage {
 
     OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END(BAD_REQUEST.value(), "Operation can have a double wild card (/**), but only at the end", BadRequestException.class),
 
+    OPERATION_ROUTE_ALREADY_EXISTS(BAD_REQUEST.value(), "A Operation with the same route exists in another Api.", BadRequestException.class),
+
     API_BASEPATH_MALFORMED(BAD_REQUEST.value(), "Api basepath can not contain a wild card", BadRequestException.class),
 
     USERNAME_OR_PASSWORD_INCORRECT(BAD_REQUEST.value(), "Username or password incorrect", BadRequestException.class),

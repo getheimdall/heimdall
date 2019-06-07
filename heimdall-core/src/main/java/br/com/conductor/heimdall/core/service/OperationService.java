@@ -21,11 +21,6 @@ package br.com.conductor.heimdall.core.service;
  * ==========================LICENSE_END===================================
  */
 
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ONLY_ONE_OPERATION_PER_RESOURCE;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.OPERATION_CANT_HAVE_SINGLE_WILDCARD;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,6 +28,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 import br.com.conductor.heimdall.core.entity.Api;
+import br.com.conductor.heimdall.core.repository.jdbc.OperationJDBCRepository;
 import br.com.conductor.heimdall.core.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -57,6 +53,8 @@ import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
 import br.com.conductor.heimdall.core.util.ConstantsCache;
 import br.com.conductor.heimdall.core.util.Pageable;
 
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
+
 /**
  * This class provides methods to create, read, update and delete a {@link Operation} resource.
  * 
@@ -75,6 +73,9 @@ public class OperationService {
 
      @Autowired
      private InterceptorService interceptorService;
+
+     @Autowired
+     private OperationJDBCRepository operationJDBCRepository;
 
      @Autowired
      private ApiService apiService;
@@ -172,38 +173,6 @@ public class OperationService {
 
           return new ArrayList<>();
      }
-     
-     /**
-      * Saves a {@link Operation} to the repository.
-      * 
-      * @param  apiId						The {@link br.com.conductor.heimdall.core.entity.Api} Id
-      * @param 	resourceId					The {@link Resource} Id
-      * @param 	operationDTO				The {@link OperationDTO}
-      * @return								The saved {@link Operation}
-      */
-     @Transactional
-     public Operation save(Long apiId, Long resourceId, OperationDTO operationDTO) {
-
-          Resource resource = resourceRepository.findByApiIdAndId(apiId, resourceId);
-          HeimdallException.checkThrow(resource == null, GLOBAL_RESOURCE_NOT_FOUND);
-                    
-          Operation resData = operationRepository.findByResourceApiIdAndMethodAndPath(apiId, operationDTO.getMethod(), operationDTO.getPath());
-          HeimdallException.checkThrow(resData != null &&
-                  Objects.equals(resData.getResource().getId(), resource.getId()), ONLY_ONE_OPERATION_PER_RESOURCE);
-
-          Operation operation = GenericConverter.mapper(operationDTO, Operation.class);
-          operation.setResource(resource);
-          operation.setPath(StringUtils.removeMultipleSlashes(operation.getPath()));
-
-          HeimdallException.checkThrow(validateSingleWildCardOperationPath(operation), OPERATION_CANT_HAVE_SINGLE_WILDCARD);
-          HeimdallException.checkThrow(validateDoubleWildCardOperationPath(operation), OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END);
-
-          operation = operationRepository.save(operation);
-          
-          amqpRoute.dispatchRoutes();
-          
-          return operation;
-     }
 
      /**
       * Saves a {@link Operation} to the repository.
@@ -221,6 +190,9 @@ public class OperationService {
           Operation resData = operationRepository.findByResourceApiIdAndMethodAndPath(apiId, operation.getMethod(), operation.getPath());
           HeimdallException.checkThrow(resData != null &&
                   Objects.equals(resData.getResource().getId(), resource.getId()), ONLY_ONE_OPERATION_PER_RESOURCE);
+
+          boolean patternExists = operationJDBCRepository.countPattern(resource.getApi().getBasePath() + "/" + operation.getPath());
+          HeimdallException.checkThrow(patternExists, OPERATION_ROUTE_ALREADY_EXISTS);
 
           operation.setResource(resource);
           operation.setPath(StringUtils.removeMultipleSlashes(operation.getPath()));
@@ -258,7 +230,10 @@ public class OperationService {
           operation = GenericConverter.mapper(operationDTO, operation);
           operation.setPath(StringUtils.removeMultipleSlashes(operation.getPath()));
 
-          HeimdallException.checkThrow(validateSingleWildCardOperationPath(operation), OPERATION_CANT_HAVE_SINGLE_WILDCARD);
+         boolean patternExists = operationJDBCRepository.countPattern(operation.getResource().getApi().getBasePath() + "/" + operation.getPath());
+         HeimdallException.checkThrow(patternExists, OPERATION_ROUTE_ALREADY_EXISTS);
+
+         HeimdallException.checkThrow(validateSingleWildCardOperationPath(operation), OPERATION_CANT_HAVE_SINGLE_WILDCARD);
           HeimdallException.checkThrow(validateDoubleWildCardOperationPath(operation), OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END);
           
           operation = operationRepository.save(operation);
