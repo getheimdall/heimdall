@@ -56,6 +56,8 @@ public class AppPersist implements Serializable {
 
     private Status status;
 
+    @NotNull
+    @Size(min = 1)
     private List<ReferenceIdDTO> plans;
 
     private String clientId;

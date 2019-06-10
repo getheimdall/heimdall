@@ -52,6 +52,8 @@ public class AccessTokenPersist implements Serializable {
      
      private LocalDateTime expiredDate;
 
+     @NotNull
+     @Size(min = 1)
      private List<ReferenceIdDTO> plans;
      
      private Status status;

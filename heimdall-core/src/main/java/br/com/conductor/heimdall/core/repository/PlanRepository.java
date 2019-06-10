@@ -24,6 +24,8 @@ package br.com.conductor.heimdall.core.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import br.com.conductor.heimdall.core.entity.Plan;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 /**
  * Plan Repository.
@@ -32,5 +34,14 @@ import br.com.conductor.heimdall.core.entity.Plan;
  *
  */
 public interface PlanRepository extends JpaRepository<Plan, Long> {
+
+     /**
+      * Check if a plan has apps attached
+      *
+      * @param id
+      * @return
+      */
+     @Query(value = "select count(0) from apps_plans where plan_id = :id", nativeQuery = true)
+     Integer findAppsWithPlan(@Param("id") Long id);
 
 }

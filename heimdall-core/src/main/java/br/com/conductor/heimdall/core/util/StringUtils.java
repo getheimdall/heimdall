@@ -71,31 +71,6 @@ public abstract class StringUtils {
           return value.toString();
      }
 
-     /**
-      * Concatenates multiple strings.
-      * 
-      * @param  strings				Multiple String parameters 
-      * @return						The concatenated String
-      */
-     public static String join(String... strings) {
-          
-          return org.apache.commons.lang.StringUtils.join(strings);
-          
-     }
-
-     /**
-      * Concatenates multiple strings with a specific separator.
-      * 
-      * @param 	separator			The separator to be used.
-      * @param  strings				Multiple String parameters 
-      * @return						The concatenated String
-      */
-     public static String join(String separator, String... strings) {
-          
-          return org.apache.commons.lang.StringUtils.join(strings, separator);
-          
-     }
-
     /**
      * Removes all instances of double forward slash from a path and
      * makes sure that there is one forward slash at the start of the

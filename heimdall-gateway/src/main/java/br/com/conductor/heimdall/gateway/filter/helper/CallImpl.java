@@ -102,7 +102,7 @@ public class CallImpl implements Call {
                     HttpServletRequest r = context.getRequest();
                     
                     String value = r.getHeader(name);
-                    if (value != null) {
+                    if (value == null) {
                          
                          value = context.getZuulRequestHeaders().get(name);
                     }

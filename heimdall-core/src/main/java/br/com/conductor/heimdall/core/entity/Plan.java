@@ -27,6 +27,7 @@ import java.util.Set;
 
 import javax.persistence.*;
 
+import lombok.ToString;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -67,6 +68,7 @@ public class Plan implements Serializable {
      @ManyToOne
      @JoinColumn(name = "API_ID", nullable = false)
      @JsonIgnoreProperties({ "environments" })
+     @ToString.Exclude
      private Api api;
      
      @Column(name = "CREATION_DATE", nullable = false, updatable=false)

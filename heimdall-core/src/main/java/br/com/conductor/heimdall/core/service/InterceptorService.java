@@ -275,6 +275,7 @@ public class InterceptorService {
 
             String api = interceptor.getOperation().getResource().getApi().getId().toString();
             pathName = String.join("/", zuulFilterRoot, MIDDLEWARE_API_ROOT, api, fileName);
+            middlewareRepository.detachFromInterceptor(id);
         }
 
         if (TypeInterceptor.CORS.equals(interceptor.getType())) {
