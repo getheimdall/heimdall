@@ -30,6 +30,7 @@ import br.com.conductor.heimdall.core.util.TemplateUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Implementation of the HeimdallInterceptor to type LogMask.
@@ -45,7 +46,7 @@ public class LogMaskerHeimdallInterceptor implements HeimdallInterceptor {
     }
 
     @Override
-    public Object parseContent(String content) {
+    public LogMaskDTO parseContent(String content) {
         try {
             return JsonUtils.convertJsonToObject(content, LogMaskDTO.class);
         } catch (Exception e) {
@@ -56,8 +57,10 @@ public class LogMaskerHeimdallInterceptor implements HeimdallInterceptor {
         return null;    }
 
     @Override
-    public HashMap<String, Object> buildParameters(Object objectCustom, HashMap<String, Object> parameters, Interceptor interceptor) {
-        LogMaskDTO logMaskDTO = (LogMaskDTO) objectCustom;
+    public Map<String, Object> buildParameters(Interceptor interceptor) {
+
+        Map<String, Object> parameters = new HashMap<>();
+        LogMaskDTO logMaskDTO = this.parseContent(interceptor.getContent());
 
         parameters.put("body", logMaskDTO.getBody());
         parameters.put("uri", logMaskDTO.getUri());

@@ -24,6 +24,9 @@ package br.com.conductor.heimdall.core.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import br.com.conductor.heimdall.core.entity.Middleware;
 import br.com.conductor.heimdall.core.enums.Status;
@@ -95,5 +98,13 @@ public interface MiddlewareRepository extends JpaRepository<Middleware, Long> {
       * @return				The Middleware found
 	  */
      Middleware findTop1ByApiIdOrderByVersionDesc(Long apiId);
+
+	/**
+	 * 
+	 * @param id interceptor id
+	 */
+	@Modifying
+	@Query(value = "DELETE FROM MIDDLEWARES_INTERCEPTORS WHERE INTERCEPTOR_ID = :ID", nativeQuery = true)
+	void detachFromInterceptor(@Param("ID") Long id);
           
 }

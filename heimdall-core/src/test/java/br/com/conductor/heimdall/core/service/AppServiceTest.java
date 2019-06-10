@@ -27,6 +27,7 @@ import br.com.conductor.heimdall.core.dto.integration.AppCallbackDTO;
 import br.com.conductor.heimdall.core.dto.page.AppPage;
 import br.com.conductor.heimdall.core.dto.persist.AppPersist;
 import br.com.conductor.heimdall.core.dto.request.AppRequestDTO;
+import br.com.conductor.heimdall.core.entity.AccessToken;
 import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.entity.Developer;
 import br.com.conductor.heimdall.core.entity.Plan;
@@ -53,6 +54,8 @@ import org.springframework.data.domain.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -242,6 +245,7 @@ public class AppServiceTest {
 
     @Test
     public void updateAppTest() {
+
         Mockito.when(devRepository.findOne(Mockito.anyLong())).thenReturn(developer);
         Mockito.when(appRepository.save(Mockito.any(App.class))).thenReturn(app);
 
@@ -249,13 +253,52 @@ public class AppServiceTest {
 
         assertEquals(saved.getId(), app.getId());
 
+        Plan plan1 = new Plan();
+        plan1.setId(1L);
+
+        Plan plan2 = new Plan();
+        plan2.setId(2L);
+
+        List<Plan> plans = new ArrayList<>();
+        plans.add(plan1);
+        plans.add(plan2);
+        app.setPlans(plans);
+
+        List<AccessToken> accessTokens = new ArrayList<>();
+        AccessToken act1 = new AccessToken();
+        act1.setId(1L);
+        act1.setApp(app);
+        act1.setPlans(plans);
+
+        AccessToken act2 = new AccessToken();
+        act2.setId(2L);
+        act2.setApp(app);
+        act2.setPlans(plans);
+
+        accessTokens.add(act1);
+        accessTokens.add(act2);
+
+        app.setAccessTokens(accessTokens);
+
         Mockito.when(appRepository.findOne(Mockito.anyLong())).thenReturn(app);
+        Mockito.when(accessTokenRepository.findByAppId(app.getId())).thenReturn(accessTokens);
 
         AppDTO appDTO = new AppDTO();
+        List<ReferenceIdDTO> referenceIdDTOS = new ArrayList<>();
+        ReferenceIdDTO referenceIdDTO = new ReferenceIdDTO();
+        referenceIdDTO.setId(1L);
+        referenceIdDTOS.add(referenceIdDTO);
+        appDTO.setPlans(referenceIdDTOS);
 
         App update = appService.update(1L, appDTO);
 
         assertEquals(update.getId(), app.getId());
+        assertEquals(1, act1.getPlans().size());
+        assertEquals(1, act2.getPlans().size());
+        assertTrue(act1.getPlans().contains(plan1));
+        assertTrue(act2.getPlans().contains(plan1));
+        assertFalse(act1.getPlans().contains(plan2));
+        assertFalse(act2.getPlans().contains(plan2));
     }
 
     @Test
