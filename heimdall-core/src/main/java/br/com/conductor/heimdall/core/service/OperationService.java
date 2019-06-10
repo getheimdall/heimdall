@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.repository.jdbc.OperationJDBCRepository;
@@ -115,13 +114,7 @@ public class OperationService {
      @Transactional(readOnly = true)
      public OperationPage list(Long apiId, Long resourceId, OperationDTO operationDTO, PageableDTO pageableDTO) {
 
-          Resource resource = resourceRepository.findByApiIdAndId(apiId, resourceId);
-          HeimdallException.checkThrow(resource == null, GLOBAL_RESOURCE_NOT_FOUND);
-
-          Operation operation = GenericConverter.mapper(operationDTO, Operation.class);
-          operation.setResource(resource);
-          
-          Example<Operation> example = Example.of(operation, ExampleMatcher.matching().withIgnorePaths("resource.api").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+          Example<Operation> example = this.prepareExample(apiId, resourceId, operationDTO);
           
           Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
           Page<Operation> page = operationRepository.findAll(example, pageable);
@@ -139,16 +132,23 @@ public class OperationService {
       */
      @Transactional(readOnly = true)
      public List<Operation> list(Long apiId, Long resourceId, OperationDTO operationDTO) {
-          
-          Resource resource = resourceRepository.findByApiIdAndId(apiId, resourceId);
-          HeimdallException.checkThrow(resource == null, GLOBAL_RESOURCE_NOT_FOUND);
-          
-          Operation operation = GenericConverter.mapper(operationDTO, Operation.class);
-          operation.setResource(resource);
-          
-          Example<Operation> example = Example.of(operation, ExampleMatcher.matching().withIgnorePaths("resource.api").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+
+          Example<Operation> example = this.prepareExample(apiId, resourceId, operationDTO);
 
           return operationRepository.findAll(example);
+     }
+
+     /*
+      * Creates a Example for Hibernate query
+      */
+     private Example<Operation> prepareExample(Long apiId, Long resourceId, OperationDTO operationDTO) {
+         Resource resource = resourceRepository.findByApiIdAndId(apiId, resourceId);
+         HeimdallException.checkThrow(resource == null, GLOBAL_RESOURCE_NOT_FOUND);
+
+         Operation operation = GenericConverter.mapper(operationDTO, Operation.class);
+         operation.setResource(resource);
+
+         return Example.of(operation, ExampleMatcher.matching().withIgnorePaths("resource.api").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
      }
 
      /**
@@ -168,7 +168,12 @@ public class OperationService {
           api.getResources().forEach(resource -> operations.addAll(this.list(apiId, resource.getId(), operationDTO)));
 
           if (!operations.isEmpty()) {
-               return operations.stream().map(op -> new Operation(op.getId(), op.getMethod(), op.getPath(), null, null)).collect(Collectors.toList());
+               for (Operation operation : operations) {
+                   operation.setDescription(null);
+                   operation.setResource(null);
+               }
+
+               return operations;
           }
 
           return new ArrayList<>();
@@ -230,10 +235,10 @@ public class OperationService {
           operation = GenericConverter.mapper(operationDTO, operation);
           operation.setPath(StringUtils.removeMultipleSlashes(operation.getPath()));
 
-         boolean patternExists = operationJDBCRepository.countPattern(operation.getResource().getApi().getBasePath() + "/" + operation.getPath());
-         HeimdallException.checkThrow(patternExists, OPERATION_ROUTE_ALREADY_EXISTS);
+          boolean patternExists = operationJDBCRepository.countPattern(operation.getResource().getApi().getBasePath() + "/" + operation.getPath());
+          HeimdallException.checkThrow(patternExists, OPERATION_ROUTE_ALREADY_EXISTS);
 
-         HeimdallException.checkThrow(validateSingleWildCardOperationPath(operation), OPERATION_CANT_HAVE_SINGLE_WILDCARD);
+          HeimdallException.checkThrow(validateSingleWildCardOperationPath(operation), OPERATION_CANT_HAVE_SINGLE_WILDCARD);
           HeimdallException.checkThrow(validateDoubleWildCardOperationPath(operation), OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END);
           
           operation = operationRepository.save(operation);
