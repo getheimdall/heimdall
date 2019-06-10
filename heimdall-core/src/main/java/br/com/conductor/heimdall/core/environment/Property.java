@@ -183,4 +183,14 @@ public class Property {
     	private int delayTimeSeconds = 30;
      }
 
+     @Data
+     public class Interceptor {
+        private Health health = new Health();
+     }
+
+     @Data
+     public class Health {
+          private Long fixedRate;
+     }
+
 }
