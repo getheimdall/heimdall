@@ -49,6 +49,8 @@ const logMaskerContent = content => {
         if (ignoredHeaders && typeof ignoredHeaders === 'string') {
             const ignoredHeadersSplit = ignoredHeaders.split(',')
             content.ignoredHeaders = ignoredHeadersSplit.map(ignoredHeader => ignoredHeader.trim())
+        } else {
+            content.ignoredHeaders = []
         }
 
         return JSON.stringify(content)
