@@ -36,6 +36,7 @@ import br.com.conductor.heimdall.core.repository.AccessTokenRepository;
 import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.repository.DeveloperRepository;
 import br.com.conductor.heimdall.core.repository.PlanRepository;
+import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -53,8 +54,8 @@ import org.springframework.data.domain.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 
-import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -77,6 +78,9 @@ public class AppServiceTest {
 
     @Mock
     private PlanRepository planRepository;
+
+    @Mock
+    private AMQPCacheService amqpCacheService;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
