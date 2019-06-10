@@ -22,7 +22,6 @@ package br.com.conductor.heimdall.core.service;
  */
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
-import static br.com.twsoftware.alfred.object.Objeto.isBlank;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -186,7 +185,7 @@ public class AppService {
      public App update(Long id, AppDTO appDTO) {
 
           App app = appRepository.findOne(id);
-          HeimdallException.checkThrow(isBlank(app), GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(app == null, GLOBAL_RESOURCE_NOT_FOUND);
      
           updateTokensPlansByApp(id, appDTO.getPlans().stream().map(ReferenceIdDTO::getId).collect(Collectors.toList()));
           
