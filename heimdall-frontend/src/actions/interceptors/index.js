@@ -26,6 +26,20 @@ export const clearInterceptors = () => dispatch => {
     dispatch({ type: InterceptorConstants.CLEAR_INTERCEPTORS })
 }
 
+export const refreshInterceptors = () => dispatch => {
+    interceptorService.refresh()
+        .then(data => {
+            dispatch(sendNotification({ type: 'success', message: i18n.t('interceptors_refreshed') }))
+            dispatch(finishLoading())
+        })
+        .catch(error => {
+            if (error.response && error.response.status === 400) {
+                dispatch(sendNotification({ type: 'error', message: i18n.t('error'), description: error.response.data.message }))
+            }
+            dispatch(finishLoading())
+        })
+}
+
 export const getAllInterceptorsTypes = () => dispatch => {
     interceptorService.getInterceptorTypes()
         .then(data => {

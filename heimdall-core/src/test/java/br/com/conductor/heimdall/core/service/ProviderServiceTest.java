@@ -6,7 +6,7 @@ package br.com.conductor.heimdall.core.service;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -167,5 +167,15 @@ public class ProviderServiceTest {
 		Mockito.when(this.providerRepository.findOne(Mockito.any(Long.class))).thenReturn(providerDatabase);
 
 		providerService.edit(1L, providerDTO);
+	}
+
+	@Test
+	public void findProviderTest() {
+		Provider provider = new Provider();
+
+		Mockito.when(this.providerRepository.findOne(Mockito.any(Long.class))).thenReturn(provider);
+		Provider accessTokenResp = providerService.findOne(1L);
+		assertEquals(accessTokenResp.getId(), provider.getId());
+		Mockito.verify(this.providerRepository, Mockito.times(1)).findOne(Mockito.any(Long.class));
 	}
 }

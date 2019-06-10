@@ -6,7 +6,7 @@ package br.com.conductor.heimdall.core.service;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -20,15 +20,22 @@ package br.com.conductor.heimdall.core.service;
  * ==========================LICENSE_END===================================
  */
 
+import br.com.conductor.heimdall.core.dto.AppDTO;
+import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
+import br.com.conductor.heimdall.core.dto.integration.AppCallbackDTO;
+import br.com.conductor.heimdall.core.dto.page.AppPage;
 import br.com.conductor.heimdall.core.dto.persist.AppPersist;
+import br.com.conductor.heimdall.core.dto.request.AppRequestDTO;
 import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.entity.Developer;
+import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.exception.BadRequestException;
+import br.com.conductor.heimdall.core.repository.AccessTokenRepository;
 import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.repository.DeveloperRepository;
+import br.com.conductor.heimdall.core.repository.PlanRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,6 +45,15 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
@@ -53,6 +69,12 @@ public class AppServiceTest {
 
     @Mock
     private DeveloperRepository devRepository;
+
+    @Mock
+    private AccessTokenRepository accessTokenRepository;
+
+    @Mock
+    private PlanRepository planRepository;
 
     @Mock
     private AMQPCacheService amqpCacheService;
@@ -84,6 +106,7 @@ public class AppServiceTest {
         appPersist.setName("App test");
         appPersist.setDescription("App test description");
         appPersist.setDeveloper(new ReferenceIdDTO(1L));
+
     }
 
     @Test
@@ -96,7 +119,7 @@ public class AppServiceTest {
 
         App saved = this.appService.save(appPersist);
 
-        Assert.assertEquals(app.getId(), saved.getId());
+        assertEquals(app.getId(), saved.getId());
     }
 
     @Test
@@ -111,7 +134,7 @@ public class AppServiceTest {
 
         App saved = this.appService.save(appPersist);
 
-        Assert.assertEquals(app.getId(), saved.getId());
+        assertEquals(app.getId(), saved.getId());
     }
 
     @Test
@@ -128,5 +151,119 @@ public class AppServiceTest {
         Mockito.when(devRepository.findOne(Mockito.anyLong())).thenReturn(developer);
 
         this.appService.save(appPersist);
+    }
+
+    @Test
+    public void SaveWithAppCallbackDTOTest() {
+
+        AppCallbackDTO reqBody = new AppCallbackDTO();
+        reqBody.setName("Test Name");
+        reqBody.setDeveloper("developer@conductor.com.br");
+
+        appPersist.setClientId("8d19n91d8");
+
+        Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(null);
+        Mockito.when(appRepository.save(Mockito.any(App.class))).thenReturn(app);
+        Mockito.when(devRepository.findOne(Mockito.anyLong())).thenReturn(developer);
+        Mockito.when(devRepository.findByEmail(Mockito.anyString())).thenReturn(developer);
+
+        App saved = this.appService.save(reqBody);
+
+        assertEquals(app.getId(), saved.getId());
+    }
+
+    @Test
+    public void SaveWithAppNotNullCallbackDTOTest() {
+
+        AppCallbackDTO reqBody = new AppCallbackDTO();
+        reqBody.setName("Test Name");
+        reqBody.setDeveloper("developer@conductor.com.br");
+
+        appPersist.setClientId("8d19n91d8");
+
+        Mockito.when(planRepository.findOne(1L)).thenReturn(new Plan());
+        Mockito.when(appRepository.findByClientId(Mockito.anyString())).thenReturn(app);
+        Mockito.when(appRepository.save(Mockito.any(App.class))).thenReturn(app);
+        Mockito.when(devRepository.findOne(Mockito.anyLong())).thenReturn(developer);
+        Mockito.when(devRepository.findByEmail(Mockito.anyString())).thenReturn(developer);
+
+        App saved = this.appService.save(reqBody);
+
+        assertEquals(app.getId(), saved.getId());
+    }
+
+    @Test
+    public void listAppWithPageableTest() {
+
+        PageableDTO pageableDTO = new PageableDTO();
+        pageableDTO.setLimit(10);
+        pageableDTO.setOffset(0);
+
+        List<App> apps = new ArrayList<>();
+        apps.add(app);
+
+        AppRequestDTO appRequestDTO = new AppRequestDTO();
+
+        Page<App> page = new PageImpl<>(apps);
+
+        Mockito.when(this.appRepository.findAll(Mockito.any(Example.class), Mockito.any(Pageable.class)))
+               .thenReturn(page);
+
+        AppPage apiPageResp = appService.list(appRequestDTO, pageableDTO);
+
+        assertEquals(1L, apiPageResp.getTotalElements());
+        Mockito.verify(this.appRepository, Mockito.times(1))
+               .findAll(Mockito.any(Example.class), Mockito.any(Pageable.class));
+    }
+
+    @Test
+    public void listAppWithoutPageableTest() {
+
+        List<App> apps = new ArrayList<>();
+        apps.add(app);
+
+        Mockito.when(this.appRepository.findAll(Mockito.any(Example.class))).thenReturn(apps);
+        AppRequestDTO appRequestDTO = new AppRequestDTO();
+        List<App> listAppResp = appService.list(appRequestDTO);
+
+        assertEquals(apps.size(), listAppResp.size());
+        Mockito.verify(this.appRepository, Mockito.times(1)).findAll(Mockito.any(Example.class));
+    }
+
+    @Test
+    public void findAppTest() {
+
+        Mockito.when(this.appRepository.findOne(Mockito.any(Long.class))).thenReturn(app);
+        Mockito.when(accessTokenRepository.findByAppId(app.getId())).thenReturn(Mockito.anyList());
+        App appResp = appService.find(1L);
+        assertEquals(appResp.getId(), app.getId());
+        Mockito.verify(this.appRepository, Mockito.times(1)).findOne(Mockito.any(Long.class));
+    }
+
+    @Test
+    public void updateAppTest() {
+        Mockito.when(devRepository.findOne(Mockito.anyLong())).thenReturn(developer);
+        Mockito.when(appRepository.save(Mockito.any(App.class))).thenReturn(app);
+
+        App saved = appService.save(appPersist);
+
+        assertEquals(saved.getId(), app.getId());
+
+        Mockito.when(appRepository.findOne(Mockito.anyLong())).thenReturn(app);
+
+        AppDTO appDTO = new AppDTO();
+
+        App update = appService.update(1L, appDTO);
+
+        assertEquals(update.getId(), app.getId());
+    }
+
+    @Test
+    public void deleteAppTest() {
+
+        Mockito.when(appRepository.findOne(Mockito.anyLong())).thenReturn(app);
+        this.appService.delete(1L);
+        Mockito.verify(this.appRepository, Mockito.times(1)).delete(app);
+
     }
 }

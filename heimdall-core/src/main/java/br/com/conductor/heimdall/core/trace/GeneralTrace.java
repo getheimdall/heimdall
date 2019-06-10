@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.trace;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -21,10 +21,9 @@ package br.com.conductor.heimdall.core.trace;
  * ==========================LICENSE_END===================================
  */
 
-import java.util.Date;
-
 import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 /**
  * Data class that represents a General Trace
@@ -37,7 +36,7 @@ public class GeneralTrace {
 
      private String description;
      
-     private String insertedOnDate = br.com.twsoftware.alfred.data.Data.getDataFormatada(new Date(), "dd/MM/yyyy hh:mm:ss.SSS");
+     private String insertedOnDate = LocalDateTime.now().toString();
 
      private String content;
 

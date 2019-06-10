@@ -1,13 +1,10 @@
-
-package br.com.conductor.heimdall.gateway.filter;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -20,33 +17,23 @@ package br.com.conductor.heimdall.gateway.filter;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.filter;
 
-import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
-import static br.com.conductor.heimdall.gateway.util.ConstantsContext.*;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.FORWARD_LOCATION_PREFIX;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.FORWARD_TO_KEY;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.HTTPS_PORT;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.HTTPS_SCHEME;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.HTTP_PORT;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.HTTP_SCHEME;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PROXY_KEY;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.REQUEST_URI_KEY;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.RETRYABLE_KEY;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SERVICE_HEADER;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SERVICE_ID_HEADER;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SERVICE_ID_KEY;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_FOR_HEADER;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_HOST_HEADER;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_PORT_HEADER;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_PROTO_HEADER;
-
-import java.util.*;
-import java.util.Map.Entry;
-
-import javax.servlet.http.HttpServletRequest;
-
+import br.com.conductor.heimdall.core.enums.HttpMethod;
+import br.com.conductor.heimdall.core.util.Constants;
+import br.com.conductor.heimdall.core.util.ConstantsPath;
+import br.com.conductor.heimdall.core.util.UrlUtil;
+import br.com.conductor.heimdall.gateway.router.Credential;
+import br.com.conductor.heimdall.gateway.router.CredentialRepository;
 import br.com.conductor.heimdall.gateway.router.EnvironmentInfo;
 import br.com.conductor.heimdall.gateway.router.EnvironmentInfoRepository;
+import br.com.conductor.heimdall.gateway.trace.FilterDetail;
+import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import br.com.conductor.heimdall.gateway.util.RequestHelper;
+import br.com.conductor.heimdall.gateway.zuul.route.HeimdallRoute;
+import br.com.conductor.heimdall.gateway.zuul.route.ProxyRouteLocator;
+import com.netflix.zuul.context.RequestContext;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
 import org.springframework.cloud.netflix.zuul.filters.Route;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
@@ -61,20 +48,15 @@ import org.springframework.util.PathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.util.UrlPathHelper;
 
-import com.netflix.zuul.context.RequestContext;
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
 
-import br.com.conductor.heimdall.core.enums.HttpMethod;
-import br.com.conductor.heimdall.core.util.Constants;
-import br.com.conductor.heimdall.core.util.ConstantsPath;
-import br.com.conductor.heimdall.core.util.UrlUtil;
-import br.com.conductor.heimdall.gateway.router.Credential;
-import br.com.conductor.heimdall.gateway.router.CredentialRepository;
-import br.com.conductor.heimdall.gateway.trace.FilterDetail;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
-import br.com.conductor.heimdall.gateway.util.RequestHelper;
-import br.com.conductor.heimdall.gateway.zuul.route.HeimdallRoute;
-import br.com.conductor.heimdall.gateway.zuul.route.ProxyRouteLocator;
-import lombok.extern.slf4j.Slf4j;
+import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
+import static br.com.conductor.heimdall.gateway.util.ConstantsContext.*;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.*;
 
 /**
  * Extends the {@link PreDecorationFilter}.
@@ -278,7 +260,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
 
                         if (method.equals(HttpMethod.OPTIONS.name())) {
                             Optional<Credential> first = credentials.stream().findFirst();
-                            if (first.get().isCors()) {
+                            if (first.isPresent() && first.get().isCors()) {
                             	credential = first.get();
                             }
                         }

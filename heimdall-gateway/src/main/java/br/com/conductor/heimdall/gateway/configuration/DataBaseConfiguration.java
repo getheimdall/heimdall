@@ -1,18 +1,15 @@
-
-package br.com.conductor.heimdall.gateway.configuration;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +17,7 @@ package br.com.conductor.heimdall.gateway.configuration;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.configuration;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -41,9 +39,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 import br.com.conductor.heimdall.core.environment.Property;
-import br.com.twsoftware.alfred.object.Objeto;
 import liquibase.integration.spring.SpringLiquibase;
-import lombok.Cleanup;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -65,8 +61,6 @@ public class DataBaseConfiguration implements EnvironmentAware {
      private String database;
 
      private RelaxedPropertyResolver liquiBasePropertyResolver;
-     
-     private SpringLiquibase liquibase;
      
      @Override
      public void setEnvironment(Environment environment) {
@@ -111,17 +105,17 @@ public class DataBaseConfiguration implements EnvironmentAware {
                hikariConfig.addDataSourceProperty("multiSubnetFailover", property.getDatasource().isMultiSubnetFailover());
           }
 
-          if (Objeto.notBlank(property.getDatasource().getEncrypt())) {
+          if (property.getDatasource().getEncrypt() != null) {
                
                hikariConfig.addDataSourceProperty("encrypt", property.getDatasource().getEncrypt());
           }
           
-          if (Objeto.notBlank(property.getDatasource().getTrustServerCertificate())) {
+          if (property.getDatasource().getTrustServerCertificate() != null) {
                
                hikariConfig.addDataSourceProperty("trustServerCertificate", property.getDatasource().getTrustServerCertificate());
           }
           
-          if (Objeto.notBlank(property.getDatasource().getHostNameInCertificate())) {
+          if (property.getDatasource().getHostNameInCertificate() != null) {
                
                hikariConfig.addDataSourceProperty("hostNameInCertificate", property.getDatasource().getHostNameInCertificate());
           }
@@ -137,22 +131,22 @@ public class DataBaseConfiguration implements EnvironmentAware {
       * @param dataSource		The {@link DataSource} that will be used to create the {@link SpringLiquibase} instance
       * @return					The {@link SpringLiquibase} instance created
       */
-     @Bean
-     public SpringLiquibase liquibase(@Qualifier("dataSource") DataSource dataSource) {
+	@Bean
+	public SpringLiquibase liquibase(@Qualifier("dataSource") DataSource dataSource) {
 
-          liquibase = new SpringLiquibase();
-          liquibase.setDataSource(dataSource);
-          liquibase.setChangeLog("classpath:liquibase/master.xml");
-          liquibase.setContexts(liquiBasePropertyResolver.getProperty("context"));
-          liquibase.setShouldRun(property.getDatasource().isRunLiquibase());
+		SpringLiquibase liquibase = new SpringLiquibase();
+		liquibase.setDataSource(dataSource);
+		liquibase.setChangeLog("classpath:liquibase/master.xml");
+		liquibase.setContexts(liquiBasePropertyResolver.getProperty("context"));
+		liquibase.setShouldRun(property.getDatasource().isRunLiquibase());
 
-          releaseLiquibaseLocks(dataSource);
-          clearLiquibaseCheckSums(dataSource);
+		releaseLiquibaseLocks(dataSource);
+		clearLiquibaseCheckSums(dataSource);
 
-          log.debug("Configuring Liquibase and versioning the database ... Please wait!");
+		log.debug("Configuring Liquibase and versioning the database ... Please wait!");
 
-          return liquibase;
-     }
+		return liquibase;
+	}
 
      /**
       * Release all Liquibase locks from a {@link DataSource}.
@@ -161,15 +155,10 @@ public class DataBaseConfiguration implements EnvironmentAware {
       */
      public void releaseLiquibaseLocks(DataSource ds) {
 
-          try {
+          try (Connection con = ds.getConnection(); Statement st = con.createStatement()) {
 
                log.info("Releasing Liquibase Locks");
 
-               @Cleanup
-               Connection con = ds.getConnection();
-
-               @Cleanup
-               Statement st = con.createStatement();
                st.executeUpdate("DELETE FROM DATABASECHANGELOGLOCK");
 
                con.commit();
@@ -186,15 +175,10 @@ public class DataBaseConfiguration implements EnvironmentAware {
       */
      public void clearLiquibaseCheckSums(DataSource ds) {
 
-          try {
+    	 try (Connection con = ds.getConnection(); Statement st = con.createStatement()) {
 
                log.info("Clear Liquibase ChecksSums");
 
-               @Cleanup
-               Connection con = ds.getConnection();
-
-               @Cleanup
-               Statement st = con.createStatement();
                st.executeUpdate("UPDATE DATABASECHANGELOG SET MD5SUM=NULL");
 
                con.commit();

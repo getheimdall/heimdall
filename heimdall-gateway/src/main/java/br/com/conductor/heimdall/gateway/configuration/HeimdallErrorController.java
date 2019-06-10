@@ -1,18 +1,15 @@
-
-package br.com.conductor.heimdall.gateway.configuration;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +17,7 @@ package br.com.conductor.heimdall.gateway.configuration;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.configuration;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -36,6 +34,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
@@ -64,7 +63,7 @@ public class HeimdallErrorController implements ErrorController {
       * @param request		The {@link HttpServletRequest}
       * @return				{@link ResponseEntity}
       */
-     @RequestMapping(value = "${error.path:/error}", produces = MediaType.APPLICATION_JSON_VALUE)
+     @RequestMapping(value = "${error.path:/error}", produces = MediaType.APPLICATION_JSON_VALUE, method=RequestMethod.GET)
      public @ResponseBody ResponseEntity<Map<String, Object>> error(HttpServletRequest request) {
           Map<String, Object> errorAttributes = new LinkedHashMap<String, Object>();
           errorAttributes.put("timestamp", LocalDateTime.now());
@@ -81,10 +80,10 @@ public class HeimdallErrorController implements ErrorController {
           Throwable error = getError(request);
           
           if (error != null) {
-               HeimdallException exceptionPIER = new HeimdallException(ExceptionMessage.GLOBAL_ERROR_ZUUL);
+               HeimdallException exception = new HeimdallException(ExceptionMessage.GLOBAL_ERROR_ZUUL);
                
-               errorAttributes.put("exception", exceptionPIER.getClass().getSimpleName());
-               errorAttributes.put("message", exceptionPIER.getMessage());
+               errorAttributes.put("exception", exception.getClass().getSimpleName());
+               errorAttributes.put("message", exception.getMessage());
           }
           
           Object message = request.getAttribute("javax.servlet.error.message");
