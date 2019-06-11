@@ -243,7 +243,6 @@ public enum ExceptionMessage {
             case REQUEST_TIMEOUT:
                 throw new TimeoutException(this);
             case INTERNAL_SERVER_ERROR:
-                throw new ServerErrorException(this);
             default:
                 throw new ServerErrorException(this);
         }
