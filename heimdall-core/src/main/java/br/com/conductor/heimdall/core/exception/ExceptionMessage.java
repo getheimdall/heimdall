@@ -244,7 +244,6 @@ public enum ExceptionMessage {
                 throw new NotFoundException(this);
             case REQUEST_TIMEOUT:
                 throw new TimeoutException(this);
-            case INTERNAL_SERVER_ERROR:
             default:
                 throw new ServerErrorException(this);
         }
@@ -266,11 +265,11 @@ public enum ExceptionMessage {
         if (dynamicText != null && dynamicText.length > 0) {
 
             if (dynamicText.length == 1) {
-                this.message = messageDefault.replaceAll("\\{}", dynamicText[0]);
+                this.message = messageDefault.replace("{}", dynamicText[0]);
             } else {
 
                 int count = 0;
-                while (messageDefault.contains("{}")) {
+                while (messageDefault.contains("{}") && count < dynamicText.length) {
                     messageDefault = messageDefault.replaceFirst("\\{}", dynamicText[count]);
 
                     this.message = messageDefault;
