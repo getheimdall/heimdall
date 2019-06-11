@@ -196,7 +196,7 @@ public class OperationService {
           HeimdallException.checkThrow(resData != null &&
                   Objects.equals(resData.getResource().getId(), resource.getId()), ONLY_ONE_OPERATION_PER_RESOURCE);
 
-          boolean patternExists = operationJDBCRepository.countPattern(resource.getApi().getBasePath() + "/" + operation.getPath());
+          boolean patternExists = operationJDBCRepository.patternExists(resource.getApi().getBasePath() + "/" + operation.getPath());
           HeimdallException.checkThrow(patternExists, OPERATION_ROUTE_ALREADY_EXISTS);
 
           operation.setResource(resource);
@@ -235,7 +235,7 @@ public class OperationService {
           operation = GenericConverter.mapper(operationDTO, operation);
           operation.setPath(StringUtils.removeMultipleSlashes(operation.getPath()));
 
-          boolean patternExists = operationJDBCRepository.countPattern(operation.getResource().getApi().getBasePath() + "/" + operation.getPath());
+          boolean patternExists = operationJDBCRepository.patternExists(operation.getResource().getApi().getBasePath() + "/" + operation.getPath());
           HeimdallException.checkThrow(patternExists, OPERATION_ROUTE_ALREADY_EXISTS);
 
           HeimdallException.checkThrow(validateSingleWildCardOperationPath(operation), OPERATION_CANT_HAVE_SINGLE_WILDCARD);
@@ -304,7 +304,7 @@ public class OperationService {
          List<String> path = Arrays.asList(operation.getPath().split("/"));
                    
          if (path.contains("**"))
-        	 return !operation.getPath().endsWith("**") || !(path.stream().filter(o -> o.equals("**")).count() == 1);              
+        	 return !(operation.getPath().endsWith("**") && (path.stream().filter(o -> o.equals("**")).count() == 1));
          else 
        	 	 return false;
     }
