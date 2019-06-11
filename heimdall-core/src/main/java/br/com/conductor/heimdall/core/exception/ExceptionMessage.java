@@ -264,22 +264,17 @@ public enum ExceptionMessage {
 
         if (dynamicText != null && dynamicText.length > 0) {
 
-            int count = 0;
-            String baseMessage = messageDefault;
-            while (baseMessage.contains("{}")) {
+            if (dynamicText.length == 1) {
+                this.message = messageDefault.replaceAll("\\{}", dynamicText[0]);
+            } else {
 
-                if (dynamicText.length == 1) {
+                int count = 0;
+                while (messageDefault.contains("{}")) {
+                    messageDefault = messageDefault.replaceFirst("\\{}", dynamicText[count]);
 
-                    this.message = messageDefault.replace("{}", dynamicText[count]);
-                    baseMessage = this.message;
-                } else {
-
-                    messageDefault = messageDefault.replaceFirst("\\{\\}", dynamicText[count]);
                     this.message = messageDefault;
-                    baseMessage = this.message;
-
+                    count++;
                 }
-                count++;
             }
         }
         raise();
