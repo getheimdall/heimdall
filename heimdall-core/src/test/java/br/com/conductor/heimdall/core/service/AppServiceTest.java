@@ -37,6 +37,8 @@ import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.repository.DeveloperRepository;
 import br.com.conductor.heimdall.core.repository.PlanRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
+import com.google.common.collect.Lists;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -57,6 +59,9 @@ import java.util.List;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
@@ -89,6 +94,8 @@ public class AppServiceTest {
     private App app1;
     private Developer developer;
     private AppPersist appPersist;
+    private AppDTO appDTO;
+    private List<ReferenceIdDTO> referenceIdDTOList = Lists.newArrayList(new ReferenceIdDTO(0L));
 
     @Before
     public void initAttributes() {
@@ -109,7 +116,10 @@ public class AppServiceTest {
         appPersist.setName("App test");
         appPersist.setDescription("App test description");
         appPersist.setDeveloper(new ReferenceIdDTO(1L));
-
+    
+        appDTO = new AppDTO();
+        appDTO.setName("App name");
+        appDTO.setDeveloper(new ReferenceIdDTO(1l));
     }
 
     @Test
@@ -308,5 +318,59 @@ public class AppServiceTest {
         this.appService.delete(1L);
         Mockito.verify(this.appRepository, Mockito.times(1)).delete(app);
 
+    }
+
+    @Test
+    public void testUpdateHavingPlans() {
+        Mockito.when(appRepository.findOne(Mockito.anyLong())).thenReturn(app);
+        Mockito.when(appRepository.save(Mockito.any(App.class))).thenReturn(app);
+        Mockito.when(accessTokenRepository.findByAppId(Mockito.anyLong())).thenReturn(Lists.newArrayList(getAccessToken(Lists.newArrayList(getPlan()))));
+        
+        appDTO.setPlans(referenceIdDTOList);
+        
+        this.appService.update(0L, appDTO);
+        Mockito.verify(accessTokenRepository, Mockito.times(2)).findByAppId(Mockito.anyLong());
+        Mockito.verify(accessTokenRepository, Mockito.times(1)).save(Mockito.any(AccessToken.class));
+    }
+    
+    
+    @Test
+    public void testUpdateHavingNoAccessToken() {
+        Mockito.when(appRepository.findOne(Mockito.anyLong())).thenReturn(app);
+        Mockito.when(appRepository.save(Mockito.any(App.class))).thenReturn(app);
+        Mockito.when(accessTokenRepository.findByAppId(Mockito.anyLong())).thenReturn(null);
+        
+        appDTO.setPlans(referenceIdDTOList);
+        
+        this.appService.update(0L, appDTO);
+        Mockito.verify(accessTokenRepository, Mockito.times(0)).save(Mockito.any(AccessToken.class));
+    }
+    
+    @Test
+    public void testUpdateHavingEmptyAccessToken() {
+        Mockito.when(appRepository.findOne(Mockito.anyLong())).thenReturn(app);
+        Mockito.when(appRepository.save(Mockito.any(App.class))).thenReturn(app);
+        Mockito.when(accessTokenRepository.findByAppId(Mockito.anyLong())).thenReturn(new ArrayList<>());
+        
+        appDTO.setPlans(referenceIdDTOList);
+        
+        this.appService.update(0L, appDTO);
+        Mockito.verify(accessTokenRepository, Mockito.times(0)).save(Mockito.any(AccessToken.class));
+    }
+    
+    
+    private Plan getPlan() {
+        
+        Plan plan = new Plan();
+        plan.setId(1l);
+        return plan;
+    }
+    
+    private AccessToken getAccessToken(List<Plan> plans) {
+        
+        AccessToken accessToken = new AccessToken();
+        accessToken.setPlans(plans);
+        accessToken.setId(0L);
+        return accessToken;
     }
 }

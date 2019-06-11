@@ -50,7 +50,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
@@ -171,6 +170,8 @@ public class InterceptorService {
         HeimdallException.checkThrow(!ignoredOperations.isEmpty(), INTERCEPTOR_IGNORED_INVALID, ignoredOperations.toString());
 
         HeimdallException.checkThrow((TypeInterceptor.CLIENT_ID.equals(interceptor.getType()) && InterceptorLifeCycle.PLAN.equals(interceptor.getLifeCycle())), INTERCEPTOR_INVALID_LIFECYCLE, interceptor.getType().name());
+        HeimdallException.checkThrow((TypeInterceptor.MIDDLEWARE.equals(interceptor.getType()) && !InterceptorLifeCycle.OPERATION.equals(interceptor.getLifeCycle())),
+                                     MIDDLEWARE_NO_OPERATION_FOUND, interceptor.getType().name());
 
         if (TypeInterceptor.RATTING == interceptor.getType()) {
             mountRatelimitInRedis(interceptor);
