@@ -20,18 +20,20 @@ package br.com.conductor.heimdall.core.service;
  * ==========================LICENSE_END===================================
  */
 
-import static org.junit.Assert.assertEquals;
-
 import br.com.conductor.heimdall.core.dto.ApiDTO;
+import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
+import br.com.conductor.heimdall.core.dto.page.ApiPage;
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Environment;
+import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.enums.Status;
 import br.com.conductor.heimdall.core.exception.BadRequestException;
 import br.com.conductor.heimdall.core.repository.ApiRepository;
+import br.com.conductor.heimdall.core.repository.ResourceRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
+import io.swagger.models.Swagger;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -40,9 +42,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
@@ -50,327 +60,437 @@ import java.util.List;
 @RunWith(MockitoJUnitRunner.class)
 public class ApiServiceTest {
 
+     @InjectMocks
+     private ApiService apiService;
 
-    @InjectMocks
-    private ApiService apiService;
+     @Mock
+     private ApiRepository apiRepository;
 
-    @Mock
-    private ApiRepository apiRepository;
+     @Mock
+     private ResourceRepository resourceRepository;
 
-    @Mock
-    private EnvironmentService environmentService;
+     @Mock
+     private EnvironmentService environmentService;
 
-    @Mock
-    private AMQPRouteService amqpRoute;
+     @Mock
+     private ResourceService resourceService;
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+     @Mock
+     private SwaggerService swaggerService;
 
-    private ApiDTO apiDTO;
+     @Mock
+     private MiddlewareService middlewareService;
 
-    private Api api;
+     @Mock
+     private AMQPRouteService amqpRoute;
 
-    @Before
-    public void initAttributes() {
-        api = new Api();
-        api.setId(1L);
-        api.setBasePath("/test");
+     @Rule
+     public ExpectedException thrown = ExpectedException.none();
 
-        apiDTO = new ApiDTO();
-        apiDTO.setName("test");
-        apiDTO.setBasePath("/test");
-        apiDTO.setDescription("test");
-        apiDTO.setVersion("1.0.0");
-        apiDTO.setStatus(Status.ACTIVE);
-    }
+     private ApiDTO apiDTO;
 
-    @Test
-    public void saveTestWithSuccess() {
-        Environment e1 = new Environment();
-        e1.setInboundURL("http://localhost:8080");
+     private Api api;
 
-        Environment e2 = new Environment();
-        e2.setInboundURL("http://localhost:8081");
+     @Before
+     public void initAttributes() {
 
-        Environment e3 = new Environment();
-        e3.setInboundURL("http://localhost:8082");
+          api = new Api();
+          api.setId(1L);
+          api.setBasePath("/test");
 
-        Mockito.when(apiRepository.save(Mockito.any(Api.class))).thenReturn(api);
-        Mockito.when(environmentService.find(1L)).thenReturn(e1);
-        Mockito.when(environmentService.find(2L)).thenReturn(e2);
-        Mockito.when(environmentService.find(3L)).thenReturn(e3);
+          apiDTO = new ApiDTO();
+          apiDTO.setName("test");
+          apiDTO.setBasePath("/test");
+          apiDTO.setDescription("test");
+          apiDTO.setVersion("1.0.0");
+          apiDTO.setStatus(Status.ACTIVE);
+     }
 
-        List<ReferenceIdDTO> environmentsDTO = new ArrayList<>();
-        environmentsDTO.add(new ReferenceIdDTO(1L));
-        environmentsDTO.add(new ReferenceIdDTO(2L));
-        environmentsDTO.add(new ReferenceIdDTO(3L));
+     @Test
+     public void saveTestWithSuccess() {
 
-        apiDTO.setEnvironments(environmentsDTO);
+          Environment e1 = new Environment();
+          e1.setInboundURL("http://localhost:8080");
 
-        Api saved = apiService.save(apiDTO);
+          Environment e2 = new Environment();
+          e2.setInboundURL("http://localhost:8081");
 
-        assertEquals(saved.getId(), api.getId());
-    }
+          Environment e3 = new Environment();
+          e3.setInboundURL("http://localhost:8082");
 
-    @Test
-    public void saveTestWithEnvironmentNull() {
+          Mockito.when(apiRepository.save(Mockito.any(Api.class))).thenReturn(api);
+          Mockito.when(environmentService.find(1L)).thenReturn(e1);
+          Mockito.when(environmentService.find(2L)).thenReturn(e2);
+          Mockito.when(environmentService.find(3L)).thenReturn(e3);
 
-        Environment e1 = new Environment();
-        e1.setInboundURL("http://localhost:8080");
+          List<ReferenceIdDTO> environmentsDTO = new ArrayList<>();
+          environmentsDTO.add(new ReferenceIdDTO(1L));
+          environmentsDTO.add(new ReferenceIdDTO(2L));
+          environmentsDTO.add(new ReferenceIdDTO(3L));
 
-        Environment e2 = new Environment();
-        e2.setInboundURL("http://localhost:8081");
+          apiDTO.setEnvironments(environmentsDTO);
 
-        Mockito.when(apiRepository.save(Mockito.any(Api.class))).thenReturn(api);
-        Mockito.when(environmentService.find(1L)).thenReturn(e1);
-        Mockito.when(environmentService.find(2L)).thenReturn(e2);
-        Mockito.when(environmentService.find(3L)).thenReturn(null);
+          Api saved = apiService.save(apiDTO);
 
-        List<ReferenceIdDTO> environmentsDTO = new ArrayList<>();
-        environmentsDTO.add(new ReferenceIdDTO(1L));
-        environmentsDTO.add(new ReferenceIdDTO(2L));
-        environmentsDTO.add(new ReferenceIdDTO(3L));
+          assertEquals(saved.getId(), api.getId());
+     }
 
-        apiDTO.setEnvironments(environmentsDTO);
+     @Test
+     public void saveTestWithEnvironmentNull() {
 
-        Api saved = apiService.save(apiDTO);
+          Environment e1 = new Environment();
+          e1.setInboundURL("http://localhost:8080");
 
-        assertEquals(saved.getId(), api.getId());
-    }
+          Environment e2 = new Environment();
+          e2.setInboundURL("http://localhost:8081");
 
-    @Test
-    public void saveTestWithInboundEnvironmentsNull() {
-        Environment e1 = new Environment();
-        e1.setInboundURL("http://localhost:8080");
+          Mockito.when(apiRepository.save(Mockito.any(Api.class))).thenReturn(api);
+          Mockito.when(environmentService.find(1L)).thenReturn(e1);
+          Mockito.when(environmentService.find(2L)).thenReturn(e2);
+          Mockito.when(environmentService.find(3L)).thenReturn(null);
 
-        Environment e2 = new Environment();
+          List<ReferenceIdDTO> environmentsDTO = new ArrayList<>();
+          environmentsDTO.add(new ReferenceIdDTO(1L));
+          environmentsDTO.add(new ReferenceIdDTO(2L));
+          environmentsDTO.add(new ReferenceIdDTO(3L));
 
-        Environment e3 = new Environment();
+          apiDTO.setEnvironments(environmentsDTO);
 
-        Mockito.when(apiRepository.save(Mockito.any(Api.class))).thenReturn(api);
-        Mockito.when(environmentService.find(1L)).thenReturn(e1);
-        Mockito.when(environmentService.find(2L)).thenReturn(e2);
-        Mockito.when(environmentService.find(3L)).thenReturn(e3);
+          Api saved = apiService.save(apiDTO);
 
-        List<ReferenceIdDTO> environmentsDTO = new ArrayList<>();
-        environmentsDTO.add(new ReferenceIdDTO(1L));
-        environmentsDTO.add(new ReferenceIdDTO(2L));
-        environmentsDTO.add(new ReferenceIdDTO(3L));
+          assertEquals(saved.getId(), api.getId());
+     }
 
-        apiDTO.setEnvironments(environmentsDTO);
+     @Test
+     public void saveTestWithInboundEnvironmentsNull() {
 
-        Api saved = apiService.save(apiDTO);
+          Environment e1 = new Environment();
+          e1.setInboundURL("http://localhost:8080");
 
-        assertEquals(saved.getId(), api.getId());
-    }
+          Environment e2 = new Environment();
 
-    @Test
-    public void saveTestWithInboundEnvironmentsEmpty() {
-        Environment e1 = new Environment();
-        e1.setInboundURL("http://localhost:8080");
+          Environment e3 = new Environment();
 
-        Environment e2 = new Environment();
-        e2.setInboundURL("");
+          Mockito.when(apiRepository.save(Mockito.any(Api.class))).thenReturn(api);
+          Mockito.when(environmentService.find(1L)).thenReturn(e1);
+          Mockito.when(environmentService.find(2L)).thenReturn(e2);
+          Mockito.when(environmentService.find(3L)).thenReturn(e3);
 
-        Environment e3 = new Environment();
-        e3.setInboundURL("");
+          List<ReferenceIdDTO> environmentsDTO = new ArrayList<>();
+          environmentsDTO.add(new ReferenceIdDTO(1L));
+          environmentsDTO.add(new ReferenceIdDTO(2L));
+          environmentsDTO.add(new ReferenceIdDTO(3L));
 
-        Mockito.when(apiRepository.save(Mockito.any(Api.class))).thenReturn(api);
-        Mockito.when(environmentService.find(1L)).thenReturn(e1);
-        Mockito.when(environmentService.find(2L)).thenReturn(e2);
-        Mockito.when(environmentService.find(3L)).thenReturn(e3);
+          apiDTO.setEnvironments(environmentsDTO);
 
-        List<ReferenceIdDTO> environmentsDTO = new ArrayList<>();
-        environmentsDTO.add(new ReferenceIdDTO(1L));
-        environmentsDTO.add(new ReferenceIdDTO(2L));
-        environmentsDTO.add(new ReferenceIdDTO(3L));
+          Api saved = apiService.save(apiDTO);
 
-        apiDTO.setEnvironments(environmentsDTO);
+          assertEquals(saved.getId(), api.getId());
+     }
 
-        Api saved = apiService.save(apiDTO);
+     @Test
+     public void saveTestWithInboundEnvironmentsEmpty() {
 
-        assertEquals(saved.getId(), api.getId());
-    }
+          Environment e1 = new Environment();
+          e1.setInboundURL("http://localhost:8080");
 
-    @Test
-    public void saveTestExpectedException() {
+          Environment e2 = new Environment();
+          e2.setInboundURL("");
 
-        thrown.expect(BadRequestException.class);
-        thrown.expectMessage("Apis can't have environments with the same inbound url");
+          Environment e3 = new Environment();
+          e3.setInboundURL("");
 
-        Environment e1 = new Environment();
-        e1.setInboundURL("http://localhost:8080");
+          Mockito.when(apiRepository.save(Mockito.any(Api.class))).thenReturn(api);
+          Mockito.when(environmentService.find(1L)).thenReturn(e1);
+          Mockito.when(environmentService.find(2L)).thenReturn(e2);
+          Mockito.when(environmentService.find(3L)).thenReturn(e3);
 
-        Environment e2 = new Environment();
-        e2.setInboundURL("http://localhost:8081");
+          List<ReferenceIdDTO> environmentsDTO = new ArrayList<>();
+          environmentsDTO.add(new ReferenceIdDTO(1L));
+          environmentsDTO.add(new ReferenceIdDTO(2L));
+          environmentsDTO.add(new ReferenceIdDTO(3L));
 
-        Environment e3 = new Environment();
-        e3.setInboundURL("http://localhost:8081");
+          apiDTO.setEnvironments(environmentsDTO);
 
-        Mockito.when(apiRepository.save(Mockito.any(Api.class))).thenReturn(api);
-        Mockito.when(environmentService.find(1L)).thenReturn(e1);
-        Mockito.when(environmentService.find(2L)).thenReturn(e2);
-        Mockito.when(environmentService.find(3L)).thenReturn(e3);
+          Api saved = apiService.save(apiDTO);
 
-        List<ReferenceIdDTO> environmentsDTO = new ArrayList<>();
-        environmentsDTO.add(new ReferenceIdDTO(1L));
-        environmentsDTO.add(new ReferenceIdDTO(2L));
-        environmentsDTO.add(new ReferenceIdDTO(3L));
+          assertEquals(saved.getId(), api.getId());
+     }
 
-        apiDTO.setEnvironments(environmentsDTO);
+     @Test
+     public void saveTestExpectedException() {
 
-        Api saved = apiService.save(apiDTO);
-    }
+          thrown.expect(BadRequestException.class);
+          thrown.expectMessage("Apis can't have environments with the same inbound url");
 
-    @Test
-    public void updateTestSuccess() {
+          Environment e1 = new Environment();
+          e1.setInboundURL("http://localhost:8080");
 
-        Environment e1 = new Environment();
-        e1.setInboundURL("http://localhost:8080");
+          Environment e2 = new Environment();
+          e2.setInboundURL("http://localhost:8081");
 
-        Environment e2 = new Environment();
-        e2.setInboundURL("http://localhost:8081");
+          Environment e3 = new Environment();
+          e3.setInboundURL("http://localhost:8081");
 
-        Environment e3 = new Environment();
-        e3.setInboundURL("http://localhost:8082");
+          Mockito.when(apiRepository.save(Mockito.any(Api.class))).thenReturn(api);
+          Mockito.when(environmentService.find(1L)).thenReturn(e1);
+          Mockito.when(environmentService.find(2L)).thenReturn(e2);
+          Mockito.when(environmentService.find(3L)).thenReturn(e3);
 
-        Mockito.when(apiRepository.save(Mockito.any(Api.class))).thenReturn(api);
-        Mockito.when(apiRepository.findOne(Mockito.anyLong())).thenReturn(api);
-        Mockito.when(apiRepository.findByBasePath(Mockito.anyString())).thenReturn(api);
-        Mockito.when(environmentService.find(1L)).thenReturn(e1);
-        Mockito.when(environmentService.find(2L)).thenReturn(e2);
-        Mockito.when(environmentService.find(3L)).thenReturn(e3);
+          List<ReferenceIdDTO> environmentsDTO = new ArrayList<>();
+          environmentsDTO.add(new ReferenceIdDTO(1L));
+          environmentsDTO.add(new ReferenceIdDTO(2L));
+          environmentsDTO.add(new ReferenceIdDTO(3L));
 
-        List<ReferenceIdDTO> environmentsDTO = new ArrayList<>();
-        environmentsDTO.add(new ReferenceIdDTO(1L));
-        environmentsDTO.add(new ReferenceIdDTO(2L));
-        environmentsDTO.add(new ReferenceIdDTO(3L));
+          apiDTO.setEnvironments(environmentsDTO);
 
-        apiDTO.setEnvironments(environmentsDTO);
+          Api saved = apiService.save(apiDTO);
+     }
 
-        Api update = apiService.update(1L, apiDTO);
+     @Test
+     public void updateTestSuccess() {
 
-        assertEquals(update.getId(), api.getId());
-    }
+          Environment e1 = new Environment();
+          e1.setInboundURL("http://localhost:8080");
 
-    @Test
-    public void updateTestEnvironmentsNull() {
+          Environment e2 = new Environment();
+          e2.setInboundURL("http://localhost:8081");
 
-        Environment e1 = new Environment();
-        e1.setInboundURL("http://localhost:8080");
+          Environment e3 = new Environment();
+          e3.setInboundURL("http://localhost:8082");
 
-        Environment e2 = new Environment();
-        e2.setInboundURL("http://localhost:8081");
+          Mockito.when(apiRepository.save(Mockito.any(Api.class))).thenReturn(api);
+          Mockito.when(apiRepository.findOne(Mockito.anyLong())).thenReturn(api);
+          Mockito.when(apiRepository.findByBasePath(Mockito.anyString())).thenReturn(api);
+          Mockito.when(environmentService.find(1L)).thenReturn(e1);
+          Mockito.when(environmentService.find(2L)).thenReturn(e2);
+          Mockito.when(environmentService.find(3L)).thenReturn(e3);
 
-        Mockito.when(apiRepository.save(Mockito.any(Api.class))).thenReturn(api);
-        Mockito.when(apiRepository.findOne(Mockito.anyLong())).thenReturn(api);
-        Mockito.when(apiRepository.findByBasePath(Mockito.anyString())).thenReturn(api);
-        Mockito.when(environmentService.find(1L)).thenReturn(e1);
-        Mockito.when(environmentService.find(2L)).thenReturn(e2);
-        Mockito.when(environmentService.find(3L)).thenReturn(null);
+          List<ReferenceIdDTO> environmentsDTO = new ArrayList<>();
+          environmentsDTO.add(new ReferenceIdDTO(1L));
+          environmentsDTO.add(new ReferenceIdDTO(2L));
+          environmentsDTO.add(new ReferenceIdDTO(3L));
 
-        List<ReferenceIdDTO> environmentsDTO = new ArrayList<>();
-        environmentsDTO.add(new ReferenceIdDTO(1L));
-        environmentsDTO.add(new ReferenceIdDTO(2L));
-        environmentsDTO.add(new ReferenceIdDTO(3L));
+          apiDTO.setEnvironments(environmentsDTO);
 
-        apiDTO.setEnvironments(environmentsDTO);
+          Api update = apiService.update(1L, apiDTO);
 
-        Api update = apiService.update(1L, apiDTO);
+          assertEquals(update.getId(), api.getId());
+     }
 
-        assertEquals(update.getId(), api.getId());
-    }
+     @Test
+     public void updateTestEnvironmentsNull() {
 
-    @Test
-    public void updateTestInboundsEnvironmentNull() {
+          Environment e1 = new Environment();
+          e1.setInboundURL("http://localhost:8080");
 
-        Environment e1 = new Environment();
-        e1.setInboundURL("http://localhost:8080");
+          Environment e2 = new Environment();
+          e2.setInboundURL("http://localhost:8081");
 
-        Environment e2 = new Environment();
+          Mockito.when(apiRepository.save(Mockito.any(Api.class))).thenReturn(api);
+          Mockito.when(apiRepository.findOne(Mockito.anyLong())).thenReturn(api);
+          Mockito.when(apiRepository.findByBasePath(Mockito.anyString())).thenReturn(api);
+          Mockito.when(environmentService.find(1L)).thenReturn(e1);
+          Mockito.when(environmentService.find(2L)).thenReturn(e2);
+          Mockito.when(environmentService.find(3L)).thenReturn(null);
 
-        Environment e3 = new Environment();
+          List<ReferenceIdDTO> environmentsDTO = new ArrayList<>();
+          environmentsDTO.add(new ReferenceIdDTO(1L));
+          environmentsDTO.add(new ReferenceIdDTO(2L));
+          environmentsDTO.add(new ReferenceIdDTO(3L));
 
-        Mockito.when(apiRepository.save(Mockito.any(Api.class))).thenReturn(api);
-        Mockito.when(apiRepository.findOne(Mockito.anyLong())).thenReturn(api);
-        Mockito.when(apiRepository.findByBasePath(Mockito.anyString())).thenReturn(api);
-        Mockito.when(environmentService.find(1L)).thenReturn(e1);
-        Mockito.when(environmentService.find(2L)).thenReturn(e2);
-        Mockito.when(environmentService.find(3L)).thenReturn(e3);
+          apiDTO.setEnvironments(environmentsDTO);
 
-        List<ReferenceIdDTO> environmentsDTO = new ArrayList<>();
-        environmentsDTO.add(new ReferenceIdDTO(1L));
-        environmentsDTO.add(new ReferenceIdDTO(2L));
-        environmentsDTO.add(new ReferenceIdDTO(3L));
+          Api update = apiService.update(1L, apiDTO);
 
-        apiDTO.setEnvironments(environmentsDTO);
+          assertEquals(update.getId(), api.getId());
+     }
 
-        Api update = apiService.update(1L, apiDTO);
+     @Test
+     public void updateTestInboundsEnvironmentNull() {
 
-        assertEquals(update.getId(), api.getId());
-    }
+          Environment e1 = new Environment();
+          e1.setInboundURL("http://localhost:8080");
 
-    @Test
-    public void updateTestInboundsEnvironmentEmpty() {
+          Environment e2 = new Environment();
 
-        Environment e1 = new Environment();
-        e1.setInboundURL("http://localhost:8080");
+          Environment e3 = new Environment();
 
-        Environment e2 = new Environment();
-        e2.setInboundURL("");
+          Mockito.when(apiRepository.save(Mockito.any(Api.class))).thenReturn(api);
+          Mockito.when(apiRepository.findOne(Mockito.anyLong())).thenReturn(api);
+          Mockito.when(apiRepository.findByBasePath(Mockito.anyString())).thenReturn(api);
+          Mockito.when(environmentService.find(1L)).thenReturn(e1);
+          Mockito.when(environmentService.find(2L)).thenReturn(e2);
+          Mockito.when(environmentService.find(3L)).thenReturn(e3);
 
-        Environment e3 = new Environment();
-        e3.setInboundURL("");
+          List<ReferenceIdDTO> environmentsDTO = new ArrayList<>();
+          environmentsDTO.add(new ReferenceIdDTO(1L));
+          environmentsDTO.add(new ReferenceIdDTO(2L));
+          environmentsDTO.add(new ReferenceIdDTO(3L));
 
-        Mockito.when(apiRepository.save(Mockito.any(Api.class))).thenReturn(api);
-        Mockito.when(apiRepository.findOne(Mockito.anyLong())).thenReturn(api);
-        Mockito.when(apiRepository.findByBasePath(Mockito.anyString())).thenReturn(api);
-        Mockito.when(environmentService.find(1L)).thenReturn(e1);
-        Mockito.when(environmentService.find(2L)).thenReturn(e2);
-        Mockito.when(environmentService.find(3L)).thenReturn(e3);
+          apiDTO.setEnvironments(environmentsDTO);
 
-        List<ReferenceIdDTO> environmentsDTO = new ArrayList<>();
-        environmentsDTO.add(new ReferenceIdDTO(1L));
-        environmentsDTO.add(new ReferenceIdDTO(2L));
-        environmentsDTO.add(new ReferenceIdDTO(3L));
+          Api update = apiService.update(1L, apiDTO);
 
-        apiDTO.setEnvironments(environmentsDTO);
+          assertEquals(update.getId(), api.getId());
+     }
 
-        Api update = apiService.update(1L, apiDTO);
+     @Test
+     public void updateTestInboundsEnvironmentEmpty() {
 
-        assertEquals(update.getId(), api.getId());
-    }
+          Environment e1 = new Environment();
+          e1.setInboundURL("http://localhost:8080");
 
-    @Test
-    public void updateTestExpectedException() {
+          Environment e2 = new Environment();
+          e2.setInboundURL("");
 
-        thrown.expect(BadRequestException.class);
-        thrown.expectMessage("Apis can't have environments with the same inbound url");
+          Environment e3 = new Environment();
+          e3.setInboundURL("");
 
-        Environment e1 = new Environment();
-        e1.setInboundURL("http://localhost:8080");
+          Mockito.when(apiRepository.save(Mockito.any(Api.class))).thenReturn(api);
+          Mockito.when(apiRepository.findOne(Mockito.anyLong())).thenReturn(api);
+          Mockito.when(apiRepository.findByBasePath(Mockito.anyString())).thenReturn(api);
+          Mockito.when(environmentService.find(1L)).thenReturn(e1);
+          Mockito.when(environmentService.find(2L)).thenReturn(e2);
+          Mockito.when(environmentService.find(3L)).thenReturn(e3);
 
-        Environment e2 = new Environment();
-        e2.setInboundURL("http://localhost:8080");
+          List<ReferenceIdDTO> environmentsDTO = new ArrayList<>();
+          environmentsDTO.add(new ReferenceIdDTO(1L));
+          environmentsDTO.add(new ReferenceIdDTO(2L));
+          environmentsDTO.add(new ReferenceIdDTO(3L));
 
-        Environment e3 = new Environment();
-        e3.setInboundURL("http://localhost:8081");
+          apiDTO.setEnvironments(environmentsDTO);
 
-        Mockito.when(apiRepository.save(Mockito.any(Api.class))).thenReturn(api);
-        Mockito.when(apiRepository.findOne(Mockito.anyLong())).thenReturn(api);
-        Mockito.when(apiRepository.findByBasePath(Mockito.anyString())).thenReturn(api);
-        Mockito.when(environmentService.find(1L)).thenReturn(e1);
-        Mockito.when(environmentService.find(2L)).thenReturn(e2);
-        Mockito.when(environmentService.find(3L)).thenReturn(e3);
+          Api update = apiService.update(1L, apiDTO);
 
+          assertEquals(update.getId(), api.getId());
+     }
 
-        List<ReferenceIdDTO> environmentsDTO = new ArrayList<>();
-        environmentsDTO.add(new ReferenceIdDTO(1L));
-        environmentsDTO.add(new ReferenceIdDTO(2L));
-        environmentsDTO.add(new ReferenceIdDTO(3L));
+     @Test
+     public void updateTestExpectedException() {
 
-        apiDTO.setEnvironments(environmentsDTO);
+          thrown.expect(BadRequestException.class);
+          thrown.expectMessage("Apis can't have environments with the same inbound url");
 
-        Api update = apiService.update(1L, apiDTO);
-    }
+          Environment e1 = new Environment();
+          e1.setInboundURL("http://localhost:8080");
+
+          Environment e2 = new Environment();
+          e2.setInboundURL("http://localhost:8080");
+
+          Environment e3 = new Environment();
+          e3.setInboundURL("http://localhost:8081");
+
+          Mockito.when(apiRepository.save(Mockito.any(Api.class))).thenReturn(api);
+          Mockito.when(apiRepository.findOne(Mockito.anyLong())).thenReturn(api);
+          Mockito.when(apiRepository.findByBasePath(Mockito.anyString())).thenReturn(api);
+          Mockito.when(environmentService.find(1L)).thenReturn(e1);
+          Mockito.when(environmentService.find(2L)).thenReturn(e2);
+          Mockito.when(environmentService.find(3L)).thenReturn(e3);
+
+          List<ReferenceIdDTO> environmentsDTO = new ArrayList<>();
+          environmentsDTO.add(new ReferenceIdDTO(1L));
+          environmentsDTO.add(new ReferenceIdDTO(2L));
+          environmentsDTO.add(new ReferenceIdDTO(3L));
+
+          apiDTO.setEnvironments(environmentsDTO);
+
+          Api update = apiService.update(1L, apiDTO);
+     }
+
+     @Test
+     public void listApiWithoutPageableTest() {
+
+          List<Api> apis = new ArrayList<>();
+          apis.add(api);
+
+          Mockito.when(this.apiRepository.findAll(Mockito.any(Example.class))).thenReturn(apis);
+
+          List<Api> listApiResp = apiService.list(apiDTO);
+
+          assertEquals(apis.size(), listApiResp.size());
+          Mockito.verify(this.apiRepository, Mockito.times(1)).findAll(Mockito.any(Example.class));
+     }
+
+     @Test
+     public void listApiWithPageableTest() {
+
+          PageableDTO pageableDTO = new PageableDTO();
+          pageableDTO.setLimit(10);
+          pageableDTO.setOffset(0);
+
+          List<Api> apis = new ArrayList<>();
+          apis.add(api);
+
+          Page<Api> page = new PageImpl<>(apis);
+
+          Mockito.when(this.apiRepository.findAll(Mockito.any(Example.class), Mockito.any(Pageable.class)))
+                 .thenReturn(page);
+
+          ApiPage apiPageResp = apiService.list(apiDTO, pageableDTO);
+
+          assertEquals(1L, apiPageResp.getTotalElements());
+          Mockito.verify(this.apiRepository, Mockito.times(1))
+                 .findAll(Mockito.any(Example.class), Mockito.any(Pageable.class));
+     }
+
+     @Test
+     public void findApiTest() {
+
+          Mockito.when(this.apiRepository.findOne(Mockito.any(Long.class))).thenReturn(api);
+          Api apiResp = apiService.find(1L);
+          assertEquals(apiResp.getId(), api.getId());
+          Mockito.verify(this.apiRepository, Mockito.times(1)).findOne(Mockito.any(Long.class));
+     }
+
+     @Test
+     public void deleteApiTest() {
+
+          Mockito.when(apiRepository.findOne(Mockito.anyLong())).thenReturn(api);
+          this.apiService.delete(1L);
+          Mockito.verify(this.apiRepository, Mockito.times(1)).delete(api);
+     }
+
+     @Test
+     public void findSwaggerByApiTest() {
+
+          Mockito.when(apiRepository.findOne(Mockito.anyLong())).thenReturn(api);
+          Mockito.when(resourceRepository.findAll(Mockito.any(Example.class))).thenReturn(Mockito.anyList());
+          Mockito.when(swaggerService.exportApiToSwaggerJSON(api)).thenReturn(new Swagger());
+          Swagger result = this.apiService.findSwaggerByApi(1L);
+          Mockito.verify(swaggerService, Mockito.times(1)).exportApiToSwaggerJSON(api);
+          assertNotNull(result);
+     }
+
+     @Test
+     public void updateBySwaggerTest() throws IOException {
+
+          Mockito.when(apiRepository.findOne(Mockito.anyLong())).thenReturn(api);
+          Mockito.when(swaggerService.importApiFromSwaggerJSON(api, "adsqwe", false)).thenReturn(api);
+
+          apiService.updateBySwagger(1L, "asd", false);
+          Mockito.verify(apiRepository, Mockito.times(1)).save(Mockito.any(Api.class));
+     }
+
+     @Test
+     public void updateBySwaggerApiNullTest() throws IOException {
+
+          Mockito.when(apiRepository.findOne(Mockito.anyLong())).thenReturn(api);
+          Mockito.when(swaggerService.importApiFromSwaggerJSON(api, "adsqwe", false))
+                 .thenThrow(IOException.class);
+
+          apiService.updateBySwagger(1L, "adsqwe", false);
+          Mockito.verify(apiRepository, Mockito.times(1)).save(Mockito.any(Api.class));
+     }
+
+     @Test
+     public void plansByApiTest() {
+          List<Plan> plans = new ArrayList<>();
+          plans.add(new Plan());
+          plans.add(new Plan());
+          api.setPlans(plans);
+          Mockito.when(apiRepository.findOne(Mockito.anyLong())).thenReturn(api);
+          List<Plan> plansResp = apiService.plansByApi(1L);
+          assertNotNull(plansResp);
+     }
 }

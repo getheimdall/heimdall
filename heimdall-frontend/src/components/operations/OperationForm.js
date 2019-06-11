@@ -29,10 +29,13 @@ class OperationForm extends Component {
         this.props.resetOperation()
     }
 
-    onSubmitForm() {
+    onSubmitForm(formWithoutErrors) {
         this.props.form.validateFieldsAndScroll((err, payload) => {
             if (!err) {
+                formWithoutErrors(true);
                 this.props.onSubmit(payload)
+            }else {
+                formWithoutErrors(false);
             }
         });
     }

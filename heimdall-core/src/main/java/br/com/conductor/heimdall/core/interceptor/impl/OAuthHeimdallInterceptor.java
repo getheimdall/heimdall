@@ -31,6 +31,7 @@ import br.com.conductor.heimdall.core.util.TemplateUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Implementation of the HeimdallInterceptor to type OAuth.
@@ -46,7 +47,7 @@ public class OAuthHeimdallInterceptor implements HeimdallInterceptor {
     }
 
     @Override
-    public Object parseContent(String content) {
+    public OAuthDTO parseContent(String content) {
         try {
             return JsonUtils.convertJsonToObject(content, OAuthDTO.class);
         } catch (Exception e) {
@@ -58,8 +59,10 @@ public class OAuthHeimdallInterceptor implements HeimdallInterceptor {
     }
 
     @Override
-    public HashMap<String, Object> buildParameters(Object objectCustom, HashMap<String, Object> parameters, Interceptor interceptor) {
-        OAuthDTO oAuthDTO = (OAuthDTO) objectCustom;
+    public Map<String, Object> buildParameters(Interceptor interceptor) {
+
+        Map<String, Object> parameters = new HashMap<>();
+        OAuthDTO oAuthDTO = this.parseContent(interceptor.getContent());
 
         parameters.put("providerId", oAuthDTO.getProviderId() == null ? 0L : oAuthDTO.getProviderId());
         parameters.put("timeAccessToken", oAuthDTO.getTimeAccessToken() == null ? 0 : oAuthDTO.getTimeAccessToken());

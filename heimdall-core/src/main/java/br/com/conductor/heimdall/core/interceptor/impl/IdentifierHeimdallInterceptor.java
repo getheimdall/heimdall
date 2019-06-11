@@ -26,6 +26,7 @@ import br.com.conductor.heimdall.core.enums.TypeExecutionPoint;
 import br.com.conductor.heimdall.core.interceptor.HeimdallInterceptor;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Implementation of the HeimdallInterceptor to type Identifier.
@@ -40,12 +41,12 @@ public class IdentifierHeimdallInterceptor implements HeimdallInterceptor {
     }
 
     @Override
-    public Object parseContent(String content) {
+    public String parseContent(String content) {
         return "";
     }
 
     @Override
-    public HashMap<String, Object> buildParameters(Object objectCustom, HashMap<String, Object> parameters, Interceptor interceptor) {
-        return parameters;
+    public Map<String, Object> buildParameters(Interceptor interceptor) {
+        return new HashMap<>();
     }
 }
