@@ -49,6 +49,8 @@ const logMaskerContent = content => {
         if (ignoredHeaders && typeof ignoredHeaders === 'string') {
             const ignoredHeadersSplit = ignoredHeaders.split(',')
             content.ignoredHeaders = ignoredHeadersSplit.map(ignoredHeader => ignoredHeader.trim())
+        } else {
+            content.ignoredHeaders = []
         }
 
         return JSON.stringify(content)
@@ -57,7 +59,15 @@ const logMaskerContent = content => {
     return content
 }
 
-const defaultContent = content => {
+const stringifyContent = content => {
+    if (content) {
+        return JSON.stringify(content)
+    }
+
+    return content
+}
+
+const simpleContent = content => {
     return content
 }
 
@@ -66,5 +76,6 @@ export const InterceptorContent = {
     cacheContent,
     ipsContent,
     logMaskerContent,
-    defaultContent
+    stringifyContent,
+    simpleContent
 }

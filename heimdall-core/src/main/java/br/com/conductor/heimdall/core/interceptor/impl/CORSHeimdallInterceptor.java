@@ -45,7 +45,7 @@ public class CORSHeimdallInterceptor implements HeimdallInterceptor {
     }
 
     @Override
-    public Object parseContent(String content) {
+    public Map<String, String> parseContent(String content) {
         try {
             return (Map<String, String>) JsonUtils.convertJsonToObject(content, Map.class);
         } catch (Exception e) {
@@ -57,9 +57,11 @@ public class CORSHeimdallInterceptor implements HeimdallInterceptor {
     }
 
     @Override
-    public HashMap<String, Object> buildParameters(Object objectCustom, HashMap<String, Object> parameters, Interceptor interceptor) {
+    public Map<String, Object> buildParameters(Interceptor interceptor) {
 
-        Map<String, String> cors = (Map<String, String>) objectCustom;
+        Map<String, Object> parameters = new HashMap<>();
+
+        Map<String, String> cors = this.parseContent(interceptor.getContent());
         parameters.put("cors", cors.entrySet());
 
         return parameters;
