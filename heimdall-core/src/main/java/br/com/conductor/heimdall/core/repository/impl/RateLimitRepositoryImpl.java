@@ -21,6 +21,9 @@ package br.com.conductor.heimdall.core.repository.impl;
 
 import javax.annotation.PostConstruct;
 
+import br.com.conductor.heimdall.core.enums.Interval;
+import br.com.conductor.heimdall.core.util.ConstantsCache;
+import org.redisson.api.RLock;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,4 +82,17 @@ public class RateLimitRepositoryImpl implements RateLimitRepository {
           }
      }
 
+     @Override
+     public RLock getLock(String key) {
+          return redissonClientRateLimitInterceptor.getLock(key);
+     }
+
+     @Override
+     public RateLimit mountRatelimit(Long interceptorId, Long calls, Interval interval) {
+
+          String path = ConstantsCache.RATE_LIMIT_KEY_PREFIX + interceptorId;
+
+          RateLimit rate = new RateLimit(path, calls, interval);
+          return this.save(rate);
+     }
 }

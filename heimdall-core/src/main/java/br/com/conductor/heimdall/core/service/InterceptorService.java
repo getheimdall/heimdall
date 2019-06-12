@@ -31,12 +31,10 @@ import br.com.conductor.heimdall.core.enums.Status;
 import br.com.conductor.heimdall.core.enums.TypeInterceptor;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
+import br.com.conductor.heimdall.core.interceptor.impl.RattingHeimdallInterceptor;
 import br.com.conductor.heimdall.core.repository.*;
 import br.com.conductor.heimdall.core.service.amqp.AMQPInterceptorService;
-import br.com.conductor.heimdall.core.util.JsonUtils;
-import br.com.conductor.heimdall.core.util.Pageable;
-import br.com.conductor.heimdall.core.util.StringUtils;
-import br.com.conductor.heimdall.core.util.TemplateUtils;
+import br.com.conductor.heimdall.core.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -173,11 +171,12 @@ public class InterceptorService {
         HeimdallException.checkThrow((TypeInterceptor.MIDDLEWARE.equals(interceptor.getType()) && !InterceptorLifeCycle.OPERATION.equals(interceptor.getLifeCycle())),
                                      MIDDLEWARE_NO_OPERATION_FOUND, interceptor.getType().name());
 
-        if (TypeInterceptor.RATTING == interceptor.getType()) {
-            mountRatelimitInRedis(interceptor);
-        }
-
         interceptor = interceptorRepository.save(interceptor);
+
+        if (TypeInterceptor.RATTING == interceptor.getType()) {
+            RateLimitDTO rateLimitDTO = new RattingHeimdallInterceptor().parseContent(interceptor.getContent());
+            ratelimitRepository.mountRatelimit(interceptor.getId(), rateLimitDTO.getCalls(), rateLimitDTO.getInterval());
+        }
 
         if (TypeInterceptor.CORS.equals(interceptor.getType())) {
             Api api = apiRepository.findOne(interceptor.getApi().getId());
@@ -242,7 +241,8 @@ public class InterceptorService {
         validateTemplate(interceptor.getType(), interceptor.getContent());
 
         if (TypeInterceptor.RATTING == interceptor.getType()) {
-            mountRatelimitInRedis(interceptor);
+            RateLimitDTO rateLimitDTO = new RattingHeimdallInterceptor().parseContent(interceptor.getContent());
+            ratelimitRepository.mountRatelimit(interceptor.getId(), rateLimitDTO.getCalls(), rateLimitDTO.getInterval());
         }
 
         interceptor = interceptorRepository.save(interceptor);
@@ -267,7 +267,7 @@ public class InterceptorService {
 
         if (TypeInterceptor.RATTING == interceptor.getType()) {
 
-            String path = createPath(interceptor);
+            String path = ConstantsCache.RATE_LIMIT_KEY_PREFIX + interceptor.getId();
 
             ratelimitRepository.delete(path);
         }
@@ -308,28 +308,6 @@ public class InterceptorService {
     public void deleteAllfromResource(Long resourceId) {
         List<Interceptor> interceptors = interceptorRepository.findByResourceId(resourceId);
         interceptors.forEach(interceptor -> this.delete(interceptor.getId()));
-    }
-
-    /**
-     * Creates the ratelimts in Redis.
-     *
-     * @param interceptor Interceptor
-     */
-    protected void mountRatelimitInRedis(Interceptor interceptor) {
-
-        RateLimitDTO rateLimitDTO = new RateLimitDTO();
-        try {
-            rateLimitDTO = JsonUtils.convertJsonToObject(interceptor.getContent(), RateLimitDTO.class);
-        } catch (Exception e) {
-
-            log.error(e.getMessage(), e);
-            ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(interceptor.getType().name(), TemplateUtils.TEMPLATE_RATTING);
-        }
-
-        String path = createPath(interceptor);
-
-        RateLimit rate = new RateLimit(path, rateLimitDTO.getCalls(), rateLimitDTO.getInterval());
-        ratelimitRepository.save(rate);
     }
 
     /**
@@ -401,39 +379,6 @@ public class InterceptorService {
         }
 
         return invalids;
-    }
-
-    /*
-     * Creates the path to be used as key for the RateLimit repository
-     */
-    private String createPath(Interceptor interceptor) {
-
-        String path = "";
-
-        switch (interceptor.getLifeCycle()) {
-            case API: {
-                Api api = apiRepository.findOne(interceptor.getReferenceId());
-                path = api.getBasePath();
-                break;
-            }
-            case PLAN: {
-                Plan plan = planRepository.findOne(interceptor.getReferenceId());
-                path = plan.getApi().getBasePath();
-                break;
-            }
-            case RESOURCE: {
-                Resource res = resourceRepository.findOne(interceptor.getReferenceId());
-                path = res.getApi().getBasePath() + "-" + res.getName();
-                break;
-            }
-            case OPERATION: {
-                Operation op = operationRepository.findOne(interceptor.getReferenceId());
-                path = op.getResource().getApi().getBasePath() + "-" + op.getResource().getName() + "-" + op.getPath();
-                break;
-            }
-        }
-
-        return path;
     }
 
 }

@@ -26,11 +26,9 @@ import br.com.conductor.heimdall.core.enums.TypeExecutionPoint;
 import br.com.conductor.heimdall.core.enums.TypeInterceptor;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
-import br.com.conductor.heimdall.core.interceptor.HeimdallInterceptor;
 import br.com.conductor.heimdall.core.util.*;
 import com.netflix.zuul.FilterLoader;
 import com.netflix.zuul.filters.FilterRegistry;
-import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,6 +65,7 @@ public class InterceptorFileService {
     private static final String EXECUTION_POINT = "executionPoint";
     private static final String IGNORED_OPERATIONS = "ignoredOperations";
     private static final String IGNORED_RESOURCES = "ignoredResources";
+    private static final String INTERCEPTOR_ID = "interceptor-id";
     private static final String INTERCEPTOR_STATUS = "interceptorStatus";
     private static final String INTERCEPTOR_TYPE = "interceptorType";
     private static final String LIFECYCLE = "lifeCycle";
@@ -108,6 +107,7 @@ public class InterceptorFileService {
 
         Map<String, Object> parameters = new HashMap<>();
         parameters.put(API_ID, interceptor.getApi().getId());
+        parameters.put(INTERCEPTOR_ID, interceptor.getId());
         parameters.put(EXECUTION_POINT, interceptor.getExecutionPoint().getFilterType());
         parameters.put(IGNORED_OPERATIONS, interceptor.getIgnoredOperations());
         parameters.put(IGNORED_RESOURCES, interceptor.getIgnoredResources());
