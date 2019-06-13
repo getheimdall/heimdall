@@ -30,7 +30,9 @@ import org.junit.Ignore;
  *
  */
 @Ignore
-public class ConstantsCache {
+public final class ConstantsCache {
+
+     private ConstantsCache() { }
 
      public static final String OPERATION_ACTIVE_FROM_ENDPOINT = "OPERATION_ACTIVE_FROM_ENDPOINT";
      

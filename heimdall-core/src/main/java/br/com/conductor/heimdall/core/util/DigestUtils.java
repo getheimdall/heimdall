@@ -27,9 +27,11 @@ package br.com.conductor.heimdall.core.util;
  * @author Marcos Filho
  *
  */
-public abstract class DigestUtils {
+public final class DigestUtils {
 
-	 /**
+    private DigestUtils() { }
+
+    /**
 	  * Return a hexadecimal string representation of the MD5 digest of the given bytes.
 	  * 
 	  * @param  value		The value to be converted
