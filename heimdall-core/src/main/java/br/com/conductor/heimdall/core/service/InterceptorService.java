@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.core.service;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -20,22 +17,19 @@ package br.com.conductor.heimdall.core.service;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.service;
 
-import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.dto.*;
-import br.com.conductor.heimdall.core.dto.interceptor.RateLimitDTO;
-import br.com.conductor.heimdall.core.dto.page.InterceptorPage;
-import br.com.conductor.heimdall.core.entity.*;
-import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
-import br.com.conductor.heimdall.core.enums.Status;
-import br.com.conductor.heimdall.core.enums.TypeInterceptor;
-import br.com.conductor.heimdall.core.exception.ExceptionMessage;
-import br.com.conductor.heimdall.core.exception.HeimdallException;
-import br.com.conductor.heimdall.core.interceptor.impl.RattingHeimdallInterceptor;
-import br.com.conductor.heimdall.core.repository.*;
-import br.com.conductor.heimdall.core.service.amqp.AMQPInterceptorService;
-import br.com.conductor.heimdall.core.util.*;
-import lombok.extern.slf4j.Slf4j;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.INTERCEPTOR_IGNORED_INVALID;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.INTERCEPTOR_INVALID_LIFECYCLE;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.INTERCEPTOR_REFERENCE_NOT_FOUND;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.MIDDLEWARE_NO_OPERATION_FOUND;
+import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Example;
@@ -46,12 +40,36 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
-import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
+import br.com.conductor.heimdall.core.converter.GenericConverter;
+import br.com.conductor.heimdall.core.dto.InterceptorDTO;
+import br.com.conductor.heimdall.core.dto.InterceptorFileDTO;
+import br.com.conductor.heimdall.core.dto.PageDTO;
+import br.com.conductor.heimdall.core.dto.PageableDTO;
+import br.com.conductor.heimdall.core.dto.interceptor.RateLimitDTO;
+import br.com.conductor.heimdall.core.dto.page.InterceptorPage;
+import br.com.conductor.heimdall.core.entity.Api;
+import br.com.conductor.heimdall.core.entity.Interceptor;
+import br.com.conductor.heimdall.core.entity.Middleware;
+import br.com.conductor.heimdall.core.entity.Operation;
+import br.com.conductor.heimdall.core.entity.Plan;
+import br.com.conductor.heimdall.core.entity.Resource;
+import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
+import br.com.conductor.heimdall.core.enums.Status;
+import br.com.conductor.heimdall.core.enums.TypeInterceptor;
+import br.com.conductor.heimdall.core.exception.ExceptionMessage;
+import br.com.conductor.heimdall.core.exception.HeimdallException;
+import br.com.conductor.heimdall.core.interceptor.impl.RattingHeimdallInterceptor;
+import br.com.conductor.heimdall.core.repository.ApiRepository;
+import br.com.conductor.heimdall.core.repository.InterceptorRepository;
+import br.com.conductor.heimdall.core.repository.MiddlewareRepository;
+import br.com.conductor.heimdall.core.repository.OperationRepository;
+import br.com.conductor.heimdall.core.repository.PlanRepository;
+import br.com.conductor.heimdall.core.repository.RateLimitRepository;
+import br.com.conductor.heimdall.core.repository.ResourceRepository;
+import br.com.conductor.heimdall.core.service.amqp.AMQPInterceptorService;
+import br.com.conductor.heimdall.core.util.ConstantsCache;
+import br.com.conductor.heimdall.core.util.Pageable;
+import br.com.conductor.heimdall.core.util.StringUtils;
 
 /**
  * This class provides methods to create, read, update and delete a {@link Interceptor} resource.<br/>
@@ -60,7 +78,6 @@ import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
  * @author Filipe Germano
  * @author Marcos Filho
  */
-@Slf4j
 @Service
 public class InterceptorService {
 

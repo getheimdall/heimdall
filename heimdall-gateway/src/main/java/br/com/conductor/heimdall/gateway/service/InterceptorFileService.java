@@ -26,11 +26,13 @@ import br.com.conductor.heimdall.core.enums.TypeExecutionPoint;
 import br.com.conductor.heimdall.core.enums.TypeInterceptor;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
+import br.com.conductor.heimdall.core.repository.jdbc.OperationJDBCRepository;
 import br.com.conductor.heimdall.core.util.*;
 import com.netflix.zuul.FilterLoader;
 import com.netflix.zuul.filters.FilterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -57,6 +59,9 @@ import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_ROOT;
 @Service
 @Slf4j
 public class InterceptorFileService {
+	
+	@Autowired
+	private OperationJDBCRepository operationJdbcRepository;
 
     @Value("${zuul.filter.root}")
     private String zuulFilterRoot;
@@ -88,6 +93,10 @@ public class InterceptorFileService {
         String template = templateInterceptor(interceptor.getType(), interceptor.getExecutionPoint());
 
         if (template != null) {
+        	List<Long> ignoredOperations = operationJdbcRepository.findIgnoredOperationsFromInterceptor(interceptor.getId());
+        	if (ignoredOperations != null && !ignoredOperations.isEmpty()) {
+        		interceptor.setIgnoredOperations(new HashSet<>(ignoredOperations));
+        	}
             final Map<String, Object> parameters = buildParametersFile(interceptor);
 
             generateFileInterceptor(template, parameters);
