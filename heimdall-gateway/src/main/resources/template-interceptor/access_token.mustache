@@ -74,7 +74,7 @@ public class AccessTokenInterceptor extends HeimdallFilter {
     @Override
     public void execute() throws Throwable {
         AccessTokenInterceptorService accessTokenInterceptorService = (AccessTokenInterceptorService) BeanManager.getBean(AccessTokenInterceptorService.class);
-        accessTokenInterceptorService.validate(apiId, Location.valueOf("{{location}}"));
+        accessTokenInterceptorService.validate(apiId, Location.{{location}});
     }
 
 }
