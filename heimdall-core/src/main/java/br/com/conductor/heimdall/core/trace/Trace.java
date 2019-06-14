@@ -24,11 +24,15 @@ package br.com.conductor.heimdall.core.trace;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.util.UrlUtil;
+import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -52,6 +56,7 @@ import static net.logstash.logback.marker.Markers.append;
 @Data
 @Slf4j
 @JsonInclude(Include.NON_NULL)
+@JsonFilter("customFilter")
 public class Trace {
 
     private static final Logger logMongo = LoggerFactory.getLogger("mongo");
@@ -113,6 +118,9 @@ public class Trace {
     @JsonIgnore
     private boolean printLogstash;
 
+    @JsonIgnore
+    private boolean printFilters;
+
     private String version;
 
     public Trace() {
@@ -127,13 +135,14 @@ public class Trace {
      * @param printMongo
      * @param printLogstash
      */
-    public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printMongo, boolean printLogstash){
+    public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printMongo, boolean printLogstash, boolean printFilters){
 
         this.shouldPrint = true;
         this.profile = profile;
         this.printAllTrace = printAllTrace;
         this.printMongo = printMongo;
         this.printLogstash = printLogstash;
+        this.printFilters = printFilters;
 
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HeimdallException.checkThrow(request == null, ExceptionMessage.GLOBAL_REQUEST_NOT_FOUND);
@@ -162,8 +171,8 @@ public class Trace {
      * @param printLogstash
      * @param version
      */
-    public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printMongo, boolean printLogstash, String version) {
-        this(printAllTrace, profile, servletRequest, printMongo, printLogstash);
+    public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printMongo, boolean printLogstash, String version, boolean printFilters) {
+        this(printAllTrace, profile, servletRequest, printMongo, printLogstash, printFilters);
         this.version = version;
     }
 
@@ -246,7 +255,7 @@ public class Trace {
      */
     private void writeTrace() throws JsonProcessingException {
 
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = mapper();
 
         if (this.printAllTrace) {
 
@@ -286,7 +295,7 @@ public class Trace {
     }
 
     private void printInLogger(Logger logger) throws JsonProcessingException {
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = mapper();
 
         if (isInfo(this.resultStatus)) {
 
@@ -316,4 +325,18 @@ public class Trace {
                 HttpStatus.valueOf(statusCode).is4xxClientError();
     }
 
+    private ObjectMapper mapper() {
+        SimpleBeanPropertyFilter customFilter;
+
+        if (!this.printFilters) {
+            customFilter = SimpleBeanPropertyFilter.serializeAllExcept("filters");
+        } else {
+            customFilter = SimpleBeanPropertyFilter.serializeAll();
+        }
+
+        FilterProvider filters = new SimpleFilterProvider().addFilter("customFilter", customFilter);
+
+        return new ObjectMapper().setFilterProvider(filters);
+
+    }
 }

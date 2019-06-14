@@ -11,6 +11,7 @@ import br.com.conductor.heimdall.core.util.TemplateUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 public class LogWriterHeimdallInterceptor implements HeimdallInterceptor {
@@ -21,7 +22,7 @@ public class LogWriterHeimdallInterceptor implements HeimdallInterceptor {
     }
 
     @Override
-    public Object parseContent(String content) {
+    public LogWriterDTO parseContent(String content) {
         try {
             return JsonUtils.convertJsonToObject(content, LogWriterDTO.class);
         } catch (Exception e) {
@@ -32,8 +33,10 @@ public class LogWriterHeimdallInterceptor implements HeimdallInterceptor {
     }
 
     @Override
-    public HashMap<String, Object> buildParameters(Object objectCustom, HashMap<String, Object> parameters, Interceptor interceptor) {
-        LogWriterDTO logWriterDTO = (LogWriterDTO) objectCustom;
+    public Map<String, Object> buildParameters(Interceptor interceptor) {
+
+        Map<String, Object> parameters = new HashMap<>();
+        LogWriterDTO logWriterDTO = this.parseContent(interceptor.getContent());
 
         parameters.put("body", logWriterDTO.getBody());
         parameters.put("headers", logWriterDTO.getHeaders());

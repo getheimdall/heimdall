@@ -19,8 +19,9 @@
  */
 package br.com.conductor.heimdall.gateway.filter.helper;
 
+import br.com.conductor.heimdall.core.trace.GeneralTrace;
 import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import br.com.conductor.heimdall.core.trace.TraceContextHolder;
 import br.com.conductor.heimdall.gateway.util.ConstantsContext;
 import br.com.conductor.heimdall.middleware.spec.*;
 import com.netflix.zuul.context.RequestContext;
@@ -624,7 +625,7 @@ public class CallImpl implements Call {
 
           public String pattern() {
                
-               return TraceContextHolder.getInstance().getActualTrace().getPattern();
+               return null;
           }
 
           public Long operationId() {

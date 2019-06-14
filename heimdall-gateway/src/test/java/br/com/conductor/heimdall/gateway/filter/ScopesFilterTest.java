@@ -76,7 +76,7 @@ public class ScopesFilterTest {
         context.setRequest(this.request);
         context.setResponse(this.response);
         context.setResponseStatusCode(HttpStatus.OK.value());
-        TraceContextHolder.getInstance().init(true, "developer", this.request, false, false, "");
+        TraceContextHolder.getInstance().init(true, "developer", this.request, false, false, "", true);
 
     }
 

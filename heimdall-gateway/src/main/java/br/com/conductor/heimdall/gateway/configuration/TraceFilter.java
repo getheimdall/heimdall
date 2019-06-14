@@ -81,7 +81,7 @@ public class TraceFilter implements Filter {
 		try {
 
 			trace = TraceContextHolder.getInstance().init(prop.getTrace().isPrintAllTrace(), profile, request,
-			prop.getMongo().getEnabled(), prop.getLogstash().getEnabled(), buildProperties.getVersion());
+			prop.getMongo().getEnabled(), prop.getLogstash().getEnabled(), buildProperties.getVersion(), prop.getTrace().isPrintHeimdallFilters());
 			if (shouldDisableTrace(request)) {
 				trace.setShouldPrint(false);
 			}
