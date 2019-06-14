@@ -38,6 +38,13 @@ public interface Trace {
 	  */
      public void addStackTrace(String clazz, String message, String stack);
 
+	 /**
+	  * Gets the {@link StackTrace}.
+	  *
+	  * @return				The current StackTrace
+	  */
+	 public StackTrace getStackTrace();
+
      /**
       * Adds a Trace.
       * 

@@ -1,13 +1,10 @@
-
-package br.com.conductor.heimdall.middleware.util.helpermock.call;
-
 /*-
  * =========================LICENSE_START==================================
- * heimdall-middleware-spec
+ * heimdall-gateway
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -20,26 +17,29 @@ package br.com.conductor.heimdall.middleware.util.helpermock.call;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.trace;
 
 import br.com.conductor.heimdall.middleware.spec.StackTrace;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
- * Mock class created to help unit test the root request class of a middleware.
+ * Data class that represents a custom Stack Trace.
+ * Implements the {@link StackTrace} interface.
  *
- * @author Marcelo Aguiar
+ * @author Thiago Sampaio
+ *
  */
-@NoArgsConstructor
-@AllArgsConstructor
 @Data
-public class StackTraceMock implements StackTrace{
+@AllArgsConstructor
+public class StackTraceImpl implements StackTrace {
 
-    public String clazz;
+    private String clazz;
 
-    public String message;
+    private String message;
 
-    public String stack;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String stack;
 
 }

@@ -43,6 +43,8 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import br.com.conductor.heimdall.core.trace.GeneralTrace;
+import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
 import br.com.conductor.heimdall.gateway.util.ConstantsContext;
 import br.com.conductor.heimdall.middleware.spec.*;
 import org.apache.commons.lang3.StringUtils;
@@ -516,6 +518,31 @@ public class CallImpl implements Call {
                stackTrace.put("message", message);
                stackTrace.put("stack", stack);
                this.addTrace("middleware-stacktrace", stackTrace);
+          }
+
+          @Override
+          public StackTrace getStackTrace() {
+               List<GeneralTrace> traces = TraceContextHolder.getInstance().getActualTrace().getTraces();
+               GeneralTrace generalTrace = traces.stream()
+                       .filter(gt -> gt.getDescription().equals("middleware-stacktrace"))
+                       .findAny()
+                       .orElse(null);
+
+               if (generalTrace != null) {
+                    Map<String, String> content = (Map<String, String>) generalTrace.getContent();
+
+                    return new StackTraceImpl(
+                            content.get("class"),
+                            content.get("message"),
+                            content.get("stack")
+                    );
+               } else {
+                    return new StackTraceImpl(
+                            "No class",
+                            "No StackTrace Found",
+                            ""
+                    );
+               }
           }
 
           @Override
