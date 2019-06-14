@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.interceptor;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -24,7 +24,7 @@ package br.com.conductor.heimdall.core.interceptor;
 import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.enums.TypeExecutionPoint;
 
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Provides methods that are used for all built-in Heimdall Interceptors.
@@ -53,10 +53,8 @@ public interface HeimdallInterceptor {
     /**
      * Any parameters that should be used by the interceptor can be created here.
      *
-     * @param objectCustom Custom parameter Object
-     * @param parameters Map of parameters
      * @param interceptor The {@link Interceptor}
      * @return
      */
-    HashMap<String, Object> buildParameters(Object objectCustom, HashMap<String, Object> parameters, Interceptor interceptor);
+    Map<String, Object> buildParameters(Interceptor interceptor);
 }

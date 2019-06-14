@@ -4,7 +4,7 @@
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -31,7 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -57,20 +56,22 @@ public class AccessTokenInterceptorService {
      */
     public void validate(Long apiId, Location location) {
 
-        HttpServletRequest req = RequestContext.getCurrentContext().getRequest();
+        RequestContext context = RequestContext.getCurrentContext();
 
         String clientId;
         String accessToken;
         if (Location.HEADER.equals(location)) {
-            clientId = req.getHeader(CLIENT_ID);
-            accessToken = req.getHeader(ACCESS_TOKEN);
+            clientId = context.getZuulRequestHeaders().get(CLIENT_ID);
+            accessToken = context.getZuulRequestHeaders().get(ACCESS_TOKEN);
+
+            if (clientId == null) clientId = context.getRequest().getHeader(CLIENT_ID);
+            if (accessToken == null) accessToken = context.getRequest().getHeader(ACCESS_TOKEN);
         } else {
-            clientId = req.getParameter(CLIENT_ID);
-            accessToken = req.getParameter(ACCESS_TOKEN);
+            clientId = context.getRequest().getParameter(CLIENT_ID);
+            accessToken = context.getRequest().getParameter(ACCESS_TOKEN);
         }
 
         this.validateAccessToken(apiId, clientId, accessToken);
-
     }
 
     /**
@@ -86,7 +87,12 @@ public class AccessTokenInterceptorService {
 
         TraceContextHolder.getInstance().getActualTrace().setAccessToken(DigestUtils.digestMD5(accessToken));
 
-        if ((accessToken != null && !accessToken.isEmpty()) && (clientId != null && !clientId.isEmpty())) {
+        if (clientId == null || clientId.isEmpty()) {
+            buildResponse(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, "Client Id"));
+            return;
+        }
+
+        if (accessToken != null && !accessToken.isEmpty()) {
 
             AccessToken token = accessTokenRepository.findAccessTokenActive(accessToken);
 

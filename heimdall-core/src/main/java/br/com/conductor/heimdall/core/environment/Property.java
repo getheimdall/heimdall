@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.environment;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -181,6 +181,16 @@ public class Property {
     	private int failureNumber = 3;
     	private int successNumber = 3;
     	private int delayTimeSeconds = 30;
+     }
+
+     @Data
+     public class Interceptor {
+        private Health health = new Health();
+     }
+
+     @Data
+     public class Health {
+          private Long fixedRate;
      }
 
 }

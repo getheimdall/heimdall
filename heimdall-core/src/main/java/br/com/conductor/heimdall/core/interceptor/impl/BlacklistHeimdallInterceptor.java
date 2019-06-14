@@ -6,7 +6,7 @@ package br.com.conductor.heimdall.core.interceptor.impl;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -32,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Implementation of the HeimdallInterceptor to type Blacklist.
@@ -47,7 +48,7 @@ public class BlacklistHeimdallInterceptor implements HeimdallInterceptor {
     }
 
     @Override
-    public Object parseContent(String content) {
+    public IpsDTO parseContent(String content) {
         try {
             return JsonUtils.convertJsonToObject(content, IpsDTO.class);
         } catch (IOException e) {
@@ -59,8 +60,10 @@ public class BlacklistHeimdallInterceptor implements HeimdallInterceptor {
     }
 
     @Override
-    public HashMap<String, Object> buildParameters(Object objectCustom, HashMap<String, Object> parameters, Interceptor interceptor) {
-        IpsDTO ipsDTO = (IpsDTO) objectCustom;
+    public Map<String, Object> buildParameters(Interceptor interceptor) {
+
+        Map<String, Object> parameters = new HashMap<>();
+        IpsDTO ipsDTO = this.parseContent(interceptor.getContent());
         parameters.put("ips", ipsDTO.getIps());
         return parameters;
     }

@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.entity;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -27,6 +27,7 @@ import java.util.Set;
 
 import javax.persistence.*;
 
+import lombok.ToString;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -67,6 +68,7 @@ public class Plan implements Serializable {
      @ManyToOne
      @JoinColumn(name = "API_ID", nullable = false)
      @JsonIgnoreProperties({ "environments" })
+     @ToString.Exclude
      private Api api;
      
      @Column(name = "CREATION_DATE", nullable = false, updatable=false)

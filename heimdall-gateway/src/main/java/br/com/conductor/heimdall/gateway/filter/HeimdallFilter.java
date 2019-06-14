@@ -4,7 +4,7 @@
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -50,10 +50,10 @@ public abstract class HeimdallFilter extends ZuulFilter {
           
           RequestContext ctx = RequestContext.getCurrentContext();
           if (ctx == null || ctx.getRequest() == null) {
-               should =  false;
+               should = false;
           }
           
-          if (!ctx.sendZuulResponse()) {
+          if (ctx != null && !ctx.sendZuulResponse()) {
                return false;
           }
           

@@ -4,7 +4,7 @@
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -105,7 +105,7 @@ public class ScopeResource {
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_SCOPE)
     public ResponseEntity<?> findAll(@PathVariable("apiId") Long apiId, @ModelAttribute ScopeDTO scopeDTO, @ModelAttribute PageableDTO pageableDTO) {
 
-        if (pageableDTO.getLimit() != null && pageableDTO.getOffset() != null) {
+        if (!pageableDTO.isEmpty()) {
 
             ScopePage scopePage = scopeService.list(apiId, scopeDTO, pageableDTO);
             return ResponseEntity.ok(scopePage);

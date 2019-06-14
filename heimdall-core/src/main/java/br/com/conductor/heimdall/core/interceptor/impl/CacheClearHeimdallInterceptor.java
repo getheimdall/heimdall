@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.interceptor.impl;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -32,6 +32,7 @@ import br.com.conductor.heimdall.core.util.TemplateUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Implements the {@link HeimdallInterceptor} to remove caches created.
@@ -47,7 +48,7 @@ public class CacheClearHeimdallInterceptor implements HeimdallInterceptor {
     }
 
     @Override
-    public Object parseContent(String content) {
+    public CacheDTO parseContent(String content) {
         try {
             return JsonUtils.convertJsonToObject(content, CacheDTO.class);
         } catch (Exception e) {
@@ -58,8 +59,10 @@ public class CacheClearHeimdallInterceptor implements HeimdallInterceptor {
         return null;    }
 
     @Override
-    public HashMap<String, Object> buildParameters(Object objectCustom, HashMap<String, Object> parameters, Interceptor interceptor) {
-        CacheDTO cacheDTO = (CacheDTO) objectCustom;
+    public Map<String, Object> buildParameters(Interceptor interceptor) {
+
+        Map<String, Object> parameters = new HashMap<>();
+        CacheDTO cacheDTO = this.parseContent(interceptor.getContent());
 
         parameters.put("cache", cacheDTO.getCache());
 

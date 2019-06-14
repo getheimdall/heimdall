@@ -1,18 +1,15 @@
-
-package br.com.conductor.heimdall.api.resource;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-api
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +17,7 @@ package br.com.conductor.heimdall.api.resource;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.api.resource;
 
 import br.com.conductor.heimdall.api.dto.PrivilegeDTO;
 import br.com.conductor.heimdall.api.dto.page.PrivilegePage;
@@ -28,7 +26,6 @@ import br.com.conductor.heimdall.api.service.PrivilegeService;
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
-import br.com.twsoftware.alfred.object.Objeto;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -85,7 +82,7 @@ public class PrivilegeResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_PRIVILEGE)
      public ResponseEntity<?> findAll(@ModelAttribute PrivilegeDTO privilegeDTO, @ModelAttribute PageableDTO pageableDTO) {
 
-          if (Objeto.notBlank(pageableDTO)) {
+          if (!pageableDTO.isEmpty()) {
 
                PrivilegePage apiPage = privilegeService.list(privilegeDTO, pageableDTO);
                return ResponseEntity.ok(apiPage);

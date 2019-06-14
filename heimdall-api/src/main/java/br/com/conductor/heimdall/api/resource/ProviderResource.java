@@ -1,12 +1,10 @@
-package br.com.conductor.heimdall.api.resource;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-api
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -19,26 +17,7 @@ package br.com.conductor.heimdall.api.resource;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-
-import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_PROVIDER;
-
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+package br.com.conductor.heimdall.api.resource;
 
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
@@ -47,8 +26,17 @@ import br.com.conductor.heimdall.core.dto.page.ProviderPage;
 import br.com.conductor.heimdall.core.entity.Provider;
 import br.com.conductor.heimdall.core.service.ProviderService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
-import br.com.twsoftware.alfred.object.Objeto;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_PROVIDER;
 
 /**
  * Uses a {@link ProviderService} to provide methods to create, read, update and delete a {@link Provider}
@@ -91,7 +79,7 @@ public class ProviderResource {
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_PROVIDER)
     public ResponseEntity<?> findAll(@ModelAttribute ProviderDTO providerDTO, @ModelAttribute PageableDTO pageableDTO) {
 
-        if (Objeto.notBlank(pageableDTO)) {
+        if (!pageableDTO.isEmpty()) {
 
             ProviderPage providerPage = providerService.listWithPageableAndFilter(providerDTO, pageableDTO);
             return ResponseEntity.ok(providerPage);

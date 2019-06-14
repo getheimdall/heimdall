@@ -4,7 +4,7 @@
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -322,11 +322,6 @@ public class OAuthInterceptorService {
             oAuthRequest.setGrantType(request.getHeader("grant_type"));
         }
 
-//        Not in use yet
-//        if (Objeto.isBlank(oAuthRequest.getCode())) {
-//            oAuthRequest.setCode(helper.call().request().header().get("code"));
-//        }
-
         if (Objects.isNull(oAuthRequest.getRefreshToken()) || oAuthRequest.getRefreshToken().isEmpty()) {
             oAuthRequest.setRefreshToken(request.getHeader("refresh_token"));
         }
@@ -496,8 +491,7 @@ public class OAuthInterceptorService {
 
     public boolean isJson(String string) {
 
-        try {
-            JsonParser parser = mapper().getFactory().createParser(string);
+        try (JsonParser parser = mapper().getFactory().createParser(string)) {
 
             while (parser.nextToken() != null) {}
 

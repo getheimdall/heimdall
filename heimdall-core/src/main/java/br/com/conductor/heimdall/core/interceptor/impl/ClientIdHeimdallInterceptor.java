@@ -6,7 +6,7 @@ package br.com.conductor.heimdall.core.interceptor.impl;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -31,6 +31,7 @@ import br.com.conductor.heimdall.core.util.TemplateUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Implementation of the HeimdallInterceptor to type ClientId.
@@ -46,23 +47,20 @@ public class ClientIdHeimdallInterceptor implements HeimdallInterceptor {
     }
 
     @Override
-    public Object parseContent(String content) {
+    public AccessTokenClientIdDTO parseContent(String content) {
         try {
             return JsonUtils.convertJsonToObject(content, AccessTokenClientIdDTO.class);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(TypeInterceptor.ACCESS_TOKEN.name(), TemplateUtils.TEMPLATE_ACCESS_TOKEN);
+            ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(TypeInterceptor.CLIENT_ID.name(), TemplateUtils.TEMPLATE_CLIENT_ID);
         }
 
         return null;
     }
 
     @Override
-    public HashMap<String, Object> buildParameters(Object objectCustom, HashMap<String, Object> parameters, Interceptor interceptor) {
+    public Map<String, Object> buildParameters(Interceptor interceptor) {
 
-        AccessTokenClientIdDTO accessTokenClientIdDTO = (AccessTokenClientIdDTO) objectCustom;
-        parameters.put("location", accessTokenClientIdDTO.getLocation());
-
-        return parameters;
+        return new HashMap<>();
     }
 }

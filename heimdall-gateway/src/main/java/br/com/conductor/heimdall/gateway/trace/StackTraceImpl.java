@@ -35,11 +35,11 @@ import lombok.Data;
 @AllArgsConstructor
 public class StackTraceImpl implements StackTrace {
 
-    private String clazz;
+     private String clazz;
 
-    private String message;
+     private String message;
 
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String stack;
+     @JsonInclude(JsonInclude.Include.NON_NULL)
+     private String stack;
 
 }

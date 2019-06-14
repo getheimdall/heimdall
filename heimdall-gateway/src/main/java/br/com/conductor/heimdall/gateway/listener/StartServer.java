@@ -1,17 +1,15 @@
-package br.com.conductor.heimdall.gateway.listener;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,30 +17,7 @@ package br.com.conductor.heimdall.gateway.listener;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.ROUTE_TYPE;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-
-import javax.annotation.PostConstruct;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
-import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-
-import com.netflix.zuul.FilterLoader;
-import com.netflix.zuul.groovy.GroovyCompiler;
-import com.netflix.zuul.groovy.GroovyFileFilter;
+package br.com.conductor.heimdall.gateway.listener;
 
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Interceptor;
@@ -56,8 +31,6 @@ import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.configuration.HeimdallHandlerMapping;
 import br.com.conductor.heimdall.gateway.service.InterceptorFileService;
 import br.com.conductor.heimdall.gateway.util.HeimdallFilterFileManager;
-import br.com.twsoftware.alfred.io.Arquivo;
-import br.com.twsoftware.alfred.object.Objeto;
 import com.netflix.zuul.FilterLoader;
 import com.netflix.zuul.groovy.GroovyCompiler;
 import com.netflix.zuul.groovy.GroovyFileFilter;
@@ -208,7 +181,8 @@ public class StartServer implements ServletContextListener {
 	 */
 	public void createMiddlewaresInterceptor(Middleware middleware) {
 
-		if (Objeto.notBlank(middleware) && Objeto.notBlank(middleware.getInterceptors())) {
+		if (middleware != null &&
+				(middleware.getInterceptors() != null && !middleware.getInterceptors().isEmpty())) {
 
 			middleware.getInterceptors()
 					.forEach(interceptor -> interceptorFileService.createFileInterceptor(interceptor));
@@ -282,8 +256,7 @@ public class StartServer implements ServletContextListener {
 	/**
 	 * Loads the {@link Middleware} files.
 	 *
-	 * @param middlewareId
-	 *                         The {@link Middleware} Id
+	 * @param middleware The {@link Middleware}
 	 */
 	void loadMiddlewareFiles(Middleware middleware) {
 

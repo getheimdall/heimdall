@@ -6,7 +6,7 @@ package br.com.conductor.heimdall.core.service;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -137,14 +137,17 @@ public class SwaggerService {
     }
 
     private Resource findResourceByTagOrCreate(Tag tag, List<Resource> resources) {
-        return resources.stream().filter(r -> r.getName().equalsIgnoreCase(tag.getName())).findFirst().orElse(createResourceByTag(tag, null));
+        if (resources.isEmpty()) {
+            return createResourceByTag(tag);
+        }
+        return resources.stream().filter(r -> r.getName().equalsIgnoreCase(tag.getName())).findFirst().orElse(createResourceByTag(tag));
     }
 
-    private Resource createResourceByTag(Tag tag, List<Operation> operations) {
+    private Resource createResourceByTag(Tag tag) {
         Resource resource = new Resource();
         resource.setName(tag.getName());
         resource.setDescription(tag.getDescription());
-        resource.setOperations(Objects.nonNull(operations) ? operations : new ArrayList<>());
+        resource.setOperations(new ArrayList<>());
 
         return resource;
     }
@@ -211,30 +214,28 @@ public class SwaggerService {
 
         Map<String, Path> pathMap = new HashMap<>();
 
-        api.getResources().forEach(resource -> {
-            resource.getOperations().forEach(operation -> {
-                String pathOperation = operation.getPath();
-                if (Objects.isNull(pathMap.get(pathOperation))) {
-                    pathMap.put(pathOperation, new Path());
-                }
+        api.getResources().forEach(resource -> resource.getOperations().forEach(operation -> {
+            String pathOperation = operation.getPath();
+            if (Objects.isNull(pathMap.get(pathOperation))) {
+                pathMap.put(pathOperation, new Path());
+            }
 
-                Path path = pathMap.get(pathOperation);
+            Path path = pathMap.get(pathOperation);
 
-                io.swagger.models.Operation operationSwagger = new io.swagger.models.Operation();
-                if (operation.getDescription() != null) {
-                    operationSwagger.setOperationId(operation.getDescription().trim().concat(operation.getMethod().name()));
-                    operationSwagger.setSummary(operation.getDescription());
-                }
-                operationSwagger.setConsumes(new ArrayList<>());
-                operationSwagger.setTags(Collections.singletonList(resource.getName()));
-                operationSwagger.setDeprecated(false);
-                operationSwagger.setParameters(new ArrayList<>());
-                operationSwagger.setProduces(new ArrayList<>());
-                operationSwagger.setResponses(new HashMap<>());
+            io.swagger.models.Operation operationSwagger = new io.swagger.models.Operation();
+            if (operation.getDescription() != null) {
+                operationSwagger.setOperationId(operation.getDescription().trim().concat(operation.getMethod().name()));
+                operationSwagger.setSummary(operation.getDescription());
+            }
+            operationSwagger.setConsumes(new ArrayList<>());
+            operationSwagger.setTags(Collections.singletonList(resource.getName()));
+            operationSwagger.setDeprecated(false);
+            operationSwagger.setParameters(new ArrayList<>());
+            operationSwagger.setProduces(new ArrayList<>());
+            operationSwagger.setResponses(new HashMap<>());
 
-                path.set(operation.getMethod().name().toLowerCase(), operationSwagger);
-            });
-        });
+            path.set(operation.getMethod().name().toLowerCase(), operationSwagger);
+        }));
 
         return pathMap;
     }

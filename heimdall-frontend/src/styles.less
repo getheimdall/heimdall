@@ -492,6 +492,43 @@ body {
     width: 100% !important;
 }
 
+@color-ignored: #fc6238;
+@color-notIgnore: #0a183d;
+
+.buttonIgnoreMixin(@background: trasparent, @textColor: black, @border: none) {
+    background: @background;
+    color: @textColor;
+    border: @border;
+
+    &:hover {
+        background: darken(@background, 20%);
+        color: @textColor;
+        border: @border;
+    }
+
+    &:focus {
+        background: @background;
+        color: @textColor;
+        border: @border;
+    }
+}
+
+.button-ignored {
+    .buttonIgnoreMixin(transparent, @color-ignored, 1px solid @color-ignored)
+}
+
+
+.button-not-ignored {
+    .buttonIgnoreMixin(@color-notIgnore, white)
+}
+
+.cors-interceptor {
+
+    .ant-form-item {
+        margin-bottom: 5px;
+    }
+}
+
 @media screen and (max-width: 400px) {
     .no-mobile-padding {
         padding-left: 0;

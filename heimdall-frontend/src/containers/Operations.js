@@ -57,6 +57,12 @@ class Operations extends Component {
             .then(data => {
                 this.reloadOperations()
             })
+            .catch(error => {
+                if (error.response && error.response.status === 400) {
+                    notification['error']({ message: i18n.t('error'), description: error.response.data.message })
+                }
+                this.reloadOperations()
+            })
 
     }
 
@@ -81,8 +87,11 @@ class Operations extends Component {
     }
 
     handleSave = (e) => {
-        this.operationForm.onSubmitForm()
-        this.setState({ ...this.state, operationSelected: 0, operations: null, visibleModal: false });
+        this.operationForm.onSubmitForm((formWithoutErrors) => {
+           if (formWithoutErrors) {
+               this.setState({ ...this.state, operationSelected: 0, operations: null, visibleModal: false });
+           }
+        });
     }
 
     submitPayload = (payload) => {

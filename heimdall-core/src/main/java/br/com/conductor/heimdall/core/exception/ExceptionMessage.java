@@ -7,12 +7,12 @@ package br.com.conductor.heimdall.core.exception;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,7 +21,6 @@ package br.com.conductor.heimdall.core.exception;
  * ==========================LICENSE_END===================================
  */
 
-import br.com.twsoftware.alfred.object.Objeto;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -31,12 +30,12 @@ import static org.springframework.http.HttpStatus.*;
 
 /**
  * Enum that concentrates the messages and validations of the exceptions <br/>
- * 
+ *
  * @author Filipe Germano
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  * @author Marcelo Aguiar Rodrigues
  * @author <a href="https://github.com/felipe-brito" target="_blank" >Felipe Brito</a>
- * 
+ *
  */
 @Slf4j
 public enum ExceptionMessage {
@@ -71,6 +70,8 @@ public enum ExceptionMessage {
 
     INTERCEPTOR_INVALID_LIFECYCLE(BAD_REQUEST.value(), "{} interceptor can not be attached to the Plan life cycle", BadRequestException.class),
 
+    MIDDLEWARE_NO_OPERATION_FOUND(BAD_REQUEST.value(), "Middleware must have an operation attached", BadRequestException.class),
+
     MIDDLEWARE_UNSUPPORTED_TYPE(BAD_REQUEST.value(), "File type differs from .jar not supported", BadRequestException.class),
 
     MIDDLEWARE_CONTAINS_INTERCEPTORS(BAD_REQUEST.value(), "Middleware still contains interceptors associated", BadRequestException.class),
@@ -100,11 +101,11 @@ public enum ExceptionMessage {
     ONLY_ONE_OPERATION_PER_RESOURCE(BAD_REQUEST.value(), "Only one operation per resource", BadRequestException.class),
 
     ONLY_ONE_RESOURCE_PER_API(BAD_REQUEST.value(), "Only one resource per api", BadRequestException.class),
-  
+
     SOME_PLAN_NOT_PRESENT_IN_APP(BAD_REQUEST.value(), "Some of the informed plans do not belong to the App plans", BadRequestException.class),
-  
+
     ONLY_ONE_MIDDLEWARE_PER_VERSION_AND_API(BAD_REQUEST.value(), "Only one middleware per version and api", BadRequestException.class),
-     
+
     ENVIRONMENT_ALREADY_EXISTS(BAD_REQUEST.value(), "Environment already exists", BadRequestException.class),
 
     PRIVILEGES_NOT_EXIST(BAD_REQUEST.value(), "Privileges {} defined to attach in role not exist ", BadRequestException.class),
@@ -113,12 +114,14 @@ public enum ExceptionMessage {
 
     ENVIRONMENT_ATTACHED_TO_API(BAD_REQUEST.value(), "Environment attached to Api", BadRequestException.class),
 
+    PLAN_ATTACHED_TO_APPS(BAD_REQUEST.value(), "Plan attached to App", BadRequestException.class),
+
     ENVIRONMENT_INBOUND_DNS_PATTERN(BAD_REQUEST.value(), "Environment inbound URL has to follow the pattern http[s]://host.domain[:port] or www.host.domain[:port]", BadRequestException.class),
-    
+
     PROVIDER_NOT_FOUND(BAD_REQUEST.value(), "Provider not found", BadRequestException.class),
-     
+
     PROVIDER_USER_UNAUTHORIZED(UNAUTHORIZED.value(), "User provided unauthorized", UnauthorizedException.class),
-     
+
     TOKEN_EXPIRED(UNAUTHORIZED.value(), "Token expired", UnauthorizedException.class),
 
     TOKEN_INVALID(FORBIDDEN.value(), "Token not valid", ForbiddenException.class),
@@ -176,7 +179,7 @@ public enum ExceptionMessage {
     SCOPE_INVALID_NAME(BAD_REQUEST.value(), "A Scope with the provided name already exists", BadRequestException.class),
 
     SCOPE_NO_OPERATION_FOUND(BAD_REQUEST.value(), "A Scope must have at least one Operation", BadRequestException.class),
-  
+
     CORS_INTERCEPTOR_NOT_API_LIFE_CYCLE(BAD_REQUEST.value(), "The CORS Interceptor only allowed for API LifeCycle", BadRequestException.class),
 
     CORS_INTERCEPTOR_ALREADY_ASSIGNED_TO_THIS_API(BAD_REQUEST.value(), "A CORS Interceptor already assigned to this API", BadRequestException.class),
@@ -210,7 +213,7 @@ public enum ExceptionMessage {
         this.httpCode = httpCode;
         this.defaultMessage = message;
         this.klass = klass;
-        this.message = Objeto.isBlank(this.message) ? this.defaultMessage.replace("{}", "") : this.message;
+        this.message = (this.message == null || this.message.isEmpty()) ? this.defaultMessage.replace("{}", "") : this.message;
     }
 
     /**
@@ -226,7 +229,7 @@ public enum ExceptionMessage {
 
         log.debug("Raising error: {}", this);
 
-        this.message = Objeto.isBlank(this.message) ? this.defaultMessage.replace("{}", "") : this.message;
+        this.message = (this.message == null || this.message.isEmpty()) ? this.defaultMessage.replace("{}", "") : this.message;
 
         switch(HttpStatus.valueOf(this.httpCode)){
             case BAD_REQUEST:
@@ -244,7 +247,7 @@ public enum ExceptionMessage {
             default:
                 throw new ServerErrorException(this);
         }
-        
+
     }
 
     /**

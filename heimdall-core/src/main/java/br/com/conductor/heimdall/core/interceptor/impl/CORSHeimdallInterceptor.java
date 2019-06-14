@@ -4,7 +4,7 @@
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -45,7 +45,7 @@ public class CORSHeimdallInterceptor implements HeimdallInterceptor {
     }
 
     @Override
-    public Object parseContent(String content) {
+    public Map<String, String> parseContent(String content) {
         try {
             return (Map<String, String>) JsonUtils.convertJsonToObject(content, Map.class);
         } catch (Exception e) {
@@ -57,9 +57,11 @@ public class CORSHeimdallInterceptor implements HeimdallInterceptor {
     }
 
     @Override
-    public HashMap<String, Object> buildParameters(Object objectCustom, HashMap<String, Object> parameters, Interceptor interceptor) {
+    public Map<String, Object> buildParameters(Interceptor interceptor) {
 
-        Map<String, String> cors = (Map<String, String>) objectCustom;
+        Map<String, Object> parameters = new HashMap<>();
+
+        Map<String, String> cors = this.parseContent(interceptor.getContent());
         parameters.put("cors", cors.entrySet());
 
         return parameters;

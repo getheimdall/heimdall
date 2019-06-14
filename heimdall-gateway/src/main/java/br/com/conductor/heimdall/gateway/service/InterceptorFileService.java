@@ -4,7 +4,7 @@
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -20,20 +20,19 @@
 package br.com.conductor.heimdall.gateway.service;
 
 import br.com.conductor.heimdall.core.dto.InterceptorFileDTO;
-import br.com.conductor.heimdall.core.dto.interceptor.AccessTokenClientIdDTO;
 import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.enums.TypeExecutionPoint;
 import br.com.conductor.heimdall.core.enums.TypeInterceptor;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
-import br.com.conductor.heimdall.core.repository.InterceptorRepository;
+import br.com.conductor.heimdall.core.interceptor.HeimdallInterceptor;
 import br.com.conductor.heimdall.core.util.*;
 import com.netflix.zuul.FilterLoader;
 import com.netflix.zuul.filters.FilterRegistry;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -47,6 +46,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
+import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_ROOT;
 
 /**
  * Provides methods to create and remove the {@link Interceptor} files.
@@ -54,21 +54,32 @@ import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
  * @author Filipe Germano
  * @author Marcos Filho
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ * @author Marcelo Aguiar Rodrigues
  */
 @Service
 @Slf4j
 public class InterceptorFileService {
 
-    @Autowired
-    private InterceptorRepository interceptorRepository;
-
     @Value("${zuul.filter.root}")
     private String zuulFilterRoot;
+
+    private static final String API_ID = "apiId";
+    private static final String EXECUTION_POINT = "executionPoint";
+    private static final String IGNORED_OPERATIONS = "ignoredOperations";
+    private static final String IGNORED_RESOURCES = "ignoredResources";
+    private static final String INTERCEPTOR_STATUS = "interceptorStatus";
+    private static final String INTERCEPTOR_TYPE = "interceptorType";
+    private static final String LIFECYCLE = "lifeCycle";
+    private static final String NAME = "name";
+    private static final String PATH_MIDDLEWARE = "pathMiddleware";
+    private static final String ORDER = "order";
+    private static final String REFERENCE_ID = "referenceId";
+    private static final String ZUUL_FILTER_ROOT = "zuulFilterRoot";
 
     /**
      * Creates a {@link Interceptor} from its Id.
      *
-     * @param id The {@link Interceptor} Id
+     * @param interceptor The {@link Interceptor}
      */
     @Transactional(readOnly = true)
     public void createFileInterceptor(Interceptor interceptor) {
@@ -76,45 +87,42 @@ public class InterceptorFileService {
         HeimdallException.checkThrow(interceptor == null, ExceptionMessage.INTERCEPTOR_NOT_EXIST);
 
         String template = templateInterceptor(interceptor.getType(), interceptor.getExecutionPoint());
-        generateFileInterceptor(interceptor, template, buildParametersFile(interceptor, template));
 
+        if (template != null) {
+            final Map<String, Object> parameters = buildParametersFile(interceptor);
+
+            generateFileInterceptor(template, parameters);
+        } else {
+            String[] message = {ExceptionMessage.INTERCEPTOR_TEMPLATE_NOT_EXIST.getMessage(), interceptor.getId().toString(), interceptor.getType().name(), interceptor.getExecutionPoint().name()};
+            String error = String.join(", ", message);
+            log.error(error);
+        }
     }
 
     /*
      * Constructs a parameter file from a Interceptor.
      */
-    private HashMap<String, Object> buildParametersFile(Interceptor interceptor, String template) {
+    private Map<String, Object> buildParametersFile(Interceptor interceptor) {
 
-        final Long INVALID_REFERENCE_ID = -1L;
+        final long INVALID_REFERENCE_ID = -1L;
 
-        if (template != null) {
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put(API_ID, interceptor.getApi().getId());
+        parameters.put(EXECUTION_POINT, interceptor.getExecutionPoint().getFilterType());
+        parameters.put(IGNORED_OPERATIONS, interceptor.getIgnoredOperations());
+        parameters.put(IGNORED_RESOURCES, interceptor.getIgnoredResources());
+        parameters.put(INTERCEPTOR_STATUS, interceptor.getStatus());
+        parameters.put(INTERCEPTOR_TYPE, interceptor.getType());
+        parameters.put(LIFECYCLE, interceptor.getLifeCycle().name());
+        parameters.put(NAME, StringUtils.concatCamelCase(interceptor.getLifeCycle().name(), interceptor.getType().name(), interceptor.getExecutionPoint().getFilterType(), interceptor.getId().toString()));
+        parameters.put(ORDER, StringUtils.generateOrder(definePrefixOrder(interceptor.getLifeCycle()), interceptor.getOrder()));
+        parameters.put(REFERENCE_ID, (interceptor.getReferenceId() != null) ? interceptor.getReferenceId() : INVALID_REFERENCE_ID);
+        parameters.put(ZUUL_FILTER_ROOT, zuulFilterRoot);
+        parameters.put(PATH_MIDDLEWARE, String.join("/", zuulFilterRoot, MIDDLEWARE_API_ROOT, interceptor.getApi().getId().toString(), MIDDLEWARE_ROOT));
 
-            HashMap<String, Object> parameters = new HashMap<>();
-            parameters.put("order", StringUtils.generateOrder(definePrefixOrder(interceptor.getLifeCycle()), interceptor.getOrder()));
-            parameters.put("executionPoint", interceptor.getExecutionPoint().getFilterType());
-            parameters.put("ignoredOperations", interceptor.getIgnoredOperations());
-            parameters.put("ignoredResources", interceptor.getIgnoredResources());
-            parameters.put("lifeCycle", interceptor.getLifeCycle().name());
-            parameters.put("name", StringUtils.concatCamelCase(interceptor.getLifeCycle().name(), interceptor.getType().name(), interceptor.getExecutionPoint().getFilterType(), interceptor.getId().toString()));
-            parameters.put("zuulFilterRoot", zuulFilterRoot);
-            parameters.put("path", createPath(interceptor));
-            parameters.put("apiId", interceptor.getApi().getId());
-            parameters.put("interceptorStatus", interceptor.getStatus());
+        parameters.putAll(interceptor.getType().getHeimdallInterceptor().buildParameters(interceptor));
 
-            if (interceptor.getReferenceId() != null)
-                parameters.put("referenceId", interceptor.getReferenceId());
-            else
-                parameters.put("referenceId", INVALID_REFERENCE_ID);
-
-            return buildCustom(parameters, interceptor);
-        } else {
-
-            String[] message = {ExceptionMessage.INTERCEPTOR_TEMPLATE_NOT_EXIST.getMessage(), interceptor.getId().toString(), interceptor.getType().name(), interceptor.getExecutionPoint().name()};
-            String error = String.join(", ", message);
-            log.error(error);
-
-            return null;
-        }
+        return parameters;
     }
 
     /**
@@ -188,72 +196,20 @@ public class InterceptorFileService {
 
     }
 
-    private HashMap<String, Object> buildCustom(HashMap<String, Object> parameters, Interceptor interceptor) {
-
-        Object objectCustom = interceptor.getType().getHeimdallInterceptor().parseContent(interceptor.getContent());
-
-        if (objectCustom != null) {
-
-            if (objectCustom instanceof AccessTokenClientIdDTO) {
-
-                if (TypeInterceptor.ACCESS_TOKEN.equals(interceptor.getType())) {
-
-                    InterceptorLifeCycle lifeCycle = interceptor.getLifeCycle();
-                    List<Interceptor> interceptors = new ArrayList<>();
-                    switch (lifeCycle) {
-                        case API:
-                            interceptors = interceptorRepository.findByTypeAndApiId(TypeInterceptor.CLIENT_ID, interceptor.getApi().getId());
-                            break;
-                        case PLAN:
-                            interceptors = interceptorRepository.findByTypeAndPlanId(TypeInterceptor.CLIENT_ID, interceptor.getPlan().getId());
-                            break;
-                        case RESOURCE:
-                            interceptors = interceptorRepository.findByTypeAndResourceId(TypeInterceptor.CLIENT_ID, interceptor.getResource().getId());
-                            break;
-                        case OPERATION:
-                            interceptors = interceptorRepository.findByTypeAndOperationId(TypeInterceptor.CLIENT_ID, interceptor.getOperation().getId());
-                            break;
-                        default:
-                            break;
-                    }
-
-                    for (Interceptor i : interceptors) {
-
-                        try {
-                            AccessTokenClientIdDTO clientIdDTO = JsonUtils.convertJsonToObject(i.getContent(), AccessTokenClientIdDTO.class);
-                            if (clientIdDTO != null && (clientIdDTO.getName() != null && !clientIdDTO.getName().isEmpty())) {
-
-                                parameters.put("client_id", clientIdDTO.getName());
-                                break;
-                            }
-
-                        } catch (IOException e) {
-
-                            log.error(e.getMessage(), e);
-                        }
-                    }
-                }
-            }
-
-            parameters = interceptor.getType().getHeimdallInterceptor().buildParameters(objectCustom, parameters, interceptor);
-        }
-
-        return parameters;
-    }
-
-    private void generateFileInterceptor(Interceptor interceptor, String template, HashMap<String, Object> parameters) {
+    private void generateFileInterceptor(String template, Map<String, Object> parameters) {
 
         try {
             String codeInterceptor = GenerateMustache.generateTemplate(template, parameters);
-            String fileName = StringUtils.concatCamelCase(interceptor.getLifeCycle().name(), interceptor.getType().name(), interceptor.getExecutionPoint().getFilterType(), interceptor.getId().toString()) + ".groovy";
+            String fileName = parameters.get("name") + ".groovy";
 
             String pathName;
-            if (TypeInterceptor.MIDDLEWARE.equals(interceptor.getType())) {
+            final TypeInterceptor interceptorType = (TypeInterceptor) parameters.get("interceptorType");
+            if (TypeInterceptor.MIDDLEWARE.equals(interceptorType)) {
 
-                pathName = String.join(File.separator, zuulFilterRoot, MIDDLEWARE_API_ROOT, interceptor.getOperation().getResource().getApi().getId().toString(), fileName);
+                pathName = String.join(File.separator, zuulFilterRoot, MIDDLEWARE_API_ROOT, parameters.get("apiId").toString(), fileName);
             } else {
 
-                pathName = String.join(File.separator, zuulFilterRoot, interceptor.getExecutionPoint().getFilterType(), fileName);
+                pathName = String.join(File.separator, zuulFilterRoot, parameters.get("executionPoint").toString(), fileName);
             }
             File file = new File(pathName);
 
@@ -265,24 +221,4 @@ public class InterceptorFileService {
 
     }
 
-    /*
-     * Creates the path to be used as key for the RateLimit repository
-     */
-    private String createPath(Interceptor interceptor) {
-
-        switch (interceptor.getLifeCycle()) {
-            case API:
-                return interceptor.getApi().getBasePath();
-            case PLAN:
-                return interceptor.getPlan().getApi().getBasePath();
-            case RESOURCE:
-                return interceptor.getResource().getApi().getBasePath() + "-" + interceptor.getResource().getName();
-            case OPERATION:
-                return interceptor.getOperation().getResource().getApi().getBasePath() + "-" +
-                        interceptor.getOperation().getResource().getName() + "-" +
-                        interceptor.getOperation().getPath();
-            default:
-                return "";
-        }
-    }
 }

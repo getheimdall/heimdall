@@ -6,7 +6,7 @@ package br.com.conductor.heimdall.core.interceptor.impl;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -25,6 +25,7 @@ import br.com.conductor.heimdall.core.enums.TypeExecutionPoint;
 import br.com.conductor.heimdall.core.interceptor.HeimdallInterceptor;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Implementation of the HeimdallInterceptor to type Custom.
@@ -39,14 +40,17 @@ public class CustomHeimdallInterceptor implements HeimdallInterceptor {
     }
 
     @Override
-    public Object parseContent(String content) {
+    public String parseContent(String content) {
         return content;
     }
 
     @Override
-    public HashMap<String, Object> buildParameters(Object objectCustom, HashMap<String, Object> parameters, Interceptor interceptor) {
+    public Map<String, Object> buildParameters(Interceptor interceptor) {
 
-        parameters.put("content", objectCustom);
+        Map<String, Object> parameters = new HashMap<>();
+
+        parameters.put("content", interceptor.getContent());
+
         return parameters;
     }
 }

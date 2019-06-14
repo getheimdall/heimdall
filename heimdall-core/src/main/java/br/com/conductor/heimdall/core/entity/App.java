@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.entity;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -101,6 +101,7 @@ public class App implements Serializable {
         status = (status == null) ? Status.ACTIVE : status;
 
         creationDate = LocalDateTime.now();
+        clientId = clientId.trim();
     }
 
 

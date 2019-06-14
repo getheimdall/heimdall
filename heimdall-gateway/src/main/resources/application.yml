@@ -13,6 +13,9 @@ heimdall:
     hostname: hostname
     excludeRabbit: true
     retryable: false
+    interceptor:
+        health:
+            fixedRate: 600000
     logstash:
         enabled: true
         destination: 127.0.0.1

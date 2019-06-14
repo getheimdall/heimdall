@@ -6,7 +6,7 @@ package br.com.conductor.heimdall.core.interceptor.impl;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -28,10 +28,10 @@ import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.interceptor.HeimdallInterceptor;
 import br.com.conductor.heimdall.core.util.JsonUtils;
 import br.com.conductor.heimdall.core.util.TemplateUtils;
-import br.com.twsoftware.alfred.object.Objeto;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Implementation of the HeimdallInterceptor to type OAuth.
@@ -47,7 +47,7 @@ public class OAuthHeimdallInterceptor implements HeimdallInterceptor {
     }
 
     @Override
-    public Object parseContent(String content) {
+    public OAuthDTO parseContent(String content) {
         try {
             return JsonUtils.convertJsonToObject(content, OAuthDTO.class);
         } catch (Exception e) {
@@ -59,12 +59,14 @@ public class OAuthHeimdallInterceptor implements HeimdallInterceptor {
     }
 
     @Override
-    public HashMap<String, Object> buildParameters(Object objectCustom, HashMap<String, Object> parameters, Interceptor interceptor) {
-        OAuthDTO oAuthDTO = (OAuthDTO) objectCustom;
+    public Map<String, Object> buildParameters(Interceptor interceptor) {
 
-        parameters.put("providerId", Objeto.isBlank(oAuthDTO.getProviderId()) ? 0L : oAuthDTO.getProviderId());
-        parameters.put("timeAccessToken", Objeto.isBlank(oAuthDTO.getTimeAccessToken()) ? 0 : oAuthDTO.getTimeAccessToken());
-        parameters.put("timeRefreshToken", Objeto.isBlank(oAuthDTO.getTimeRefreshToken()) ? 1800 : oAuthDTO.getTimeRefreshToken());
+        Map<String, Object> parameters = new HashMap<>();
+        OAuthDTO oAuthDTO = this.parseContent(interceptor.getContent());
+
+        parameters.put("providerId", oAuthDTO.getProviderId() == null ? 0L : oAuthDTO.getProviderId());
+        parameters.put("timeAccessToken", oAuthDTO.getTimeAccessToken() == null ? 0 : oAuthDTO.getTimeAccessToken());
+        parameters.put("timeRefreshToken", oAuthDTO.getTimeRefreshToken() == null ? 1800 : oAuthDTO.getTimeRefreshToken());
         parameters.put("typeOAuth", oAuthDTO.getTypeOAuth());
         parameters.put("privateKey", oAuthDTO.getPrivateKey());
 

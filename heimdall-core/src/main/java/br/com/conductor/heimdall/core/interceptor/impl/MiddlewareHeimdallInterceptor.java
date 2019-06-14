@@ -6,7 +6,7 @@ package br.com.conductor.heimdall.core.interceptor.impl;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -25,6 +25,7 @@ import br.com.conductor.heimdall.core.enums.TypeExecutionPoint;
 import br.com.conductor.heimdall.core.interceptor.HeimdallInterceptor;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
 import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_ROOT;
@@ -42,17 +43,16 @@ public class MiddlewareHeimdallInterceptor implements HeimdallInterceptor {
     }
 
     @Override
-    public Object parseContent(String content) {
-        return content;
+    public String parseContent(String content) {
+        return content.trim();
     }
 
     @Override
-    public HashMap<String, Object> buildParameters(Object objectCustom, HashMap<String, Object> parameters, Interceptor interceptor) {
+    public Map<String, Object> buildParameters(Interceptor interceptor) {
 
-        String api = interceptor.getOperation().getResource().getApi().getId().toString();
-        String pathReferences = String.join("/", parameters.get("zuulFilterRoot").toString(), MIDDLEWARE_API_ROOT, api, MIDDLEWARE_ROOT);
-        parameters.put("pathMiddleware", pathReferences);
-        parameters.put("content", objectCustom);
+        Map<String, Object> parameters = new HashMap<>();
+
+        parameters.put("content", this.parseContent(interceptor.getContent()));
 
         return parameters;
     }
