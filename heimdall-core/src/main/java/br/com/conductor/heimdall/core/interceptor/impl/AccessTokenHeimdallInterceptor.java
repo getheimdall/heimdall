@@ -31,6 +31,7 @@ import br.com.conductor.heimdall.core.util.TemplateUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Implementation of the HeimdallInterceptor to type AccessToken.
@@ -46,7 +47,7 @@ public class AccessTokenHeimdallInterceptor implements HeimdallInterceptor {
     }
 
     @Override
-    public Object parseContent(String content) {
+    public AccessTokenClientIdDTO parseContent(String content) {
         try {
             return JsonUtils.convertJsonToObject(content, AccessTokenClientIdDTO.class);
         } catch (Exception e) {
@@ -58,9 +59,11 @@ public class AccessTokenHeimdallInterceptor implements HeimdallInterceptor {
     }
 
     @Override
-    public HashMap<String, Object> buildParameters(Object objectCustom, HashMap<String, Object> parameters, Interceptor interceptor) {
+    public Map<String, Object> buildParameters(Interceptor interceptor) {
 
-        AccessTokenClientIdDTO accessTokenClientIdDTO = (AccessTokenClientIdDTO) objectCustom;
+        AccessTokenClientIdDTO accessTokenClientIdDTO = this.parseContent(interceptor.getContent());
+        Map<String, Object> parameters = new HashMap<>();
+
         parameters.put("location", accessTokenClientIdDTO.getLocation());
 
         return parameters;

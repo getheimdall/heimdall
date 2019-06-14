@@ -168,4 +168,14 @@ public class ProviderServiceTest {
 
 		providerService.edit(1L, providerDTO);
 	}
+
+	@Test
+	public void findProviderTest() {
+		Provider provider = new Provider();
+
+		Mockito.when(this.providerRepository.findOne(Mockito.any(Long.class))).thenReturn(provider);
+		Provider accessTokenResp = providerService.findOne(1L);
+		assertEquals(accessTokenResp.getId(), provider.getId());
+		Mockito.verify(this.providerRepository, Mockito.times(1)).findOne(Mockito.any(Long.class));
+	}
 }
