@@ -61,6 +61,11 @@ public class ClientIdHeimdallInterceptor implements HeimdallInterceptor {
     @Override
     public Map<String, Object> buildParameters(Interceptor interceptor) {
 
-        return new HashMap<>();
+        AccessTokenClientIdDTO accessTokenClientIdDTO = this.parseContent(interceptor.getContent());
+        Map<String, Object> parameters = new HashMap<>();
+
+        parameters.put("location", accessTokenClientIdDTO.getLocation());
+
+        return parameters;
     }
 }

@@ -76,7 +76,7 @@ public class ClientIdInterceptor extends HeimdallFilter {
     @Override
     public void execute() throws Throwable {
         ClientIdInterceptorService clientIdInterceptorService = (ClientIdInterceptorService) BeanManager.getBean(ClientIdInterceptorService.class);
-        clientIdInterceptorService.validate(apiId, Location.valueOf("{{location}}"));
+        clientIdInterceptorService.validate(apiId, Location.{{location}});
     }
 
 }
