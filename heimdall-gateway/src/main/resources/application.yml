@@ -57,6 +57,7 @@ heimdall:
         discardingThreshold: 0
         zoneId: America/Sao_Paulo
     trace:
+        printHeimdallFilters: true
         printAllTrace: true
         sanitizes:
             - access_token

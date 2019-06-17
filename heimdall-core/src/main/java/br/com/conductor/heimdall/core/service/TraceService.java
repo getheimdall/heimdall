@@ -27,7 +27,6 @@ import br.com.conductor.heimdall.core.dto.logs.FiltersDTO;
 import br.com.conductor.heimdall.core.dto.logs.LogTraceDTO;
 import br.com.conductor.heimdall.core.dto.page.LogTraceDTOPage;
 import br.com.conductor.heimdall.core.entity.LogTrace;
-import br.com.conductor.heimdall.core.entity.Trace;
 import br.com.conductor.heimdall.core.util.MongoLogConnector;
 import br.com.conductor.heimdall.core.util.Page;
 import org.bson.types.ObjectId;
@@ -51,7 +50,7 @@ public class TraceService {
 	private MongoLogConnector mongoConnection;
 
     /**
-     * Finds a {@link Trace} by its Id.
+     * Finds a {@link br.com.conductor.heimdall.core.trace.Trace} by its Id.
      * 
      * @param id The Trace Id
      * @return Trace found

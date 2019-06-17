@@ -34,7 +34,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class StackTraceMock implements StackTrace {
+public class StackTraceMock implements StackTrace{
 
     public String clazz;
 

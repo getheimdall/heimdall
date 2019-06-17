@@ -30,7 +30,9 @@ import br.com.conductor.heimdall.core.exception.ExceptionMessage;
  * @author Filipe Germano
  *
  */
-public abstract class StringUtils {
+public class StringUtils {
+
+     private StringUtils() {}
 
 	/**
 	 * Creates a String that represents a order. It adds leading zeros ("0").
