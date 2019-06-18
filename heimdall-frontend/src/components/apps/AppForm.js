@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import {Row, Form, Input, Col, Switch, Tooltip, Button, Modal, AutoComplete, Spin, Checkbox, Tag, Table} from 'antd'
 
 import i18n from "../../i18n/i18n"
-import Loading from '../ui/Loading'
 import ColorUtils from "../../utils/ColorUtils"
 import ComponentAuthority from "../policy/ComponentAuthority"
 import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
@@ -163,7 +162,7 @@ class AppForm extends Component {
                             </FormItem>
                         </Col>
                         <Col sm={24} md={12}>
-                            {this.props.plans && this.props.plans.content.length === 0 ? <Loading/> :
+                            {this.props.plans && this.props.plans.content.length === 0 ? null :
                                 <FormItem label={i18n.t('plans')}>
                                     {
                                         getFieldDecorator('plans', {
