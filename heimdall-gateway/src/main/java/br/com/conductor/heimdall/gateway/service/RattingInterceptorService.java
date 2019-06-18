@@ -20,10 +20,10 @@
 package br.com.conductor.heimdall.gateway.service;
 
 import br.com.conductor.heimdall.core.entity.RateLimit;
+import br.com.conductor.heimdall.core.enums.Interval;
 import br.com.conductor.heimdall.core.repository.RateLimitRepository;
 import com.netflix.zuul.context.RequestContext;
 import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -42,22 +42,24 @@ public class RattingInterceptorService {
     @Autowired
     private RateLimitRepository rateLimitRepository;
 
-    @Autowired
-    private RedissonClient redissonClientRateLimitInterceptor;
-
     /**
      * Limits the number of requests to a specific path
      *
      * @param name RLock name
      * @param path rate limit key
      */
-    public void execute(String name, String path) {
+    public void execute(String name, String path, Long calls, Interval interval, Long id) {
         RequestContext ctx = RequestContext.getCurrentContext();
 
-        RLock lock = redissonClientRateLimitInterceptor.getLock(name);
+        RLock lock = rateLimitRepository.getLock(name);
         lock.lock();
 
         RateLimit rate = rateLimitRepository.find(path);
+
+        if (rate == null) {
+            rate = rateLimitRepository.mountRatelimit(id, calls, interval);
+        }
+
         if (rate.getLastRequest() == null) {
             rate.setLastRequest(LocalDateTime.now());
         }
@@ -83,7 +85,7 @@ public class RattingInterceptorService {
     /*
      * Checks if the limiting time has ended
      */
-    public boolean hasIntervalEnded(RateLimit rate) {
+    private boolean hasIntervalEnded(RateLimit rate) {
 
         switch (rate.getInterval()) {
             case SECONDS:
