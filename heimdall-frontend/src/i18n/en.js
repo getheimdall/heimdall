@@ -42,6 +42,7 @@ export default {
         'outbound_url': 'Outbound URL',
         'active': 'Active',
         'inactive': 'Inactive',
+        'deprecated': 'Deprecated',
         'variables': 'Variables',
         'you_do_not_have_variables_in_this': " You don't have variables in this",
         'please': 'Please',
