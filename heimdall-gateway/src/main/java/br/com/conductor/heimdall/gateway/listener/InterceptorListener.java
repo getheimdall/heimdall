@@ -19,19 +19,20 @@
  */
 package br.com.conductor.heimdall.gateway.listener;
 
-import br.com.conductor.heimdall.core.dto.InterceptorFileDTO;
-import br.com.conductor.heimdall.core.entity.Interceptor;
-import br.com.conductor.heimdall.core.repository.InterceptorRepository;
-import br.com.conductor.heimdall.core.util.RabbitConstants;
-import br.com.conductor.heimdall.gateway.service.InterceptorFileService;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Objects;
+
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
+import br.com.conductor.heimdall.core.dto.InterceptorFileDTO;
+import br.com.conductor.heimdall.core.entity.Interceptor;
+import br.com.conductor.heimdall.core.repository.jdbc.InterceptorJDBCRepository;
+import br.com.conductor.heimdall.core.util.RabbitConstants;
+import br.com.conductor.heimdall.gateway.service.InterceptorFileService;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Listener that controls the {@link Interceptor} repository.
@@ -48,9 +49,12 @@ public class InterceptorListener {
      
      @Autowired
      private InterceptorFileService interceptorFileService;
-
+//
+//     @Autowired
+//     private InterceptorRepository interceptorRepository;
+     
      @Autowired
-     private InterceptorRepository interceptorRepository;
+     private InterceptorJDBCRepository interceptorJdbcRepository;
 
      @Autowired
      private StartServer startServer;
@@ -65,8 +69,7 @@ public class InterceptorListener {
 
           Long interceptorId = (Long) rabbitTemplate.getMessageConverter().fromMessage(message);
 
-
-          Interceptor interceptor = interceptorRepository.findOne(interceptorId);
+          Interceptor interceptor = interceptorJdbcRepository.findOneInterceptorSimplified(interceptorId);
           if (Objects.nonNull(interceptor)) {
                
                log.info("Updating/Creating Interceptor id: " + interceptorId);

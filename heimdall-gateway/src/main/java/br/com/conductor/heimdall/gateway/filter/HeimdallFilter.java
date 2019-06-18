@@ -19,15 +19,14 @@
  */
 package br.com.conductor.heimdall.gateway.filter;
 
-import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
 import org.springframework.stereotype.Component;
 
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 
 import br.com.conductor.heimdall.core.util.Constants;
-import br.com.conductor.heimdall.gateway.trace.FilterDetail;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import br.com.conductor.heimdall.core.trace.FilterDetail;
+import br.com.conductor.heimdall.core.trace.TraceContextHolder;
 
 /**
  * HeimdallFilter is a extension of a {@link ZuulFilter}.
@@ -86,7 +85,7 @@ public abstract class HeimdallFilter extends ZuulFilter {
                detail.setStatus(Constants.SUCCESS);
           } catch (Throwable e) {
                detail.setStatus(Constants.FAILED);
-               detail.setStackTrace(new StackTraceImpl(e.getClass().getName(), e.getMessage()));
+               detail.setStackTrace(e.getClass().getName(), e.getMessage());
           } finally {
                long endTime = System.currentTimeMillis();
 

@@ -30,7 +30,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
@@ -39,9 +38,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import br.com.conductor.heimdall.core.environment.Property;
-import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
-import br.com.conductor.heimdall.gateway.trace.Trace;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import br.com.conductor.heimdall.core.trace.Trace;
+import br.com.conductor.heimdall.core.trace.TraceContextHolder;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -83,7 +81,7 @@ public class TraceFilter implements Filter {
 		try {
 
 			trace = TraceContextHolder.getInstance().init(prop.getTrace().isPrintAllTrace(), profile, request,
-			prop.getMongo().getEnabled(), prop.getLogstash().getEnabled(), buildProperties.getVersion());
+			prop.getMongo().getEnabled(), prop.getLogstash().getEnabled(), buildProperties.getVersion(), prop.getTrace().isPrintHeimdallFilters());
 			if (shouldDisableTrace(request)) {
 				trace.setShouldPrint(false);
 			}
@@ -93,7 +91,6 @@ public class TraceFilter implements Filter {
 		} catch (Exception e) {
 
 			log.error("Error {} during request {} exception {}", e.getMessage(),((HttpServletRequest) request).getRequestURL(), e.getStackTrace());
-			if (trace != null) trace.setStackTrace(new StackTraceImpl(e.getClass().getName(), e.getMessage(), ExceptionUtils.getStackTrace(e)));
 			throw e;
 		} finally {
 

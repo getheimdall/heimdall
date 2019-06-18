@@ -30,6 +30,7 @@ import br.com.conductor.heimdall.core.exception.ExceptionMessage;
  * @author Filipe Germano
  *
  */
+
 public final class StringUtils {
 
     private StringUtils() { }
