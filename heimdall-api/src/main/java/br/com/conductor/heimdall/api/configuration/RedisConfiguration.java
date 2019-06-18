@@ -19,9 +19,9 @@
  */
 package br.com.conductor.heimdall.api.configuration;
 
-import java.time.Duration;
-
-import br.com.conductor.heimdall.core.util.ConstantsInterceptors;
+import br.com.conductor.heimdall.core.entity.RateLimit;
+import br.com.conductor.heimdall.core.environment.Property;
+import br.com.conductor.heimdall.core.util.ConstantsCache;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -37,10 +37,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-
-import br.com.conductor.heimdall.core.entity.RateLimit;
-import br.com.conductor.heimdall.core.environment.Property;
 import redis.clients.jedis.JedisPoolConfig;
+
+import java.time.Duration;
 
 /**
  * Class responsible for the Redis configuration.
@@ -147,13 +146,13 @@ public class RedisConfiguration {
      @Bean(autowire = Autowire.BY_NAME)
      public RedissonClient redissonClientRateLimitInterceptor() {
 
-          return createConnection(ConstantsInterceptors.RATE_LIMIT_DATABASE);
+          return createConnection(ConstantsCache.RATE_LIMIT_DATABASE);
      }
 
      @Bean(autowire = Autowire.BY_NAME)
      public RedissonClient redissonClientCacheInterceptor() {
 
-          return createConnection(ConstantsInterceptors.CACHE_INTERCEPTOR_DATABASE);
+          return createConnection(ConstantsCache.CACHE_INTERCEPTOR_DATABASE);
      }
 
      private RedissonClient createConnection(int database) {

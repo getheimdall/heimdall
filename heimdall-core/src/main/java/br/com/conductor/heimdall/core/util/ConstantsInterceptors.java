@@ -37,7 +37,4 @@ public class ConstantsInterceptors {
 
      public static final String IDENTIFIER_ID = "identifier_id";
 
-     public static final int RATE_LIMIT_DATABASE = 2;
-
-     public static final int CACHE_INTERCEPTOR_DATABASE = 4;
 }

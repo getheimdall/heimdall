@@ -197,12 +197,12 @@ public class MiddlewareServiceTest {
 		Middleware saved = service.save(api.getId(), middlewareDTO, multipartFile);
 
 		Map<Status, List<Middleware>> middlewareMap = middlewareList.stream()
-				.collect(Collectors.groupingBy(m -> m.getStatus()));
-		
-		assertTrue(saved.equals(middleware));
+				.collect(Collectors.groupingBy(Middleware::getStatus));
+
+		assertEquals(saved, middleware);
 		assertEquals(Status.ACTIVE, saved.getStatus());
 		assertEquals(1, middlewareMap.get(Status.INACTIVE).size());
-		assertEquals(4, middlewareMap.get(Status.DEPRECATED).size());
+		assertNull(middlewareMap.get(Status.DEPRECATED));
 
 	}
 	
@@ -215,9 +215,9 @@ public class MiddlewareServiceTest {
 		Middleware saved = service.save(api.getId(), middlewareDTO, multipartFile);
 
 		Map<Status, List<Middleware>> middlewareMap = middlewareList.stream()
-				.collect(Collectors.groupingBy(m -> m.getStatus()));
-		
-		assertTrue(saved.equals(middleware));
+				.collect(Collectors.groupingBy(Middleware::getStatus));
+
+		assertEquals(saved, middleware);
 		assertEquals(Status.ACTIVE, saved.getStatus());
 		assertEquals(3, middlewareMap.get(Status.INACTIVE).size());
 		assertEquals(2, middlewareMap.get(Status.DEPRECATED).size());
@@ -250,9 +250,9 @@ public class MiddlewareServiceTest {
 		Middleware saved = service.save(api.getId(), middlewareDTO, multipartFile);
 
 		Map<Status, List<Middleware>> middlewareMap = middlewareList.stream()
-				.collect(Collectors.groupingBy(m -> m.getStatus()));
-		
-		assertTrue(saved.equals(middleware));
+				.collect(Collectors.groupingBy(Middleware::getStatus));
+
+		assertEquals(saved, middleware);
 		assertEquals(Status.ACTIVE, saved.getStatus());
 		assertEquals(1, middlewareMap.get(Status.INACTIVE).size());
 		assertEquals(4, middlewareMap.get(Status.DEPRECATED).size());
@@ -272,19 +272,12 @@ public class MiddlewareServiceTest {
 		Middleware saved = service.save(api.getId(), middlewareDTO, multipartFile);
 
 		Map<Status, List<Middleware>> middlewareMap = middlewareList.stream()
-				.collect(Collectors.groupingBy(m -> m.getStatus()));
-		
-		assertTrue(saved.equals(middleware));
+				.collect(Collectors.groupingBy(Middleware::getStatus));
+
+		assertEquals(saved, middleware);
 		assertEquals(Status.ACTIVE, saved.getStatus());
 		assertEquals(1, middlewareMap.get(Status.INACTIVE).size());
-		assertEquals(4, middlewareMap.get(Status.DEPRECATED).size());
-		
-		assertNull(m2.getFile());
-		assertNull(m3.getFile());
-		
-		assertNotNull(m4.getFile());
-		assertNotNull(m5.getFile());
-		
+		assertNull(middlewareMap.get(Status.DEPRECATED));
 	}
 	
 	@Test

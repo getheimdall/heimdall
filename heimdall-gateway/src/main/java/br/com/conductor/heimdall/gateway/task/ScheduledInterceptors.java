@@ -20,19 +20,19 @@
 
 package br.com.conductor.heimdall.gateway.task;
 
-import br.com.conductor.heimdall.core.entity.Interceptor;
-import br.com.conductor.heimdall.core.enums.TypeInterceptor;
-import br.com.conductor.heimdall.core.repository.jdbc.InterceptorJDBCRepository;
-import br.com.conductor.heimdall.core.service.InterceptorService;
-import br.com.conductor.heimdall.core.util.StringUtils;
-import br.com.conductor.heimdall.gateway.service.InterceptorFileService;
+import java.io.File;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.util.List;
+import br.com.conductor.heimdall.core.entity.Interceptor;
+import br.com.conductor.heimdall.core.enums.TypeInterceptor;
+import br.com.conductor.heimdall.core.repository.jdbc.InterceptorJDBCRepository;
+import br.com.conductor.heimdall.core.util.StringUtils;
+import br.com.conductor.heimdall.gateway.service.InterceptorFileService;
 
 /**
  * @author @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
@@ -42,9 +42,6 @@ public class ScheduledInterceptors {
 
     @Autowired
     private InterceptorFileService interceptorFileService;
-
-    @Autowired
-    private InterceptorService interceptorService;
 
     @Autowired
     private InterceptorJDBCRepository interceptorJDBCRepository;
@@ -58,7 +55,7 @@ public class ScheduledInterceptors {
 
         interceptors.forEach(interceptor -> {
             if (!checkInterceptorInDisk(interceptor)) {
-                interceptorFileService.createFileInterceptor(interceptorService.find(interceptor.getId()));
+                interceptorFileService.createFileInterceptor(interceptor);
             }
         });
     }
@@ -66,7 +63,6 @@ public class ScheduledInterceptors {
     private boolean checkInterceptorInDisk(Interceptor interceptor) {
 
         String filename = StringUtils.concatCamelCase(interceptor.getLifeCycle().name(), interceptor.getType().name(), interceptor.getExecutionPoint().getFilterType(), interceptor.getId().toString()) + ".groovy";
-
         String path = this.path;
 
         if (interceptor.getType() == TypeInterceptor.MIDDLEWARE) {
@@ -76,9 +72,8 @@ public class ScheduledInterceptors {
         }
 
         path = path.concat(File.separator + filename);
-
         File file = new File(path);
-
+        
         return file.exists();
     }
 

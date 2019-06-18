@@ -26,6 +26,7 @@ import br.com.conductor.heimdall.core.enums.TypeExecutionPoint;
 import br.com.conductor.heimdall.core.enums.TypeInterceptor;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.interceptor.HeimdallInterceptor;
+import br.com.conductor.heimdall.core.util.ConstantsCache;
 import br.com.conductor.heimdall.core.util.JsonUtils;
 import br.com.conductor.heimdall.core.util.TemplateUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -66,29 +67,9 @@ public class RattingHeimdallInterceptor implements HeimdallInterceptor {
 
         parameters.put("calls", rateLimitDTO.getCalls());
         parameters.put("interval", rateLimitDTO.getInterval().name());
-        parameters.put("path", createPath(interceptor));
+        parameters.put("cache-key", ConstantsCache.RATE_LIMIT_KEY_PREFIX + interceptor.getId());
 
         return parameters;
     }
 
-    /*
-     * Creates the path to be used as key for the RateLimit repository
-     */
-    private String createPath(Interceptor interceptor) {
-
-        switch (interceptor.getLifeCycle()) {
-            case API:
-                return interceptor.getApi().getBasePath();
-            case PLAN:
-                return interceptor.getPlan().getApi().getBasePath();
-            case RESOURCE:
-                return interceptor.getResource().getApi().getBasePath() + "-" + interceptor.getResource().getName();
-            case OPERATION:
-                return interceptor.getOperation().getResource().getApi().getBasePath() + "-" +
-                        interceptor.getOperation().getResource().getName() + "-" +
-                        interceptor.getOperation().getPath();
-            default:
-                return "";
-        }
-    }
 }
