@@ -21,18 +21,13 @@ package br.com.conductor.heimdall.core.service;
  * ==========================LICENSE_END===================================
  */
 
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ONLY_ONE_OPERATION_PER_RESOURCE;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.OPERATION_CANT_HAVE_SINGLE_WILDCARD;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import br.com.conductor.heimdall.core.entity.Api;
+import br.com.conductor.heimdall.core.repository.jdbc.OperationJDBCRepository;
 import br.com.conductor.heimdall.core.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -57,6 +52,8 @@ import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
 import br.com.conductor.heimdall.core.util.ConstantsCache;
 import br.com.conductor.heimdall.core.util.Pageable;
 
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
+
 /**
  * This class provides methods to create, read, update and delete a {@link Operation} resource.
  * 
@@ -75,6 +72,9 @@ public class OperationService {
 
      @Autowired
      private InterceptorService interceptorService;
+
+     @Autowired
+     private OperationJDBCRepository operationJDBCRepository;
 
      @Autowired
      private ApiService apiService;
@@ -114,13 +114,7 @@ public class OperationService {
      @Transactional(readOnly = true)
      public OperationPage list(Long apiId, Long resourceId, OperationDTO operationDTO, PageableDTO pageableDTO) {
 
-          Resource resource = resourceRepository.findByApiIdAndId(apiId, resourceId);
-          HeimdallException.checkThrow(resource == null, GLOBAL_RESOURCE_NOT_FOUND);
-
-          Operation operation = GenericConverter.mapper(operationDTO, Operation.class);
-          operation.setResource(resource);
-          
-          Example<Operation> example = Example.of(operation, ExampleMatcher.matching().withIgnorePaths("resource.api").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+          Example<Operation> example = this.prepareExample(apiId, resourceId, operationDTO);
           
           Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
           Page<Operation> page = operationRepository.findAll(example, pageable);
@@ -138,16 +132,23 @@ public class OperationService {
       */
      @Transactional(readOnly = true)
      public List<Operation> list(Long apiId, Long resourceId, OperationDTO operationDTO) {
-          
-          Resource resource = resourceRepository.findByApiIdAndId(apiId, resourceId);
-          HeimdallException.checkThrow(resource == null, GLOBAL_RESOURCE_NOT_FOUND);
-          
-          Operation operation = GenericConverter.mapper(operationDTO, Operation.class);
-          operation.setResource(resource);
-          
-          Example<Operation> example = Example.of(operation, ExampleMatcher.matching().withIgnorePaths("resource.api").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+
+          Example<Operation> example = this.prepareExample(apiId, resourceId, operationDTO);
 
           return operationRepository.findAll(example);
+     }
+
+     /*
+      * Creates a Example for Hibernate query
+      */
+     private Example<Operation> prepareExample(Long apiId, Long resourceId, OperationDTO operationDTO) {
+         Resource resource = resourceRepository.findByApiIdAndId(apiId, resourceId);
+         HeimdallException.checkThrow(resource == null, GLOBAL_RESOURCE_NOT_FOUND);
+
+         Operation operation = GenericConverter.mapper(operationDTO, Operation.class);
+         operation.setResource(resource);
+
+         return Example.of(operation, ExampleMatcher.matching().withIgnorePaths("resource.api").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
      }
 
      /**
@@ -167,42 +168,15 @@ public class OperationService {
           api.getResources().forEach(resource -> operations.addAll(this.list(apiId, resource.getId(), operationDTO)));
 
           if (!operations.isEmpty()) {
-               return operations.stream().map(op -> new Operation(op.getId(), op.getMethod(), op.getPath(), null, null)).collect(Collectors.toList());
+               for (Operation operation : operations) {
+                   operation.setDescription(null);
+                   operation.setResource(null);
+               }
+
+               return operations;
           }
 
           return new ArrayList<>();
-     }
-     
-     /**
-      * Saves a {@link Operation} to the repository.
-      * 
-      * @param  apiId						The {@link br.com.conductor.heimdall.core.entity.Api} Id
-      * @param 	resourceId					The {@link Resource} Id
-      * @param 	operationDTO				The {@link OperationDTO}
-      * @return								The saved {@link Operation}
-      */
-     @Transactional
-     public Operation save(Long apiId, Long resourceId, OperationDTO operationDTO) {
-
-          Resource resource = resourceRepository.findByApiIdAndId(apiId, resourceId);
-          HeimdallException.checkThrow(resource == null, GLOBAL_RESOURCE_NOT_FOUND);
-                    
-          Operation resData = operationRepository.findByResourceApiIdAndMethodAndPath(apiId, operationDTO.getMethod(), operationDTO.getPath());
-          HeimdallException.checkThrow(resData != null &&
-                  Objects.equals(resData.getResource().getId(), resource.getId()), ONLY_ONE_OPERATION_PER_RESOURCE);
-
-          Operation operation = GenericConverter.mapper(operationDTO, Operation.class);
-          operation.setResource(resource);
-          operation.setPath(StringUtils.removeMultipleSlashes(operation.getPath()));
-
-          HeimdallException.checkThrow(validateSingleWildCardOperationPath(operation), OPERATION_CANT_HAVE_SINGLE_WILDCARD);
-          HeimdallException.checkThrow(validateDoubleWildCardOperationPath(operation), OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END);
-
-          operation = operationRepository.save(operation);
-          
-          amqpRoute.dispatchRoutes();
-          
-          return operation;
      }
 
      /**
@@ -221,6 +195,9 @@ public class OperationService {
           Operation resData = operationRepository.findByResourceApiIdAndMethodAndPath(apiId, operation.getMethod(), operation.getPath());
           HeimdallException.checkThrow(resData != null &&
                   Objects.equals(resData.getResource().getId(), resource.getId()), ONLY_ONE_OPERATION_PER_RESOURCE);
+
+          boolean patternExists = operationJDBCRepository.patternExists(resource.getApi().getBasePath() + "/" + operation.getPath());
+          HeimdallException.checkThrow(patternExists, OPERATION_ROUTE_ALREADY_EXISTS);
 
           operation.setResource(resource);
           operation.setPath(StringUtils.removeMultipleSlashes(operation.getPath()));
@@ -257,6 +234,9 @@ public class OperationService {
           
           operation = GenericConverter.mapper(operationDTO, operation);
           operation.setPath(StringUtils.removeMultipleSlashes(operation.getPath()));
+
+          boolean patternExists = operationJDBCRepository.patternExists(operation.getResource().getApi().getBasePath() + "/" + operation.getPath());
+          HeimdallException.checkThrow(patternExists, OPERATION_ROUTE_ALREADY_EXISTS);
 
           HeimdallException.checkThrow(validateSingleWildCardOperationPath(operation), OPERATION_CANT_HAVE_SINGLE_WILDCARD);
           HeimdallException.checkThrow(validateDoubleWildCardOperationPath(operation), OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END);
@@ -324,7 +304,7 @@ public class OperationService {
          List<String> path = Arrays.asList(operation.getPath().split("/"));
                    
          if (path.contains("**"))
-        	 return !operation.getPath().endsWith("**") || !(path.stream().filter(o -> o.equals("**")).count() == 1);              
+        	 return !(operation.getPath().endsWith("**") && (path.stream().filter(o -> o.equals("**")).count() == 1));
          else 
        	 	 return false;
     }

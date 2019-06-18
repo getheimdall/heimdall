@@ -13,6 +13,7 @@ import br.com.conductor.heimdall.core.repository.ApiRepository;
 import br.com.conductor.heimdall.core.repository.InterceptorRepository;
 import br.com.conductor.heimdall.core.repository.OperationRepository;
 import br.com.conductor.heimdall.core.repository.ResourceRepository;
+import br.com.conductor.heimdall.core.repository.jdbc.OperationJDBCRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
 import org.junit.Before;
@@ -69,6 +70,9 @@ public class OperationServiceTest {
      @Mock
      private AMQPRouteService amqpRoute;
 
+     @Mock
+     private OperationJDBCRepository operationJDBCRepository;
+
      @Rule
      public ExpectedException thrown = ExpectedException.none();
 
@@ -106,6 +110,7 @@ public class OperationServiceTest {
           operationDTO.setDescription("Operation Description");
           operationDTO.setMethod(HttpMethod.GET);
           operationDTO.setPath("/test");
+
      }
 
      @Test
@@ -118,7 +123,8 @@ public class OperationServiceTest {
                                                                                Mockito.any(HttpMethod.class),
                                                                                Mockito.anyString()
           )).thenReturn(null);
-          Operation saved = operationService.save(api.getId(), res.getId(), operationDTO);
+          Mockito.when(operationJDBCRepository.patternExists(Mockito.anyString())).thenReturn(false);
+          Operation saved = operationService.save(api.getId(), res.getId(), operation);
           assertEquals(saved.getId(), operation.getId());
      }
 
@@ -132,6 +138,7 @@ public class OperationServiceTest {
                                                                                Mockito.any(HttpMethod.class),
                                                                                Mockito.anyString()
           )).thenReturn(null);
+          Mockito.when(operationJDBCRepository.patternExists(Mockito.anyString())).thenReturn(false);
           Operation saved = operationService.save(api.getId(), res.getId(), operation);
           assertEquals(saved.getId(), operation.getId());
      }
@@ -150,7 +157,7 @@ public class OperationServiceTest {
                                                                                Mockito.anyString()
           )).thenReturn(operation);
 
-          Operation saved = operationService.save(api.getId(), res.getId(), operationDTO);
+          Operation saved = operationService.save(api.getId(), res.getId(), operation);
           assertEquals(saved.getId(), operation.getId());
      }
 
@@ -250,10 +257,11 @@ public class OperationServiceTest {
                  .thenReturn(res);
           Mockito.when(operationRepository.save(Mockito.any(Operation.class))).thenReturn(operation);
           Mockito.when(resourceRepository.findByApiIdAndId(Mockito.any(), Mockito.anyLong())).thenReturn(res);
+          Mockito.when(operationJDBCRepository.patternExists(Mockito.anyString())).thenReturn(false);
 
           operationDTO.setDescription("Anoter description");
 
-          Operation saved = operationService.save(1L, 1L, operationDTO);
+          Operation saved = operationService.save(1L, 1L, operation);
 
           assertEquals(saved.getId(), operation.getId());
 
