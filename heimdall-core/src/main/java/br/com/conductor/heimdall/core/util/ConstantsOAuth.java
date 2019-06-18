@@ -25,7 +25,9 @@ package br.com.conductor.heimdall.core.util;
  *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
-public class ConstantsOAuth {
+public final class ConstantsOAuth {
+
+    private ConstantsOAuth() { }
 
     public final static String GRANT_TYPE_PASSWORD = "PASSWORD";
     public final static String GRANT_TYPE_REFRESH_TOKEN = "REFRESH_TOKEN";

@@ -28,7 +28,9 @@ package br.com.conductor.heimdall.core.util;
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  * @author Marcelo Aguiar Rodrigues
  */
-public class TemplateUtils {
+public final class TemplateUtils {
+
+     private TemplateUtils() { }
 
      public static final String TEMPLATE_RATTING = "{\"calls\":20,\"interval\":\"MINUTES\"}";
      public static final String TEMPLATE_ACCESS_TOKEN = "{\"location\": \"HEADER\", \"name\": \"access_token\"}";

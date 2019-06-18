@@ -30,11 +30,12 @@ import br.com.conductor.heimdall.core.exception.ExceptionMessage;
  * @author Filipe Germano
  *
  */
-public class StringUtils {
 
-     private StringUtils() {}
+public final class StringUtils {
 
-	/**
+    private StringUtils() { }
+
+    /**
 	 * Creates a String that represents a order. It adds leading zeros ("0").
 	 * 
 	 * @param  prefix					The number to be prefixed

@@ -35,9 +35,11 @@ import com.github.mustachejava.MustacheFactory;
  * @author Filipe Germano
  *
  */
-public abstract class GenerateMustache {
-     
-	 /**
+public final class GenerateMustache {
+
+    private GenerateMustache() { }
+
+    /**
 	  * Generates a Mustache file.
 	  * 
 	  * @param template		The template for generation
