@@ -19,6 +19,10 @@ export const getAllResourcesByApi = idApi => dispatch => {
 
 const clearResourcesAction = () => ({ type: ResourceConstants.CLEAR_RESOURCES })
 
+export const sendNotification = notification => dispatch => {
+    dispatch({ type: ResourceConstants.RESOURCE_NOTIFICATION, notification })
+}
+
 export const clearResources = () => dispatch => {
     dispatch(clearResourcesAction())
 }
@@ -61,6 +65,7 @@ export const save = (idApi, resource) => dispatch => {
     })
     .then(() => {
         // console.log('finally')
+        dispatch(sendNotification({ type: 'success', message: i18n.t('resource_saved') }))
         dispatch(getAllResourcesByApi(idApi))
         dispatch(toggleModal(false))
         dispatch(finishLoading())
@@ -71,6 +76,7 @@ export const update = (idApi, resource) => dispatch => {
     dispatch(initLoading())
     resourceService.update(idApi, resource)
     .then(data => {
+        dispatch(sendNotification({ type: 'success', message: i18n.t('resource_updated') }))
         dispatch(getAllResourcesByApi(idApi))
         dispatch(toggleModal(false))
         dispatch(finishLoading())
@@ -94,6 +100,7 @@ export const remove = (idApi, idResource) => dispatch => {
         }
     })
     .then(() => {
+        dispatch(sendNotification({ type: 'success', message: i18n.t('resource_removed') }))
         dispatch(getAllResourcesByApi(idApi))
         dispatch(finishLoading())
     })

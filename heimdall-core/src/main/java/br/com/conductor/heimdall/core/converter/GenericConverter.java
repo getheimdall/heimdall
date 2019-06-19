@@ -53,7 +53,7 @@ public abstract class GenericConverter {
 
      /**
       * Converts a source to a type destination.
-      * 
+      *
       * @param source				The source object
       * @param destination			The destination object
       * @return						The object created
@@ -86,5 +86,17 @@ public abstract class GenericConverter {
           }
 
           return model;
+     }
+
+     public static <T, E> void convertWithMapping(T source, E destination, PropertyMap<T, E> mapping) {
+
+          if (source != null && destination != null) {
+
+               ModelMapper modelMapper = new ModelMapper();
+
+               modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+               modelMapper.addMappings(mapping);
+               modelMapper.map(source, destination);
+          }
      }
 }

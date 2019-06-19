@@ -146,6 +146,7 @@ class Middlewares extends Component {
                                     <span>
                                         {record.status === 'ACTIVE' && <Tag color="green">{i18n.t('active')}</Tag>}
                                         {record.status === 'INACTIVE' && <Tag color="red">{i18n.t('inactive')}</Tag>}
+                                        {record.status === 'DEPRECATED' && <Tag color="#989898">{i18n.t('deprecated')}</Tag>}
                                     </span>
                                 )}/>
                                 <Column title={i18n.t('created_on')} dataIndex="creationDate"/>

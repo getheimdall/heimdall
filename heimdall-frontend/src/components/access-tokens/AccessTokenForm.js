@@ -63,7 +63,7 @@ class AccessTokenForm extends Component {
     }
 
     checkToken = (rule, value, callback) => {
-        if (value !== value.trim()) {
+        if (value && value !== value.trim()) {
             callback(i18n.t('please_check_token_spacing'))
         }
         callback()
@@ -84,6 +84,7 @@ class AccessTokenForm extends Component {
                 <Form>
                     {accessToken && getFieldDecorator('id', {initialValue: accessToken.id})(<Input type='hidden'/>)}
                     <Row gutter={24}>
+                        {!accessToken &&
                         <Col sm={24} md={24}>
                             <FormItem label={i18n.t('token')}>
                                 {
@@ -98,6 +99,7 @@ class AccessTokenForm extends Component {
                                 }
                             </FormItem>
                         </Col>
+                        }
                         <Col sm={24} md={24}>
                             <FormItem label={i18n.t('app')}>
                                 {
