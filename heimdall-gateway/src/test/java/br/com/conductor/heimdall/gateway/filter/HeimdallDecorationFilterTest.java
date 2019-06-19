@@ -1,4 +1,3 @@
-
 package br.com.conductor.heimdall.gateway.filter;
 
 import br.com.conductor.heimdall.core.enums.HttpMethod;
@@ -17,7 +16,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.REQUEST_URI_KEY;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -34,15 +36,6 @@ import org.springframework.cloud.netflix.zuul.filters.ZuulProperties.ZuulRoute;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
-import com.netflix.zuul.context.RequestContext;
-
-import static org.junit.Assert.*;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.REQUEST_URI_KEY;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HeimdallDecorationFilterTest {

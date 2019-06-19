@@ -21,6 +21,7 @@ package br.com.conductor.heimdall.gateway.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.context.annotation.RequestScope;
 
 import br.com.conductor.heimdall.gateway.filter.helper.HelperImpl;
 import br.com.conductor.heimdall.middleware.spec.Helper;
@@ -34,6 +35,7 @@ import br.com.conductor.heimdall.middleware.spec.Helper;
 public class HelperConfiguration {
 
 	@Bean
+	@RequestScope
 	public Helper helper() {
 		return new HelperImpl();
 	}

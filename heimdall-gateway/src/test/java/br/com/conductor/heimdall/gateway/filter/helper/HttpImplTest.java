@@ -11,6 +11,7 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.concurrent.Callable;
 
@@ -21,7 +22,7 @@ import static junit.framework.TestCase.assertNotNull;
 public class HttpImplTest {
      
      @InjectMocks
-     private HttpImpl subject = new HttpImpl(false, new CircuitBreakerManager(), true);
+     private HttpImpl subject = new HttpImpl(new RestTemplate(), new CircuitBreakerManager(), true);
 
      @Mock
      private CircuitBreakerManager circuitBreakerManager;
