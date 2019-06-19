@@ -30,7 +30,9 @@ import org.junit.Ignore;
  *
  */
 @Ignore
-public class ConstantsCache {
+public final class ConstantsCache {
+
+     private ConstantsCache() { }
 
      public static final String OPERATION_ACTIVE_FROM_ENDPOINT = "OPERATION_ACTIVE_FROM_ENDPOINT";
      
@@ -50,4 +52,9 @@ public class ConstantsCache {
 
      public static final String CACHE_BUCKET = "CACHE_BUCKET";
 
+     public static final String RATE_LIMIT_KEY_PREFIX = "ratelimit-interceptor:";
+
+     public static final int RATE_LIMIT_DATABASE = 2;
+
+     public static final int CACHE_INTERCEPTOR_DATABASE = 4;
 }

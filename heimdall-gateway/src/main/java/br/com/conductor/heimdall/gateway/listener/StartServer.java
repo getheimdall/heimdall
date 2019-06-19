@@ -19,40 +19,49 @@
  */
 package br.com.conductor.heimdall.gateway.listener;
 
+import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.ROUTE_TYPE;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.annotation.PostConstruct;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
+
+import org.apache.commons.io.FileUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+
+import com.netflix.zuul.FilterLoader;
+import com.netflix.zuul.groovy.GroovyCompiler;
+import com.netflix.zuul.groovy.GroovyFileFilter;
+
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.entity.Middleware;
 import br.com.conductor.heimdall.core.enums.Status;
-import br.com.conductor.heimdall.core.repository.InterceptorRepository;
 import br.com.conductor.heimdall.core.repository.jdbc.ApiJDBCRepository;
+import br.com.conductor.heimdall.core.repository.jdbc.InterceptorJDBCRepository;
 import br.com.conductor.heimdall.core.repository.jdbc.MiddlewareJDBCRepository;
 import br.com.conductor.heimdall.core.service.FileService;
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.configuration.HeimdallHandlerMapping;
 import br.com.conductor.heimdall.gateway.service.InterceptorFileService;
 import br.com.conductor.heimdall.gateway.util.HeimdallFilterFileManager;
-import com.netflix.zuul.FilterLoader;
-import com.netflix.zuul.groovy.GroovyCompiler;
-import com.netflix.zuul.groovy.GroovyFileFilter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-
-import javax.annotation.PostConstruct;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.*;
 
 /**
  * StartServer
@@ -69,9 +78,9 @@ public class StartServer implements ServletContextListener {
 
 	@Autowired
 	private InterceptorFileService interceptorFileService;
-
+	
 	@Autowired
-	private InterceptorRepository interceptorRepository;
+	private InterceptorJDBCRepository interceptorJDBCRepository;
 
 	@Autowired
 	private ApiJDBCRepository apiJDBCRepository;
@@ -164,11 +173,10 @@ public class StartServer implements ServletContextListener {
 	 */
 	private void createInterceptors() {
 
-		List<Interceptor> interceptors = interceptorRepository.findAll();
+		List<Interceptor> interceptors = interceptorJDBCRepository.findAllInterceptorsSimplified();
 		if (Objects.nonNull(interceptors)) {
 
 			interceptors.forEach(interceptor -> interceptorFileService.createFileInterceptor(interceptor));
-
 		}
 	}
 
@@ -181,11 +189,12 @@ public class StartServer implements ServletContextListener {
 	 */
 	public void createMiddlewaresInterceptor(Middleware middleware) {
 
-		if (middleware != null &&
-				(middleware.getInterceptors() != null && !middleware.getInterceptors().isEmpty())) {
-
-			middleware.getInterceptors()
-					.forEach(interceptor -> interceptorFileService.createFileInterceptor(interceptor));
+		if (middleware != null) {
+			List<Interceptor> interceptors = interceptorJDBCRepository.findInterceptorsSimplifiedFromMiddleware(middleware.getId());
+			
+			if (interceptors != null && !interceptors.isEmpty()) {
+				interceptors.forEach(interceptor -> interceptorFileService.createFileInterceptor(interceptor));
+			}
 		}
 	}
 

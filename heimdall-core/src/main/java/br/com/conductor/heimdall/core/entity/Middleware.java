@@ -101,7 +101,7 @@ public class Middleware implements Serializable {
      private Status status;
      
      @JsonIgnore
-     @ManyToMany(fetch = FetchType.EAGER)
+     @ManyToMany(fetch = FetchType.LAZY)
      @JoinTable(name = "MIDDLEWARES_INTERCEPTORS", 
           joinColumns = @JoinColumn(name = "MIDDLEWARE_ID", referencedColumnName = "ID"), 
           inverseJoinColumns = @JoinColumn(name = "INTERCEPTOR_ID", referencedColumnName = "ID"))

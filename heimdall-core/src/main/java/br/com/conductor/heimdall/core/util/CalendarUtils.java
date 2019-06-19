@@ -32,7 +32,9 @@ import java.util.Map;
  * @author Marcelo Aguiar
  *
  */
-public class CalendarUtils {
+public final class CalendarUtils {
+
+    private CalendarUtils() { }
 
     private static final int MONDAY = 1;
     private static final int SUNDAY = 7;

@@ -20,9 +20,9 @@
 package br.com.conductor.heimdall.gateway.filter;
 
 import br.com.conductor.heimdall.core.util.Constants;
+import br.com.conductor.heimdall.core.trace.FilterDetail;
+import br.com.conductor.heimdall.core.trace.TraceContextHolder;
 import br.com.conductor.heimdall.gateway.filter.helper.ApiResponseImpl;
-import br.com.conductor.heimdall.gateway.trace.FilterDetail;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.gateway.util.ResponseHelper;
 import br.com.conductor.heimdall.middleware.spec.ApiResponse;
 import br.com.conductor.heimdall.middleware.spec.Helper;
@@ -106,7 +106,7 @@ public class CacheWriterFilter extends ZuulFilter {
 
         ApiResponse apiResponse = new ApiResponseImpl();
         apiResponse.setHeaders(headers);
-        apiResponse.setBody(ResponseHelper.getResponseBody(context, headers, helper));
+        apiResponse.setBody(ResponseHelper.getResponseBody(context, headers));
         apiResponse.setStatus(response.getStatus());
 
         Long timeToLive = (Long) context.get(CACHE_TIME_TO_LIVE);

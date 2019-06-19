@@ -29,7 +29,9 @@ package br.com.conductor.heimdall.core.util;
  * @author Marcelo Aguiar Rodrigues
  *
  */
-public class ConstantsInterceptors {
+public final class ConstantsInterceptors {
+
+     private ConstantsInterceptors() { }
 
      public static final String GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND = "Could not find a required %s or it is not valid";
 
@@ -37,7 +39,4 @@ public class ConstantsInterceptors {
 
      public static final String IDENTIFIER_ID = "identifier_id";
 
-     public static final int RATE_LIMIT_DATABASE = 2;
-
-     public static final int CACHE_INTERCEPTOR_DATABASE = 4;
 }

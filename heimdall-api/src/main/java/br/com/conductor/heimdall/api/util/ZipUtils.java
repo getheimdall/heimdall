@@ -32,7 +32,9 @@ import java.util.zip.ZipOutputStream;
  *
  * @author Marcelo Aguiar Rodrigues
  */
-public class ZipUtils {
+public final class ZipUtils {
+
+    private ZipUtils() { }
 
     /**
      * Returns a zipped middleware file.
@@ -40,7 +42,7 @@ public class ZipUtils {
      * @param middleware {@link Middleware}
      * @return zipped middleware file as a byte array
      */
-    public byte[] zipFiles(Middleware middleware) {
+    public static byte[] zipFiles(Middleware middleware) {
 
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
              BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(byteArrayOutputStream);

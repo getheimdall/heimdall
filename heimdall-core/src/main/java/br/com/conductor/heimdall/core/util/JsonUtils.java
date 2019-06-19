@@ -32,15 +32,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Filipe Germano
  *
  */
-public abstract class JsonUtils {
-     
-	 /**
-	  * Converts a java Object to a <i>json</i> String representation.
-	  * 
-	  * @param  object						The object to be converter
-	  * @return								The json String representation of the object
-	  * @throws JsonProcessingException
-	  */
+public final class JsonUtils {
+
+    private JsonUtils() { }
+
+    /**
+     * Converts a java Object to a <i>json</i> String representation.
+     *
+     * @param  object						The object to be converter
+     * @return								The json String representation of the object
+     * @throws JsonProcessingException
+     */
      public static <T> String convertObjectToJson(T object) throws JsonProcessingException {
           
           ObjectMapper mapper = new ObjectMapper();

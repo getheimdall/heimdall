@@ -16,6 +16,7 @@ bin/
 *.iws
 *.iml
 *.ipr
+rest-client.env.json
 
 ### NetBeans ###
 nbproject/private/

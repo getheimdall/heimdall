@@ -20,7 +20,7 @@
 package br.com.conductor.heimdall.gateway.failsafe;
 
 import br.com.conductor.heimdall.core.environment.Property;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import br.com.conductor.heimdall.core.trace.TraceContextHolder;
 import br.com.conductor.heimdall.gateway.util.ConstantsContext;
 import com.netflix.zuul.context.RequestContext;
 import lombok.extern.slf4j.Slf4j;
