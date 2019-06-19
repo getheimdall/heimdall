@@ -1,4 +1,3 @@
-
 package br.com.conductor.heimdall.gateway.filter;
 
 import br.com.conductor.heimdall.core.enums.HttpMethod;
@@ -37,18 +36,6 @@ import org.springframework.cloud.netflix.zuul.filters.ZuulProperties.ZuulRoute;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-
-import com.netflix.zuul.context.RequestContext;
-
-import br.com.conductor.heimdall.core.enums.HttpMethod;
-import br.com.conductor.heimdall.gateway.router.Credential;
-import br.com.conductor.heimdall.gateway.router.CredentialRepository;
-import br.com.conductor.heimdall.gateway.router.EnvironmentInfo;
-import br.com.conductor.heimdall.gateway.router.EnvironmentInfoRepository;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
-import br.com.conductor.heimdall.gateway.util.RequestHelper;
-import br.com.conductor.heimdall.gateway.zuul.route.HeimdallRoute;
-import br.com.conductor.heimdall.gateway.zuul.route.ProxyRouteLocator;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HeimdallDecorationFilterTest {
