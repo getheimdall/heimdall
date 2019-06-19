@@ -20,6 +20,8 @@
 package br.com.conductor.heimdall.gateway.filter;
 
 import br.com.conductor.heimdall.core.enums.HttpMethod;
+import br.com.conductor.heimdall.core.trace.FilterDetail;
+import br.com.conductor.heimdall.core.trace.TraceContextHolder;
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.core.util.ConstantsPath;
 import br.com.conductor.heimdall.core.util.UrlUtil;
@@ -27,8 +29,6 @@ import br.com.conductor.heimdall.gateway.router.Credential;
 import br.com.conductor.heimdall.gateway.router.CredentialRepository;
 import br.com.conductor.heimdall.gateway.router.EnvironmentInfo;
 import br.com.conductor.heimdall.gateway.router.EnvironmentInfoRepository;
-import br.com.conductor.heimdall.gateway.trace.FilterDetail;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.gateway.util.RequestHelper;
 import br.com.conductor.heimdall.gateway.zuul.route.HeimdallRoute;
 import br.com.conductor.heimdall.gateway.zuul.route.ProxyRouteLocator;
@@ -260,7 +260,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
 
                         if (method.equals(HttpMethod.OPTIONS.name())) {
                             Optional<Credential> first = credentials.stream().findFirst();
-                            if (first.isPresent() && first.get().isCors()) {
+                            if (first.get().isCors()) {
                             	credential = first.get();
                             }
                         }
@@ -313,7 +313,6 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                         traceContextHolder.getActualTrace().setApiName(credential.getApiName());
                         traceContextHolder.getActualTrace().setResourceId(credential.getResourceId());
                         traceContextHolder.getActualTrace().setOperationId(credential.getOperationId());
-                        traceContextHolder.getActualTrace().setPattern(credential.getOperationPath());
 
                         return new HeimdallRoute(pattern, route, false);
                     } else {

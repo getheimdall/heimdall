@@ -163,6 +163,7 @@ public class Property {
      public class Trace {
           private boolean printAllTrace = false;
           private List<String> sanitizes = new ArrayList<>();
+          private boolean printHeimdallFilters = false;
      }
      
      private Middlewares middlewares = new Middlewares();

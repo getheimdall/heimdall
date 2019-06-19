@@ -28,7 +28,9 @@ package br.com.conductor.heimdall.core.util;
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  * @author Marcelo Aguiar Rodrigues
  */
-public class TemplateUtils {
+public final class TemplateUtils {
+
+     private TemplateUtils() { }
 
      public static final String TEMPLATE_RATTING = "{\"calls\":20,\"interval\":\"MINUTES\"}";
      public static final String TEMPLATE_ACCESS_TOKEN = "{\"location\": \"HEADER\", \"name\": \"access_token\"}";
@@ -39,6 +41,7 @@ public class TemplateUtils {
      public static final String TEMPLATE_CACHE = "{\"cache\":\"cache-name\", \"timeToLive\": 10000, \"headers\": [\"header1\", \"header2\"], \"queryParams\": [\"queryParam1\", \"queryParam2\"]}";
      public static final String TEMPLATE_CACHE_CLEAR = "{\"cache\":\"cache-name\"}";
      public static final String TEMPLATE_LOG_MASKER = "{\"body\":true,\"uri\":true,\"headers\":true,\"ignoredHeaders\":[\"headerName\"]}";
+     public static final String TEMPLATE_LOG_WRITER = "{\"body\":true,\"uri\":true,\"headers\":true,\"requiredHeaders\":[\"headerName\"]}";
      public static final String TEMPLATE_CORS = "{\"Access-Control-Allow-Origin\": \"*\", " +
              "\"Access-Control-Allow-Credentials\": \"true\", " +
              "\"Access-Control-Allow-Methods\": \"POST, GET, PUT, PATCH, DELETE, OPTIONS\", " +

@@ -34,9 +34,11 @@ import java.net.URL;
  *
  */
 @Slf4j
-public class UrlUtil {
+public final class UrlUtil {
 
-	 /**
+    private UrlUtil() { }
+
+    /**
 	  * Returns the current URL from a {@link HttpServletRequest}.
 	  * 
 	  * @param 	request			The {@link HttpServletRequest}

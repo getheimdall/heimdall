@@ -19,8 +19,9 @@
  */
 package br.com.conductor.heimdall.gateway.filter.helper;
 
+import br.com.conductor.heimdall.core.trace.GeneralTrace;
 import br.com.conductor.heimdall.gateway.trace.StackTraceImpl;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import br.com.conductor.heimdall.core.trace.TraceContextHolder;
 import br.com.conductor.heimdall.gateway.util.ConstantsContext;
 import br.com.conductor.heimdall.middleware.spec.*;
 import com.netflix.zuul.context.RequestContext;
@@ -489,28 +490,48 @@ public class CallImpl implements Call {
      }
      
      public class TraceImpl implements Trace {
-          
-          public void setStackTrace(StackTrace stackTrace) {
-               
-               TraceContextHolder.getInstance().getActualTrace().setStackTrace(stackTrace);
-          }
-          
+
           @Override
           public void addStackTrace(String clazz, String message, String stack) {
-               
-               TraceContextHolder.getInstance().getActualTrace().setStackTrace(new StackTraceImpl(clazz, message, stack));
-          }
-          
-          public StackTrace getStackTrace() {
-               
-               return TraceContextHolder.getInstance().getActualTrace().getStackTrace();
+               Map<String, String> stackTrace = new HashMap<>();
+               stackTrace.put("class", clazz);
+               stackTrace.put("message", message);
+               stackTrace.put("stack", stack);
+               this.addTrace("middleware-stacktrace", stackTrace);
           }
 
+          @Override
+          public StackTrace getStackTrace() {
+               List<GeneralTrace> traces = TraceContextHolder.getInstance().getActualTrace().getTraces();
+               GeneralTrace generalTrace = traces.stream()
+                       .filter(gt -> gt.getDescription().equals("middleware-stacktrace"))
+                       .findAny()
+                       .orElse(null);
+
+               if (generalTrace != null) {
+                    Map<String, String> content = (Map<String, String>) generalTrace.getContent();
+
+                    return new StackTraceImpl(
+                            content.get("class"),
+                            content.get("message"),
+                            content.get("stack")
+                    );
+               } else {
+                    return new StackTraceImpl(
+                            "No class",
+                            "No StackTrace Found",
+                            ""
+                    );
+               }
+          }
+
+          @Override
           public void addTrace(String trace) {
 
                TraceContextHolder.getInstance().getActualTrace().trace(trace);
           }
 
+          @Override
           public void addTrace(String trace, Object object) {
                
                TraceContextHolder.getInstance().getActualTrace().trace(trace, object);
@@ -604,7 +625,7 @@ public class CallImpl implements Call {
 
           public String pattern() {
                
-               return TraceContextHolder.getInstance().getActualTrace().getPattern();
+               return null;
           }
 
           public Long operationId() {

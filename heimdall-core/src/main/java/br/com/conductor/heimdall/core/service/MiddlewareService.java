@@ -118,15 +118,7 @@ public class MiddlewareService {
      @Transactional(readOnly = true)
      public MiddlewarePage list(Long apiId, MiddlewareDTO middlewareDTO, PageableDTO pageableDTO) {
 
-          Api api = apiRepository.findOne(apiId);
-          HeimdallException.checkThrow(api == null, GLOBAL_RESOURCE_NOT_FOUND);
-
-          Middleware middleware = GenericConverter.mapper(middlewareDTO, Middleware.class);
-          Api apiFind = new Api();
-          apiFind.setId(apiId);
-          middleware.setApi(apiFind);
-
-          Example<Middleware> example = Example.of(middleware, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+          Example<Middleware> example = this.createExample(apiId, middlewareDTO);
 
           Sort sort = new Sort(new Sort.Order(Sort.Direction.DESC, "creationDate"));
 
@@ -148,19 +140,23 @@ public class MiddlewareService {
      @Transactional(readOnly = true)
      public List<Middleware> list(Long apiId, MiddlewareDTO middlewareDTO) {
 
-          Api api = apiRepository.findOne(apiId);
-          HeimdallException.checkThrow(api == null, GLOBAL_RESOURCE_NOT_FOUND);
-
-          Middleware middleware = GenericConverter.mapper(middlewareDTO, Middleware.class);
-          Api apiFind = new Api();
-          apiFind.setId(apiId);
-          middleware.setApi(apiFind);
-
-          Example<Middleware> example = Example.of(middleware, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+          Example<Middleware> example = this.createExample(apiId, middlewareDTO);
 
           List<Middleware> middlewares = middlewareRepository.findAll(example);
 
           return middlewares;
+     }
+
+     private Example<Middleware> createExample(Long apiId, MiddlewareDTO middlewareDTO) {
+         Api api = apiRepository.findOne(apiId);
+         HeimdallException.checkThrow(api == null, GLOBAL_RESOURCE_NOT_FOUND);
+
+         Middleware middleware = GenericConverter.mapper(middlewareDTO, Middleware.class);
+         Api apiFind = new Api();
+         apiFind.setId(apiId);
+         middleware.setApi(apiFind);
+
+         return Example.of(middleware, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
      }
 
      /**
@@ -297,26 +293,28 @@ public class MiddlewareService {
 
 				List<Middleware> active = middlewareMap.get(Status.ACTIVE);
 				List<Middleware> inactive = middlewareMap.get(Status.INACTIVE);
+				List<Middleware> deprecated = middlewareMap.get(Status.DEPRECATED);
 
-				active.forEach(m -> m.setStatus(Status.INACTIVE));
-				inactive.addAll(active);
-				inactive.sort((m1, m2) -> m2.getCreationDate().compareTo(m1.getCreationDate()));
+                active.forEach(m -> m.setStatus(Status.INACTIVE));
 
-				inactive.stream().skip(allowInactive).forEach(m -> {
-					m.setStatus(Status.DEPRECATED);
-					if (deleteDeprecated != null && deleteDeprecated)
-						m.setFile(null);
-				});
+                inactive.addAll(active);
+                inactive.sort((m1, m2) -> m2.getCreationDate().compareTo(m1.getCreationDate()));
+                inactive.stream().skip(allowInactive).forEach(m -> {
+                    m.setStatus(Status.DEPRECATED);
+                    deprecated.add(m);
+                });
+
+                if (deleteDeprecated != null && deleteDeprecated) {
+                    middlewareRepository.delete(deprecated);
+                    list.removeAll(deprecated);
+                }
 
 			} else {
 				middlewareMap.get(Status.ACTIVE).forEach(m -> m.setStatus(Status.INACTIVE));
 			}
-
-			return list;
 		}
 
-		return null;
-
+		return list;
 	}
 
 }

@@ -32,9 +32,11 @@ import org.springframework.http.MediaType;
  * @author Marcos Filho
  *
  */
-public class ContentTypeUtils {
-     
-	 /**
+public final class ContentTypeUtils {
+
+	private ContentTypeUtils() { }
+
+	/**
 	  * The list of blacklisted types
 	  */
 	 private static final String[] blackList = new String[] { 

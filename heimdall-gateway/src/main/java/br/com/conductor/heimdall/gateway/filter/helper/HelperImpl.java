@@ -21,10 +21,14 @@ package br.com.conductor.heimdall.gateway.filter.helper;
 
 import br.com.conductor.heimdall.core.environment.Property;
 import br.com.conductor.heimdall.gateway.failsafe.CircuitBreakerManager;
+import br.com.conductor.heimdall.gateway.filter.helper.http.HeimdallResponseErrorHandler;
 import br.com.conductor.heimdall.middleware.enums.DBType;
 import br.com.conductor.heimdall.middleware.spec.*;
 import com.mongodb.MongoClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * Implementation of the {@link Helper} interface.
@@ -43,9 +47,14 @@ public class HelperImpl implements Helper {
 
 	@Autowired
 	private Property property;
+	
+	@Autowired
+	private ZuulProperties zuulProperty;
 
 	@Autowired
 	private CircuitBreakerManager circuitBreakerManager;
+	
+	private RestTemplate restTemplate;
 
 	public HelperImpl() {
 		enableHandler = false;
@@ -87,7 +96,25 @@ public class HelperImpl implements Helper {
 
 	@Override
 	public Http http() {
-		return new HttpImpl(enableHandler, circuitBreakerManager, property.getFailsafe().isEnabled());
+		return new HttpImpl(rest(), circuitBreakerManager, property.getFailsafe().isEnabled());
+	}
+	
+	private RestTemplate rest() {
+        if (this.restTemplate == null) {
+            this.restTemplate = new RestTemplate(httpClientRequestFactory());
+        }
+
+        if (enableHandler) {
+            this.restTemplate.setErrorHandler(new HeimdallResponseErrorHandler());
+        }
+        return this.restTemplate;
+    }
+	
+	private HttpComponentsClientHttpRequestFactory httpClientRequestFactory() {
+		HttpComponentsClientHttpRequestFactory httpClient = new HttpComponentsClientHttpRequestFactory();
+		httpClient.setConnectTimeout(zuulProperty.getHost().getConnectTimeoutMillis());
+		httpClient.setReadTimeout(zuulProperty.getHost().getSocketTimeoutMillis());
+		return httpClient;
 	}
 
 	@Override

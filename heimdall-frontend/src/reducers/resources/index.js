@@ -19,6 +19,8 @@ export default (state = {}, action) => {
             return { ...state, loading: true }
         case ResourceConstants.FINISH_LOADING:
             return { ...state, loading: false }
+        case ResourceConstants.RESOURCE_NOTIFICATION:
+            return { ...state, notification: action.notification}
         default:
             return state
     }

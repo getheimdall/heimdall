@@ -19,26 +19,29 @@
  */
 package br.com.conductor.heimdall.gateway.filter.helper;
 
-import br.com.conductor.heimdall.gateway.failsafe.CircuitBreakerManager;
-import br.com.conductor.heimdall.gateway.filter.helper.http.HeimdallResponseErrorHandler;
-import br.com.conductor.heimdall.middleware.spec.Http;
-import br.com.conductor.heimdall.middleware.spec.Json;
-import com.netflix.zuul.context.RequestContext;
+import static br.com.conductor.heimdall.core.util.ConstantsInterceptors.IDENTIFIER_ID;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import org.apache.http.entity.ContentType;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URI;
-import java.util.*;
+import com.netflix.zuul.context.RequestContext;
 
-import static br.com.conductor.heimdall.core.util.ConstantsInterceptors.IDENTIFIER_ID;
+import br.com.conductor.heimdall.gateway.failsafe.CircuitBreakerManager;
+import br.com.conductor.heimdall.middleware.spec.Http;
+import br.com.conductor.heimdall.middleware.spec.Json;
 
 /**
  * Implementation of the {@link Http} interface.
@@ -62,8 +65,6 @@ public class HttpImpl implements Http {
     private MultiValueMap<String, String> formData;
 
     private RestTemplate restTemplate;
-
-    private boolean enableHandler;
     
     private MultiValueMap<String, String> queryParams;
 
@@ -71,8 +72,8 @@ public class HttpImpl implements Http {
 
     private boolean isFailSafeEnabled;
 
-    public HttpImpl(boolean enableHandler, CircuitBreakerManager circuitBreakerManager, boolean isFailSafeEnabled) {
-        this.enableHandler = enableHandler;
+    public HttpImpl(RestTemplate restTemplate, CircuitBreakerManager circuitBreakerManager, boolean isFailSafeEnabled) {
+    	this.restTemplate = restTemplate;
         this.circuitBreakerManager = circuitBreakerManager;
         this.isFailSafeEnabled = isFailSafeEnabled;
         this.queryParams = new LinkedMultiValueMap<>();
@@ -264,30 +265,23 @@ public class HttpImpl implements Http {
             String url = method.name() + ":" + uri.toString();
 
             return circuitBreakerManager.failsafe(
-                    () -> rest().exchange(uri, method, httpEntity, responseType),
+                    () -> this.restTemplate.exchange(uri, method, httpEntity, responseType),
                     url
             );
         }
 
-        return rest().exchange(uri, method, httpEntity, responseType);
+        return this.restTemplate.exchange(uri, method, httpEntity, responseType);
 
     }
 
+    /**
+     * This provider will affect only the next request inside middleware
+     */
     @Override
+    @Deprecated
     public RestTemplate clientProvider(RestTemplate restTemplate) {
 
         this.restTemplate = restTemplate;
-        return this.restTemplate;
-    }
-
-    private RestTemplate rest() {
-        if (this.restTemplate == null) {
-            this.restTemplate = new RestTemplate(new HttpComponentsClientHttpRequestFactory());
-        }
-
-        if (enableHandler) {
-            this.restTemplate.setErrorHandler(new HeimdallResponseErrorHandler());
-        }
         return this.restTemplate;
     }
 

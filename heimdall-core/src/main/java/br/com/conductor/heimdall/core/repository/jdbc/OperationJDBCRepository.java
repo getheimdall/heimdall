@@ -1,3 +1,22 @@
+/*-
+ * =========================LICENSE_START==================================
+ * heimdall-core
+ * ========================================================================
+ * Copyright (C) 2018 Conductor Tecnologia SA
+ * ========================================================================
+ * Licensed under the Apache License, Version 2.0 (the "License")
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ==========================LICENSE_END===================================
+ */
 package br.com.conductor.heimdall.core.repository.jdbc;
 
 import java.util.HashMap;
@@ -36,10 +55,10 @@ public class OperationJDBCRepository {
 
 	public List<String> findOperationsFromAllApis(List<Long> apiIds) {
 
-		Map<String, Object> params = new HashMap<String, Object>();
+		Map<String, Object> params = new HashMap<>();
 		params.put("ids", apiIds);
 		
-		StringBuilder sql = new StringBuilder();
+		StringBuilder sql = new StringBuilder(190);
 		sql.append("SELECT CONCAT(API.BASE_PATH, OP.PATH) ");
 		sql.append("FROM OPERATIONS OP ");
 		sql.append("INNER JOIN RESOURCES RES ON OP.RESOURCE_ID = RES.ID ");
@@ -47,5 +66,29 @@ public class OperationJDBCRepository {
 		sql.append("WHERE API.ID IN (:ids) ");
 
 		return new NamedParameterJdbcTemplate(jdbcTemplate).queryForList(sql.toString(), params, String.class);
+	}
+	
+	public List<Long> findIgnoredOperationsFromInterceptor(Long interceptorId) {
+		StringBuilder sql = new StringBuilder();
+		sql.append("SELECT OPERATION_ID ");
+		sql.append("FROM IGNORED_INTERCEPTORS_OPERATIONS ");
+		sql.append("WHERE INTERCEPTOR_ID = ? ");
+
+		return jdbcTemplate.queryForList(sql.toString(), new Object[] { interceptorId }, Long.class);
+	}
+  
+  public boolean patternExists(String pattern) {
+
+		StringBuilder sql = new StringBuilder(180);
+		sql.append("SELECT ");
+		sql.append("count(*) ");
+		sql.append("FROM OPERATIONS OP ");
+		sql.append("INNER JOIN RESOURCES RES ON OP.RESOURCE_ID = RES.ID ");
+		sql.append("INNER JOIN APIS API ON RES.API_ID = API.ID ");
+		sql.append("WHERE CONCAT(API.BASE_PATH, OP.PATH) = ?");
+
+		int count = jdbcTemplate.queryForObject(sql.toString(), new Object[] { pattern }, Integer.class);
+
+		return count > 0;
 	}
 }

@@ -24,6 +24,8 @@ package br.com.conductor.heimdall.gateway.util;
  */
 public final class ConstantsContext {
 
+    private ConstantsContext() { }
+
     public static final String API_ID = "api-id";
     public static final String API_NAME = "api-name";
     public static final String RESOURCE_ID = "resource-id";

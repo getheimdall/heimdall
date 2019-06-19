@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
+import org.modelmapper.PropertyMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -193,7 +194,14 @@ public class AccessTokenService {
           HeimdallException.checkThrow(appRecover == null, APP_NOT_EXIST);
           HeimdallException.checkThrow(!verifyIfPlansContainsInApp(appRecover, accessTokenPersist.getPlans()), SOME_PLAN_NOT_PRESENT_IN_APP);
 
-          accessToken = GenericConverter.mapper(accessTokenPersist, accessToken);
+          PropertyMap<AccessTokenPersist, AccessToken> propertyMap = new PropertyMap<AccessTokenPersist, AccessToken>() {
+               @Override
+               protected void configure() {
+                    skip(destination.getCode());
+               }
+          };
+
+          GenericConverter.convertWithMapping(accessTokenPersist, accessToken, propertyMap);
           accessToken = accessTokenRepository.save(accessToken);
 
           amqpCacheService.dispatchClean();

@@ -19,6 +19,7 @@
  */
 
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
+import br.com.conductor.heimdall.core.enums.Interval;
 import br.com.conductor.heimdall.core.util.BeanManager;
 import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
 import br.com.conductor.heimdall.gateway.service.LifeCycleService;
@@ -34,6 +35,9 @@ public class RateLimitInterceptor extends HeimdallFilter {
     private static Long referenceId;
     private static Long apiId;
     private static boolean status;
+    private static Long calls;
+    private static Long interceptorId;
+    private static Interval interval;
 
     public RateLimitInterceptor() {
 
@@ -50,6 +54,9 @@ public class RateLimitInterceptor extends HeimdallFilter {
         referenceId = {{referenceId}};
         apiId = {{apiId}};
         status = {{interceptorStatus}};
+        calls = {{calls}};
+        interceptorId = {{interceptor-id}};
+        interval = Interval.{{interval}};
     }
 
     @Override
@@ -76,7 +83,7 @@ public class RateLimitInterceptor extends HeimdallFilter {
     @Override
     public void execute() throws Throwable {
         RattingInterceptorService rattingInterceptorService = (RattingInterceptorService) BeanManager.getBean(RattingInterceptorService.class);
-        rattingInterceptorService.execute("{{name}}", "{{path}}");
+        rattingInterceptorService.execute("{{name}}", "{{cache-key}}", calls, interval, interceptorId);
     }
 
 }

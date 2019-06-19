@@ -56,6 +56,7 @@ class Operations extends Component {
         operationService.save(idApi, idResource, operation)
             .then(data => {
                 this.reloadOperations()
+                notification['success']({ message: i18n.t('success'), description: i18n.t('operation_saved') })
             })
             .catch(error => {
                 if (error.response && error.response.status === 400) {
@@ -70,6 +71,7 @@ class Operations extends Component {
         operationService.update(idApi, idResource, operation)
             .then(data => {
                 this.reloadOperations()
+                notification['success']({ message: i18n.t('success'), description: i18n.t('operation_updated') })
             })
     }
 
@@ -77,6 +79,7 @@ class Operations extends Component {
         operationService.remove(idApi, idResource, operation)
             .then(data => {
                 this.reloadOperations()
+                notification['success']({ message: i18n.t('success'), description: i18n.t('operation_removed') })
             })
             .catch(error => {
                 if (error.response && error.response.status === 400) {

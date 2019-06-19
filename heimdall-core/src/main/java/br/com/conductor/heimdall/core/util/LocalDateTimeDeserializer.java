@@ -38,8 +38,6 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
  *
  */
 public class LocalDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
-     
-     public static final LocalDateTimeDeserializer INSTANCE = new LocalDateTimeDeserializer();
 
      private LocalDateTimeDeserializer(){}
 
@@ -78,7 +76,7 @@ public class LocalDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
                     int nanosecond = parser.getIntValue();
                     
                     if (parser.nextToken() != JsonToken.END_ARRAY) {
-                         throw context.wrongTokenException(parser, JsonToken.END_ARRAY, "Expected array to end.");
+                         context.reportWrongTokenException(JsonToken.class, JsonToken.END_ARRAY, "Expected array to end.");
                     }
                     return LocalDateTime.of(year, month, day, hour, minute, second, nanosecond);
 
@@ -89,7 +87,8 @@ public class LocalDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
                     }
                     return LocalDateTime.parse(string, ISO_DATE_TIME);
           }
-          throw context.wrongTokenException(parser, JsonToken.START_ARRAY, "Expected array or string.");
+          context.reportWrongTokenException(JsonToken.class, JsonToken.START_ARRAY, "Expected array or string.");
+          return null;
      }
 
 }

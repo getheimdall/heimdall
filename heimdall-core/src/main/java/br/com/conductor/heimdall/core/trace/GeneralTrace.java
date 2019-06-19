@@ -21,6 +21,10 @@ package br.com.conductor.heimdall.core.trace;
  * ==========================LICENSE_END===================================
  */
 
+import java.time.LocalDateTime;
+
+import br.com.conductor.heimdall.core.util.LocalDateTimeSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -35,18 +39,18 @@ import java.time.LocalDateTime;
 public class GeneralTrace {
 
      private String description;
-     
-     private String insertedOnDate = LocalDateTime.now().toString();
 
-     private String content;
+     @JsonSerialize(using = LocalDateTimeSerializer.class)
+     private LocalDateTime insertedOnDate = LocalDateTime.now();
+
+     private Object content;
 
      /**
       * Adds a description to the trace.
-      * 
+      *
       * @param description	Trace message
       */
-     public GeneralTrace(String description){
-    	 
+     public GeneralTrace(String description) {
 
           super();
           this.description = description;
@@ -54,16 +58,15 @@ public class GeneralTrace {
 
      /**
       * Adds a description and Object to the trace.
-      * 
+      *
       * @param description	Trace message
       * @param content		Object with content
       */
-     public GeneralTrace(String description, Object content){
+     public GeneralTrace(String description, Object content) {
 
           super();
           this.description = description;
-          this.content = content.toString();
-		
+          this.content = content;
      }
 
 }
