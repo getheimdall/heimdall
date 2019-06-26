@@ -35,7 +35,6 @@ import br.com.conductor.heimdall.middleware.spec.Helper;
 public class HelperConfiguration {
 
 	@Bean
-	@RequestScope
 	public Helper helper() {
 		return new HelperImpl();
 	}
