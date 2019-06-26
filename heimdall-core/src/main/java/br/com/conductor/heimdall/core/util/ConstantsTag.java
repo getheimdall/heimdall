@@ -29,7 +29,9 @@ package br.com.conductor.heimdall.core.util;
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
-public class ConstantsTag {
+public final class ConstantsTag {
+
+     private ConstantsTag() { }
 
      public static final String TAG_APIS = "Apis";
      public static final String TAG_MIDDLEWARES = "Middlewares";

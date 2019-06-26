@@ -20,6 +20,7 @@
 package br.com.conductor.heimdall.api.resource;
 
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
+import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.OperationDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.page.OperationPage;
@@ -126,7 +127,8 @@ public class OperationResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_OPERATION)
      public ResponseEntity<?> save(@PathVariable("apiId") Long apiId, @PathVariable("resourceId") Long resourceId, @RequestBody @Valid OperationDTO operationDTO) {
 
-          Operation operation = operationService.save(apiId, resourceId, operationDTO);
+          Operation operation = GenericConverter.mapper(operationDTO, Operation.class);
+          operation = operationService.save(apiId, resourceId, operation);
 
           return ResponseEntity.created(URI.create(String.format("/%s/%s/%s/%s/%s/%s", "apis", apiId.toString(), "resources", resourceId.toString(), "operations", operation.getId().toString()))).build();
      }

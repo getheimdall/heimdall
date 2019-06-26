@@ -43,7 +43,9 @@ import java.util.stream.Collectors;
  * @author Marcelo Aguiar Rodrigues
  */
 @Slf4j
-public class JwtUtils {
+public final class JwtUtils {
+
+    private JwtUtils() { }
 
     /**
      * This method generate a new token with refreshToken.

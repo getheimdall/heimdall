@@ -28,7 +28,9 @@ package br.com.conductor.heimdall.core.util;
  * @author Marcos Filho
  *
  */
-public class RabbitConstants {
+public final class RabbitConstants {
+
+     private RabbitConstants() { }
 
      //EXCHANGES
      public static final String EXCHANGE_FANOUT_HEIMDALL_REMOVE_INTERCEPTORS = "heimdall.EXCHANGE_FANOUT_HEIMDALL_REMOVE_INTERCEPTORS";

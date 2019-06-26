@@ -19,8 +19,8 @@
  */
 package br.com.conductor.heimdall.gateway.service;
 
-import br.com.conductor.heimdall.gateway.trace.RequestResponseParser;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import br.com.conductor.heimdall.core.trace.RequestResponseParser;
+import br.com.conductor.heimdall.core.trace.TraceContextHolder;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,7 +46,7 @@ public class LogMaskerServiceTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        TraceContextHolder.getInstance().init(true, "developer", new MockHttpServletRequest(), false, false, "");
+        TraceContextHolder.getInstance().init(true, "developer", new MockHttpServletRequest(), false, false, "", true);
 
         Map<String, String> headers = new HashMap<>();
         headers.put("connection", "Keep-alive");

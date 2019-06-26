@@ -23,6 +23,8 @@ package br.com.conductor.heimdall.core.trace;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import lombok.Data;
 
 /**
@@ -34,10 +36,13 @@ import lombok.Data;
 @Data
 public class RequestResponseParser {
 
+     @JsonInclude(Include.NON_NULL)
      private String uri;
 
+     @JsonInclude(Include.NON_NULL)
      private Map<String, String> headers;
 
+     @JsonInclude(Include.NON_NULL)
      private String body;
 
 }

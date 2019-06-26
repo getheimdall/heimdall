@@ -20,8 +20,8 @@
 package br.com.conductor.heimdall.gateway.filter;
 
 import br.com.conductor.heimdall.core.util.Constants;
-import br.com.conductor.heimdall.gateway.trace.FilterDetail;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
+import br.com.conductor.heimdall.core.trace.FilterDetail;
+import br.com.conductor.heimdall.core.trace.TraceContextHolder;
 import com.netflix.zuul.context.RequestContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.netflix.zuul.filters.post.SendResponseFilter;

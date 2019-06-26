@@ -29,8 +29,10 @@ package br.com.conductor.heimdall.core.util;
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
-public class ConstantsPath {
-	
+public final class ConstantsPath {
+
+     private ConstantsPath() { }
+
      public static final String PATH_ROOT = "/";
      
      public static final String PATH_API = "/v1/api";

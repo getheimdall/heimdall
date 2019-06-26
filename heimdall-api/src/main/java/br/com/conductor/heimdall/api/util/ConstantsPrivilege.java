@@ -26,8 +26,10 @@ package br.com.conductor.heimdall.api.util;
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  * 
  */
-public class ConstantsPrivilege {
-     
+public final class ConstantsPrivilege {
+
+     private ConstantsPrivilege() { }
+
      public static final String PRIVILEGE_READ_ACCESSTOKEN = "hasAuthority('READ_ACCESSTOKEN')";
      public static final String PRIVILEGE_CREATE_ACCESSTOKEN = "hasAuthority('CREATE_ACCESSTOKEN')";
      public static final String PRIVILEGE_UPDATE_ACCESSTOKEN = "hasAuthority('UPDATE_ACCESSTOKEN')";
