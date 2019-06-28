@@ -36,8 +36,25 @@
 		</then>
 	</if>
 
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>/tmp/heimdall.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<maxHistory>5</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<charset>utf-8</charset>
+			<Pattern>%d %-5level [%thread] %logger{0}: %msg%n</Pattern>
+		</encoder>
+	</appender>
+
+	<appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+		<queueSize>512</queueSize>
+		<appender-ref ref="FILE"/>
+	</appender>
+
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
+		<appender-ref ref="ASYNC"/>
 		<if condition='"true".equals(p("sentry_enabled"))'>
 			<then>
 				<appender-ref ref="APPENDER_SENTRY_LOGS"/>
