@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.core.service;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -20,6 +17,7 @@ package br.com.conductor.heimdall.core.service;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.service;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ACCESS_TOKEN_ALREADY_EXISTS;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ACCESS_TOKEN_NOT_DEFINED;
@@ -73,13 +71,7 @@ public class AccessTokenService {
      private AccessTokenRepository accessTokenRepository;
 
      @Autowired
-     private AppRepository appRespository;
-
-     @Autowired
      private AppService appService;
-
-     @Autowired
-     private PlanRepository planRepository;
 
      @Autowired
      private AMQPCacheService amqpCacheService;
@@ -91,7 +83,7 @@ public class AccessTokenService {
       * @return  						The {@link AccessToken} found
       */
      @Transactional(readOnly = true)
-     public AccessToken find(Long id) {
+     public AccessToken find(String id) {
 
           AccessToken accessToken = accessTokenRepository.findOne(id);
           HeimdallException.checkThrow(accessToken == null, GLOBAL_RESOURCE_NOT_FOUND);
@@ -102,58 +94,42 @@ public class AccessTokenService {
      /**
       * Returns a paged list of all {@link AccessToken} from a request.
       *
-      * @param 	accessTokenRequest 		{@link AccessTokenRequest} The request for {@link AccessToken}
       * @param 	pageableDTO 			{@link PageableDTO} The pageable DTO
       * @return 						The paged {@link AccessToken} list as a {@link AccessTokenPage} object
       */
      @Transactional(readOnly = true)
-     public AccessTokenPage list(AccessTokenRequest accessTokenRequest, PageableDTO pageableDTO) {
-
-          AccessToken accessToken = GenericConverter.mapper(accessTokenRequest, AccessToken.class);
-
-          Example<AccessToken> example = Example.of(accessToken, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+     public AccessTokenPage list(PageableDTO pageableDTO) {
 
           Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
-          Page<AccessToken> page = accessTokenRepository.findAll(example, pageable);
+          Page<AccessToken> page = accessTokenRepository.findAll(pageable);
 
-          AccessTokenPage accessTokenPage = new AccessTokenPage(PageDTO.build(page));
-
-          return accessTokenPage;
+          return new AccessTokenPage(PageDTO.build(page));
      }
 
      /**
       * Returns a list of all {@link AccessToken} from a request
       *
-      * @param 	accessTokenRequest 		{@link AccessTokenRequest} The request for {@link AccessToken}
       * @return 						The list of {@link AccessToken}
       */
      @Transactional(readOnly = true)
-     public List<AccessToken> list(AccessTokenRequest accessTokenRequest) {
+     public List<AccessToken> list() {
 
-          AccessToken accessToken = GenericConverter.mapper(accessTokenRequest, AccessToken.class);
-
-          Example<AccessToken> example = Example.of(accessToken, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
-
-          List<AccessToken> accessTokens = accessTokenRepository.findAll(example);
-
-          return accessTokens;
+          return accessTokenRepository.findAll();
      }
 
      /**
       * Saves a new {@link AccessToken} for a {@link App}. If the {@link AccessToken} does not
       * have a token it generates a new token for it.
       *
-      * @param 	accessTokenPersist 		{@link AccessTokenPersist}
+      * @param 	accessToken 		{@link AccessTokenPersist}
       * @return 						The {@link AccessToken} that was saved to the repository
       */
      @Transactional
-     public AccessToken save(AccessTokenPersist accessTokenPersist) {
+     public AccessToken save(AccessToken accessToken) {
 
-          AccessToken accessToken = GenericConverter.mapper(accessTokenPersist, AccessToken.class);
-
-          App appRecover = appRespository.findOne(accessTokenPersist.getApp().getId());
+          App appRecover = appService.find(accessToken.getApp().getId());
           HeimdallException.checkThrow(appRecover == null, APP_NOT_EXIST);
-          HeimdallException.checkThrow(!verifyIfPlansContainsInApp(appRecover, accessTokenPersist.getPlans()), SOME_PLAN_NOT_PRESENT_IN_APP);
+          HeimdallException.checkThrow(!verifyIfPlansContainsInApp(appRecover, accessToken.getPlans()), SOME_PLAN_NOT_PRESENT_IN_APP);
 
           AccessToken existAccessToken;
           if (accessToken.getCode() != null) {
@@ -185,24 +161,24 @@ public class AccessTokenService {
       * @return 						The {@link AccessToken} updated
       */
      @Transactional
-     public AccessToken update(Long id, AccessTokenPersist accessTokenPersist) {
+     public AccessToken update(String id, AccessTokenPersist accessTokenPersist) {
 
           AccessToken accessToken = accessTokenRepository.findOne(id);
-          HeimdallException.checkThrow(accessToken == null, GLOBAL_RESOURCE_NOT_FOUND);
-
-          App appRecover = appRespository.findOne(accessTokenPersist.getApp().getId());
-          HeimdallException.checkThrow(appRecover == null, APP_NOT_EXIST);
-          HeimdallException.checkThrow(!verifyIfPlansContainsInApp(appRecover, accessTokenPersist.getPlans()), SOME_PLAN_NOT_PRESENT_IN_APP);
-
-          PropertyMap<AccessTokenPersist, AccessToken> propertyMap = new PropertyMap<AccessTokenPersist, AccessToken>() {
-               @Override
-               protected void configure() {
-                    skip(destination.getCode());
-               }
-          };
-
-          GenericConverter.convertWithMapping(accessTokenPersist, accessToken, propertyMap);
-          accessToken = accessTokenRepository.save(accessToken);
+//          HeimdallException.checkThrow(accessToken == null, GLOBAL_RESOURCE_NOT_FOUND);
+//
+//          App appRecover = appService.find(accessTokenPersist.getApp().getId());
+//          HeimdallException.checkThrow(appRecover == null, APP_NOT_EXIST);
+//          HeimdallException.checkThrow(!verifyIfPlansContainsInApp(appRecover, accessTokenPersist.getPlans()), SOME_PLAN_NOT_PRESENT_IN_APP);
+//
+//          PropertyMap<AccessTokenPersist, AccessToken> propertyMap = new PropertyMap<AccessTokenPersist, AccessToken>() {
+//               @Override
+//               protected void configure() {
+//                    skip(destination.getCode());
+//               }
+//          };
+//
+//          GenericConverter.convertWithMapping(accessTokenPersist, accessToken, propertyMap);
+//          accessToken = accessTokenRepository.save(accessToken);
 
           amqpCacheService.dispatchClean();
 
@@ -215,7 +191,7 @@ public class AccessTokenService {
       * @param 	id 						The ID of the {@link AccessToken} to be deleted
       */
      @Transactional
-     public void delete(Long id) {
+     public void delete(String id) {
 
           AccessToken accessToken = accessTokenRepository.findOne(id);
           HeimdallException.checkThrow(accessToken == null, GLOBAL_RESOURCE_NOT_FOUND);
@@ -226,46 +202,14 @@ public class AccessTokenService {
      }
 
      /**
-      * Saves a new {@link AccessToken} for a {@link App}.
-      *
-      * @param reqBody					The {@link AccessTokenDTO}
-      * @return							The {@link AccessToken} saved
-      */
-     @Transactional
-     public AccessToken save(AccessTokenDTO reqBody) {
-
-          AccessToken accessToken = GenericConverter.mapper(reqBody, AccessToken.class);
-          HeimdallException.checkThrow(accessToken.getCode() == null, ACCESS_TOKEN_NOT_DEFINED);
-
-          App app = appService.save(reqBody.getApp());
-
-          AccessToken existAccessToken;
-
-          existAccessToken = accessTokenRepository.findByCode(accessToken.getCode());
-          HeimdallException.checkThrow(existAccessToken != null, ACCESS_TOKEN_ALREADY_EXISTS);
-
-          accessToken.setApp(app);
-
-          Plan plan = planRepository.findOne(1L);
-          if (plan != null) {
-
-               accessToken.setPlans(new ArrayList<>(Collections.singletonList(plan)));
-          }
-
-          accessToken = accessTokenRepository.save(accessToken);
-
-          return accessToken;
-     }
-
-     /**
       * Verify if all plans informed contains in {@link List}<{@link Plan}> of the {@link App}
       *
       * @param app The {@link App}
       * @param plansId {@link List}<{@link ReferenceIdDTO}> plansIds
       * @return True if contains all, false otherwise
       */
-     private boolean verifyIfPlansContainsInApp(App app, List<ReferenceIdDTO> plansId) {
-          final List<Long> plansSelected = plansId.stream().map(ReferenceIdDTO::getId).collect(Collectors.toList());
+     private boolean verifyIfPlansContainsInApp(App app, List<Plan> plansId) {
+          final List<String> plansSelected = plansId.stream().map(Plan::getId).collect(Collectors.toList());
           return plansId.size() == app.getPlans().stream()
                   .filter(plan -> Collections.frequency(plansSelected, plan.getId()) == 1)
                   .count();

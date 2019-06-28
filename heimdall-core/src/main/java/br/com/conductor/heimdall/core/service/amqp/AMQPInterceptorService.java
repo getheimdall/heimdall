@@ -49,7 +49,7 @@ public class AMQPInterceptorService {
       * 
       * @param id
       */
-     public void dispatchInterceptor(Long id) {
+     public void dispatchInterceptor(String id) {
           
           rabbitTemplate.convertAndSend(RabbitConstants.EXCHANGE_FANOUT_HEIMDALL_ADD_INTERCEPTORS, "", id);
           log.debug("Dispatch Interceptor");

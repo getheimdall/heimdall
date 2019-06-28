@@ -37,7 +37,7 @@ import br.com.conductor.heimdall.core.util.ConstantsCache;
  * @author Filipe Germano
  *
  */
-public interface AccessTokenRepository extends JpaRepository<AccessToken, Long> {
+public interface AccessTokenRepository extends JpaRepository<AccessToken, String> {
 
 	/**
 	 * Finds a active {@link AccessToken} by its code.
@@ -45,7 +45,6 @@ public interface AccessTokenRepository extends JpaRepository<AccessToken, Long> 
 	 * @param  code			The AccessToken code
 	 * @return				The AccessToken
 	 */
-     @Cacheable(ConstantsCache.ACCESS_TOKENS_ACTIVE_CACHE)
      @Query("select ac from AccessToken ac join ac.plans p join fetch ac.app a where ac.code = :code and ac.status = 'ACTIVE' and (ac.expiredDate >= CURRENT_TIMESTAMP or ac.expiredDate is null) and p.status = 'ACTIVE' ")
      AccessToken findAccessTokenActive(@Param("code") String code);
 
@@ -63,6 +62,6 @@ public interface AccessTokenRepository extends JpaRepository<AccessToken, Long> 
       * @param  id			The AccessToken id
       * @return				The AccessToken
       */
-     List<AccessToken> findByAppId(Long id);
+     List<AccessToken> findByAppId(String id);
 
 }

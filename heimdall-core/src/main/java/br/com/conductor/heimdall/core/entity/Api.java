@@ -22,19 +22,18 @@ package br.com.conductor.heimdall.core.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
@@ -48,6 +47,9 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
 
@@ -71,89 +73,45 @@ import lombok.NoArgsConstructor;
  *
  */
 @Data
-@Table(name = "APIS")
-@Entity
-@DynamicUpdate
-@DynamicInsert
 @EqualsAndHashCode(of = { "id" })
 @AllArgsConstructor
 @NoArgsConstructor
+@RedisHash("api")
 public class Api implements Serializable {
 
      private static final long serialVersionUID = 1817533065623403784L;
 
      @Id
-     @GeneratedValue(strategy = GenerationType.IDENTITY)
-     @Column(name = "ID")
-     private Long id;
+     private String id;
 
-     @Column(name = "NAME", length = 80, nullable = false)
      private String name;
 
-     @Column(name = "VERSION", length = 40, nullable = false)
      private String version;
 
-     @Column(name = "DESCRIPTION", length = 200)
      private String description;
 
-     @Column(name = "BASE_PATH", length = 80, nullable = false, unique = true)
+     @Indexed
      private String basePath;
 
-     @Column(name = "CORS", nullable = false)
      private boolean cors;
 
-     @Column(name = "CREATION_DATE", nullable = false)
      @DateTimeFormat(iso = ISO.DATE_TIME)
      @JsonDeserialize(using = LocalDateTimeDeserializer.class)
      @JsonSerialize(using = LocalDateTimeSerializer.class)
      private LocalDateTime creationDate;
 
-     @JsonIgnore
-     @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.MERGE, CascadeType.REMOVE, CascadeType.REFRESH, CascadeType.DETACH})
-     @JoinColumn(name = "API_ID")
-     private Set<Resource> resources;
+     private Set<Resource> resources = new HashSet<>();
 
-     @Column(name = "STATUS", length = 10, nullable = false)
-     @Enumerated(EnumType.STRING)
      private Status status;
 
-     @ManyToMany
-     @LazyCollection(LazyCollectionOption.FALSE)
-     @JoinTable(name = "APIS_ENVIRONMENTS", 
-          joinColumns = @JoinColumn(name = "API_ID", referencedColumnName = "ID"), 
-          inverseJoinColumns = @JoinColumn(name = "ENVIRONMENT_ID", referencedColumnName = "ID"))
-     private List<Environment> environments;
+     private List<Environment> environments = new ArrayList<>();
      
-     @OneToMany(mappedBy = "api", fetch=FetchType.LAZY)
-     @JsonIgnore
-     private List<Plan> plans;
+     private List<Plan> plans = new ArrayList<>();
 
-     @PrePersist
-     private void callPrePersists() {
-          initValuesPersist();
-          fixBasePath();
+     public void addResource(String id) {
+          Resource resource = new Resource();
+          resource.setId(id);
+          this.resources.add(resource);
      }
-     
-     @PreUpdate
-     private void callPreUpdates() {
-          fixBasePath();
-     }
-     
-     private void initValuesPersist() {
-
-          status = (status == null) ? Status.ACTIVE : status;
-          
-          creationDate = LocalDateTime.now();
-     }
-     
-     /*
-      * Adjust the basepath to not permit the save or update with "/" in the end of path.
-      */
-     private void fixBasePath() {
-
-          if (this.basePath.endsWith(ConstantsPath.PATH_ROOT)) {
-               this.basePath = StringUtils.removeEnd(basePath, ConstantsPath.PATH_ROOT);
-          }
-     }     
 
 }

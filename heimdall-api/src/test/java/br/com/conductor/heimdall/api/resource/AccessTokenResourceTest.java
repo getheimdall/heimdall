@@ -42,7 +42,7 @@ import java.util.Collections;
 public class AccessTokenResourceTest {
 
      private MockMvc mockMvc;
-     
+
      @MockBean
      private AccessTokenService service;
 
@@ -54,7 +54,7 @@ public class AccessTokenResourceTest {
 
      @Autowired
      private FilterChainProxy filterChain;
-     
+
      @BeforeClass
      public static void setup() {
           RabbitQueueUtils.init();
@@ -71,49 +71,49 @@ public class AccessTokenResourceTest {
          mockMvc = MockMvcBuilders.webAppContextSetup(context)
                  .apply(SecurityMockMvcConfigurers.springSecurity()).addFilter(filterChain).build();
      }
-     
+
      @Test
      @WithMockUser(username="tester", authorities={"CREATE_ACCESSTOKEN"})
      public void testSavingAccessTokenWithoutApp() throws Exception {
-          
+
           mockMvc.perform(MockMvcRequestBuilders.post(ConstantsPath.PATH_ACCESS_TOKENS, 10L)
                                                 .content("{\"code\":\"!!@!##1212\", \"plans\": [{\"id\": 5}]}")
                                                 .contentType(MediaType.APPLICATION_JSON))
                  .andExpect(MockMvcResultMatchers.status().is4xxClientError())
                  .andExpect(MockMvcResultMatchers.content().json("{\"status\":400,\"exception\":\"MethodArgumentNotValidException\",\"erros\":[{\"defaultMessage\":\"may not be null\",\"field\":\"app\",\"code\":\"NotNull\"}]}"));
      }
-     
+
      @Test
      @WithMockUser(username="tester", authorities={"CREATE_ACCESSTOKEN"})
      public void testSavingAccessTokenWithEmptyPlans() throws Exception {
-          
+
           mockMvc.perform(MockMvcRequestBuilders.post(ConstantsPath.PATH_ACCESS_TOKENS, 10L)
                                                 .content("{\"code\":\"!!@!##1212\", \"app\":{\"id\":10}, \"plans\": [] }")
                                                 .contentType(MediaType.APPLICATION_JSON))
                  .andExpect(MockMvcResultMatchers.status().is4xxClientError())
                  .andExpect(MockMvcResultMatchers.content().json("{\"status\":400,\"exception\":\"MethodArgumentNotValidException\",\"erros\":[{\"defaultMessage\":\"size must be between 1 and 2147483647\",\"field\":\"plans\",\"code\":\"Size\"}]}"));
      }
-     
+
      @Test
      @WithMockUser(username="tester", authorities={"CREATE_ACCESSTOKEN"})
      public void testSavingAccessTokenWithoutPlans() throws Exception {
-          
+
           mockMvc.perform(MockMvcRequestBuilders.post(ConstantsPath.PATH_ACCESS_TOKENS, 10L)
                                                 .content("{\"code\":\"!!@!##1212\", \"app\":{\"id\":10}}")
                                                 .contentType(MediaType.APPLICATION_JSON))
                  .andExpect(MockMvcResultMatchers.status().is4xxClientError())
                  .andExpect(MockMvcResultMatchers.content().json("{\"status\":400,\"exception\":\"MethodArgumentNotValidException\",\"erros\":[{\"defaultMessage\":\"may not be null\",\"field\":\"plans\",\"code\":\"NotNull\"}]}"));
      }
-     
+
      @Test
      @WithMockUser(username="tester", authorities={"CREATE_ACCESSTOKEN"})
      public void testSavingAccessTokenWithoutDefaultValues() throws Exception {
-          
+
           AccessToken recoverAt = new AccessToken();
-          recoverAt.setId(10L);
-          
-          Mockito.when(service.save(Mockito.any(AccessTokenPersist.class))).thenReturn(recoverAt);
-          
+          recoverAt.setId("10L");
+
+          Mockito.when(service.save(Mockito.any(AccessToken.class))).thenReturn(recoverAt);
+
           mockMvc.perform(MockMvcRequestBuilders.post(ConstantsPath.PATH_ACCESS_TOKENS, 10L)
                  .content("{\"code\":\"!!@!##1212\",\"app\":{\"id\":10}, \"plans\": [{\"id\": 5}]}")
                  .contentType(MediaType.APPLICATION_JSON))

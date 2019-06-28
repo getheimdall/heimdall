@@ -47,7 +47,7 @@ public class AMQPMiddlewareService {
 	 * 
 	 * @param idMiddleware The {@link Middleware} Id
 	 */
-	public void dispatchCreateMiddlewares(Long idMiddleware) {
+	public void dispatchCreateMiddlewares(String idMiddleware) {
 
 		log.info("Dispatching to create/update the middleware: {}", idMiddleware);
 		rabbitTemplate.convertAndSend(RabbitConstants.EXCHANGE_FANOUT_HEIMDALL_MIDDLEWARES, "", idMiddleware);

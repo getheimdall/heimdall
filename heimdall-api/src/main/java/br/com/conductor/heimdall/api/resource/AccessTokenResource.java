@@ -26,6 +26,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import br.com.conductor.heimdall.core.converter.GenericConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +46,6 @@ import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.page.AccessTokenPage;
 import br.com.conductor.heimdall.core.dto.persist.AccessTokenPersist;
-import br.com.conductor.heimdall.core.dto.request.AccessTokenRequest;
 import br.com.conductor.heimdall.core.entity.AccessToken;
 import br.com.conductor.heimdall.core.service.AccessTokenService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
@@ -75,7 +75,7 @@ public class AccessTokenResource {
      @ApiOperation(value = "Find AccessToken by id", response = AccessToken.class)
      @GetMapping(value = "/{accessTokenId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_ACCESSTOKEN)
-     public ResponseEntity<?> findById(@PathVariable("accessTokenId") Long id) {
+     public ResponseEntity<?> findById(@PathVariable("accessTokenId") String id) {
 
           AccessToken accessToken = accessTokenService.find(id);
 
@@ -85,7 +85,6 @@ public class AccessTokenResource {
      /**
       * Finds all {@link AccessToken}
       * 
-      * @param accessTokenRequest	{@link AccessTokenRequest}
       * @param pageableDTO			{@link PageableDTO}
       * @return						{@link ResponseEntity}
       */
@@ -93,15 +92,15 @@ public class AccessTokenResource {
      @ApiOperation(value = "Find all AccessTokens", responseContainer = "List", response = AccessToken.class)
      @GetMapping
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_ACCESSTOKEN)
-     public ResponseEntity<?> findAll(@ModelAttribute AccessTokenRequest accessTokenRequest, @ModelAttribute PageableDTO pageableDTO) {
+     public ResponseEntity<?> findAll(@ModelAttribute PageableDTO pageableDTO) {
           
           if (!pageableDTO.isEmpty()) {
                
-               AccessTokenPage accessTokenPage = accessTokenService.list(accessTokenRequest, pageableDTO);      
+               AccessTokenPage accessTokenPage = accessTokenService.list(pageableDTO);
                return ResponseEntity.ok(accessTokenPage);
           } else {
                
-               List<AccessToken> accessTokens = accessTokenService.list(accessTokenRequest);      
+               List<AccessToken> accessTokens = accessTokenService.list();
                return ResponseEntity.ok(accessTokens);
           }
      }
@@ -118,9 +117,11 @@ public class AccessTokenResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_ACCESSTOKEN)
      public ResponseEntity<?> save(@RequestBody @Valid AccessTokenPersist accessTokenPersist) {
 
-          AccessToken accessToken = accessTokenService.save(accessTokenPersist);
+          AccessToken accessToken = GenericConverter.mapper(accessTokenPersist, AccessToken.class);
 
-          return ResponseEntity.created(URI.create(String.format("/%s/%s", "access-tokens", accessToken.getId().toString()))).build();
+          accessToken = accessTokenService.save(accessToken);
+
+          return ResponseEntity.created(URI.create(String.format("/%s/%s", "access-tokens", accessToken.getId()))).build();
      }
 
      /**
@@ -134,7 +135,7 @@ public class AccessTokenResource {
      @ApiOperation(value = "Update AccessToken")
      @PutMapping(value = "/{accessTokenId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_ACCESSTOKEN)
-     public ResponseEntity<?> update(@PathVariable("accessTokenId") Long id, @RequestBody AccessTokenPersist accessTokenPersist) {
+     public ResponseEntity<?> update(@PathVariable("accessTokenId") String id, @RequestBody AccessTokenPersist accessTokenPersist) {
 
           AccessToken accessToken = accessTokenService.update(id, accessTokenPersist);
           
@@ -151,7 +152,7 @@ public class AccessTokenResource {
      @ApiOperation(value = "Delete AccessToken")
      @DeleteMapping(value = "/{accessTokenId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_ACCESSTOKEN)
-     public ResponseEntity<?> delete(@PathVariable("accessTokenId") Long id) {
+     public ResponseEntity<?> delete(@PathVariable("accessTokenId") String id) {
 
           accessTokenService.delete(id);
           
