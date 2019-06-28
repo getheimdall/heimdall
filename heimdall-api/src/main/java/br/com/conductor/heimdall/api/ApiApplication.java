@@ -31,6 +31,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
@@ -44,7 +45,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableConfigurationProperties({ Property.class, JwtProperty.class})
 @ComponentScan(basePackages = { "br.com.conductor.heimdall.api", "br.com.conductor.heimdall.core" })
 @EntityScan({"br.com.conductor.heimdall.core.entity", "br.com.conductor.heimdall.api.entity"})
-@EnableJpaRepositories({"br.com.conductor.heimdall.core.repository", "br.com.conductor.heimdall.api.repository"})
+@EnableRedisRepositories({"br.com.conductor.heimdall.core.repository", "br.com.conductor.heimdall.api.repository"})
 public class ApiApplication extends SpringBootServletInitializer  {
 
      public static void main(String[] args) {

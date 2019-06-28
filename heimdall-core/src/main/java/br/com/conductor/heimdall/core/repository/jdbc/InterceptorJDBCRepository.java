@@ -54,9 +54,9 @@ public class InterceptorJDBCRepository {
 
         return jdbcTemplate.query(sql.toString(), (resultSet, i) -> {
             Interceptor interceptor = new Interceptor();
-            interceptor.setId(resultSet.getLong(1));
+            interceptor.setId(resultSet.getString(1));
             Api api = new Api();
-            api.setId(resultSet.getLong(2));
+            api.setId(resultSet.getString(2));
             interceptor.setApi(api);
             interceptor.setExecutionPoint(TypeExecutionPoint.valueOf(resultSet.getString(3)));
             interceptor.setLifeCycle(InterceptorLifeCycle.valueOf(resultSet.getString(4)));
@@ -65,7 +65,7 @@ public class InterceptorJDBCRepository {
             interceptor.setContent(resultSet.getString(7));
             interceptor.setOrder(resultSet.getInt(8));
             interceptor.setStatus(resultSet.getBoolean(9));
-            interceptor.setReferenceId(resultSet.getLong(10));
+            interceptor.setReferenceId(resultSet.getString(10));
 
             return interceptor;
         });
@@ -87,9 +87,9 @@ public class InterceptorJDBCRepository {
 
         return jdbcTemplate.query(sql.toString(), new Object[] { middlewareId }, (resultSet, i) -> {
             Interceptor interceptor = new Interceptor();
-            interceptor.setId(resultSet.getLong(1));
+            interceptor.setId(resultSet.getString(1));
             Api api = new Api();
-            api.setId(resultSet.getLong(2));
+            api.setId(resultSet.getString(2));
             interceptor.setApi(api);
             interceptor.setExecutionPoint(TypeExecutionPoint.valueOf(resultSet.getString(3)));
             interceptor.setLifeCycle(InterceptorLifeCycle.valueOf(resultSet.getString(4)));
@@ -98,7 +98,7 @@ public class InterceptorJDBCRepository {
             interceptor.setContent(resultSet.getString(7));
             interceptor.setOrder(resultSet.getInt(8));
             interceptor.setStatus(resultSet.getBoolean(9));
-            interceptor.setReferenceId(resultSet.getLong(10));
+            interceptor.setReferenceId(resultSet.getString(10));
 
             return interceptor;
         });
@@ -119,9 +119,9 @@ public class InterceptorJDBCRepository {
 
         return jdbcTemplate.queryForObject(sql.toString(), new Object[] { interceptorId }, (resultSet, i) -> {
             Interceptor interceptor = new Interceptor();
-            interceptor.setId(resultSet.getLong(1));
+            interceptor.setId(resultSet.getString(1));
             Api api = new Api();
-            api.setId(resultSet.getLong(2));
+            api.setId(resultSet.getString(2));
             interceptor.setApi(api);
             interceptor.setExecutionPoint(TypeExecutionPoint.valueOf(resultSet.getString(3)));
             interceptor.setLifeCycle(InterceptorLifeCycle.valueOf(resultSet.getString(4)));
@@ -130,7 +130,7 @@ public class InterceptorJDBCRepository {
             interceptor.setContent(resultSet.getString(7));
             interceptor.setOrder(resultSet.getInt(8));
             interceptor.setStatus(resultSet.getBoolean(9));
-            interceptor.setReferenceId(resultSet.getLong(10));
+            interceptor.setReferenceId(resultSet.getString(10));
 
             return interceptor;
         });

@@ -32,7 +32,7 @@ import java.util.List;
  * @author Filipe Germano
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
-public interface EnvironmentRepository extends JpaRepository<Environment, Long> {
+public interface EnvironmentRepository extends JpaRepository<Environment, String> {
 
     /**
      * Finds all Environments by its inbound URL.
@@ -49,7 +49,7 @@ public interface EnvironmentRepository extends JpaRepository<Environment, Long> 
      * @return
      */
     @Query(value = "select count(0) from apis_environments where environment_id = :id", nativeQuery = true)
-    Integer findApisWithEnvironment(@Param("id") Long id);
+    Integer findApisWithEnvironment(@Param("id") String id);
 
     /**
      * Check if exist any Api with other environment that contain the same inbound_url.
@@ -59,6 +59,6 @@ public interface EnvironmentRepository extends JpaRepository<Environment, Long> 
      * @return The number of APIs found with the same inbound_url
      */
     @Query(value = "SELECT COUNT(DISTINCT env.id) from environments env INNER JOIN apis_environments api_env ON api_env.environment_id=env.id INNER JOIN apis apis ON apis.id=api_env.api_id INNER JOIN (select apis2.id from apis apis2 INNER JOIN apis_environments api_env2 ON apis2.id=api_env2.api_id INNER JOIN environments env2 ON api_env2.environment_id=env2.id where env2.id = :id) AS a ON (a.id = apis.id) where env.id <> :id and env.inbound_url = :inbound", nativeQuery = true)
-    Integer findApiWithOtherEnvironmentEqualsInbound(@Param("id") Long id, @Param("inbound") String inbound);
+    Integer findApiWithOtherEnvironmentEqualsInbound(@Param("id") String id, @Param("inbound") String inbound);
 
 }

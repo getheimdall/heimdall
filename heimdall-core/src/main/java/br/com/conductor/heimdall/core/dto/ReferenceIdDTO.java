@@ -40,6 +40,6 @@ public class ReferenceIdDTO implements Serializable {
 
      private static final long serialVersionUID = -7325639885315556027L;
      
-     private Long id;
+     private String id;
 
 }

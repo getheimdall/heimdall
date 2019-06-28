@@ -27,6 +27,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.redis.core.RedisHash;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -38,37 +39,25 @@ import java.time.LocalDateTime;
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Data
-@Table(name = "PROVIDER_PARAMS")
-@Entity
-@DynamicUpdate
-@DynamicInsert
 @EqualsAndHashCode(of = {"id"})
 @NoArgsConstructor
 @AllArgsConstructor
+@RedisHash("providerParam")
 public class ProviderParam implements Serializable {
 
     private static final long serialVersionUID = 2575009691412505853L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID")
-    private Long id;
+    private String id;
 
-    @Column(name = "NAME", length = 180, nullable = false, unique = true)
     private String name;
 
-    @Column(name = "LOCATION", length = 100, nullable = false, unique = true)
     private String location;
 
-    @Column(name = "VALUE", length = 200)
     private String value;
 
-    @Column(name = "CREATION_DATE", nullable = false, updatable = false)
     private LocalDateTime creationDate;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
-    @JoinColumn(name = "provider_id")
-    @JsonIgnoreProperties("providerParams")
     private Provider provider;
 
     @PrePersist

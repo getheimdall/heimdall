@@ -22,19 +22,16 @@ package br.com.conductor.heimdall.core.entity;
  */
 
 import br.com.conductor.heimdall.core.enums.Status;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
 
-import javax.persistence.*;
+import javax.persistence.PrePersist;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -45,54 +42,32 @@ import java.util.List;
  * @author Filipe Germano
  */
 @Data
-@Table(name = "APPS")
-@Entity
-@DynamicUpdate
-@DynamicInsert
 @EqualsAndHashCode(of = {"id"})
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(Include.NON_NULL)
+@RedisHash("app")
 public class App implements Serializable {
 
     private static final long serialVersionUID = -8080005929936415705L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID")
-    private Long id;
+    private String id;
 
-    @Column(name = "CLIENT_ID", length = 250, nullable = false, unique = true)
     private String clientId;
 
-    @Column(name = "NAME", length = 180, nullable = false, unique = true)
     private String name;
 
-    @Column(name = "DESCRIPTION", length = 200)
     private String description;
 
-    @ManyToOne
-    @JoinColumn(name = "DEVELOPER_ID", nullable = false)
     private Developer developer;
 
-    @Column(name = "CREATION_DATE", nullable = false)
     private LocalDateTime creationDate;
 
-    @Column(name = "STATUS", length = 10, nullable = false)
-    @Enumerated(EnumType.STRING)
     private Status status;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = {CascadeType.REMOVE})
-    @JoinColumn(name = "APP_ID", insertable = false, updatable = false)
-    @JsonIgnoreProperties({"app", "plans"})
     private List<AccessToken> accessTokens;
 
-    @ManyToMany
-    @LazyCollection(LazyCollectionOption.FALSE)
-    @JoinTable(name = "APPS_PLANS",
-            joinColumns = @JoinColumn(name = "APP_ID", referencedColumnName = "ID"),
-            inverseJoinColumns = @JoinColumn(name = "PLAN_ID", referencedColumnName = "ID"))
-    @JsonIgnoreProperties({"api"})
     private List<Plan> plans;
 
     @PrePersist

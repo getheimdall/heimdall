@@ -28,6 +28,6 @@ import br.com.conductor.heimdall.core.entity.Provider;
  *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
-public interface ProviderRepository extends JpaRepository<Provider, Long> {
+public interface ProviderRepository extends JpaRepository<Provider, String> {
 
 }

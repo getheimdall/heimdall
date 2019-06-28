@@ -36,7 +36,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class InterceptorFileDTO {
 
-     private Long id;
+     private String id;
 
      private String path;
 }

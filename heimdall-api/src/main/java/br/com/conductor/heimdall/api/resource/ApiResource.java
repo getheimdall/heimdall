@@ -20,15 +20,18 @@
 package br.com.conductor.heimdall.api.resource;
 
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
+import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.ApiDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.page.ApiPage;
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.service.ApiService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
+import br.com.conductor.heimdall.core.util.Pageable;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.models.Swagger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -67,7 +70,7 @@ public class ApiResource {
      @ApiOperation(value = "Find API by id", response = Api.class)
      @GetMapping(value = "/{apiId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_API)
-     public ResponseEntity<?> findById(@PathVariable("apiId") Long id) {
+     public ResponseEntity<?> findById(@PathVariable("apiId") String id) {
 
           Api api = apiService.find(id);
           return ResponseEntity.ok(api);
@@ -83,7 +86,7 @@ public class ApiResource {
      @ApiOperation(value = "Get SwaggerJson by Api Id", response = Api.class)
      @GetMapping(value = "/{apiId}/swagger")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_API)
-     public ResponseEntity<?> getSwaggerByApiId(@PathVariable("apiId") Long id) {
+     public ResponseEntity<?> getSwaggerByApiId(@PathVariable("apiId") String id) {
 
           Swagger swagger = apiService.findSwaggerByApi(id);
 
@@ -93,7 +96,6 @@ public class ApiResource {
      /**
       * Fids all {@link Api} from a request.
       * 
-      * @param apiDTO				{@link ApiDTO}
       * @param pageableDTO			{@link PageableDTO}
       * @return						{@link ResponseEntity}
       */
@@ -101,15 +103,17 @@ public class ApiResource {
      @ApiOperation(value = "Find all APIs", responseContainer = "List", response = Api.class)
      @GetMapping
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_API)
-     public ResponseEntity<?> findAll(@ModelAttribute ApiDTO apiDTO, @ModelAttribute PageableDTO pageableDTO) {
+     public ResponseEntity<?> findAll(@ModelAttribute PageableDTO pageableDTO) {
           
           if (!pageableDTO.isEmpty()) {
-               
-               ApiPage apiPage = apiService.list(apiDTO, pageableDTO);      
+
+               Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+
+               Page<Api> apiPage = apiService.list(pageable);
                return ResponseEntity.ok(apiPage);
           } else {
                
-               List<Api> apis = apiService.list(apiDTO);      
+               List<Api> apis = apiService.list();
                return ResponseEntity.ok(apis);
           }
           
@@ -127,9 +131,11 @@ public class ApiResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_API)
      public ResponseEntity<?> save(@RequestBody @Valid ApiDTO apiDTO) {
 
-          Api api = apiService.save(apiDTO);
+          Api api = GenericConverter.mapper(apiDTO, Api.class);
 
-          return ResponseEntity.created(URI.create(String.format("/%s/%s", "apis", api.getId().toString()))).build();
+          api = apiService.save(api);
+
+          return ResponseEntity.created(URI.create(String.format("/%s/%s", "apis", api.getId()))).build();
      }
 
      /**
@@ -143,9 +149,10 @@ public class ApiResource {
      @ApiOperation(value = "Update API")
      @PutMapping(value = "/{apiId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_API)
-     public ResponseEntity<?> update(@PathVariable("apiId") Long id, @RequestBody ApiDTO apiDTO) {
+     public ResponseEntity<?> update(@PathVariable("apiId") String id, @RequestBody ApiDTO apiDTO) {
 
-          Api api = apiService.update(id, apiDTO);
+          Api api = GenericConverter.mapper(apiDTO, Api.class);
+          api = apiService.update(id, api);
           
           return ResponseEntity.ok(api);
      }
@@ -160,7 +167,7 @@ public class ApiResource {
      @ApiOperation(value = "Delete API")
      @DeleteMapping(value = "/{apiId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_API)
-     public ResponseEntity<?> delete(@PathVariable("apiId") Long id) {
+     public ResponseEntity<?> delete(@PathVariable("apiId") String id) {
 
           apiService.delete(id);
           
@@ -189,7 +196,7 @@ public class ApiResource {
      @ApiOperation(value = "Update API by Swagger JSON")
      @PutMapping("/{apiId}/swagger")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_API)
-     public ResponseEntity<?> updateApiBySwaggerJSON(@PathVariable("apiId") Long id, @RequestBody String swagger, boolean override) {
+     public ResponseEntity<?> updateApiBySwaggerJSON(@PathVariable("apiId") String id, @RequestBody String swagger, boolean override) {
           Api api = apiService.updateBySwagger(id, swagger, override);
           return ResponseEntity.ok(api);
      }

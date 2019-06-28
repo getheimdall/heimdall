@@ -65,7 +65,7 @@ public class IntegrationResource {
      @PostMapping(value = "/access-token/callback", produces = MediaType.APPLICATION_JSON_VALUE)
      public ResponseEntity<?> accessTokenCallback(@RequestBody @Valid AccessTokenDTO reqBody) {
           
-          tokenService.save(reqBody);
+//          tokenService.save(reqBody);
           return ResponseEntity.ok().build();
      }
      

@@ -39,7 +39,7 @@ import java.util.List;
  * @author Filipe Germano
  *
  */
-public interface AppRepository extends JpaRepository<App, Long> {
+public interface AppRepository extends JpaRepository<App, String> {
 
      /**
 	 * Finds a active App by its client Id.
@@ -48,7 +48,6 @@ public interface AppRepository extends JpaRepository<App, Long> {
 	 * @return				The App found
 	 */
      @Lock(LockModeType.NONE)
-     @Cacheable(ConstantsCache.APPS_ACTIVE_CACHE)
      @Query("select a from App a join a.plans p where a.clientId = :clientId and a.status = 'ACTIVE' and p.status = 'ACTIVE' ")
      App findAppActive(@Param("clientId") String clientId);
 
@@ -59,17 +58,7 @@ public interface AppRepository extends JpaRepository<App, Long> {
 	 * @return				The App found
 	 */
      @Lock(LockModeType.NONE)
-     @Cacheable(ConstantsCache.APPS_CLIENT_ID)
 	App findByClientId(String clientId);
-
-	/**
-	 * Finds a App by its name.
-	 * 
-	 * @param  name			The App name
-	 * @return				The App found
-	 */
-     @Lock(LockModeType.NONE)
-	App findByName(String name);
 
 	/**
 	 * Finds a List of {@link Plan} associated with a App.
@@ -79,6 +68,6 @@ public interface AppRepository extends JpaRepository<App, Long> {
 	 */
      @Lock(LockModeType.NONE)
 	@Query("select p from App a join a.plans p where a.id = :appId")
-	List<Plan> findPlansByApp(@Param("appId") Long appId);
+	List<Plan> findPlansByApp(@Param("appId") String appId);
 
 }

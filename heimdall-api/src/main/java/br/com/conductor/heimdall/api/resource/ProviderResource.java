@@ -98,7 +98,7 @@ public class ProviderResource {
     @ResponseBody
     @ApiOperation(value = "Find Provider by ID", response = Provider.class)
     @GetMapping("/{id}")
-    public ResponseEntity<?> findById(@PathVariable Long id) {
+    public ResponseEntity<?> findById(@PathVariable String id) {
 
         Provider provider = providerService.findOne(id);
 
@@ -115,7 +115,7 @@ public class ProviderResource {
     @ResponseBody
     @ApiOperation(value = "Update provider")
     @PutMapping(value = "/{idProvider}")
-    public ResponseEntity<?> update(@PathVariable Long idProvider, @RequestBody ProviderDTO providerDTO) {
+    public ResponseEntity<?> update(@PathVariable String idProvider, @RequestBody ProviderDTO providerDTO) {
         Provider providerEdit = this.providerService.edit(idProvider, providerDTO);
 
         return ResponseEntity.ok(providerEdit);
@@ -131,7 +131,7 @@ public class ProviderResource {
     @ApiOperation(value = "Delete Provider")
     @DeleteMapping(value = "/{providerId}")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_OPERATION)
-    public ResponseEntity<?> delete(@PathVariable Long providerId) {
+    public ResponseEntity<?> delete(@PathVariable String providerId) {
 
         this.providerService.delete(providerId);
 

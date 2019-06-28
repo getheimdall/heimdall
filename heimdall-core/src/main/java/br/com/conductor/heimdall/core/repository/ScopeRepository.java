@@ -27,10 +27,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
  *
  * @author Marcelo Aguiar Rodrigues
  */
-public interface ScopeRepository extends JpaRepository<Scope, Long> {
+public interface ScopeRepository extends JpaRepository<Scope, String> {
 
-    Scope findByApiIdAndId(Long apiId, Long id);
+    Scope findByApiIdAndId(String apiId, String id);
 
-    Scope findByApiIdAndName(Long apiId, String name);
+    Scope findByApiIdAndName(String apiId, String name);
 
 }

@@ -63,7 +63,7 @@ public class DeveloperService {
       * @param  id 						The ID of the {@link Developer} 
       * @return 						The {@link Developer} found
       */
-     public Developer find(Long id) {
+     public Developer find(String id) {
           
           Developer developer = developerRepository.findOne(id);      
           HeimdallException.checkThrow(developer == null, GLOBAL_RESOURCE_NOT_FOUND);
@@ -143,7 +143,7 @@ public class DeveloperService {
       * @return							The updated {@link Developer}
       */
      @Transactional
-     public Developer update(Long id, DeveloperDTO developerDTO) {
+     public Developer update(String id, DeveloperDTO developerDTO) {
 
           Developer developer = developerRepository.findOne(id);
           HeimdallException.checkThrow(developer == null, GLOBAL_RESOURCE_NOT_FOUND);
@@ -159,7 +159,7 @@ public class DeveloperService {
       * @param  id						The ID of the {@link Developer} to be deleted
       */
      @Transactional
-     public void delete(Long id) {
+     public void delete(String id) {
 
           Developer developer = developerRepository.findOne(id);
           HeimdallException.checkThrow(developer == null, GLOBAL_RESOURCE_NOT_FOUND);

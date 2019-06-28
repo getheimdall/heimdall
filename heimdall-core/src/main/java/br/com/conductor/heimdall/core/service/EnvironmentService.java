@@ -65,7 +65,7 @@ public class EnvironmentService {
      * @param id The id of the {@link Environment}
      * @return The {@link Environment} that was found
      */
-    public Environment find(Long id) {
+    public Environment find(String id) {
 
         Environment environment = environmentRepository.findOne(id);
         HeimdallException.checkThrow(environment == null, GLOBAL_RESOURCE_NOT_FOUND);
@@ -80,14 +80,10 @@ public class EnvironmentService {
      * @param pageableDTO    The {@link PageableDTO}
      * @return The paged {@link Environment} list as a {@link EnvironmentPage} object
      */
-    public EnvironmentPage list(EnvironmentDTO environmentDTO, PageableDTO pageableDTO) {
-
-        Environment environment = GenericConverter.mapper(environmentDTO, Environment.class);
-
-        Example<Environment> example = Example.of(environment, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+    public EnvironmentPage list(PageableDTO pageableDTO) {
 
         Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
-        Page<Environment> page = environmentRepository.findAll(example, pageable);
+        Page<Environment> page = environmentRepository.findAll(pageable);
 
          return new EnvironmentPage(PageDTO.build(page));
     }
@@ -98,13 +94,9 @@ public class EnvironmentService {
      * @param environmentDTO The {@link EnvironmentDTO}
      * @return The List<{@link Environment}>
      */
-    public List<Environment> list(EnvironmentDTO environmentDTO) {
+    public List<Environment> list() {
 
-        Environment environment = GenericConverter.mapper(environmentDTO, Environment.class);
-
-        Example<Environment> example = Example.of(environment, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
-
-         return environmentRepository.findAll(example);
+         return environmentRepository.findAll();
     }
 
     /**
@@ -137,7 +129,7 @@ public class EnvironmentService {
      * @return The updated {@link Environment}
      */
     @Transactional
-    public Environment update(Long id, EnvironmentDTO environmentDTO) {
+    public Environment update(String id, EnvironmentDTO environmentDTO) {
 
         Environment environment = environmentRepository.findOne(id);
         HeimdallException.checkThrow(environment == null, GLOBAL_RESOURCE_NOT_FOUND);
@@ -164,7 +156,7 @@ public class EnvironmentService {
       * @param 	id 						The id of the {@link Environment}
       */
      @Transactional
-     public void delete(Long id) {
+     public void delete(String id) {
 
         Environment environment = environmentRepository.findOne(id);
         HeimdallException.checkThrow(environment == null, GLOBAL_RESOURCE_NOT_FOUND);

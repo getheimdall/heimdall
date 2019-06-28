@@ -66,7 +66,7 @@ public class PlanService {
      private AMQPCacheService amqpCacheService;
 
      @Transactional(readOnly = true)
-     public Plan find(Long id) {
+     public Plan find(String id) {
           
           Plan plan = planRepository.findOne(id);
           HeimdallException.checkThrow(plan == null, GLOBAL_RESOURCE_NOT_FOUND);
@@ -143,14 +143,14 @@ public class PlanService {
       * @param 	planDTO						The {@link PlanDTO}
       * @return								The updated {@link Plan}
       */
-     public Plan update(Long id, PlanDTO planDTO) {
+     public Plan update(String id, PlanDTO planDTO) {
 
           Plan plan = planRepository.findOne(id);
           HeimdallException.checkThrow(plan == null, GLOBAL_RESOURCE_NOT_FOUND);
           
           plan = GenericConverter.mapper(planDTO, plan);
 
-          final Long planId = plan.getId();
+          final String planId = plan.getId();
 
           if (plan.isDefaultPlan()) {
                List<Plan> plans = apiService.plansByApi(plan.getApi().getId());
@@ -169,7 +169,7 @@ public class PlanService {
       * 
       * @param 	id						The {@link Plan} Id
       */
-     public void delete(Long id) {
+     public void delete(String id) {
 
           Plan plan = planRepository.findOne(id);
           HeimdallException.checkThrow(plan == null, GLOBAL_RESOURCE_NOT_FOUND);

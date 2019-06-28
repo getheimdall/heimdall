@@ -27,15 +27,14 @@ import java.util.Set;
 
 import javax.persistence.*;
 
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import br.com.conductor.heimdall.core.enums.Status;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import org.springframework.data.redis.core.RedisHash;
 
 /**
  * This class represents a Plan registered to the system.
@@ -45,47 +44,29 @@ import lombok.EqualsAndHashCode;
  *
  */
 @Data
-@Table(name = "PLANS")
-@Entity
-@DynamicUpdate
-@DynamicInsert
+@AllArgsConstructor
+@NoArgsConstructor
 @EqualsAndHashCode(of = { "id" })
+@RedisHash("plan")
 public class Plan implements Serializable {
      
      private static final long serialVersionUID = 69029100636149640L;
 
      @Id
-     @GeneratedValue(strategy = GenerationType.IDENTITY)
-     @Column(name = "ID")
-     private Long id;
+     private String id;
      
-     @Column(name = "NAME", length = 180, nullable = false, unique = true)
      private String name;
      
-     @Column(name = "DESCRIPTION", length = 200)
      private String description;
      
-     @ManyToOne
-     @JoinColumn(name = "API_ID", nullable = false)
-     @JsonIgnoreProperties({ "environments" })
-     @ToString.Exclude
      private Api api;
      
-     @Column(name = "CREATION_DATE", nullable = false, updatable=false)
      private LocalDateTime creationDate;
 
-     @Column(name = "DEFAULT_PLAN", nullable = false)
      private boolean defaultPlan;
      
-     @Column(name = "STATUS", length = 10, nullable = false)
-     @Enumerated(EnumType.STRING)
      private Status status;
 
-     @ManyToMany(fetch = FetchType.EAGER)
-     @JoinTable(name = "SCOPES_PLANS",
-             joinColumns = @JoinColumn(name = "PLAN_ID", referencedColumnName = "ID"),
-             inverseJoinColumns = @JoinColumn(name = "SCOPE_ID", referencedColumnName = "ID"))
-     @JsonIgnoreProperties({"plans"})
      private Set<Scope> scopes;
 
      @PrePersist

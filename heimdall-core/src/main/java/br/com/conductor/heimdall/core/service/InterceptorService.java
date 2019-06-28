@@ -115,7 +115,7 @@ public class InterceptorService {
      * @return The {@link Interceptor} found
      */
     @Transactional(readOnly = true)
-    public Interceptor find(Long id) {
+    public Interceptor find(String id) {
 
         Interceptor interceptor = interceptorRepository.findOne(id);
         HeimdallException.checkThrow(interceptor == null, GLOBAL_RESOURCE_NOT_FOUND);
@@ -178,10 +178,10 @@ public class InterceptorService {
             validateFilterCors(interceptor);
         }
 
-        List<Long> ignoredResources = ignoredValidate(interceptorDTO.getIgnoredResources(), resourceRepository);
+        List<String> ignoredResources = ignoredValidate(interceptorDTO.getIgnoredResources(), resourceRepository);
         HeimdallException.checkThrow(!ignoredResources.isEmpty(), INTERCEPTOR_IGNORED_INVALID, ignoredResources.toString());
 
-        List<Long> ignoredOperations = ignoredValidate(interceptorDTO.getIgnoredOperations(), operationRepository);
+        List<String> ignoredOperations = ignoredValidate(interceptorDTO.getIgnoredOperations(), operationRepository);
         HeimdallException.checkThrow(!ignoredOperations.isEmpty(), INTERCEPTOR_IGNORED_INVALID, ignoredOperations.toString());
 
         HeimdallException.checkThrow((TypeInterceptor.CLIENT_ID.equals(interceptor.getType()) && InterceptorLifeCycle.PLAN.equals(interceptor.getLifeCycle())), INTERCEPTOR_INVALID_LIFECYCLE, interceptor.getType().name());
@@ -243,7 +243,7 @@ public class InterceptorService {
      * @param interceptorDTO The {@link InterceptorDTO}
      * @return The updated {@link Interceptor}
      */
-    public Interceptor update(Long id, InterceptorDTO interceptorDTO) {
+    public Interceptor update(String id, InterceptorDTO interceptorDTO) {
 
         Interceptor interceptor = interceptorRepository.findOne(id);
         HeimdallException.checkThrow(interceptor == null, GLOBAL_RESOURCE_NOT_FOUND);
@@ -274,7 +274,7 @@ public class InterceptorService {
      * @param id The Id of the {@link Interceptor} to be deleted
      */
     @Transactional
-    public void delete(Long id) {
+    public void delete(String id) {
 
         Interceptor interceptor = interceptorRepository.findOne(id);
         HeimdallException.checkThrow(interceptor == null, GLOBAL_RESOURCE_NOT_FOUND);
@@ -291,7 +291,7 @@ public class InterceptorService {
 
         if (TypeInterceptor.MIDDLEWARE.equals(interceptor.getType())) {
 
-            String api = interceptor.getOperation().getResource().getApi().getId().toString();
+            String api = interceptor.getOperation().getResource().getApi().getId();
             pathName = String.join("/", zuulFilterRoot, MIDDLEWARE_API_ROOT, api, fileName);
             middlewareRepository.detachFromInterceptor(id);
         }
@@ -312,7 +312,7 @@ public class InterceptorService {
      * @param operationId Operation with the attatched Interceptors
      */
     @Transactional
-    public void deleteAllfromOperation(Long operationId) {
+    public void deleteAllfromOperation(String operationId) {
         List<Interceptor> interceptors = interceptorRepository.findByOperationId(operationId);
         interceptors.forEach(interceptor -> this.delete(interceptor.getId()));
     }
@@ -322,7 +322,7 @@ public class InterceptorService {
      * @param resourceId Resource with the attatched Interceptors
      */
     @Transactional
-    public void deleteAllfromResource(Long resourceId) {
+    public void deleteAllfromResource(String resourceId) {
         List<Interceptor> interceptors = interceptorRepository.findByResourceId(resourceId);
         interceptors.forEach(interceptor -> this.delete(interceptor.getId()));
     }
@@ -381,12 +381,12 @@ public class InterceptorService {
         HeimdallException.checkThrow(interceptor.getApi().isCors(), ExceptionMessage.CORS_INTERCEPTOR_ALREADY_ASSIGNED_TO_THIS_API);
     }
 
-    private List<Long> ignoredValidate(List<Long> ignoredList, JpaRepository<?, Long> repository) {
+    private List<String> ignoredValidate(List<String> ignoredList, JpaRepository<?, String> repository) {
 
-        List<Long> invalids = new ArrayList<>();
+        List<String> invalids = new ArrayList<>();
         if (ignoredList != null && !ignoredList.isEmpty()) {
 
-            for (Long ignored : ignoredList) {
+            for (String ignored : ignoredList) {
 
                 Object o = repository.findOne(ignored);
                 if (o == null) {

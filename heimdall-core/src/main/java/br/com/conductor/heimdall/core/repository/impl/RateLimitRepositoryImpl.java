@@ -88,7 +88,7 @@ public class RateLimitRepositoryImpl implements RateLimitRepository {
      }
 
      @Override
-     public RateLimit mountRatelimit(Long interceptorId, Long calls, Interval interval) {
+     public RateLimit mountRatelimit(String interceptorId, Long calls, Interval interval) {
 
           String path = ConstantsCache.RATE_LIMIT_KEY_PREFIX + interceptorId;
 

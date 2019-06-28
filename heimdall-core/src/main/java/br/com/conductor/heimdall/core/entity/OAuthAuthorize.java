@@ -24,6 +24,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.redis.core.RedisHash;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -36,32 +37,23 @@ import java.util.Base64;
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Data
-@Table(name = "OAUTH_AUTHORIZES")
-@Entity
-@DynamicUpdate
-@DynamicInsert
 @EqualsAndHashCode(of = {"id"})
+@RedisHash("oauthAuthorize")
 public class OAuthAuthorize implements Serializable {
 
     private static final long serialVersionUID = -591348072727902230L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @Column(name = "CLIENT_ID", length = 250, nullable = false, unique = true)
     private String clientId;
 
-    @Column(name = "TOKEN_AUTHORIZE", nullable = false)
     private String tokenAuthorize;
 
-    @Column(name = "GRANT_TYPE", length = 100)
     private String grantType;
 
-    @Column(name = "EXPIRATION_DATE")
     private LocalDateTime expirationDate;
 
-    @Column(name = "EXPIRATION_TIME")
     private int expirationTime;
 
     public OAuthAuthorize() {

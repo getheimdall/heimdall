@@ -77,7 +77,7 @@ public class SwaggerService {
             resourceService.deleteAllFromApi(api.getId());
             resources = new ArrayList<>();
         } else {
-            resources = resourceService.list(api.getId(), new ResourceDTO());
+            resources = resourceService.list(api.getId());
         }
 
         Swagger swagger = new Swagger20Parser().parse(swaggerAsString);
@@ -90,7 +90,7 @@ public class SwaggerService {
         return api;
     }
 
-    private void readTags(List<Tag> tags, List<Resource> resources, Long apiId) {
+    private void readTags(List<Tag> tags, List<Resource> resources, String apiId) {
         tags.forEach(tag -> {
             if (resourceThisTagNotExist(tag, resources)) {
                 Resource resourceCreated = findResourceByTagOrCreate(tag, resources);
@@ -100,7 +100,7 @@ public class SwaggerService {
         });
     }
 
-    private void readPaths(Map<String, Path> paths, String basePath, List<Resource> resources, Long apiId) {
+    private void readPaths(Map<String, Path> paths, String basePath, List<Resource> resources, String apiId) {
 
         paths.forEach(((valuePath, pathItem) -> {
             io.swagger.models.Operation get = pathItem.getGet();
@@ -170,7 +170,7 @@ public class SwaggerService {
         return op;
     }
 
-    private void readOperation(String valuePath, String basePath, io.swagger.models.Operation verb, HttpMethod method, List<Resource> resources, Long apiId) {
+    private void readOperation(String valuePath, String basePath, io.swagger.models.Operation verb, HttpMethod method, List<Resource> resources, String apiId) {
 
         verb.getTags().forEach(tagName -> {
             Tag tag = new Tag().name(tagName);

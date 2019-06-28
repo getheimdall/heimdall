@@ -50,6 +50,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import br.com.conductor.heimdall.core.enums.Status;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.data.redis.core.RedisHash;
 
 /**
  * This class represents a Middleware registered to the system.
@@ -58,53 +59,33 @@ import lombok.EqualsAndHashCode;
  *
  */
 @Data
-@Table(name = "MIDDLEWARES")
-@Entity
-@DynamicUpdate
-@DynamicInsert
 @EqualsAndHashCode(of = { "id" })
+@RedisHash("middleware")
 public class Middleware implements Serializable {
 
      private static final long serialVersionUID = -7787479865447488433L;
 
      @Id
-     @GeneratedValue(strategy = GenerationType.IDENTITY)
-     @Column(name = "ID")
-     private Long id;
+     private String id;
      
-     @Column(name = "NAME", length = 80, nullable = false)
      private String name;
      
-     @Column(name = "VERSION", length = 20, nullable = false)
      private String version;
      
-     @Column(name = "PATH", nullable = false)
-     private String path;    
+     private String path;
 
-     @Column(name = "TYPE", length = 20, nullable = false)
      private String type;
 
-     @Column(name = "[FILE]")
      @JsonIgnore
      private byte[] file;
      
-     @ManyToOne(fetch = FetchType.LAZY)
-     @JoinColumn(name = "API_ID", nullable = false)
-     @JsonManagedReference
      private Api api;
      
-     @Column(name = "CREATION_DATE", nullable = false)
      private LocalDateTime creationDate;
      
-     @Column(name = "STATUS", length = 10, nullable = false)
-     @Enumerated(EnumType.STRING)
      private Status status;
      
      @JsonIgnore
-     @ManyToMany(fetch = FetchType.LAZY)
-     @JoinTable(name = "MIDDLEWARES_INTERCEPTORS", 
-          joinColumns = @JoinColumn(name = "MIDDLEWARE_ID", referencedColumnName = "ID"), 
-          inverseJoinColumns = @JoinColumn(name = "INTERCEPTOR_ID", referencedColumnName = "ID"))
      private List<Interceptor> interceptors;
      
      @PrePersist

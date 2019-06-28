@@ -29,9 +29,11 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.redis.core.RedisHash;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,35 +43,30 @@ import java.util.List;
  *
  */
 @Data
-@Table(name = "RESOURCES", uniqueConstraints = { @UniqueConstraint(columnNames = { "API_ID", "NAME" }) })
-@Entity
-@DynamicUpdate
-@DynamicInsert
 @EqualsAndHashCode(of = { "id" })
 @AllArgsConstructor
 @NoArgsConstructor
+@RedisHash("resource")
 public class Resource implements Serializable {
 
      private static final long serialVersionUID = 8482072044625354477L;
 
      @Id
-     @GeneratedValue(strategy = GenerationType.IDENTITY)
-     @Column(name = "ID")
-     private Long id;
+     private String id;
 
-     @Column(name = "NAME", length = 180, unique = true, nullable = false)
      private String name;
 
-     @Column(name = "DESCRIPTION", length = 200)
      private String description;
 
      @JsonIgnore
-     @ManyToOne(fetch = FetchType.EAGER)
-     @JoinColumn(name = "API_ID", nullable = false)
      private Api api;
 
-     @OneToMany(fetch = FetchType.EAGER, cascade = { CascadeType.REMOVE, CascadeType.MERGE }, orphanRemoval = true, mappedBy = "resource")
-     @JsonBackReference
-     private List<Operation> operations;
+     private List<Operation> operations = new ArrayList<>();
 
+     public void addOperation(String id) {
+          Operation operation = new Operation();
+          operation.setId(id);
+
+          this.operations.add(operation);
+     }
 }

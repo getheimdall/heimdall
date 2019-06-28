@@ -66,7 +66,7 @@ public class AppResource {
      @ApiOperation(value = "Find App by id", response = App.class)
      @GetMapping(value = "/{appId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_APP)
-     public ResponseEntity<?> findById(@PathVariable("appId") Long id) {
+     public ResponseEntity<?> findById(@PathVariable("appId") String id) {
 
           App app = appService.find(id);
 
@@ -157,7 +157,7 @@ public class AppResource {
      @ApiOperation(value = "Update App")
      @PutMapping(value = "/{appId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_APP)
-     public ResponseEntity<?> update(@PathVariable("appId") Long id, @RequestBody AppDTO appDTO) {
+     public ResponseEntity<?> update(@PathVariable("appId") String id, @RequestBody AppDTO appDTO) {
 
           App app = appService.update(id, appDTO);
           
@@ -174,7 +174,7 @@ public class AppResource {
      @ApiOperation(value = "Delete App")
      @DeleteMapping(value = "/{appId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_APP)
-     public ResponseEntity<?> delete(@PathVariable("appId") Long id) {
+     public ResponseEntity<?> delete(@PathVariable("appId") String id) {
 
           appService.delete(id);
           

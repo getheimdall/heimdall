@@ -40,25 +40,7 @@ import br.com.conductor.heimdall.core.util.ConstantsCache;
  * @author Filipe Germano
  *
  */
-public interface OperationRepository extends JpaRepository<Operation, Long> {
-
-	 /**
-	  * Returns a List of Operation from a endpoint.
-	  *  
-	  * @param endPoint			The endpoint that will be searched
-	  * @return					The List of Operation's associated with the endpoint
-	  */
-     @Cacheable(ConstantsCache.OPERATION_ACTIVE_FROM_ENDPOINT)
-     @Query("select op from Operation op join fetch op.resource r join fetch r.api a join fetch a.environments e where CONCAT(a.basePath, op.path) = :endPoint")
-     List<Operation> findByEndPoint(@Param("endPoint") String endPoint);
-     
-     /**
-      * Returns a List of Operation associated with a {@link Resource}.
-      * 
-      * @param idResource		The Resource Id
-      * @return					The List of Operation
-      */
-     List<Operation> findByResourceId(Long idResource);
+public interface OperationRepository extends JpaRepository<Operation, String> {
      
      /**
       * Finds a Operation by its Id, {@link Api} Id and {@link Resource} Id.
@@ -68,7 +50,7 @@ public interface OperationRepository extends JpaRepository<Operation, Long> {
       * @param id				The Operation Id
       * @return					The Operation found
       */
-     Operation findByResourceApiIdAndResourceIdAndId(Long apiId, Long resourceId, Long id);
+     Operation findByResourceApiIdAndResourceIdAndId(String apiId, String resourceId, String id);
 
      /**
       * Returns a List of Operation from a {@link Api} Id and {@link Resource} Id.
@@ -77,25 +59,7 @@ public interface OperationRepository extends JpaRepository<Operation, Long> {
       * @param resourceId		The Resource Id
       * @return					The List of Operation
       */
-     List<Operation> findByResourceApiIdAndResourceId(Long apiId, Long resourceId);
-
-     /**
-      * Returns a List of Operation from a {@link Api} Id.
-      * 
-      * @param apiId			The Api Id
-      * @return					The List of Operation
-      */
-     List<Operation> findByResourceApiId(Long apiId);
-     
-     /**
-      * Finds a Operation by its path, {@link Resource} Id and HTTP method. 
-      * 
-      * @param resourceId		The Resource Id
-      * @param method			The HTTP method
-      * @param path				The path to the Operation
-      * @return					The Operation found
-      */
-     Operation findByResourceIdAndMethodAndPath(Long resourceId, HttpMethod method, String path);
+     List<Operation> findByResourceApiIdAndResourceId(String apiId, String resourceId);
      
      /**
       * Find an Operation by {@link Api} Id, HTTP method and Operation path.
@@ -105,24 +69,5 @@ public interface OperationRepository extends JpaRepository<Operation, Long> {
       * @param path
       * @return
       */
-     Operation findByResourceApiIdAndMethodAndPath(Long apiId, HttpMethod method, String path);
-
-     /**
-      * Finds a Operation by its path and HTTP method.
-      * 
-      * @param method			The HTTP method
-      * @param path				The path to the Operation
-      * @return					The Operation found
-      */
-     Operation findByMethodAndPath(HttpMethod method, String path);
-     
-     /**
-      * Check if an operation has interceptors attached 
-      * 
-      * @param id
-      * @return
-      */
-     @Query(value = "select count(0) from interceptors where life_cycle = 'OPERATION' and operation_id = :id", nativeQuery = true)
-     Integer findInterceptorWithOperation(@Param("id") Long id);
-
+     Operation findByResourceApiIdAndMethodAndPath(String apiId, HttpMethod method, String path);
 }

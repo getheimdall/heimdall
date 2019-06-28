@@ -46,6 +46,7 @@ import org.hibernate.annotations.DynamicUpdate;
 import br.com.conductor.heimdall.core.enums.Status;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.data.redis.core.RedisHash;
 
 /**
  * This class represents a Environment registered to the system.
@@ -54,43 +55,27 @@ import lombok.EqualsAndHashCode;
  *
  */
 @Data
-@Table(name = "ENVIRONMENTS")
-@Entity
-@DynamicUpdate
-@DynamicInsert
 @EqualsAndHashCode(of = { "id" })
+@RedisHash("environment")
 public class Environment implements Serializable {
 
      private static final long serialVersionUID = 5863767211338151356L;
 
      @Id
-     @GeneratedValue(strategy = GenerationType.IDENTITY)
-     @Column(name = "ID")
-     private Long id;
+     private String id;
 
-     @Column(name = "NAME", length = 180, nullable = false)
      private String name;
 
-     @Column(name = "DESCRIPTION", length = 200)
      private String description;
 
-     @Column(name = "INBOUND_URL", length = 250, nullable = false, unique = true)
      private String inboundURL;
 
-     @Column(name = "OUTBOUND_URL", length = 250, nullable = false)
      private String outboundURL;
      
-     @Column(name = "CREATION_DATE", nullable = false)
      private LocalDateTime creationDate;
      
-     @Column(name = "STATUS", length = 10, nullable = false)
-     @Enumerated(EnumType.STRING)
      private Status status;
 
-     @ElementCollection(fetch = FetchType.EAGER)
-     @MapKeyColumn(name = "[KEY]")
-     @Column(name = "VALUE")
-     @CollectionTable(name = "VARIABLES", joinColumns = @JoinColumn(name = "ENVIRONMENT_ID", referencedColumnName = "ID"))
      private Map<String, String> variables;
      
      @PrePersist

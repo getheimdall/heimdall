@@ -37,7 +37,7 @@ import br.com.conductor.heimdall.core.enums.Status;
  * @author Filipe Germano
  *
  */
-public interface MiddlewareRepository extends JpaRepository<Middleware, Long> {
+public interface MiddlewareRepository extends JpaRepository<Middleware, String> {
      
 	 /**
 	  * Finds a Middleware by its Id and Status.
@@ -46,15 +46,7 @@ public interface MiddlewareRepository extends JpaRepository<Middleware, Long> {
 	  * @param  status		The Middleware Status
 	  * @return				The Middleware found
 	  */
-     Middleware findByIdAndStatus(Long id, Status status);
-
-     /**
-      * Finds a List of Middleware by Status.
-      * 
-      * @param  status
-      * @return				The List of Middleware found
-	  */
-     List<Middleware> findByStatus(Status status);
+     Middleware findByIdAndStatus(String id, Status status);
 
      /**
       * Finds a List of Middleware by Api Id.
@@ -62,7 +54,7 @@ public interface MiddlewareRepository extends JpaRepository<Middleware, Long> {
       * @param  apiId
       * @return				The List of Middleware found
 	  */
-     List<Middleware> findByApiId(Long apiId);
+     List<Middleware> findByApiId(String apiId);
 
      /**
       * Finds a List of Middleware by Status and Api Id.
@@ -71,7 +63,7 @@ public interface MiddlewareRepository extends JpaRepository<Middleware, Long> {
       * @param  apiId		The Api Id
       * @return				The List of Middleware found
 	  */
-     List<Middleware> findByStatusAndApiId(Status status, Long apiId);
+     List<Middleware> findByStatusAndApiId(Status status, String apiId);
      
      /**
       * Finds a Middleware by its Id and Api Id.
@@ -80,7 +72,7 @@ public interface MiddlewareRepository extends JpaRepository<Middleware, Long> {
       * @param  id			The Middleware Id
       * @return				The Middleware found
 	  */
-     Middleware findByApiIdAndId(Long apiId, Long id);
+     Middleware findByApiIdAndId(String apiId, String id);
      
      /**
       * Finds a Middleware by Api Id and Version.
@@ -89,15 +81,7 @@ public interface MiddlewareRepository extends JpaRepository<Middleware, Long> {
       * @param  name		The Middleware Version
       * @return				The Middleware found
 	  */
-     Middleware findByApiIdAndVersion(Long apiId, String name);
-     
-     /**
-      * Finds a the first Middleware by Api Id.
-      * 
-      * @param  apiId		The Api Id
-      * @return				The Middleware found
-	  */
-     Middleware findTop1ByApiIdOrderByVersionDesc(Long apiId);
+     Middleware findByApiIdAndVersion(String apiId, String name);
 
 	/**
 	 * 
@@ -105,6 +89,6 @@ public interface MiddlewareRepository extends JpaRepository<Middleware, Long> {
 	 */
 	@Modifying
 	@Query(value = "DELETE FROM MIDDLEWARES_INTERCEPTORS WHERE INTERCEPTOR_ID = :ID", nativeQuery = true)
-	void detachFromInterceptor(@Param("ID") Long id);
+	void detachFromInterceptor(@Param("ID") String id);
           
 }

@@ -66,7 +66,7 @@ public class ScopeService {
     private AMQPCacheService amqpCacheService;
 
     @Transactional(readOnly = true)
-    public Scope find(final Long apiId, final Long scopeId) {
+    public Scope find(final String apiId, final String scopeId) {
 
         final Scope scope = scopeRepository.findByApiIdAndId(apiId, scopeId);
         HeimdallException.checkThrow(scope == null, GLOBAL_RESOURCE_NOT_FOUND);
@@ -83,7 +83,7 @@ public class ScopeService {
      * @return The paged {@link Scope} list as a {@link ScopePage} object
      */
     @Transactional(readOnly = true)
-    public ScopePage list(final Long apiId, final ScopeDTO scopeDTO, final PageableDTO pageableDTO) {
+    public ScopePage list(final String apiId, final ScopeDTO scopeDTO, final PageableDTO pageableDTO) {
 
         Api api = apiService.find(apiId);
 
@@ -106,7 +106,7 @@ public class ScopeService {
      * @return The List of {@link Scope}
      */
     @Transactional(readOnly = true)
-    public List<Scope> list(final Long apiId, final ScopeDTO scopeDTO) {
+    public List<Scope> list(final String apiId, final ScopeDTO scopeDTO) {
 
         Api api = apiService.find(apiId);
 
@@ -129,7 +129,7 @@ public class ScopeService {
      * @return Scope saved
      */
     @Transactional
-    public Scope save(final Long apiId, Scope scope) {
+    public Scope save(final String apiId, Scope scope) {
 
         final Api api = apiService.find(apiId);
 
@@ -169,7 +169,7 @@ public class ScopeService {
      * @param scopeId Scope Id
      */
     @Transactional
-    public void delete(final Long apiId, final Long scopeId) {
+    public void delete(final String apiId, final String scopeId) {
 
         Scope scope = scopeRepository.findByApiIdAndId(apiId, scopeId);
         HeimdallException.checkThrow(scope == null, GLOBAL_RESOURCE_NOT_FOUND);
@@ -188,7 +188,7 @@ public class ScopeService {
      * @return The updated {@link Scope}
      */
     @Transactional
-    public Scope update(final Long apiId, final Long scopeId, Scope scope) {
+    public Scope update(final String apiId, final String scopeId, Scope scope) {
 
         Api api = apiService.find(apiId);
 

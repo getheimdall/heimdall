@@ -67,7 +67,7 @@ public class EnvironmentResource {
      @ApiOperation(value = "Find Environment by id", response = Environment.class)
      @GetMapping(value = "/{environmentId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_ENVIRONMENT)
-     public ResponseEntity<?> findById(@PathVariable("environmentId") Long id) {
+     public ResponseEntity<?> findById(@PathVariable("environmentId") String id) {
 
           Environment environment = environmentService.find(id);
 
@@ -77,7 +77,6 @@ public class EnvironmentResource {
      /**
       * Finds all {@link Environment} from a request.
       * 
-      * @param environmentDTO		{@link EnvironmentDTO}
       * @param pageableDTO			{@link PageableDTO}
       * @return						{@link ResponseEntity}
       */
@@ -85,15 +84,15 @@ public class EnvironmentResource {
      @ApiOperation(value = "Find all Environments", responseContainer = "List", response = Environment.class)
      @GetMapping
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_ENVIRONMENT)
-     public ResponseEntity<?> findAll(@ModelAttribute EnvironmentDTO environmentDTO, @ModelAttribute PageableDTO pageableDTO) {
+     public ResponseEntity<?> findAll(@ModelAttribute PageableDTO pageableDTO) {
           
           if (!pageableDTO.isEmpty()) {
                
-               EnvironmentPage environmentPage = environmentService.list(environmentDTO, pageableDTO);      
+               EnvironmentPage environmentPage = environmentService.list(pageableDTO);
                return ResponseEntity.ok(environmentPage);
           } else {
                
-               List<Environment> environments = environmentService.list(environmentDTO);      
+               List<Environment> environments = environmentService.list();
                return ResponseEntity.ok(environments);
           }
      }
@@ -126,7 +125,7 @@ public class EnvironmentResource {
      @ApiOperation(value = "Update Environment")
      @PutMapping(value = "/{environmentId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_ENVIRONMENT)
-     public ResponseEntity<?> update(@PathVariable("environmentId") Long id, @RequestBody EnvironmentDTO environmentDTO) {
+     public ResponseEntity<?> update(@PathVariable("environmentId") String id, @RequestBody EnvironmentDTO environmentDTO) {
 
           Environment environment = environmentService.update(id, environmentDTO);
           amqpCacheService.dispatchClean();
@@ -144,7 +143,7 @@ public class EnvironmentResource {
      @ApiOperation(value = "Delete Environment")
      @DeleteMapping(value = "/{environmentId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_ENVIRONMENT)
-     public ResponseEntity<?> delete(@PathVariable("environmentId") Long id) {
+     public ResponseEntity<?> delete(@PathVariable("environmentId") String id) {
 
           environmentService.delete(id);
           amqpCacheService.dispatchClean();

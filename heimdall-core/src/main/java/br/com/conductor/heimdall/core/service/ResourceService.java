@@ -10,9 +10,9 @@ package br.com.conductor.heimdall.core.service;
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,230 +21,189 @@ package br.com.conductor.heimdall.core.service;
  * ==========================LICENSE_END===================================
  */
 
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ONLY_ONE_RESOURCE_PER_API;
-
-import java.util.List;
-import java.util.Objects;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.StringMatcher;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.dto.PageDTO;
-import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.ResourceDTO;
 import br.com.conductor.heimdall.core.dto.page.ResourcePage;
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Resource;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
-import br.com.conductor.heimdall.core.repository.ApiRepository;
 import br.com.conductor.heimdall.core.repository.ResourceRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
 import br.com.conductor.heimdall.core.util.Pageable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ONLY_ONE_RESOURCE_PER_API;
 
 /**
  * This class provides methos to create, read, update and delete a {@link Resource} resource.
- * 
+ *
  * @author Filipe Germano
  * @author Marcelo Aguiar Rodrigues
- *
  */
 @Service
 public class ResourceService {
 
-     @Autowired
-     private ResourceRepository resourceRepository;
+    @Autowired
+    private ResourceRepository resourceRepository;
 
-     @Autowired
-     private ApiRepository apiRepository;
+    @Autowired
+    private ApiService apiService;
 
-     @Autowired
-     private OperationService operationService;
+    @Autowired
+    private OperationService operationService;
 
-     @Autowired
-     private InterceptorService interceptorService;
-     
-     @Autowired
-     private AMQPRouteService amqpRoute;
+    @Autowired
+    private InterceptorService interceptorService;
+
+    @Autowired
+    private AMQPRouteService amqpRoute;
 
 
-     /**
-      * Finds a {@link Resource} by its Id and {@link Api} Id.
-      * 
-      * @param 	apiId						The {@link Api} Id
-      * @param 	resourceId					The {@link Resource} Id
-      * @return								The {@link Resource} found
-      */
-     @Transactional(readOnly = true)
-     public Resource find(Long apiId, Long resourceId) {
-          
-          Resource resource = resourceRepository.findByApiIdAndId(apiId, resourceId);      
-          HeimdallException.checkThrow(resource == null, GLOBAL_RESOURCE_NOT_FOUND);
-                              
-          return resource;
-     }
-     
-     /**
-      * Generates a paged list of {@link Resource} from a request.
-      * 
-      * @param 	apiId						The {@link Api} Id
-      * @param 	resourceDTO					The {@link ResourceDTO}
-      * @param 	pageableDTO					The {@link PageableDTO}
-      * @return								The paged {@link Resource} list as a {@link ResourcePage} object
-      */
-     public ResourcePage list(Long apiId, ResourceDTO resourceDTO, PageableDTO pageableDTO) {
+    /**
+     * Finds a {@link Resource} by its Id and {@link Api} Id.
+     *
+     * @param apiId      The {@link Api} Id
+     * @param resourceId The {@link Resource} Id
+     * @return The {@link Resource} found
+     */
+    @Transactional(readOnly = true)
+    public Resource find(final String apiId, final String resourceId) {
 
-          Api api = apiRepository.findOne(apiId);
-          HeimdallException.checkThrow(api == null, GLOBAL_RESOURCE_NOT_FOUND);
-          
-          Resource resource = GenericConverter.mapper(resourceDTO, Resource.class);
-          resource.setApi(api);
-          
-          Example<Resource> example = Example.of(resource, ExampleMatcher.matching().withIgnorePaths("api.creationDate").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
-          
-          Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
-          Page<Resource> page = resourceRepository.findAll(example, pageable);
-          
-          ResourcePage resourcePage = new ResourcePage(PageDTO.build(page));
-          
-          return resourcePage;
-     }
+        apiService.find(apiId);
 
-     /**
-      * Generates a list of {@link Resource} from a request.
-      * 
-      * @param 	apiId						The {@link Api} Id
-      * @param 	resourceDTO					The {@link ResourceDTO}
-      * @return								The List of {@link Resource}
-      */
-     public List<Resource> list(Long apiId, ResourceDTO resourceDTO) {
-          
-          Api api = apiRepository.findOne(apiId);
-          HeimdallException.checkThrow(api == null, GLOBAL_RESOURCE_NOT_FOUND);
-          
-          Resource resource = GenericConverter.mapper(resourceDTO, Resource.class);
-          resource.setApi(api);
-          
-          Example<Resource> example = Example.of(resource, ExampleMatcher.matching().withIgnorePaths("api.creationDate").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
-          
-          List<Resource> resources = resourceRepository.findAll(example);
-          
-          return resources;
-     }
-     
-     /**
-      * Saves a {@link Resource} to the repository.
-      * 
-      * @param 	apiId						The {@link Api} Id
-      * @param 	resourceDTO					The {@link ResourceDTO}
-      * @return								The saved {@link Resource}
-      */
-     public Resource save(Long apiId, ResourceDTO resourceDTO) {
+        Resource resource = resourceRepository.findOne(resourceId);
+        HeimdallException.checkThrow(resource == null, GLOBAL_RESOURCE_NOT_FOUND);
 
-          Api api = apiRepository.findOne(apiId);
-          HeimdallException.checkThrow(api == null, GLOBAL_RESOURCE_NOT_FOUND);
-                    
-          Resource resData = resourceRepository.findByApiIdAndName(apiId, resourceDTO.getName());
-          HeimdallException.checkThrow(resData != null &&
-                  Objects.equals(resData.getApi().getId(), api.getId()), ONLY_ONE_RESOURCE_PER_API);
-          
-          Resource resource = GenericConverter.mapper(resourceDTO, Resource.class);
-          resource.setApi(api);
-          
-          resource = resourceRepository.save(resource);
-          
-          amqpRoute.dispatchRoutes();
-          
-          return resource;
-     }
+        return resource;
+    }
 
-     /**
-      * Saves a {@link Resource} to the repository.
-      *
-      * @param 	apiId						The {@link Api} Id
-      * @param 	resource					The {@link Resource}
-      * @return								The saved {@link Resource}
-      */
-     public Resource save(Long apiId, Resource resource) {
+    /**
+     * Generates a paged list of {@link Resource} from a request.
+     *
+     * @param apiId       The {@link Api} Id
+     * @param pageable The {@link Pageable}
+     * @return The paged {@link Resource} list as a {@link ResourcePage} object
+     */
+    public Page<Resource> list(final String apiId, final Pageable pageable) {
 
-          Api api = apiRepository.findOne(apiId);
-          HeimdallException.checkThrow(api == null, GLOBAL_RESOURCE_NOT_FOUND);
+        final List<Resource> resources = this.list(apiId);
 
-          Resource resData = resourceRepository.findByApiIdAndName(apiId, resource.getName());
-          HeimdallException.checkThrow(resData != null &&
-                  Objects.equals(resData.getApi().getId(), api.getId()), ONLY_ONE_RESOURCE_PER_API);
+        return new PageImpl<>(resources, pageable, resources.size());
+    }
 
-          resource.setApi(api);
+    /**
+     * Generates a list of {@link Resource} from a request.
+     *
+     * @param apiId       The {@link Api} Id
+     * @return The List of {@link Resource}
+     */
+    public List<Resource> list(String apiId) {
 
-          resource = resourceRepository.save(resource);
+        apiService.find(apiId);
 
-          amqpRoute.dispatchRoutes();
+        final List<Resource> resources = resourceRepository.findAll();
 
-          return resource;
-     }
+        return resources.stream()
+                .filter(resource -> apiId.equals(resource.getApi().getId()))
+                .collect(Collectors.toList());
+    }
 
-     /**
-      * Updates a {@link Resource} by its Id and {@link Api} Id
-      * 
-      * @param 	apiId						The {@link Api} Id
-      * @param 	resourceId					The {@link Resource} Id
-      * @param 	resourceDTO					The {@link ResourceDTO}
-      * @return								The updated {@link Resource}
-      */
-     public Resource update(Long apiId, Long resourceId, ResourceDTO resourceDTO) {
+    /**
+     * Saves a {@link Resource} to the repository.
+     *
+     * @param apiId    The {@link Api} Id
+     * @param resource The {@link Resource}
+     * @return The saved {@link Resource}
+     */
+    public Resource save(final String apiId, final Resource resource) {
 
-          Resource resource = resourceRepository.findByApiIdAndId(apiId, resourceId);
-          HeimdallException.checkThrow(resource == null, GLOBAL_RESOURCE_NOT_FOUND);
-          
-          Resource resData = resourceRepository.findByApiIdAndName(apiId, resourceDTO.getName());
-          HeimdallException.checkThrow(resData != null &&
-                  Objects.equals(resData.getApi().getId(), resource.getApi().getId()) &&
-                  !Objects.equals(resData.getId(), resource.getId()), ONLY_ONE_RESOURCE_PER_API);
-          
-          resource = GenericConverter.mapper(resourceDTO, resource);
-          
-          resource = resourceRepository.save(resource);
-          
-          amqpRoute.dispatchRoutes();
-          
-          return resource;
-     }
-     
-     /**
-      * Deletes a {@link Resource} by its Id.
-      * 
-      * @param 	apiId						The {@link Api} Id
-      * @param 	resourceId					The {@link Resource} Id
-      */
-     public void delete(Long apiId, Long resourceId) {
+        final Api api = apiService.find(apiId);
 
-          Resource resource = resourceRepository.findByApiIdAndId(apiId, resourceId);
-          HeimdallException.checkThrow(resource == null, GLOBAL_RESOURCE_NOT_FOUND);
+        final boolean anyMatch = this.list(apiId).stream()
+                .anyMatch(res -> resource.getName().equals(res.getName()));
 
-          // Deletes all operations attached to the Resource
-          operationService.deleteAllfromResource(apiId, resourceId);
+        HeimdallException.checkThrow(anyMatch, ONLY_ONE_RESOURCE_PER_API);
 
-          // Deletes all interceptors attached to the Resource
-          interceptorService.deleteAllfromResource(resourceId);
-          
-          resourceRepository.delete(resource.getId());
-          
-          amqpRoute.dispatchRoutes();
-     }
+        Api apiPersist = new Api();
+        apiPersist.setId(apiId);
+        resource.setApi(apiPersist);
 
-     /**
-      * Deletes all Resources from a Api
-      *
-      * @param apiId Api with the Resources
-      */
-     public void deleteAllFromApi(Long apiId) {
-          List<Resource> resources = resourceRepository.findByApiId(apiId);
-          resources.forEach(resource -> this.delete(apiId, resource.getId()));
-     }
+        final Resource savedResource = resourceRepository.save(resource);
+
+        api.addResource(savedResource.getId());
+
+        apiService.update(api.getId(), api);
+
+        amqpRoute.dispatchRoutes();
+
+        return savedResource;
+    }
+
+    /**
+     * Updates a {@link Resource} by its Id and {@link Api} Id
+     *
+     * @param apiId       The {@link Api} Id
+     * @param resourceId  The {@link Resource} Id
+     * @param resourcePersist The {@link ResourceDTO}
+     * @return The updated {@link Resource}
+     */
+    public Resource update(String apiId, String resourceId, Resource resourcePersist) {
+
+        final Resource resource = this.find(apiId, resourceId);
+
+        final Resource resData = this.list(apiId).stream()
+                .filter(res -> resourcePersist.getName().equals(res.getName()))
+                .findAny()
+                .orElse(null);
+        HeimdallException.checkThrow(resData != null &&
+                !Objects.equals(resData.getId(), resource.getId()), ONLY_ONE_RESOURCE_PER_API);
+
+        final Resource updatedResource = GenericConverter.mapper(resourcePersist, resource);
+
+        final Resource savedResource = resourceRepository.save(updatedResource);
+
+        amqpRoute.dispatchRoutes();
+
+        return savedResource;
+    }
+
+    /**
+     * Deletes a {@link Resource} by its Id.
+     *
+     * @param apiId      The {@link Api} Id
+     * @param resourceId The {@link Resource} Id
+     */
+    public void delete(String apiId, String resourceId) {
+
+        Resource resource = this.find(apiId, resourceId);
+
+        // Deletes all operations attached to the Resource
+// TODO       operationService.deleteAllfromResource(apiId, resourceId);
+//
+//        // Deletes all interceptors attached to the Resource
+// TODO       interceptorService.deleteAllfromResource(resourceId);
+
+        resourceRepository.delete(resource.getId());
+
+        amqpRoute.dispatchRoutes();
+    }
+
+    /**
+     * Deletes all Resources from a Api TODO
+     *
+     * @param apiId Api with the Resources
+     */
+    public void deleteAllFromApi(String apiId) {
+        List<Resource> resources = this.list(apiId);
+        resources.forEach(resource -> this.delete(apiId, resource.getId()));
+    }
 }

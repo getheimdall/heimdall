@@ -99,7 +99,7 @@ public class MiddlewareService {
       * @return  						The {@link Middleware} associated with the {@link Api}
       */
      @Transactional(readOnly = true)
-     public Middleware find(Long apiId, Long middlewareId) {
+     public Middleware find(String apiId, String middlewareId) {
 
           Middleware middleware = middlewareRepository.findByApiIdAndId(apiId, middlewareId);
           HeimdallException.checkThrow(middleware == null, GLOBAL_RESOURCE_NOT_FOUND);
@@ -116,7 +116,7 @@ public class MiddlewareService {
       * @return  						A paged {@link Middleware} list as a {@link MiddlewarePage} object
       */
      @Transactional(readOnly = true)
-     public MiddlewarePage list(Long apiId, MiddlewareDTO middlewareDTO, PageableDTO pageableDTO) {
+     public MiddlewarePage list(String apiId, MiddlewareDTO middlewareDTO, PageableDTO pageableDTO) {
 
           Example<Middleware> example = this.createExample(apiId, middlewareDTO);
 
@@ -138,7 +138,7 @@ public class MiddlewareService {
       * @return 						 	The list of {@link Middleware}
       */
      @Transactional(readOnly = true)
-     public List<Middleware> list(Long apiId, MiddlewareDTO middlewareDTO) {
+     public List<Middleware> list(String apiId, MiddlewareDTO middlewareDTO) {
 
           Example<Middleware> example = this.createExample(apiId, middlewareDTO);
 
@@ -147,7 +147,7 @@ public class MiddlewareService {
           return middlewares;
      }
 
-     private Example<Middleware> createExample(Long apiId, MiddlewareDTO middlewareDTO) {
+     private Example<Middleware> createExample(String apiId, MiddlewareDTO middlewareDTO) {
          Api api = apiRepository.findOne(apiId);
          HeimdallException.checkThrow(api == null, GLOBAL_RESOURCE_NOT_FOUND);
 
@@ -168,7 +168,7 @@ public class MiddlewareService {
       * @return 						The new {@link Middleware} created
       */
      @Transactional
-     public Middleware save(Long apiId, MiddlewareDTO middlewareDTO, MultipartFile file) {
+     public Middleware save(String apiId, MiddlewareDTO middlewareDTO, MultipartFile file) {
 
     	  List<Middleware> middlewares = updateMiddlewaresStatus(middlewareRepository.findByApiId(apiId));
 
@@ -215,7 +215,7 @@ public class MiddlewareService {
       * @return 						The middleware that was updated
       */
      @Transactional
-     public Middleware update(Long apiId, Long middlewareId, MiddlewareDTO middlewareDTO) {
+     public Middleware update(String apiId, String middlewareId, MiddlewareDTO middlewareDTO) {
 
           Middleware middleware = middlewareRepository.findByApiIdAndId(apiId, middlewareId);
           HeimdallException.checkThrow(middleware == null, GLOBAL_RESOURCE_NOT_FOUND);
@@ -247,7 +247,7 @@ public class MiddlewareService {
       * @param 	middlewareId			The middleware ID
       */
      @Transactional
-     public void delete(Long apiId, Long middlewareId) {
+     public void delete(String apiId, String middlewareId) {
 
           Middleware middleware = middlewareRepository.findByApiIdAndId(apiId, middlewareId);
           HeimdallException.checkThrow(middleware == null, GLOBAL_RESOURCE_NOT_FOUND);
@@ -265,7 +265,7 @@ public class MiddlewareService {
       * @param apiId Api with the Middlewares
       */
      @Transactional
-     public void deleteAll(Long apiId) {
+     public void deleteAll(String apiId) {
          List<Middleware> middlewares = middlewareRepository.findByApiId(apiId);
          middlewares.forEach(middleware -> this.delete(apiId, middleware.getId()));
      }

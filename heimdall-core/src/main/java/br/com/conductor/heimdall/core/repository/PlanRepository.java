@@ -33,7 +33,7 @@ import org.springframework.data.repository.query.Param;
  * @author Filipe Germano
  *
  */
-public interface PlanRepository extends JpaRepository<Plan, Long> {
+public interface PlanRepository extends JpaRepository<Plan, String> {
 
      /**
       * Check if a plan has apps attached
@@ -42,6 +42,6 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
       * @return
       */
      @Query(value = "select count(0) from apps_plans where plan_id = :id", nativeQuery = true)
-     Integer findAppsWithPlan(@Param("id") Long id);
+     Integer findAppsWithPlan(@Param("id") String id);
 
 }

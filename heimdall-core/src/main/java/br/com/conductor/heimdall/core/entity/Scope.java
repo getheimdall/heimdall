@@ -36,6 +36,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.data.redis.core.RedisHash;
 
 /**
  * This class represents a Scope registered to the system.
@@ -43,42 +44,26 @@ import lombok.NoArgsConstructor;
  * @author Marcelo Aguiar Rodrigues
  */
 @Data
-@Table(name = "SCOPES")
-@Entity
-@DynamicUpdate
-@DynamicInsert
 @EqualsAndHashCode(of = { "id" })
 @AllArgsConstructor
 @NoArgsConstructor
+@RedisHash("scope")
 public class Scope implements Serializable {
 
 	private static final long serialVersionUID = 7495733828659838366L;
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID")
-    private Long id;
+    private String id;
 
-    @Column(name = "NAME", length = 180, unique = true, nullable = false)
     private String name;
 
-    @Column(name = "DESCRIPTION", length = 200)
     private String description;
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "API_ID", nullable = false)
     private Api api;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "SCOPES_OPERATIONS",
-            joinColumns = @JoinColumn(name = "SCOPE_ID", referencedColumnName = "ID"),
-            inverseJoinColumns = @JoinColumn(name = "OPERATION_ID", referencedColumnName = "ID"))
-    @JsonIgnoreProperties({"resource"})
     private Set<Operation> operations;
 
-    @JsonIgnore
-    public Set<Long> getOperationsIds() {
+    public Set<String> getOperationsIds() {
         return this.operations != null ? this.operations.stream().map(Operation::getId).collect(Collectors.toSet()) : Collections.emptySet();
     }
 

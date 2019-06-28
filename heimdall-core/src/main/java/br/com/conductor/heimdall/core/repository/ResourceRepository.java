@@ -21,12 +21,9 @@ package br.com.conductor.heimdall.core.repository;
  * ==========================LICENSE_END===================================
  */
 
-import java.util.List;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Resource;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * Provide methods to find a specific {@link Resource} or a List of them.
@@ -34,32 +31,15 @@ import br.com.conductor.heimdall.core.entity.Resource;
  * @author Filipe Germano
  *
  */
-public interface ResourceRepository extends JpaRepository<Resource, Long> {
-     
-	 /**
-	  * Finds a Resource by its Id and {@link Api} Id.
-	  *  
-	  * @param apiId		The Api Id
-	  * @param id			The Resource Id
-	  * @return				The Resource found
-	  */
-     Resource findByApiIdAndId(Long apiId, Long id);
-     
-     /**
-      * Finds a list of Resource's for a {@link Api} by the Api's Id.
-      * 
-	  * @param apiId		The Api Id
-      * @return				The List of Resource's found
-      */
-     List<Resource> findByApiId(Long apiId);
+public interface ResourceRepository extends JpaRepository<Resource, String> {
 
-     /**
+	/**
       * Finds a Resource by its name and {@link Api} Id.
       * 
 	  * @param apiId		The Api Id
       * @param name			The Resource name
 	  * @return				The Resource found
       */
-     Resource findByApiIdAndName(Long apiId, String name);
+     Resource findByApiIdAndName(String apiId, String name);
      
 }

@@ -64,7 +64,7 @@ public class ScopeResource {
     @ApiOperation(value = "Find Scope by id", response = Scope.class)
     @GetMapping(value = "/{scopeId}")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_SCOPE)
-    public ResponseEntity<?> findById(@PathVariable("apiId") Long apiId, @PathVariable("scopeId") Long scopeId) {
+    public ResponseEntity<?> findById(@PathVariable("apiId") String apiId, @PathVariable("scopeId") String scopeId) {
 
         Scope scope = scopeService.find(apiId, scopeId);
 
@@ -82,7 +82,7 @@ public class ScopeResource {
     @ApiOperation(value = "Save a new Scope")
     @PostMapping
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_SCOPE)
-    public ResponseEntity<?> save(@PathVariable("apiId") Long apiId, @RequestBody @Valid ScopeDTO scopeDTO) {
+    public ResponseEntity<?> save(@PathVariable("apiId") String apiId, @RequestBody @Valid ScopeDTO scopeDTO) {
 
         Scope scope = GenericConverter.mapper(scopeDTO, Scope.class);
 
@@ -103,7 +103,7 @@ public class ScopeResource {
     @ApiOperation(value = "Find all Scopes", responseContainer = "List", response = Scope.class)
     @GetMapping
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_SCOPE)
-    public ResponseEntity<?> findAll(@PathVariable("apiId") Long apiId, @ModelAttribute ScopeDTO scopeDTO, @ModelAttribute PageableDTO pageableDTO) {
+    public ResponseEntity<?> findAll(@PathVariable("apiId") String apiId, @ModelAttribute ScopeDTO scopeDTO, @ModelAttribute PageableDTO pageableDTO) {
 
         if (!pageableDTO.isEmpty()) {
 
@@ -128,7 +128,7 @@ public class ScopeResource {
     @ApiOperation(value = "Update Scope")
     @PutMapping(value = "/{scopeId}")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_SCOPE)
-    public ResponseEntity<?> update(@PathVariable("apiId") Long apiId, @PathVariable("scopeId") Long scopeId, @RequestBody @Valid ScopeDTO scopeDTO) {
+    public ResponseEntity<?> update(@PathVariable("apiId") String apiId, @PathVariable("scopeId") String scopeId, @RequestBody @Valid ScopeDTO scopeDTO) {
 
         Scope scope = GenericConverter.mapper(scopeDTO, Scope.class);
 
@@ -148,7 +148,7 @@ public class ScopeResource {
     @ApiOperation(value = "Delete Scope")
     @DeleteMapping(value = "/{scopeId}")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_SCOPE)
-    public ResponseEntity<?> delete(@PathVariable("apiId") Long apiId, @PathVariable("scopeId") Long scopeId) {
+    public ResponseEntity<?> delete(@PathVariable("apiId") String apiId, @PathVariable("scopeId") String scopeId) {
 
         scopeService.delete(apiId, scopeId);
 

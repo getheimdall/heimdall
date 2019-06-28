@@ -91,7 +91,7 @@ public class AppService {
       * @return							The {@link App} that was found
       */
      @Transactional(readOnly = true)
-     public App find(Long id) {
+     public App find(String id) {
 
           App app = appRepository.findOne(id);
           HeimdallException.checkThrow(app == null, GLOBAL_RESOURCE_NOT_FOUND);
@@ -182,7 +182,7 @@ public class AppService {
       * @return							The updated {@link App}
       * @throws HeimdallException		Resource not found
       */
-     public App update(Long id, AppDTO appDTO) {
+     public App update(String id, AppDTO appDTO) {
 
           App app = appRepository.findOne(id);
           HeimdallException.checkThrow(app == null, GLOBAL_RESOURCE_NOT_FOUND);
@@ -205,7 +205,7 @@ public class AppService {
       * @param appId The ID of the {@link App}
       * @param plansIds List of {@link Plan}'s IDs 
       */
-     private void updateTokensPlansByApp(Long appId, List<Long> plansIds) {
+     private void updateTokensPlansByApp(String appId, List<String> plansIds) {
           List<AccessToken> accessTokenList = accessTokenRepository.findByAppId(appId);
           if (Objects.nonNull(accessTokenList)) {
                accessTokenList.forEach(accessToken -> {
@@ -224,7 +224,7 @@ public class AppService {
       * @param  id						The ID of the {@link App}
       * @throws HeimdallException		Resource not found
       */
-     public void delete(Long id) {
+     public void delete(String id) {
 
           App app = appRepository.findOne(id);
           HeimdallException.checkThrow(app == null, GLOBAL_RESOURCE_NOT_FOUND);
@@ -245,35 +245,35 @@ public class AppService {
      public App save(AppCallbackDTO reqBody) {
           App app = appRepository.findByClientId(reqBody.getCode());
 
-          Developer dev = devRepository.findByEmail(reqBody.getDeveloper());
-          HeimdallException.checkThrow(dev == null, DEVELOPER_NOT_EXIST);
-
-          if (app == null) {
-
-               app = new App();
-
-          } else {
-
-               List<Plan> plans = appRepository.findPlansByApp(app.getId());
-               app.setPlans(plans);
-          }
-
-          app.setClientId(reqBody.getCode());
-          app.setDeveloper(dev);
-          app.setDescription(reqBody.getDescription());
-          app.setName(reqBody.getName());
-
-          if (app.getPlans() != null && app.getPlans().isEmpty()) {
-
-               Plan plan = planRepository.findOne(1L);
-               if (plan != null) {
-                    app.setPlans(new ArrayList<>(Collections.singletonList(plan)));
-               }
-          }
-
-          app = appRepository.save(app);
-
-          amqpCacheService.dispatchClean();
+//          Developer dev = devRepository.findByEmail(reqBody.getDeveloper());
+//          HeimdallException.checkThrow(dev == null, DEVELOPER_NOT_EXIST);
+//
+//          if (app == null) {
+//
+//               app = new App();
+//
+//          } else {
+//
+//               List<Plan> plans = appRepository.findPlansByApp(app.getId());
+//               app.setPlans(plans);
+//          }
+//
+//          app.setClientId(reqBody.getCode());
+//          app.setDeveloper(dev);
+//          app.setDescription(reqBody.getDescription());
+//          app.setName(reqBody.getName());
+//
+//          if (app.getPlans() != null && app.getPlans().isEmpty()) {
+//
+//               Plan plan = planRepository.findOne(1L);
+//               if (plan != null) {
+//                    app.setPlans(new ArrayList<>(Collections.singletonList(plan)));
+//               }
+//          }
+//
+//          app = appRepository.save(app);
+//
+//          amqpCacheService.dispatchClean();
 
           return app;
      }

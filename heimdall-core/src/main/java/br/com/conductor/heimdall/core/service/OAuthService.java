@@ -215,7 +215,7 @@ public class OAuthService {
      * @return The {@link Provider}
      * @throws ProviderException Provider not found
      */
-    public Provider getProvider(Long providerId) throws ProviderException {
+    public Provider getProvider(String providerId) throws ProviderException {
         Provider provider = providerService.findOne(providerId);
         if (provider == null) {
             throw new ProviderException(ExceptionMessage.PROVIDER_NOT_FOUND);

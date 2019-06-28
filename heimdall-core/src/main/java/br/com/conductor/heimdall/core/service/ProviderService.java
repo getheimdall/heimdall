@@ -76,7 +76,7 @@ public class ProviderService {
      * @return The edited {@link Provider}
      */
     @Transactional
-    public Provider edit(Long idProvider, ProviderDTO providerEdit) {
+    public Provider edit(String idProvider, ProviderDTO providerEdit) {
         Provider found = providerRepository.findOne(idProvider);
 
         HeimdallException.checkThrow(Objects.isNull(found), ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND);
@@ -138,7 +138,7 @@ public class ProviderService {
      * @param id The {@link Provider} Id
      * @return The {@link Provider}
      */
-    public Provider findOne(Long id) {
+    public Provider findOne(String id) {
         return this.providerRepository.findOne(id);
     }
 
@@ -147,7 +147,7 @@ public class ProviderService {
      *
      * @param id The {@link Provider} Id
      */
-    public void delete(Long id) {
+    public void delete(String id) {
         this.providerRepository.delete(id);
     }
 

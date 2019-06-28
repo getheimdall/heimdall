@@ -72,6 +72,6 @@ public interface RateLimitRepository {
      * @param interval time interval
      * @return rate limit created
      */
-     RateLimit mountRatelimit(Long interceptorId, Long calls, Interval interval);
+     RateLimit mountRatelimit(String interceptorId, Long calls, Interval interval);
 
 }

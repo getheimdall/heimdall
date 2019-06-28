@@ -37,6 +37,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.data.redis.core.RedisHash;
 
 /**
  * This class represents a Variable registered to the system.
@@ -45,28 +46,17 @@ import lombok.EqualsAndHashCode;
  *
  */
 @Data
-@Table(name = "VARIABLES", uniqueConstraints = { @UniqueConstraint(columnNames = { "ENVIRONMENT_ID", "[KEY]" }) })
-@Entity
-@DynamicUpdate
-@DynamicInsert
 @EqualsAndHashCode(of = { "id" })
+@RedisHash("variable")
 public class Variable implements Serializable {
      
      private static final long serialVersionUID = -5575544928960511350L;
 
      @Id
-     @GeneratedValue(strategy = GenerationType.IDENTITY)
-     @Column(name = "ID")
-     private Long id;
+     private String id;
 
-     @Column(name = "[KEY]", length = 180, nullable = false)
      private String key;
      
-     @Column(name = "VALUE", length = 250, nullable = false)
      private String value;
-
-     @ManyToOne
-     @JoinColumn(name = "ENVIRONMENT_ID", nullable = false)     
-     private Environment environment;     
      
 }

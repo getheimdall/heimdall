@@ -72,7 +72,7 @@ public class InterceptorResource {
      @ApiOperation(value = "Find API by id", response = Interceptor.class)
      @GetMapping(value = "/{interceptorId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_INTERCEPTOR)
-     public ResponseEntity<?> findById(@PathVariable("interceptorId") Long id) {
+     public ResponseEntity<?> findById(@PathVariable("interceptorId") String id) {
 
           Interceptor interceptor = interceptorService.find(id);
 
@@ -151,7 +151,7 @@ public class InterceptorResource {
      @ApiOperation(value = "Update Interceptor")
      @PutMapping(value = "/{interceptorId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_INTERCEPTOR)
-     public ResponseEntity<?> update(@PathVariable("interceptorId") Long id, @RequestBody InterceptorDTO interceptorDTO) {
+     public ResponseEntity<?> update(@PathVariable("interceptorId") String id, @RequestBody InterceptorDTO interceptorDTO) {
 
           Interceptor interceptor = interceptorService.update(id, interceptorDTO);
           
@@ -168,7 +168,7 @@ public class InterceptorResource {
      @ApiOperation(value = "Delete Interceptor")
      @DeleteMapping(value = "/{interceptorId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_INTERCEPTOR)
-     public ResponseEntity<?> delete(@PathVariable("interceptorId") Long id) {
+     public ResponseEntity<?> delete(@PathVariable("interceptorId") String id) {
 
           interceptorService.delete(id);
           

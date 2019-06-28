@@ -32,7 +32,7 @@ import br.com.conductor.heimdall.core.entity.Developer;
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
-public interface DeveloperRepository extends JpaRepository<Developer, Long> {
+public interface DeveloperRepository extends JpaRepository<Developer, String> {
 
 	 /**
 	  * Finds a {@link Developer} by its email.

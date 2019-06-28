@@ -79,7 +79,7 @@ public class DeveloperResource {
      @ApiOperation(value = "Find Developer by id", response = Developer.class)
      @GetMapping(value = "/{developerId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_DEVELOPER)
-     public ResponseEntity<?> findById(@PathVariable("developerId") Long id) {
+     public ResponseEntity<?> findById(@PathVariable("developerId") String id) {
 
           Developer developer = developerService.find(id);
 
@@ -138,7 +138,7 @@ public class DeveloperResource {
      @ApiOperation(value = "Update Developer")
      @PutMapping(value = "/{developerId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_DEVELOPER)
-     public ResponseEntity<?> update(@PathVariable("developerId") Long id, @RequestBody DeveloperDTO developerDTO) {
+     public ResponseEntity<?> update(@PathVariable("developerId") String id, @RequestBody DeveloperDTO developerDTO) {
 
           Developer developer = developerService.update(id, developerDTO);
           
@@ -155,7 +155,7 @@ public class DeveloperResource {
      @ApiOperation(value = "Delete Developer")
      @DeleteMapping(value = "/{developerId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_DEVELOPER)
-     public ResponseEntity<?> delete(@PathVariable("developerId") Long id) {
+     public ResponseEntity<?> delete(@PathVariable("developerId") String id) {
 
           developerService.delete(id);
           

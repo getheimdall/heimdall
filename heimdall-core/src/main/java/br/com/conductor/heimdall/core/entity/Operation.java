@@ -30,6 +30,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.redis.core.RedisHash;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -41,36 +42,24 @@ import java.io.Serializable;
  *
  */
 @Data
-@Table(name = "OPERATIONS", uniqueConstraints = { @UniqueConstraint(columnNames = { "RESOURCE_ID", "METHOD", "PATH" }) })
-@Entity
-@DynamicUpdate
-@DynamicInsert
 @EqualsAndHashCode(of = { "id" })
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@RedisHash("operation")
 public class Operation implements Serializable {
 
      private static final long serialVersionUID = -7728017075091653564L;
 
      @Id
-     @GeneratedValue(strategy = GenerationType.IDENTITY)
-     @Column(name = "ID")
-     private Long id;
+     private String id;
 
-     @Column(name = "METHOD", length = 20, nullable = false)
-     @Enumerated(EnumType.STRING)
      private HttpMethod method;
 
-     @Column(name = "PATH", length = 180, nullable = false)
      private String path;
 
-     @Column(name = "DESCRIPTION", length = 200)
      private String description;
 
-     @ManyToOne(fetch = FetchType.EAGER)
-     @JoinColumn(name = "RESOURCE_ID", nullable = false)
-     @JsonManagedReference
      private Resource resource;
 
      /**

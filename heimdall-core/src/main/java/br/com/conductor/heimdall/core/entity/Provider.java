@@ -25,6 +25,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.redis.core.RedisHash;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -37,37 +38,25 @@ import java.util.List;
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Data
-@Table(name = "PROVIDERS")
-@Entity
-@DynamicUpdate
-@DynamicInsert
 @EqualsAndHashCode(of = {"id"})
+@RedisHash("provider")
 public class Provider implements Serializable {
 
     private static final long serialVersionUID = 6667573637255450718L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID")
-    private Long id;
+    private String id;
 
-    @Column(name = "NAME", length = 180, nullable = false, unique = true)
     private String name;
 
-    @Column(name = "DESCRIPTION", length = 200)
     private String description;
 
-    @Column(name = "PATH", length = 1000)
     private String path;
 
-    @OneToMany(mappedBy = "provider", cascade={CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, orphanRemoval=true, fetch = FetchType.EAGER)
-    @JsonIgnoreProperties("provider")
     private List<ProviderParam> providerParams;
 
-    @Column(name = "CREATION_DATE", nullable = false, updatable = false)
     private LocalDateTime creationDate;
 
-    @Column(name = "PROVIDER_DEFAULT", nullable = false, updatable = false)
     private boolean providerDefault;
 
     @PrePersist
