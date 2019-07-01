@@ -61,11 +61,6 @@ public class AccessTokenHeimdallInterceptor implements HeimdallInterceptor {
     @Override
     public Map<String, Object> buildParameters(Interceptor interceptor) {
 
-        AccessTokenClientIdDTO accessTokenClientIdDTO = this.parseContent(interceptor.getContent());
-        Map<String, Object> parameters = new HashMap<>();
-
-        parameters.put("location", accessTokenClientIdDTO.getLocation());
-
-        return parameters;
+        return new HashMap<>();
     }
 }

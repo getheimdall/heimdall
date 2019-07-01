@@ -19,7 +19,6 @@
  */
 
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
-import br.com.conductor.heimdall.core.enums.Location;
 import br.com.conductor.heimdall.gateway.service.LifeCycleService;
 import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
 import br.com.conductor.heimdall.gateway.service.ClientIdInterceptorService;
@@ -76,7 +75,7 @@ public class ClientIdInterceptor extends HeimdallFilter {
     @Override
     public void execute() throws Throwable {
         ClientIdInterceptorService clientIdInterceptorService = (ClientIdInterceptorService) BeanManager.getBean(ClientIdInterceptorService.class);
-        clientIdInterceptorService.validate(apiId, Location.{{location}});
+        clientIdInterceptorService.validate(apiId);
     }
 
 }

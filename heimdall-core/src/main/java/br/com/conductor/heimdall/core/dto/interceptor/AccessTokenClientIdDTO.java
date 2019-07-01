@@ -36,7 +36,4 @@ public class AccessTokenClientIdDTO implements Serializable {
 
      private static final long serialVersionUID = 7399610317624346876L;
 
-     private String location;
-
-     private String name;
 }

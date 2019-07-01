@@ -19,9 +19,8 @@
  */
 package br.com.conductor.heimdall.gateway.service;
 
+import br.com.conductor.heimdall.core.entity.ApiResponse;
 import br.com.conductor.heimdall.core.trace.TraceContextHolder;
-import br.com.conductor.heimdall.middleware.spec.ApiResponse;
-import br.com.conductor.heimdall.middleware.spec.Helper;
 import com.netflix.zuul.context.RequestContext;
 import org.assertj.core.util.Lists;
 import org.redisson.api.RBucket;
@@ -29,6 +28,7 @@ import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -46,9 +46,6 @@ import static br.com.conductor.heimdall.gateway.util.ConstantsContext.API_NAME;
  */
 @Service
 public class CacheInterceptorService {
-	
-	@Autowired
-    private Helper helper;
 
 	@Autowired
 	private RedissonClient redissonClientCacheInterceptor;
@@ -77,9 +74,13 @@ public class CacheInterceptorService {
             } else {
                 ApiResponse response = rBucket.get();
 
-                helper.call().response().header().addAll(response.getHeaders());
-                helper.call().response().setBody(response.getBody());
-                helper.call().response().setStatus(response.getStatus());
+                HttpServletResponse r = context.getResponse();
+
+                response.getHeaders().forEach(r::addHeader);
+                context.setResponseBody(response.getBody());
+                context.getResponse().setStatus(response.getStatus());
+
+
                 context.setSendZuulResponse(false);
                 responseFromCache = true;
             }
