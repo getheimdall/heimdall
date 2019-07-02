@@ -18,11 +18,9 @@ package br.com.conductor.heimdall.api.configuration;
 import br.com.conductor.heimdall.core.environment.Property;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-import liquibase.integration.spring.SpringLiquibase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.bind.RelaxedPropertyResolver;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,9 +28,6 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.env.Environment;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 /**
  * Implements the {@link EnvironmentAware} interface.
@@ -47,17 +42,12 @@ public class DataBaseConfiguration implements EnvironmentAware {
      @Autowired
      Property property;
 
-     private final String SQL_SERVER = "SQL_SERVER";
-
-     @Value("${spring.jpa.database}")
+    @Value("${spring.jpa.database}")
      private String database;
-
-     private RelaxedPropertyResolver liquiBasePropertyResolver;
 
      @Override
      public void setEnvironment(Environment environment) {
 
-          this.liquiBasePropertyResolver = new RelaxedPropertyResolver(environment, "liquiBase.");
      }
      
      /**
@@ -90,8 +80,9 @@ public class DataBaseConfiguration implements EnvironmentAware {
           hikariConfig.addDataSourceProperty("loginTimeout", property.getDatasource().getLoginTimeout());
           hikariConfig.addDataSourceProperty("applicationName", property.getDatasource().getAppName());
           hikariConfig.addDataSourceProperty("portNumber", property.getDatasource().getPortNumber());
-          
-          if (SQL_SERVER.equals(database)) {
+
+         String SQL_SERVER = "SQL_SERVER";
+         if (SQL_SERVER.equals(database)) {
                
                hikariConfig.addDataSourceProperty("sendStringParametersAsUnicode", property.getDatasource().isSendStringParametersAsUnicode());
                hikariConfig.addDataSourceProperty("multiSubnetFailover", property.getDatasource().isMultiSubnetFailover());
@@ -116,68 +107,6 @@ public class DataBaseConfiguration implements EnvironmentAware {
 
           return dataSource;
      }
-     
-	/**
-	 * Configures a {@link SpringLiquibase} based on a {@link DataSource}.
-	 * 
-	 * @param dataSource {@link DataSource}
-	 * @return {@link SpringLiquibase}
-	 */
-	@Bean
-	public SpringLiquibase liquibase(DataSource dataSource) {
 
-		SpringLiquibase liquibase = new SpringLiquibase();
-		liquibase.setDataSource(dataSource);
-		liquibase.setChangeLog("classpath:liquibase/master.xml");
-		liquibase.setContexts(liquiBasePropertyResolver.getProperty("context"));
-		liquibase.setShouldRun(property.getDatasource().isRunLiquibase());
-
-		releaseLiquibaseLocks(dataSource);
-		clearLiquibaseCheckSums(dataSource);
-
-		log.debug("Configuring Liquibase and versioning the database ... Please wait!");
-
-		return liquibase;
-	}
-
-     /**
-      * Release all Liquibase locks from a {@link DataSource}.
-      * 
-      * @param ds			{@link DataSource}
-      */
-     public void releaseLiquibaseLocks(DataSource ds) {
-
-          try (Connection con = ds.getConnection(); Statement st = con.createStatement()) {
-
-               log.info("Releasing Liquibase Locks");
-
-               st.executeUpdate("DELETE FROM DATABASECHANGELOGLOCK");
-
-               con.commit();
-
-          } catch (SQLException e) {
-               log.info("Error while trying to delete DATABASECHANGELOGLOCK");
-          }
-     }
-
-     /**
-      * Clears all Liquibase checksums from a {@link DataSource}.
-      * 
-      * @param ds			{@link DataSource}
-      */
-     public void clearLiquibaseCheckSums(DataSource ds) {
-
-          try (Connection con = ds.getConnection(); Statement st = con.createStatement()) {
-
-               log.info("Clear Liquibase ChecksSums");
-
-               st.executeUpdate("UPDATE DATABASECHANGELOG SET MD5SUM=NULL");
-
-               con.commit();
-
-          } catch (SQLException e) {
-               log.info("Error while trying to delete MD5SUM");
-          }
-     }
 
 }

@@ -107,9 +107,7 @@ public class Property {
           
           private Boolean trustServerCertificate;
           
-          private String hostNameInCertificate;          
-
-          private boolean runLiquibase;
+          private String hostNameInCertificate;
 
           private boolean sendStringParametersAsUnicode;
 
