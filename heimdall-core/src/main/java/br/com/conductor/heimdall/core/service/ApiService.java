@@ -151,7 +151,7 @@ public class ApiService {
             basepath = basepath.substring(0, basepath.length() - 1);
         }
 
-        HeimdallException.checkThrow(this.findApiByBasepath(basepath) != null, API_BASEPATH_EXIST);
+        HeimdallException.checkThrow(apiRepository.findByBasePath(basepath) != null, API_BASEPATH_EXIST);
         HeimdallException.checkThrow(validateInboundsEnvironments(api), API_CANT_ENVIRONMENT_INBOUND_URL_EQUALS);
 
         api.setBasePath(basepath);
@@ -178,7 +178,7 @@ public class ApiService {
         HeimdallException.checkThrow(apiPersist.getBasePath() == null || apiPersist.getBasePath().isEmpty(), API_BASEPATH_EMPTY);
         HeimdallException.checkThrow(checkWildCardsInBasepath(apiPersist.getBasePath()), API_BASEPATH_MALFORMED);
 
-        final Api validateApi = this.findApiByBasepath(apiPersist.getBasePath());
+        final Api validateApi = apiRepository.findByBasePath(apiPersist.getBasePath());
         HeimdallException.checkThrow(validateApi != null && !Objects.equals(validateApi.getId(), api.getId()), API_BASEPATH_EXIST);
 
         final Api updatedApi = GenericConverter.mapper(apiPersist, api);
@@ -277,13 +277,4 @@ public class ApiService {
         return inbounds.stream().anyMatch(inbound -> Collections.frequency(inbounds, inbound) > 1);
     }
 
-    private Api findApiByBasepath(final String basepath) {
-        final List<Api> apis = apiRepository.findAll();
-        return apis.stream()
-                .filter(a -> basepath.equals(a.getBasePath()))
-                .findAny()
-                .orElse(null)
-                ;
-
-    }
 }

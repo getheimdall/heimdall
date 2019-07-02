@@ -31,7 +31,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
-import javax.persistence.PrePersist;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -70,7 +69,7 @@ public class App implements Serializable {
 
     private List<Plan> plans;
 
-    @PrePersist
+
     private void initValuesPersist() {
 
         status = (status == null) ? Status.ACTIVE : status;

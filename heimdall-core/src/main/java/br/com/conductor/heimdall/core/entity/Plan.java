@@ -21,20 +21,17 @@ package br.com.conductor.heimdall.core.entity;
  * ==========================LICENSE_END===================================
  */
 
+import br.com.conductor.heimdall.core.enums.Status;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Set;
-
-import javax.persistence.*;
-
-import lombok.*;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import br.com.conductor.heimdall.core.enums.Status;
-import org.springframework.data.redis.core.RedisHash;
 
 /**
  * This class represents a Plan registered to the system.
@@ -69,7 +66,6 @@ public class Plan implements Serializable {
 
      private Set<Scope> scopes;
 
-     @PrePersist
      private void initValuesPersist() {
 
           status = (status == null) ? Status.ACTIVE : status;

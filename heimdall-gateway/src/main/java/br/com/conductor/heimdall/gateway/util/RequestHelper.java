@@ -23,7 +23,6 @@ import br.com.conductor.heimdall.core.environment.Property;
 import br.com.conductor.heimdall.core.util.DigestUtils;
 import br.com.conductor.heimdall.core.util.UrlUtil;
 import br.com.conductor.heimdall.core.trace.RequestResponseParser;
-import br.com.conductor.heimdall.middleware.spec.Request;
 import com.netflix.zuul.context.RequestContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +37,7 @@ import java.util.HashMap;
 
 /**
  *
- * Provides methods to dump {@link Request} and get the info from the headers of a request.
+ * Provides methods to dump request and get the info from the headers of a request.
  *
  * @author Marcos Filho
  *

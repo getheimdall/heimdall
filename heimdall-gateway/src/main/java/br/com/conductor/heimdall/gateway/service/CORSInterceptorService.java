@@ -20,10 +20,10 @@
 package br.com.conductor.heimdall.gateway.service;
 
 import br.com.conductor.heimdall.gateway.util.ConstantsContext;
-import br.com.conductor.heimdall.middleware.enums.HttpStatus;
 import com.netflix.util.Pair;
 import com.netflix.zuul.context.RequestContext;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletResponse;

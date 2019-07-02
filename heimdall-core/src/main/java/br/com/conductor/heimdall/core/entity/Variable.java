@@ -20,24 +20,12 @@ package br.com.conductor.heimdall.core.entity;
  * ==========================LICENSE_END===================================
  */
 
-import java.io.Serializable;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+
+import java.io.Serializable;
 
 /**
  * This class represents a Variable registered to the system.
@@ -47,12 +35,10 @@ import org.springframework.data.redis.core.RedisHash;
  */
 @Data
 @EqualsAndHashCode(of = { "id" })
-@RedisHash("variable")
 public class Variable implements Serializable {
      
      private static final long serialVersionUID = -5575544928960511350L;
 
-     @Id
      private String id;
 
      private String key;

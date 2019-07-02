@@ -20,6 +20,7 @@
 package br.com.conductor.heimdall.api.resource;
 
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
+import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.DeveloperDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.page.DeveloperPage;
@@ -27,8 +28,10 @@ import br.com.conductor.heimdall.core.dto.request.DeveloperLogin;
 import br.com.conductor.heimdall.core.entity.Developer;
 import br.com.conductor.heimdall.core.service.DeveloperService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
+import br.com.conductor.heimdall.core.util.Pageable;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -89,7 +92,6 @@ public class DeveloperResource {
      /**
       * Finds all {@link Developer} from a request.
       * 
-      * @param developerDTO			{@link DeveloperDTO}
       * @param pageableDTO			{@link PageableDTO}
       * @return						{@link ResponseEntity}
       */
@@ -97,15 +99,18 @@ public class DeveloperResource {
      @ApiOperation(value = "Find all Developers", responseContainer = "List", response = Developer.class)
      @GetMapping
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_DEVELOPER)
-     public ResponseEntity<?> findAll(@ModelAttribute DeveloperDTO developerDTO, @ModelAttribute PageableDTO pageableDTO) {
-          
+     public ResponseEntity<?> findAll(@ModelAttribute PageableDTO pageableDTO) {
+
           if (!pageableDTO.isEmpty()) {
-               
-               DeveloperPage developerPage = developerService.list(developerDTO, pageableDTO);      
+
+               Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+               Page<Developer> developerPage = developerService.list(pageable);
+
                return ResponseEntity.ok(developerPage);
           } else {
                
-               List<Developer> developers = developerService.list(developerDTO);      
+               List<Developer> developers = developerService.list();
+
                return ResponseEntity.ok(developers);
           }
      }
@@ -122,9 +127,10 @@ public class DeveloperResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_DEVELOPER)
      public ResponseEntity<?> save(@RequestBody @Valid DeveloperDTO developerDTO) {
 
-          Developer developer = developerService.save(developerDTO);
+          Developer developer = GenericConverter.mapper(developerDTO, Developer.class);
+          developer = developerService.save(developer);
 
-          return ResponseEntity.created(URI.create(String.format("/%s/%s", "developers", developer.getId().toString()))).build();
+          return ResponseEntity.created(URI.create(String.format("/%s/%s", "developers", developer.getId()))).build();
      }
 
      /**
@@ -140,7 +146,8 @@ public class DeveloperResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_DEVELOPER)
      public ResponseEntity<?> update(@PathVariable("developerId") String id, @RequestBody DeveloperDTO developerDTO) {
 
-          Developer developer = developerService.update(id, developerDTO);
+          Developer developer = GenericConverter.mapper(developerDTO, Developer.class);
+          developer = developerService.update(id, developer);
           
           return ResponseEntity.ok(developer);
      }

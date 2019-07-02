@@ -21,7 +21,6 @@ package br.com.conductor.heimdall.core.repository;
  * ==========================LICENSE_END===================================
  */
 
-import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Resource;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -31,15 +30,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author Filipe Germano
  *
  */
-public interface ResourceRepository extends JpaRepository<Resource, String> {
-
-	/**
-      * Finds a Resource by its name and {@link Api} Id.
-      * 
-	  * @param apiId		The Api Id
-      * @param name			The Resource name
-	  * @return				The Resource found
-      */
-     Resource findByApiIdAndName(String apiId, String name);
-     
-}
+public interface ResourceRepository extends JpaRepository<Resource, String> { }

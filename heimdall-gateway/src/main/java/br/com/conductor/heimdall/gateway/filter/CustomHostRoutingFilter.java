@@ -26,6 +26,9 @@ import br.com.conductor.heimdall.gateway.failsafe.CircuitBreakerManager;
 import com.netflix.zuul.context.RequestContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.springframework.cloud.commons.httpclient.ApacheHttpClientConnectionManagerFactory;
+import org.springframework.cloud.commons.httpclient.ApacheHttpClientFactory;
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
 import org.springframework.cloud.netflix.zuul.filters.route.SimpleHostRoutingFilter;
@@ -48,14 +51,22 @@ public class CustomHostRoutingFilter extends SimpleHostRoutingFilter {
      private FilterDetail detail = new FilterDetail();
      private final CircuitBreakerManager circuitBreakerManager;
 
+	public CustomHostRoutingFilter(ProxyRequestHelper helper, ZuulProperties properties,
+								   ApacheHttpClientConnectionManagerFactory connectionManagerFactory,
+								   ApacheHttpClientFactory httpClientFactory, CircuitBreakerManager circuitBreakerManager) {
+		super(helper, properties, connectionManagerFactory, httpClientFactory);
+		this.circuitBreakerManager = circuitBreakerManager;
+	}
+
      /**
       * Creates a CustomHostRoutingFilter from a {@link ProxyRequestHelper} and a {@link ZuulProperties}.
       * 
       * @param helper		{@link ProxyRequestHelper}
       * @param properties	{@link ZuulProperties}
       */
-     public CustomHostRoutingFilter(ProxyRequestHelper helper, ZuulProperties properties, CircuitBreakerManager circuitBreakerManager) {
-          super(helper, properties);
+     public CustomHostRoutingFilter(ProxyRequestHelper helper, ZuulProperties properties, CloseableHttpClient httpClient,
+									CircuitBreakerManager circuitBreakerManager) {
+		 super(helper, properties, httpClient);
           this.circuitBreakerManager = circuitBreakerManager;
      }
      
@@ -84,9 +95,7 @@ public class CustomHostRoutingFilter extends SimpleHostRoutingFilter {
 
 		RequestContext context = RequestContext.getCurrentContext();
 		HttpServletRequest request = context.getRequest();
-		HttpHost httpHost = new HttpHost(
-				context.getRouteHost().getHost(),
-				context.getRouteHost().getPort(),
+		HttpHost httpHost = new HttpHost(context.getRouteHost().getHost(), context.getRouteHost().getPort(),
 				context.getRouteHost().getProtocol());
 
 		Long operationId = (Long) context.get(OPERATION_ID);

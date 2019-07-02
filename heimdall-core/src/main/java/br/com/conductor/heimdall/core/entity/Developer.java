@@ -26,8 +26,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
 
-import javax.persistence.PrePersist;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -51,8 +51,10 @@ public class Developer implements Serializable {
 
      private String name;
 
+     @Indexed
      private String email;
 
+     @Indexed
      private String password;
 
      private LocalDateTime creationDate;
@@ -61,7 +63,6 @@ public class Developer implements Serializable {
 
      private Status status;
 
-     @PrePersist
      private void initValuesPersist() {
 
           status = (status == null) ? Status.ACTIVE : status;

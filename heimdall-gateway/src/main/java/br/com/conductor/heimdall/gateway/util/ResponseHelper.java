@@ -20,7 +20,6 @@
 package br.com.conductor.heimdall.gateway.util;
 
 import br.com.conductor.heimdall.core.util.ContentTypeUtils;
-import br.com.conductor.heimdall.middleware.spec.Helper;
 import com.netflix.zuul.context.RequestContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.util.StreamUtils;
@@ -28,7 +27,6 @@ import org.springframework.util.StreamUtils;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;

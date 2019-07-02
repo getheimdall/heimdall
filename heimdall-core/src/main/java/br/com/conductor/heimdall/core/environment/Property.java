@@ -35,7 +35,7 @@ import lombok.Data;
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Data
-@ConfigurationProperties(prefix = "heimdall", ignoreUnknownFields = true)
+@ConfigurationProperties(prefix = "heimdall")
 public class Property {
 
      private String contextPath;
@@ -165,15 +165,7 @@ public class Property {
           private List<String> sanitizes = new ArrayList<>();
           private boolean printHeimdallFilters = false;
      }
-     
-     private Middlewares middlewares = new Middlewares();
-     
-     @Data
-     public class Middlewares {
-    	 private Integer allowInactive;
-    	 private Boolean deleteDeprecated;
-     }
-     
+
      private FailSafe failsafe = new FailSafe();
      
      @Data

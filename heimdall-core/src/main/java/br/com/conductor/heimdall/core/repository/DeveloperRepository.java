@@ -34,14 +34,6 @@ import br.com.conductor.heimdall.core.entity.Developer;
  */
 public interface DeveloperRepository extends JpaRepository<Developer, String> {
 
-	 /**
-	  * Finds a {@link Developer} by its email.
-	  * 
-	  * @param  email		The Developer email
-	  * @return				The Developer found
-	  */
-     Developer findByEmail(String email);
-
 	/**
 	 * Finds a {@link Developer} by its email and password
 	 *

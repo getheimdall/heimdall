@@ -30,9 +30,6 @@ import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.service.OAuthService;
 import br.com.conductor.heimdall.core.util.JwtUtils;
 import br.com.conductor.heimdall.core.trace.TraceContextHolder;
-import br.com.conductor.heimdall.middleware.enums.HttpStatus;
-import br.com.conductor.heimdall.middleware.enums.HttpStatus.Series;
-import br.com.conductor.heimdall.middleware.spec.Http;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -43,10 +40,7 @@ import com.netflix.zuul.context.RequestContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -97,7 +91,7 @@ public class OAuthInterceptorService {
      * @param timeRefreshToken time to expire refreshToken
      * @param providerId       {@link Provider} id
      */
-    public void execute(TypeOAuth typeOAuth, String privateKey, int timeAccessToken, int timeRefreshToken, Long providerId) {
+    public void execute(TypeOAuth typeOAuth, String privateKey, int timeAccessToken, int timeRefreshToken, String providerId) {
 
         try {
             executeInterceptor(typeOAuth, privateKey, timeAccessToken, timeRefreshToken, providerId);
@@ -130,7 +124,7 @@ public class OAuthInterceptorService {
      * @param timeRefreshToken time to expire refreshToken
      * @param providerId       {@link Provider} id
      */
-    public void executeInterceptor(TypeOAuth typeOAuth, String privateKey, int timeAccessToken, int timeRefreshToken, Long providerId) {
+    public void executeInterceptor(TypeOAuth typeOAuth, String privateKey, int timeAccessToken, int timeRefreshToken, String providerId) {
 
         this.context = RequestContext.getCurrentContext();
         OAuthRequest oAuthRequest = recoverOAuthRequest();
@@ -179,7 +173,7 @@ public class OAuthInterceptorService {
      * @param providerId   {@link Provider} id
      */
 
-    private void runAuthorize(OAuthRequest oAuthRequest, String clientId, Long providerId, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsJson, String accessToken) {
+    private void runAuthorize(OAuthRequest oAuthRequest, String clientId, String providerId, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsJson, String accessToken) {
 
         HeimdallException.checkThrow(Objects.isNull(oAuthRequest.getClientId()) || oAuthRequest.getClientId().isEmpty(), ExceptionMessage.CLIENT_ID_NOT_FOUND);
 
@@ -338,7 +332,7 @@ public class OAuthInterceptorService {
      *
      * @param uri The {@link UriComponentsBuilder} to set query params
      * @param providerParams List of the {@link ProviderParam}
-     * @return The {@link Http} result
+     * @return The {@link HttpEntity} result
      */
     private HttpEntity createHttpEntity(UriComponentsBuilder uri, List<ProviderParam> providerParams) {
 
@@ -470,7 +464,7 @@ public class OAuthInterceptorService {
                 ResponseEntity<String> entityResponse = template
                     .exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.POST, createHttpEntity(uriComponentsBuilder, provider.getProviderParams()), String.class);
 
-                HeimdallException.checkThrow(!(Series.valueOf(entityResponse.getStatusCodeValue()) == Series.SUCCESSFUL), ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);
+                HeimdallException.checkThrow(!(HttpStatus.Series.valueOf(entityResponse.getStatusCodeValue()) == HttpStatus.Series.SUCCESSFUL), ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);
             } catch (Exception ex) {
                 log.error(ex.getMessage(), ex);
                 throw new UnauthorizedException(ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);

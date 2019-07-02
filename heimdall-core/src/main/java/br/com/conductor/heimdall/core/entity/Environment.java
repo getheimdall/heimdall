@@ -21,32 +21,15 @@ package br.com.conductor.heimdall.core.entity;
  * ==========================LICENSE_END===================================
  */
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.Map;
-
-import javax.persistence.CollectionTable;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.MapKeyColumn;
-import javax.persistence.PrePersist;
-import javax.persistence.Table;
-
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
-
 import br.com.conductor.heimdall.core.enums.Status;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * This class represents a Environment registered to the system.
@@ -78,7 +61,6 @@ public class Environment implements Serializable {
 
      private Map<String, String> variables;
      
-     @PrePersist
      private void initValuesPersist() {
 
           status = (status == null) ? Status.ACTIVE : status;

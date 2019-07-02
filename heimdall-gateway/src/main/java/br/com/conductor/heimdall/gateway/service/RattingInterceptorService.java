@@ -48,7 +48,7 @@ public class RattingInterceptorService {
      * @param name RLock name
      * @param path rate limit key
      */
-    public void execute(String name, String path, Long calls, Interval interval, Long id) {
+    public void execute(String name, String path, Long calls, Interval interval, String id) {
         RequestContext ctx = RequestContext.getCurrentContext();
 
         RLock lock = rateLimitRepository.getLock(name);

@@ -37,10 +37,10 @@ heimdall:
         appName: HEIMDALL
         databaseName: heimdall
         portNumber: 5432
-        serverName: 127.0.0.1
+        serverName: 192.168.10.200
         username: postgres
         password: 123456
-        runLiquibase: true
+        runLiquibase: false
         sendStringParametersAsUnicode: false
     mongo:
         enabled: false
@@ -71,11 +71,8 @@ heimdall:
     security:
         enabled: true
         jwt:
-            expiration-time: 600
+            expiration-time: 900000000
             secret: secretKey
-    middlewares:
-        allowInactive: 0
-        deleteDeprecated: false
 
 spring:
     pid:
@@ -95,7 +92,7 @@ spring:
             INDENT_OUTPUT: true
             WRITE-DATES-AS-TIMESTAMPS: false
     rabbitmq:
-        host: 127.0.0.1
+        host: 192.168.10.200
         port: 5672
         #virtual-host: dev
         requested-heartbeat: 10

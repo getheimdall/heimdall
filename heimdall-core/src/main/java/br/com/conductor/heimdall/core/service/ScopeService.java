@@ -60,7 +60,7 @@ public class ScopeService {
     private ApiService apiService;
 
     @Autowired
-    private OperationRepository operationRepository;
+    private OperationService operationService;
 
     @Autowired
     private AMQPCacheService amqpCacheService;
@@ -142,15 +142,15 @@ public class ScopeService {
                 SCOPE_NO_OPERATION_FOUND);
 
         scope.getOperations().forEach(op -> {
-            Operation operation = operationRepository.findOne(op.getId());
+            Operation operation = operationService.find(op.getId());
 
             HeimdallException.checkThrow(
                     operation == null,
-                    SCOPE_INVALID_OPERATION, op.getId().toString());
+                    SCOPE_INVALID_OPERATION, op.getId());
 
             HeimdallException.checkThrow(
                     !operation.getResource().getApi().getId().equals(apiId),
-                    SCOPE_OPERATION_NOT_IN_API, operation.getId().toString(), apiId.toString());
+                    SCOPE_OPERATION_NOT_IN_API, operation.getId(), apiId);
         });
 
         scope.setApi(api);

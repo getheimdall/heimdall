@@ -30,7 +30,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import javax.persistence.LockModeType;
+//import javax.persistence.LockModeType;
 import java.util.List;
 
 /**
@@ -47,7 +47,7 @@ public interface AppRepository extends JpaRepository<App, String> {
 	 * @param  clientId		The client id
 	 * @return				The App found
 	 */
-     @Lock(LockModeType.NONE)
+//     @Lock(LockModeType.NONE)
      @Query("select a from App a join a.plans p where a.clientId = :clientId and a.status = 'ACTIVE' and p.status = 'ACTIVE' ")
      App findAppActive(@Param("clientId") String clientId);
 
@@ -57,7 +57,7 @@ public interface AppRepository extends JpaRepository<App, String> {
 	 * @param  clientId		The client id
 	 * @return				The App found
 	 */
-     @Lock(LockModeType.NONE)
+//     @Lock(LockModeType.NONE)
 	App findByClientId(String clientId);
 
 	/**
@@ -66,7 +66,7 @@ public interface AppRepository extends JpaRepository<App, String> {
 	 * @param  appId		The App Id
 	 * @return				The list of Plan
 	 */
-     @Lock(LockModeType.NONE)
+//     @Lock(LockModeType.NONE)
 	@Query("select p from App a join a.plans p where a.id = :appId")
 	List<Plan> findPlansByApp(@Param("appId") String appId);
 

@@ -41,18 +41,6 @@ public class OperationJDBCRepository {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 
-	public List<Operation> findAllByApiId(Long id) {
-		StringBuilder sql = new StringBuilder(170);
-		sql.append("SELECT PATH ");
-		sql.append("from OPERATIONS OP ");
-		sql.append("INNER JOIN RESOURCES RES ON OP.RESOURCE_ID = RES.ID ");
-		sql.append("INNER JOIN APIS API ON RES.API_ID = API.ID ");
-		sql.append("WHERE API.ID = ? ");
-
-		return jdbcTemplate.query(sql.toString(), new Object[] { id },
-				new BeanPropertyRowMapper<Operation>(Operation.class));
-	}
-
 	public List<String> findOperationsFromAllApis(List<Long> apiIds) {
 
 		Map<String, Object> params = new HashMap<>();
@@ -68,7 +56,7 @@ public class OperationJDBCRepository {
 		return new NamedParameterJdbcTemplate(jdbcTemplate).queryForList(sql.toString(), params, String.class);
 	}
 	
-	public List<Long> findIgnoredOperationsFromInterceptor(Long interceptorId) {
+	public List<Long> findIgnoredOperationsFromInterceptor(String interceptorId) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("SELECT OPERATION_ID ");
 		sql.append("FROM IGNORED_INTERCEPTORS_OPERATIONS ");
@@ -77,18 +65,4 @@ public class OperationJDBCRepository {
 		return jdbcTemplate.queryForList(sql.toString(), new Object[] { interceptorId }, Long.class);
 	}
   
-  public boolean patternExists(String pattern) {
-
-		StringBuilder sql = new StringBuilder(180);
-		sql.append("SELECT ");
-		sql.append("count(*) ");
-		sql.append("FROM OPERATIONS OP ");
-		sql.append("INNER JOIN RESOURCES RES ON OP.RESOURCE_ID = RES.ID ");
-		sql.append("INNER JOIN APIS API ON RES.API_ID = API.ID ");
-		sql.append("WHERE CONCAT(API.BASE_PATH, OP.PATH) = ?");
-
-		int count = jdbcTemplate.queryForObject(sql.toString(), new Object[] { pattern }, Integer.class);
-
-		return count > 0;
-	}
 }

@@ -156,7 +156,7 @@ public class RoleService {
           Role role = roleRepository.findOne(roleId);
           HeimdallException.checkThrow(role == null, GLOBAL_RESOURCE_NOT_FOUND);
           
-          roleRepository.delete(role.getId());
+          roleRepository.delete(role);
      }
 
      /**

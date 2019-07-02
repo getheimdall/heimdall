@@ -76,7 +76,6 @@ public class EnvironmentService {
     /**
      * Generates a paged list of {@link Environment} from a request.
      *
-     * @param environmentDTO The {@link EnvironmentDTO}
      * @param pageableDTO    The {@link PageableDTO}
      * @return The paged {@link Environment} list as a {@link EnvironmentPage} object
      */
@@ -91,7 +90,6 @@ public class EnvironmentService {
     /**
      * Generates a list of {@link Environment} from a request.
      *
-     * @param environmentDTO The {@link EnvironmentDTO}
      * @return The List<{@link Environment}>
      */
     public List<Environment> list() {
@@ -131,7 +129,7 @@ public class EnvironmentService {
     @Transactional
     public Environment update(String id, EnvironmentDTO environmentDTO) {
 
-        Environment environment = environmentRepository.findOne(id);
+        Environment environment = this.find(id);
         HeimdallException.checkThrow(environment == null, GLOBAL_RESOURCE_NOT_FOUND);
 
         List<Environment> environments = environmentRepository.findByInboundURL(environmentDTO.getInboundURL());
@@ -158,7 +156,7 @@ public class EnvironmentService {
      @Transactional
      public void delete(String id) {
 
-        Environment environment = environmentRepository.findOne(id);
+        Environment environment = this.find(id);
         HeimdallException.checkThrow(environment == null, GLOBAL_RESOURCE_NOT_FOUND);
 
         Integer totalEnvironmentsAttached = environmentRepository.findApisWithEnvironment(id);

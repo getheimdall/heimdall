@@ -19,18 +19,15 @@
  */
 package br.com.conductor.heimdall.gateway.filter;
 
+import br.com.conductor.heimdall.core.entity.ApiResponse;
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.core.trace.FilterDetail;
 import br.com.conductor.heimdall.core.trace.TraceContextHolder;
-import br.com.conductor.heimdall.gateway.filter.helper.ApiResponseImpl;
 import br.com.conductor.heimdall.gateway.util.ResponseHelper;
-import br.com.conductor.heimdall.middleware.spec.ApiResponse;
-import br.com.conductor.heimdall.middleware.spec.Helper;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBucket;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletResponse;
@@ -52,9 +49,6 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 public class CacheWriterFilter extends ZuulFilter {
 
     private FilterDetail detail = new FilterDetail();
-
-    @Autowired
-    private Helper helper;
 
     @Override
     public String filterType() {
@@ -104,7 +98,7 @@ public class CacheWriterFilter extends ZuulFilter {
 
         Map<String, String> headers = ResponseHelper.getResponseHeaders(context);
 
-        ApiResponse apiResponse = new ApiResponseImpl();
+        ApiResponse apiResponse = new ApiResponse();
         apiResponse.setHeaders(headers);
         apiResponse.setBody(ResponseHelper.getResponseBody(context, headers));
         apiResponse.setStatus(response.getStatus());

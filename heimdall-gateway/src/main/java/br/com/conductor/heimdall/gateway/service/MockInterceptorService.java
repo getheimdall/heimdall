@@ -19,12 +19,10 @@
  */
 package br.com.conductor.heimdall.gateway.service;
 
-import br.com.conductor.heimdall.middleware.spec.Helper;
 import com.netflix.zuul.context.RequestContext;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -34,9 +32,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class MockInterceptorService {
-	
-	@Autowired
-    private Helper helper;
 
     /**
      * Creates a response to the user with the body content.
@@ -49,13 +44,13 @@ public class MockInterceptorService {
         RequestContext ctx = RequestContext.getCurrentContext();
 
         if (isJson(body)) {
-            helper.call().response().header().add("Content-Type", "application/json");
+            ctx.getResponse().addHeader("Content-Type", "application/json");
         } else {
 
-            helper.call().response().header().add("Content-Type", "text/plain");
+            ctx.getResponse().addHeader("Content-Type", "text/plain");
         }
 
-        helper.call().response().setBody(body);
+        ctx.setResponseBody(body);
 
         ctx.setSendZuulResponse(false);
         ctx.setResponseStatusCode(status);

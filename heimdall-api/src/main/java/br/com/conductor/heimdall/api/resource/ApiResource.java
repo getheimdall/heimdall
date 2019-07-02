@@ -23,7 +23,6 @@ import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.ApiDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
-import br.com.conductor.heimdall.core.dto.page.ApiPage;
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.service.ApiService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
@@ -36,7 +35,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.net.URI;
@@ -170,25 +168,6 @@ public class ApiResource {
      public ResponseEntity<?> delete(@PathVariable("apiId") String id) {
 
           apiService.delete(id);
-          
-          return ResponseEntity.noContent().build();
-     }
-
-     /**
-      * Uploads the {@link Api} file.
-      * 
-      * @param id					The Api Id
-      * @param file					{@link MultipartFile} of the Api
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Delete API")
-     @PostMapping(value = "/{apiId}/file-middlewares")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_API)
-     public ResponseEntity<?> fileUpload(@PathVariable("apiId") Long id, 
-               @RequestParam("file") MultipartFile file) {
-          
-          
           
           return ResponseEntity.noContent().build();
      }

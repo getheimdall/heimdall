@@ -22,17 +22,14 @@ package br.com.conductor.heimdall.core.entity;
 import br.com.conductor.heimdall.core.enums.HttpMethod;
 import br.com.conductor.heimdall.core.util.ConstantsPath;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
-import javax.persistence.*;
 import java.io.Serializable;
 
 /**
@@ -65,8 +62,6 @@ public class Operation implements Serializable {
      /**
       * Adjust the path to not permit the save or update with "/" or spaces in the end of path.
       */
-     @PreUpdate
-     @PrePersist
      private void fixBasePath() {
           this.path = this.path.trim();
           if (this.path.endsWith(ConstantsPath.PATH_ROOT)) {

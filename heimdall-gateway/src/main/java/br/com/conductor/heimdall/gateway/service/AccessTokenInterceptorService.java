@@ -21,7 +21,6 @@ package br.com.conductor.heimdall.gateway.service;
 
 import br.com.conductor.heimdall.core.entity.AccessToken;
 import br.com.conductor.heimdall.core.entity.Plan;
-import br.com.conductor.heimdall.core.enums.Location;
 import br.com.conductor.heimdall.core.repository.AccessTokenRepository;
 import br.com.conductor.heimdall.core.util.ConstantsInterceptors;
 import br.com.conductor.heimdall.core.util.DigestUtils;
@@ -35,7 +34,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
 import static br.com.conductor.heimdall.gateway.util.ConstantsContext.ACCESS_TOKEN;
 import static br.com.conductor.heimdall.gateway.util.ConstantsContext.CLIENT_ID;
 
@@ -49,27 +47,19 @@ public class AccessTokenInterceptorService {
     private AccessTokenRepository accessTokenRepository;
 
     /**
-     * Validates if a access token originated from {@link Location} is valid
+     * Validates if a access token originated
      *
      * @param apiId    Api id
-     * @param location {@link Location}
      */
-    public void validate(Long apiId, Location location) {
+    public void validate(String apiId) {
 
         RequestContext context = RequestContext.getCurrentContext();
 
-        String clientId;
-        String accessToken;
-        if (Location.HEADER.equals(location)) {
-            clientId = context.getZuulRequestHeaders().get(CLIENT_ID);
-            accessToken = context.getZuulRequestHeaders().get(ACCESS_TOKEN);
+        String clientId = context.getZuulRequestHeaders().get(CLIENT_ID);
+        String accessToken = context.getZuulRequestHeaders().get(ACCESS_TOKEN);
 
-            if (clientId == null) clientId = context.getRequest().getHeader(CLIENT_ID);
-            if (accessToken == null) accessToken = context.getRequest().getHeader(ACCESS_TOKEN);
-        } else {
-            clientId = context.getRequest().getParameter(CLIENT_ID);
-            accessToken = context.getRequest().getParameter(ACCESS_TOKEN);
-        }
+        if (clientId == null) clientId = context.getRequest().getHeader(CLIENT_ID);
+        if (accessToken == null) accessToken = context.getRequest().getHeader(ACCESS_TOKEN);
 
         this.validateAccessToken(apiId, clientId, accessToken);
     }
@@ -81,7 +71,7 @@ public class AccessTokenInterceptorService {
      * @param clientId    user client_id
      * @param accessToken access token
      */
-    private void validateAccessToken(Long apiId, String clientId, String accessToken) {
+    private void validateAccessToken(String apiId, String clientId, String accessToken) {
 
         final String ACCESS_TOKEN = "Access Token";
 
@@ -99,7 +89,7 @@ public class AccessTokenInterceptorService {
             if (token != null && token.getApp() != null) {
 
                 List<Plan> plans = token.getApp().getPlans();
-                Set<Long> collect = plans.parallelStream().map(plan -> plan.getApi().getId()).collect(Collectors.toSet());
+                Set<String> collect = plans.parallelStream().map(plan -> plan.getApi().getId()).collect(Collectors.toSet());
                 if (collect.contains(apiId)) {
 
                     String cId = token.getApp().getClientId();
@@ -124,7 +114,6 @@ public class AccessTokenInterceptorService {
     private void buildResponse(String message) {
         RequestContext ctx = RequestContext.getCurrentContext();
         ctx.setSendZuulResponse(false);
-        ctx.put(INTERRUPT, true);
         ctx.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
         ctx.setResponseBody(message);
     }

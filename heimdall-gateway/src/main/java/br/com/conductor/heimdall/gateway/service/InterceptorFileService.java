@@ -27,7 +27,8 @@ import br.com.conductor.heimdall.core.enums.TypeInterceptor;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.jdbc.OperationJDBCRepository;
-import br.com.conductor.heimdall.core.util.*;
+import br.com.conductor.heimdall.core.util.GenerateMustache;
+import br.com.conductor.heimdall.core.util.StringUtils;
 import com.netflix.zuul.FilterLoader;
 import com.netflix.zuul.filters.FilterRegistry;
 import lombok.extern.slf4j.Slf4j;
@@ -42,11 +43,11 @@ import org.springframework.util.ReflectionUtils;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-
-import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
-import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_ROOT;
 
 /**
  * Provides methods to create and remove the {@link Interceptor} files.
@@ -75,7 +76,6 @@ public class InterceptorFileService {
     private static final String INTERCEPTOR_TYPE = "interceptorType";
     private static final String LIFECYCLE = "lifeCycle";
     private static final String NAME = "name";
-    private static final String PATH_MIDDLEWARE = "pathMiddleware";
     private static final String ORDER = "order";
     private static final String REFERENCE_ID = "referenceId";
     private static final String ZUUL_FILTER_ROOT = "zuulFilterRoot";
@@ -101,7 +101,7 @@ public class InterceptorFileService {
 
             generateFileInterceptor(template, parameters);
         } else {
-            String[] message = {ExceptionMessage.INTERCEPTOR_TEMPLATE_NOT_EXIST.getMessage(), interceptor.getId().toString(), interceptor.getType().name(), interceptor.getExecutionPoint().name()};
+            String[] message = {ExceptionMessage.INTERCEPTOR_TEMPLATE_NOT_EXIST.getMessage(), interceptor.getId(), interceptor.getType().name(), interceptor.getExecutionPoint().name()};
             String error = String.join(", ", message);
             log.error(error);
         }
@@ -123,11 +123,10 @@ public class InterceptorFileService {
         parameters.put(INTERCEPTOR_STATUS, interceptor.getStatus());
         parameters.put(INTERCEPTOR_TYPE, interceptor.getType());
         parameters.put(LIFECYCLE, interceptor.getLifeCycle().name());
-        parameters.put(NAME, StringUtils.concatCamelCase(interceptor.getLifeCycle().name(), interceptor.getType().name(), interceptor.getExecutionPoint().getFilterType(), interceptor.getId().toString()));
+        parameters.put(NAME, StringUtils.concatCamelCase(interceptor.getLifeCycle().name(), interceptor.getType().name(), interceptor.getExecutionPoint().getFilterType(), interceptor.getId()));
         parameters.put(ORDER, StringUtils.generateOrder(definePrefixOrder(interceptor.getLifeCycle()), interceptor.getOrder()));
         parameters.put(REFERENCE_ID, (interceptor.getReferenceId() != null) ? interceptor.getReferenceId() : INVALID_REFERENCE_ID);
         parameters.put(ZUUL_FILTER_ROOT, zuulFilterRoot);
-        parameters.put(PATH_MIDDLEWARE, String.join("/", zuulFilterRoot, MIDDLEWARE_API_ROOT, interceptor.getApi().getId().toString(), MIDDLEWARE_ROOT));
 
         parameters.putAll(interceptor.getType().getHeimdallInterceptor().buildParameters(interceptor));
 
@@ -211,16 +210,9 @@ public class InterceptorFileService {
             String codeInterceptor = GenerateMustache.generateTemplate(template, parameters);
             String fileName = parameters.get("name") + ".groovy";
 
-            String pathName;
-            final TypeInterceptor interceptorType = (TypeInterceptor) parameters.get("interceptorType");
-            if (TypeInterceptor.MIDDLEWARE.equals(interceptorType)) {
-
-                pathName = String.join(File.separator, zuulFilterRoot, MIDDLEWARE_API_ROOT, parameters.get("apiId").toString(), fileName);
-            } else {
-
-                pathName = String.join(File.separator, zuulFilterRoot, parameters.get("executionPoint").toString(), fileName);
-            }
-            File file = new File(pathName);
+            File file = new File(
+                    String.join(File.separator, zuulFilterRoot, parameters.get("executionPoint").toString(), fileName)
+            );
 
             FileUtils.writeStringToFile(file, codeInterceptor, StandardCharsets.UTF_8);
         } catch (IOException e) {

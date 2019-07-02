@@ -19,24 +19,17 @@
  */
 package br.com.conductor.heimdall.core.entity;
 
-import java.io.Serializable;
-import java.util.Collections;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import javax.persistence.*;
-
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+
+import java.io.Serializable;
+import java.util.Collections;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * This class represents a Scope registered to the system.

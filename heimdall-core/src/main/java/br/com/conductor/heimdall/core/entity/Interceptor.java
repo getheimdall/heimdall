@@ -31,10 +31,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.redis.core.RedisHash;
 
-import javax.persistence.PostLoad;
-import javax.persistence.PrePersist;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -71,9 +70,9 @@ public class Interceptor implements Serializable {
      
      private LocalDateTime creationDate;
 
-     private Set<Long> ignoredResources;
+     private Set<Long> ignoredResources = new HashSet<>();
 
-     private Set<Long> ignoredOperations;
+     private Set<Long> ignoredOperations = new HashSet<>();
      
      @JsonIgnore
      private Plan plan;
@@ -92,7 +91,6 @@ public class Interceptor implements Serializable {
 
      private Boolean status;
      
-     @PrePersist
      private void initValuesPersist() {
 
           creationDate = LocalDateTime.now();
@@ -119,7 +117,6 @@ public class Interceptor implements Serializable {
           }
      }
 
-     @PostLoad
      private void initValuesLoad() {
           
           switch (lifeCycle) {

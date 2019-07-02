@@ -100,7 +100,7 @@ public class ProviderResource {
     @GetMapping("/{id}")
     public ResponseEntity<?> findById(@PathVariable String id) {
 
-        Provider provider = providerService.findOne(id);
+        Provider provider = providerService.find(id);
 
         return ResponseEntity.ok(provider);
     }

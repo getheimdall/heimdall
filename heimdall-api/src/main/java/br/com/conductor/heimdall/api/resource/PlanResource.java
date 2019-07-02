@@ -20,14 +20,16 @@
 package br.com.conductor.heimdall.api.resource;
 
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
+import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.PlanDTO;
-import br.com.conductor.heimdall.core.dto.page.PlanPage;
 import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.service.PlanService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
+import br.com.conductor.heimdall.core.util.Pageable;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -73,7 +75,6 @@ public class PlanResource {
      /**
       * Finds all {@link Plan} from a request.
       * 
-      * @param planDTO				{@link PlanDTO}
       * @param pageableDTO			{@link PageableDTO}
       * @return						{@link ResponseEntity}
       */
@@ -81,15 +82,16 @@ public class PlanResource {
      @ApiOperation(value = "Find all Plans", responseContainer = "List", response = Plan.class)
      @GetMapping
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_PLAN)
-     public ResponseEntity<?> findAll(@ModelAttribute PlanDTO planDTO, @ModelAttribute PageableDTO pageableDTO) {
+     public ResponseEntity<?> findAll(@ModelAttribute PageableDTO pageableDTO) {
           
           if (!pageableDTO.isEmpty()) {
-               
-               PlanPage planPage = planService.list(planDTO, pageableDTO);      
+               Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+               Page<Plan> planPage = planService.list(pageable);
+
                return ResponseEntity.ok(planPage);
           } else {
                
-               List<Plan> plans = planService.list(planDTO);      
+               List<Plan> plans = planService.list();
                return ResponseEntity.ok(plans);
           }
      }
@@ -106,9 +108,11 @@ public class PlanResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_PLAN)
      public ResponseEntity<?> save(@RequestBody @Valid PlanDTO planDTO) {
 
-          Plan plan = planService.save(planDTO);
+          Plan plan = GenericConverter.mapper(planDTO, Plan.class);
 
-          return ResponseEntity.created(URI.create(String.format("/%s/%s", "plans", plan.getId().toString()))).build();
+          plan = planService.save(plan);
+
+          return ResponseEntity.created(URI.create(String.format("/%s/%s", "plans", plan.getId()))).build();
      }
 
      /**
@@ -124,7 +128,9 @@ public class PlanResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_PLAN)
      public ResponseEntity<?> update(@PathVariable("planId") String id, @RequestBody PlanDTO planDTO) {
 
-          Plan plan = planService.update(id, planDTO);
+          Plan plan = GenericConverter.mapper(planDTO, Plan.class);
+
+          plan = planService.update(id, plan);
           
           return ResponseEntity.ok(plan);
      }

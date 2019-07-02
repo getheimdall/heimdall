@@ -77,52 +77,33 @@ public class PlanService {
      /**
       * Generates a paged list of {@link Plan} from a request.
       * 
-      * @param  planDTO						The {@link PlanDTO}
-      * @param  pageableDTO					The {@link PageableDTO}
+      * @param  pageable					The {@link Pageable}
       * @return								The paged {@link Plan} list as a {@link PlanPage} object
       */
      @Transactional(readOnly = true)
-     public PlanPage list(PlanDTO planDTO, PageableDTO pageableDTO) {
+     public Page<Plan> list(Pageable pageable) {
 
-          Plan plan = GenericConverter.mapper(planDTO, Plan.class);
-          
-          Example<Plan> example = Example.of(plan, ExampleMatcher.matching().withIgnorePaths("defaultPlan").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
-          
-          Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
-          Page<Plan> page = planRepository.findAll(example, pageable);
-          
-          PlanPage planPage = new PlanPage(PageDTO.build(page));
-          
-          return planPage;
+          return planRepository.findAll(pageable);
      }
 
      /**
       * Generates a list of {@link Plan} from a request.
       * 
-      * @param  planDTO						The {@link PlanDTO}
       * @return								The List of {@link Plan}
       */
      @Transactional(readOnly = true)
-     public List<Plan> list(PlanDTO planDTO) {
-          
-          Plan plan = GenericConverter.mapper(planDTO, Plan.class);
-          
-          Example<Plan> example = Example.of(plan, ExampleMatcher.matching().withIgnorePaths("defaultPlan").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
-          
-          List<Plan> plans = planRepository.findAll(example);
-          
-          return plans;
+     public List<Plan> list() {
+
+          return planRepository.findAll();
      }
      
      /**
       * Saves a {@link Plan} to the repository.
       * 
-      * @param  planDTO						The {@link PlanDTO}
+      * @param  plan						The {@link Plan}
       * @return								The saved {@link Plan}
       */
-     public Plan save(PlanDTO planDTO) {
-
-          Plan plan = GenericConverter.mapper(planDTO, Plan.class);
+     public Plan save(Plan plan) {
 
           if (plan.isDefaultPlan()) {
                List<Plan> plans = apiService.plansByApi(plan.getApi().getId());
@@ -140,22 +121,19 @@ public class PlanService {
       * Updates a {@link Plan} by its Id.
       * 
       * @param 	id							The {@link Plan} Id
-      * @param 	planDTO						The {@link PlanDTO}
+      * @param 	planPersist					The {@link Plan}
       * @return								The updated {@link Plan}
       */
-     public Plan update(String id, PlanDTO planDTO) {
+     public Plan update(final String id, final Plan planPersist) {
 
-          Plan plan = planRepository.findOne(id);
-          HeimdallException.checkThrow(plan == null, GLOBAL_RESOURCE_NOT_FOUND);
-          
-          plan = GenericConverter.mapper(planDTO, plan);
+          Plan plan = this.find(id);
 
-          final String planId = plan.getId();
-
-          if (plan.isDefaultPlan()) {
+          if (planPersist.isDefaultPlan()) {
                List<Plan> plans = apiService.plansByApi(plan.getApi().getId());
-               HeimdallException.checkThrow(plans.stream().anyMatch(p -> !p.getId().equals(planId) && p.isDefaultPlan()), DEFAULT_PLAN_ALREADY_EXIST_TO_THIS_API);
+               HeimdallException.checkThrow(plans.stream().anyMatch(p -> !id.equals(p.getId()) && p.isDefaultPlan()), DEFAULT_PLAN_ALREADY_EXIST_TO_THIS_API);
           }
+
+          plan = GenericConverter.mapper(planPersist, plan);
 
           plan = planRepository.save(plan);
 
@@ -171,9 +149,8 @@ public class PlanService {
       */
      public void delete(String id) {
 
-          Plan plan = planRepository.findOne(id);
-          HeimdallException.checkThrow(plan == null, GLOBAL_RESOURCE_NOT_FOUND);
-          
+          Plan plan = this.find(id);
+
           Integer totalAppsAttached = planRepository.findAppsWithPlan(id);
           HeimdallException.checkThrow(totalAppsAttached > 0, PLAN_ATTACHED_TO_APPS);
 

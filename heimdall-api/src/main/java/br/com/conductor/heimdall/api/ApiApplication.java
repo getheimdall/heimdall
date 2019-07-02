@@ -30,12 +30,10 @@ import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
-import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
- * Since Heimdall is a SpringBoot application, this is a {@link SpringBootServletInitializer}.
+ * Since Heimdall is a SpringBoot application.
  *
  * @author Marcos Filho
  * @see <a href="https://projects.spring.io/spring-boot/">https://projects.spring.io/spring-boot/</a>

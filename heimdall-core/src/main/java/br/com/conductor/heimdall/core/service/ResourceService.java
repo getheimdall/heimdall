@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.core.service;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -20,6 +17,7 @@ package br.com.conductor.heimdall.core.service;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.service;
 
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.ResourceDTO;
@@ -31,6 +29,7 @@ import br.com.conductor.heimdall.core.repository.ResourceRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
 import br.com.conductor.heimdall.core.util.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
@@ -38,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
@@ -187,12 +187,12 @@ public class ResourceService {
         Resource resource = this.find(apiId, resourceId);
 
         // Deletes all operations attached to the Resource
-// TODO       operationService.deleteAllfromResource(apiId, resourceId);
+        operationService.deleteAllfromResource(apiId, resourceId);
 //
 //        // Deletes all interceptors attached to the Resource
 // TODO       interceptorService.deleteAllfromResource(resourceId);
 
-        resourceRepository.delete(resource.getId());
+//        resourceRepository.delete(resource.getId());
 
         amqpRoute.dispatchRoutes();
     }

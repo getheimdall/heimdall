@@ -51,11 +51,9 @@ import com.netflix.zuul.groovy.GroovyFileFilter;
 
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Interceptor;
-import br.com.conductor.heimdall.core.entity.Middleware;
 import br.com.conductor.heimdall.core.enums.Status;
 import br.com.conductor.heimdall.core.repository.jdbc.ApiJDBCRepository;
 import br.com.conductor.heimdall.core.repository.jdbc.InterceptorJDBCRepository;
-import br.com.conductor.heimdall.core.repository.jdbc.MiddlewareJDBCRepository;
 import br.com.conductor.heimdall.core.service.FileService;
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.configuration.HeimdallHandlerMapping;

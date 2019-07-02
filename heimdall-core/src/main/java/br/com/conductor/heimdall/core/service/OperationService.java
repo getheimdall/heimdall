@@ -95,10 +95,14 @@ public class OperationService {
           apiService.find(apiId);
           resourceService.find(apiId, resourceId);
 
-          Operation operation = operationRepository.findOne(operationId);
-          HeimdallException.checkThrow(operation == null, GLOBAL_RESOURCE_NOT_FOUND);
-                              
-          return operation;
+         return this.find(operationId);
+     }
+
+     public Operation find(String id) {
+         Operation operation = operationRepository.findOne(id);
+         HeimdallException.checkThrow(operation == null, GLOBAL_RESOURCE_NOT_FOUND);
+
+         return operation;
      }
      
      /**
@@ -194,7 +198,7 @@ public class OperationService {
           HeimdallException.checkThrow(validateSingleWildCardOperationPath(operation), OPERATION_CANT_HAVE_SINGLE_WILDCARD);
           HeimdallException.checkThrow(validateDoubleWildCardOperationPath(operation), OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END);
 
-          Operation savedOperation = operationRepository.save(operation);
+          final Operation savedOperation = operationRepository.save(operation);
 
           resource.addOperation(savedOperation.getId());
 
@@ -220,20 +224,20 @@ public class OperationService {
       * @param  apiId						The {@link br.com.conductor.heimdall.core.entity.Api} Id
       * @param 	resourceId					The {@link Resource} Id
       * @param 	operationId					The {@link Operation} Id
-      * @param 	operationpersist			The {@link Operation}
+      * @param 	operationPersist			The {@link Operation}
       * @return								The updated {@link Operation}
       */
      @Transactional
-     public Operation update(String apiId, String resourceId, String operationId, Operation operationpersist) {
+     public Operation update(String apiId, String resourceId, String operationId, Operation operationPersist) {
 
           Operation operation = this.find(apiId, resourceId, operationId);
 
-          Operation resData = operationRepository.findByResourceApiIdAndMethodAndPath(apiId, operationpersist.getMethod(), operationpersist.getPath());
+          Operation resData = operationRepository.findByResourceApiIdAndMethodAndPath(apiId, operationPersist.getMethod(), operationPersist.getPath());
           HeimdallException.checkThrow(resData != null &&
                   resData.getResource().getId().equals(operation.getResource().getId()) &&
                   !resData.getId().equals(operation.getId()), ONLY_ONE_OPERATION_PER_RESOURCE);
           
-          operation = GenericConverter.mapper(operationpersist, operation);
+          operation = GenericConverter.mapper(operationPersist, operation);
           operation.setPath(StringUtils.removeMultipleSlashes(operation.getPath()));
 
           HeimdallException.checkThrow(validatePath(operation.getResource().getApi().getBasePath() + "/" + operation.getPath()), OPERATION_ROUTE_ALREADY_EXISTS);
@@ -250,7 +254,7 @@ public class OperationService {
           return operation;
      }
      
-     /**TODO
+     /**
       * Deletes a {@link Operation} by its Id, {@link Resource} Id and {@link br.com.conductor.heimdall.core.entity.Api} Id.
       *
       * @param  apiId						The {@link br.com.conductor.heimdall.core.entity.Api} Id
@@ -263,16 +267,16 @@ public class OperationService {
           Operation operation = this.find(apiId, resourceId, operationId);
 
           // Deletes all interceptors attached to the Operation
-          interceptorService.deleteAllfromOperation(operationId);
+//          interceptorService.deleteAllfromOperation(operationId);
 
-          operationRepository.delete(operation.getId());
+          operationRepository.delete(operation);
           amqpCacheService.dispatchClean(ConstantsCache.OPERATION_ACTIVE_FROM_ENDPOINT, operation.getResource().getApi().getBasePath() + operation.getPath());
           
           
           amqpRoute.dispatchRoutes();
      }
 
-     /**TODO
+     /**
       * Deletes all Operations from a Resource
       *
       * @param apiId      Api with the Resource
@@ -280,7 +284,7 @@ public class OperationService {
       */
      @Transactional
      public void deleteAllfromResource(String apiId, String resourceId) {
-          List<Operation> operations = operationRepository.findByResourceApiIdAndResourceId(apiId, resourceId);
+          List<Operation> operations = this.list(apiId, resourceId);
           operations.forEach(operation -> this.delete(apiId, resourceId, operation.getId()));
      }
 

@@ -71,15 +71,14 @@ public class ProviderService {
     /**
      * Edits a {@link Provider} by its Id
      *
-     * @param idProvider   The {@link Provider} Id
+     * @param id   The {@link Provider} Id
      * @param providerEdit The {@link ProviderDTO}
      * @return The edited {@link Provider}
      */
     @Transactional
-    public Provider edit(String idProvider, ProviderDTO providerEdit) {
-        Provider found = providerRepository.findOne(idProvider);
+    public Provider edit(String id, ProviderDTO providerEdit) {
+        Provider found = this.find(id);
 
-        HeimdallException.checkThrow(Objects.isNull(found), ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND);
         HeimdallException.checkThrow(found.isProviderDefault(), ExceptionMessage.DEFAULT_PROVIDER_CAN_NOT_UPDATED_OR_REMOVED);
 
         found.setName(providerEdit.getName());
@@ -138,8 +137,12 @@ public class ProviderService {
      * @param id The {@link Provider} Id
      * @return The {@link Provider}
      */
-    public Provider findOne(String id) {
-        return this.providerRepository.findOne(id);
+    public Provider find(String id) {
+        Provider provider = providerRepository.findOne(id);
+
+        HeimdallException.checkThrow(Objects.isNull(provider), ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND);
+
+        return provider;
     }
 
     /**
@@ -148,7 +151,9 @@ public class ProviderService {
      * @param id The {@link Provider} Id
      */
     public void delete(String id) {
-        this.providerRepository.delete(id);
+        final Provider provider = this.find(id);
+
+        this.providerRepository.delete(provider);
     }
 
     protected ProviderParam getProviderParam(ProviderParamsDTO p, Provider provider) {

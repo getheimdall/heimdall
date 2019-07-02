@@ -73,10 +73,7 @@ public class AppService {
      private AppRepository appRepository;
 
      @Autowired
-     private DeveloperRepository devRepository;
-
-     @Autowired
-     private PlanRepository planRepository;
+     private DeveloperService developerService;
 
      @Autowired
      private AccessTokenRepository accessTokenRepository;
@@ -165,7 +162,7 @@ public class AppService {
 
           App app = GenericConverter.mapper(appDTO, App.class);
 
-          Developer dev = devRepository.findOne(app.getDeveloper().getId());
+          Developer dev = developerService.find(app.getDeveloper().getId());
           HeimdallException.checkThrow(dev == null, DEVELOPER_NOT_EXIST);
 
           amqpCacheService.dispatchClean();
@@ -184,9 +181,8 @@ public class AppService {
       */
      public App update(String id, AppDTO appDTO) {
 
-          App app = appRepository.findOne(id);
-          HeimdallException.checkThrow(app == null, GLOBAL_RESOURCE_NOT_FOUND);
-     
+          App app = this.find(id);
+
           updateTokensPlansByApp(id, appDTO.getPlans().stream().map(ReferenceIdDTO::getId).collect(Collectors.toList()));
           
           app.setAccessTokens(accessTokenRepository.findByAppId(app.getId()));
@@ -226,56 +222,12 @@ public class AppService {
       */
      public void delete(String id) {
 
-          App app = appRepository.findOne(id);
-          HeimdallException.checkThrow(app == null, GLOBAL_RESOURCE_NOT_FOUND);
+          App app = this.find(id);
 
           amqpCacheService.dispatchClean();
 
           appRepository.delete(app);
      }
 
-     /**
-      * Saves a {@link App}.
-      *
-      * @param  reqBody					{@link AppCallbackDTO}
-      * @return							The {@link App} saved
-      * @throws HeimdallException		Developer not exist
-      */
-     @Transactional
-     public App save(AppCallbackDTO reqBody) {
-          App app = appRepository.findByClientId(reqBody.getCode());
-
-//          Developer dev = devRepository.findByEmail(reqBody.getDeveloper());
-//          HeimdallException.checkThrow(dev == null, DEVELOPER_NOT_EXIST);
-//
-//          if (app == null) {
-//
-//               app = new App();
-//
-//          } else {
-//
-//               List<Plan> plans = appRepository.findPlansByApp(app.getId());
-//               app.setPlans(plans);
-//          }
-//
-//          app.setClientId(reqBody.getCode());
-//          app.setDeveloper(dev);
-//          app.setDescription(reqBody.getDescription());
-//          app.setName(reqBody.getName());
-//
-//          if (app.getPlans() != null && app.getPlans().isEmpty()) {
-//
-//               Plan plan = planRepository.findOne(1L);
-//               if (plan != null) {
-//                    app.setPlans(new ArrayList<>(Collections.singletonList(plan)));
-//               }
-//          }
-//
-//          app = appRepository.save(app);
-//
-//          amqpCacheService.dispatchClean();
-
-          return app;
-     }
 
 }

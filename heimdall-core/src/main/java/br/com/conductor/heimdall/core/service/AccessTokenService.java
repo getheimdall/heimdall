@@ -163,22 +163,21 @@ public class AccessTokenService {
      @Transactional
      public AccessToken update(String id, AccessTokenPersist accessTokenPersist) {
 
-          AccessToken accessToken = accessTokenRepository.findOne(id);
-//          HeimdallException.checkThrow(accessToken == null, GLOBAL_RESOURCE_NOT_FOUND);
-//
-//          App appRecover = appService.find(accessTokenPersist.getApp().getId());
-//          HeimdallException.checkThrow(appRecover == null, APP_NOT_EXIST);
+          AccessToken accessToken = this.find(id);
+
+          App appRecover = appService.find(accessTokenPersist.getApp().getId());
+          HeimdallException.checkThrow(appRecover == null, APP_NOT_EXIST);
 //          HeimdallException.checkThrow(!verifyIfPlansContainsInApp(appRecover, accessTokenPersist.getPlans()), SOME_PLAN_NOT_PRESENT_IN_APP);
-//
-//          PropertyMap<AccessTokenPersist, AccessToken> propertyMap = new PropertyMap<AccessTokenPersist, AccessToken>() {
-//               @Override
-//               protected void configure() {
-//                    skip(destination.getCode());
-//               }
-//          };
-//
-//          GenericConverter.convertWithMapping(accessTokenPersist, accessToken, propertyMap);
-//          accessToken = accessTokenRepository.save(accessToken);
+
+          PropertyMap<AccessTokenPersist, AccessToken> propertyMap = new PropertyMap<AccessTokenPersist, AccessToken>() {
+               @Override
+               protected void configure() {
+                    skip(destination.getCode());
+               }
+          };
+
+          GenericConverter.convertWithMapping(accessTokenPersist, accessToken, propertyMap);
+          accessToken = accessTokenRepository.save(accessToken);
 
           amqpCacheService.dispatchClean();
 
@@ -193,8 +192,7 @@ public class AccessTokenService {
      @Transactional
      public void delete(String id) {
 
-          AccessToken accessToken = accessTokenRepository.findOne(id);
-          HeimdallException.checkThrow(accessToken == null, GLOBAL_RESOURCE_NOT_FOUND);
+          AccessToken accessToken = this.find(id);
 
           amqpCacheService.dispatchClean();
 

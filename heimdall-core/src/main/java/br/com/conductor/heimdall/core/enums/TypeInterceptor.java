@@ -42,7 +42,6 @@ public enum TypeInterceptor {
 	ACCESS_TOKEN(new AccessTokenHeimdallInterceptor()),
 	CLIENT_ID(new ClientIdHeimdallInterceptor()),
 	CUSTOM(new CustomHeimdallInterceptor()),
-	MIDDLEWARE(new MiddlewareHeimdallInterceptor()),
 	OAUTH(new OAuthHeimdallInterceptor()),
 	BLACKLIST(new BlacklistHeimdallInterceptor()),
 	WHITELIST(new WhitelistHeimdallInterceptor()),

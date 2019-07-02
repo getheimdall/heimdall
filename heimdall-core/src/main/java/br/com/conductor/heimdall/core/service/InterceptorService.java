@@ -23,8 +23,6 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_R
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.INTERCEPTOR_IGNORED_INVALID;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.INTERCEPTOR_INVALID_LIFECYCLE;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.INTERCEPTOR_REFERENCE_NOT_FOUND;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.MIDDLEWARE_NO_OPERATION_FOUND;
-import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -49,19 +47,16 @@ import br.com.conductor.heimdall.core.dto.interceptor.RateLimitDTO;
 import br.com.conductor.heimdall.core.dto.page.InterceptorPage;
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Interceptor;
-import br.com.conductor.heimdall.core.entity.Middleware;
 import br.com.conductor.heimdall.core.entity.Operation;
 import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.entity.Resource;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
-import br.com.conductor.heimdall.core.enums.Status;
 import br.com.conductor.heimdall.core.enums.TypeInterceptor;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.interceptor.impl.RattingHeimdallInterceptor;
 import br.com.conductor.heimdall.core.repository.ApiRepository;
 import br.com.conductor.heimdall.core.repository.InterceptorRepository;
-import br.com.conductor.heimdall.core.repository.MiddlewareRepository;
 import br.com.conductor.heimdall.core.repository.OperationRepository;
 import br.com.conductor.heimdall.core.repository.PlanRepository;
 import br.com.conductor.heimdall.core.repository.RateLimitRepository;
@@ -94,7 +89,7 @@ public class InterceptorService {
     private OperationRepository operationRepository;
 
     @Autowired
-    private MiddlewareRepository middlewareRepository;
+    private ApiService apiService;
 
     @Autowired
     private ApiRepository apiRepository;
@@ -178,53 +173,20 @@ public class InterceptorService {
             validateFilterCors(interceptor);
         }
 
-        List<String> ignoredResources = ignoredValidate(interceptorDTO.getIgnoredResources(), resourceRepository);
-        HeimdallException.checkThrow(!ignoredResources.isEmpty(), INTERCEPTOR_IGNORED_INVALID, ignoredResources.toString());
-
-        List<String> ignoredOperations = ignoredValidate(interceptorDTO.getIgnoredOperations(), operationRepository);
-        HeimdallException.checkThrow(!ignoredOperations.isEmpty(), INTERCEPTOR_IGNORED_INVALID, ignoredOperations.toString());
+//        List<String> ignoredResources = ignoredValidate(interceptorDTO.getIgnoredResources(), resourceRepository);
+//        HeimdallException.checkThrow(!ignoredResources.isEmpty(), INTERCEPTOR_IGNORED_INVALID, ignoredResources.toString());
+//
+//        List<String> ignoredOperations = ignoredValidate(interceptorDTO.getIgnoredOperations(), operationRepository);
+//        HeimdallException.checkThrow(!ignoredOperations.isEmpty(), INTERCEPTOR_IGNORED_INVALID, ignoredOperations.toString());
 
         HeimdallException.checkThrow((TypeInterceptor.CLIENT_ID.equals(interceptor.getType()) && InterceptorLifeCycle.PLAN.equals(interceptor.getLifeCycle())), INTERCEPTOR_INVALID_LIFECYCLE, interceptor.getType().name());
-        HeimdallException.checkThrow((TypeInterceptor.MIDDLEWARE.equals(interceptor.getType()) && !InterceptorLifeCycle.OPERATION.equals(interceptor.getLifeCycle())),
-                                     MIDDLEWARE_NO_OPERATION_FOUND, interceptor.getType().name());
 
         interceptor = interceptorRepository.save(interceptor);
 
-        if (TypeInterceptor.RATTING == interceptor.getType()) {
-            RateLimitDTO rateLimitDTO = new RattingHeimdallInterceptor().parseContent(interceptor.getContent());
-            ratelimitRepository.mountRatelimit(interceptor.getId(), rateLimitDTO.getCalls(), rateLimitDTO.getInterval());
-        }
-
         if (TypeInterceptor.CORS.equals(interceptor.getType())) {
-            Api api = apiRepository.findOne(interceptor.getApi().getId());
+            Api api = apiService.find(interceptor.getApi().getId());
             api.setCors(true);
-            apiRepository.save(api);
-        }
-
-        if (TypeInterceptor.MIDDLEWARE.equals(interceptor.getType())) {
-
-            Operation operation = operationRepository.findOne(interceptor.getReferenceId());
-            if (operation != null) {
-                Api api = operation.getResource().getApi();
-
-                List<Middleware> middlewares = middlewareRepository.findByStatusAndApiId(Status.ACTIVE, api.getId());
-                for (Middleware middleware : middlewares) {
-
-                    List<Interceptor> interceptors = middleware.getInterceptors();
-                    if (interceptors != null && !interceptors.isEmpty()) {
-
-                        interceptors.add(interceptor);
-                        middleware.setInterceptors(interceptors);
-                    } else {
-
-                        interceptors = new ArrayList<>();
-                        interceptors.add(interceptor);
-                        middleware.setInterceptors(interceptors);
-                    }
-                }
-
-                middlewareRepository.save(middlewares);
-            }
+            apiService.update(api.getId(), api);
         }
 
         amqpInterceptorService.dispatchInterceptor(interceptor.getId());
@@ -245,7 +207,7 @@ public class InterceptorService {
      */
     public Interceptor update(String id, InterceptorDTO interceptorDTO) {
 
-        Interceptor interceptor = interceptorRepository.findOne(id);
+        Interceptor interceptor = this.find(id);
         HeimdallException.checkThrow(interceptor == null, GLOBAL_RESOURCE_NOT_FOUND);
         interceptor = GenericConverter.mapper(interceptorDTO, interceptor);
 
@@ -276,7 +238,7 @@ public class InterceptorService {
     @Transactional
     public void delete(String id) {
 
-        Interceptor interceptor = interceptorRepository.findOne(id);
+        Interceptor interceptor = this.find(id);
         HeimdallException.checkThrow(interceptor == null, GLOBAL_RESOURCE_NOT_FOUND);
 
         String fileName = StringUtils.concatCamelCase(interceptor.getLifeCycle().name(), interceptor.getType().name(), interceptor.getExecutionPoint().getFilterType(), interceptor.getId().toString()) + ".groovy";
@@ -289,16 +251,9 @@ public class InterceptorService {
             ratelimitRepository.delete(path);
         }
 
-        if (TypeInterceptor.MIDDLEWARE.equals(interceptor.getType())) {
-
-            String api = interceptor.getOperation().getResource().getApi().getId();
-            pathName = String.join("/", zuulFilterRoot, MIDDLEWARE_API_ROOT, api, fileName);
-            middlewareRepository.detachFromInterceptor(id);
-        }
-
         if (TypeInterceptor.CORS.equals(interceptor.getType())) {
             interceptor.getApi().setCors(false);
-            apiRepository.save(interceptor.getApi());
+            apiService.update(interceptor.getApi().getId(), interceptor.getApi());
         }
 
         interceptorRepository.delete(interceptor);
@@ -381,21 +336,21 @@ public class InterceptorService {
         HeimdallException.checkThrow(interceptor.getApi().isCors(), ExceptionMessage.CORS_INTERCEPTOR_ALREADY_ASSIGNED_TO_THIS_API);
     }
 
-    private List<String> ignoredValidate(List<String> ignoredList, JpaRepository<?, String> repository) {
-
-        List<String> invalids = new ArrayList<>();
-        if (ignoredList != null && !ignoredList.isEmpty()) {
-
-            for (String ignored : ignoredList) {
-
-                Object o = repository.findOne(ignored);
-                if (o == null) {
-                    invalids.add(ignored);
-                }
-            }
-        }
-
-        return invalids;
-    }
+//    private List<String> ignoredValidate(List<String> ignoredList, JpaRepository<?, String> repository) {
+//
+//        List<String> invalids = new ArrayList<>();
+//        if (ignoredList != null && !ignoredList.isEmpty()) {
+//
+//            for (String ignored : ignoredList) {
+//
+//                Object o = repository.find(ignored);
+//                if (o == null) {
+//                    invalids.add(ignored);
+//                }
+//            }
+//        }
+//
+//        return invalids;
+//    }
 
 }

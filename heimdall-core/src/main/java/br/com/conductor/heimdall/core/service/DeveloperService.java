@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.core.service;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
@@ -10,9 +7,9 @@ package br.com.conductor.heimdall.core.service;
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +17,7 @@ package br.com.conductor.heimdall.core.service;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.service;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
 
@@ -31,6 +29,7 @@ import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -85,51 +84,34 @@ public class DeveloperService {
      /**
       * Generates a paged list of {@link Developer}s from a request.
       * 
-      * @param  developerDTO 			The {@link DeveloperDTO}
-      * @param  pageableDTO 			The {@link PageableDTO}
       * @return							The paged {@link Developer} list as a {@link DeveloperPage} object
       */
-     public DeveloperPage list(DeveloperDTO developerDTO, PageableDTO pageableDTO) {
+     public Page<Developer> list(Pageable pageable) {
 
-          Developer developer = GenericConverter.mapper(developerDTO, Developer.class);
-          
-          Example<Developer> example = Example.of(developer, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
-          
-          Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
-          Page<Developer> page = developerRepository.findAll(example, pageable);
-          
-          DeveloperPage developerPage = new DeveloperPage(PageDTO.build(page));
-          
-          return developerPage;
+          List<Developer> developers = this.list();
+
+          return new PageImpl<>(developers, pageable, developers.size());
      }
 
      /**
       * Generates a list of {@link Developer} from a request.
       * 
-      * @param  developerDTO 			The {@link DeveloperDTO}
       * @return							The list of {@link Developer}
       */
-     public List<Developer> list(DeveloperDTO developerDTO) {
-          
-          Developer developer = GenericConverter.mapper(developerDTO, Developer.class);
-          
-          Example<Developer> example = Example.of(developer, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
-          
-          List<Developer> developers = developerRepository.findAll(example);
-          
-          return developers;
+     public List<Developer> list() {
+
+          return developerRepository.findAll();
      }
      
      /**
       * Saves a {@link Developer}.
       * 
-      * @param  developerDTO 			The {@link DeveloperDTO}
+      * @param  developer 			The {@link Developer}
       * @return							The {@link Developer} saved
       */
      @Transactional
-     public Developer save(DeveloperDTO developerDTO) {
+     public Developer save(Developer developer) {
 
-          Developer developer = GenericConverter.mapper(developerDTO, Developer.class);
           developer = developerRepository.save(developer);
           
           return developer;
@@ -139,19 +121,17 @@ public class DeveloperService {
       * Updates a {@link Developer} by its ID.
       * 
       * @param  id						The ID of the {@link Developer} to be updated
-      * @param  developerDTO 			The {@link DeveloperDTO}
+      * @param  developer      			The {@link Developer}
       * @return							The updated {@link Developer}
       */
      @Transactional
-     public Developer update(String id, DeveloperDTO developerDTO) {
+     public Developer update(final String id, final Developer developer) {
 
-          Developer developer = developerRepository.findOne(id);
-          HeimdallException.checkThrow(developer == null, GLOBAL_RESOURCE_NOT_FOUND);
-          
-          developer = GenericConverter.mapper(developerDTO, developer);
-          developer = developerRepository.save(developer);
-          
-          return developer;
+          final Developer developerToUpdate = this.find(id);
+
+          final Developer updated = GenericConverter.mapper(developer, developerToUpdate);
+
+          return developerRepository.save(updated);
      }
      
      /**
@@ -161,9 +141,8 @@ public class DeveloperService {
      @Transactional
      public void delete(String id) {
 
-          Developer developer = developerRepository.findOne(id);
-          HeimdallException.checkThrow(developer == null, GLOBAL_RESOURCE_NOT_FOUND);
-          
+          Developer developer = this.find(id);
+
           developerRepository.delete(developer);
      }
 
