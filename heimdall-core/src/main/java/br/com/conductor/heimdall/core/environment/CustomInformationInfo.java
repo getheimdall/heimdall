@@ -38,7 +38,6 @@ public class CustomInformationInfo implements InfoContributor {
 
     @Override
     public void contribute(Info.Builder builder) {
-        builder.withDetail("traces", !property.getTrace().isPrintAllTrace() && property.getMongo().getEnabled());
-        builder.withDetail("analytics", property.getMongo().getEnabled());
+        builder.withDetail("traces", !property.getTrace().isPrintAllTrace());
     }
 }
