@@ -91,6 +91,18 @@ public abstract class GenericConverter {
           }
      }
 
+     public static <T, E> E convertWithMapping(T source, Class<E> destination, PropertyMap<T, E> mapping) {
+
+          if (source != null && destination != null) {
+
+               ModelMapper modelMapper = mapper();
+
+               modelMapper.addMappings(mapping);
+               return modelMapper.map(source, destination);
+          }
+          return null;
+     }
+
      private static ModelMapper mapper() {
           ModelMapper modelMapper = new ModelMapper();
           modelMapper.getConfiguration()

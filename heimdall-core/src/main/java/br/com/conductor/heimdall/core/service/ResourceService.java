@@ -37,8 +37,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ONLY_ONE_RESOURCE_PER_API;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 
 /**
  * This class provides methos to create, read, update and delete a {@link Resource} resource.
@@ -82,7 +81,7 @@ public class ResourceService {
 
     public Resource find(final String id) {
         Resource resource = resourceRepository.findOne(id);
-        HeimdallException.checkThrow(resource == null, GLOBAL_RESOURCE_NOT_FOUND);
+        HeimdallException.checkThrow(resource == null, GLOBAL_NOT_FOUND, "Resource");
 
         return resource;
     }

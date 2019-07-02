@@ -15,10 +15,6 @@
  */
 package br.com.conductor.heimdall.core.service;
 
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.DEFAULT_PLAN_ALREADY_EXIST_TO_THIS_API;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.PLAN_ATTACHED_TO_APPS;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -44,6 +40,8 @@ import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.PlanRepository;
 import br.com.conductor.heimdall.core.util.Pageable;
 
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
+
 /**
  * This class provides methods to create, read, update and delete a {@link Plan} resource.
  * 
@@ -67,7 +65,7 @@ public class PlanService {
      public Plan find(String id) {
           
           Plan plan = planRepository.findOne(id);
-          HeimdallException.checkThrow(plan == null, GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(plan == null, GLOBAL_NOT_FOUND, "Plan");
                               
           return plan;
      }

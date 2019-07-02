@@ -46,26 +46,17 @@ public class AccessToken implements Serializable {
 
      @Id
      private String id;
-     
+
+     @Indexed
      private String code;
 
      @Indexed
-     private App app;
-     
-     private LocalDateTime expiredDate;
+     private String app;
 
      private LocalDateTime creationDate;
      
-     private List<Plan> plans;
+     private List<String> plans;
      
      private Status status;
-     
-     private void initValuesPersist() {
-
-          status = (status == null) ? Status.ACTIVE : status;
-
-          creationDate = LocalDateTime.now();
-          code = code.trim();
-     }
 
 }

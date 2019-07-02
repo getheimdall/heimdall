@@ -21,17 +21,16 @@ package br.com.conductor.heimdall.core.service;
  * ==========================LICENSE_END===================================
  */
 
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ENVIRONMENT_INBOUND_DNS_PATTERN;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ENVIRONMENT_ATTACHED_TO_API;
-
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import br.com.conductor.heimdall.core.entity.Api;
+import br.com.conductor.heimdall.core.enums.Status;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,6 +46,8 @@ import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.EnvironmentRepository;
 import br.com.conductor.heimdall.core.util.Pageable;
 
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
+
 /**
  * This class provides methods to create, read, update and delete the {@link Environment} resource.
  *
@@ -59,6 +60,9 @@ public class EnvironmentService {
     @Autowired
     private EnvironmentRepository environmentRepository;
 
+    @Autowired
+    private ApiService apiService;
+
     /**
      * Finds a {@link Environment} by its ID.
      *
@@ -68,7 +72,7 @@ public class EnvironmentService {
     public Environment find(String id) {
 
         Environment environment = environmentRepository.findOne(id);
-        HeimdallException.checkThrow(environment == null, GLOBAL_RESOURCE_NOT_FOUND);
+        HeimdallException.checkThrow(environment == null, GLOBAL_NOT_FOUND, "Environment");
 
         return environment;
     }
@@ -76,15 +80,12 @@ public class EnvironmentService {
     /**
      * Generates a paged list of {@link Environment} from a request.
      *
-     * @param pageableDTO    The {@link PageableDTO}
+     * @param pageable The {@link Pageable}
      * @return The paged {@link Environment} list as a {@link EnvironmentPage} object
      */
-    public EnvironmentPage list(PageableDTO pageableDTO) {
+    public Page<Environment> list(Pageable pageable) {
 
-        Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
-        Page<Environment> page = environmentRepository.findAll(pageable);
-
-         return new EnvironmentPage(PageDTO.build(page));
+        return environmentRepository.findAll(pageable);
     }
 
     /**
@@ -94,95 +95,92 @@ public class EnvironmentService {
      */
     public List<Environment> list() {
 
-         return environmentRepository.findAll();
+        return environmentRepository.findAll();
     }
 
     /**
      * Saves a {@link Environment} in the repository.
      *
-     * @param environmentDTO The {@link EnvironmentDTO}
+     * @param environment The {@link Environment}
      * @return The saved {@link Environment}
      */
     @Transactional
-    public Environment save(EnvironmentDTO environmentDTO) {
+    public Environment save(Environment environment) {
 
-        List<Environment> environments = environmentRepository.findByInboundURL(environmentDTO.getInboundURL());
+        List<Environment> environments = environmentRepository.findByInboundURL(environment.getInboundURL());
 
-        Environment environmentEqual = environments.stream().filter(e -> e.getOutboundURL().equals(environmentDTO.getOutboundURL())).findFirst().orElse(null);
-        HeimdallException.checkThrow(environmentEqual != null, ExceptionMessage.ENVIRONMENT_ALREADY_EXISTS);
+        Environment environmentEqual = environments.stream().filter(e -> e.getOutboundURL().equals(environment.getOutboundURL())).findFirst().orElse(null);
+        HeimdallException.checkThrow(environmentEqual != null, ENVIRONMENT_ALREADY_EXISTS);
 
-        Environment environment = GenericConverter.mapper(environmentDTO, Environment.class);
-        HeimdallException.checkThrow(!validateInboundURL(environment.getInboundURL()), ENVIRONMENT_INBOUND_DNS_PATTERN);
+        HeimdallException.checkThrow(validateInboundURL(environment.getInboundURL()), ENVIRONMENT_INBOUND_DNS_PATTERN);
 
-        environment = environmentRepository.save(environment);
+        environment.setCreationDate(LocalDateTime.now());
+        environment.setStatus(environment.getStatus() == null ? Status.ACTIVE : environment.getStatus());
 
-        return environment;
+        return environmentRepository.save(environment);
     }
 
     /**
      * Updates a {@link Environment} by its ID.
      *
-     * @param id             The id of the {@link Environment}
-     * @param environmentDTO The {@link EnvironmentDTO}
+     * @param id                 The id of the {@link Environment}
+     * @param environmentPersist The {@link EnvironmentDTO}
      * @return The updated {@link Environment}
      */
     @Transactional
-    public Environment update(String id, EnvironmentDTO environmentDTO) {
+    public Environment update(String id, Environment environmentPersist) {
 
         Environment environment = this.find(id);
-        HeimdallException.checkThrow(environment == null, GLOBAL_RESOURCE_NOT_FOUND);
 
-        List<Environment> environments = environmentRepository.findByInboundURL(environmentDTO.getInboundURL());
+        List<Environment> environments = environmentRepository.findByInboundURL(environmentPersist.getInboundURL());
 
-        Environment environmentEqual = environments.stream().filter(e -> e.getOutboundURL().equals(environmentDTO.getOutboundURL())).findFirst().orElse(null);
-        HeimdallException.checkThrow(environmentEqual != null && !Objects.requireNonNull(environmentEqual).getId().equals(environment.getId()), ExceptionMessage.ENVIRONMENT_ALREADY_EXISTS);
+        Environment environmentEqual = environments.stream().filter(e -> e.getOutboundURL().equals(environmentPersist.getOutboundURL())).findFirst().orElse(null);
+        HeimdallException.checkThrow(environmentEqual != null && !Objects.requireNonNull(environmentEqual).getId().equals(environment.getId()), ENVIRONMENT_ALREADY_EXISTS);
 
-        Integer apis = environmentRepository.findApiWithOtherEnvironmentEqualsInbound(environment.getId(), environmentDTO.getInboundURL());
+        // TODO
+        Integer apis = environmentRepository.findApiWithOtherEnvironmentEqualsInbound(environment.getId(), environmentPersist.getInboundURL());
         HeimdallException.checkThrow(apis > 0, ExceptionMessage.API_CANT_ENVIRONMENT_INBOUND_URL_EQUALS);
 
-        environment = GenericConverter.mapper(environmentDTO, environment);
-        HeimdallException.checkThrow(!validateInboundURL(environment.getInboundURL()), ENVIRONMENT_INBOUND_DNS_PATTERN);
+        HeimdallException.checkThrow(validateInboundURL(environment.getInboundURL()), ENVIRONMENT_INBOUND_DNS_PATTERN);
 
-        environmentRepository.save(environment);
+        environment = GenericConverter.mapper(environmentPersist, environment);
 
-        return environment;
+        return environmentRepository.save(environment);
     }
 
-     /**
-      * Deletes a {@link Environment} by its ID.
-      *
-      * @param 	id 						The id of the {@link Environment}
-      */
-     @Transactional
-     public void delete(String id) {
+    /**
+     * Deletes a {@link Environment} by its ID.
+     *
+     * @param id The id of the {@link Environment}
+     */
+    @Transactional
+    public void delete(String id) {
 
         Environment environment = this.find(id);
-        HeimdallException.checkThrow(environment == null, GLOBAL_RESOURCE_NOT_FOUND);
 
         Integer totalEnvironmentsAttached = environmentRepository.findApisWithEnvironment(id);
         HeimdallException.checkThrow(totalEnvironmentsAttached > 0, ENVIRONMENT_ATTACHED_TO_API);
 
-
         environmentRepository.delete(environment);
     }
 
-     /*
-      * Validates if the String follow one of the patterns:
-      *     * http[s]://host.domain[:port]
-      *     * www.host.domain[:port]
-      *
-      * @return true if it is a a valid inbound, false otherwise
-      */
+    /*
+     * Validates if the String follow one of the patterns:
+     *     * http[s]://host.domain[:port]
+     *     * www.host.domain[:port]
+     *
+     * @return true if it is a a valid inbound, false otherwise
+     */
     private boolean validateInboundURL(String inbound) {
 
         if (inbound.matches("(http://|https://|www\\.)(.+)")) {
             String temp = inbound.replaceAll("(http://|https://|www\\.)(.+)", "$2");
 
             if (temp.matches(".+\\..+"))
-                return !temp.matches(".*/.*");
+                return temp.matches(".*/.*");
         }
 
-        return false;
+        return true;
     }
 
 }

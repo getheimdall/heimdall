@@ -23,6 +23,7 @@ package br.com.conductor.heimdall.core.service;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
 import br.com.conductor.heimdall.core.dto.persist.AppPersist;
 import br.com.conductor.heimdall.core.entity.AccessToken;
+import br.com.conductor.heimdall.core.enums.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -76,7 +78,7 @@ public class AppService {
      private DeveloperService developerService;
 
      @Autowired
-     private AccessTokenRepository accessTokenRepository;
+     private AccessTokenService accessTokenService;
 
      @Autowired
      private AMQPCacheService amqpCacheService;
@@ -91,8 +93,8 @@ public class AppService {
      public App find(String id) {
 
           App app = appRepository.findOne(id);
-          HeimdallException.checkThrow(app == null, GLOBAL_RESOURCE_NOT_FOUND);
-          app.setAccessTokens(accessTokenRepository.findByAppId(app.getId()));
+          HeimdallException.checkThrow(app == null, GLOBAL_NOT_FOUND, "App");
+          app.setAccessTokens(this.getAccessTokens(app));
 
           return app;
      }
@@ -100,55 +102,39 @@ public class AppService {
      /**
       * Generates a paged list of App.
       *
-      * @param 	appDTO					The {@link AppDTO}
-      * @param 	pageableDTO				The {@link PageableDTO}
+      * @param 	pageable				The {@link Pageable}
       * @return							The paged {@link App} list as a {@link AppPage} object
       */
      @Transactional(readOnly = true)
-     public AppPage list(AppRequestDTO appDTO, PageableDTO pageableDTO) {
+     public Page<App> list(Pageable pageable) {
 
-          App app = GenericConverter.mapper(appDTO, App.class);
-
-          Example<App> example = Example.of(app, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
-
-          Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
-          Page<App> page = appRepository.findAll(example, pageable);
-
-          AppPage appPage = new AppPage(PageDTO.build(page));
-
-          return appPage;
+          return appRepository.findAll(pageable);
      }
 
      /**
       * Generates a list of {@link App}.
       *
-      * @param 	appDTO					The {@link AppDTO}
       * @return							The list of {@link App}'s
       */
      @Transactional(readOnly = true)
-     public List<App> list(AppRequestDTO appDTO) {
+     public List<App> list() {
 
-          App app = GenericConverter.mapper(appDTO, App.class);
-
-          Example<App> example = Example.of(app, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
-
-          List<App> apps = appRepository.findAll(example);
-
-          return apps;
+          return appRepository.findAll();
      }
 
      /**
       * Saves a {@link App} to the repository.
       * 
-      * @param 	appDTO					The {@link AppPersist}
+      * @param 	app					The {@link App}
       * @return							The saved {@link App}
       * @throws HeimdallException		Developer not exist, ClientId already used
       */
-     public App save(AppPersist appDTO) {
+     @Transactional
+     public App save(App app) {
 
-          if (appDTO.getClientId() != null) {
-               App app = appRepository.findByClientId(appDTO.getClientId());
-               HeimdallException.checkThrow(Objects.nonNull(app), CLIENT_ID_ALREADY);
+          if (app.getClientId() != null) {
+
+               HeimdallException.checkThrow(appRepository.findByClientId(app.getClientId()) != null, APP_CLIENT_ID_ALREADY_USED);
           } else {
                RandomString randomString = new RandomString(12);
                String token = randomString.nextString();
@@ -157,13 +143,14 @@ public class AppService {
                     token = randomString.nextString();
                }
 
-               appDTO.setClientId(token);
+               app.setClientId(token);
           }
 
-          App app = GenericConverter.mapper(appDTO, App.class);
+          app.setCreationDate(LocalDateTime.now());
+          app.setClientId(app.getClientId().trim());
+          app.setStatus(app.getStatus() == null ? Status.ACTIVE : app.getStatus());
 
-          Developer dev = developerService.find(app.getDeveloper().getId());
-          HeimdallException.checkThrow(dev == null, DEVELOPER_NOT_EXIST);
+          developerService.find(app.getDeveloperId());
 
           amqpCacheService.dispatchClean();
 
@@ -175,25 +162,29 @@ public class AppService {
       * Updates a {@link App} by its ID.
       *
       * @param 	id						The ID of the {@link App}
-      * @param 	appDTO					{@link AppDTO}
+      * @param 	appPersist					{@link App}
       * @return							The updated {@link App}
       * @throws HeimdallException		Resource not found
       */
-     public App update(String id, AppDTO appDTO) {
+     public App update(String id, App appPersist) {
 
           App app = this.find(id);
 
-          updateTokensPlansByApp(id, appDTO.getPlans().stream().map(ReferenceIdDTO::getId).collect(Collectors.toList()));
+          updateTokensPlansByApp(id, appPersist.getPlans());
           
-          app.setAccessTokens(accessTokenRepository.findByAppId(app.getId()));
-          app = GenericConverter.mapper(appDTO, app);
+          app.setAccessTokens(this.getAccessTokens(app));
+          app = GenericConverter.mapper(appPersist, app);
           app = appRepository.save(app);
           
           amqpCacheService.dispatchClean();
           
           return app;
      }
-     
+
+     public App update(App app) {
+          return this.update(app.getId(), app);
+     }
+
      /**
       * Updates app's access tokens.
       * This is used for removing the access token to plan association, only if an app removes one of it's plans. 
@@ -202,13 +193,14 @@ public class AppService {
       * @param plansIds List of {@link Plan}'s IDs 
       */
      private void updateTokensPlansByApp(String appId, List<String> plansIds) {
-          List<AccessToken> accessTokenList = accessTokenRepository.findByAppId(appId);
+          List<AccessToken> accessTokenList = accessTokenService.findByAppId(appId);
+
           if (Objects.nonNull(accessTokenList)) {
                accessTokenList.forEach(accessToken -> {
                     if (Objects.nonNull(accessToken.getPlans()) && !accessToken.getPlans().isEmpty()) {
-                         List<Plan> planList = accessToken.getPlans().stream().filter(plan -> plansIds.contains(plan.getId())).collect(Collectors.toList());
+                         List<String> planList = accessToken.getPlans().stream().filter(plansIds::contains).collect(Collectors.toList());
                          accessToken.setPlans(planList);
-                         accessTokenRepository.save(accessToken);
+                         accessTokenService.update(accessToken);
                     }
                });
           }
@@ -229,5 +221,11 @@ public class AppService {
           appRepository.delete(app);
      }
 
+     private List<String> getAccessTokens(App app) {
+          return accessTokenService.findByAppId(app.getId()).stream()
+                  .map(AccessToken::getId)
+                  .collect(Collectors.toList())
+                  ;
+     }
 
 }

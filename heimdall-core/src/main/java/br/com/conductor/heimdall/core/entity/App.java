@@ -16,6 +16,7 @@
 package br.com.conductor.heimdall.core.entity;
 
 import br.com.conductor.heimdall.core.enums.Status;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import lombok.AllArgsConstructor;
@@ -24,9 +25,11 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -47,29 +50,45 @@ public class App implements Serializable {
     @Id
     private String id;
 
+    @Indexed
     private String clientId;
 
     private String name;
 
     private String description;
 
-    private Developer developer;
+    private String developerId;
 
     private LocalDateTime creationDate;
 
     private Status status;
 
-    private List<AccessToken> accessTokens;
+    @JsonIgnore
+    private List<String> accessTokens = new ArrayList<>();
 
-    private List<Plan> plans;
+    private List<String> plans = new ArrayList<>();
 
     private void initValuesPersist() {
 
         status = (status == null) ? Status.ACTIVE : status;
 
-        creationDate = LocalDateTime.now();
         clientId = clientId.trim();
     }
 
+    public void addAccessToken(String id) {
+        this.accessTokens.add(id);
+    }
+
+    public void removeAccessToken(String id) {
+        this.accessTokens.remove(id);
+    }
+
+    public void addPlan(String id) {
+        this.plans.add(id);
+    }
+
+    public void removePlan(String id) {
+        this.plans.remove(id);
+    }
 
 }

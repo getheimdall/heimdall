@@ -42,13 +42,11 @@ public class AccessTokenPersist implements Serializable {
      private String code;
 
      @NotNull
-     private ReferenceIdDTO app;
-     
-     private LocalDateTime expiredDate;
+     private String app;
 
      @NotNull
      @Size(min = 1)
-     private List<ReferenceIdDTO> plans;
+     private List<String> plans;
      
      private Status status;
 

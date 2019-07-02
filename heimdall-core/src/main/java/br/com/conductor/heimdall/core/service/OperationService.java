@@ -15,35 +15,30 @@
  */
 package br.com.conductor.heimdall.core.service;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
+import br.com.conductor.heimdall.core.converter.GenericConverter;
+import br.com.conductor.heimdall.core.dto.OperationDTO;
+import br.com.conductor.heimdall.core.dto.page.OperationPage;
 import br.com.conductor.heimdall.core.entity.Api;
-import br.com.conductor.heimdall.core.repository.jdbc.OperationJDBCRepository;
+import br.com.conductor.heimdall.core.entity.Operation;
+import br.com.conductor.heimdall.core.entity.Resource;
+import br.com.conductor.heimdall.core.exception.HeimdallException;
+import br.com.conductor.heimdall.core.repository.OperationRepository;
+import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
+import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
+import br.com.conductor.heimdall.core.util.ConstantsCache;
+import br.com.conductor.heimdall.core.util.Pageable;
 import br.com.conductor.heimdall.core.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.dto.OperationDTO;
-import br.com.conductor.heimdall.core.dto.PageDTO;
-import br.com.conductor.heimdall.core.dto.PageableDTO;
-import br.com.conductor.heimdall.core.dto.page.OperationPage;
-import br.com.conductor.heimdall.core.entity.Operation;
-import br.com.conductor.heimdall.core.entity.Resource;
-import br.com.conductor.heimdall.core.exception.HeimdallException;
-import br.com.conductor.heimdall.core.repository.OperationRepository;
-import br.com.conductor.heimdall.core.repository.ResourceRepository;
-import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
-import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
-import br.com.conductor.heimdall.core.util.ConstantsCache;
-import br.com.conductor.heimdall.core.util.Pageable;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 
@@ -85,7 +80,6 @@ public class OperationService {
     @Transactional(readOnly = true)
     public Operation find(String apiId, String resourceId, String operationId) {
 
-        apiService.find(apiId);
         resourceService.find(apiId, resourceId);
 
         return this.find(operationId);
@@ -93,7 +87,7 @@ public class OperationService {
 
     public Operation find(String id) {
         Operation operation = operationRepository.findOne(id);
-        HeimdallException.checkThrow(operation == null, GLOBAL_RESOURCE_NOT_FOUND);
+        HeimdallException.checkThrow(operation == null, GLOBAL_NOT_FOUND, "Operation");
 
         return operation;
     }

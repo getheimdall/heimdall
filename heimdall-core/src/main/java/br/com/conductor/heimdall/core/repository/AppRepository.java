@@ -10,9 +10,9 @@ package br.com.conductor.heimdall.core.repository;
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -37,37 +37,35 @@ import java.util.List;
  * Provides methods to access a {@link App}.
  *
  * @author Filipe Germano
- *
  */
 public interface AppRepository extends JpaRepository<App, String> {
 
-     /**
-	 * Finds a active App by its client Id.
-	 * 
-	 * @param  clientId		The client id
-	 * @return				The App found
-	 */
+    /**
+     * Finds a active App by its client Id.
+     *
+     * @param clientId The client id
+     * @return The App found
+     */
 //     @Lock(LockModeType.NONE)
-     @Query("select a from App a join a.plans p where a.clientId = :clientId and a.status = 'ACTIVE' and p.status = 'ACTIVE' ")
-     App findAppActive(@Param("clientId") String clientId);
+    @Query("select a from App a join a.plans p where a.clientId = :clientId and a.status = 'ACTIVE' and p.status = 'ACTIVE' ")
+    App findAppActive(@Param("clientId") String clientId);
 
-     /**
-	 * Finds a App by its client Id.
-	 * 
-	 * @param  clientId		The client id
-	 * @return				The App found
-	 */
-//     @Lock(LockModeType.NONE)
-	App findByClientId(String clientId);
+    /**
+     * Finds a App by its client Id.
+     *
+     * @param clientId The client id
+     * @return The App found
+     */
+    App findByClientId(String clientId);
 
-	/**
-	 * Finds a List of {@link Plan} associated with a App.
-	 * 
-	 * @param  appId		The App Id
-	 * @return				The list of Plan
-	 */
+    /**
+     * Finds a List of {@link Plan} associated with a App.
+     *
+     * @param appId The App Id
+     * @return The list of Plan
+     */
 //     @Lock(LockModeType.NONE)
-	@Query("select p from App a join a.plans p where a.id = :appId")
-	List<Plan> findPlansByApp(@Param("appId") String appId);
+    @Query("select p from App a join a.plans p where a.id = :appId")
+    List<Plan> findPlansByApp(@Param("appId") String appId);
 
 }

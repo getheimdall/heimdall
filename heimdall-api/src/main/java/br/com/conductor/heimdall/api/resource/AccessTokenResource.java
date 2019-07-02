@@ -23,7 +23,10 @@ import java.util.List;
 import javax.validation.Valid;
 
 import br.com.conductor.heimdall.core.converter.GenericConverter;
+import br.com.conductor.heimdall.core.util.Pageable;
+import org.modelmapper.PropertyMap;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -91,8 +94,9 @@ public class AccessTokenResource {
      public ResponseEntity<?> findAll(@ModelAttribute PageableDTO pageableDTO) {
           
           if (!pageableDTO.isEmpty()) {
-               
-               AccessTokenPage accessTokenPage = accessTokenService.list(pageableDTO);
+               Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+
+               Page<AccessToken> accessTokenPage = accessTokenService.list(pageable);
                return ResponseEntity.ok(accessTokenPage);
           } else {
                
@@ -132,8 +136,15 @@ public class AccessTokenResource {
      @PutMapping(value = "/{accessTokenId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_ACCESSTOKEN)
      public ResponseEntity<?> update(@PathVariable("accessTokenId") String id, @RequestBody AccessTokenPersist accessTokenPersist) {
+          PropertyMap<AccessTokenPersist, AccessToken> propertyMap = new PropertyMap<AccessTokenPersist, AccessToken>() {
+               @Override
+               protected void configure() {
+                    skip(destination.getCode());
+               }
+          };
 
-          AccessToken accessToken = accessTokenService.update(id, accessTokenPersist);
+          AccessToken accessToken = GenericConverter.convertWithMapping(accessTokenPersist, AccessToken.class, propertyMap);
+          accessToken = accessTokenService.update(id, accessToken);
           
           return ResponseEntity.ok(accessToken);
      }

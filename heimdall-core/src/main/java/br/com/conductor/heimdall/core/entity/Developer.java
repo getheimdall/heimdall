@@ -59,14 +59,6 @@ public class Developer implements Serializable {
 
      private LocalDateTime creationDate;
 
-     private List<App> apps;
-
      private Status status;
 
-     private void initValuesPersist() {
-
-          status = (status == null) ? Status.ACTIVE : status;
-
-          creationDate = LocalDateTime.now();
-     }
 }

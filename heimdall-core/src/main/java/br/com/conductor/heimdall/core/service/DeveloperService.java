@@ -19,24 +19,20 @@
  */
 package br.com.conductor.heimdall.core.service;
 
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.DEVELOPER_NOT_FOUND;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_NOT_FOUND;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import br.com.conductor.heimdall.core.dto.request.DeveloperLogin;
+import br.com.conductor.heimdall.core.enums.Status;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.dto.DeveloperDTO;
-import br.com.conductor.heimdall.core.dto.PageDTO;
-import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.page.DeveloperPage;
 import br.com.conductor.heimdall.core.entity.Developer;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
@@ -65,7 +61,7 @@ public class DeveloperService {
      public Developer find(String id) {
           
           Developer developer = developerRepository.findOne(id);      
-          HeimdallException.checkThrow(developer == null, GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(developer == null, GLOBAL_NOT_FOUND, "Developer");
                               
           return developer;
      }
@@ -88,9 +84,7 @@ public class DeveloperService {
       */
      public Page<Developer> list(Pageable pageable) {
 
-          List<Developer> developers = this.list();
-
-          return new PageImpl<>(developers, pageable, developers.size());
+          return developerRepository.findAll(pageable);
      }
 
      /**
@@ -111,6 +105,9 @@ public class DeveloperService {
       */
      @Transactional
      public Developer save(Developer developer) {
+
+          developer.setCreationDate(LocalDateTime.now());
+          developer.setStatus(developer.getStatus() == null ? Status.ACTIVE : developer.getStatus());
 
           developer = developerRepository.save(developer);
           

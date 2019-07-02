@@ -45,15 +45,13 @@ public class AppPersist implements Serializable {
     private String description;
 
     @NotNull
-    private ReferenceIdDTO developer;
-
-    private List<String> tags;
+    private String developerId;
 
     private Status status;
 
     @NotNull
     @Size(min = 1)
-    private List<ReferenceIdDTO> plans;
+    private List<String> plans;
 
     private String clientId;
 }

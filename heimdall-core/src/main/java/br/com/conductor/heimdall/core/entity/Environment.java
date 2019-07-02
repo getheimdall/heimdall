@@ -26,9 +26,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -51,6 +53,7 @@ public class Environment implements Serializable {
 
      private String description;
 
+     @Indexed
      private String inboundURL;
 
      private String outboundURL;
@@ -59,13 +62,6 @@ public class Environment implements Serializable {
      
      private Status status;
 
-     private Map<String, String> variables;
-     
-     private void initValuesPersist() {
-
-          status = (status == null) ? Status.ACTIVE : status;
-
-          creationDate = LocalDateTime.now();
-     }
+     private Map<String, String> variables = new HashMap<>();
 
 }

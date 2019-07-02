@@ -16,6 +16,7 @@
 package br.com.conductor.heimdall.api.resource;
 
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
+import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.AppDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.page.AppPage;
@@ -24,8 +25,11 @@ import br.com.conductor.heimdall.core.dto.request.AppRequestDTO;
 import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.service.AppService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
+import br.com.conductor.heimdall.core.util.Pageable;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -72,7 +76,6 @@ public class AppResource {
      /**
       * Finds all {@link App} from a request.
       * 
-      * @param appDTO				{@link AppDTO}
       * @param pageableDTO			{@link PageableDTO}
       * @return						{@link ResponseEntity}
       */
@@ -80,47 +83,18 @@ public class AppResource {
      @ApiOperation(value = "Find all Apps", responseContainer = "List", response = App.class)
      @GetMapping
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_APP)
-     public ResponseEntity<?> findAll(@ModelAttribute AppRequestDTO appDTO, @ModelAttribute PageableDTO pageableDTO) {
+     public ResponseEntity<?> findAll(@ModelAttribute PageableDTO pageableDTO) {
           
           if (!pageableDTO.isEmpty()) {
-               
-               AppPage appPage = appService.list(appDTO, pageableDTO);
-               
-               if (!appPage.getContent().isEmpty()) {
-                    List<App> apps = appPage.getContent();
-                    apps = apps.stream()
-                            .map(app -> new App(
-                                    app.getId(),
-                                    app.getClientId(),
-                                    app.getName(),
-                                    app.getDescription(),
-                                    app.getDeveloper(),
-                                    app.getCreationDate(),
-                                    app.getStatus(),
-                                    null,
-                                    app.getPlans()))
-                            .collect(Collectors.toList());
-                    appPage.setContent(apps);
-               }
+
+               Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+               Page<App> appPage = appService.list(pageable);
+
                return ResponseEntity.ok(appPage);
           } else {
                
-               List<App> apps = appService.list(appDTO);
-               
-               if (!apps.isEmpty()) {
-                    apps = apps.stream()
-                            .map(app -> new App(
-                                    app.getId(),
-                                    app.getClientId(),
-                                    app.getName(),
-                                    app.getDescription(),
-                                    app.getDeveloper(),
-                                    app.getCreationDate(),
-                                    app.getStatus(),
-                                    null,
-                                    app.getPlans()))
-                            .collect(Collectors.toList());
-               }
+               List<App> apps = appService.list();
+
                return ResponseEntity.ok(apps);
           }
      }
@@ -136,10 +110,11 @@ public class AppResource {
      @PostMapping
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_APP)
      public ResponseEntity<?> save(@RequestBody @Valid AppPersist appDTO) {
+          App app = GenericConverter.mapper(appDTO, App.class);
 
-          App app = appService.save(appDTO);
+          app = appService.save(app);
 
-          return ResponseEntity.created(URI.create(String.format("/%s/%s", "apps", app.getId().toString()))).build();
+          return ResponseEntity.created(URI.create(String.format("/%s/%s", "apps", app.getId()))).build();
      }
 
      /**
@@ -154,8 +129,9 @@ public class AppResource {
      @PutMapping(value = "/{appId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_APP)
      public ResponseEntity<?> update(@PathVariable("appId") String id, @RequestBody AppDTO appDTO) {
+          App app = GenericConverter.mapper(appDTO, App.class);
 
-          App app = appService.update(id, appDTO);
+          app = appService.update(id, app);
           
           return ResponseEntity.ok(app);
      }

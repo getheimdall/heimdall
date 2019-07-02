@@ -78,7 +78,7 @@ public class ApiService {
     public Api find(String id) {
 
         Api api = apiRepository.findOne(id);
-        HeimdallException.checkThrow(api == null, GLOBAL_RESOURCE_NOT_FOUND);
+        HeimdallException.checkThrow(api == null, GLOBAL_NOT_FOUND, "Api");
 
         return api;
     }

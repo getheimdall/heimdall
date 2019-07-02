@@ -44,6 +44,8 @@ public enum ExceptionMessage {
 
     GLOBAL_REQUEST_NOT_FOUND(NOT_FOUND.value(), "Request not found", NotFoundException.class),
 
+    GLOBAL_NOT_FOUND(NOT_FOUND.value(), "{} not found", NotFoundException.class),
+
     GLOBAL_RESOURCE_NOT_FOUND(NOT_FOUND.value(), "Resource not found", NotFoundException.class),
 
     GLOBAL_JSON_INVALID_FORMAT(BAD_REQUEST.value(), "Json invalid format", BadRequestException.class),
@@ -52,7 +54,7 @@ public enum ExceptionMessage {
 
     GLOBAL_TIMEOUT(REQUEST_TIMEOUT.value(), REQUEST_TIMEOUT.getReasonPhrase(), TimeoutException.class),
 
-    ACCESS_TOKEN_ALREADY_EXISTS(BAD_REQUEST.value(), "Token already exists", BadRequestException.class),
+    ACCESS_TOKEN_ALREADY_EXISTS(BAD_REQUEST.value(), "Access Token already used", BadRequestException.class),
 
     INTERCEPTOR_LIMIT_REACHED(BAD_REQUEST.value(), "Intercept limit reached", BadRequestException.class),
 
@@ -80,15 +82,15 @@ public enum ExceptionMessage {
 
     MIDDLEWARE_PAYLOAD_TOO_LARGE(PAYLOAD_TOO_LARGE.value(), "Content is to big. Maximal allowed request size is 25MB", MultipartException.class),
 
-    ACCESS_TOKEN_NOT_DEFINED(BAD_REQUEST.value(), "Access token not defined", BadRequestException.class),
+    ACCESS_TOKEN_NOT_FOUND(BAD_REQUEST.value(), "Access token not found", BadRequestException.class),
 
     APP_REPEATED(BAD_REQUEST.value(), "App repeated", BadRequestException.class),
 
-    DEVELOPER_NOT_EXIST(BAD_REQUEST.value(), "Developer not exist", BadRequestException.class),
+    DEVELOPER_NOT_FOUND(BAD_REQUEST.value(), "Developer not found", BadRequestException.class),
 
     RESOURCE_METHOD_NOT_ACCEPT(BAD_REQUEST.value(), "method not accepted please use: GET, POST, PUT, PATH or DELETE", BadRequestException.class),
 
-    APP_NOT_EXIST(BAD_REQUEST.value(), "App does not exist", BadRequestException.class),
+    APP_NOT_FOUND(BAD_REQUEST.value(), "App not found", BadRequestException.class),
 
     API_NOT_EXIST(BAD_REQUEST.value(), "Api does not exist", BadRequestException.class),
 
@@ -102,7 +104,7 @@ public enum ExceptionMessage {
 
     ONLY_ONE_RESOURCE_PER_API(BAD_REQUEST.value(), "Only one resource per api", BadRequestException.class),
 
-    SOME_PLAN_NOT_PRESENT_IN_APP(BAD_REQUEST.value(), "Some of the informed plans do not belong to the App plans", BadRequestException.class),
+    SOME_PLAN_NOT_PRESENT_IN_APP(BAD_REQUEST.value(), "Some of the informed plans do not belong to the App's plans", BadRequestException.class),
 
     ONLY_ONE_MIDDLEWARE_PER_VERSION_AND_API(BAD_REQUEST.value(), "Only one middleware per version and api", BadRequestException.class),
 
@@ -158,9 +160,9 @@ public enum ExceptionMessage {
 
     EMAIL_ALREADY_EXIST(BAD_REQUEST.value(), "Email already exist!", BadRequestException.class),
 
-    CLIENT_ID_ALREADY(BAD_REQUEST.value(), "clientId already used", BadRequestException.class),
+    APP_CLIENT_ID_ALREADY_USED(BAD_REQUEST.value(), "Client Id already used", BadRequestException.class),
 
-    CLIENT_ID_NOT_FOUND(BAD_REQUEST.value(), "client_id not found", BadRequestException.class),
+    APP_CLIENT_ID_NOT_FOUND(BAD_REQUEST.value(), "Client Id not found", BadRequestException.class),
 
     AUTHORIZATION_NOT_FOUND(UNAUTHORIZED.value(), "Authorization not found in header", UnauthorizedException.class),
 

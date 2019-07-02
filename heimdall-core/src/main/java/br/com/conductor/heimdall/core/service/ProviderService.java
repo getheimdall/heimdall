@@ -140,7 +140,7 @@ public class ProviderService {
     public Provider find(String id) {
         Provider provider = providerRepository.findOne(id);
 
-        HeimdallException.checkThrow(Objects.isNull(provider), ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND);
+        HeimdallException.checkThrow(Objects.isNull(provider), ExceptionMessage.GLOBAL_NOT_FOUND, "Provider");
 
         return provider;
     }

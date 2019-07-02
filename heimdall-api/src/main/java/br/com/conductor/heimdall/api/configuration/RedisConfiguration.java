@@ -101,6 +101,8 @@ public class RedisConfiguration {
           redisTemplate.setValueSerializer(new JdkSerializationRedisSerializer());
           redisTemplate.setHashKeySerializer(new StringRedisSerializer());
           redisTemplate.setHashValueSerializer(new JdkSerializationRedisSerializer());
+          redisTemplate.setEnableTransactionSupport(true);
+
           return redisTemplate;
      }
      
@@ -118,6 +120,8 @@ public class RedisConfiguration {
           redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
           redisTemplate.setHashKeySerializer(new StringRedisSerializer());
           redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+          redisTemplate.setEnableTransactionSupport(true);
+
           return redisTemplate;
      }
      

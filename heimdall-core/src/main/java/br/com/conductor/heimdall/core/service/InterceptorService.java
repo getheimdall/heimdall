@@ -19,11 +19,6 @@
  */
 package br.com.conductor.heimdall.core.service;
 
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.INTERCEPTOR_IGNORED_INVALID;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.INTERCEPTOR_INVALID_LIFECYCLE;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.INTERCEPTOR_REFERENCE_NOT_FOUND;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +60,8 @@ import br.com.conductor.heimdall.core.service.amqp.AMQPInterceptorService;
 import br.com.conductor.heimdall.core.util.ConstantsCache;
 import br.com.conductor.heimdall.core.util.Pageable;
 import br.com.conductor.heimdall.core.util.StringUtils;
+
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 
 /**
  * This class provides methods to create, read, update and delete a {@link Interceptor} resource.<br/>
@@ -113,7 +110,7 @@ public class InterceptorService {
     public Interceptor find(String id) {
 
         Interceptor interceptor = interceptorRepository.findOne(id);
-        HeimdallException.checkThrow(interceptor == null, GLOBAL_RESOURCE_NOT_FOUND);
+        HeimdallException.checkThrow(interceptor == null, GLOBAL_NOT_FOUND, "Interceptor");
 
         return interceptor;
     }

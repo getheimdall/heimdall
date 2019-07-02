@@ -69,7 +69,7 @@ public class ScopeService {
     public Scope find(final String apiId, final String scopeId) {
 
         final Scope scope = scopeRepository.findByApiIdAndId(apiId, scopeId);
-        HeimdallException.checkThrow(scope == null, GLOBAL_RESOURCE_NOT_FOUND);
+        HeimdallException.checkThrow(scope == null, GLOBAL_NOT_FOUND, "Scope");
 
         return scope;
     }
