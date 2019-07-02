@@ -135,25 +135,6 @@ public class Property {
           private boolean blockWhenExhausted;
           private Integer connectionPoolSize;
      }
-     
-     private Mongo mongo = new Mongo();
-
-     @Data
-     public class Mongo {
-
-          private Boolean enabled;
-          private String serverName;
-          private String url;
-          private Long port;
-          private String dataBase;
-          private String collection;
-          private String username;
-          private String password;
-          private Long queueSize;
-          private Long discardingThreshold;
-          private String zoneId;
-          
-     }
 
      private Trace trace = new Trace();
 
