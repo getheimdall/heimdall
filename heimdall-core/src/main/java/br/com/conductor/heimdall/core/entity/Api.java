@@ -1,11 +1,6 @@
-package br.com.conductor.heimdall.core.entity;
-
-/*-
- * =========================LICENSE_START==================================
- * heimdall-core
- * ========================================================================
+/*
  * Copyright (C) 2018 Conductor Tecnologia SA
- * ========================================================================
+ *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,8 +12,8 @@ package br.com.conductor.heimdall.core.entity;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.entity;
 
 import br.com.conductor.heimdall.core.enums.Status;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -80,14 +75,32 @@ public class Api implements Serializable {
 
      private Status status;
 
-     private List<Environment> environments = new ArrayList<>();
+     private Set<Environment> environments = new HashSet<>();
      
-     private List<Plan> plans = new ArrayList<>();
+     private Set<Plan> plans = new HashSet<>();
 
      public void addResource(String id) {
           Resource resource = new Resource();
           resource.setId(id);
           this.resources.add(resource);
+     }
+
+     public void removeResource(String id) {
+          Resource resource = new Resource();
+          resource.setId(id);
+          this.resources.remove(resource);
+     }
+
+     public void addPlan(String id) {
+          Plan plan = new Plan();
+          plan.setId(id);
+          this.plans.add(plan);
+     }
+
+     public void removePlan(String id) {
+          Plan plan = new Plan();
+          plan.setId(id);
+          this.plans.remove(plan);
      }
 
 }

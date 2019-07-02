@@ -1,12 +1,6 @@
-
-package br.com.conductor.heimdall.core.service;
-
-/*-
- * =========================LICENSE_START==================================
- * heimdall-core
- * ========================================================================
+/*
  * Copyright (C) 2018 Conductor Tecnologia SA
- * ========================================================================
+ *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,8 +12,8 @@ package br.com.conductor.heimdall.core.service;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.service;
 
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.page.ApiPage;
@@ -130,7 +124,7 @@ public class ApiService {
                 .sorted(Comparator.comparing(Api::getName))
                 .forEach(api -> api.setEnvironments(api.getEnvironments().stream()
                         .map(env -> environmentService.find(env.getId()))
-                        .collect(Collectors.toList())));
+                        .collect(Collectors.toSet())));
 
         return apis;
      }
@@ -192,6 +186,10 @@ public class ApiService {
         return savedApi;
     }
 
+    public Api update(Api api) {
+        return this.update(api.getId(), api);
+    }
+
     /**
      * Updates a {@link Api} by Swagger JSON.
      *
@@ -238,7 +236,7 @@ public class ApiService {
       * @return     List of the {@link Plan}
       */
      @Transactional(readOnly = true)
-     public List<Plan> plansByApi(String id) {
+     public Set<Plan> plansByApi(String id) {
 
           Api found = this.find(id);
 
@@ -275,6 +273,22 @@ public class ApiService {
                 .collect(Collectors.toList());
 
         return inbounds.stream().anyMatch(inbound -> Collections.frequency(inbounds, inbound) > 1);
+    }
+
+    public void removePlan(Plan plan) {
+        Api api = this.find(plan.getApi().getId());
+
+        api.removePlan(plan.getId());
+
+        this.update(api);
+    }
+
+    public void removeResource(Resource resource) {
+        Api api = this.find(resource.getApi().getId());
+
+        api.removeResource(resource.getId());
+
+        this.update(api);
     }
 
 }

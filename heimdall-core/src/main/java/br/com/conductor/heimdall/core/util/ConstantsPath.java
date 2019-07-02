@@ -1,25 +1,19 @@
-
-package br.com.conductor.heimdall.core.util;
-
-/*-
- * =========================LICENSE_START==================================
- * heimdall-core
- * ========================================================================
+/*
  * Copyright (C) 2018 Conductor Tecnologia SA
- * ========================================================================
+ *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.util;
 
 /**
  * This class holds the path constants.
@@ -49,15 +43,12 @@ public final class ConstantsPath {
 
      public static final String PATH_RESOURCES = PATH_APIS + "/{apiId}" + "/resources";
 
-     public static final String PATH_MIDDLEWARES = PATH_APIS + "/{apiId}" + "/middlewares";
-     
+
      public static final String PATH_OPERATIONS = PATH_APIS + "/{apiId}";
 
      public static final String PATH_ACCESS_TOKENS = PATH_API + "/access_tokens";
 
      public static final String PATH_INTERCEPTORS = PATH_API + "/interceptors";
-     
-     public static final String PATH_INTEGRATION_RESOURCES = PATH_API + "/integrations";
 
      public static final String PATH_ENVIRONMENTS = PATH_API + "/environments";
 
@@ -70,16 +61,12 @@ public final class ConstantsPath {
      public static final String PATH_PRIVILEGES = PATH_API + "/privileges";
      
      public static final String PATH_PROVIDER = PATH_API + "/providers";
-     
-     public static final String PATH_TRACES = PATH_API + "/traces";
 
      public static final String PATH_LOGIN = PATH_API + "/login";
 
      public static final String PATH_LOGOUT = PATH_API + "/logout";
 
      public static final String PATH_LDAP = PATH_API + "/ldap";
-
-     public static final String PATH_METRICS = PATH_API + "/metrics";
 
      public static final String PATH_SCOPES = PATH_APIS + "/{apiId}" + "/scopes";
 

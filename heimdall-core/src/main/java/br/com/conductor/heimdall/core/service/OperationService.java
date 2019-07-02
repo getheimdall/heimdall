@@ -1,25 +1,19 @@
-
-package br.com.conductor.heimdall.core.service;
-
-/*-
- * =========================LICENSE_START==================================
- * heimdall-core
- * ========================================================================
+/*
  * Copyright (C) 2018 Conductor Tecnologia SA
- * ========================================================================
+ *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.service;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -55,261 +49,268 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 
 /**
  * This class provides methods to create, read, update and delete a {@link Operation} resource.
- * 
+ *
  * @author Filipe Germano
  * @author Marcelo Aguiar Rodrigues
- *
  */
 @Service
 public class OperationService {
 
-     @Autowired
-     private OperationRepository operationRepository;
+    @Autowired
+    private OperationRepository operationRepository;
 
-     @Autowired
-     private ResourceService resourceService;
+    @Autowired
+    private ResourceService resourceService;
 
-     @Autowired
-     private InterceptorService interceptorService;
+    @Autowired
+    private InterceptorService interceptorService;
 
-     @Autowired
-     private ApiService apiService;
+    @Autowired
+    private ApiService apiService;
 
-     @Autowired
-     private AMQPRouteService amqpRoute;
+    @Autowired
+    private AMQPRouteService amqpRoute;
 
-     @Autowired
-     private AMQPCacheService amqpCacheService;
+    @Autowired
+    private AMQPCacheService amqpCacheService;
 
-     /**
-      * Finds a {@link Operation} by its Id, {@link Resource} Id and {@link br.com.conductor.heimdall.core.entity.Api} Id.
-      * 
-      * @param  apiId						The {@link br.com.conductor.heimdall.core.entity.Api} Id
-      * @param 	resourceId					The {@link Resource} Id
-      * @param 	operationId					The {@link Operation} Id
-      * @return								The {@link Operation} found
-      */
-     @Transactional(readOnly = true)
-     public Operation find(String apiId, String resourceId, String operationId) {
+    /**
+     * Finds a {@link Operation} by its Id, {@link Resource} Id and {@link br.com.conductor.heimdall.core.entity.Api} Id.
+     *
+     * @param apiId       The {@link br.com.conductor.heimdall.core.entity.Api} Id
+     * @param resourceId  The {@link Resource} Id
+     * @param operationId The {@link Operation} Id
+     * @return The {@link Operation} found
+     */
+    @Transactional(readOnly = true)
+    public Operation find(String apiId, String resourceId, String operationId) {
 
-          apiService.find(apiId);
-          resourceService.find(apiId, resourceId);
+        apiService.find(apiId);
+        resourceService.find(apiId, resourceId);
 
-         return this.find(operationId);
-     }
+        return this.find(operationId);
+    }
 
-     public Operation find(String id) {
-         Operation operation = operationRepository.findOne(id);
-         HeimdallException.checkThrow(operation == null, GLOBAL_RESOURCE_NOT_FOUND);
+    public Operation find(String id) {
+        Operation operation = operationRepository.findOne(id);
+        HeimdallException.checkThrow(operation == null, GLOBAL_RESOURCE_NOT_FOUND);
 
-         return operation;
-     }
-     
-     /**
-      * Generates a paged list of {@link Operation} from a request.
-      * 
-      * @param  apiId						The {@link br.com.conductor.heimdall.core.entity.Api} Id
-      * @param 	resourceId					The {@link Resource} Id
-      * @param 	pageable					The {@link Pageable}
-      * @return								The paged {@link Operation} list as a {@link OperationPage} object
-      */
-     @Transactional(readOnly = true)
-     public Page<Operation> list(String apiId, String resourceId, Pageable pageable) {
+        return operation;
+    }
 
-         final List<Operation> operations = this.list(apiId, resourceId);
+    /**
+     * Generates a paged list of {@link Operation} from a request.
+     *
+     * @param apiId      The {@link br.com.conductor.heimdall.core.entity.Api} Id
+     * @param resourceId The {@link Resource} Id
+     * @param pageable   The {@link Pageable}
+     * @return The paged {@link Operation} list as a {@link OperationPage} object
+     */
+    @Transactional(readOnly = true)
+    public Page<Operation> list(String apiId, String resourceId, Pageable pageable) {
 
-         return new PageImpl<>(operations, pageable, operations.size());
-     }
+        final List<Operation> operations = this.list(apiId, resourceId);
 
-     /**
-      * Generates a list of {@link Operation} from a request.
-      * 
-      * @param  apiId						The {@link br.com.conductor.heimdall.core.entity.Api} Id
-      * @param 	resourceId					The {@link Resource} Id
-      * @return								The list of {@link Operation}
-      */
-     @Transactional(readOnly = true)
-     public List<Operation> list(String apiId, String resourceId) {
+        return new PageImpl<>(operations, pageable, operations.size());
+    }
 
-         resourceService.find(apiId, resourceId);
+    /**
+     * Generates a list of {@link Operation} from a request.
+     *
+     * @param apiId      The {@link br.com.conductor.heimdall.core.entity.Api} Id
+     * @param resourceId The {@link Resource} Id
+     * @return The list of {@link Operation}
+     */
+    @Transactional(readOnly = true)
+    public List<Operation> list(String apiId, String resourceId) {
 
-         final List<Operation> operations = operationRepository.findAll();
+        resourceService.find(apiId, resourceId);
 
-         return operations.stream()
-                 .filter(operation -> resourceId.equals(operation.getResource().getId()))
-                 .collect(Collectors.toList());
-     }
+        final List<Operation> operations = operationRepository.findAll();
 
-     /**
-      * Lists all {@link Operation} from one {@link Api}
-      *
-      * @param apiId The {@link Api} Id
-      * @return The complete list of all {@link Operation} from the {@link Api}
-      */
-     @Transactional(readOnly = true)
-     public List<Operation> list(final String apiId) {
-          apiService.find(apiId);
+        return operations.stream()
+                .filter(operation -> resourceId.equals(operation.getResource().getId()))
+                .collect(Collectors.toList());
+    }
 
-         final List<Operation> allOperations = operationRepository.findAll();
+    /**
+     * Lists all {@link Operation} from one {@link Api}
+     *
+     * @param apiId The {@link Api} Id
+     * @return The complete list of all {@link Operation} from the {@link Api}
+     */
+    @Transactional(readOnly = true)
+    public List<Operation> list(final String apiId) {
+        apiService.find(apiId);
 
-         final List<Operation> operations = allOperations.stream()
-                 .filter(operation -> {
-                     final Resource resource = resourceService.find(apiId, operation.getResource().getId());
-                     return apiId.equals(resource.getApi().getId());
-                 })
-                 .collect(Collectors.toList());
+        final List<Operation> allOperations = operationRepository.findAll();
 
-          if (!operations.isEmpty()) {
-               for (Operation operation : operations) {
-                   operation.setDescription(null);
-                   operation.setResource(null);
-               }
-          }
+        final List<Operation> operations = allOperations.stream()
+                .filter(operation -> {
+                    final Resource resource = resourceService.find(apiId, operation.getResource().getId());
+                    return apiId.equals(resource.getApi().getId());
+                })
+                .collect(Collectors.toList());
 
-          return operations;
-     }
+        if (!operations.isEmpty()) {
+            for (Operation operation : operations) {
+                operation.setDescription(null);
+                operation.setResource(null);
+            }
+        }
 
-     /**
-      * Saves a {@link Operation} to the repository.
-      *
-      * @param  apiId						The {@link br.com.conductor.heimdall.core.entity.Api} Id
-      * @param 	resourceId					The {@link Resource} Id
-      * @return								The saved {@link Operation}
-      */
-     @Transactional
-     public Operation save(String apiId, String resourceId, final Operation operation) {
+        return operations;
+    }
 
-         final Resource resource = resourceService.find(apiId, resourceId);
+    /**
+     * Saves a {@link Operation} to the repository.
+     *
+     * @param apiId      The {@link br.com.conductor.heimdall.core.entity.Api} Id
+     * @param resourceId The {@link Resource} Id
+     * @return The saved {@link Operation}
+     */
+    @Transactional
+    public Operation save(String apiId, String resourceId, final Operation operation) {
 
-         operation.setPath(StringUtils.removeMultipleSlashes(operation.getPath()));
+        final Resource resource = resourceService.find(apiId, resourceId);
 
-          HeimdallException.checkThrow(
-                  this.list(apiId).stream()
-                          .anyMatch(op -> op.getPath().equals(operation.getPath()) && op.getMethod().equals(operation.getMethod())),
-                  ONLY_ONE_OPERATION_PER_RESOURCE);
+        operation.setPath(StringUtils.removeMultipleSlashes(operation.getPath()));
+        operation.fixBasePath();
 
-          HeimdallException.checkThrow(validatePath(resource.getApi().getBasePath() + "/" + operation.getPath()), OPERATION_ROUTE_ALREADY_EXISTS);
+        HeimdallException.checkThrow(
+                this.list(apiId).stream()
+                        .anyMatch(op -> op.getPath().equals(operation.getPath()) && op.getMethod().equals(operation.getMethod())),
+                ONLY_ONE_OPERATION_PER_RESOURCE);
 
-          final Resource resourcePersist = new Resource();
-          resourcePersist.setId(resourceId);
+        HeimdallException.checkThrow(validatePath(resource.getApi().getBasePath() + "/" + operation.getPath()), OPERATION_ROUTE_ALREADY_EXISTS);
 
-          operation.setResource(resourcePersist);
+        final Resource resourcePersist = new Resource();
+        resourcePersist.setId(resourceId);
 
-          HeimdallException.checkThrow(validateSingleWildCardOperationPath(operation), OPERATION_CANT_HAVE_SINGLE_WILDCARD);
-          HeimdallException.checkThrow(validateDoubleWildCardOperationPath(operation), OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END);
+        operation.setResource(resourcePersist);
 
-          final Operation savedOperation = operationRepository.save(operation);
+        HeimdallException.checkThrow(validateSingleWildCardOperationPath(operation), OPERATION_CANT_HAVE_SINGLE_WILDCARD);
+        HeimdallException.checkThrow(validateDoubleWildCardOperationPath(operation), OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END);
 
-          resource.addOperation(savedOperation.getId());
+        final Operation savedOperation = operationRepository.save(operation);
 
-          resourceService.update(apiId, resourceId, resource);
+        resource.addOperation(savedOperation.getId());
 
-          amqpRoute.dispatchRoutes();
+        resourceService.update(apiId, resourceId, resource);
 
-          return savedOperation;
-     }
+        amqpRoute.dispatchRoutes();
 
-     private boolean validatePath(String pattern) {
-         final List<Api> apis = apiService.list();
-         final Set<String> routes = new TreeSet<>();
+        return savedOperation;
+    }
 
-         apis.forEach(api -> this.list(api.getId())
-                 .forEach(operation -> routes.add(api.getBasePath() + operation.getPath())));
+    private boolean validatePath(String pattern) {
+        final List<Api> apis = apiService.list();
+        final Set<String> routes = new TreeSet<>();
 
-         return routes.contains(pattern);
-     }
-     /**TODO
-      * Updates a {@link Operation} by its Id, {@link br.com.conductor.heimdall.core.entity.Api} Id, {@link Resource} Id and {@link OperationDTO}.
-      *
-      * @param  apiId						The {@link br.com.conductor.heimdall.core.entity.Api} Id
-      * @param 	resourceId					The {@link Resource} Id
-      * @param 	operationId					The {@link Operation} Id
-      * @param 	operationPersist			The {@link Operation}
-      * @return								The updated {@link Operation}
-      */
-     @Transactional
-     public Operation update(String apiId, String resourceId, String operationId, Operation operationPersist) {
+        apis.forEach(api -> this.list(api.getId())
+                .forEach(operation -> routes.add(api.getBasePath() + operation.getPath())));
 
-          Operation operation = this.find(apiId, resourceId, operationId);
+        return routes.contains(pattern);
+    }
 
-          Operation resData = operationRepository.findByResourceApiIdAndMethodAndPath(apiId, operationPersist.getMethod(), operationPersist.getPath());
-          HeimdallException.checkThrow(resData != null &&
-                  resData.getResource().getId().equals(operation.getResource().getId()) &&
-                  !resData.getId().equals(operation.getId()), ONLY_ONE_OPERATION_PER_RESOURCE);
-          
-          operation = GenericConverter.mapper(operationPersist, operation);
-          operation.setPath(StringUtils.removeMultipleSlashes(operation.getPath()));
+    /**
+     * TODO
+     * Updates a {@link Operation} by its Id, {@link br.com.conductor.heimdall.core.entity.Api} Id, {@link Resource} Id and {@link OperationDTO}.
+     *
+     * @param apiId            The {@link br.com.conductor.heimdall.core.entity.Api} Id
+     * @param resourceId       The {@link Resource} Id
+     * @param operationId      The {@link Operation} Id
+     * @param operationPersist The {@link Operation}
+     * @return The updated {@link Operation}
+     */
+    @Transactional
+    public Operation update(String apiId, String resourceId, String operationId, Operation operationPersist) {
 
-          HeimdallException.checkThrow(validatePath(operation.getResource().getApi().getBasePath() + "/" + operation.getPath()), OPERATION_ROUTE_ALREADY_EXISTS);
+        Operation operation = this.find(apiId, resourceId, operationId);
 
-          HeimdallException.checkThrow(validateSingleWildCardOperationPath(operation), OPERATION_CANT_HAVE_SINGLE_WILDCARD);
-          HeimdallException.checkThrow(validateDoubleWildCardOperationPath(operation), OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END);
-          
-          operation = operationRepository.save(operation);
-          
-          amqpRoute.dispatchRoutes();
-          
-          amqpCacheService.dispatchClean(ConstantsCache.OPERATION_ACTIVE_FROM_ENDPOINT, operation.getResource().getApi().getBasePath() + operation.getPath());
-          
-          return operation;
-     }
-     
-     /**
-      * Deletes a {@link Operation} by its Id, {@link Resource} Id and {@link br.com.conductor.heimdall.core.entity.Api} Id.
-      *
-      * @param  apiId						The {@link br.com.conductor.heimdall.core.entity.Api} Id
-      * @param 	resourceId					The {@link Resource} Id
-      * @param 	operationId					The {@link Operation} Id
-      */
-     @Transactional
-     public void delete(String apiId, String resourceId, String operationId) {
+        Operation resData = operationRepository.findByResourceApiIdAndMethodAndPath(apiId, operationPersist.getMethod(), operationPersist.getPath());
+        HeimdallException.checkThrow(resData != null &&
+                resData.getResource().getId().equals(operation.getResource().getId()) &&
+                !resData.getId().equals(operation.getId()), ONLY_ONE_OPERATION_PER_RESOURCE);
 
-          Operation operation = this.find(apiId, resourceId, operationId);
+        operation = GenericConverter.mapper(operationPersist, operation);
+        operation.setPath(StringUtils.removeMultipleSlashes(operation.getPath()));
+        operation.fixBasePath();
 
-          // Deletes all interceptors attached to the Operation
+        HeimdallException.checkThrow(validatePath(operation.getResource().getApi().getBasePath() + "/" + operation.getPath()), OPERATION_ROUTE_ALREADY_EXISTS);
+
+        HeimdallException.checkThrow(validateSingleWildCardOperationPath(operation), OPERATION_CANT_HAVE_SINGLE_WILDCARD);
+        HeimdallException.checkThrow(validateDoubleWildCardOperationPath(operation), OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END);
+
+        operation = operationRepository.save(operation);
+
+        amqpRoute.dispatchRoutes();
+
+        amqpCacheService.dispatchClean(ConstantsCache.OPERATION_ACTIVE_FROM_ENDPOINT, operation.getResource().getApi().getBasePath() + operation.getPath());
+
+        return operation;
+    }
+
+    /**
+     * Deletes a {@link Operation} by its Id, {@link Resource} Id and {@link br.com.conductor.heimdall.core.entity.Api} Id.
+     *
+     * @param apiId       The {@link br.com.conductor.heimdall.core.entity.Api} Id
+     * @param resourceId  The {@link Resource} Id
+     * @param operationId The {@link Operation} Id
+     */
+    @Transactional
+    public void delete(String apiId, String resourceId, String operationId) {
+
+        Operation operation = this.find(apiId, resourceId, operationId);
+
+        final Api api = apiService.find(apiId);
+
+        // Deletes all interceptors attached to the Operation
 //          interceptorService.deleteAllfromOperation(operationId);
 
-          operationRepository.delete(operation);
-          amqpCacheService.dispatchClean(ConstantsCache.OPERATION_ACTIVE_FROM_ENDPOINT, operation.getResource().getApi().getBasePath() + operation.getPath());
-          
-          
-          amqpRoute.dispatchRoutes();
-     }
+        resourceService.removeOperation(operation);
 
-     /**
-      * Deletes all Operations from a Resource
-      *
-      * @param apiId      Api with the Resource
-      * @param resourceId Resource with the Operations
-      */
-     @Transactional
-     public void deleteAllfromResource(String apiId, String resourceId) {
-          List<Operation> operations = this.list(apiId, resourceId);
-          operations.forEach(operation -> this.delete(apiId, resourceId, operation.getId()));
-     }
+        operationRepository.delete(operation);
 
-     /*
-      * A Operation can not have a single wild card at any point in it.
-      * 
-      * @return  true when the path of the operation contains a single wild card, false otherwise
-      */
-     private boolean validateSingleWildCardOperationPath(Operation operation) {
-         
-          return Arrays.asList(operation.getPath().split("/")).contains("*");
-     }
-     
-     /*
-      * A Operation can have a one double wild card that must to be at the end of it, not at any other point.
-      * 
-      * @return true when the path has more than one double wild card or one not at the end, false otherwise
-      */
-     private boolean validateDoubleWildCardOperationPath(Operation operation) {
-         List<String> path = Arrays.asList(operation.getPath().split("/"));
-                   
-         if (path.contains("**"))
-        	 return !(operation.getPath().endsWith("**") && (path.stream().filter(o -> o.equals("**")).count() == 1));
-         else 
-       	 	 return false;
+        amqpCacheService.dispatchClean(ConstantsCache.OPERATION_ACTIVE_FROM_ENDPOINT, api.getBasePath() + operation.getPath());
+
+        amqpRoute.dispatchRoutes();
+    }
+
+    /**
+     * Deletes all Operations from a Resource
+     *
+     * @param apiId      Api with the Resource
+     * @param resourceId Resource with the Operations
+     */
+    @Transactional
+    public void deleteAllfromResource(String apiId, String resourceId) {
+        List<Operation> operations = this.list(apiId, resourceId);
+        operations.forEach(operation -> this.delete(apiId, resourceId, operation.getId()));
+    }
+
+    /*
+     * A Operation can not have a single wild card at any point in it.
+     *
+     * @return  true when the path of the operation contains a single wild card, false otherwise
+     */
+    private boolean validateSingleWildCardOperationPath(Operation operation) {
+
+        return Arrays.asList(operation.getPath().split("/")).contains("*");
+    }
+
+    /*
+     * A Operation can have a one double wild card that must to be at the end of it, not at any other point.
+     *
+     * @return true when the path has more than one double wild card or one not at the end, false otherwise
+     */
+    private boolean validateDoubleWildCardOperationPath(Operation operation) {
+        List<String> path = Arrays.asList(operation.getPath().split("/"));
+
+        if (path.contains("**"))
+            return !(operation.getPath().endsWith("**") && (path.stream().filter(o -> o.equals("**")).count() == 1));
+        else
+            return false;
     }
 
 }

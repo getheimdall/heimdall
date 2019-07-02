@@ -1,32 +1,30 @@
-
-package br.com.conductor.heimdall.core.service;
-
-/*-
- * =========================LICENSE_START==================================
- * heimdall-core
- * ========================================================================
+/*
  * Copyright (C) 2018 Conductor Tecnologia SA
- * ========================================================================
+ *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.service;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.DEFAULT_PLAN_ALREADY_EXIST_TO_THIS_API;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.PLAN_ATTACHED_TO_APPS;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
+import br.com.conductor.heimdall.core.entity.Api;
+import br.com.conductor.heimdall.core.enums.Status;
 import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -106,11 +104,20 @@ public class PlanService {
      public Plan save(Plan plan) {
 
           if (plan.isDefaultPlan()) {
-               List<Plan> plans = apiService.plansByApi(plan.getApi().getId());
+               Set<Plan> plans = apiService.plansByApi(plan.getApi().getId());
                HeimdallException.checkThrow(plans.stream().anyMatch(Plan::isDefaultPlan), DEFAULT_PLAN_ALREADY_EXIST_TO_THIS_API);
           }
 
+          plan.setStatus(plan.getStatus() == null ? Status.ACTIVE : plan.getStatus());
+          plan.setCreationDate(LocalDateTime.now());
+
           plan = planRepository.save(plan);
+
+          Api api = apiService.find(plan.getApi().getId());
+
+          api.addPlan(plan.getId());
+
+          apiService.update(api);
 
           amqpCacheService.dispatchClean();
 
@@ -129,7 +136,7 @@ public class PlanService {
           Plan plan = this.find(id);
 
           if (planPersist.isDefaultPlan()) {
-               List<Plan> plans = apiService.plansByApi(plan.getApi().getId());
+               Set<Plan> plans = apiService.plansByApi(plan.getApi().getId());
                HeimdallException.checkThrow(plans.stream().anyMatch(p -> !id.equals(p.getId()) && p.isDefaultPlan()), DEFAULT_PLAN_ALREADY_EXIST_TO_THIS_API);
           }
 
@@ -151,8 +158,10 @@ public class PlanService {
 
           Plan plan = this.find(id);
 
-          Integer totalAppsAttached = planRepository.findAppsWithPlan(id);
-          HeimdallException.checkThrow(totalAppsAttached > 0, PLAN_ATTACHED_TO_APPS);
+//          Integer totalAppsAttached = planRepository.findAppsWithPlan(id);
+//          HeimdallException.checkThrow(totalAppsAttached > 0, PLAN_ATTACHED_TO_APPS);
+
+          apiService.removePlan(plan);
 
           planRepository.delete(plan);
 

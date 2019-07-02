@@ -1,9 +1,6 @@
-/*-
- * =========================LICENSE_START==================================
- * heimdall-core
- * ========================================================================
+/*
  * Copyright (C) 2018 Conductor Tecnologia SA
- * ========================================================================
+ *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,7 +12,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * ==========================LICENSE_END===================================
  */
 package br.com.conductor.heimdall.core.service;
 
@@ -23,6 +19,7 @@ import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.ResourceDTO;
 import br.com.conductor.heimdall.core.dto.page.ResourcePage;
 import br.com.conductor.heimdall.core.entity.Api;
+import br.com.conductor.heimdall.core.entity.Operation;
 import br.com.conductor.heimdall.core.entity.Resource;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.ResourceRepository;
@@ -80,7 +77,11 @@ public class ResourceService {
 
         apiService.find(apiId);
 
-        Resource resource = resourceRepository.findOne(resourceId);
+        return this.find(resourceId);
+    }
+
+    public Resource find(final String id) {
+        Resource resource = resourceRepository.findOne(id);
         HeimdallException.checkThrow(resource == null, GLOBAL_RESOURCE_NOT_FOUND);
 
         return resource;
@@ -176,7 +177,11 @@ public class ResourceService {
         return savedResource;
     }
 
-    /**
+    public Resource update(Resource resource) {
+        return this.update(resource.getApi().getId(), resource.getId(), resource);
+    }
+
+    /**TODO
      * Deletes a {@link Resource} by its Id.
      *
      * @param apiId      The {@link Api} Id
@@ -194,6 +199,8 @@ public class ResourceService {
 
 //        resourceRepository.delete(resource.getId());
 
+        apiService.removeResource(resource);
+
         amqpRoute.dispatchRoutes();
     }
 
@@ -205,5 +212,13 @@ public class ResourceService {
     public void deleteAllFromApi(String apiId) {
         List<Resource> resources = this.list(apiId);
         resources.forEach(resource -> this.delete(apiId, resource.getId()));
+    }
+
+    public void removeOperation(Operation operation) {
+        Resource resource = this.find(operation.getResource().getId());
+
+        resource.removeOperation(operation.getId());
+
+        this.update(resource);
     }
 }
