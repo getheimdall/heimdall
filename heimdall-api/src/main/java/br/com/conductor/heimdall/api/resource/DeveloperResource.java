@@ -19,7 +19,6 @@ import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.DeveloperDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
-import br.com.conductor.heimdall.core.dto.page.DeveloperPage;
 import br.com.conductor.heimdall.core.dto.request.DeveloperLogin;
 import br.com.conductor.heimdall.core.entity.Developer;
 import br.com.conductor.heimdall.core.service.DeveloperService;

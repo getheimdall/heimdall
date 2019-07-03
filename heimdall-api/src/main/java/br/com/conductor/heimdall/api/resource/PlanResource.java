@@ -41,111 +41,111 @@ import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_PLANS;
  * Uses a {@link PlanService} to provide methods to create, read, update and delete a {@link Plan}.
  *
  * @author Filipe Germano
- *
  */
-@io.swagger.annotations.Api(value = PATH_PLANS, produces = MediaType.APPLICATION_JSON_VALUE, tags = { ConstantsTag.TAG_PLANS })
+@io.swagger.annotations.Api(
+        value = PATH_PLANS,
+        produces = MediaType.APPLICATION_JSON_VALUE,
+        tags = {ConstantsTag.TAG_PLANS})
 @RestController
 @RequestMapping(value = PATH_PLANS)
 public class PlanResource {
 
-     @Autowired
-     private PlanService planService;
+    @Autowired
+    private PlanService planService;
 
-     /**
-      * Finds a {@link Plan} by its Id.
-      * 
-      * @param id					The Plan Id
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Find Plan by id", response = Plan.class)
-     @GetMapping(value = "/{planId}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_PLAN)
-     public ResponseEntity<?> findById(@PathVariable("planId") String id) {
+    /**
+     * Finds a {@link Plan} by its Id.
+     *
+     * @param id The Plan Id
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Find Plan by id", response = Plan.class)
+    @GetMapping(value = "/{planId}")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_PLAN)
+    public ResponseEntity<?> findById(@PathVariable("planId") String id) {
 
-          Plan plan = planService.find(id);
+        Plan plan = planService.find(id);
 
-          return ResponseEntity.ok(plan);
-     }
+        return ResponseEntity.ok(plan);
+    }
 
-     /**
-      * Finds all {@link Plan} from a request.
-      * 
-      * @param pageableDTO			{@link PageableDTO}
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Find all Plans", responseContainer = "List", response = Plan.class)
-     @GetMapping
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_PLAN)
-     public ResponseEntity<?> findAll(@ModelAttribute PageableDTO pageableDTO) {
-          
-          if (!pageableDTO.isEmpty()) {
-               Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
-               Page<Plan> planPage = planService.list(pageable);
+    /**
+     * Finds all {@link Plan} from a request.
+     *
+     * @param pageableDTO {@link PageableDTO}
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Find all Plans", responseContainer = "List", response = Plan.class)
+    @GetMapping
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_PLAN)
+    public ResponseEntity<?> findAll(@ModelAttribute PageableDTO pageableDTO) {
 
-               return ResponseEntity.ok(planPage);
-          } else {
-               
-               List<Plan> plans = planService.list();
-               return ResponseEntity.ok(plans);
-          }
-     }
+        if (!pageableDTO.isEmpty()) {
+            Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+            Page<Plan> planPage = planService.list(pageable);
 
-     /**
-      * Saves a {@link Plan}.
-      * 
-      * @param planDTO				{@link PlanDTO}
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Save a new Plan")
-     @PostMapping
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_PLAN)
-     public ResponseEntity<?> save(@RequestBody @Valid PlanDTO planDTO) {
+            return ResponseEntity.ok(planPage);
+        } else {
+            List<Plan> plans = planService.list();
 
-          Plan plan = GenericConverter.mapper(planDTO, Plan.class);
+            return ResponseEntity.ok(plans);
+        }
+    }
 
-          plan = planService.save(plan);
+    /**
+     * Saves a {@link Plan}.
+     *
+     * @param planDTO {@link PlanDTO}
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Save a new Plan")
+    @PostMapping
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_PLAN)
+    public ResponseEntity<?> save(@RequestBody @Valid PlanDTO planDTO) {
 
-          return ResponseEntity.created(URI.create(String.format("/%s/%s", "plans", plan.getId()))).build();
-     }
+        Plan plan = GenericConverter.mapper(planDTO, Plan.class);
+        plan = planService.save(plan);
 
-     /**
-      * Updates a {@link Plan}.
-      * 
-      * @param id					The Plan Id
-      * @param planDTO				{@link PlanDTO}
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Update Plan")
-     @PutMapping(value = "/{planId}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_PLAN)
-     public ResponseEntity<?> update(@PathVariable("planId") String id, @RequestBody PlanDTO planDTO) {
+        return ResponseEntity.created(URI.create(String.format("/%s/%s", "plans", plan.getId()))).build();
+    }
 
-          Plan plan = GenericConverter.mapper(planDTO, Plan.class);
+    /**
+     * Updates a {@link Plan}.
+     *
+     * @param id      The Plan Id
+     * @param planDTO {@link PlanDTO}
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Update Plan")
+    @PutMapping(value = "/{planId}")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_PLAN)
+    public ResponseEntity<?> update(@PathVariable("planId") String id, @RequestBody PlanDTO planDTO) {
 
-          plan = planService.update(id, plan);
-          
-          return ResponseEntity.ok(plan);
-     }
+        Plan plan = GenericConverter.mapper(planDTO, Plan.class);
+        plan = planService.update(id, plan);
 
-     /**
-      * Deletes a {@link Plan}.
-      * 
-      * @param id					The Plan Id
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Delete Plan")
-     @DeleteMapping(value = "/{planId}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_PLAN)
-     public ResponseEntity<?> delete(@PathVariable("planId") String id) {
+        return ResponseEntity.ok(plan);
+    }
 
-          planService.delete(id);
-          
-          return ResponseEntity.noContent().build();
-     }
+    /**
+     * Deletes a {@link Plan}.
+     *
+     * @param id The Plan Id
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Delete Plan")
+    @DeleteMapping(value = "/{planId}")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_PLAN)
+    public ResponseEntity<?> delete(@PathVariable("planId") String id) {
+
+        planService.delete(id);
+
+        return ResponseEntity.noContent().build();
+    }
 
 }

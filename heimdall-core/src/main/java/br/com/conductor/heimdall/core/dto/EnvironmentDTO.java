@@ -52,7 +52,7 @@ public class EnvironmentDTO implements Serializable {
      @Size(max = 250)
      private String outboundURL;
      
-     private Status status;
+     private Status status = Status.ACTIVE;
 
      private Map<String, String> variables;
      

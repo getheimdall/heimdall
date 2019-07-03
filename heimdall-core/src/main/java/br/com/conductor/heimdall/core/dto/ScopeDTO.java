@@ -23,7 +23,7 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * Class is a Data Transfer Object for the {@link br.com.conductor.heimdall.core.entity.Scope}
+ * Class is a Data Transfer Object for the Scope
  *
  * @author Marcelo Aguiar Rodrigues
  */

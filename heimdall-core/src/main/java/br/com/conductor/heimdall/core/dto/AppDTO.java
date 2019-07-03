@@ -46,7 +46,7 @@ public class AppDTO implements Serializable {
      @NotNull
      private ReferenceIdDTO developer;
 
-     private Status status;
+     private Status status = Status.ACTIVE;
      
      @NotNull
      @Size(min = 1)

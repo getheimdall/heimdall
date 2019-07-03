@@ -39,7 +39,10 @@ import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_API;
  *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
-@io.swagger.annotations.Api(value = PATH_API, produces = MediaType.APPLICATION_JSON_VALUE, tags = { ConstantsTag.TAG_AUTH })
+@io.swagger.annotations.Api(
+        value = PATH_API,
+        produces = MediaType.APPLICATION_JSON_VALUE,
+        tags = {ConstantsTag.TAG_AUTH})
 @RestController
 public class AuthResource {
 
@@ -51,7 +54,9 @@ public class AuthResource {
 
     @ApiOperation(value = "Login Authentication")
     @PostMapping(ConstantsPath.PATH_LOGIN)
-    public ResponseEntity<?> login(@RequestBody AccountCredentials accountCredentials, HttpServletResponse response) {
+    public ResponseEntity<?> login(@RequestBody AccountCredentials accountCredentials,
+                                   HttpServletResponse response) {
+
         UserAuthenticateResponse userLogged = tokenAuthenticationService.login(accountCredentials, response);
 
         return ResponseEntity.ok(userLogged);
@@ -61,6 +66,7 @@ public class AuthResource {
     @ApiOperation(value = "Logout Authentication", response = String.class)
     @GetMapping(ConstantsPath.PATH_LOGOUT)
     public ResponseEntity logout(HttpServletRequest request) {
+
         String token = request.getHeader("Authorization");
 
         if (token != null) {

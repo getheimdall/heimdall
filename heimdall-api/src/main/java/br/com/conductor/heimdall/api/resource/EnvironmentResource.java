@@ -19,7 +19,6 @@ import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.EnvironmentDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
-import br.com.conductor.heimdall.core.dto.page.EnvironmentPage;
 import br.com.conductor.heimdall.core.entity.Environment;
 import br.com.conductor.heimdall.core.service.EnvironmentService;
 import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
@@ -59,7 +58,7 @@ public class EnvironmentResource {
      * Finds a {@link Environment} by its Id.
      *
      * @param id The Environment Id
-     * @return                        {@link ResponseEntity}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Find Environment by id", response = Environment.class)
@@ -76,7 +75,7 @@ public class EnvironmentResource {
      * Finds all {@link Environment} from a request.
      *
      * @param pageableDTO {@link PageableDTO}
-     * @return                        {@link ResponseEntity}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Find all Environments", responseContainer = "List", response = Environment.class)
@@ -101,7 +100,7 @@ public class EnvironmentResource {
      * Saves a {@link Environment}.
      *
      * @param environmentDTO {@link EnvironmentDTO}
-     * @return                        {@link ResponseEntity}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Save a new Environment")
@@ -121,7 +120,7 @@ public class EnvironmentResource {
      *
      * @param id             The Environment Id
      * @param environmentDTO {@link EnvironmentDTO}
-     * @return                        {@link ResponseEntity}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Update Environment")
@@ -141,7 +140,7 @@ public class EnvironmentResource {
      * Deletes a {@link Environment}.
      *
      * @param id The Environment Id
-     * @return                        {@link ResponseEntity}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Delete Environment")

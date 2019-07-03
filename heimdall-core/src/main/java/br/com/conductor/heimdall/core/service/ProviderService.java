@@ -21,11 +21,9 @@ package br.com.conductor.heimdall.core.service;
  */
 
 import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.dto.PageDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.ProviderDTO;
 import br.com.conductor.heimdall.core.dto.ProviderParamsDTO;
-import br.com.conductor.heimdall.core.dto.page.ProviderPage;
 import br.com.conductor.heimdall.core.entity.Provider;
 import br.com.conductor.heimdall.core.entity.ProviderParam;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
@@ -101,9 +99,9 @@ public class ProviderService {
      *
      * @param providerDTO The {@link ProviderDTO}
      * @param pageableDTO The {@link PageableDTO}
-     * @return The paged {@link Provider} list as a {@link ProviderPage} object
+     * @return The paged {@link Provider} list
      */
-    public ProviderPage listWithPageableAndFilter(ProviderDTO providerDTO, PageableDTO pageableDTO) {
+    public Page<Provider> listWithPageableAndFilter(ProviderDTO providerDTO, PageableDTO pageableDTO) {
 
         Provider provider = GenericConverter.mapper(providerDTO, Provider.class);
         Example<Provider> example = Example.of(provider,
@@ -111,9 +109,7 @@ public class ProviderService {
 
         Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
 
-        Page<Provider> page = this.providerRepository.findAll(example, pageable);
-
-        return new ProviderPage(PageDTO.build(page));
+        return this.providerRepository.findAll(example, pageable);
     }
 
     /**

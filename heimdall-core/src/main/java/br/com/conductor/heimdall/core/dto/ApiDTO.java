@@ -57,7 +57,7 @@ public class ApiDTO implements Serializable {
      @Size(max = 200)
      private String destinationSandbox;
 
-     private Status status;
+     private Status status = Status.ACTIVE;
      
      private List<ReferenceIdDTO> environments;
 

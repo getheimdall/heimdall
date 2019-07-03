@@ -51,6 +51,6 @@ public class PlanDTO implements Serializable {
 
      private List<ReferenceIdDTO> scopes;
 
-     private Status status;
+     private Status status = Status.ACTIVE;
      
 }

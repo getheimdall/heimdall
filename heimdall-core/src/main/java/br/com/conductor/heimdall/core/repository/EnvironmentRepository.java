@@ -42,23 +42,4 @@ public interface EnvironmentRepository extends JpaRepository<Environment, String
      */
     List<Environment> findByInboundURL(String inboundURL);
 
-    /**
-     * Check if an environment has apis attached
-     *
-     * @param id
-     * @return
-     */
-    @Query(value = "select count(0) from apis_environments where environment_id = :id", nativeQuery = true)
-    Integer findApisWithEnvironment(@Param("id") String id);
-
-    /**
-     * Check if exist any Api with other environment that contain the same inbound_url.
-     *
-     * @param id      The {@link Environment} id
-     * @param inbound Inbound url
-     * @return The number of APIs found with the same inbound_url
-     */
-    @Query(value = "SELECT COUNT(DISTINCT env.id) from environments env INNER JOIN apis_environments api_env ON api_env.environment_id=env.id INNER JOIN apis apis ON apis.id=api_env.api_id INNER JOIN (select apis2.id from apis apis2 INNER JOIN apis_environments api_env2 ON apis2.id=api_env2.api_id INNER JOIN environments env2 ON api_env2.environment_id=env2.id where env2.id = :id) AS a ON (a.id = apis.id) where env.id <> :id and env.inbound_url = :inbound", nativeQuery = true)
-    Integer findApiWithOtherEnvironmentEqualsInbound(@Param("id") String id, @Param("inbound") String inbound);
-
 }

@@ -42,196 +42,180 @@ import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_OPERATIONS;
  * Uses a {@link OperationService} to provide methods to create, read, update and delete a {@link Operation}.
  *
  * @author Filipe Germano
- *
  */
-@io.swagger.annotations.Api(value = PATH_OPERATIONS, produces = MediaType.APPLICATION_JSON_VALUE, tags = { ConstantsTag.TAG_OPERATIONS })
+@io.swagger.annotations.Api(
+        value = PATH_OPERATIONS,
+        produces = MediaType.APPLICATION_JSON_VALUE,
+        tags = {ConstantsTag.TAG_OPERATIONS})
 @RestController
 @RequestMapping(value = PATH_OPERATIONS)
 public class OperationResource {
 
-     @Autowired
-     private OperationService operationService;
+    @Autowired
+    private OperationService operationService;
 
-     @Autowired
-     private AMQPRouteService aMQPRouteService;
+    @Autowired
+    private AMQPRouteService aMQPRouteService;
 
-     /**
-      * Finds a {@link Operation} by its Id.
-      * 
-      * @param apiId
-      * The Api Id
-      * @param resourceId
-      * The Resource Id
-      * @param operationId
-      * The Operation Id
-      * @return {@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Find Operation by id", response = Operation.class)
-     @GetMapping(value = "/resources/{resourceId}/operations/{operationId}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_OPERATION)
-     public ResponseEntity<?> findById(@PathVariable("apiId") String apiId,
-                                       @PathVariable("resourceId") String resourceId,
-                                       @PathVariable("operationId") String operationId) {
-
-          Operation operation = operationService.find(apiId, resourceId, operationId);
-
-          return ResponseEntity.ok(operation);
-     }
-
-     /**
-      * Finds all {@link Operation} from a request.
-      * 
-      * @param apiId
-      * The Api Id
-      * @param resourceId
-      * The Resource Id
-      * @param pageableDTO
-      * {@link PageableDTO}
-      * @return {@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Find all Operations", responseContainer = "List", response = Operation.class)
-     @GetMapping(value = "/resources/{resourceId}/operations")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_OPERATION)
-     public ResponseEntity<?> findAll(@PathVariable("apiId") String apiId,
+    /**
+     * Finds a {@link Operation} by its Id.
+     *
+     * @param apiId       The Api Id
+     * @param resourceId  The Resource Id
+     * @param operationId The Operation Id
+     * @return {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Find Operation by id", response = Operation.class)
+    @GetMapping(value = "/resources/{resourceId}/operations/{operationId}")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_OPERATION)
+    public ResponseEntity<?> findById(@PathVariable("apiId") String apiId,
                                       @PathVariable("resourceId") String resourceId,
-                                      @ModelAttribute PageableDTO pageableDTO) {
+                                      @PathVariable("operationId") String operationId) {
 
-          if (!pageableDTO.isEmpty()) {
+        Operation operation = operationService.find(apiId, resourceId, operationId);
 
-               Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+        return ResponseEntity.ok(operation);
+    }
 
-               Page<Operation> operationPage = operationService.list(apiId, resourceId, pageable);
-               return ResponseEntity.ok(operationPage);
-          } else {
-
-               List<Operation> operations = operationService.list(apiId, resourceId);
-               return ResponseEntity.ok(operations);
-          }
-     }
-
-     /**
-      * Saves a {@link Operation}.
-      * 
-      * @param apiId
-      * The Api Id
-      * @param resourceId
-      * The Resource Id
-      * @param operationDTO
-      * {@link OperationDTO}
-      * @return {@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Save a new Operation")
-     @PostMapping(value = "/resources/{resourceId}/operations")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_OPERATION)
-     public ResponseEntity<?> save(@PathVariable("apiId") String apiId,
-                                   @PathVariable("resourceId") String resourceId,
-                                   @RequestBody @Valid OperationDTO operationDTO) {
-
-          Operation operation = GenericConverter.mapper(operationDTO, Operation.class);
-          operation = operationService.save(apiId, resourceId, operation);
-
-          return ResponseEntity.created(
-                  URI.create(
-                          String.format("/%s/%s/%s/%s/%s/%s",
-                          "apis", apiId,
-                          "resources", resourceId,
-                          "operations", operation.getId()
-                          )
-                  )
-          ).build();
-     }
-
-     /**
-      * Updates a {@link Operation}.
-      * 
-      * @param apiId
-      * The Api Id
-      * @param resourceId
-      * The Resource Id
-      * @param operationId
-      * The Operation Id
-      * @param operationDTO
-      * {@link OperationDTO}
-      * @return {@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Update Operation")
-     @PutMapping(value = "/resources/{resourceId}/operations/{operationId}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_OPERATION)
-     public ResponseEntity<?> update(@PathVariable("apiId") String apiId,
+    /**
+     * Finds all {@link Operation} from a request.
+     *
+     * @param apiId       The Api Id
+     * @param resourceId  The Resource Id
+     * @param pageableDTO {@link PageableDTO}
+     * @return {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Find all Operations", responseContainer = "List", response = Operation.class)
+    @GetMapping(value = "/resources/{resourceId}/operations")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_OPERATION)
+    public ResponseEntity<?> findAll(@PathVariable("apiId") String apiId,
                                      @PathVariable("resourceId") String resourceId,
-                                     @PathVariable("operationId") String operationId,
-                                     @RequestBody OperationDTO operationDTO) {
+                                     @ModelAttribute PageableDTO pageableDTO) {
 
-          Operation operation = GenericConverter.mapper(operationDTO, Operation.class);
+        if (!pageableDTO.isEmpty()) {
 
-          operation = operationService.update(apiId, resourceId, operationId, operation);
+            Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
 
-          return ResponseEntity.ok(operation);
-     }
+            Page<Operation> operationPage = operationService.list(apiId, resourceId, pageable);
+            return ResponseEntity.ok(operationPage);
+        } else {
 
-     /**
-      * Deletes a {@link Operation}.
-      * 
-      * @param apiId
-      * The Api Id
-      * @param resourceId
-      * The Resource Id
-      * @param operationId
-      * The Operation Id
-      * @return {@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Delete Operation")
-     @DeleteMapping(value = "/resources/{resourceId}/operations/{operationId}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_OPERATION)
-     public ResponseEntity<?> delete(@PathVariable("apiId") String apiId,
-                                     @PathVariable("resourceId") String resourceId,
-                                     @PathVariable("operationId") String operationId) {
+            List<Operation> operations = operationService.list(apiId, resourceId);
+            return ResponseEntity.ok(operations);
+        }
+    }
 
-          operationService.delete(apiId, resourceId, operationId);
+    /**
+     * Saves a {@link Operation}.
+     *
+     * @param apiId        The Api Id
+     * @param resourceId   The Resource Id
+     * @param operationDTO {@link OperationDTO}
+     * @return {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Save a new Operation")
+    @PostMapping(value = "/resources/{resourceId}/operations")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_OPERATION)
+    public ResponseEntity<?> save(@PathVariable("apiId") String apiId,
+                                  @PathVariable("resourceId") String resourceId,
+                                  @RequestBody @Valid OperationDTO operationDTO) {
 
-          return ResponseEntity.noContent().build();
-     }
+        Operation operation = GenericConverter.mapper(operationDTO, Operation.class);
+        operation = operationService.save(apiId, resourceId, operation);
 
-     /**
-      * Refreshes all {@link Operation}.
-      * 
-      * @param apiId
-      * The Api Id
-      * @param resourceId
-      * The Resource Id
-      * @return {@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Refresh all Operations")
-     @PostMapping(value = "/resources/{resourceId}/operations/refresh")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_REFRESH_OPERATION)
-     public ResponseEntity<?> refresh(@PathVariable("apiId") Long apiId,
-                                      @PathVariable("resourceId") Long resourceId) {
+        return ResponseEntity.created(
+                URI.create(
+                        String.format("/%s/%s/%s/%s/%s/%s",
+                                "apis", apiId,
+                                "resources", resourceId,
+                                "operations", operation.getId()
+                        )
+                )
+        ).build();
+    }
 
-          aMQPRouteService.dispatchRoutes();
+    /**
+     * Updates a {@link Operation}.
+     *
+     * @param apiId        The Api Id
+     * @param resourceId   The Resource Id
+     * @param operationId  The Operation Id
+     * @param operationDTO {@link OperationDTO}
+     * @return {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Update Operation")
+    @PutMapping(value = "/resources/{resourceId}/operations/{operationId}")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_OPERATION)
+    public ResponseEntity<?> update(@PathVariable("apiId") String apiId,
+                                    @PathVariable("resourceId") String resourceId,
+                                    @PathVariable("operationId") String operationId,
+                                    @RequestBody OperationDTO operationDTO) {
 
-          return ResponseEntity.noContent().build();
-     }
+        Operation operation = GenericConverter.mapper(operationDTO, Operation.class);
 
-     /**
-      * Lists all Operations from an Api
-      *
-      * @param apiId The Api Id
-      * @return The complete list of Operations
-      */
-     @ResponseBody
-     @ApiOperation(value = "Find all Operations", responseContainer = "List", response = Operation.class)
-     @GetMapping(value = "/operations")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_OPERATION)
-     public ResponseEntity<?> findAllOperations(@PathVariable("apiId") String apiId) {
+        operation = operationService.update(apiId, resourceId, operationId, operation);
 
-          List<Operation> operations = operationService.list(apiId);
-          return ResponseEntity.ok(operations);
-     }
+        return ResponseEntity.ok(operation);
+    }
+
+    /**
+     * Deletes a {@link Operation}.
+     *
+     * @param apiId       The Api Id
+     * @param resourceId  The Resource Id
+     * @param operationId The Operation Id
+     * @return {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Delete Operation")
+    @DeleteMapping(value = "/resources/{resourceId}/operations/{operationId}")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_OPERATION)
+    public ResponseEntity<?> delete(@PathVariable("apiId") String apiId,
+                                    @PathVariable("resourceId") String resourceId,
+                                    @PathVariable("operationId") String operationId) {
+
+        operationService.delete(apiId, resourceId, operationId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Refreshes all {@link Operation}.
+     *
+     * @param apiId      The Api Id
+     * @param resourceId The Resource Id
+     * @return {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Refresh all Operations")
+    @PostMapping(value = "/resources/{resourceId}/operations/refresh")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_REFRESH_OPERATION)
+    public ResponseEntity<?> refresh(@PathVariable("apiId") Long apiId,
+                                     @PathVariable("resourceId") Long resourceId) {
+
+        aMQPRouteService.dispatchRoutes();
+
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Lists all Operations from an Api
+     *
+     * @param apiId The Api Id
+     * @return The complete list of Operations
+     */
+    @ResponseBody
+    @ApiOperation(value = "Find all Operations", responseContainer = "List", response = Operation.class)
+    @GetMapping(value = "/operations")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_OPERATION)
+    public ResponseEntity<?> findAllOperations(@PathVariable("apiId") String apiId) {
+
+        List<Operation> operations = operationService.list(apiId);
+        return ResponseEntity.ok(operations);
+    }
 
 }

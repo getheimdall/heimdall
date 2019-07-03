@@ -16,12 +16,10 @@
 package br.com.conductor.heimdall.core.service;
 
 import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.dto.page.ApiPage;
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Environment;
 import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.entity.Resource;
-import br.com.conductor.heimdall.core.enums.Status;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.ApiRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
@@ -67,6 +65,9 @@ public class ApiService {
     private ResourceService resourceService;
 
     @Autowired
+    private PlanService planService;
+
+    @Autowired
     private SwaggerService swaggerService;
 
     /**
@@ -92,8 +93,8 @@ public class ApiService {
     public Swagger findSwaggerByApi(String id) {
 
         Api api = this.find(id);
-        List<Resource> resources = resourceService.list(api.getId());
-        api.setResources(new HashSet<>(resources));
+//        List<Resource> resources = resourceService.list(api.getId());
+//        api.setResources(new HashSet<>(resources));
 
         return swaggerService.exportApiToSwaggerJSON(api);
     }
@@ -102,7 +103,7 @@ public class ApiService {
      * Generates a paged list of the {@link Api}'s
      *
      * @param pageable {@link Pageable}
-     * @return The paged {@link Api} list as a {@link ApiPage} object
+     * @return The paged {@link Api} list
      */
     public Page<Api> list(Pageable pageable) {
 
@@ -120,11 +121,7 @@ public class ApiService {
 
         List<Api> apis = apiRepository.findAll();
 
-        apis.stream()
-                .sorted(Comparator.comparing(Api::getName))
-                .forEach(api -> api.setEnvironments(api.getEnvironments().stream()
-                        .map(env -> environmentService.find(env.getId()))
-                        .collect(Collectors.toSet())));
+        apis.sort(Comparator.comparing(Api::getName));
 
         return apis;
      }
@@ -149,7 +146,6 @@ public class ApiService {
         HeimdallException.checkThrow(validateInboundsEnvironments(api), API_CANT_ENVIRONMENT_INBOUND_URL_EQUALS);
 
         api.setBasePath(basepath);
-        api.setStatus(api.getStatus() == null ? Status.ACTIVE : api.getStatus());
         api.setCreationDate(LocalDateTime.now());
 
         final Api savedApi = apiRepository.save(api);
@@ -240,7 +236,7 @@ public class ApiService {
 
           Api found = this.find(id);
 
-          return found.getPlans();
+          return found.getPlans().stream().map(planId -> planService.find(planId)).collect(Collectors.toSet());
      }
 
     /*
@@ -262,7 +258,7 @@ public class ApiService {
      */
     private boolean validateInboundsEnvironments(Api api) {
         final List<Environment> environments = api.getEnvironments().stream()
-                .map(environment -> environmentService.find(environment.getId()))
+                .map(environment -> environmentService.find(environment))
                 .collect(Collectors.toList());
 
         List<String> inbounds = environments.stream()

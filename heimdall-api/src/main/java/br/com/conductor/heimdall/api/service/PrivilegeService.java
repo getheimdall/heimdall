@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Set;
 
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_NOT_FOUND;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
 
 /**
@@ -57,7 +58,7 @@ public class PrivilegeService {
      public Privilege find(Long id) {
 
           Privilege privilege = repository.findOne(id);
-          HeimdallException.checkThrow(privilege == null, GLOBAL_RESOURCE_NOT_FOUND);
+          HeimdallException.checkThrow(privilege == null, GLOBAL_NOT_FOUND, "Privilege");
 
           return privilege;
      }

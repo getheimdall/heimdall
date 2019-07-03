@@ -19,128 +19,121 @@
  */
 package br.com.conductor.heimdall.core.service;
 
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.DEVELOPER_NOT_FOUND;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_NOT_FOUND;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
+import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.request.DeveloperLogin;
-import br.com.conductor.heimdall.core.enums.Status;
+import br.com.conductor.heimdall.core.entity.Developer;
+import br.com.conductor.heimdall.core.exception.HeimdallException;
+import br.com.conductor.heimdall.core.repository.DeveloperRepository;
+import br.com.conductor.heimdall.core.util.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.dto.page.DeveloperPage;
-import br.com.conductor.heimdall.core.entity.Developer;
-import br.com.conductor.heimdall.core.exception.HeimdallException;
-import br.com.conductor.heimdall.core.repository.DeveloperRepository;
-import br.com.conductor.heimdall.core.util.Pageable;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_NOT_FOUND;
 
 /**
  * This class provides methods to create, read, update and delete the {@link Developer} resource.
- * 
+ *
  * @author Filipe Germano
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
- *
  */
 @Service
 public class DeveloperService {
 
-     @Autowired
-     private DeveloperRepository developerRepository;
+    @Autowired
+    private DeveloperRepository developerRepository;
 
-     /**
-      * Finds a {@link Developer} by its ID.
-      * 
-      * @param  id 						The ID of the {@link Developer} 
-      * @return 						The {@link Developer} found
-      */
-     public Developer find(String id) {
-          
-          Developer developer = developerRepository.findOne(id);      
-          HeimdallException.checkThrow(developer == null, GLOBAL_NOT_FOUND, "Developer");
-                              
-          return developer;
-     }
+    /**
+     * Finds a {@link Developer} by its ID.
+     *
+     * @param id The ID of the {@link Developer}
+     * @return The {@link Developer} found
+     */
+    public Developer find(final String id) {
 
-     /**
-      * Finds a {@link Developer} by its email and password.
-      *
-      * @param developerLogin The {@link DeveloperLogin}
-      * @return The Developer
-      */
-     public Developer login(DeveloperLogin developerLogin) {
+        final Developer developer = developerRepository.findOne(id);
+        HeimdallException.checkThrow(developer == null, GLOBAL_NOT_FOUND, "Developer");
 
-          return developerRepository.findByEmailAndPassword(developerLogin.getEmail(), developerLogin.getPassword());
-     }
-     
-     /**
-      * Generates a paged list of {@link Developer}s from a request.
-      * 
-      * @return							The paged {@link Developer} list as a {@link DeveloperPage} object
-      */
-     public Page<Developer> list(Pageable pageable) {
+        return developer;
+    }
 
-          return developerRepository.findAll(pageable);
-     }
+    /**
+     * Finds a {@link Developer} by its email and password.
+     *
+     * @param developerLogin The {@link DeveloperLogin}
+     * @return The Developer
+     */
+    public Developer login(final DeveloperLogin developerLogin) {
 
-     /**
-      * Generates a list of {@link Developer} from a request.
-      * 
-      * @return							The list of {@link Developer}
-      */
-     public List<Developer> list() {
+        return developerRepository.findByEmailAndPassword(developerLogin.getEmail(), developerLogin.getPassword());
+    }
 
-          return developerRepository.findAll();
-     }
-     
-     /**
-      * Saves a {@link Developer}.
-      * 
-      * @param  developer 			The {@link Developer}
-      * @return							The {@link Developer} saved
-      */
-     @Transactional
-     public Developer save(Developer developer) {
+    /**
+     * Generates a paged list of {@link Developer}s from a request.
+     *
+     * @return The paged {@link Developer} list
+     */
+    public Page<Developer> list(final Pageable pageable) {
 
-          developer.setCreationDate(LocalDateTime.now());
-          developer.setStatus(developer.getStatus() == null ? Status.ACTIVE : developer.getStatus());
+        return developerRepository.findAll(pageable);
+    }
 
-          developer = developerRepository.save(developer);
-          
-          return developer;
-     }
+    /**
+     * Generates a list of {@link Developer} from a request.
+     *
+     * @return The list of {@link Developer}
+     */
+    public List<Developer> list() {
 
-     /**
-      * Updates a {@link Developer} by its ID.
-      * 
-      * @param  id						The ID of the {@link Developer} to be updated
-      * @param  developer      			The {@link Developer}
-      * @return							The updated {@link Developer}
-      */
-     @Transactional
-     public Developer update(final String id, final Developer developer) {
+        return developerRepository.findAll();
+    }
 
-          final Developer developerToUpdate = this.find(id);
+    /**
+     * Saves a {@link Developer}.
+     *
+     * @param developer The {@link Developer}
+     * @return The {@link Developer} saved
+     */
+    @Transactional
+    public Developer save(final Developer developer) {
 
-          final Developer updated = GenericConverter.mapper(developer, developerToUpdate);
+        developer.setCreationDate(LocalDateTime.now());
 
-          return developerRepository.save(updated);
-     }
-     
-     /**
-      * Deletes a {@link Developer} by its ID.
-      * @param  id						The ID of the {@link Developer} to be deleted
-      */
-     @Transactional
-     public void delete(String id) {
+        return developerRepository.save(developer);
+    }
 
-          Developer developer = this.find(id);
+    /**
+     * Updates a {@link Developer} by its ID.
+     *
+     * @param id        The ID of the {@link Developer} to be updated
+     * @param developer The {@link Developer}
+     * @return The updated {@link Developer}
+     */
+    @Transactional
+    public Developer update(final String id, final Developer developer) {
 
-          developerRepository.delete(developer);
-     }
+        final Developer developerToUpdate = this.find(id);
+
+        final Developer updated = GenericConverter.mapper(developer, developerToUpdate);
+
+        return developerRepository.save(updated);
+    }
+
+    /**
+     * Deletes a {@link Developer} by its ID.
+     *
+     * @param id The ID of the {@link Developer} to be deleted
+     */
+    @Transactional
+    public void delete(String id) {
+
+        Developer developer = this.find(id);
+
+        developerRepository.delete(developer);
+    }
 
 }

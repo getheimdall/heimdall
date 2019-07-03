@@ -47,6 +47,6 @@ public class DeveloperDTO implements Serializable {
      @Size(max = 300)
      private String password;
      
-     private Status status;
+     private Status status = Status.ACTIVE;
 
 }

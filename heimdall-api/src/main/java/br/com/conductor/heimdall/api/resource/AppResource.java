@@ -19,9 +19,7 @@ import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.AppDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
-import br.com.conductor.heimdall.core.dto.page.AppPage;
 import br.com.conductor.heimdall.core.dto.persist.AppPersist;
-import br.com.conductor.heimdall.core.dto.request.AppRequestDTO;
 import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.service.AppService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
@@ -29,7 +27,6 @@ import br.com.conductor.heimdall.core.util.Pageable;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,7 +35,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_APPS;
 
@@ -48,109 +44,113 @@ import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_APPS;
  * @author Filipe Germano
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
-@io.swagger.annotations.Api(value = PATH_APPS, produces = MediaType.APPLICATION_JSON_VALUE, tags = { ConstantsTag.TAG_APPS })
+@io.swagger.annotations.Api(
+        value = PATH_APPS,
+        produces = MediaType.APPLICATION_JSON_VALUE,
+        tags = {ConstantsTag.TAG_APPS})
 @RestController
 @RequestMapping(value = PATH_APPS)
 public class AppResource {
 
-     @Autowired
-     private AppService appService;
+    @Autowired
+    private AppService appService;
 
-     /**
-      * Finds a {@link App} by its Id.
-      * 
-      * @param id					The App Id
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Find App by id", response = App.class)
-     @GetMapping(value = "/{appId}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_APP)
-     public ResponseEntity<?> findById(@PathVariable("appId") String id) {
+    /**
+     * Finds a {@link App} by its Id.
+     *
+     * @param id The App Id
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Find App by id", response = App.class)
+    @GetMapping(value = "/{appId}")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_APP)
+    public ResponseEntity<?> findById(@PathVariable("appId") String id) {
 
-          App app = appService.find(id);
+        App app = appService.find(id);
 
-          return ResponseEntity.ok(app);
-     }
+        return ResponseEntity.ok(app);
+    }
 
-     /**
-      * Finds all {@link App} from a request.
-      * 
-      * @param pageableDTO			{@link PageableDTO}
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Find all Apps", responseContainer = "List", response = App.class)
-     @GetMapping
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_APP)
-     public ResponseEntity<?> findAll(@ModelAttribute PageableDTO pageableDTO) {
-          
-          if (!pageableDTO.isEmpty()) {
+    /**
+     * Finds all {@link App} from a request.
+     *
+     * @param pageableDTO {@link PageableDTO}
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Find all Apps", responseContainer = "List", response = App.class)
+    @GetMapping
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_APP)
+    public ResponseEntity<?> findAll(@ModelAttribute PageableDTO pageableDTO) {
 
-               Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
-               Page<App> appPage = appService.list(pageable);
+        if (!pageableDTO.isEmpty()) {
 
-               return ResponseEntity.ok(appPage);
-          } else {
-               
-               List<App> apps = appService.list();
+            Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+            Page<App> appPage = appService.list(pageable);
 
-               return ResponseEntity.ok(apps);
-          }
-     }
+            return ResponseEntity.ok(appPage);
+        } else {
 
-     /**
-      * Saves a {@link App}.
-      * 
-      * @param appDTO				{@link AppDTO}
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Save a new App")
-     @PostMapping
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_APP)
-     public ResponseEntity<?> save(@RequestBody @Valid AppPersist appDTO) {
-          App app = GenericConverter.mapper(appDTO, App.class);
+            List<App> apps = appService.list();
 
-          app = appService.save(app);
+            return ResponseEntity.ok(apps);
+        }
+    }
 
-          return ResponseEntity.created(URI.create(String.format("/%s/%s", "apps", app.getId()))).build();
-     }
+    /**
+     * Saves a {@link App}.
+     *
+     * @param appDTO {@link AppDTO}
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Save a new App")
+    @PostMapping
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_APP)
+    public ResponseEntity<?> save(@RequestBody @Valid AppPersist appDTO) {
 
-     /**
-      * Updates a {@link App}.
-      * 
-      * @param id					The App Id
-      * @param appDTO				{@link AppDTO}
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Update App")
-     @PutMapping(value = "/{appId}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_APP)
-     public ResponseEntity<?> update(@PathVariable("appId") String id, @RequestBody AppDTO appDTO) {
-          App app = GenericConverter.mapper(appDTO, App.class);
+        App app = GenericConverter.mapper(appDTO, App.class);
+        app = appService.save(app);
 
-          app = appService.update(id, app);
-          
-          return ResponseEntity.ok(app);
-     }
+        return ResponseEntity.created(URI.create(String.format("/%s/%s", "apps", app.getId()))).build();
+    }
 
-     /**
-      * Deletes a {@link App}.
-      * 
-      * @param id					The App Id
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Delete App")
-     @DeleteMapping(value = "/{appId}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_APP)
-     public ResponseEntity<?> delete(@PathVariable("appId") String id) {
+    /**
+     * Updates a {@link App}.
+     *
+     * @param id     The App Id
+     * @param appDTO {@link AppDTO}
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Update App")
+    @PutMapping(value = "/{appId}")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_APP)
+    public ResponseEntity<?> update(@PathVariable("appId") String id,
+                                    @RequestBody AppDTO appDTO) {
 
-          appService.delete(id);
-          
-          return ResponseEntity.noContent().build();
-     }
+        App app = GenericConverter.mapper(appDTO, App.class);
+        app = appService.update(id, app);
+
+        return ResponseEntity.ok(app);
+    }
+
+    /**
+     * Deletes a {@link App}.
+     *
+     * @param id The App Id
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Delete App")
+    @DeleteMapping(value = "/{appId}")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_APP)
+    public ResponseEntity<?> delete(@PathVariable("appId") String id) {
+
+        appService.delete(id);
+
+        return ResponseEntity.noContent().build();
+    }
 
 }

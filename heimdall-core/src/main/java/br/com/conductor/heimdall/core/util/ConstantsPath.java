@@ -43,7 +43,6 @@ public final class ConstantsPath {
 
      public static final String PATH_RESOURCES = PATH_APIS + "/{apiId}" + "/resources";
 
-
      public static final String PATH_OPERATIONS = PATH_APIS + "/{apiId}";
 
      public static final String PATH_ACCESS_TOKENS = PATH_API + "/access_tokens";

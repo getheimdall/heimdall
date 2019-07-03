@@ -19,35 +19,28 @@
  */
 package br.com.conductor.heimdall.core.service;
 
-import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.dto.PageDTO;
-import br.com.conductor.heimdall.core.dto.PageableDTO;
-import br.com.conductor.heimdall.core.dto.ScopeDTO;
-import br.com.conductor.heimdall.core.dto.page.ScopePage;
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Operation;
 import br.com.conductor.heimdall.core.entity.Scope;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
-import br.com.conductor.heimdall.core.repository.OperationRepository;
 import br.com.conductor.heimdall.core.repository.ScopeRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 import br.com.conductor.heimdall.core.util.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 
 /**
  * This class provides methods to create, read, update and delete the {@link Scope} entity.
- * 
+ *
  * @author Marcelo Aguiar Rodrigues
  */
 @Service
@@ -68,7 +61,7 @@ public class ScopeService {
     @Transactional(readOnly = true)
     public Scope find(final String apiId, final String scopeId) {
 
-        final Scope scope = scopeRepository.findByApiIdAndId(apiId, scopeId);
+        final Scope scope = scopeRepository.findByApiAndId(apiId, scopeId);
         HeimdallException.checkThrow(scope == null, GLOBAL_NOT_FOUND, "Scope");
 
         return scope;
@@ -77,48 +70,34 @@ public class ScopeService {
     /**
      * Generates a paged list of {@link Scope} from a request.
      *
-     * @param apiId       The {@link Api} Id
-     * @param scopeDTO    The {@link ScopeDTO}
-     * @param pageableDTO The {@link PageableDTO}
-     * @return The paged {@link Scope} list as a {@link ScopePage} object
+     * @param apiId The {@link Api} Id
+     * @return The paged {@link Scope} list
      */
     @Transactional(readOnly = true)
-    public ScopePage list(final String apiId, final ScopeDTO scopeDTO, final PageableDTO pageableDTO) {
+    public Page<Scope> list(final String apiId, final Pageable pageable) {
 
-        Api api = apiService.find(apiId);
+        final List<Scope> scopes = this.list(apiId);
 
-        Scope scope = GenericConverter.mapper(scopeDTO, Scope.class);
-        scope.setApi(api);
-
-        Example<Scope> example = Example.of(scope, ExampleMatcher.matching().withIgnorePaths("api.creationDate").withIgnoreCase().withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING));
-
-        Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit(), new Sort(Sort.Direction.ASC, "id"));
-        Page<Scope> page = scopeRepository.findAll(example, pageable);
-
-        return new ScopePage(PageDTO.build(page));
+        return new PageImpl<>(scopes, pageable, scopes.size());
     }
 
     /**
      * Generates a list of {@link Scope} from a request.
      *
-     * @param apiId    The {@link Api} Id
-     * @param scopeDTO The {@link ScopeDTO}
+     * @param apiId The {@link Api} Id
      * @return The List of {@link Scope}
      */
     @Transactional(readOnly = true)
-    public List<Scope> list(final String apiId, final ScopeDTO scopeDTO) {
+    public List<Scope> list(final String apiId) {
 
-        Api api = apiService.find(apiId);
+        apiService.find(apiId);
 
-        Scope scope = GenericConverter.mapper(scopeDTO, Scope.class);
-        scope.setApi(api);
-
-        Example<Scope> example = Example.of(scope, ExampleMatcher.matching().withIgnorePaths("api.creationDate").withIgnoreCase().withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING));
-
-        List<Scope> scopes = scopeRepository.findAll(example);
+        List<Scope> scopes = scopeRepository.findAll();
         scopes.sort(Comparator.comparing(Scope::getId));
 
-        return scopes;
+        return scopes.stream()
+                .filter(scope -> apiId.equals(scope.getApi()))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -133,9 +112,7 @@ public class ScopeService {
 
         final Api api = apiService.find(apiId);
 
-        HeimdallException.checkThrow(api == null, GLOBAL_RESOURCE_NOT_FOUND);
-
-        final Scope scopeData = scopeRepository.findByApiIdAndName(apiId, scope.getName());
+        final Scope scopeData = scopeRepository.findByApiAndName(apiId, scope.getName());
         HeimdallException.checkThrow(scopeData != null, SCOPE_INVALID_NAME);
 
         HeimdallException.checkThrow(scope.getOperations() == null || scope.getOperations().isEmpty(),
@@ -153,7 +130,7 @@ public class ScopeService {
                     SCOPE_OPERATION_NOT_IN_API, operation.getId(), apiId);
         });
 
-        scope.setApi(api);
+        scope.setApi(api.getId());
 
         scope = scopeRepository.save(scope);
 
@@ -165,14 +142,13 @@ public class ScopeService {
     /**
      * Deletes a {@link Scope} from the repository.
      *
-     * @param apiId Api Id
+     * @param apiId   Api Id
      * @param scopeId Scope Id
      */
     @Transactional
     public void delete(final String apiId, final String scopeId) {
 
-        Scope scope = scopeRepository.findByApiIdAndId(apiId, scopeId);
-        HeimdallException.checkThrow(scope == null, GLOBAL_RESOURCE_NOT_FOUND);
+        Scope scope = this.find(apiId, scopeId);
 
         scopeRepository.delete(scope);
 
@@ -194,7 +170,7 @@ public class ScopeService {
 
         this.find(apiId, scopeId);
 
-        scope.setApi(api);
+        scope.setApi(api.getId());
         scope.setId(scopeId);
 
         scope = scopeRepository.save(scope);

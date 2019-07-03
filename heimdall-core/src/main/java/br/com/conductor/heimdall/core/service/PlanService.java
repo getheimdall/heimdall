@@ -15,155 +15,150 @@
  */
 package br.com.conductor.heimdall.core.service;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
-
+import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.entity.Api;
+import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.enums.Status;
+import br.com.conductor.heimdall.core.exception.HeimdallException;
+import br.com.conductor.heimdall.core.repository.PlanRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
+import br.com.conductor.heimdall.core.util.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.dto.PageDTO;
-import br.com.conductor.heimdall.core.dto.PageableDTO;
-import br.com.conductor.heimdall.core.dto.PlanDTO;
-import br.com.conductor.heimdall.core.dto.page.PlanPage;
-import br.com.conductor.heimdall.core.entity.Plan;
-import br.com.conductor.heimdall.core.exception.HeimdallException;
-import br.com.conductor.heimdall.core.repository.PlanRepository;
-import br.com.conductor.heimdall.core.util.Pageable;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Set;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 
 /**
  * This class provides methods to create, read, update and delete a {@link Plan} resource.
- * 
+ *
  * @author Filipe Germano
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
- *
  */
 @Service
 public class PlanService {
 
-     @Autowired
-     private PlanRepository planRepository;
+    @Autowired
+    private PlanRepository planRepository;
 
-     @Autowired
-     private ApiService apiService;
+    @Autowired
+    private ApiService apiService;
 
-     @Autowired
-     private AMQPCacheService amqpCacheService;
+    @Autowired
+    private AppService appService;
 
-     @Transactional(readOnly = true)
-     public Plan find(String id) {
-          
-          Plan plan = planRepository.findOne(id);
-          HeimdallException.checkThrow(plan == null, GLOBAL_NOT_FOUND, "Plan");
-                              
-          return plan;
-     }
-     
-     /**
-      * Generates a paged list of {@link Plan} from a request.
-      * 
-      * @param  pageable					The {@link Pageable}
-      * @return								The paged {@link Plan} list as a {@link PlanPage} object
-      */
-     @Transactional(readOnly = true)
-     public Page<Plan> list(Pageable pageable) {
+    @Autowired
+    private AMQPCacheService amqpCacheService;
 
-          return planRepository.findAll(pageable);
-     }
+    @Transactional(readOnly = true)
+    public Plan find(String id) {
 
-     /**
-      * Generates a list of {@link Plan} from a request.
-      * 
-      * @return								The List of {@link Plan}
-      */
-     @Transactional(readOnly = true)
-     public List<Plan> list() {
+        Plan plan = planRepository.findOne(id);
+        HeimdallException.checkThrow(plan == null, GLOBAL_NOT_FOUND, "Plan");
 
-          return planRepository.findAll();
-     }
-     
-     /**
-      * Saves a {@link Plan} to the repository.
-      * 
-      * @param  plan						The {@link Plan}
-      * @return								The saved {@link Plan}
-      */
-     public Plan save(Plan plan) {
+        return plan;
+    }
 
-          if (plan.isDefaultPlan()) {
-               Set<Plan> plans = apiService.plansByApi(plan.getApi().getId());
-               HeimdallException.checkThrow(plans.stream().anyMatch(Plan::isDefaultPlan), DEFAULT_PLAN_ALREADY_EXIST_TO_THIS_API);
-          }
+    /**
+     * Generates a paged list of {@link Plan} from a request.
+     *
+     * @param pageable The {@link Pageable}
+     * @return The paged {@link Plan} list
+     */
+    @Transactional(readOnly = true)
+    public Page<Plan> list(Pageable pageable) {
 
-          plan.setStatus(plan.getStatus() == null ? Status.ACTIVE : plan.getStatus());
-          plan.setCreationDate(LocalDateTime.now());
+        return planRepository.findAll(pageable);
+    }
 
-          plan = planRepository.save(plan);
+    /**
+     * Generates a list of {@link Plan} from a request.
+     *
+     * @return The List of {@link Plan}
+     */
+    @Transactional(readOnly = true)
+    public List<Plan> list() {
 
-          Api api = apiService.find(plan.getApi().getId());
+        return planRepository.findAll();
+    }
 
-          api.addPlan(plan.getId());
+    /**
+     * Saves a {@link Plan} to the repository.
+     *
+     * @param plan The {@link Plan}
+     * @return The saved {@link Plan}
+     */
+    public Plan save(Plan plan) {
 
-          apiService.update(api);
+        if (plan.isDefaultPlan()) {
+            Set<Plan> plans = apiService.plansByApi(plan.getApi().getId());
+            HeimdallException.checkThrow(plans.stream().anyMatch(Plan::isDefaultPlan), DEFAULT_PLAN_ALREADY_EXIST_TO_THIS_API);
+        }
 
-          amqpCacheService.dispatchClean();
+        plan.setCreationDate(LocalDateTime.now());
 
-          return plan;
-     }
+        plan = planRepository.save(plan);
 
-     /**
-      * Updates a {@link Plan} by its Id.
-      * 
-      * @param 	id							The {@link Plan} Id
-      * @param 	planPersist					The {@link Plan}
-      * @return								The updated {@link Plan}
-      */
-     public Plan update(final String id, final Plan planPersist) {
+        Api api = apiService.find(plan.getApi().getId());
 
-          Plan plan = this.find(id);
+        api.addPlan(plan.getId());
 
-          if (planPersist.isDefaultPlan()) {
-               Set<Plan> plans = apiService.plansByApi(plan.getApi().getId());
-               HeimdallException.checkThrow(plans.stream().anyMatch(p -> !id.equals(p.getId()) && p.isDefaultPlan()), DEFAULT_PLAN_ALREADY_EXIST_TO_THIS_API);
-          }
+        apiService.update(api);
 
-          plan = GenericConverter.mapper(planPersist, plan);
+        amqpCacheService.dispatchClean();
 
-          plan = planRepository.save(plan);
+        return plan;
+    }
 
-          amqpCacheService.dispatchClean();
+    /**
+     * Updates a {@link Plan} by its Id.
+     *
+     * @param id          The {@link Plan} Id
+     * @param planPersist The {@link Plan}
+     * @return The updated {@link Plan}
+     */
+    public Plan update(final String id, final Plan planPersist) {
 
-          return plan;
-     }
-     
-     /**
-      * Deletes a {@link Plan} by its Id.
-      * 
-      * @param 	id						The {@link Plan} Id
-      */
-     public void delete(String id) {
+        Plan plan = this.find(id);
 
-          Plan plan = this.find(id);
+        if (planPersist.isDefaultPlan()) {
+            Set<Plan> plans = apiService.plansByApi(plan.getApi().getId());
+            HeimdallException.checkThrow(plans.stream()
+                            .anyMatch(p -> !id.equals(p.getId()) && p.isDefaultPlan()),
+                    DEFAULT_PLAN_ALREADY_EXIST_TO_THIS_API);
+        }
 
-//          Integer totalAppsAttached = planRepository.findAppsWithPlan(id);
-//          HeimdallException.checkThrow(totalAppsAttached > 0, PLAN_ATTACHED_TO_APPS);
+        plan = GenericConverter.mapper(planPersist, plan);
 
-          apiService.removePlan(plan);
+        plan = planRepository.save(plan);
 
-          planRepository.delete(plan);
+        amqpCacheService.dispatchClean();
 
-          amqpCacheService.dispatchClean();
-     }
+        return plan;
+    }
+
+    /**
+     * Deletes a {@link Plan} by its Id.
+     *
+     * @param id The {@link Plan} Id
+     */
+    public void delete(String id) {
+
+        Plan plan = this.find(id);
+
+        HeimdallException.checkThrow(appService.list().stream()
+                .anyMatch(app -> app.getPlans().contains(id)), PLAN_ATTACHED_TO_APPS);
+
+        apiService.removePlan(plan);
+
+        planRepository.delete(plan);
+
+        amqpCacheService.dispatchClean();
+    }
 
 }

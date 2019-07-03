@@ -18,16 +18,17 @@ package br.com.conductor.heimdall.api.resource;
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
 import br.com.conductor.heimdall.core.dto.InterceptorDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
-import br.com.conductor.heimdall.core.dto.page.InterceptorPage;
 import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.enums.TypeInterceptor;
 import br.com.conductor.heimdall.core.service.InterceptorService;
 import br.com.conductor.heimdall.core.service.amqp.AMQPInterceptorService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
+import br.com.conductor.heimdall.core.util.Pageable;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -47,7 +48,10 @@ import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_INTERCEPTOR
  * @author Marcos Filho
  *
  */
-@io.swagger.annotations.Api(value = PATH_INTERCEPTORS, produces = MediaType.APPLICATION_JSON_VALUE, tags = { ConstantsTag.TAG_INTERCEPTORS })
+@io.swagger.annotations.Api(
+        value = PATH_INTERCEPTORS,
+        produces = MediaType.APPLICATION_JSON_VALUE,
+        tags = { ConstantsTag.TAG_INTERCEPTORS })
 @RestController
 @RequestMapping(value = PATH_INTERCEPTORS)
 public class InterceptorResource {
@@ -78,7 +82,6 @@ public class InterceptorResource {
      /**
       * Finds all {@link Interceptor} from a request.
       * 
-      * @param interceptorDTO		{@link InterceptorDTO}
       * @param pageableDTO			{@link PageableDTO}
       * @return						{@link ResponseEntity}
       */
@@ -86,15 +89,16 @@ public class InterceptorResource {
      @ApiOperation(value = "Find all Interceptors", responseContainer = "List", response = Interceptor.class)
      @GetMapping
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_INTERCEPTOR)
-     public ResponseEntity<?> findAll(@ModelAttribute InterceptorDTO interceptorDTO, @ModelAttribute PageableDTO pageableDTO) {
+     public ResponseEntity<?> findAll(@ModelAttribute PageableDTO pageableDTO) {
           
           if (pageableDTO != null && !pageableDTO.isEmpty()) {
-               
-               InterceptorPage interceptorPage = interceptorService.list(interceptorDTO, pageableDTO);      
+               Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+               Page<Interceptor> interceptorPage = interceptorService.list(pageable);
+
                return ResponseEntity.ok(interceptorPage);
           } else {
                
-               List<Interceptor> interceptors = interceptorService.list(interceptorDTO);      
+               List<Interceptor> interceptors = interceptorService.list();
                return ResponseEntity.ok(interceptors);
           }
      }
@@ -111,7 +115,6 @@ public class InterceptorResource {
      public ResponseEntity<?> types() {
 
           List<Option> types = new ArrayList<>();
-
           for (TypeInterceptor type : TypeInterceptor.values()) {
                types.add(new Option(type.name()));
           }
@@ -133,7 +136,9 @@ public class InterceptorResource {
 
           Interceptor interceptor = interceptorService.save(interceptorDTO); 
 
-          return ResponseEntity.created(URI.create(String.format("/%s/%s", "interceptors", interceptor.getId().toString()))).build();
+          return ResponseEntity.created(
+                  URI.create(String.format("/%s/%s", "interceptors", interceptor.getId()))
+          ).build();
      }
 
      /**

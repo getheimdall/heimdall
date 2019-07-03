@@ -40,7 +40,10 @@ import io.swagger.annotations.ApiOperation;
  * @author Filipe Germano
  *
  */
-@io.swagger.annotations.Api(value = PATH_CACHES, produces = MediaType.APPLICATION_JSON_VALUE, tags = { ConstantsTag.TAG_CACHES })
+@io.swagger.annotations.Api(
+        value = PATH_CACHES,
+        produces = MediaType.APPLICATION_JSON_VALUE,
+        tags = { ConstantsTag.TAG_CACHES })
 @RestController
 @RequestMapping(value = PATH_CACHES)
 public class CacheResource {

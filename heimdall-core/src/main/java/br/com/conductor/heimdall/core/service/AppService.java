@@ -21,46 +21,27 @@ package br.com.conductor.heimdall.core.service;
  * ==========================LICENSE_END===================================
  */
 
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
-import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
-import br.com.conductor.heimdall.core.dto.persist.AppPersist;
+import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.entity.AccessToken;
-import br.com.conductor.heimdall.core.enums.Status;
+import br.com.conductor.heimdall.core.entity.App;
+import br.com.conductor.heimdall.core.entity.Plan;
+import br.com.conductor.heimdall.core.exception.HeimdallException;
+import br.com.conductor.heimdall.core.repository.AppRepository;
+import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
+import br.com.conductor.heimdall.core.util.Pageable;
+import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
-import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.dto.AppDTO;
-import br.com.conductor.heimdall.core.dto.PageDTO;
-import br.com.conductor.heimdall.core.dto.PageableDTO;
-import br.com.conductor.heimdall.core.dto.integration.AppCallbackDTO;
-import br.com.conductor.heimdall.core.dto.page.AppPage;
-import br.com.conductor.heimdall.core.dto.request.AppRequestDTO;
-import br.com.conductor.heimdall.core.entity.App;
-import br.com.conductor.heimdall.core.entity.Developer;
-import br.com.conductor.heimdall.core.entity.Plan;
-import br.com.conductor.heimdall.core.exception.HeimdallException;
-import br.com.conductor.heimdall.core.repository.AccessTokenRepository;
-import br.com.conductor.heimdall.core.repository.AppRepository;
-import br.com.conductor.heimdall.core.repository.DeveloperRepository;
-import br.com.conductor.heimdall.core.repository.PlanRepository;
-import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
-import br.com.conductor.heimdall.core.util.Pageable;
-import net.bytebuddy.utility.RandomString;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.APP_CLIENT_ID_ALREADY_USED;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_NOT_FOUND;
 
 /**
  * This class provides methods to create, read, update and delete the {@link App} resource.
@@ -103,7 +84,7 @@ public class AppService {
       * Generates a paged list of App.
       *
       * @param 	pageable				The {@link Pageable}
-      * @return							The paged {@link App} list as a {@link AppPage} object
+      * @return							The paged {@link App} list
       */
      @Transactional(readOnly = true)
      public Page<App> list(Pageable pageable) {
@@ -148,7 +129,6 @@ public class AppService {
 
           app.setCreationDate(LocalDateTime.now());
           app.setClientId(app.getClientId().trim());
-          app.setStatus(app.getStatus() == null ? Status.ACTIVE : app.getStatus());
 
           developerService.find(app.getDeveloperId());
 

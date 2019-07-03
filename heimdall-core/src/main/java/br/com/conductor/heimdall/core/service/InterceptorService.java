@@ -19,47 +19,29 @@
  */
 package br.com.conductor.heimdall.core.service;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.StringMatcher;
-import org.springframework.data.domain.Page;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.InterceptorDTO;
 import br.com.conductor.heimdall.core.dto.InterceptorFileDTO;
-import br.com.conductor.heimdall.core.dto.PageDTO;
-import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.interceptor.RateLimitDTO;
-import br.com.conductor.heimdall.core.dto.page.InterceptorPage;
-import br.com.conductor.heimdall.core.entity.Api;
-import br.com.conductor.heimdall.core.entity.Interceptor;
-import br.com.conductor.heimdall.core.entity.Operation;
-import br.com.conductor.heimdall.core.entity.Plan;
-import br.com.conductor.heimdall.core.entity.Resource;
+import br.com.conductor.heimdall.core.entity.*;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.enums.TypeInterceptor;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.interceptor.impl.RattingHeimdallInterceptor;
-import br.com.conductor.heimdall.core.repository.ApiRepository;
-import br.com.conductor.heimdall.core.repository.InterceptorRepository;
-import br.com.conductor.heimdall.core.repository.OperationRepository;
-import br.com.conductor.heimdall.core.repository.PlanRepository;
-import br.com.conductor.heimdall.core.repository.RateLimitRepository;
-import br.com.conductor.heimdall.core.repository.ResourceRepository;
+import br.com.conductor.heimdall.core.repository.*;
 import br.com.conductor.heimdall.core.service.amqp.AMQPInterceptorService;
 import br.com.conductor.heimdall.core.util.ConstantsCache;
 import br.com.conductor.heimdall.core.util.Pageable;
 import br.com.conductor.heimdall.core.util.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.io.File;
+import java.util.List;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 
@@ -77,13 +59,13 @@ public class InterceptorService {
     private InterceptorRepository interceptorRepository;
 
     @Autowired
-    private PlanRepository planRepository;
+    private PlanService planService;
 
     @Autowired
-    private ResourceRepository resourceRepository;
+    private ResourceService resourceService;
 
     @Autowired
-    private OperationRepository operationRepository;
+    private OperationService operationService;
 
     @Autowired
     private ApiService apiService;
@@ -118,37 +100,23 @@ public class InterceptorService {
     /**
      * Generates a paged list of {@link Interceptor} from a request.
      *
-     * @param interceptorDTO The {@link InterceptorDTO}
-     * @param pageableDTO    The {@link PageableDTO}
-     * @return The paged {@link Interceptor} list as a {@link InterceptorPage} object
+     * @return The paged {@link Interceptor} list
      */
     @Transactional(readOnly = true)
-    public InterceptorPage list(InterceptorDTO interceptorDTO, PageableDTO pageableDTO) {
+    public Page<Interceptor> list(Pageable pageable) {
 
-        Interceptor interceptor = GenericConverter.mapper(interceptorDTO, Interceptor.class);
-
-        Example<Interceptor> example = Example.of(interceptor, ExampleMatcher.matching().withIgnorePaths("api.cors").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
-
-        Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
-        Page<Interceptor> page = interceptorRepository.findAll(example, pageable);
-
-        return new InterceptorPage(PageDTO.build(page));
+        return interceptorRepository.findAll(pageable);
     }
 
     /**
      * Generates a list of {@link Interceptor} from a request.
      *
-     * @param interceptorDTO The {@link InterceptorDTO}
      * @return The List<{@link Interceptor}> list
      */
     @Transactional(readOnly = true)
-    public List<Interceptor> list(InterceptorDTO interceptorDTO) {
+    public List<Interceptor> list() {
 
-        Interceptor interceptor = GenericConverter.mapper(interceptorDTO, Interceptor.class);
-
-        Example<Interceptor> example = Example.of(interceptor, ExampleMatcher.matching().withIgnorePaths("api.cors").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
-
-        return interceptorRepository.findAll(example);
+        return interceptorRepository.findAll();
     }
 
     /**
@@ -205,7 +173,6 @@ public class InterceptorService {
     public Interceptor update(String id, InterceptorDTO interceptorDTO) {
 
         Interceptor interceptor = this.find(id);
-        HeimdallException.checkThrow(interceptor == null, GLOBAL_RESOURCE_NOT_FOUND);
         interceptor = GenericConverter.mapper(interceptorDTO, interceptor);
 
         if (TypeInterceptor.CORS.equals(interceptor.getType())) {
@@ -236,9 +203,8 @@ public class InterceptorService {
     public void delete(String id) {
 
         Interceptor interceptor = this.find(id);
-        HeimdallException.checkThrow(interceptor == null, GLOBAL_RESOURCE_NOT_FOUND);
 
-        String fileName = StringUtils.concatCamelCase(interceptor.getLifeCycle().name(), interceptor.getType().name(), interceptor.getExecutionPoint().getFilterType(), interceptor.getId().toString()) + ".groovy";
+        String fileName = StringUtils.concatCamelCase(interceptor.getLifeCycle().name(), interceptor.getType().name(), interceptor.getExecutionPoint().getFilterType(), interceptor.getId()) + ".groovy";
         String pathName = String.join(File.separator, zuulFilterRoot, interceptor.getExecutionPoint().getFilterType(), fileName);
 
         if (TypeInterceptor.RATTING == interceptor.getType()) {
@@ -290,32 +256,28 @@ public class InterceptorService {
 
         switch (interceptor.getLifeCycle()) {
             case API:
-                Api api = apiRepository.findOne(interceptor.getReferenceId());
-                HeimdallException.checkThrow(api == null, INTERCEPTOR_REFERENCE_NOT_FOUND);
+                Api api = apiService.find(interceptor.getReferenceId());
                 interceptor.setResource(null);
                 interceptor.setOperation(null);
                 interceptor.setPlan(null);
                 interceptor.setApi(api);
                 break;
             case PLAN:
-                Plan plan = planRepository.findOne(interceptor.getReferenceId());
-                HeimdallException.checkThrow(plan == null, INTERCEPTOR_REFERENCE_NOT_FOUND);
+                Plan plan = planService.find(interceptor.getReferenceId());
                 interceptor.setResource(null);
                 interceptor.setOperation(null);
                 interceptor.setPlan(plan);
                 interceptor.setApi(plan.getApi());
                 break;
             case RESOURCE:
-                Resource resource = resourceRepository.findOne(interceptor.getReferenceId());
-                HeimdallException.checkThrow(resource == null, INTERCEPTOR_REFERENCE_NOT_FOUND);
+                Resource resource = resourceService.find(interceptor.getReferenceId());
                 interceptor.setOperation(null);
                 interceptor.setPlan(null);
                 interceptor.setResource(resource);
                 interceptor.setApi(resource.getApi());
                 break;
             case OPERATION:
-                Operation operation = operationRepository.findOne(interceptor.getReferenceId());
-                HeimdallException.checkThrow(operation == null, INTERCEPTOR_REFERENCE_NOT_FOUND);
+                Operation operation = operationService.find(interceptor.getReferenceId());
                 interceptor.setResource(null);
                 interceptor.setPlan(null);
                 interceptor.setOperation(operation);

@@ -17,7 +17,6 @@ package br.com.conductor.heimdall.core.service;
 
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.ResourceDTO;
-import br.com.conductor.heimdall.core.dto.page.ResourcePage;
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Operation;
 import br.com.conductor.heimdall.core.entity.Resource;
@@ -26,7 +25,6 @@ import br.com.conductor.heimdall.core.repository.ResourceRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
 import br.com.conductor.heimdall.core.util.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
@@ -34,10 +32,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_NOT_FOUND;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ONLY_ONE_RESOURCE_PER_API;
 
 /**
  * This class provides methos to create, read, update and delete a {@link Resource} resource.
@@ -89,9 +87,9 @@ public class ResourceService {
     /**
      * Generates a paged list of {@link Resource} from a request.
      *
-     * @param apiId       The {@link Api} Id
+     * @param apiId    The {@link Api} Id
      * @param pageable The {@link Pageable}
-     * @return The paged {@link Resource} list as a {@link ResourcePage} object
+     * @return The paged {@link Resource} list
      */
     public Page<Resource> list(final String apiId, final Pageable pageable) {
 
@@ -103,7 +101,7 @@ public class ResourceService {
     /**
      * Generates a list of {@link Resource} from a request.
      *
-     * @param apiId       The {@link Api} Id
+     * @param apiId The {@link Api} Id
      * @return The List of {@link Resource}
      */
     public List<Resource> list(String apiId) {
@@ -151,8 +149,8 @@ public class ResourceService {
     /**
      * Updates a {@link Resource} by its Id and {@link Api} Id
      *
-     * @param apiId       The {@link Api} Id
-     * @param resourceId  The {@link Resource} Id
+     * @param apiId           The {@link Api} Id
+     * @param resourceId      The {@link Resource} Id
      * @param resourcePersist The {@link ResourceDTO}
      * @return The updated {@link Resource}
      */
@@ -180,7 +178,8 @@ public class ResourceService {
         return this.update(resource.getApi().getId(), resource.getId(), resource);
     }
 
-    /**TODO
+    /**
+     * TODO
      * Deletes a {@link Resource} by its Id.
      *
      * @param apiId      The {@link Api} Id
@@ -196,7 +195,7 @@ public class ResourceService {
 //        // Deletes all interceptors attached to the Resource
 // TODO       interceptorService.deleteAllfromResource(resourceId);
 
-//        resourceRepository.delete(resource.getId());
+        resourceRepository.delete(resource.getId());
 
         apiService.removeResource(resource);
 

@@ -19,7 +19,6 @@ import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.ResourceDTO;
-import br.com.conductor.heimdall.core.dto.page.ResourcePage;
 import br.com.conductor.heimdall.core.entity.Resource;
 import br.com.conductor.heimdall.core.service.ResourceService;
 import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
@@ -45,7 +44,10 @@ import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_RESOURCES;
  * @author Filipe Germano
  * @author Marcos Filho
  */
-@io.swagger.annotations.Api(value = PATH_RESOURCES, produces = MediaType.APPLICATION_JSON_VALUE, tags = {ConstantsTag.TAG_RESOURCES})
+@io.swagger.annotations.Api(
+        value = PATH_RESOURCES,
+        produces = MediaType.APPLICATION_JSON_VALUE,
+        tags = {ConstantsTag.TAG_RESOURCES})
 @RestController
 @RequestMapping(value = PATH_RESOURCES)
 public class ResourceResource {
@@ -67,7 +69,8 @@ public class ResourceResource {
     @ApiOperation(value = "Find Resource by id", response = Resource.class)
     @GetMapping(value = "/{resourceId}")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_RESOURCE)
-    public ResponseEntity<?> findById(@PathVariable("apiId") String apiId, @PathVariable("resourceId") String resourceId) {
+    public ResponseEntity<?> findById(@PathVariable("apiId") String apiId,
+                                      @PathVariable("resourceId") String resourceId) {
 
         Resource resource = resourceService.find(apiId, resourceId);
 
@@ -85,16 +88,17 @@ public class ResourceResource {
     @ApiOperation(value = "Find all Resources", responseContainer = "List", response = Resource.class)
     @GetMapping
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_RESOURCE)
-    public ResponseEntity<?> findAll(@PathVariable("apiId") String apiId, @ModelAttribute PageableDTO pageableDTO) {
+    public ResponseEntity<?> findAll(@PathVariable("apiId") String apiId,
+                                     @ModelAttribute PageableDTO pageableDTO) {
 
         if (!pageableDTO.isEmpty()) {
             Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
-
             Page<Resource> resourcePage = resourceService.list(apiId, pageable);
+
             return ResponseEntity.ok(resourcePage);
         } else {
-
             List<Resource> resources = resourceService.list(apiId);
+
             return ResponseEntity.ok(resources);
         }
     }
@@ -110,7 +114,8 @@ public class ResourceResource {
     @ApiOperation(value = "Save a new Resource")
     @PostMapping
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_RESOURCE)
-    public ResponseEntity<?> save(@PathVariable("apiId") String apiId, @RequestBody @Valid ResourceDTO resourceDTO) {
+    public ResponseEntity<?> save(@PathVariable("apiId") String apiId,
+                                  @RequestBody @Valid ResourceDTO resourceDTO) {
 
         Resource resource = GenericConverter.mapper(resourceDTO, Resource.class);
         resource = resourceService.save(apiId, resource);
@@ -130,7 +135,9 @@ public class ResourceResource {
     @ApiOperation(value = "Update Resource")
     @PutMapping(value = "/{resourceId}")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_RESOURCE)
-    public ResponseEntity<?> update(@PathVariable("apiId") String apiId, @PathVariable("resourceId") String resourceId, @RequestBody ResourceDTO resourceDTO) {
+    public ResponseEntity<?> update(@PathVariable("apiId") String apiId,
+                                    @PathVariable("resourceId") String resourceId,
+                                    @RequestBody ResourceDTO resourceDTO) {
 
         Resource resource = GenericConverter.mapper(resourceDTO, Resource.class);
         resource = resourceService.update(apiId, resourceId, resource);
@@ -149,7 +156,8 @@ public class ResourceResource {
     @ApiOperation(value = "Delete Resource")
     @DeleteMapping(value = "/{resourceId}")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_RESOURCE)
-    public ResponseEntity<?> delete(@PathVariable("apiId") String apiId, @PathVariable("resourceId") String resourceId) {
+    public ResponseEntity<?> delete(@PathVariable("apiId") String apiId,
+                                    @PathVariable("resourceId") String resourceId) {
 
         resourceService.delete(apiId, resourceId);
 

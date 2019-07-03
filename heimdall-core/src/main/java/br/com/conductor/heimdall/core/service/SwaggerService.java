@@ -20,7 +20,6 @@ package br.com.conductor.heimdall.core.service;
  * ==========================LICENSE_END===================================
  */
 
-import br.com.conductor.heimdall.core.dto.ResourceDTO;
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Environment;
 import br.com.conductor.heimdall.core.entity.Operation;
@@ -52,6 +51,9 @@ public class SwaggerService {
     @Autowired
     private OperationService operationService;
 
+    @Autowired
+    private EnvironmentService environmentService;
+
     public Swagger exportApiToSwaggerJSON(Api api) {
         Swagger swagger = new Swagger();
 
@@ -59,8 +61,11 @@ public class SwaggerService {
         swagger.setBasePath(api.getBasePath());
 
         swagger.setInfo(getInfoByApi(api));
-        Optional<Environment> optionalEnvironment = api.getEnvironments().stream().findFirst();
-        optionalEnvironment.ifPresent(environment -> swagger.setHost(environment.getInboundURL()));
+        Optional<String> optionalEnvironment = api.getEnvironments().stream().findFirst();
+        optionalEnvironment.ifPresent(envId -> {
+            final Environment environment = environmentService.find(envId);
+            swagger.setHost(environment.getInboundURL());
+        });
         swagger.setTags(getTagsByApi(api));
         swagger.setPaths(getPathsByApi(api));
         swagger.setDefinitions(new HashMap<>());
@@ -85,7 +90,7 @@ public class SwaggerService {
         readTags(swagger.getTags(), resources, api.getId());
         readPaths(swagger.getPaths(), api.getBasePath(), resources, api.getId());
 
-        api.setResources(new HashSet<>(resources));
+        api.setResources(resources.stream().map(Resource::getId).collect(Collectors.toSet()));
 
         return api;
     }
@@ -206,7 +211,12 @@ public class SwaggerService {
 
     private List<Tag> getTagsByApi(Api api) {
         return api.getResources().stream()
-                .map(resource -> new Tag().name(resource.getName()).description(resource.getDescription()))
+                .map(resourceId -> {
+                    final Resource resource = resourceService.find(resourceId);
+                    return new Tag()
+                            .name(resource.getName())
+                            .description(resource.getDescription());
+                })
                 .collect(Collectors.toList());
     }
 
@@ -214,28 +224,28 @@ public class SwaggerService {
 
         Map<String, Path> pathMap = new HashMap<>();
 
-        api.getResources().forEach(resource -> resource.getOperations().forEach(operation -> {
-            String pathOperation = operation.getPath();
-            if (Objects.isNull(pathMap.get(pathOperation))) {
-                pathMap.put(pathOperation, new Path());
-            }
-
-            Path path = pathMap.get(pathOperation);
-
-            io.swagger.models.Operation operationSwagger = new io.swagger.models.Operation();
-            if (operation.getDescription() != null) {
-                operationSwagger.setOperationId(operation.getDescription().trim().concat(operation.getMethod().name()));
-                operationSwagger.setSummary(operation.getDescription());
-            }
-            operationSwagger.setConsumes(new ArrayList<>());
-            operationSwagger.setTags(Collections.singletonList(resource.getName()));
-            operationSwagger.setDeprecated(false);
-            operationSwagger.setParameters(new ArrayList<>());
-            operationSwagger.setProduces(new ArrayList<>());
-            operationSwagger.setResponses(new HashMap<>());
-
-            path.set(operation.getMethod().name().toLowerCase(), operationSwagger);
-        }));
+//        api.getResources().forEach(resource -> resource.getOperations().forEach(operation -> {
+//            String pathOperation = operation.getPath();
+//            if (Objects.isNull(pathMap.get(pathOperation))) {
+//                pathMap.put(pathOperation, new Path());
+//            }
+//
+//            Path path = pathMap.get(pathOperation);
+//
+//            io.swagger.models.Operation operationSwagger = new io.swagger.models.Operation();
+//            if (operation.getDescription() != null) {
+//                operationSwagger.setOperationId(operation.getDescription().trim().concat(operation.getMethod().name()));
+//                operationSwagger.setSummary(operation.getDescription());
+//            }
+//            operationSwagger.setConsumes(new ArrayList<>());
+//            operationSwagger.setTags(Collections.singletonList(resource.getName()));
+//            operationSwagger.setDeprecated(false);
+//            operationSwagger.setParameters(new ArrayList<>());
+//            operationSwagger.setProduces(new ArrayList<>());
+//            operationSwagger.setResponses(new HashMap<>());
+//
+//            path.set(operation.getMethod().name().toLowerCase(), operationSwagger);
+//        }));
 
         return pathMap;
     }

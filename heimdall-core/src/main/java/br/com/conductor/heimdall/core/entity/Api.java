@@ -16,10 +16,6 @@
 package br.com.conductor.heimdall.core.entity;
 
 import br.com.conductor.heimdall.core.enums.Status;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -27,14 +23,10 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.format.annotation.DateTimeFormat.ISO;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -66,41 +58,30 @@ public class Api implements Serializable {
 
      private boolean cors;
 
-     @DateTimeFormat(iso = ISO.DATE_TIME)
-     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
-     @JsonSerialize(using = LocalDateTimeSerializer.class)
      private LocalDateTime creationDate;
 
-     private Set<Resource> resources = new HashSet<>();
+     private Set<String> resources = new HashSet<>();
 
      private Status status;
 
-     private Set<Environment> environments = new HashSet<>();
+     private Set<String> environments = new HashSet<>();
      
-     private Set<Plan> plans = new HashSet<>();
+     private Set<String> plans = new HashSet<>();
 
      public void addResource(String id) {
-          Resource resource = new Resource();
-          resource.setId(id);
-          this.resources.add(resource);
+          this.resources.add(id);
      }
 
      public void removeResource(String id) {
-          Resource resource = new Resource();
-          resource.setId(id);
-          this.resources.remove(resource);
+          this.resources.remove(id);
      }
 
      public void addPlan(String id) {
-          Plan plan = new Plan();
-          plan.setId(id);
-          this.plans.add(plan);
+          this.plans.add(id);
      }
 
      public void removePlan(String id) {
-          Plan plan = new Plan();
-          plan.setId(id);
-          this.plans.remove(plan);
+          this.plans.remove(id);
      }
 
 }

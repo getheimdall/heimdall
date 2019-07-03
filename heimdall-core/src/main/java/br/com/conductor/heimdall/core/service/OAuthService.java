@@ -218,7 +218,7 @@ public class OAuthService {
     public Provider getProvider(String providerId) throws ProviderException {
         Provider provider = providerService.find(providerId);
         if (provider == null) {
-            throw new ProviderException(ExceptionMessage.PROVIDER_NOT_FOUND);
+            throw new ProviderException(ExceptionMessage.GLOBAL_NOT_FOUND);
         }
         return provider;
     }

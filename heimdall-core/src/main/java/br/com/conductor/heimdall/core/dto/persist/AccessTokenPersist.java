@@ -48,6 +48,6 @@ public class AccessTokenPersist implements Serializable {
      @Size(min = 1)
      private List<String> plans;
      
-     private Status status;
+     private Status status = Status.ACTIVE;
 
 }

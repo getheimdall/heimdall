@@ -19,11 +19,9 @@
  */
 package br.com.conductor.heimdall.core.service;
 
-import br.com.conductor.heimdall.core.dto.page.AccessTokenPage;
 import br.com.conductor.heimdall.core.dto.persist.AccessTokenPersist;
 import br.com.conductor.heimdall.core.entity.AccessToken;
 import br.com.conductor.heimdall.core.entity.App;
-import br.com.conductor.heimdall.core.enums.Status;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.AccessTokenRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
@@ -78,7 +76,7 @@ public class AccessTokenService {
     /**
      * Returns a paged list of all {@link AccessToken} from a request.
      *
-     * @return The paged {@link AccessToken} list as a {@link AccessTokenPage} object
+     * @return The paged {@link AccessToken} list
      */
     @Transactional(readOnly = true)
     public Page<AccessToken> list(Pageable pageable) {
@@ -127,7 +125,6 @@ public class AccessTokenService {
 
         accessToken.setCreationDate(LocalDateTime.now());
         accessToken.setCode(accessToken.getCode().trim());
-        accessToken.setStatus(accessToken.getStatus() == null ? Status.ACTIVE : accessToken.getStatus());
 
         accessToken = accessTokenRepository.save(accessToken);
 

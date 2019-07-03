@@ -21,30 +21,22 @@ package br.com.conductor.heimdall.core.service;
  * ==========================LICENSE_END===================================
  */
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import br.com.conductor.heimdall.core.entity.Api;
-import br.com.conductor.heimdall.core.enums.Status;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.dto.EnvironmentDTO;
-import br.com.conductor.heimdall.core.dto.PageDTO;
-import br.com.conductor.heimdall.core.dto.PageableDTO;
-import br.com.conductor.heimdall.core.dto.page.EnvironmentPage;
+import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Environment;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.EnvironmentRepository;
 import br.com.conductor.heimdall.core.util.Pageable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 
@@ -81,7 +73,7 @@ public class EnvironmentService {
      * Generates a paged list of {@link Environment} from a request.
      *
      * @param pageable The {@link Pageable}
-     * @return The paged {@link Environment} list as a {@link EnvironmentPage} object
+     * @return The paged {@link Environment} list
      */
     public Page<Environment> list(Pageable pageable) {
 
@@ -111,11 +103,9 @@ public class EnvironmentService {
 
         Environment environmentEqual = environments.stream().filter(e -> e.getOutboundURL().equals(environment.getOutboundURL())).findFirst().orElse(null);
         HeimdallException.checkThrow(environmentEqual != null, ENVIRONMENT_ALREADY_EXISTS);
-
         HeimdallException.checkThrow(validateInboundURL(environment.getInboundURL()), ENVIRONMENT_INBOUND_DNS_PATTERN);
 
         environment.setCreationDate(LocalDateTime.now());
-        environment.setStatus(environment.getStatus() == null ? Status.ACTIVE : environment.getStatus());
 
         return environmentRepository.save(environment);
     }
@@ -124,7 +114,7 @@ public class EnvironmentService {
      * Updates a {@link Environment} by its ID.
      *
      * @param id                 The id of the {@link Environment}
-     * @param environmentPersist The {@link EnvironmentDTO}
+     * @param environmentPersist The {@link Environment}
      * @return The updated {@link Environment}
      */
     @Transactional
@@ -132,16 +122,23 @@ public class EnvironmentService {
 
         Environment environment = this.find(id);
 
+        HeimdallException.checkThrow(validateInboundURL(environment.getInboundURL()), ENVIRONMENT_INBOUND_DNS_PATTERN);
+
         List<Environment> environments = environmentRepository.findByInboundURL(environmentPersist.getInboundURL());
 
         Environment environmentEqual = environments.stream().filter(e -> e.getOutboundURL().equals(environmentPersist.getOutboundURL())).findFirst().orElse(null);
         HeimdallException.checkThrow(environmentEqual != null && !Objects.requireNonNull(environmentEqual).getId().equals(environment.getId()), ENVIRONMENT_ALREADY_EXISTS);
 
-        // TODO
-        Integer apis = environmentRepository.findApiWithOtherEnvironmentEqualsInbound(environment.getId(), environmentPersist.getInboundURL());
-        HeimdallException.checkThrow(apis > 0, ExceptionMessage.API_CANT_ENVIRONMENT_INBOUND_URL_EQUALS);
+        this.getApisWithEnvironment(id)
+                .forEach(api -> {
+                    final long count = api.getEnvironments().stream()
+                        .map(this::find)
+                        .filter(env -> env.getInboundURL().equals(environmentPersist.getInboundURL()))
+                        .count()
+                        ;
 
-        HeimdallException.checkThrow(validateInboundURL(environment.getInboundURL()), ENVIRONMENT_INBOUND_DNS_PATTERN);
+                    HeimdallException.checkThrow(count > 1, ExceptionMessage.API_CANT_ENVIRONMENT_INBOUND_URL_EQUALS);
+                });
 
         environment = GenericConverter.mapper(environmentPersist, environment);
 
@@ -158,7 +155,8 @@ public class EnvironmentService {
 
         Environment environment = this.find(id);
 
-        Integer totalEnvironmentsAttached = environmentRepository.findApisWithEnvironment(id);
+        final long totalEnvironmentsAttached = this.getApisWithEnvironment(id).size();
+//        Integer totalEnvironmentsAttached = environmentRepository.findApisWithEnvironment(id);
         HeimdallException.checkThrow(totalEnvironmentsAttached > 0, ENVIRONMENT_ATTACHED_TO_API);
 
         environmentRepository.delete(environment);
@@ -183,4 +181,9 @@ public class EnvironmentService {
         return true;
     }
 
+    private List<Api> getApisWithEnvironment(String environmentId) {
+        return apiService.list().stream()
+                .filter(api -> api.getEnvironments().contains(environmentId))
+                .collect(Collectors.toList());
+    }
 }

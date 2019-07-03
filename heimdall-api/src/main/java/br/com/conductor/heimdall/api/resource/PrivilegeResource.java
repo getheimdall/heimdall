@@ -38,70 +38,71 @@ import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_PRIVILEGES;
  * Uses a {@link PrivilegeService} to provide methods to find one or more {@link Privilege}.
  *
  * @author Marcos Filho
- *
  */
-@io.swagger.annotations.Api(value = PATH_PRIVILEGES, produces = MediaType.APPLICATION_JSON_VALUE, tags = { ConstantsTag.TAG_PRIVILEGES })
+@io.swagger.annotations.Api(
+        value = PATH_PRIVILEGES,
+        produces = MediaType.APPLICATION_JSON_VALUE,
+        tags = {ConstantsTag.TAG_PRIVILEGES})
 @RestController
 @RequestMapping(value = PATH_PRIVILEGES)
 public class PrivilegeResource {
 
-     @Autowired
-     private PrivilegeService privilegeService;
+    @Autowired
+    private PrivilegeService privilegeService;
 
-     /**
-      * Finds a {@link Privilege} by its Id.
-      * 
-      * @param id					The Privilege Id
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Find Privileges by id", response = Privilege.class)
-     @GetMapping(value = "/{apiId}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_PRIVILEGE)
-     public ResponseEntity<?> findById(@PathVariable("apiId") Long id) {
+    /**
+     * Finds a {@link Privilege} by its Id.
+     *
+     * @param id The Privilege Id
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Find Privileges by id", response = Privilege.class)
+    @GetMapping(value = "/{apiId}")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_PRIVILEGE)
+    public ResponseEntity<?> findById(@PathVariable("apiId") Long id) {
 
-          Privilege privilege = privilegeService.find(id);
+        Privilege privilege = privilegeService.find(id);
 
-          return ResponseEntity.ok(privilege);
-     }
+        return ResponseEntity.ok(privilege);
+    }
 
-     /**
-      * Finds all {@link Privilege} from a request.
-      * 
-      * @param privilegeDTO			{@link PrivilegeDTO}
-      * @param pageableDTO			{@link PageableDTO}
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Find all Privileges", responseContainer = "List", response = Privilege.class)
-     @GetMapping
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_PRIVILEGE)
-     public ResponseEntity<?> findAll(@ModelAttribute PrivilegeDTO privilegeDTO, @ModelAttribute PageableDTO pageableDTO) {
+    /**
+     * Finds all {@link Privilege} from a request.
+     *
+     * @param privilegeDTO {@link PrivilegeDTO}
+     * @param pageableDTO  {@link PageableDTO}
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Find all Privileges", responseContainer = "List", response = Privilege.class)
+    @GetMapping
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_PRIVILEGE)
+    public ResponseEntity<?> findAll(@ModelAttribute PrivilegeDTO privilegeDTO,
+                                     @ModelAttribute PageableDTO pageableDTO) {
 
-          if (!pageableDTO.isEmpty()) {
+        if (!pageableDTO.isEmpty()) {
+            PrivilegePage apiPage = privilegeService.list(privilegeDTO, pageableDTO);
 
-               PrivilegePage apiPage = privilegeService.list(privilegeDTO, pageableDTO);
-               return ResponseEntity.ok(apiPage);
-          } else {
+            return ResponseEntity.ok(apiPage);
+        } else {
+            List<Privilege> privileges = privilegeService.list(privilegeDTO);
 
-               List<Privilege> privileges = privilegeService.list(privilegeDTO);
-               return ResponseEntity.ok(privileges);
-          }
+            return ResponseEntity.ok(privileges);
+        }
+    }
 
-     }
+    @ResponseBody
+    @ApiOperation(value = "Find all Privileges by username", responseContainer = "List", response = Privilege.class)
+    @PostMapping("/username")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_PRIVILEGE)
+    public ResponseEntity findPrivilegesByUsername(@RequestBody String username) {
 
-     @ResponseBody
-     @ApiOperation(value = "Find all Privileges by username", responseContainer = "List", response = Privilege.class)
-     @PostMapping("/username")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_PRIVILEGE)
-     public ResponseEntity findPrivilegesByUsername(@RequestBody String username) {
+        Set<Privilege> list = privilegeService.list(username);
+        if (list.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
 
-          Set<Privilege> list = privilegeService.list(username);
-
-          if (list.isEmpty()){
-               return ResponseEntity.notFound().build();
-          }
-
-          return ResponseEntity.ok(list);
-     }
+        return ResponseEntity.ok(list);
+    }
 }

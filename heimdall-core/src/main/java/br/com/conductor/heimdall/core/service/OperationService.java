@@ -16,8 +16,6 @@
 package br.com.conductor.heimdall.core.service;
 
 import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.dto.OperationDTO;
-import br.com.conductor.heimdall.core.dto.page.OperationPage;
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Operation;
 import br.com.conductor.heimdall.core.entity.Resource;
@@ -34,10 +32,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
@@ -70,9 +65,9 @@ public class OperationService {
     private AMQPCacheService amqpCacheService;
 
     /**
-     * Finds a {@link Operation} by its Id, {@link Resource} Id and {@link br.com.conductor.heimdall.core.entity.Api} Id.
+     * Finds a {@link Operation} by its Id, {@link Resource} Id and {@link Api} Id.
      *
-     * @param apiId       The {@link br.com.conductor.heimdall.core.entity.Api} Id
+     * @param apiId       The {@link Api} Id
      * @param resourceId  The {@link Resource} Id
      * @param operationId The {@link Operation} Id
      * @return The {@link Operation} found
@@ -95,10 +90,10 @@ public class OperationService {
     /**
      * Generates a paged list of {@link Operation} from a request.
      *
-     * @param apiId      The {@link br.com.conductor.heimdall.core.entity.Api} Id
+     * @param apiId      The {@link Api} Id
      * @param resourceId The {@link Resource} Id
      * @param pageable   The {@link Pageable}
-     * @return The paged {@link Operation} list as a {@link OperationPage} object
+     * @return The paged {@link Operation} list
      */
     @Transactional(readOnly = true)
     public Page<Operation> list(String apiId, String resourceId, Pageable pageable) {
@@ -111,7 +106,7 @@ public class OperationService {
     /**
      * Generates a list of {@link Operation} from a request.
      *
-     * @param apiId      The {@link br.com.conductor.heimdall.core.entity.Api} Id
+     * @param apiId      The {@link Api} Id
      * @param resourceId The {@link Resource} Id
      * @return The list of {@link Operation}
      */
@@ -159,7 +154,7 @@ public class OperationService {
     /**
      * Saves a {@link Operation} to the repository.
      *
-     * @param apiId      The {@link br.com.conductor.heimdall.core.entity.Api} Id
+     * @param apiId      The {@link Api} Id
      * @param resourceId The {@link Resource} Id
      * @return The saved {@link Operation}
      */
@@ -199,7 +194,7 @@ public class OperationService {
 
     private boolean validatePath(String pattern) {
         final List<Api> apis = apiService.list();
-        final Set<String> routes = new TreeSet<>();
+        final Set<String> routes = new HashSet<>();
 
         apis.forEach(api -> this.list(api.getId())
                 .forEach(operation -> routes.add(api.getBasePath() + operation.getPath())));
@@ -209,9 +204,9 @@ public class OperationService {
 
     /**
      * TODO
-     * Updates a {@link Operation} by its Id, {@link br.com.conductor.heimdall.core.entity.Api} Id, {@link Resource} Id and {@link OperationDTO}.
+     * Updates a {@link Operation} by its Id, {@link Api} Id, {@link Resource} Id
      *
-     * @param apiId            The {@link br.com.conductor.heimdall.core.entity.Api} Id
+     * @param apiId            The {@link Api} Id
      * @param resourceId       The {@link Resource} Id
      * @param operationId      The {@link Operation} Id
      * @param operationPersist The {@link Operation}
@@ -246,9 +241,9 @@ public class OperationService {
     }
 
     /**
-     * Deletes a {@link Operation} by its Id, {@link Resource} Id and {@link br.com.conductor.heimdall.core.entity.Api} Id.
+     * Deletes a {@link Operation} by its Id, {@link Resource} Id and {@link Api} Id.
      *
-     * @param apiId       The {@link br.com.conductor.heimdall.core.entity.Api} Id
+     * @param apiId       The {@link Api} Id
      * @param resourceId  The {@link Resource} Id
      * @param operationId The {@link Operation} Id
      */
@@ -260,7 +255,7 @@ public class OperationService {
         final Api api = apiService.find(apiId);
 
         // Deletes all interceptors attached to the Operation
-//          interceptorService.deleteAllfromOperation(operationId);
+        interceptorService.deleteAllfromOperation(operationId);
 
         resourceService.removeOperation(operation);
 

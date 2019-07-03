@@ -25,6 +25,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -48,16 +49,14 @@ public class Scope implements Serializable {
 	@Id
     private String id;
 
+	@Indexed
     private String name;
 
     private String description;
 
-    private Api api;
+    @Indexed
+    private String api;
 
     private Set<Operation> operations;
-
-    public Set<String> getOperationsIds() {
-        return this.operations != null ? this.operations.stream().map(Operation::getId).collect(Collectors.toSet()) : Collections.emptySet();
-    }
 
 }

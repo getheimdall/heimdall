@@ -29,8 +29,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface ScopeRepository extends JpaRepository<Scope, String> {
 
-    Scope findByApiIdAndId(String apiId, String id);
+    Scope findByApiAndId(String apiId, String id);
 
-    Scope findByApiIdAndName(String apiId, String name);
+    Scope findByApiAndName(String apiId, String name);
 
 }

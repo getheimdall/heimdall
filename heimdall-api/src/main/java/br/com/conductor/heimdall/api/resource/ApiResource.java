@@ -43,136 +43,143 @@ import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_APIS;
  *
  * @author Filipe Germano
  * @author Marcos Filho
- *
  */
-@io.swagger.annotations.Api(value = PATH_APIS, produces = MediaType.APPLICATION_JSON_VALUE, tags = { ConstantsTag.TAG_APIS })
+@io.swagger.annotations.Api(
+        value = PATH_APIS,
+        produces = MediaType.APPLICATION_JSON_VALUE,
+        tags = {ConstantsTag.TAG_APIS})
 @RestController
 @RequestMapping(value = PATH_APIS)
 
 public class ApiResource {
 
-     @Autowired
-     private ApiService apiService;
-     
-     /**
-      * Finds a {@link Api} by its Id.
-      * 
-      * @param id					The Api Id
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Find API by id", response = Api.class)
-     @GetMapping(value = "/{apiId}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_API)
-     public ResponseEntity<?> findById(@PathVariable("apiId") String id) {
+    @Autowired
+    private ApiService apiService;
 
-          Api api = apiService.find(id);
-          return ResponseEntity.ok(api);
-     }
+    /**
+     * Finds a {@link Api} by its Id.
+     *
+     * @param id The Api Id
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Find API by id", response = Api.class)
+    @GetMapping(value = "/{apiId}")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_API)
+    public ResponseEntity<?> findById(@PathVariable("apiId") String id) {
 
-     /**
-      * Get {@link Swagger} by {@link Api} its Id.
-      *
-      * @param id					The Api Id
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Get SwaggerJson by Api Id", response = Api.class)
-     @GetMapping(value = "/{apiId}/swagger")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_API)
-     public ResponseEntity<?> getSwaggerByApiId(@PathVariable("apiId") String id) {
+        Api api = apiService.find(id);
 
-          Swagger swagger = apiService.findSwaggerByApi(id);
+        return ResponseEntity.ok(api);
+    }
 
-          return ResponseEntity.ok(swagger);
-     }
+    /**
+     * Get {@link Swagger} by {@link Api} its Id.
+     *
+     * @param id The Api Id
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Get SwaggerJson by Api Id", response = Api.class)
+    @GetMapping(value = "/{apiId}/swagger")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_API)
+    public ResponseEntity<?> getSwaggerByApiId(@PathVariable("apiId") String id) {
 
-     /**
-      * Fids all {@link Api} from a request.
-      * 
-      * @param pageableDTO			{@link PageableDTO}
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Find all APIs", responseContainer = "List", response = Api.class)
-     @GetMapping
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_API)
-     public ResponseEntity<?> findAll(@ModelAttribute PageableDTO pageableDTO) {
-          
-          if (!pageableDTO.isEmpty()) {
+        Swagger swagger = apiService.findSwaggerByApi(id);
 
-               Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+        return ResponseEntity.ok(swagger);
+    }
 
-               Page<Api> apiPage = apiService.list(pageable);
-               return ResponseEntity.ok(apiPage);
-          } else {
-               
-               List<Api> apis = apiService.list();
-               return ResponseEntity.ok(apis);
-          }
-          
-     }
+    /**
+     * Fids all {@link Api} from a request.
+     *
+     * @param pageableDTO {@link PageableDTO}
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Find all APIs", responseContainer = "List", response = Api.class)
+    @GetMapping
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_API)
+    public ResponseEntity<?> findAll(@ModelAttribute PageableDTO pageableDTO) {
 
-     /**
-      * Saves a {@link Api}.
-      * 
-      * @param apiDTO				{@link ApiDTO}
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Save a new API")
-     @PostMapping
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_API)
-     public ResponseEntity<?> save(@RequestBody @Valid ApiDTO apiDTO) {
+        if (!pageableDTO.isEmpty()) {
 
-          Api api = GenericConverter.mapper(apiDTO, Api.class);
+            Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+            Page<Api> apiPage = apiService.list(pageable);
 
-          api = apiService.save(api);
+            return ResponseEntity.ok(apiPage);
+        } else {
 
-          return ResponseEntity.created(URI.create(String.format("/%s/%s", "apis", api.getId()))).build();
-     }
+            List<Api> apis = apiService.list();
+            return ResponseEntity.ok(apis);
+        }
 
-     /**
-      * Updates a {@link Api}.
-      * 
-      * @param id					The Api Id
-      * @param apiDTO				{@link ApiDTO}
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Update API")
-     @PutMapping(value = "/{apiId}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_API)
-     public ResponseEntity<?> update(@PathVariable("apiId") String id, @RequestBody ApiDTO apiDTO) {
+    }
 
-          Api api = GenericConverter.mapper(apiDTO, Api.class);
-          api = apiService.update(id, api);
-          
-          return ResponseEntity.ok(api);
-     }
+    /**
+     * Saves a {@link Api}.
+     *
+     * @param apiDTO {@link ApiDTO}
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Save a new API")
+    @PostMapping
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_API)
+    public ResponseEntity<?> save(@RequestBody @Valid ApiDTO apiDTO) {
 
-     /**
-      * Deletes a {@link Api}.
-      * 
-      * @param id					The Api Id
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Delete API")
-     @DeleteMapping(value = "/{apiId}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_API)
-     public ResponseEntity<?> delete(@PathVariable("apiId") String id) {
+        Api api = GenericConverter.mapper(apiDTO, Api.class);
+        api = apiService.save(api);
 
-          apiService.delete(id);
-          
-          return ResponseEntity.noContent().build();
-     }
+        return ResponseEntity.created(URI.create(String.format("/%s/%s", "apis", api.getId()))).build();
+    }
 
-     @ApiOperation(value = "Update API by Swagger JSON")
-     @PutMapping("/{apiId}/swagger")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_API)
-     public ResponseEntity<?> updateApiBySwaggerJSON(@PathVariable("apiId") String id, @RequestBody String swagger, boolean override) {
-          Api api = apiService.updateBySwagger(id, swagger, override);
-          return ResponseEntity.ok(api);
-     }
+    /**
+     * Updates a {@link Api}.
+     *
+     * @param id     The Api Id
+     * @param apiDTO {@link ApiDTO}
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Update API")
+    @PutMapping(value = "/{apiId}")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_API)
+    public ResponseEntity<?> update(@PathVariable("apiId") String id,
+                                    @RequestBody ApiDTO apiDTO) {
+
+        Api api = GenericConverter.mapper(apiDTO, Api.class);
+        api = apiService.update(id, api);
+
+        return ResponseEntity.ok(api);
+    }
+
+    /**
+     * Deletes a {@link Api}.
+     *
+     * @param id The Api Id
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Delete API")
+    @DeleteMapping(value = "/{apiId}")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_API)
+    public ResponseEntity<?> delete(@PathVariable("apiId") String id) {
+
+        apiService.delete(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @ApiOperation(value = "Update API by Swagger JSON")
+    @PutMapping("/{apiId}/swagger")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_API)
+    public ResponseEntity<?> updateApiBySwaggerJSON(@PathVariable("apiId") String id,
+                                                    @RequestBody String swagger,
+                                                    boolean override) {
+
+        Api api = apiService.updateBySwagger(id, swagger, override);
+
+        return ResponseEntity.ok(api);
+    }
 }
