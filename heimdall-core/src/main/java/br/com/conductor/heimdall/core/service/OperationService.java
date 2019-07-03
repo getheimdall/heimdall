@@ -118,7 +118,7 @@ public class OperationService {
         final List<Operation> operations = operationRepository.findAll();
 
         return operations.stream()
-                .filter(operation -> resourceId.equals(operation.getResource().getId()))
+                .filter(operation -> resourceId.equals(operation.getResourceId()))
                 .collect(Collectors.toList());
     }
 
@@ -136,15 +136,15 @@ public class OperationService {
 
         final List<Operation> operations = allOperations.stream()
                 .filter(operation -> {
-                    final Resource resource = resourceService.find(apiId, operation.getResource().getId());
-                    return apiId.equals(resource.getApi().getId());
+                    final Resource resource = resourceService.find(apiId, operation.getResourceId());
+                    return apiId.equals(resource.getApiId());
                 })
                 .collect(Collectors.toList());
 
         if (!operations.isEmpty()) {
             for (Operation operation : operations) {
                 operation.setDescription(null);
-                operation.setResource(null);
+                operation.setResourceId(null);
             }
         }
 
@@ -162,6 +162,7 @@ public class OperationService {
     public Operation save(String apiId, String resourceId, final Operation operation) {
 
         final Resource resource = resourceService.find(apiId, resourceId);
+        final Api api = apiService.find(apiId);
 
         operation.setPath(StringUtils.removeMultipleSlashes(operation.getPath()));
         operation.fixBasePath();
@@ -171,12 +172,10 @@ public class OperationService {
                         .anyMatch(op -> op.getPath().equals(operation.getPath()) && op.getMethod().equals(operation.getMethod())),
                 ONLY_ONE_OPERATION_PER_RESOURCE);
 
-        HeimdallException.checkThrow(validatePath(resource.getApi().getBasePath() + "/" + operation.getPath()), OPERATION_ROUTE_ALREADY_EXISTS);
+        HeimdallException.checkThrow(validatePath(api.getBasePath() + "/" + operation.getPath()), OPERATION_ROUTE_ALREADY_EXISTS);
 
-        final Resource resourcePersist = new Resource();
-        resourcePersist.setId(resourceId);
-
-        operation.setResource(resourcePersist);
+        operation.setResourceId(resourceId);
+        operation.setApiId(apiId);
 
         HeimdallException.checkThrow(validateSingleWildCardOperationPath(operation), OPERATION_CANT_HAVE_SINGLE_WILDCARD);
         HeimdallException.checkThrow(validateDoubleWildCardOperationPath(operation), OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END);
@@ -216,17 +215,18 @@ public class OperationService {
     public Operation update(String apiId, String resourceId, String operationId, Operation operationPersist) {
 
         Operation operation = this.find(apiId, resourceId, operationId);
+        final Api api = apiService.find(apiId);
 
         Operation resData = operationRepository.findByResourceApiIdAndMethodAndPath(apiId, operationPersist.getMethod(), operationPersist.getPath());
         HeimdallException.checkThrow(resData != null &&
-                resData.getResource().getId().equals(operation.getResource().getId()) &&
+                resData.getResourceId().equals(operation.getResourceId()) &&
                 !resData.getId().equals(operation.getId()), ONLY_ONE_OPERATION_PER_RESOURCE);
 
         operation = GenericConverter.mapper(operationPersist, operation);
         operation.setPath(StringUtils.removeMultipleSlashes(operation.getPath()));
         operation.fixBasePath();
 
-        HeimdallException.checkThrow(validatePath(operation.getResource().getApi().getBasePath() + "/" + operation.getPath()), OPERATION_ROUTE_ALREADY_EXISTS);
+        HeimdallException.checkThrow(validatePath(api.getBasePath() + "/" + operation.getPath()), OPERATION_ROUTE_ALREADY_EXISTS);
 
         HeimdallException.checkThrow(validateSingleWildCardOperationPath(operation), OPERATION_CANT_HAVE_SINGLE_WILDCARD);
         HeimdallException.checkThrow(validateDoubleWildCardOperationPath(operation), OPERATION_CANT_HAVE_DOUBLE_WILDCARD_NOT_AT_THE_END);
@@ -235,7 +235,7 @@ public class OperationService {
 
         amqpRoute.dispatchRoutes();
 
-        amqpCacheService.dispatchClean(ConstantsCache.OPERATION_ACTIVE_FROM_ENDPOINT, operation.getResource().getApi().getBasePath() + operation.getPath());
+        amqpCacheService.dispatchClean(ConstantsCache.OPERATION_ACTIVE_FROM_ENDPOINT, api.getBasePath() + operation.getPath());
 
         return operation;
     }

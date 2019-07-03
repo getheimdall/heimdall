@@ -57,7 +57,7 @@ public class InterceptorJDBCRepository {
             interceptor.setId(resultSet.getString(1));
             Api api = new Api();
             api.setId(resultSet.getString(2));
-            interceptor.setApi(api);
+//            interceptor.setApi(api);
             interceptor.setExecutionPoint(TypeExecutionPoint.valueOf(resultSet.getString(3)));
             interceptor.setLifeCycle(InterceptorLifeCycle.valueOf(resultSet.getString(4)));
             interceptor.setType(TypeInterceptor.valueOf(resultSet.getString(5)));
@@ -90,7 +90,7 @@ public class InterceptorJDBCRepository {
             interceptor.setId(resultSet.getString(1));
             Api api = new Api();
             api.setId(resultSet.getString(2));
-            interceptor.setApi(api);
+//            interceptor.setApi(api);
             interceptor.setExecutionPoint(TypeExecutionPoint.valueOf(resultSet.getString(3)));
             interceptor.setLifeCycle(InterceptorLifeCycle.valueOf(resultSet.getString(4)));
             interceptor.setType(TypeInterceptor.valueOf(resultSet.getString(5)));
@@ -122,7 +122,7 @@ public class InterceptorJDBCRepository {
             interceptor.setId(resultSet.getString(1));
             Api api = new Api();
             api.setId(resultSet.getString(2));
-            interceptor.setApi(api);
+//            interceptor.setApi(api);
             interceptor.setExecutionPoint(TypeExecutionPoint.valueOf(resultSet.getString(3)));
             interceptor.setLifeCycle(InterceptorLifeCycle.valueOf(resultSet.getString(4)));
             interceptor.setType(TypeInterceptor.valueOf(resultSet.getString(5)));

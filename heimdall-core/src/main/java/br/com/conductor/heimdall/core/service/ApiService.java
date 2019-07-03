@@ -93,8 +93,8 @@ public class ApiService {
     public Swagger findSwaggerByApi(String id) {
 
         Api api = this.find(id);
-//        List<Resource> resources = resourceService.list(api.getId());
-//        api.setResources(new HashSet<>(resources));
+        List<Resource> resources = resourceService.list(api.getId());
+        api.setResources(resources.stream().map(Resource::getId).collect(Collectors.toSet()));
 
         return swaggerService.exportApiToSwaggerJSON(api);
     }
@@ -124,7 +124,7 @@ public class ApiService {
         apis.sort(Comparator.comparing(Api::getName));
 
         return apis;
-     }
+    }
 
     /**
      * Saves a {@link Api}.
@@ -157,8 +157,8 @@ public class ApiService {
     /**
      * Updates a {@link Api} by its ID.
      *
-     * @param id     The ID of the {@link Api}
-     * @param apiPersist    {@link Api}
+     * @param id         The ID of the {@link Api}
+     * @param apiPersist {@link Api}
      * @return The updated {@link Api}
      */
     public Api update(String id, Api apiPersist) {
@@ -225,19 +225,19 @@ public class ApiService {
         amqpRoute.dispatchRoutes();
     }
 
-     /**
-      * Find plans from {@link Api} by its ID.
-      *
-      * @param id   The ID of the {@link Api}
-      * @return     List of the {@link Plan}
-      */
-     @Transactional(readOnly = true)
-     public Set<Plan> plansByApi(String id) {
+    /**
+     * Find plans from {@link Api} by its ID.
+     *
+     * @param id The ID of the {@link Api}
+     * @return List of the {@link Plan}
+     */
+    @Transactional(readOnly = true)
+    public Set<Plan> plansByApi(String id) {
 
-          Api found = this.find(id);
+        Api found = this.find(id);
 
-          return found.getPlans().stream().map(planId -> planService.find(planId)).collect(Collectors.toSet());
-     }
+        return found.getPlans().stream().map(planId -> planService.find(planId)).collect(Collectors.toSet());
+    }
 
     /*
      * A Api basepath can not have any sort of wild card.
@@ -272,7 +272,7 @@ public class ApiService {
     }
 
     public void removePlan(Plan plan) {
-        Api api = this.find(plan.getApi().getId());
+        Api api = this.find(plan.getApiId());
 
         api.removePlan(plan.getId());
 
@@ -280,7 +280,7 @@ public class ApiService {
     }
 
     public void removeResource(Resource resource) {
-        Api api = this.find(resource.getApi().getId());
+        Api api = this.find(resource.getApiId());
 
         api.removeResource(resource.getId());
 

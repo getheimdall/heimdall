@@ -111,7 +111,7 @@ public class ResourceService {
         final List<Resource> resources = resourceRepository.findAll();
 
         return resources.stream()
-                .filter(resource -> apiId.equals(resource.getApi().getId()))
+                .filter(resource -> apiId.equals(resource.getApiId()))
                 .collect(Collectors.toList());
     }
 
@@ -131,9 +131,7 @@ public class ResourceService {
 
         HeimdallException.checkThrow(anyMatch, ONLY_ONE_RESOURCE_PER_API);
 
-        Api apiPersist = new Api();
-        apiPersist.setId(apiId);
-        resource.setApi(apiPersist);
+        resource.setApiId(apiId);
 
         final Resource savedResource = resourceRepository.save(resource);
 
@@ -175,7 +173,7 @@ public class ResourceService {
     }
 
     public Resource update(Resource resource) {
-        return this.update(resource.getApi().getId(), resource.getId(), resource);
+        return this.update(resource.getApiId(), resource.getId(), resource);
     }
 
     /**
@@ -213,7 +211,7 @@ public class ResourceService {
     }
 
     public void removeOperation(Operation operation) {
-        Resource resource = this.find(operation.getResource().getId());
+        Resource resource = this.find(operation.getResourceId());
 
         resource.removeOperation(operation.getId());
 

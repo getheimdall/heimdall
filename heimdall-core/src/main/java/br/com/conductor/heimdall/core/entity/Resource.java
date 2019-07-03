@@ -51,7 +51,7 @@ public class Resource implements Serializable {
      private String description;
 
      @Indexed
-     private Api api;
+     private String apiId;
 
      private List<Operation> operations = new ArrayList<>();
 

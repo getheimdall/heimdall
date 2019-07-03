@@ -16,13 +16,11 @@
 package br.com.conductor.heimdall.api.service;
 
 import br.com.conductor.heimdall.api.dto.RoleDTO;
-import br.com.conductor.heimdall.api.dto.page.RolePage;
 import br.com.conductor.heimdall.api.entity.Privilege;
 import br.com.conductor.heimdall.api.entity.Role;
 import br.com.conductor.heimdall.api.repository.PrivilegeRepository;
 import br.com.conductor.heimdall.api.repository.RoleRepository;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.dto.PageDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
@@ -109,7 +107,7 @@ public class RoleService {
       * @return				{@link RolePage}
       */
      @Transactional(readOnly = false)
-     public RolePage list(RoleDTO roleDTO, PageableDTO pageableDTO) {
+     public Page<Role> list(RoleDTO roleDTO, PageableDTO pageableDTO) {
 
           Role role = GenericConverter.mapper(roleDTO, Role.class);
 
@@ -118,9 +116,7 @@ public class RoleService {
           Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
           Page<Role> page = roleRepository.findAll(example, pageable);
 
-          RolePage rolePage = new RolePage(PageDTO.build(page));
-
-          return rolePage;
+          return page;
      }
 
      /**

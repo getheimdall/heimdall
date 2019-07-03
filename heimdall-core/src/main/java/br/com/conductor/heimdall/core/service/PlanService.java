@@ -96,7 +96,7 @@ public class PlanService {
     public Plan save(Plan plan) {
 
         if (plan.isDefaultPlan()) {
-            Set<Plan> plans = apiService.plansByApi(plan.getApi().getId());
+            Set<Plan> plans = apiService.plansByApi(plan.getApiId());
             HeimdallException.checkThrow(plans.stream().anyMatch(Plan::isDefaultPlan), DEFAULT_PLAN_ALREADY_EXIST_TO_THIS_API);
         }
 
@@ -104,7 +104,7 @@ public class PlanService {
 
         plan = planRepository.save(plan);
 
-        Api api = apiService.find(plan.getApi().getId());
+        Api api = apiService.find(plan.getApiId());
 
         api.addPlan(plan.getId());
 
@@ -127,7 +127,7 @@ public class PlanService {
         Plan plan = this.find(id);
 
         if (planPersist.isDefaultPlan()) {
-            Set<Plan> plans = apiService.plansByApi(plan.getApi().getId());
+            Set<Plan> plans = apiService.plansByApi(plan.getApiId());
             HeimdallException.checkThrow(plans.stream()
                             .anyMatch(p -> !id.equals(p.getId()) && p.isDefaultPlan()),
                     DEFAULT_PLAN_ALREADY_EXIST_TO_THIS_API);

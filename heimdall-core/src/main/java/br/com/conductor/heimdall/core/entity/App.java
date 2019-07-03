@@ -29,8 +29,8 @@ import org.springframework.data.redis.core.index.Indexed;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This class represents a App registered to the system.
@@ -64,16 +64,9 @@ public class App implements Serializable {
     private Status status;
 
     @JsonIgnore
-    private List<String> accessTokens = new ArrayList<>();
+    private Set<String> accessTokens = new HashSet<>();
 
-    private List<String> plans = new ArrayList<>();
-
-    private void initValuesPersist() {
-
-        status = (status == null) ? Status.ACTIVE : status;
-
-        clientId = clientId.trim();
-    }
+    private Set<String> plans = new HashSet<>();
 
     public void addAccessToken(String id) {
         this.accessTokens.add(id);

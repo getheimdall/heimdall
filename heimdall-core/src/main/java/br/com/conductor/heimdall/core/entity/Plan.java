@@ -50,7 +50,7 @@ public class Plan implements Serializable {
      
      private String description;
      
-     private Api api;
+     private String apiId;
      
      private LocalDateTime creationDate;
 
@@ -58,19 +58,13 @@ public class Plan implements Serializable {
      
      private Status status;
 
-     private Set<Scope> scopes;
+     private Set<String> scopes;
 
      public void addScope(String id) {
-          Scope scope = new Scope();
-          scope.setId(id);
-
-          this.scopes.add(scope);
+          this.scopes.add(id);
      }
 
      public void removeScope(String id) {
-          Scope scope = new Scope();
-          scope.setId(id);
-
-          this.scopes.remove(scope);
+          this.scopes.remove(id);
      }
 }

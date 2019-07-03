@@ -17,14 +17,14 @@ package br.com.conductor.heimdall.api.service;
 
 import br.com.conductor.heimdall.api.dto.UserDTO;
 import br.com.conductor.heimdall.api.dto.UserEditDTO;
-import br.com.conductor.heimdall.api.dto.page.UserPage;
+//import br.com.conductor.heimdall.api.dto.page.UserPage;
 import br.com.conductor.heimdall.api.entity.Role;
 import br.com.conductor.heimdall.api.entity.User;
 import br.com.conductor.heimdall.api.enums.TypeUser;
 import br.com.conductor.heimdall.api.repository.RoleRepository;
 import br.com.conductor.heimdall.api.repository.UserRepository;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.dto.PageDTO;
+//import br.com.conductor.heimdall.core.dto.PageDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.util.Pageable;
@@ -110,21 +110,19 @@ public class UserService {
       * 
       * @param userDTO		{@link UserDTO}
       * @param pageableDTO	{@link PageableDTO}
-      * @return				{@link UserPage}
+      * @return
       */
      @Transactional(readOnly = false)
-     public UserPage list(UserDTO userDTO, PageableDTO pageableDTO) {
+     public Page<User> list(UserDTO userDTO, Pageable pageable) {
 
           User user = GenericConverter.mapper(userDTO, User.class);
 
           Example<User> example = Example.of(user, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 
-          Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
           Page<User> page = userRepository.findAll(example, pageable);
 
-          UserPage userPage = new UserPage(PageDTO.build(page));
 
-          return userPage;
+          return page;
      }
 
      /**

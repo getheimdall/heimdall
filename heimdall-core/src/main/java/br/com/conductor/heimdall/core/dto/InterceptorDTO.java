@@ -15,17 +15,16 @@
  */
 package br.com.conductor.heimdall.core.dto;
 
-import java.io.Serializable;
-import java.util.List;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
 import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.enums.TypeExecutionPoint;
 import br.com.conductor.heimdall.core.enums.TypeInterceptor;
 import lombok.Data;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.util.Set;
 
 /**
  * Class is a Data Transfer Object for the {@link Interceptor}.
@@ -57,7 +56,7 @@ public class InterceptorDTO implements Serializable {
      @NotNull
      private InterceptorLifeCycle lifeCycle;
      
-     private ReferenceIdDTO environment;
+     private String environmentId;
      
      @NotNull
      private TypeExecutionPoint executionPoint;
@@ -65,11 +64,11 @@ public class InterceptorDTO implements Serializable {
      @NotNull
      private Long referenceId;
      
-     private List<String> ignoredResources;
+     private Set<String> ignoredResources;
 
-     private List<String> ignoredOperations;
+     private Set<String> ignoredOperations;
      
-     private ReferenceIdDTO api;
+     private String apiId;
 
      private Boolean status;
      

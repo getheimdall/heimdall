@@ -71,9 +71,6 @@ public class InterceptorService {
     private ApiService apiService;
 
     @Autowired
-    private ApiRepository apiRepository;
-
-    @Autowired
     private RateLimitRepository ratelimitRepository;
 
     @Autowired
@@ -148,10 +145,10 @@ public class InterceptorService {
 
         interceptor = interceptorRepository.save(interceptor);
 
-        if (TypeInterceptor.CORS.equals(interceptor.getType())) {
-            Api api = apiService.find(interceptor.getApi().getId());
+         if (TypeInterceptor.CORS.equals(interceptor.getType())) {
+            Api api = apiService.find(interceptor.getApiId());
             api.setCors(true);
-            apiService.update(api.getId(), api);
+            apiService.update(api);
         }
 
         amqpInterceptorService.dispatchInterceptor(interceptor.getId());
@@ -214,9 +211,10 @@ public class InterceptorService {
             ratelimitRepository.delete(path);
         }
 
-        if (TypeInterceptor.CORS.equals(interceptor.getType())) {
-            interceptor.getApi().setCors(false);
-            apiService.update(interceptor.getApi().getId(), interceptor.getApi());
+         if (TypeInterceptor.CORS.equals(interceptor.getType())) {
+             final Api api = apiService.find(interceptor.getApiId());
+             api.setCors(false);
+            apiService.update(api);
         }
 
         interceptorRepository.delete(interceptor);
@@ -256,32 +254,32 @@ public class InterceptorService {
 
         switch (interceptor.getLifeCycle()) {
             case API:
-                Api api = apiService.find(interceptor.getReferenceId());
-                interceptor.setResource(null);
-                interceptor.setOperation(null);
-                interceptor.setPlan(null);
-                interceptor.setApi(api);
+                final Api api = apiService.find(interceptor.getReferenceId());
+                interceptor.setResourceId(null);
+                interceptor.setOperationId(null);
+                interceptor.setPlanId(null);
+                interceptor.setApiId(api.getId());
                 break;
             case PLAN:
-                Plan plan = planService.find(interceptor.getReferenceId());
-                interceptor.setResource(null);
-                interceptor.setOperation(null);
-                interceptor.setPlan(plan);
-                interceptor.setApi(plan.getApi());
+                final Plan plan = planService.find(interceptor.getReferenceId());
+                interceptor.setResourceId(null);
+                interceptor.setOperationId(null);
+                interceptor.setPlanId(plan.getId());
+                interceptor.setApiId(plan.getApiId());
                 break;
             case RESOURCE:
                 Resource resource = resourceService.find(interceptor.getReferenceId());
-                interceptor.setOperation(null);
-                interceptor.setPlan(null);
-                interceptor.setResource(resource);
-                interceptor.setApi(resource.getApi());
+                interceptor.setOperationId(null);
+                interceptor.setPlanId(null);
+                interceptor.setResourceId(resource.getId());
+                interceptor.setApiId(resource.getApiId());
                 break;
             case OPERATION:
                 Operation operation = operationService.find(interceptor.getReferenceId());
-                interceptor.setResource(null);
-                interceptor.setPlan(null);
-                interceptor.setOperation(operation);
-                interceptor.setApi(operation.getResource().getApi());
+                interceptor.setResourceId(null);
+                interceptor.setPlanId(null);
+                interceptor.setOperationId(operation.getId());
+                interceptor.setApiId(operation.getApiId());
                 break;
             default:
                 break;
@@ -292,7 +290,8 @@ public class InterceptorService {
 
     private void validateFilterCors(Interceptor interceptor) {
         HeimdallException.checkThrow(interceptor.getLifeCycle() != InterceptorLifeCycle.API, ExceptionMessage.CORS_INTERCEPTOR_NOT_API_LIFE_CYCLE);
-        HeimdallException.checkThrow(interceptor.getApi().isCors(), ExceptionMessage.CORS_INTERCEPTOR_ALREADY_ASSIGNED_TO_THIS_API);
+        HeimdallException.checkThrow(apiService.find(interceptor.getApiId()).isCors(),
+                ExceptionMessage.CORS_INTERCEPTOR_ALREADY_ASSIGNED_TO_THIS_API);
     }
 
 //    private List<String> ignoredValidate(List<String> ignoredList, JpaRepository<?, String> repository) {

@@ -16,7 +16,6 @@
 package br.com.conductor.heimdall.api.resource;
 
 import br.com.conductor.heimdall.api.dto.RoleDTO;
-import br.com.conductor.heimdall.api.dto.page.RolePage;
 import br.com.conductor.heimdall.api.entity.Role;
 import br.com.conductor.heimdall.api.service.RoleService;
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
@@ -24,6 +23,7 @@ import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -97,13 +97,13 @@ public class RoleResource {
      public ResponseEntity<?> findAll(@ModelAttribute RoleDTO roleDTO, @ModelAttribute PageableDTO pageableDTO) {
           
           if (!pageableDTO.isEmpty()) {
-               
-               RolePage resourcePage = roleService.list(roleDTO, pageableDTO);      
-               return ResponseEntity.ok(resourcePage);
+
+               Page<Role> rolePage = roleService.list(roleDTO, pageableDTO);
+               return ResponseEntity.ok(rolePage);
           } else {
                
-               List<Role> resources = roleService.list(roleDTO);      
-               return ResponseEntity.ok(resources);
+               List<Role> roles = roleService.list(roleDTO);
+               return ResponseEntity.ok(roles);
           }
      }
      

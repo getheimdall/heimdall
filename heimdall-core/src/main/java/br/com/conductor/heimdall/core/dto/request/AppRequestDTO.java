@@ -15,15 +15,13 @@
  */
 package br.com.conductor.heimdall.core.dto.request;
 
-import java.io.Serializable;
-import java.util.List;
+import br.com.conductor.heimdall.core.enums.Status;
+import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
-import br.com.conductor.heimdall.core.enums.Status;
-import lombok.Data;
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * Class is a Data Transfer Object for the AppRequest.
@@ -44,7 +42,7 @@ public class AppRequestDTO implements Serializable {
      private String description;
      
      @NotNull
-     private ReferenceIdDTO developer;
+     private String developerId;
 
      private List<String> tags;
      

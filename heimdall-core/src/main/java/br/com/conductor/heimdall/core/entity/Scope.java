@@ -57,6 +57,6 @@ public class Scope implements Serializable {
     @Indexed
     private String api;
 
-    private Set<Operation> operations;
+    private Set<String> operations;
 
 }

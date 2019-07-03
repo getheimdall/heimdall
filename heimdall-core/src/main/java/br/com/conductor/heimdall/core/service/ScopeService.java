@@ -119,14 +119,14 @@ public class ScopeService {
                 SCOPE_NO_OPERATION_FOUND);
 
         scope.getOperations().forEach(op -> {
-            Operation operation = operationService.find(op.getId());
+            Operation operation = operationService.find(op);
 
             HeimdallException.checkThrow(
                     operation == null,
-                    SCOPE_INVALID_OPERATION, op.getId());
+                    SCOPE_INVALID_OPERATION, op);
 
             HeimdallException.checkThrow(
-                    !operation.getResource().getApi().getId().equals(apiId),
+                    !operation.getApiId().equals(apiId),
                     SCOPE_OPERATION_NOT_IN_API, operation.getId(), apiId);
         });
 

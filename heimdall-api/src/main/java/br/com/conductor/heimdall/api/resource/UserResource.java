@@ -18,15 +18,17 @@ package br.com.conductor.heimdall.api.resource;
 import br.com.conductor.heimdall.api.dto.UserDTO;
 import br.com.conductor.heimdall.api.dto.UserEditDTO;
 import br.com.conductor.heimdall.api.dto.UserPasswordDTO;
-import br.com.conductor.heimdall.api.dto.page.UserPage;
 import br.com.conductor.heimdall.api.entity.User;
 import br.com.conductor.heimdall.api.service.UserService;
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
+import br.com.conductor.heimdall.core.util.Pageable;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,7 +38,6 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.security.Principal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_USERS;
 
@@ -103,19 +104,19 @@ public class UserResource {
      public ResponseEntity<?> findAll(@ModelAttribute UserDTO userDTO, @ModelAttribute PageableDTO pageableDTO) {
           
           if (!pageableDTO.isEmpty()) {
-               
-               UserPage userPage = userService.list(userDTO, pageableDTO);
-               if (!userPage.getContent().isEmpty()) {
-                    List<User> users = userPage.getContent();
-                    users = users.stream().map(user -> new User(user.getId(), user.getFirstName(), user.getLastName(), user.getUserName(), user.getEmail(), user.getPassword(), user.getStatus(), user.getCreationDate(), user.getType(), null)).collect(Collectors.toList());
-                    userPage.setContent(users);
+               Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+
+               Page<User> userPage = userService.list(userDTO, pageable);
+               List<User> users = userPage.getContent();
+               if (!users.isEmpty()) {
+                    users.forEach(user -> user.setRoles(null));
                }
-               return ResponseEntity.ok(userPage);
+               return ResponseEntity.ok(new PageImpl<>(users, pageable, users.size()));
           } else {
                
                List<User> users = userService.list(userDTO);
                if (!users.isEmpty()) {
-                    users = users.stream().map(user -> new User(user.getId(), user.getFirstName(), user.getLastName(), user.getUserName(), user.getEmail(), user.getPassword(), user.getStatus(), user.getCreationDate(), user.getType(), null)).collect(Collectors.toList());
+                    users.forEach(user -> user.setRoles(null));
                }
                return ResponseEntity.ok(users);
           }

@@ -15,15 +15,14 @@
  */
 package br.com.conductor.heimdall.core.dto;
 
-import java.io.Serializable;
-import java.util.List;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
 import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.enums.Status;
 import lombok.Data;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.util.Set;
 
 /**
  * Class is a Data Transfer Object for the {@link Plan}.
@@ -44,12 +43,12 @@ public class PlanDTO implements Serializable {
      private String description;
      
      @NotNull
-     private ReferenceIdDTO api;
+     private String apiId;
 
      @NotNull
      private boolean defaultPlan;
 
-     private List<ReferenceIdDTO> scopes;
+     private Set<String> scopes;
 
      private Status status = Status.ACTIVE;
      

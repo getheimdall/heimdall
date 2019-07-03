@@ -20,7 +20,7 @@ import lombok.Data;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
 
 /**
  * Class is a Data Transfer Object for the Scope
@@ -37,6 +37,6 @@ public class ScopeDTO implements Serializable {
     @Size(max = 200)
     private String description;
 
-    private List<ReferenceIdDTO> operations;
+    private Set<String> operations;
 
 }

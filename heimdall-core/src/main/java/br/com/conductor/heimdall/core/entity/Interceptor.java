@@ -64,7 +64,7 @@ public class Interceptor implements Serializable {
      
      private TypeExecutionPoint executionPoint;
 
-     private Environment environment;
+     private String environmentId;
 
      private String content;
      
@@ -75,19 +75,19 @@ public class Interceptor implements Serializable {
      private Set<Long> ignoredOperations = new HashSet<>();
      
      @JsonIgnore
-     private Plan plan;
+     private String planId;
 
      @JsonIgnore
-     private Resource resource;
+     private String resourceId;
 
      @JsonIgnore
-     private Operation operation;
+     private String operationId;
 
      @Transient
      private String referenceId;
      
      @JsonIgnore
-     private Api api;
+     private String apiId;
 
      private Boolean status;
      
@@ -97,20 +97,16 @@ public class Interceptor implements Serializable {
           
           switch (lifeCycle) {
                case API:
-                    api = new Api();
-                    api.setId(referenceId);
+                    apiId = referenceId;
                     break;
                case PLAN:
-                    plan = new Plan();
-                    plan.setId(referenceId);
+                    planId = referenceId;
                     break;
                case RESOURCE:
-                    resource = new Resource();
-                    resource.setId(referenceId);
+                    resourceId = referenceId;
                     break;
                case OPERATION:
-                    operation = new Operation();
-                    operation.setId(referenceId);
+                    operationId = referenceId;
                     break;
                default:
                     break;
@@ -121,16 +117,16 @@ public class Interceptor implements Serializable {
           
           switch (lifeCycle) {
                case API:
-                    referenceId = api.getId();
+                    referenceId = apiId;
                     break;
                case PLAN:
-                    referenceId = plan.getId();
+                    referenceId = planId;
                     break;
                case RESOURCE:
-                    referenceId = resource.getId();
+                    referenceId = resourceId;
                     break;
                case OPERATION:
-                    referenceId = operation.getId();
+                    referenceId = operationId;
                     break;
                default:
                     break;

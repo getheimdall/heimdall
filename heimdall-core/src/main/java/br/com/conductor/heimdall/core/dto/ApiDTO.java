@@ -15,50 +15,48 @@
  */
 package br.com.conductor.heimdall.core.dto;
 
-import java.io.Serializable;
-import java.util.List;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.enums.Status;
 import lombok.Data;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.util.Set;
 
 /**
  * Class is a Data Transfer Object for the {@link Api}.
  *
  * @author Filipe Germano
- *
  */
 @Data
 public class ApiDTO implements Serializable {
 
-     private static final long serialVersionUID = 8788858214468281712L;
+    private static final long serialVersionUID = 8788858214468281712L;
 
-     @NotNull
-     @Size(max = 80)
-     private String name;
+    @NotNull
+    @Size(max = 80)
+    private String name;
 
-     @NotNull
-     @Size(max = 40)
-     private String version;
+    @NotNull
+    @Size(max = 40)
+    private String version;
 
-     @Size(max = 200)
-     private String description;
+    @Size(max = 200)
+    private String description;
 
-     @NotNull
-     @Size(max = 80)
-     private String basePath;
+    @NotNull
+    @Size(max = 80)
+    private String basePath;
 
-     @Size(max = 200)
-     private String destinationProduction;
-     
-     @Size(max = 200)
-     private String destinationSandbox;
+    @Size(max = 200)
+    private String destinationProduction;
 
-     private Status status = Status.ACTIVE;
-     
-     private List<ReferenceIdDTO> environments;
+    @Size(max = 200)
+    private String destinationSandbox;
+
+    private Status status = Status.ACTIVE;
+
+    private Set<String> environments;
 
 }

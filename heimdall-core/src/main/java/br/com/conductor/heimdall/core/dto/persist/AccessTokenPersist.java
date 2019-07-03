@@ -15,39 +15,35 @@
  */
 package br.com.conductor.heimdall.core.dto.persist;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.util.List;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
 import br.com.conductor.heimdall.core.entity.AccessToken;
 import br.com.conductor.heimdall.core.enums.Status;
 import lombok.Data;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * Class that represents the persist for a {@link AccessToken}.
  *
  * @author Filipe Germano
- *
  */
 @Data
 public class AccessTokenPersist implements Serializable {
 
-     private static final long serialVersionUID = -9130167171077204284L;
+    private static final long serialVersionUID = -9130167171077204284L;
 
-     @Size(max = 250)
-     private String code;
+    @Size(max = 250)
+    private String code;
 
-     @NotNull
-     private String app;
+    @NotNull
+    private String app;
 
-     @NotNull
-     @Size(min = 1)
-     private List<String> plans;
-     
-     private Status status = Status.ACTIVE;
+    @NotNull
+    @Size(min = 1)
+    private List<String> plans;
+
+    private Status status = Status.ACTIVE;
 
 }

@@ -16,11 +16,9 @@
 package br.com.conductor.heimdall.api.service;
 
 import br.com.conductor.heimdall.api.dto.PrivilegeDTO;
-import br.com.conductor.heimdall.api.dto.page.PrivilegePage;
 import br.com.conductor.heimdall.api.entity.Privilege;
 import br.com.conductor.heimdall.api.repository.PrivilegeRepository;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.dto.PageDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.util.Pageable;
@@ -35,7 +33,6 @@ import java.util.List;
 import java.util.Set;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_NOT_FOUND;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
 
 /**
  * Provides methods to find one or mode {@link Privilege}.
@@ -68,20 +65,17 @@ public class PrivilegeService {
       * 
       * @param privilegeDTO		{@link PrivilegeDTO}
       * @param pageableDTO		{@link PageableDTO}
-      * @return					{@link PrivilegePage}
+      * @return
       */
-     public PrivilegePage list(PrivilegeDTO privilegeDTO, PageableDTO pageableDTO) {
+     public Page<Privilege> list(PrivilegeDTO privilegeDTO, PageableDTO pageableDTO) {
 
           Privilege privilege = GenericConverter.mapper(privilegeDTO, Privilege.class);
 
           Example<Privilege> example = Example.of(privilege, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 
           Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
-          Page<Privilege> page = repository.findAll(example, pageable);
 
-          PrivilegePage privilegePage = new PrivilegePage(PageDTO.build(page));
-
-          return privilegePage;
+          return repository.findAll(example, pageable);
      }
 
      /**

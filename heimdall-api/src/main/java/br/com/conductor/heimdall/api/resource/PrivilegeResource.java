@@ -16,7 +16,6 @@
 package br.com.conductor.heimdall.api.resource;
 
 import br.com.conductor.heimdall.api.dto.PrivilegeDTO;
-import br.com.conductor.heimdall.api.dto.page.PrivilegePage;
 import br.com.conductor.heimdall.api.entity.Privilege;
 import br.com.conductor.heimdall.api.service.PrivilegeService;
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
@@ -24,6 +23,7 @@ import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -82,9 +82,9 @@ public class PrivilegeResource {
                                      @ModelAttribute PageableDTO pageableDTO) {
 
         if (!pageableDTO.isEmpty()) {
-            PrivilegePage apiPage = privilegeService.list(privilegeDTO, pageableDTO);
+            Page<Privilege> privilegePagePage = privilegeService.list(privilegeDTO, pageableDTO);
 
-            return ResponseEntity.ok(apiPage);
+            return ResponseEntity.ok(privilegePagePage);
         } else {
             List<Privilege> privileges = privilegeService.list(privilegeDTO);
 

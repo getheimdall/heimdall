@@ -53,7 +53,9 @@ public class Operation implements Serializable {
 
      private String description;
 
-     private Resource resource;
+     private String resourceId;
+
+     private String apiId;
 
      /**
       * Adjust the path to not permit the save or update with "/" or spaces in the end of path.

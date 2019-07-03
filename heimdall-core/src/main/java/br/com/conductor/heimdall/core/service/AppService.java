@@ -38,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.APP_CLIENT_ID_ALREADY_USED;
@@ -172,7 +173,7 @@ public class AppService {
       * @param appId The ID of the {@link App}
       * @param plansIds List of {@link Plan}'s IDs 
       */
-     private void updateTokensPlansByApp(String appId, List<String> plansIds) {
+     private void updateTokensPlansByApp(String appId, Set<String> plansIds) {
           List<AccessToken> accessTokenList = accessTokenService.findByAppId(appId);
 
           if (Objects.nonNull(accessTokenList)) {
@@ -201,10 +202,10 @@ public class AppService {
           appRepository.delete(app);
      }
 
-     private List<String> getAccessTokens(App app) {
+     private Set<String> getAccessTokens(App app) {
           return accessTokenService.findByAppId(app.getId()).stream()
                   .map(AccessToken::getId)
-                  .collect(Collectors.toList())
+                  .collect(Collectors.toSet())
                   ;
      }
 
