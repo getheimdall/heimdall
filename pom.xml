@@ -277,16 +277,6 @@
 				<version>2.6.2-SNAPSHOT</version>
 			</dependency>
 			<dependency>
-				<groupId>br.com.conductor.heimdall</groupId>
-				<artifactId>heimdall-middleware-spec</artifactId>
-				<version>2.6.2-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>org.mongodb</groupId>
-				<artifactId>mongo-java-driver</artifactId>
-				<version>3.6.3</version>
-			</dependency>
-			<dependency>
 				<groupId>org.springframework.cloud</groupId>
 				<artifactId>spring-cloud-dependencies</artifactId>
 				<version>${spring-cloud.version}</version>
@@ -297,7 +287,6 @@
 	</dependencyManagement>
 
 	<modules>
-		<module>heimdall-middleware-spec</module>
 		<module>heimdall-core</module>
 		<module>heimdall-gateway</module>
 		<module>heimdall-api</module>

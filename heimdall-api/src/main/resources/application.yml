@@ -37,7 +37,7 @@ heimdall:
         appName: HEIMDALL
         databaseName: heimdall
         portNumber: 5432
-        serverName: 192.168.10.200
+        serverName: 127.0.0.1
         username: postgres
         password: 123456
         sendStringParametersAsUnicode: false
@@ -79,9 +79,9 @@ spring:
             INDENT_OUTPUT: true
             WRITE-DATES-AS-TIMESTAMPS: false
     rabbitmq:
-        host: 192.168.10.200
+        host: 127.0.0.1
         port: 5672
-        virtual-host: dev
+#        virtual-host: dev
         requested-heartbeat: 10
     cache:
         type: redis
