@@ -19,6 +19,14 @@
  */
 package br.com.conductor.heimdall.gateway.configuration;
 
+import java.time.ZoneId;
+
+import javax.annotation.PostConstruct;
+
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+
 import br.com.conductor.heimdall.core.environment.Property;
 import br.com.conductor.heimdall.gateway.appender.MongoDBAppender;
 import ch.qos.logback.classic.AsyncAppender;
@@ -28,12 +36,6 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import net.logstash.logback.appender.LogstashTcpSocketAppender;
 import net.logstash.logback.encoder.LogstashEncoder;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
-
-import javax.annotation.PostConstruct;
-import java.time.ZoneId;
 
 /**
  * Class responsible to configure the logging.
@@ -98,7 +100,6 @@ public class LogConfiguration {
 			appender.addDestination(property.getLogstash().getDestination());
 
 			LogstashEncoder encoder = new LogstashEncoder();
-
 			appender.setEncoder(encoder);
 			appender.setContext(lc);
 			appender.start();

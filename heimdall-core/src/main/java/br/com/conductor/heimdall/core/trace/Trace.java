@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.core.trace;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -20,10 +17,26 @@ package br.com.conductor.heimdall.core.trace;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.trace;
 
-import br.com.conductor.heimdall.core.exception.ExceptionMessage;
-import br.com.conductor.heimdall.core.exception.HeimdallException;
-import br.com.conductor.heimdall.core.util.UrlUtil;
+import static net.logstash.logback.marker.Markers.append;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+
 import com.fasterxml.jackson.annotation.JsonFilter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -33,19 +46,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.FilterProvider;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+
+import br.com.conductor.heimdall.core.exception.ExceptionMessage;
+import br.com.conductor.heimdall.core.exception.HeimdallException;
+import br.com.conductor.heimdall.core.util.UrlUtil;
 import lombok.Data;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-
-import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.*;
-
-import static net.logstash.logback.marker.Markers.append;
 
 /**
  * Represents the trace message.
@@ -294,20 +301,32 @@ public class Trace {
         }
     }
 
-    private void printInLogger(Logger logger) throws JsonProcessingException {
-        ObjectMapper mapper = mapper();
+	private void printInLogger(Logger logger) throws JsonProcessingException {
+		ObjectMapper mapper = mapper();
 
-        if (isInfo(this.resultStatus)) {
+		if (isInfo(this.resultStatus)) {
+			if (isMongo(logger))
+				logger.info(mapper.writeValueAsString(this));
+			else
+				logger.info(append("trace", mapper.convertValue(this, Map.class)), null);
+		} else if (isWarn(this.resultStatus)) {
 
-            logger.info(mapper.writeValueAsString(this));
-        } else if (isWarn(this.resultStatus)) {
+			if (isMongo(logger))
+				logger.warn(mapper.writeValueAsString(this));
+			else
+				logger.warn(append("trace", mapper.convertValue(this, Map.class)), null);
+		} else {
 
-            logger.warn(mapper.writeValueAsString(this));
-        } else {
+			if (isMongo(logger))
+				logger.error(mapper.writeValueAsString(this));
+			else
+				logger.error(append("trace", mapper.convertValue(this, Map.class)), null);
+		}
+	}
 
-            logger.error(mapper.writeValueAsString(this));
-        }
-    }
+	private boolean isMongo(Logger logger) {
+		return "mongo".equals(logger.getName());
+	}
 
     /*
      * Checks if the status code is in range 1xx to 2xx

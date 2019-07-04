@@ -1,14 +1,16 @@
 import axios from 'axios'
 import Session from "../services/SessionService"
 
-const baseURL = process.env.REACT_APP_SCHEME + '://' + process.env.REACT_APP_ADDRESS + ':' + process.env.REACT_APP_PORT
+const configJs = window._env_
+
+const baseURL = `${configJs.REACT_APP_SCHEME}://${configJs.REACT_APP_ADDRESS}:${configJs.REACT_APP_PORT}`
 
 const HTTP = axios.create({
     baseURL: baseURL
 })
 
 const HTTPv1 = axios.create({
-    baseURL: baseURL + process.env.REACT_APP_API,
+    baseURL: baseURL + configJs.REACT_APP_API,
     headers: {'Content-Type': 'application/json'}
 })
 
