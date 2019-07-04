@@ -20,14 +20,9 @@ package br.com.conductor.heimdall.core.interceptor.impl;
  * ==========================LICENSE_END===================================
  */
 
-import br.com.conductor.heimdall.core.dto.interceptor.AccessTokenClientIdDTO;
 import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.enums.TypeExecutionPoint;
-import br.com.conductor.heimdall.core.enums.TypeInterceptor;
-import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.interceptor.HeimdallInterceptor;
-import br.com.conductor.heimdall.core.util.JsonUtils;
-import br.com.conductor.heimdall.core.util.TemplateUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.HashMap;
@@ -47,13 +42,7 @@ public class AccessTokenHeimdallInterceptor implements HeimdallInterceptor {
     }
 
     @Override
-    public AccessTokenClientIdDTO parseContent(String content) {
-        try {
-            return JsonUtils.convertJsonToObject(content, AccessTokenClientIdDTO.class);
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(TypeInterceptor.ACCESS_TOKEN.name(), TemplateUtils.TEMPLATE_ACCESS_TOKEN);
-        }
+    public Object parseContent(String content) {
 
         return null;
     }

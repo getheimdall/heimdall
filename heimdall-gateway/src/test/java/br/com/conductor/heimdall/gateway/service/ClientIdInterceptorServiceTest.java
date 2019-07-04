@@ -23,7 +23,6 @@ import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.entity.Developer;
 import br.com.conductor.heimdall.core.entity.Plan;
-import br.com.conductor.heimdall.core.enums.Location;
 import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.trace.TraceContextHolder;
 import com.netflix.zuul.context.RequestContext;
@@ -41,6 +40,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
 import static org.junit.Assert.assertEquals;
@@ -88,25 +90,25 @@ public class ClientIdInterceptorServiceTest {
         this.request.addHeader("client_id", clientId);
 
         api1 = new Api();
-        api1.setId(10L);
+        api1.setId("10L");
 
         api2 = new Api();
-        api2.setId(20L);
+        api2.setId("20L");
 
         Plan plan1 = new Plan();
-        plan1.setApi(api1);
+        plan1.setApiId("10L");
 
         Plan plan2 = new Plan();
-        plan2.setApi(api2);
+        plan2.setApiId("20L");
 
-        List<Plan> planList = Arrays.asList(plan1, plan2);
+        Set<String> planList = Stream.of("10L", "20L").collect(Collectors.toSet());
 
         Developer developer = new Developer();
         developer.setEmail("some@email.com");
 
         app = new App();
         app.setPlans(planList);
-        app.setDeveloper(developer);
+        app.setDeveloperId("10L");
         app.setClientId(clientId);
 
     }
@@ -116,7 +118,7 @@ public class ClientIdInterceptorServiceTest {
 
         Mockito.when(appRepository.findByClientId(clientId)).thenReturn(app);
 
-        clientIdInterceptorService.validate(api1.getId(), Location.HEADER);
+        clientIdInterceptorService.validate(api1.getId());
 
         // Internal Server Error is expected because the request has no finished at this
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), this.ctx.getResponseStatusCode());
@@ -127,7 +129,7 @@ public class ClientIdInterceptorServiceTest {
 
         Mockito.when(appRepository.findByClientId(clientId)).thenReturn(app);
 
-        clientIdInterceptorService.validate(api2.getId(), Location.HEADER);
+        clientIdInterceptorService.validate(api2.getId());
 
         // Internal Server Error is expected because the request has no finished at this
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR.value(), this.ctx.getResponseStatusCode());
@@ -136,7 +138,7 @@ public class ClientIdInterceptorServiceTest {
     @Test
     public void clientIdNullTest() {
 
-        clientIdInterceptorService.validate( 10L, null);
+        clientIdInterceptorService.validate( "10L");
 
         assertEquals(HttpStatus.UNAUTHORIZED.value(), this.ctx.getResponseStatusCode());
         assertTrue((Boolean) this.ctx.get(INTERRUPT));
@@ -146,7 +148,7 @@ public class ClientIdInterceptorServiceTest {
     @Test
     public void apiIdNullTest() {
 
-        clientIdInterceptorService.validate(null, Location.HEADER);
+        clientIdInterceptorService.validate(null);
 
         assertEquals(HttpStatus.UNAUTHORIZED.value(), this.ctx.getResponseStatusCode());
         assertTrue((Boolean) this.ctx.get(INTERRUPT));
@@ -161,7 +163,7 @@ public class ClientIdInterceptorServiceTest {
 
         Mockito.when(appRepository.findByClientId(someOtherClientId)).thenReturn(null);
 
-        clientIdInterceptorService.validate(api1.getId(), Location.HEADER);
+        clientIdInterceptorService.validate(api1.getId());
 
         assertEquals(HttpStatus.UNAUTHORIZED.value(), this.ctx.getResponseStatusCode());
         assertTrue((Boolean) this.ctx.get(INTERRUPT));
@@ -173,11 +175,11 @@ public class ClientIdInterceptorServiceTest {
     public void apiNotInPlanTest() {
 
         Api api = new Api();
-        api.setId(30L);
+        api.setId("30L");
 
         Mockito.when(appRepository.findByClientId(clientId)).thenReturn(app);
 
-        clientIdInterceptorService.validate(api.getId(), Location.HEADER);
+        clientIdInterceptorService.validate(api.getId());
 
         assertEquals(HttpStatus.UNAUTHORIZED.value(), this.ctx.getResponseStatusCode());
         assertTrue((Boolean) this.ctx.get(INTERRUPT));
@@ -188,14 +190,14 @@ public class ClientIdInterceptorServiceTest {
     public void planNotInAppTest() {
 
         Api api = new Api();
-        api.setId(30L);
+        api.setId("30L");
 
         Plan plan = new Plan();
-        plan.setApi(api);
+        plan.setApiId("30L");
 
         Mockito.when(appRepository.findByClientId(clientId)).thenReturn(app);
 
-        clientIdInterceptorService.validate(api.getId(), Location.HEADER);
+        clientIdInterceptorService.validate(api.getId());
 
         assertEquals(HttpStatus.UNAUTHORIZED.value(), this.ctx.getResponseStatusCode());
         assertTrue((Boolean) this.ctx.get(INTERRUPT));

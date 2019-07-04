@@ -19,307 +19,176 @@
  */
 package br.com.conductor.heimdall.gateway.listener;
 
-import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.POST_TYPE;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PRE_TYPE;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.ROUTE_TYPE;
+import br.com.conductor.heimdall.core.entity.Interceptor;
+import br.com.conductor.heimdall.core.repository.jdbc.InterceptorJDBCRepository;
+import br.com.conductor.heimdall.gateway.configuration.HeimdallHandlerMapping;
+import br.com.conductor.heimdall.gateway.service.InterceptorFileService;
+import br.com.conductor.heimdall.gateway.util.HeimdallFilterFileManager;
+import com.netflix.zuul.FilterLoader;
+import com.netflix.zuul.groovy.GroovyCompiler;
+import com.netflix.zuul.groovy.GroovyFileFilter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
+import javax.annotation.PostConstruct;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.PostConstruct;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
-import org.apache.commons.io.FileUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-
-import com.netflix.zuul.FilterLoader;
-import com.netflix.zuul.groovy.GroovyCompiler;
-import com.netflix.zuul.groovy.GroovyFileFilter;
-
-import br.com.conductor.heimdall.core.entity.Api;
-import br.com.conductor.heimdall.core.entity.Interceptor;
-import br.com.conductor.heimdall.core.enums.Status;
-import br.com.conductor.heimdall.core.repository.jdbc.ApiJDBCRepository;
-import br.com.conductor.heimdall.core.repository.jdbc.InterceptorJDBCRepository;
-import br.com.conductor.heimdall.core.service.FileService;
-import br.com.conductor.heimdall.core.util.Constants;
-import br.com.conductor.heimdall.gateway.configuration.HeimdallHandlerMapping;
-import br.com.conductor.heimdall.gateway.service.InterceptorFileService;
-import br.com.conductor.heimdall.gateway.util.HeimdallFilterFileManager;
-import lombok.extern.slf4j.Slf4j;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.*;
 
 /**
  * StartServer
- * 
+ * <p>
  * {@link ServletContextListener} implementation.
  *
  * @author Filipe Germano
  * @author Thiago Sampaio
  * @author Marcelo Aguiar Rodrigues
- *
  */
 @Slf4j
 public class StartServer implements ServletContextListener {
 
-	@Autowired
-	private InterceptorFileService interceptorFileService;
-	
-	@Autowired
-	private InterceptorJDBCRepository interceptorJDBCRepository;
+    @Autowired
+    private InterceptorFileService interceptorFileService;
 
-	@Autowired
-	private ApiJDBCRepository apiJDBCRepository;
+    @Autowired
+    private InterceptorJDBCRepository interceptorJDBCRepository;
 
-	@Autowired
-	private MiddlewareJDBCRepository middlewareJDBCRepository;
+    @Autowired
+    private HeimdallHandlerMapping heimdallHandlerMapping;
 
-	@Autowired
-	private FileService fileService;
+    @Value("${zuul.filter.root}")
+    private String zuulFilterRoot;
 
-	@Autowired
-	private HeimdallHandlerMapping heimdallHandlerMapping;
+    @Value("${zuul.filter.interval}")
+    private int zuulFilterInterval;
 
-	@Value("${zuul.filter.root}")
-	private String zuulFilterRoot;
+    @Override
+    public void contextInitialized(ServletContextEvent sce) {
 
-	@Value("${zuul.filter.interval}")
-	private int zuulFilterInterval;
+        log.info("Initializing Groovy Interceptors");
+        heimdallHandlerMapping.initHandlers();
+        initGroovyFilterManager();
 
-	private List<Long> apiIds;
+    }
 
-	@Override
-	public void contextInitialized(ServletContextEvent sce) {
+    @Override
+    public void contextDestroyed(ServletContextEvent sce) {
+    }
 
-		log.info("Initializing Groovy Interceptors");
-		heimdallHandlerMapping.initHandlers();
-		initGroovyFilterManager();
+    private void initGroovyFilterManager() {
 
-	}
+        try {
 
-	@Override
-	public void contextDestroyed(ServletContextEvent sce) {
-	}
+            Set<String> filesAbsolutePath = filesAbsolutePath();
 
-	private void initGroovyFilterManager() {
+            FilterLoader.getInstance().setCompiler(new GroovyCompiler());
 
-		try {
+            HeimdallFilterFileManager.setFilenameFilter(new GroovyFileFilter());
+            HeimdallFilterFileManager.init(zuulFilterInterval, filesAbsolutePath);
 
-			Set<String> filesAbsolutePath = filesAbsolutePath();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
-			FilterLoader.getInstance().setCompiler(new GroovyCompiler());
+    }
 
-			HeimdallFilterFileManager.setFilenameFilter(new GroovyFileFilter());
-			HeimdallFilterFileManager.init(zuulFilterInterval, filesAbsolutePath);
+    private Set<String> filesAbsolutePath() {
+        String[] types = {PRE_TYPE, POST_TYPE, ROUTE_TYPE};
 
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+        Set<String> filesAbsolutePath = new HashSet<>();
 
-	}
+        for (String t : types) {
+            File folder = new File(zuulFilterRoot, t);
+            filesAbsolutePath.add(folder.getAbsolutePath());
+        }
 
-	private Set<String> filesAbsolutePath() {
-		String[] types = { PRE_TYPE, POST_TYPE, ROUTE_TYPE, MIDDLEWARE_API_ROOT };
+        return filesAbsolutePath;
+    }
 
-		Set<String> filesAbsolutePath = new HashSet<>();
+    /**
+     * Initializes the application
+     */
+    @PostConstruct
+    public void initApplication() {
 
-		for (String t : types) {
-			File folder = new File(zuulFilterRoot, t);
-			filesAbsolutePath.add(folder.getAbsolutePath());
-		}
+        try {
 
-		for (Long id : apiIds) {
-			File apiFolder = new File(zuulFilterRoot, MIDDLEWARE_API_ROOT + File.separator + id);
-			filesAbsolutePath.add(apiFolder.getAbsolutePath());
-		}
+            createFolders();
+            cleanFilesFolder(zuulFilterRoot);
+            createInterceptors();
+        } catch (Exception e) {
 
-		return filesAbsolutePath;
-	}
+            log.error(e.getMessage(), e);
+        }
+    }
 
-	/**
-	 * Initializes the application
-	 */
-	@PostConstruct
-	public void initApplication() {
+    /**
+     * Creates all {@link Interceptor} from the repository
+     */
+    private void createInterceptors() {
 
-		try {
+        List<Interceptor> interceptors = interceptorJDBCRepository.findAllInterceptorsSimplified();
+        if (Objects.nonNull(interceptors)) {
 
-			createFolders();
-			cleanFilesFolder(zuulFilterRoot);
-			loadAllMiddlewareFiles();
-			createInterceptors();
-		} catch (Exception e) {
+            interceptors.forEach(interceptor -> interceptorFileService.createFileInterceptor(interceptor));
+        }
+    }
 
-			log.error(e.getMessage(), e);
-		}
-	}
+    /**
+     * Cleans all the files from a specific folder.
+     *
+     * @param root The folder root
+     */
+    private void cleanFilesFolder(String root) {
 
-	/**
-	 * Creates all {@link Interceptor} from the repository
-	 */
-	private void createInterceptors() {
+        Set<File> files = listAllFiles(root);
+        files.forEach(f -> {
+            try {
 
-		List<Interceptor> interceptors = interceptorJDBCRepository.findAllInterceptorsSimplified();
-		if (Objects.nonNull(interceptors)) {
+                FileUtils.forceDelete(f);
+            } catch (IOException e) {
 
-			interceptors.forEach(interceptor -> interceptorFileService.createFileInterceptor(interceptor));
-		}
-	}
+                log.error(e.getMessage(), e);
+            }
+        });
+    }
 
-	/**
-	 * Creates the {@link Interceptor} from the {@link Middleware} by the
-	 * {@link Middleware} Id.
-	 *
-	 * @param middleware
-	 *                       The {@link Middleware} Id
-	 */
-	public void createMiddlewaresInterceptor(Middleware middleware) {
+    /**
+     * Creates the folders necessary for the routes.
+     */
+    private void createFolders() {
 
-		if (middleware != null) {
-			List<Interceptor> interceptors = interceptorJDBCRepository.findInterceptorsSimplifiedFromMiddleware(middleware.getId());
-			
-			if (interceptors != null && !interceptors.isEmpty()) {
-				interceptors.forEach(interceptor -> interceptorFileService.createFileInterceptor(interceptor));
-			}
-		}
-	}
+        String[] types = {PRE_TYPE, POST_TYPE, ROUTE_TYPE};
 
-     /**
-      * Cleans all the files from a specific folder.
-      * 
-      * @param root		The folder root
-      */
-     private void cleanFilesFolder(String root) {
-          
-          Set<File> files = listAllFiles(root);
-          files.forEach(f -> {
-               try {
-                    
-                    FileUtils.forceDelete(f);
-               } catch (IOException e) {
-                    
-                    log.error(e.getMessage(), e);
-               }
-          });
-     }
-     
-     /**
-      * Creates the folders necessary for the routes.
-      */
-     private void createFolders() {
+        for (String t : types) {
+            File folder = new File(zuulFilterRoot, t);
+            if (!folder.exists()) {
+                folder.mkdirs();
+            }
+        }
+    }
 
-		String[] types = { PRE_TYPE, POST_TYPE, ROUTE_TYPE, MIDDLEWARE_API_ROOT };
+    private Set<File> listAllFiles(String interceptorFolder) {
+        try (Stream<Path> walk = Files.walk(Paths.get(interceptorFolder))) {
 
-		for (String t : types) {
-			File folder = new File(zuulFilterRoot, t);
-			if (!folder.exists()) {
-				folder.mkdirs();
-			}
-		}
+            return walk.filter(Files::isRegularFile)
+                    .filter(path -> path.endsWith(".jar") || path.endsWith(".groovy") || path.endsWith(".java"))
+                    .map(Path::toFile)
+                    .collect(Collectors.toSet());
+        } catch (IOException e) {
+            return Collections.emptySet();
+        }
+    }
 
-		apiIds = apiJDBCRepository.findAllIds();
-		for (Long id : apiIds) {
-
-			File apiFolder = new File(zuulFilterRoot, MIDDLEWARE_API_ROOT + File.separator + id + File.separator + Constants.MIDDLEWARE_ROOT);
-			if (!apiFolder.exists()) {
-				apiFolder.mkdirs();
-			}
-		}
-	}
-
-	/**
-	 * Loads all Middleware files.
-	 */
-	private void loadAllMiddlewareFiles() {
-		try {
-
-			List<Middleware> middlewares = middlewareJDBCRepository.findAllActive();
-
-			for (Middleware middleware : middlewares) {
-
-				String rootMiddlewares = middleware.getPath();
-				cleanFilesFolder(rootMiddlewares);
-				fileService.save(middleware.getFile(), rootMiddlewares + "/" + middleware.getName() + "."
-						+ middleware.getVersion() + "." + middleware.getType());
-			}
-		} catch (Exception e) {
-
-			log.error(e.getMessage(), e);
-		}
-	}
-
-	/**
-	 * Loads the {@link Middleware} files.
-	 *
-	 * @param middleware The {@link Middleware}
-	 */
-	void loadMiddlewareFiles(Middleware middleware) {
-
-		try {
-
-			if (Objects.nonNull(middleware)) {
-
-				if (Status.ACTIVE.equals(middleware.getStatus())) {
-					fileService.save(middleware.getFile(), middleware.getPath() + "/" + middleware.getName() + "."
-							+ middleware.getVersion() + "." + middleware.getType());
-				}
-			}
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-		}
-	}
-
-	/**
-	 * Remove the {@link Middleware} files.
-	 *
-	 * @param path
-	 *                 The path to the {@link Middleware} files
-	 */
-	void removeMiddlewareFiles(String path) {
-
-		try {
-
-			cleanFilesFolder(path);
-			HeimdallFilterFileManager.getInstance().removeDirectory(path);
-
-		} catch (Exception e) {
-
-			log.error(e.getMessage(), e);
-		}
-	}
-
-     /**
-      * Include a new api directory to the file path
-      *
-      * @param api new Api
-      */
-     public void addApiDirectoryToPath(Api api) {
-          File apiFolder = new File(zuulFilterRoot, MIDDLEWARE_API_ROOT + File.separator + api.getId().toString());
-          HeimdallFilterFileManager.getInstance().addNewDirectory(apiFolder.getAbsolutePath());
-     }
-
-     private Set<File> listAllFiles(String interceptorFolder) {
-          try (Stream<Path> walk = Files.walk(Paths.get(interceptorFolder))) {
-
-               return walk.filter(Files::isRegularFile)
-                       .filter(path -> path.endsWith(".jar") || path.endsWith(".groovy") || path.endsWith(".java"))
-                       .map(Path::toFile)
-                       .collect(Collectors.toSet());
-          } catch (IOException e) {
-               return Collections.emptySet();
-          }
-
-     }
 }

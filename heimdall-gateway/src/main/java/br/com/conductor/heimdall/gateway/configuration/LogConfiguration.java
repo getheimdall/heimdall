@@ -46,10 +46,6 @@ import java.time.ZoneId;
 @Configuration
 public class LogConfiguration {
 
-	private static final int DEFAULT_QUEUE_SIZE = 500;
-
-	private static final String DEFAULT_ZONE_ID = ZoneId.systemDefault().getId();
-
 	@Autowired
 	private Property property;
 
@@ -58,36 +54,6 @@ public class LogConfiguration {
 
 		LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
 
-		if (property.getMongo().getEnabled()) {
-
-			Logger logger = (Logger) LoggerFactory.getLogger("mongo");
-			logger.setAdditive(false);
-
-			String zoneId = property.getMongo().getZoneId() != null ? property.getMongo().getZoneId() : DEFAULT_ZONE_ID;
-
-			// Creating custom MongoDBAppender
-			Appender<ILoggingEvent> appender;
-			if (property.getMongo().getUrl() != null) {
-				appender = new MongoDBAppender(property.getMongo().getUrl(), property.getMongo().getDataBase(), property.getMongo().getCollection(), zoneId);
-			} else {
-				appender = new MongoDBAppender(property.getMongo().getServerName(), property.getMongo().getPort(), property.getMongo().getDataBase(), property.getMongo().getCollection(), zoneId);
-			}
-			appender.setContext(lc);
-			appender.start();
-
-			// Creating AsyncAppender
-			int queueSize = (property.getMongo().getQueueSize() != null) ? property.getMongo().getQueueSize().intValue() : DEFAULT_QUEUE_SIZE;
-
-			AsyncAppender asyncAppender = new AsyncAppender();
-			asyncAppender.setQueueSize(queueSize);
-			if (property.getMongo().getDiscardingThreshold() != null) {
-				asyncAppender.setDiscardingThreshold(property.getMongo().getDiscardingThreshold().intValue());
-			}
-			asyncAppender.addAppender(appender);
-			asyncAppender.start();
-
-			logger.addAppender(asyncAppender);
-		}
 
 		if (property.getLogstash().getEnabled()) {
 

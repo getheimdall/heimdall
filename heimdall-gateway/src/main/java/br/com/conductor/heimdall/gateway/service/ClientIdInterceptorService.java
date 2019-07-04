@@ -21,7 +21,6 @@ package br.com.conductor.heimdall.gateway.service;
 
 import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.entity.Plan;
-import br.com.conductor.heimdall.core.enums.Location;
 import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.util.ConstantsInterceptors;
 import br.com.conductor.heimdall.core.util.DigestUtils;
@@ -44,23 +43,17 @@ public class ClientIdInterceptorService {
     private AppRepository appRepository;
 
     /**
-     * Validates if a client id originated from {@link Location} is valid
+     * Validates if a client id is valid
      *
-     * @param apiId    Api id
-     * @param location {@link Location}
+     * @param apiId Api id
      */
-    public void validate(Long apiId, Location location) {
+    public void validate(String apiId) {
 
         RequestContext context = RequestContext.getCurrentContext();
 
-        String clientId;
-        if (Location.HEADER.equals(location)) {
-            clientId = context.getZuulRequestHeaders().get(CLIENT_ID);
+        String clientId = context.getZuulRequestHeaders().get(CLIENT_ID);
 
-            if (clientId == null) clientId = context.getRequest().getHeader(CLIENT_ID);
-        }
-        else
-            clientId = context.getRequest().getParameter(CLIENT_ID);
+        if (clientId == null) clientId = context.getRequest().getHeader(CLIENT_ID);
 
         this.validateClientId(apiId, clientId);
     }
@@ -71,7 +64,7 @@ public class ClientIdInterceptorService {
      * @param apiId    The apiId
      * @param clientId ClientId to be validated
      */
-    private void validateClientId(Long apiId, String clientId) {
+    private void validateClientId(String apiId, String clientId) {
 
         final String CLIENT_ID = "Client Id";
 
@@ -81,14 +74,14 @@ public class ClientIdInterceptorService {
             App app = appRepository.findByClientId(clientId);
             if (app != null) {
 
-                Plan plan = app.getPlans().stream().filter(p -> apiId.equals(p.getApi().getId())).findFirst().orElse(null);
-                if (plan != null) {
-                    TraceContextHolder.getInstance().getActualTrace().setApp(app.getName());
-                    TraceContextHolder.getInstance().getActualTrace().setAppDeveloper(app.getDeveloper().getEmail());
-
-                } else {
-                    buildResponse(ConstantsInterceptors.GLOBAL_ACCESS_NOT_ALLOWED_API);
-                }
+// TODO               Plan plan = app.getPlans().stream().filter(p -> apiId.equals(p.getApiId())).findFirst().orElse(null);
+//                if (plan != null) {
+//                    TraceContextHolder.getInstance().getActualTrace().setApp(app.getName());
+//                    TraceContextHolder.getInstance().getActualTrace().setAppDeveloper(app.getDeveloper().getEmail());
+//
+//                } else {
+//                    buildResponse(ConstantsInterceptors.GLOBAL_ACCESS_NOT_ALLOWED_API);
+//                }
             } else {
                 buildResponse(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, CLIENT_ID));
             }

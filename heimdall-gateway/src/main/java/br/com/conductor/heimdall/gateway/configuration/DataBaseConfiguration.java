@@ -39,7 +39,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 import br.com.conductor.heimdall.core.environment.Property;
-import liquibase.integration.spring.SpringLiquibase;
+//import liquibase.integration.spring.SpringLiquibase;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -125,28 +125,28 @@ public class DataBaseConfiguration implements EnvironmentAware {
           return dataSource;
      }
      
-     /**
-      * Creates a {@link SpringLiquibase} from a {@link DataSource}.
-      * 
-      * @param dataSource		The {@link DataSource} that will be used to create the {@link SpringLiquibase} instance
-      * @return					The {@link SpringLiquibase} instance created
-      */
-	@Bean
-	public SpringLiquibase liquibase(@Qualifier("dataSource") DataSource dataSource) {
-
-		SpringLiquibase liquibase = new SpringLiquibase();
-		liquibase.setDataSource(dataSource);
-		liquibase.setChangeLog("classpath:liquibase/master.xml");
-		liquibase.setContexts(liquiBasePropertyResolver.getProperty("context"));
-		liquibase.setShouldRun(property.getDatasource().isRunLiquibase());
-
-		releaseLiquibaseLocks(dataSource);
-		clearLiquibaseCheckSums(dataSource);
-
-		log.debug("Configuring Liquibase and versioning the database ... Please wait!");
-
-		return liquibase;
-	}
+//     /**
+//      * Creates a {@link SpringLiquibase} from a {@link DataSource}.
+//      *
+//      * @param dataSource		The {@link DataSource} that will be used to create the {@link SpringLiquibase} instance
+//      * @return					The {@link SpringLiquibase} instance created
+//      */
+//	@Bean
+//	public SpringLiquibase liquibase(@Qualifier("dataSource") DataSource dataSource) {
+//
+//		SpringLiquibase liquibase = new SpringLiquibase();
+//		liquibase.setDataSource(dataSource);
+//		liquibase.setChangeLog("classpath:liquibase/master.xml");
+//		liquibase.setContexts(liquiBasePropertyResolver.getProperty("context"));
+//		liquibase.setShouldRun(property.getDatasource().isRunLiquibase());
+//
+//		releaseLiquibaseLocks(dataSource);
+//		clearLiquibaseCheckSums(dataSource);
+//
+//		log.debug("Configuring Liquibase and versioning the database ... Please wait!");
+//
+//		return liquibase;
+//	}
 
      /**
       * Release all Liquibase locks from a {@link DataSource}.

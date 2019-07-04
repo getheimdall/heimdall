@@ -38,11 +38,6 @@ public final class Constants {
      public static final String PRODUCTION = "prod";
      public static final String SUCCESS = "SUCCESS";
      public static final String FAILED = "FAILED";
-
      public static final String INTERRUPT = "INTERRUPT";
-     
-     public static final String MIDDLEWARE_ROOT = "middleware";
 
-     public static final String MIDDLEWARE_API_ROOT = "api";
-     
 }

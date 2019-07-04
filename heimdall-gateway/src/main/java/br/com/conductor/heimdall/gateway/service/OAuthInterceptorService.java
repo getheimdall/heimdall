@@ -27,6 +27,7 @@ import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.exception.UnauthorizedException;
 import br.com.conductor.heimdall.core.repository.AppRepository;
+import br.com.conductor.heimdall.core.service.AccessTokenService;
 import br.com.conductor.heimdall.core.service.OAuthService;
 import br.com.conductor.heimdall.core.util.JwtUtils;
 import br.com.conductor.heimdall.core.trace.TraceContextHolder;
@@ -79,6 +80,9 @@ public class OAuthInterceptorService {
 
     @Autowired
     private AppRepository appRepository;
+
+    @Autowired
+    private AccessTokenService accessTokenService;
 
     private RequestContext context;
 
@@ -175,7 +179,7 @@ public class OAuthInterceptorService {
 
     private void runAuthorize(OAuthRequest oAuthRequest, String clientId, String providerId, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsJson, String accessToken) {
 
-        HeimdallException.checkThrow(Objects.isNull(oAuthRequest.getClientId()) || oAuthRequest.getClientId().isEmpty(), ExceptionMessage.CLIENT_ID_NOT_FOUND);
+        HeimdallException.checkThrow(Objects.isNull(oAuthRequest.getClientId()) || oAuthRequest.getClientId().isEmpty(), ExceptionMessage.GLOBAL_NOT_FOUND, "Client Id");
 
         switch (oAuthRequest.getGrantType().toUpperCase()) {
             case GRANT_TYPE_PASSWORD:
@@ -445,7 +449,7 @@ public class OAuthInterceptorService {
 
     private void validateClientId(String clientId) {
         final App appActive = appRepository.findAppActive(clientId);
-        HeimdallException.checkThrow(Objects.isNull(appActive), ExceptionMessage.CLIENT_ID_NOT_FOUND);
+        HeimdallException.checkThrow(Objects.isNull(appActive), ExceptionMessage.GLOBAL_NOT_FOUND, "Client Id");
     }
 
 
@@ -453,7 +457,7 @@ public class OAuthInterceptorService {
         if (provider.isProviderDefault()) {
             final App appActive = appRepository.findAppActive(clientId);
 
-            final List<AccessToken> accessTokens = appActive.getAccessTokens();
+            final List<AccessToken> accessTokens = accessTokenService.findByAppId(appActive.getId());
             HeimdallException.checkThrow(accessTokens.stream().noneMatch(ac -> ac.getCode().equals(accessToken)), ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);
         } else {
 

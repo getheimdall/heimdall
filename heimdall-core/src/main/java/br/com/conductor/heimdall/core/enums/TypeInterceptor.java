@@ -48,7 +48,6 @@ public enum TypeInterceptor {
 	CACHE(new CacheHeimdallInterceptor()),
 	CACHE_CLEAR(new CacheClearHeimdallInterceptor()),
 	IDENTIFIER(new IdentifierHeimdallInterceptor()),
-	LOG_MASKER(new LogMaskerHeimdallInterceptor()),
 	LOG_WRITER(new LogWriterHeimdallInterceptor()),
 	CORS(new CORSHeimdallInterceptor()),
 
