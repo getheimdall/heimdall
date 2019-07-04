@@ -15,7 +15,6 @@
  */
 package br.com.conductor.heimdall.core.dto.interceptor;
 
-
 import br.com.conductor.heimdall.core.enums.Interval;
 import lombok.Data;
 

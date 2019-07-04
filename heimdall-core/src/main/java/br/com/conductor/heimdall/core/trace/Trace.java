@@ -1,13 +1,7 @@
-
-package br.com.conductor.heimdall.core.trace;
-
-/*-
- * =========================LICENSE_START==================================
- * heimdall-gateway
- * ========================================================================
+/*
  * Copyright (C) 2018 Conductor Tecnologia SA
- * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -18,8 +12,8 @@ package br.com.conductor.heimdall.core.trace;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.trace;
 
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
@@ -58,8 +52,6 @@ import static net.logstash.logback.marker.Markers.append;
 @JsonInclude(Include.NON_NULL)
 @JsonFilter("customFilter")
 public class Trace {
-
-    private static final Logger logMongo = LoggerFactory.getLogger("mongo");
 
     private static final Logger logstash = LoggerFactory.getLogger("logstash");
 
