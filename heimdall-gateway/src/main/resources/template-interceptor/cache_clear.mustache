@@ -44,7 +44,6 @@ public class CacheClearInterceptor extends ZuulFilter {
     private static boolean status;
     private FilterDetail detail;
     private static Set<Long> ignoredOperations;
-    private static Set<Long> ignoredResources;
 
     public CacheClearInterceptor() {
 
@@ -59,10 +58,6 @@ public class CacheClearInterceptor extends ZuulFilter {
         ignoredOperations.add({{.}});
         {{/ignoredOperations}}
 
-        ignoredResources = new HashSet<>();
-        {{#ignoredResources}}
-        ignoredResources.add({{.}});
-        {{/ignoredResources}}
     }
 
     @Override
@@ -78,7 +73,7 @@ public class CacheClearInterceptor extends ZuulFilter {
     @Override
     public boolean shouldFilter() {
         LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
-        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredResources, ignoredOperations, status);
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredOperations, status);
     }
 
     @Override

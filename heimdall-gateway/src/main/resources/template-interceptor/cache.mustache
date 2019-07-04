@@ -42,7 +42,6 @@ public class CacheInterceptor extends HeimdallFilter {
     private static List<String> headers;
     private static List<String> queryParams;
     private static Set<Long> ignoredOperations;
-    private static Set<Long> ignoredResources;
     private static boolean status;
 
     public CacheInterceptor() {
@@ -68,10 +67,6 @@ public class CacheInterceptor extends HeimdallFilter {
         ignoredOperations.add({{.}});
         {{/ignoredOperations}}
 
-        ignoredResources = new HashSet<>();
-        {{#ignoredResources}}
-        ignoredResources.add({{.}});
-        {{/ignoredResources}}
     }
 
     @Override
@@ -92,7 +87,7 @@ public class CacheInterceptor extends HeimdallFilter {
     @Override
     public boolean should() {
         LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
-        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredResources, ignoredOperations, status);
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredOperations, status);
     }
 
     @Override

@@ -82,7 +82,7 @@ public class ClientIdInterceptorServiceTest {
         ctx.clear();
         ctx.setRequest(this.request);
         ctx.setResponse(this.response);
-        TraceContextHolder.getInstance().init(true, "developer", request, false, false, "", true);
+        TraceContextHolder.getInstance().init(true,"developer", request,false,"",true);
 
         clientId = "simpleId";
         someOtherClientId = "someOtherClientId";

@@ -27,7 +27,6 @@ import static br.com.conductor.heimdall.gateway.util.ConstantsContext.ENVIRONMEN
 public class CustomInterceptor extends HeimdallFilter {
 
     private static Set<Long> ignoredOperations;
-    private static Set<Long> ignoredResources;
     private static Long referenceId;
     private static Long apiId;
     private static boolean status;
@@ -43,10 +42,6 @@ public class CustomInterceptor extends HeimdallFilter {
         ignoredOperations.add({{.}});
         {{/ignoredOperations}}
 
-        ignoredResources = new HashSet<>();
-        {{#ignoredResources}}
-        ignoredResources.add({{.}});
-        {{/ignoredResources}}
     }
 
     @Override
@@ -62,7 +57,7 @@ public class CustomInterceptor extends HeimdallFilter {
     @Override
     public boolean should() {
         LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
-        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredResources, ignoredOperations, status);
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredOperations, status);
     }
 
     @Override

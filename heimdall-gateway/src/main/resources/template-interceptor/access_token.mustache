@@ -31,8 +31,8 @@ public class AccessTokenInterceptor extends HeimdallFilter {
 
     private static Set<Long> ignoredOperations;
     private static Set<Long> ignoredResources;
-    private static Long referenceId;
-    private static Long apiId;
+    private static String referenceId;
+    private static String apiId;
 
     public AccessTokenInterceptor() {
         ignoredOperations = new HashSet<>();
@@ -40,13 +40,8 @@ public class AccessTokenInterceptor extends HeimdallFilter {
         ignoredOperations.add({{.}});
         {{/ignoredOperations}}
 
-        ignoredResources = new HashSet<>();
-        {{#ignoredResources}}
-        ignoredResources.add({{.}});
-        {{/ignoredResources}}
-
         referenceId = {{referenceId}};
-        apiId = {{apiId}};
+        apiId = "{{apiId}}";
     }
 
     @Override
@@ -62,7 +57,7 @@ public class AccessTokenInterceptor extends HeimdallFilter {
     @Override
     public boolean should() {
         LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
-        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredResources, ignoredOperations, {{interceptorStatus}});
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredOperations, {{interceptorStatus}});
     }
 
     @Override

@@ -31,7 +31,6 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 public class CorsPreInterceptor extends HeimdallFilter {
 
     private static Set<Long> ignoredOperations;
-    private static Set<Long> ignoredResources;
     private static Map<String, String> cors;
     private static Long referenceId;
     private static Long apiId;
@@ -48,11 +47,6 @@ public class CorsPreInterceptor extends HeimdallFilter {
         ignoredOperations.add({{.}});
         {{/ignoredOperations}}
 
-        ignoredResources = new HashSet<>();
-        {{#ignoredResources}}
-        ignoredResources.add({{.}});
-        {{/ignoredResources}}
-
         cors = new HashMap<>();
         {{#cors}}
         cors.put("{{key}}", "{{value}}");
@@ -62,7 +56,7 @@ public class CorsPreInterceptor extends HeimdallFilter {
     @Override
     public boolean should() {
         LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
-        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredResources, ignoredOperations, status);
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredOperations, status);
     }
 
     @Override

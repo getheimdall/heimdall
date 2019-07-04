@@ -31,7 +31,6 @@ import java.util.Set;
 public class RateLimitInterceptor extends HeimdallFilter {
 
     private static Set<Long> ignoredOperations;
-    private static Set<Long> ignoredResources;
     private static Long referenceId;
     private static Long apiId;
     private static boolean status;
@@ -45,11 +44,6 @@ public class RateLimitInterceptor extends HeimdallFilter {
         {{#ignoredOperations}}
         ignoredOperations.add({{.}});
         {{/ignoredOperations}}
-
-        ignoredResources = new HashSet<>();
-        {{#ignoredResources}}
-        ignoredResources.add({{.}});
-        {{/ignoredResources}}
 
         referenceId = {{referenceId}};
         apiId = {{apiId}};
@@ -77,7 +71,7 @@ public class RateLimitInterceptor extends HeimdallFilter {
     @Override
     public boolean should() {
         LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
-        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredResources, ignoredOperations, status);
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredOperations, status);
     }
 
     @Override

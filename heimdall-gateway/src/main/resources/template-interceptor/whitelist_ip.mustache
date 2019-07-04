@@ -32,7 +32,6 @@ import java.util.Set;
 public class WhitelistInterceptor extends HeimdallFilter {
 
     private static Set<Long> ignoredOperations;
-    private static Set<Long> ignoredResources;
     private static Set<String> whitelist;
     private static Long referenceId;
     private static Long apiId;
@@ -44,11 +43,6 @@ public class WhitelistInterceptor extends HeimdallFilter {
         {{#ignoredOperations}}
         ignoredOperations.add({{.}});
         {{/ignoredOperations}}
-
-        ignoredResources = new HashSet<>();
-        {{#ignoredResources}}
-        ignoredResources.add({{.}});
-        {{/ignoredResources}}
 
         whitelist = new HashSet<>();
         {{#ips}}
@@ -78,7 +72,7 @@ public class WhitelistInterceptor extends HeimdallFilter {
     @Override
     public boolean should() {
         LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
-            return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredResources, ignoredOperations, status);
+            return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredOperations, status);
     }
 
     @Override
