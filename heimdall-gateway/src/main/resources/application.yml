@@ -42,20 +42,7 @@ heimdall:
         serverName: 127.0.0.1
         username: postgres
         password: 123456
-        runLiquibase: true
         sendStringParametersAsUnicode: false
-    mongo:
-        enabled: false
-        #        serverName:
-        url: mongodb://admin:admin@localhost
-        port: 27017
-        dataBase: logging
-        collection: logs
-        username: admin
-        password: admin
-        queueSize: 500
-        discardingThreshold: 0
-        zoneId: America/Sao_Paulo
     trace:
         printHeimdallFilters: true
         printAllTrace: true
@@ -76,9 +63,6 @@ heimdall:
         numTestsPerEvictionRun: 3
         blockWhenExhausted: true
         connectionPoolSize: 10
-    middlewares:
-        allowInactive: 0
-        deleteDeprecated: false
     failsafe:
         enabled: false
         failureNumber: 4

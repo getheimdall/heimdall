@@ -252,7 +252,7 @@ public class OAuthService {
 
         App app = appRepository.findByClientId(clientId);
 
-        HeimdallException.checkThrow(app == null, ExceptionMessage.APP_CLIENT_ID_NOT_FOUND);
+        HeimdallException.checkThrow(app == null, ExceptionMessage.GLOBAL_NOT_FOUND, "Client Id");
 
         OAuthAuthorize oAuthAuthorizeAccessToken = new OAuthAuthorize();
         oAuthAuthorizeAccessToken.setClientId(clientId);

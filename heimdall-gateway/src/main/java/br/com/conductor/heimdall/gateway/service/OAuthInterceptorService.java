@@ -208,7 +208,7 @@ public class OAuthInterceptorService {
 //                }
 //                break;
 //            default:
-//                HeimdallException.checkThrow(true, ExceptionMessage.RESPONSE_TYPE_NOT_FOUND);
+//                HeimdallException.checkThrow(true, ExceptionMessage.GLOBAL_NOT_FOUND, "response_type");
 //        }
     }
 
