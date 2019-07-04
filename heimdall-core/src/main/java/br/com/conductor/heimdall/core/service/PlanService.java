@@ -53,6 +53,9 @@ public class PlanService {
     private AppService appService;
 
     @Autowired
+    private InterceptorService interceptorService;
+
+    @Autowired
     private AMQPCacheService amqpCacheService;
 
     @Transactional(readOnly = true)
@@ -155,6 +158,8 @@ public class PlanService {
                 .anyMatch(app -> app.getPlans().contains(id)), PLAN_ATTACHED_TO_APPS);
 
         apiService.removePlan(plan);
+
+        interceptorService.deleteAllFromPlan(id);
 
         planRepository.delete(plan);
 

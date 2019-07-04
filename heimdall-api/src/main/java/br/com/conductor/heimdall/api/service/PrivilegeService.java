@@ -15,22 +15,21 @@
  */
 package br.com.conductor.heimdall.api.service;
 
-import br.com.conductor.heimdall.api.dto.PrivilegeDTO;
 import br.com.conductor.heimdall.api.entity.Privilege;
+import br.com.conductor.heimdall.api.entity.Role;
+import br.com.conductor.heimdall.api.entity.User;
+import br.com.conductor.heimdall.api.enums.UserType;
 import br.com.conductor.heimdall.api.repository.PrivilegeRepository;
-import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.util.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_NOT_FOUND;
 
@@ -38,64 +37,76 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_N
  * Provides methods to find one or mode {@link Privilege}.
  *
  * @author Marcos Filho
- *
  */
 @Service
 public class PrivilegeService {
 
-     @Autowired
-     private PrivilegeRepository repository;
+    @Autowired
+    private PrivilegeRepository privilegeRepository;
 
-     /**
-      * Finds a {@link Privilege} by its Id.
-      * 
-      * @param id		The Privilege Id
-      * @return			{@link Privilege}
-      */
-     public Privilege find(Long id) {
+    @Autowired
+    private UserService userService;
 
-          Privilege privilege = repository.findOne(id);
-          HeimdallException.checkThrow(privilege == null, GLOBAL_NOT_FOUND, "Privilege");
+    @Autowired
+    private RoleService roleService;
 
-          return privilege;
-     }
+    /**
+     * Finds a {@link Privilege} by its Id.
+     *
+     * @param id The Privilege Id
+     * @return {@link Privilege}
+     */
+    public Privilege find(String id) {
 
-     /**
-      * Finds all {@link Privilege} from a paged request.
-      * 
-      * @param privilegeDTO		{@link PrivilegeDTO}
-      * @param pageableDTO		{@link PageableDTO}
-      * @return
-      */
-     public Page<Privilege> list(PrivilegeDTO privilegeDTO, PageableDTO pageableDTO) {
+        Privilege privilege = privilegeRepository.findOne(id);
+        HeimdallException.checkThrow(privilege == null, GLOBAL_NOT_FOUND, "Privilege");
 
-          Privilege privilege = GenericConverter.mapper(privilegeDTO, Privilege.class);
+        return privilege;
+    }
 
-          Example<Privilege> example = Example.of(privilege, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+    /**
+     * Finds all {@link Privilege} from a paged request.
+     *
+     * @param pageable {@link Pageable}
+     * @return
+     */
+    public Page<Privilege> list(Pageable pageable) {
 
-          Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+        return privilegeRepository.findAll(pageable);
+    }
 
-          return repository.findAll(example, pageable);
-     }
+    /**
+     * Finds a {@link List} of {@link Privilege} associated with one Privilege provided.
+     *
+     * @return {@link List} of {@link Privilege}
+     */
+    public List<Privilege> list() {
 
-     /**
-      * Finds a {@link List} of {@link Privilege} associated with one Privilege provided.
-      * 
-      * @param privilegeDTO		{@link PrivilegeDTO}
-      * @return					{@link List} of {@link Privilege}
-      */
-     public List<Privilege> list(PrivilegeDTO privilegeDTO) {
+        return privilegeRepository.findAll();
+    }
 
-          Privilege privilege = GenericConverter.mapper(privilegeDTO, Privilege.class);
+    public Set<Privilege> list(String username) {
 
-          Example<Privilege> example = Example.of(privilege, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+        final User user = userService.findByUsername(username);
 
-          List<Privilege> privileges = repository.findAll(example);
+        return list(user);
+    }
 
-          return privileges;
-     }
+    public Set<Privilege> list(String username, UserType userType) {
 
-     public Set<Privilege> list(String username) {
-          return repository.findPrivilegeByUsername(username);
-     }
+        final User user = userService.findByUsernameAndType(username, userType);
+
+        return list(user);
+    }
+
+    public Set<Privilege> list(User user) {
+        final Set<Privilege> privileges = new HashSet<>();
+
+        user.getRoles().stream().map(roleId -> roleService.find(roleId)).collect(Collectors.toSet())
+                .forEach(role -> role.getPrivileges().stream()
+                        .map(privilegeId -> privilegeRepository.findOne(privilegeId))
+                        .forEach(privileges::add));
+
+        return privileges;
+    }
 }

@@ -26,6 +26,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import br.com.conductor.heimdall.api.entity.Role;
+import org.springframework.stereotype.Repository;
 
 /**
  * Extends {@link JpaRepository}. Provides method to find a {@link Set} of {@link Role}.
@@ -33,7 +34,8 @@ import br.com.conductor.heimdall.api.entity.Role;
  * @author Marcos Filho
  *
  */
-public interface RoleRepository extends JpaRepository<Role, Long> {
+@Repository
+public interface RoleRepository extends JpaRepository<Role, String> {
 
 	 /**
 	  * Finds a {@link Set} of {@link Role} by its name.
@@ -45,8 +47,5 @@ public interface RoleRepository extends JpaRepository<Role, Long> {
      
      @Query(value = "select roles.* FROM ROLES roles, USERS_ROLES ur WHERE roles.ID = ur.ROLE_ID and ur.USER_ID = :id", nativeQuery = true)
      Set<Role> findRolesByUserId(@Param("id") Long id);
-	
-     @EntityGraph(attributePaths = {"privileges"})
-	@Override
-	<S extends Role> Page<S> findAll(Example<S> example, Pageable pageable);
+
 }

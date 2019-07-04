@@ -17,10 +17,11 @@ package br.com.conductor.heimdall.api.service;
 
 import br.com.conductor.heimdall.api.dto.UserAuthenticateResponse;
 import br.com.conductor.heimdall.api.entity.Ldap;
+import br.com.conductor.heimdall.api.entity.Privilege;
 import br.com.conductor.heimdall.api.entity.Role;
 import br.com.conductor.heimdall.api.entity.User;
 import br.com.conductor.heimdall.api.enums.CredentialStateEnum;
-import br.com.conductor.heimdall.api.enums.TypeUser;
+import br.com.conductor.heimdall.api.enums.UserType;
 import br.com.conductor.heimdall.api.environment.JwtProperty;
 import br.com.conductor.heimdall.api.security.AccountCredentials;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
@@ -102,7 +103,7 @@ public class TokenAuthenticationService {
         userAuthenticateResponse.setUsername(accountCredentials.getUsername());
         try {
             authenticate = authenticationManager.authenticate(userFound);
-            userAuthenticateResponse.setType(TypeUser.DATABASE);
+            userAuthenticateResponse.setType(UserType.DATABASE);
         } catch (AuthenticationException ex) {
             Ldap ldapActive = ldapService.getLdapActive();
 
@@ -110,7 +111,7 @@ public class TokenAuthenticationService {
                 try {
                     authenticateManagerBuilder.authenticationProvider(ldapProvider(ldapActive));
                     authenticate = ldapProvider(ldapActive).authenticate(userFound);
-                    userAuthenticateResponse.setType(TypeUser.LDAP);
+                    userAuthenticateResponse.setType(UserType.LDAP);
                 } catch (AuthenticationException exception) {
                     log.error(exception.getMessage(), exception);
                 }
@@ -169,7 +170,7 @@ public class TokenAuthenticationService {
                     if (credentialStateService.isLogged(claims.getId())) {
                         User userFound = userService.findByUsername(user);
                         addAuthentication(response, user, claims.getId());
-                        return new UsernamePasswordAuthenticationToken(userFound.getUserName(), userFound.getPassword(), getAuthoritiesByRoles(userFound.getRoles()));
+                        return new UsernamePasswordAuthenticationToken(userFound.getUserName(), userFound.getPassword(), getAuthoritiesByRoles(userFound));
                     }
                 }
             } catch (ExpiredJwtException ex) {
@@ -187,10 +188,13 @@ public class TokenAuthenticationService {
         return null;
     }
 
-    private Collection<? extends GrantedAuthority> getAuthoritiesByRoles(Set<Role> roles) {
+    private Collection<? extends GrantedAuthority> getAuthoritiesByRoles(User user) {
         Set<GrantedAuthority> authorities = new HashSet<>();
 
-        roles.forEach(role -> role.getPrivileges().forEach(privilege -> authorities.add(new SimpleGrantedAuthority(privilege.getName()))));
+        final Set<Privilege> privileges = privilegeService.list(user);
+
+        privileges.forEach(privilege -> authorities.add(new SimpleGrantedAuthority(privilege.getName())));
+
 
         return authorities;
     }

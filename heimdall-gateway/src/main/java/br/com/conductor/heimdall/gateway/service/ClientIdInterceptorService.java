@@ -22,6 +22,9 @@ package br.com.conductor.heimdall.gateway.service;
 import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.repository.AppRepository;
+import br.com.conductor.heimdall.core.service.AppService;
+import br.com.conductor.heimdall.core.service.DeveloperService;
+import br.com.conductor.heimdall.core.service.PlanService;
 import br.com.conductor.heimdall.core.util.ConstantsInterceptors;
 import br.com.conductor.heimdall.core.util.DigestUtils;
 import br.com.conductor.heimdall.core.trace.TraceContextHolder;
@@ -40,7 +43,13 @@ import static br.com.conductor.heimdall.gateway.util.ConstantsContext.CLIENT_ID;
 public class ClientIdInterceptorService {
 
     @Autowired
-    private AppRepository appRepository;
+    private AppService appService;
+
+    @Autowired
+    private PlanService planService;
+
+    @Autowired
+    private DeveloperService developerService;
 
     /**
      * Validates if a client id is valid
@@ -71,17 +80,19 @@ public class ClientIdInterceptorService {
         if (clientId != null) {
 
             TraceContextHolder.getInstance().getActualTrace().setClientId(DigestUtils.digestMD5(clientId));
-            App app = appRepository.findByClientId(clientId);
+            App app = appService.findByClientId(clientId);
             if (app != null) {
 
-// TODO               Plan plan = app.getPlans().stream().filter(p -> apiId.equals(p.getApiId())).findFirst().orElse(null);
-//                if (plan != null) {
-//                    TraceContextHolder.getInstance().getActualTrace().setApp(app.getName());
-//                    TraceContextHolder.getInstance().getActualTrace().setAppDeveloper(app.getDeveloper().getEmail());
-//
-//                } else {
-//                    buildResponse(ConstantsInterceptors.GLOBAL_ACCESS_NOT_ALLOWED_API);
-//                }
+                Plan plan = app.getPlans().stream()
+                        .map(planId -> planService.find(planId))
+                        .filter(p -> apiId.equals(p.getApiId())).findFirst().orElse(null);
+                if (plan != null) {
+                    TraceContextHolder.getInstance().getActualTrace().setApp(app.getName());
+                    TraceContextHolder.getInstance().getActualTrace().setAppDeveloper(developerService.find(app.getDeveloperId()).getEmail());
+
+                } else {
+                    buildResponse(ConstantsInterceptors.GLOBAL_ACCESS_NOT_ALLOWED_API);
+                }
             } else {
                 buildResponse(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, CLIENT_ID));
             }

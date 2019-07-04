@@ -16,6 +16,7 @@
 package br.com.conductor.heimdall.api.resource;
 
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
+import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.InterceptorDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.entity.Interceptor;
@@ -134,7 +135,9 @@ public class InterceptorResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_INTERCEPTOR)
      public ResponseEntity<?> save(@RequestBody @Valid InterceptorDTO interceptorDTO) {
 
-          Interceptor interceptor = interceptorService.save(interceptorDTO); 
+          Interceptor interceptor = GenericConverter.mapper(interceptorDTO, Interceptor.class);
+
+          interceptor = interceptorService.save(interceptor);
 
           return ResponseEntity.created(
                   URI.create(String.format("/%s/%s", "interceptors", interceptor.getId()))
@@ -154,7 +157,9 @@ public class InterceptorResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_INTERCEPTOR)
      public ResponseEntity<?> update(@PathVariable("interceptorId") String id, @RequestBody InterceptorDTO interceptorDTO) {
 
-          Interceptor interceptor = interceptorService.update(id, interceptorDTO);
+          Interceptor interceptor = GenericConverter.mapper(interceptorDTO, Interceptor.class);
+
+          interceptor = interceptorService.update(id, interceptor);
           
           return ResponseEntity.ok(interceptor);
      }

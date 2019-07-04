@@ -390,21 +390,6 @@ public class GlobalExceptionHandler{
 
      }
 
-    /**
-     * Method that captures all the {@link MultipartException} exceptions.
-     *
-     * @param response  {@link HttpServletRequest}
-     * @param request   {@link HttpServletResponse}
-     * @param exception {@link Exception}
-     * @return  {@link ErroInfo}
-     */
-     @ResponseStatus(HttpStatus.PAYLOAD_TOO_LARGE)
-     @ExceptionHandler(MultipartException.class)
-     public @ResponseBody ErroInfo handleExceptionMultipartException(HttpServletResponse response, HttpServletRequest request, MultipartException exception) {
-
-         return buildErrorInfo(request, new HeimdallException(ExceptionMessage.MIDDLEWARE_PAYLOAD_TOO_LARGE));
-     }
-
      /**
       * Method responsible to create the exception object.
       *

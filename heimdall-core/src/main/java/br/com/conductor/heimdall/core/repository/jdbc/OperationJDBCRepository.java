@@ -51,14 +51,5 @@ public class OperationJDBCRepository {
 
 		return new NamedParameterJdbcTemplate(jdbcTemplate).queryForList(sql.toString(), params, String.class);
 	}
-	
-	public List<Long> findIgnoredOperationsFromInterceptor(String interceptorId) {
-		StringBuilder sql = new StringBuilder();
-		sql.append("SELECT OPERATION_ID ");
-		sql.append("FROM IGNORED_INTERCEPTORS_OPERATIONS ");
-		sql.append("WHERE INTERCEPTOR_ID = ? ");
 
-		return jdbcTemplate.queryForList(sql.toString(), new Object[] { interceptorId }, Long.class);
-	}
-  
 }

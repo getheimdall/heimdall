@@ -15,14 +15,14 @@
  */
 package br.com.conductor.heimdall.api.entity;
 
-import br.com.conductor.heimdall.api.enums.TypeUser;
+import br.com.conductor.heimdall.api.enums.UserType;
 import br.com.conductor.heimdall.core.enums.Status;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -33,62 +33,38 @@ import java.util.Set;
  * Data class that represents the User.
  *
  * @author Marcos Filho
- *
  */
 @Data
-@Table(name = "USERS")
-@Entity
-@DynamicUpdate
-@DynamicInsert
-@EqualsAndHashCode(of = { "id" })
+@EqualsAndHashCode(of = {"id"})
 @AllArgsConstructor
 @NoArgsConstructor
+@RedisHash("user")
 public class User implements Serializable {
 
-     private static final long serialVersionUID = -7740868543851971847L;
+    private static final long serialVersionUID = -7740868543851971847L;
 
-     @Id
-     @GeneratedValue(strategy = GenerationType.IDENTITY)
-     @Column(name = "ID")
-     private Long id;
+    @Id
+    private String id;
 
-     @Column(name = "FIRST_NAME", length = 80, nullable = false)
-     private String firstName;
+    private String firstName;
 
-     @Column(name = "LAST_NAME", length = 80, nullable = false)
-     private String lastName;
-     
-     @Column(name = "USERNAME", length = 30, nullable = false, unique = true)
-     private String userName;
+    private String lastName;
 
-     @Column(name = "EMAIL", length = 150, nullable = false, unique = true)
-     private String email;
+    @Indexed
+    private String userName;
 
-     @Column(name = "PASSWORD", length = 300, nullable = false)
-     private String password;
+    private String email;
 
-     @Column(name = "STATUS", length = 10, nullable = false)
-     @Enumerated(EnumType.STRING)
-     private Status status;
-     
-     @Column(name = "CREATION_DATE", nullable = false)
-     private LocalDateTime creationDate;
-     
-     @Column(name = "TYPE_USER", length = 10, nullable = false)
-     @Enumerated(EnumType.STRING)
-     private TypeUser type;
-     
-     @ManyToMany(fetch = FetchType.LAZY)
-     @JoinTable(name = "USERS_ROLES", 
-               joinColumns = @JoinColumn(name = "USER_ID", referencedColumnName = "id"), 
-               inverseJoinColumns = @JoinColumn(name = "ROLE_ID", referencedColumnName = "id"))
-     private Set<Role> roles;
-     
-     @PrePersist
-     private void initValuesPersist() {
+    private String password;
 
-          status = status == null ? Status.ACTIVE : status;
-          
-          creationDate = LocalDateTime.now();        
-     }
+    @Indexed
+    private Status status;
+
+    private LocalDateTime creationDate;
+
+    @Indexed
+    private UserType type;
+
+    private Set<String> roles;
+
 }

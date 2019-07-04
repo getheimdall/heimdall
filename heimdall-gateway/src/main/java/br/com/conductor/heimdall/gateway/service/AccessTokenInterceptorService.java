@@ -20,8 +20,13 @@
 package br.com.conductor.heimdall.gateway.service;
 
 import br.com.conductor.heimdall.core.entity.AccessToken;
+import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.entity.Plan;
+import br.com.conductor.heimdall.core.enums.Status;
 import br.com.conductor.heimdall.core.repository.AccessTokenRepository;
+import br.com.conductor.heimdall.core.service.AccessTokenService;
+import br.com.conductor.heimdall.core.service.AppService;
+import br.com.conductor.heimdall.core.service.PlanService;
 import br.com.conductor.heimdall.core.util.ConstantsInterceptors;
 import br.com.conductor.heimdall.core.util.DigestUtils;
 import br.com.conductor.heimdall.core.trace.TraceContextHolder;
@@ -44,7 +49,13 @@ import static br.com.conductor.heimdall.gateway.util.ConstantsContext.CLIENT_ID;
 public class AccessTokenInterceptorService {
 
     @Autowired
-    private AccessTokenRepository accessTokenRepository;
+    private AccessTokenService accessTokenService;
+
+    @Autowired
+    private AppService appService;
+
+    @Autowired
+    private PlanService planService;
 
     /**
      * Validates if a access token originated
@@ -84,27 +95,34 @@ public class AccessTokenInterceptorService {
 
         if (accessToken != null && !accessToken.isEmpty()) {
 
-            AccessToken token = accessTokenRepository.findAccessTokenActive(accessToken);
+            final AccessToken token = accessTokenService.findByCode(accessToken);
+            if (token != null) {
+                final App app = appService.find(token.getApp());
 
-            if (token != null && token.getApp() != null) {
+                if (app != null || token.getStatus().equals(Status.ACTIVE)) {
 
-                List<Plan> plans = token.getApp().getPlans();
-                Set<String> collect = plans.parallelStream().map(plan -> plan.getApi().getId()).collect(Collectors.toSet());
-                if (collect.contains(apiId)) {
+                    Set<String> apiIds = app.getPlans().parallelStream()
+                            .map(plan -> planService.find(plan))
+                            .map(Plan::getApiId)
+                            .collect(Collectors.toSet())
+                            ;
 
-                    String cId = token.getApp().getClientId();
-                    if (clientId.equals(cId)) {
+                    if (apiIds.contains(apiId)) {
 
-                        TraceContextHolder.getInstance().getActualTrace().setApp(token.getApp().getName());
+                        String cId = app.getClientId();
+                        if (clientId.equals(cId)) {
 
+                            TraceContextHolder.getInstance().getActualTrace().setApp(app.getName());
+
+                        } else {
+                            buildResponse(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, ACCESS_TOKEN));
+                        }
                     } else {
-                        buildResponse(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, ACCESS_TOKEN));
+                        buildResponse(ConstantsInterceptors.GLOBAL_ACCESS_NOT_ALLOWED_API);
                     }
                 } else {
-                    buildResponse(ConstantsInterceptors.GLOBAL_ACCESS_NOT_ALLOWED_API);
+                    buildResponse(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, ACCESS_TOKEN));
                 }
-            } else {
-                buildResponse(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, ACCESS_TOKEN));
             }
         } else {
             buildResponse(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, ACCESS_TOKEN));

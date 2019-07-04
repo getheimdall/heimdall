@@ -58,6 +58,5 @@ public class LdapDTO implements Serializable {
     @Size(max = 120)
     private String userSearchFilter;
 
-    @NotNull(message = "Status needs to be informed.")
-    private Status status;
+    private Status status = Status.ACTIVE;
 }

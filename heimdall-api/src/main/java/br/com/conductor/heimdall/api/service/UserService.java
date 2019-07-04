@@ -18,28 +18,23 @@ package br.com.conductor.heimdall.api.service;
 import br.com.conductor.heimdall.api.dto.UserDTO;
 import br.com.conductor.heimdall.api.dto.UserEditDTO;
 //import br.com.conductor.heimdall.api.dto.page.UserPage;
-import br.com.conductor.heimdall.api.entity.Role;
 import br.com.conductor.heimdall.api.entity.User;
-import br.com.conductor.heimdall.api.enums.TypeUser;
+import br.com.conductor.heimdall.api.enums.UserType;
 import br.com.conductor.heimdall.api.repository.RoleRepository;
 import br.com.conductor.heimdall.api.repository.UserRepository;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 //import br.com.conductor.heimdall.core.dto.PageDTO;
-import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.util.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 
@@ -48,155 +43,141 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
  *
  * @author Marcos Filho
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
- *
  */
 @Service
 public class UserService {
 
-     @Autowired
-     private UserRepository userRepository;
-     
-     @Autowired
-     private RoleRepository roleRepository;
-     
-     @Autowired
-     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private UserRepository userRepository;
 
-     @Autowired
-     private CredentialStateService credentialStateService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-     /**
-      * Saves a {@link User}.
-      * 
-      * @param userDTO		{@link UserDTO}
-      * @return				{@link User}
-      */
-     @Transactional
-     public User save(UserDTO userDTO) {
+    @Autowired
+    private CredentialStateService credentialStateService;
 
-          User user = GenericConverter.mapper(userDTO, User.class);
-          user.setType(TypeUser.DATABASE);
-          user.setPassword(passwordEncoder.encode(user.getPassword()));
-          user = userRepository.save(user);
-          
-          return user;
-     }
+    /**
+     * Saves a {@link User}.
+     *
+     * @param user {@link User}
+     * @return {@link User}
+     */
+    @Transactional
+    public User save(User user) {
 
-     public User findByUsername(String username) {
-          User userFound = userRepository.findByUserName(username);
-          Set<Role> roles = roleRepository.findRolesByUserId(userFound.getId());
-          userFound.setRoles(roles);
-          return userFound;
-     }
-     
-     /**
-      * Finds a {@link User} by its Id.
-      * 
-      * @param id		The User Id
-      * @return			{@link User}
-      */
-     public User find(Long id) {
+        user.setType(UserType.DATABASE);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setCreationDate(LocalDateTime.now());
 
-          User user = userRepository.findOne(id);          
-          HeimdallException.checkThrow(user == null, GLOBAL_RESOURCE_NOT_FOUND);
-          
-          user.setRoles(roleRepository.findRolesByUserId(id));
+        user = userRepository.save(user);
 
-          return user;
-     }
+        return user;
+    }
 
-     /**
-      * Creates a paged list of {@link User} from a request.
-      * 
-      * @param userDTO		{@link UserDTO}
-      * @param pageableDTO	{@link PageableDTO}
-      * @return
-      */
-     @Transactional(readOnly = false)
-     public Page<User> list(UserDTO userDTO, Pageable pageable) {
+    public User findByUsername(String username) {
 
-          User user = GenericConverter.mapper(userDTO, User.class);
+        User user = userRepository.findByUserName(username);
+        HeimdallException.checkThrow(user == null, GLOBAL_NOT_FOUND, "User");
 
-          Example<User> example = Example.of(user, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+        return user;
+    }
 
-          Page<User> page = userRepository.findAll(example, pageable);
+    public User findByUsernameAndType(String username, UserType userType) {
 
+        User user = userRepository.findByUserNameAndType(username, userType);
+        HeimdallException.checkThrow(user == null, GLOBAL_NOT_FOUND, "User");
 
-          return page;
-     }
+        return user;
+    }
 
-     /**
-      * Creates a list of {@link User} from a request.
-      * 
-      * @param userDTO		{@link UserDTO}
-      * @return				{@link List} of {@link User}
-      */
-     @Transactional(readOnly = false)
-     public List<User> list(UserDTO userDTO) {
+    /**
+     * Finds a {@link User} by its Id.
+     *
+     * @param id The User Id
+     * @return {@link User}
+     */
+    public User find(String id) {
 
-          User user = GenericConverter.mapper(userDTO, User.class);
+        User user = userRepository.findOne(id);
+        HeimdallException.checkThrow(user == null, GLOBAL_NOT_FOUND, "User");
+        return user;
+    }
 
-          Example<User> example = Example.of(user, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+    /**
+     * Creates a paged list of {@link User} from a request.
+     *
+     * @param pageable {@link Pageable}
+     * @return
+     */
+    @Transactional
+    public Page<User> list(Pageable pageable) {
 
-          List<User> users = userRepository.findAll(example);
+        return userRepository.findAll(pageable);
+    }
 
-          return users;
-     }
+    /**
+     * Creates a list of {@link User} from a request.
+     *
+     * @return {@link List} of {@link User}
+     */
+    @Transactional
+    public List<User> list() {
 
-     /**
-      * Deletes a {@link User}.
-      * 
-      * @param userId		The User Id
-      */
-     @Transactional
-     public void delete(Long userId) {
+        return userRepository.findAll();
+    }
 
-          User user = userRepository.findOne(userId);
-          HeimdallException.checkThrow(user == null, GLOBAL_RESOURCE_NOT_FOUND);
-          
-          userRepository.delete(user.getId());
-     }
+    /**
+     * Deletes a {@link User}.
+     *
+     * @param userId The User Id
+     */
+    @Transactional
+    public void delete(String userId) {
 
-     /**
-      * Updates a {@link User}.
-      * 
-      * @param userId		The User Id
-      * @param userDTO		{@link UserDTO}
-      * @return				{@link User}
-      */
-     @Transactional
-     public User update(Long userId, UserEditDTO userDTO) {
+        User user = this.find(userId);
 
-          User user = userRepository.findOne(userId);
-          HeimdallException.checkThrow(user == null, GLOBAL_RESOURCE_NOT_FOUND);
-          
-          user = GenericConverter.mapper(userDTO, user);
-          user = userRepository.save(user);
-          
-          return user;
-     }
+        userRepository.delete(user);
+    }
 
-     /**
-      * Updates password the {@link User}
-      *
-      * @param principal {@link Principal}
-      * @param currentPassword     The current password
-      * @param newPassword         The new password
-      * @param confirmNewPassword  The confirm new password
-      */
+    /**
+     * Updates a {@link User}.
+     *
+     * @param userId  The User Id
+     * @param userDTO {@link UserDTO}
+     * @return {@link User}
+     */
+    @Transactional
+    public User update(String userId, UserEditDTO userDTO) {
+
+        User user = this.find(userId);
+
+        user = GenericConverter.mapper(userDTO, user);
+        user = userRepository.save(user);
+
+        return user;
+    }
+
+    /**
+     * Updates password the {@link User}
+     *
+     * @param principal          {@link Principal}
+     * @param currentPassword    The current password
+     * @param newPassword        The new password
+     * @param confirmNewPassword The confirm new password
+     */
     public void updatePassword(Principal principal, String currentPassword, String newPassword, String confirmNewPassword) {
 
-         final String username = principal.getName();
-         User userLogged = userRepository.findByUserName(username);
+        final String username = principal.getName();
+        User userLogged = userRepository.findByUserName(username);
 
-         HeimdallException.checkThrow(userLogged == null, GLOBAL_RESOURCE_NOT_FOUND);
-         HeimdallException.checkThrow(TypeUser.LDAP.equals(userLogged.getType()), USER_LDAP_UNAUTHORIZED_TO_CHANGE_PASSWORD);
-         HeimdallException.checkThrow(!passwordEncoder.matches(currentPassword, userLogged.getPassword()), USER_CURRENT_PASSWORD_NOT_MATCHING);
-         HeimdallException.checkThrow(passwordEncoder.matches(newPassword, userLogged.getPassword()), USER_NEW_PASSWORD_EQUALS_CURRENT_PASSWORD);
-         HeimdallException.checkThrow(!newPassword.equals(confirmNewPassword), USER_NEW_PASSWORD_NOT_MATCHING);
+        HeimdallException.checkThrow(userLogged == null, GLOBAL_RESOURCE_NOT_FOUND);
+        HeimdallException.checkThrow(UserType.LDAP.equals(userLogged.getType()), USER_LDAP_UNAUTHORIZED_TO_CHANGE_PASSWORD);
+        HeimdallException.checkThrow(!passwordEncoder.matches(currentPassword, userLogged.getPassword()), USER_CURRENT_PASSWORD_NOT_MATCHING);
+        HeimdallException.checkThrow(passwordEncoder.matches(newPassword, userLogged.getPassword()), USER_NEW_PASSWORD_EQUALS_CURRENT_PASSWORD);
+        HeimdallException.checkThrow(!newPassword.equals(confirmNewPassword), USER_NEW_PASSWORD_NOT_MATCHING);
 
-         userLogged.setPassword(passwordEncoder.encode(newPassword));
-         userRepository.save(userLogged);
-         credentialStateService.revokeByUsername(username);
+        userLogged.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(userLogged);
+        credentialStateService.revokeByUsername(username);
     }
 }

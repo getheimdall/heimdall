@@ -19,8 +19,10 @@ import br.com.conductor.heimdall.api.dto.RoleDTO;
 import br.com.conductor.heimdall.api.entity.Role;
 import br.com.conductor.heimdall.api.service.RoleService;
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
+import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
+import br.com.conductor.heimdall.core.util.Pageable;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -61,9 +63,11 @@ public class RoleResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_ROLE)
      public ResponseEntity<?> save(@RequestBody @Valid RoleDTO roleDTO) {
 
-          Role role = roleService.save(roleDTO);
+          Role role = GenericConverter.mapper(roleDTO, Role.class);
 
-          return ResponseEntity.created(URI.create(String.format("/%s/%s", "roles", role.getId().toString()))).build();
+          role = roleService.save(role);
+
+          return ResponseEntity.created(URI.create(String.format("/%s/%s", "roles", role.getId()))).build();
      }
      
      /**
@@ -76,7 +80,7 @@ public class RoleResource {
      @ApiOperation(value = "Find Role by id", response = Role.class)
      @GetMapping(value = "/{roleId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_ROLE)
-     public ResponseEntity<?> findById(@PathVariable("roleId") Long roleId) {
+     public ResponseEntity<?> findById(@PathVariable("roleId") String roleId) {
 
           Role resource = roleService.find(roleId);
 
@@ -97,12 +101,13 @@ public class RoleResource {
      public ResponseEntity<?> findAll(@ModelAttribute RoleDTO roleDTO, @ModelAttribute PageableDTO pageableDTO) {
           
           if (!pageableDTO.isEmpty()) {
+               Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+               Page<Role> rolePage = roleService.list(pageable);
 
-               Page<Role> rolePage = roleService.list(roleDTO, pageableDTO);
                return ResponseEntity.ok(rolePage);
           } else {
                
-               List<Role> roles = roleService.list(roleDTO);
+               List<Role> roles = roleService.list();
                return ResponseEntity.ok(roles);
           }
      }
@@ -118,9 +123,11 @@ public class RoleResource {
      @ApiOperation(value = "Update Role")
      @PutMapping(value = "/{roleId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_ROLE)
-     public ResponseEntity<?> update(@PathVariable("roleId") Long roleId, @RequestBody RoleDTO roleDTO) {
+     public ResponseEntity<?> update(@PathVariable("roleId") String roleId, @RequestBody RoleDTO roleDTO) {
 
-          Role role = roleService.update(roleId, roleDTO);
+          Role role = GenericConverter.mapper(roleDTO, Role.class);
+
+          role = roleService.update(roleId, role);
 
           return ResponseEntity.ok(role);
      }
@@ -135,7 +142,7 @@ public class RoleResource {
      @ApiOperation(value = "Delete Role")
      @DeleteMapping(value = "/{roleId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_ROLE)
-     public ResponseEntity<?> delete( @PathVariable("roleId") Long roleId) {
+     public ResponseEntity<?> delete( @PathVariable("roleId") String roleId) {
 
           roleService.delete(roleId);
 

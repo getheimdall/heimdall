@@ -15,16 +15,13 @@
  */
 package br.com.conductor.heimdall.api.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.redis.core.RedisHash;
 
-import javax.persistence.*;
-import java.util.Set;
+import javax.persistence.Id;
 
 /**
  * Data class that represents the Privilege.
@@ -33,24 +30,15 @@ import java.util.Set;
  *
  */
 @Data
-@Table(name = "PRIVILEGES")
-@Entity
-@DynamicUpdate
-@DynamicInsert
 @EqualsAndHashCode(of = { "id" })
 @AllArgsConstructor
 @NoArgsConstructor
+@RedisHash("privilege")
 public class Privilege {
 
      @Id
-     @GeneratedValue(strategy = GenerationType.IDENTITY)
-     @Column(name = "ID")
-     private Long id;
+     private String id;
 
-     @Column(name = "NAME", length = 80, nullable = false)
      private String name;
 
-     @JsonBackReference
-     @ManyToMany(mappedBy = "privileges", fetch = FetchType.LAZY)
-     private Set<Role> roles;
 }

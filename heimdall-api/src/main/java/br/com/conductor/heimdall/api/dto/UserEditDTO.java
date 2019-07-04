@@ -19,7 +19,6 @@
  */
 package br.com.conductor.heimdall.api.dto;
 
-import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
 import br.com.conductor.heimdall.core.enums.Status;
 import lombok.Data;
 import org.hibernate.validator.constraints.Email;
@@ -59,5 +58,5 @@ public class UserEditDTO implements Serializable {
 
     private Status status;
 
-    private List<ReferenceIdDTO> roles;
+    private List<String> roles;
 }

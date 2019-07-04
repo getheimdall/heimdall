@@ -21,6 +21,7 @@ import br.com.conductor.heimdall.api.dto.UserPasswordDTO;
 import br.com.conductor.heimdall.api.entity.User;
 import br.com.conductor.heimdall.api.service.UserService;
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
+import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
 import br.com.conductor.heimdall.core.util.Pageable;
@@ -68,9 +69,10 @@ public class UserResource {
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_USER)
      public ResponseEntity<?> save(@RequestBody @Valid UserDTO userDTO) {
 
-          User user = userService.save(userDTO);
+          User user = GenericConverter.mapper(userDTO, User.class);
+          user = userService.save(user);
 
-          return ResponseEntity.created(URI.create(String.format("/%s/%s", "users", user.getId().toString()))).build();
+          return ResponseEntity.created(URI.create(String.format("/%s/%s", "users", user.getId()))).build();
      }
      
      /**
@@ -83,7 +85,7 @@ public class UserResource {
      @ApiOperation(value = "Find User by id", response = User.class)
      @GetMapping(value = "/{userId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_USER)
-     public ResponseEntity<?> findById(@PathVariable("userId") Long userId) {
+     public ResponseEntity<?> findById(@PathVariable("userId") String userId) {
 
           User user = userService.find(userId);
 
@@ -93,7 +95,6 @@ public class UserResource {
      /**
       * Finds all {@link User} from a request.
       * 
-      * @param userDTO				{@link UserDTO}
       * @param pageableDTO			{@link PageableDTO}
       * @return						{@link ResponseEntity}
       */
@@ -101,12 +102,12 @@ public class UserResource {
      @ApiOperation(value = "Find all Users", responseContainer = "List", response = User.class)
      @GetMapping
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_USER)
-     public ResponseEntity<?> findAll(@ModelAttribute UserDTO userDTO, @ModelAttribute PageableDTO pageableDTO) {
+     public ResponseEntity<?> findAll(@ModelAttribute PageableDTO pageableDTO) {
           
           if (!pageableDTO.isEmpty()) {
                Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
 
-               Page<User> userPage = userService.list(userDTO, pageable);
+               Page<User> userPage = userService.list(pageable);
                List<User> users = userPage.getContent();
                if (!users.isEmpty()) {
                     users.forEach(user -> user.setRoles(null));
@@ -114,7 +115,7 @@ public class UserResource {
                return ResponseEntity.ok(new PageImpl<>(users, pageable, users.size()));
           } else {
                
-               List<User> users = userService.list(userDTO);
+               List<User> users = userService.list();
                if (!users.isEmpty()) {
                     users.forEach(user -> user.setRoles(null));
                }
@@ -133,7 +134,8 @@ public class UserResource {
      @ApiOperation(value = "Update User")
      @PutMapping(value = "/{userId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_USER)
-     public ResponseEntity<?> update(@PathVariable("userId") Long userId, @RequestBody UserEditDTO userDTO) {
+     public ResponseEntity<?> update(@PathVariable("userId") String userId,
+                                     @RequestBody UserEditDTO userDTO) {
 
           User user = userService.update(userId, userDTO);
 
@@ -150,7 +152,8 @@ public class UserResource {
      @ResponseBody
      @ApiOperation(value = "Update password of the User")
      @PutMapping(value = "/password")
-     public ResponseEntity<?> updatePassword(@ApiParam(hidden = true) Principal principal, @RequestBody @Valid UserPasswordDTO userPasswordDTO) {
+     public ResponseEntity<?> updatePassword(@ApiParam(hidden = true) Principal principal,
+                                             @RequestBody @Valid UserPasswordDTO userPasswordDTO) {
 
           userService.updatePassword(principal, userPasswordDTO.getCurrentPassword(), userPasswordDTO.getNewPassword(), userPasswordDTO.getConfirmNewPassword());
 
@@ -167,7 +170,7 @@ public class UserResource {
      @ApiOperation(value = "Delete User")
      @DeleteMapping(value = "/{userId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_USER)
-     public ResponseEntity<?> delete( @PathVariable("userId") Long userId) {
+     public ResponseEntity<?> delete( @PathVariable("userId") String userId) {
 
           userService.delete(userId);
 

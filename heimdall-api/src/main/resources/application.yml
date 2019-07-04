@@ -20,27 +20,6 @@ heimdall:
     rewrite:
         enable: false
         prefix: heimdall
-    datasource:
-        initializationFailTimeout: -1
-        dataBaseType: POSTGRESQL
-        socketTimeout: 10000
-        loginTimeout: 10000
-        minimumIdle: 0
-        maximumPoolSize: 50
-        validationTimeout: 10000
-        idleTimeout: 10000
-        connectionTimeout: 10000
-        dataSourceClassName: org.postgresql.ds.PGSimpleDataSource
-        connectionTestQuery: SELECT 1
-        autoCommit: false
-        initializationFailFast: false
-        appName: HEIMDALL
-        databaseName: heimdall
-        portNumber: 5432
-        serverName: 127.0.0.1
-        username: postgres
-        password: 123456
-        sendStringParametersAsUnicode: false
     redis:
         host: 127.0.0.1
         port: 6379
@@ -62,34 +41,32 @@ heimdall:
             secret: secretKey
 
 spring:
+    redis:
+        host: 127.0.0.1
+        port: 6379
     pid:
         fail-on-write-error: false
         file: heimdall.pid
-    jpa:
-        database-platform: org.hibernate.dialect.PostgreSQLDialect
-        database: POSTGRESQL
-        openInView: false
-        show_sql: true
-        generate-ddl: false
-        hibernate:
-            ddl-auto: none
-            naming-strategy: org.hibernate.cfg.EJB3NamingStrategy
+#    jpa:
+#        database-platform: org.hibernate.dialect.PostgreSQLDialect
+#        database: POSTGRESQL
+#        openInView: false
+#        show_sql: true
+#        generate-ddl: false
+#        hibernate:
+#            ddl-auto: none
+#            naming-strategy: org.hibernate.cfg.EJB3NamingStrategy
     jackson:
         serialization:
             INDENT_OUTPUT: true
             WRITE-DATES-AS-TIMESTAMPS: false
     rabbitmq:
-        host: 127.0.0.1
+        host: 192.168.10.200
         port: 5672
-#        virtual-host: dev
+        virtual-host: dev
         requested-heartbeat: 10
     cache:
-        type: redis
-    http:
-        multipart:
-            enabled: true
-            max-file-size: 25MB
-            max-request-size: 25MB
+        type: simple
 
 springfox:
     documentation:

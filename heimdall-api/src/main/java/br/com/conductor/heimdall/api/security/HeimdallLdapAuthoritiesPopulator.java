@@ -21,7 +21,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
+import br.com.conductor.heimdall.api.service.PrivilegeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.security.core.GrantedAuthority;
@@ -32,7 +34,7 @@ import org.springframework.stereotype.Component;
 import br.com.conductor.heimdall.api.entity.Privilege;
 import br.com.conductor.heimdall.api.entity.Role;
 import br.com.conductor.heimdall.api.entity.User;
-import br.com.conductor.heimdall.api.enums.TypeUser;
+import br.com.conductor.heimdall.api.enums.UserType;
 import br.com.conductor.heimdall.api.repository.RoleRepository;
 import br.com.conductor.heimdall.api.repository.UserRepository;
 
@@ -53,6 +55,9 @@ public class HeimdallLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
      @Autowired
      private RoleRepository roleRepository;
 
+     @Autowired
+     private PrivilegeService privilegeService;
+
      /**
       * If it can not find the user it creates one from the {@link DirContextOperations} provided.<br>
       * <br>
@@ -62,56 +67,39 @@ public class HeimdallLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
      @Override
      public Collection<? extends GrantedAuthority> getGrantedAuthorities(DirContextOperations userData, String username) {
 
-          User user = repository.findByUserNameAndType(username, TypeUser.LDAP);
+          User user = repository.findByUserNameAndType(username, UserType.LDAP);
 
           if (user == null) {
                User addUser = new User();
                addUser.setEmail(userData.getStringAttribute("mail"));
                addUser.setFirstName(userData.getStringAttribute("givenName"));
                addUser.setLastName(userData.getStringAttribute("sn"));
-               addUser.setType(TypeUser.LDAP);
+               addUser.setType(UserType.LDAP);
                addUser.setPassword(UUID.randomUUID().toString());
                addUser.setUserName(username);
                
                Set<Role> roles = roleRepository.findByName(Role.DEFAULT);
-               addUser.setRoles(roles);
+               addUser.setRoles(roles.stream().map(Role::getId).collect(Collectors.toSet()));
                
                repository.save(addUser);
                user = addUser;
           }
 
-          return getAuthorities(user.getRoles());
+          return getAuthorities(user);
      }
 
      /*
       * Returns a Collection of granted authorities.
       */
-     private final Collection<? extends GrantedAuthority> getAuthorities(final Collection<Role> roles) {
+     private final Collection<? extends GrantedAuthority> getAuthorities(final User user) {
 
-          return getGrantedAuthorities(getPrivileges(roles));
-     }
-
-     /*
-      * Returns a list of privileges.
-      */
-     private final List<String> getPrivileges(final Collection<Role> roles) {
-
-          final List<String> privileges = new ArrayList<String>();
-          final Set<Privilege> collection = new HashSet<Privilege>();
-          for (final Role role : roles) {
-               collection.addAll(role.getPrivileges());
-          }
-          for (final Privilege item : collection) {
-               privileges.add(item.getName());
-          }
-
-          return privileges;
+          return getGrantedAuthorities(privilegeService.list(user).stream().map(Privilege::getId).collect(Collectors.toSet()));
      }
 
      /*
       * Returns a List of granted authorities.
       */
-     private final List<GrantedAuthority> getGrantedAuthorities(final List<String> privileges) {
+     private final List<GrantedAuthority> getGrantedAuthorities(final Set<String> privileges) {
 
           final List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
           for (final String privilege : privileges) {

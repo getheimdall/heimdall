@@ -15,7 +15,6 @@
  */
 package br.com.conductor.heimdall.api.service;
 
-import br.com.conductor.heimdall.api.dto.LdapDTO;
 import br.com.conductor.heimdall.api.entity.Ldap;
 import br.com.conductor.heimdall.api.repository.LdapRepository;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
@@ -36,15 +35,14 @@ public class LdapService {
     @Autowired
     private LdapRepository ldapRepository;
 
-    public Ldap save(LdapDTO ldapDTO){
+    public Ldap save(Ldap ldap){
 
-        Ldap ldap;
 
-        if (Objects.nonNull(ldapDTO.getId())) {
-            Ldap ldapFound = ldapRepository.findOne(ldapDTO.getId());
-            ldap = GenericConverter.mapper(ldapDTO, ldapFound);
+        if (Objects.nonNull(ldap.getId())) {
+            Ldap ldapFound = ldapRepository.findOne(ldap.getId());
+            ldap = GenericConverter.mapper(ldap, ldapFound);
         } else {
-            ldap = GenericConverter.mapper(ldapDTO, Ldap.class);
+            ldap = GenericConverter.mapper(ldap, Ldap.class);
         }
 
         return ldapRepository.save(ldap);
@@ -56,7 +54,7 @@ public class LdapService {
      * @return The {@link Ldap}
      */
     public Ldap getLdap() {
-        return this.ldapRepository.findOne(1L);
+        return this.ldapRepository.findAll().stream().findFirst().orElse(null);
     }
 
     /**

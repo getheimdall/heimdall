@@ -16,7 +16,7 @@
 package br.com.conductor.heimdall.api.security;
 
 /**
- * Provides methods to retrive the username and password of a Credential.
+ * Provides methods to retrieve the username and password of a Credential.
  *
  * @author Marcos Filho
  *

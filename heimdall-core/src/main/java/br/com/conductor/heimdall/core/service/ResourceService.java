@@ -189,9 +189,9 @@ public class ResourceService {
 
         // Deletes all operations attached to the Resource
         operationService.deleteAllfromResource(apiId, resourceId);
-//
-//        // Deletes all interceptors attached to the Resource
-// TODO       interceptorService.deleteAllfromResource(resourceId);
+
+        // Deletes all interceptors attached to the Resource
+        interceptorService.deleteAllfromResource(resourceId);
 
         resourceRepository.delete(resource.getId());
 

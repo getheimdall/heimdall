@@ -21,8 +21,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import br.com.conductor.heimdall.api.entity.User;
-import br.com.conductor.heimdall.api.enums.TypeUser;
+import br.com.conductor.heimdall.api.enums.UserType;
 import br.com.conductor.heimdall.api.security.CredentialSecurity;
+import org.springframework.stereotype.Repository;
 
 /**
  * Extends {@link JpaRepository}. Provides methods to find a {@link User} and the {@link CredentialSecurity}.
@@ -30,7 +31,8 @@ import br.com.conductor.heimdall.api.security.CredentialSecurity;
  * @author Marcos Filho
  *
  */
-public interface UserRepository extends JpaRepository<User, Long> {
+@Repository
+public interface UserRepository extends JpaRepository<User, String> {
 
 	 /**
 	  * Finds a {@link User} by its username.
@@ -41,22 +43,21 @@ public interface UserRepository extends JpaRepository<User, Long> {
      User findByUserName(String username);
      
      /**
-      * Finds a {@link User} by its username and {@link TypeUser}.
+      * Finds a {@link User} by its username and {@link UserType}.
       * 
 	  * @param username		The User username.
-      * @param type			{@link TypeUser}
+      * @param type			{@link UserType}
 	  * @return				{@link User}
       */
-     User findByUserNameAndType(@Param("username") String username, @Param("type") TypeUser type);
+     User findByUserNameAndType(String username, UserType type);
 
      /**
-      * Finds a {@link CredentialSecurity} by {@link User} username and {@link TypeUser}.
+      * Finds a {@link CredentialSecurity} by {@link User} username and {@link UserType}.
       * 
 	  * @param username		The User username.
-      * @param type			{@link TypeUser}
+      * @param type			{@link UserType}
       * @return				{@link CredentialSecurity}
       */
-     @Query(value = "SELECT userName as userName, password as password FROM User WHERE userName = ?1 and type = ?2 and status =?3 ")
-     CredentialSecurity findCredentialByUserNameAndTypeAndStatus(String username, TypeUser type, Status status);
+     User findByUserNameAndTypeAndStatus(String username, UserType type, Status status);
      
 }

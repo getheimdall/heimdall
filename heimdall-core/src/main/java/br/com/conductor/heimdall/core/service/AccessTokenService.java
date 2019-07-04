@@ -69,6 +69,10 @@ public class AccessTokenService {
         return accessTokenRepository.findByApp(appId);
     }
 
+    public AccessToken findByCode(String code) {
+        return accessTokenRepository.findByCode(code);
+    }
+
     /**
      * Returns a paged list of all {@link AccessToken} from a request.
      *

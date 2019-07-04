@@ -64,7 +64,7 @@ public enum ExceptionMessage {
 
     INTERCEPTOR_IGNORED_INVALID(BAD_REQUEST.value(), "Reference operations invalid: {}", BadRequestException.class),
 
-    INTERCEPTOR_INVALID_LIFECYCLE(BAD_REQUEST.value(), "{} interceptor can not be attached to the Plan life cycle", BadRequestException.class),
+    INTERCEPTOR_INVALID_LIFECYCLE(BAD_REQUEST.value(), "ClientID interceptor can not be attached to the Plan life cycle", BadRequestException.class),
 
     ACCESS_TOKEN_NOT_FOUND(BAD_REQUEST.value(), "Access token not found", BadRequestException.class),
 

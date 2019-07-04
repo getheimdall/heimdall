@@ -33,15 +33,6 @@ import br.com.conductor.heimdall.core.util.ConstantsCache;
 public interface AccessTokenRepository extends JpaRepository<AccessToken, String> {
 
     /**
-     * Finds a active {@link AccessToken} by its code.
-     *
-     * @param code The AccessToken code
-     * @return The AccessToken
-     */
-    @Query("select ac from AccessToken ac join ac.plans p join fetch ac.app a where ac.code = :code and ac.status = 'ACTIVE' and (ac.expiredDate >= CURRENT_TIMESTAMP or ac.expiredDate is null) and p.status = 'ACTIVE' ")
-    AccessToken findAccessTokenActive(@Param("code") String code);
-
-    /**
      * Finds a {@link AccessToken} by its code.
      *
      * @param code The AccessToken code

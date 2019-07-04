@@ -43,10 +43,7 @@ import org.springframework.util.ReflectionUtils;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -61,16 +58,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class InterceptorFileService {
 	
-	@Autowired
-	private OperationJDBCRepository operationJdbcRepository;
-
     @Value("${zuul.filter.root}")
     private String zuulFilterRoot;
 
     private static final String API_ID = "apiId";
     private static final String EXECUTION_POINT = "executionPoint";
     private static final String IGNORED_OPERATIONS = "ignoredOperations";
-    private static final String IGNORED_RESOURCES = "ignoredResources";
     private static final String INTERCEPTOR_ID = "interceptor-id";
     private static final String INTERCEPTOR_STATUS = "interceptorStatus";
     private static final String INTERCEPTOR_TYPE = "interceptorType";
@@ -93,10 +86,7 @@ public class InterceptorFileService {
         String template = templateInterceptor(interceptor.getType(), interceptor.getExecutionPoint());
 
         if (template != null) {
-        	List<Long> ignoredOperations = operationJdbcRepository.findIgnoredOperationsFromInterceptor(interceptor.getId());
-        	if (ignoredOperations != null && !ignoredOperations.isEmpty()) {
-        		interceptor.setIgnoredOperations(new HashSet<>(ignoredOperations));
-        	}
+
             final Map<String, Object> parameters = buildParametersFile(interceptor);
 
             generateFileInterceptor(template, parameters);
@@ -115,11 +105,10 @@ public class InterceptorFileService {
         final long INVALID_REFERENCE_ID = -1L;
 
         Map<String, Object> parameters = new HashMap<>();
-        parameters.put(API_ID, interceptor.getApi().getId());
+        parameters.put(API_ID, interceptor.getApiId());
         parameters.put(INTERCEPTOR_ID, interceptor.getId());
         parameters.put(EXECUTION_POINT, interceptor.getExecutionPoint().getFilterType());
         parameters.put(IGNORED_OPERATIONS, interceptor.getIgnoredOperations());
-        parameters.put(IGNORED_RESOURCES, interceptor.getIgnoredResources());
         parameters.put(INTERCEPTOR_STATUS, interceptor.getStatus());
         parameters.put(INTERCEPTOR_TYPE, interceptor.getType());
         parameters.put(LIFECYCLE, interceptor.getLifeCycle().name());

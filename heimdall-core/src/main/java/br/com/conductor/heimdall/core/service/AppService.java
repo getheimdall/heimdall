@@ -75,6 +75,10 @@ public class AppService {
           return app;
      }
 
+     public App findByClientId(String clientId) {
+          return appRepository.findByClientId(clientId);
+     }
+
      /**
       * Generates a paged list of App.
       *

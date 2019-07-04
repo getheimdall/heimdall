@@ -65,6 +65,9 @@ public class ApiService {
     private ResourceService resourceService;
 
     @Autowired
+    private InterceptorService interceptorService;
+
+    @Autowired
     private PlanService planService;
 
     @Autowired
@@ -220,6 +223,8 @@ public class ApiService {
         Api api = this.find(id);
 
         resourceService.deleteAllFromApi(id);
+
+        interceptorService.deleteAllFromApi(id);
 
         apiRepository.delete(api);
         amqpRoute.dispatchRoutes();

@@ -19,6 +19,8 @@ import br.com.conductor.heimdall.api.enums.CredentialStateEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -26,22 +28,18 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "CREDENTIAL_STATE")
-@Entity
+@RedisHash("credentialState")
 public class CredentialState implements Serializable {
 
     @Id
-    @Column(name = "ID")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @Column(name = "JTI", length = 50, nullable = false, unique = true)
+    @Indexed
     private String jti;
 
-    @Column(name = "USERNAME", length = 30, nullable = false)
+    @Indexed
     private String username;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "STATE", length = 20, nullable = false)
+    @Indexed
     private CredentialStateEnum state;
 }

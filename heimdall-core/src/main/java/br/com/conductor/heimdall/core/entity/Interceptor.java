@@ -24,6 +24,7 @@ import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -58,73 +59,30 @@ public class Interceptor implements Serializable {
      
      private TypeExecutionPoint executionPoint;
 
-     private String environmentId;
-
      private String content;
      
      private LocalDateTime creationDate;
 
-     private Set<Long> ignoredResources = new HashSet<>();
+     private Set<String> ignoredOperations = new HashSet<>();
 
-     private Set<Long> ignoredOperations = new HashSet<>();
-     
      @JsonIgnore
+     @Indexed
+     private String apiId;
+
+     @JsonIgnore
+     @Indexed
      private String planId;
 
      @JsonIgnore
+     @Indexed
      private String resourceId;
 
      @JsonIgnore
+     @Indexed
      private String operationId;
 
-     @Transient
      private String referenceId;
-     
-     @JsonIgnore
-     private String apiId;
 
      private Boolean status;
-     
-     private void initValuesPersist() {
-
-          creationDate = LocalDateTime.now();
-          
-          switch (lifeCycle) {
-               case API:
-                    apiId = referenceId;
-                    break;
-               case PLAN:
-                    planId = referenceId;
-                    break;
-               case RESOURCE:
-                    resourceId = referenceId;
-                    break;
-               case OPERATION:
-                    operationId = referenceId;
-                    break;
-               default:
-                    break;
-          }
-     }
-
-     private void initValuesLoad() {
-          
-          switch (lifeCycle) {
-               case API:
-                    referenceId = apiId;
-                    break;
-               case PLAN:
-                    referenceId = planId;
-                    break;
-               case RESOURCE:
-                    referenceId = resourceId;
-                    break;
-               case OPERATION:
-                    referenceId = operationId;
-                    break;
-               default:
-                    break;
-          }
-     }
 
 }

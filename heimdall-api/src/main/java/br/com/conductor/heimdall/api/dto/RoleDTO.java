@@ -40,5 +40,5 @@ public class RoleDTO {
      @Size(max = 80, min = 6)
      private String name;
 
-     private List<ReferenceIdDTO> privileges;
+     private List<String> privileges;
 }

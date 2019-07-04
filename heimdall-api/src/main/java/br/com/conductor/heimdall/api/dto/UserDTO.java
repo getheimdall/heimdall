@@ -66,5 +66,5 @@ public class UserDTO implements Serializable {
 
      private Status status = Status.ACTIVE;
 
-     private List<ReferenceIdDTO> roles;
+     private List<String> roles;
 }

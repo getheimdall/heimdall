@@ -22,6 +22,6 @@ package br.com.conductor.heimdall.api.enums;
  * @author Marcos Filho
  *
  */
-public enum TypeUser {
+public enum UserType {
      LDAP, DATABASE
 }

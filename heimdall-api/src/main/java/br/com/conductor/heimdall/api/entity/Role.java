@@ -23,6 +23,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.redis.core.index.Indexed;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -31,36 +32,24 @@ import java.util.Set;
  * Data class that represents the Role.
  *
  * @author Marcos Filho
- *
  */
 @Data
-@Table(name = "ROLES")
-@Entity
-@DynamicUpdate
-@DynamicInsert
-@EqualsAndHashCode(of = { "id" })
+@EqualsAndHashCode(of = {"id"})
 @AllArgsConstructor
 @NoArgsConstructor
 public class Role {
 
-     public static final String DEFAULT = "DEFAULT";
+    public static final String DEFAULT = "DEFAULT";
 
-     @Id
-     @GeneratedValue(strategy = GenerationType.IDENTITY)
-     @Column(name = "ID")
-     private Long id;
-  
-     @Column(name = "NAME", length = 80, nullable = false)
-     private String name;
-     
-     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
-     @JsonIgnore
-     private Set<User> users;
-  
-     @JsonManagedReference
-     @ManyToMany(fetch = FetchType.EAGER)
-     @JoinTable(name = "ROLES_PRIVILEGES", 
-               joinColumns = @JoinColumn(name = "ROLE_ID", referencedColumnName = "id"), 
-               inverseJoinColumns = @JoinColumn(name = "PRIVILEGE_ID", referencedColumnName = "id"))
-     private Set<Privilege> privileges;
+    @Id
+    private String id;
+
+    @Indexed
+    private String name;
+
+    @JsonIgnore
+    private Set<String> users;
+
+    private Set<String> privileges;
+
 }

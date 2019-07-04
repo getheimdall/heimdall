@@ -21,6 +21,7 @@ import br.com.conductor.heimdall.api.service.PrivilegeService;
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
+import br.com.conductor.heimdall.core.util.Pageable;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -33,6 +34,7 @@ import java.util.List;
 import java.util.Set;
 
 import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_PRIVILEGES;
+
 
 /**
  * Uses a {@link PrivilegeService} to provide methods to find one or more {@link Privilege}.
@@ -54,13 +56,13 @@ public class PrivilegeResource {
      * Finds a {@link Privilege} by its Id.
      *
      * @param id The Privilege Id
-     * @return                        {@link ResponseEntity}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Find Privileges by id", response = Privilege.class)
     @GetMapping(value = "/{apiId}")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_PRIVILEGE)
-    public ResponseEntity<?> findById(@PathVariable("apiId") Long id) {
+    public ResponseEntity<?> findById(@PathVariable("apiId") String id) {
 
         Privilege privilege = privilegeService.find(id);
 
@@ -70,23 +72,23 @@ public class PrivilegeResource {
     /**
      * Finds all {@link Privilege} from a request.
      *
-     * @param privilegeDTO {@link PrivilegeDTO}
      * @param pageableDTO  {@link PageableDTO}
-     * @return                        {@link ResponseEntity}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Find all Privileges", responseContainer = "List", response = Privilege.class)
     @GetMapping
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_PRIVILEGE)
-    public ResponseEntity<?> findAll(@ModelAttribute PrivilegeDTO privilegeDTO,
-                                     @ModelAttribute PageableDTO pageableDTO) {
+    public ResponseEntity<?> findAll(@ModelAttribute PageableDTO pageableDTO) {
 
         if (!pageableDTO.isEmpty()) {
-            Page<Privilege> privilegePagePage = privilegeService.list(privilegeDTO, pageableDTO);
+
+            Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+            Page<Privilege> privilegePagePage = privilegeService.list(pageable);
 
             return ResponseEntity.ok(privilegePagePage);
         } else {
-            List<Privilege> privileges = privilegeService.list(privilegeDTO);
+            List<Privilege> privileges = privilegeService.list();
 
             return ResponseEntity.ok(privileges);
         }

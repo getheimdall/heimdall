@@ -35,7 +35,7 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
  * @see <a href="https://projects.spring.io/spring-boot/">https://projects.spring.io/spring-boot/</a>
  * 
  */
-@SpringBootApplication(exclude = {MongoAutoConfiguration.class, MongoDataAutoConfiguration.class})
+@SpringBootApplication
 @EnableConfigurationProperties({ Property.class, JwtProperty.class})
 @ComponentScan(basePackages = { "br.com.conductor.heimdall.api", "br.com.conductor.heimdall.core" })
 @EntityScan({"br.com.conductor.heimdall.core.entity", "br.com.conductor.heimdall.api.entity"})

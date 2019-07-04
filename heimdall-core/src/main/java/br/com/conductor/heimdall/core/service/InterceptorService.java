@@ -18,13 +18,11 @@ package br.com.conductor.heimdall.core.service;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.InterceptorDTO;
 import br.com.conductor.heimdall.core.dto.InterceptorFileDTO;
-import br.com.conductor.heimdall.core.dto.interceptor.RateLimitDTO;
 import br.com.conductor.heimdall.core.entity.*;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.enums.TypeInterceptor;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
-import br.com.conductor.heimdall.core.interceptor.impl.RattingHeimdallInterceptor;
 import br.com.conductor.heimdall.core.repository.*;
 import br.com.conductor.heimdall.core.service.amqp.AMQPInterceptorService;
 import br.com.conductor.heimdall.core.util.ConstantsCache;
@@ -37,7 +35,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 
@@ -115,41 +117,41 @@ public class InterceptorService {
     /**
      * Saves a {@link Interceptor} to the repository.
      *
-     * @param interceptorDTO The {@link InterceptorDTO}
+     * @param interceptor The {@link Interceptor}
      * @return The {@link Interceptor} saved
      */
     @Transactional
-    public Interceptor save(InterceptorDTO interceptorDTO) {
+    public Interceptor save(final Interceptor interceptor) {
 
-        Interceptor interceptor = GenericConverter.mapper(interceptorDTO, Interceptor.class);
-
-        interceptor = validateLifeCycle(interceptor);
+        updatesReferenceId(interceptor);
 
         validateTemplate(interceptor.getType(), interceptor.getContent());
 
         if (TypeInterceptor.CORS.equals(interceptor.getType())) {
-            validateFilterCors(interceptor);
+            HeimdallException.checkThrow(!InterceptorLifeCycle.API.equals(interceptor.getLifeCycle()), ExceptionMessage.CORS_INTERCEPTOR_NOT_API_LIFE_CYCLE);
+            HeimdallException.checkThrow(apiService.find(interceptor.getApiId()).isCors(), ExceptionMessage.CORS_INTERCEPTOR_ALREADY_ASSIGNED_TO_THIS_API);
         }
 
-//        List<String> ignoredResources = ignoredValidate(interceptorDTO.getIgnoredResources(), resourceRepository);
-//        HeimdallException.checkThrow(!ignoredResources.isEmpty(), INTERCEPTOR_IGNORED_INVALID, ignoredResources.toString());
-//
-//        List<String> ignoredOperations = ignoredValidate(interceptorDTO.getIgnoredOperations(), operationRepository);
-//        HeimdallException.checkThrow(!ignoredOperations.isEmpty(), INTERCEPTOR_IGNORED_INVALID, ignoredOperations.toString());
+        final Set<String> ignoredOperations = validateIgnoredOperations(interceptor.getIgnoredOperations());
+        HeimdallException.checkThrow(!ignoredOperations.isEmpty(), INTERCEPTOR_IGNORED_INVALID, ignoredOperations.toString());
 
-        HeimdallException.checkThrow((TypeInterceptor.CLIENT_ID.equals(interceptor.getType()) && InterceptorLifeCycle.PLAN.equals(interceptor.getLifeCycle())), INTERCEPTOR_INVALID_LIFECYCLE, interceptor.getType().name());
+        HeimdallException.checkThrow(
+                (TypeInterceptor.CLIENT_ID.equals(interceptor.getType()) && InterceptorLifeCycle.PLAN.equals(interceptor.getLifeCycle())),
+                INTERCEPTOR_INVALID_LIFECYCLE);
 
-        interceptor = interceptorRepository.save(interceptor);
+        interceptor.setCreationDate(LocalDateTime.now());
 
-         if (TypeInterceptor.CORS.equals(interceptor.getType())) {
-            Api api = apiService.find(interceptor.getApiId());
+        final Interceptor savedInterceptor = interceptorRepository.save(interceptor);
+
+        if (TypeInterceptor.CORS.equals(savedInterceptor.getType())) {
+            Api api = apiService.find(savedInterceptor.getApiId());
             api.setCors(true);
             apiService.update(api);
         }
 
-        amqpInterceptorService.dispatchInterceptor(interceptor.getId());
+        amqpInterceptorService.dispatchInterceptor(savedInterceptor.getId());
 
-        return interceptor;
+        return savedInterceptor;
     }
 
     private void validateTemplate(TypeInterceptor type, String content) {
@@ -159,32 +161,27 @@ public class InterceptorService {
     /**
      * Updates a {@link Interceptor} by its ID.
      *
-     * @param id             The ID of the {@link Interceptor} to be updated
-     * @param interceptorDTO The {@link InterceptorDTO}
+     * @param id                 The ID of the {@link Interceptor} to be updated
+     * @param interceptorPersist The {@link InterceptorDTO}
      * @return The updated {@link Interceptor}
      */
-    public Interceptor update(String id, InterceptorDTO interceptorDTO) {
+    public Interceptor update(String id, final Interceptor interceptorPersist) {
 
-        Interceptor interceptor = this.find(id);
-        interceptor = GenericConverter.mapper(interceptorDTO, interceptor);
+        final Interceptor interceptor = this.find(id);
+        GenericConverter.mapper(interceptorPersist, interceptor);
 
-        if (TypeInterceptor.CORS.equals(interceptor.getType())) {
-            HeimdallException.checkThrow(interceptor.getLifeCycle() != InterceptorLifeCycle.API, ExceptionMessage.CORS_INTERCEPTOR_NOT_API_LIFE_CYCLE);
-        }
-
-        interceptor = validateLifeCycle(interceptor);
+        updatesReferenceId(interceptor);
 
         validateTemplate(interceptor.getType(), interceptor.getContent());
 
-        if (TypeInterceptor.RATTING == interceptor.getType()) {
-            RateLimitDTO rateLimitDTO = new RattingHeimdallInterceptor().parseContent(interceptor.getContent());
-            ratelimitRepository.mountRatelimit(interceptor.getId(), rateLimitDTO.getCalls(), rateLimitDTO.getInterval());
+        if (TypeInterceptor.CORS.equals(interceptor.getType())) {
+            HeimdallException.checkThrow(!InterceptorLifeCycle.API.equals(interceptor.getLifeCycle()), ExceptionMessage.CORS_INTERCEPTOR_NOT_API_LIFE_CYCLE);
         }
 
-        interceptor = interceptorRepository.save(interceptor);
-        amqpInterceptorService.dispatchInterceptor(interceptor.getId());
+        final Interceptor updatedInterceptor = interceptorRepository.save(interceptor);
+        amqpInterceptorService.dispatchInterceptor(updatedInterceptor.getId());
 
-        return interceptor;
+        return updatedInterceptor;
     }
 
     /**
@@ -207,9 +204,9 @@ public class InterceptorService {
             ratelimitRepository.delete(path);
         }
 
-         if (TypeInterceptor.CORS.equals(interceptor.getType())) {
-             final Api api = apiService.find(interceptor.getApiId());
-             api.setCors(false);
+        if (TypeInterceptor.CORS.equals(interceptor.getType())) {
+            final Api api = apiService.find(interceptor.getApiId());
+            api.setCors(false);
             apiService.update(api);
         }
 
@@ -221,21 +218,44 @@ public class InterceptorService {
     /**
      * Deletes all Interceptors from a Operation
      *
-     * @param operationId Operation with the attatched Interceptors
+     * @param operationId Operation with the attached Interceptors
      */
     @Transactional
     public void deleteAllfromOperation(String operationId) {
-        List<Interceptor> interceptors = interceptorRepository.findByOperationId(operationId);
-        interceptors.forEach(interceptor -> this.delete(interceptor.getId()));
+        this.deleteAll(interceptorRepository.findAllByOperationId(operationId));
     }
+
     /**
      * Deletes all Interceptors from a Resource
      *
-     * @param resourceId Resource with the attatched Interceptors
+     * @param resourceId Resource with the attached Interceptors
      */
     @Transactional
     public void deleteAllfromResource(String resourceId) {
-        List<Interceptor> interceptors = interceptorRepository.findByResourceId(resourceId);
+        this.deleteAll(interceptorRepository.findAllByResourceId(resourceId));
+    }
+
+    /**
+     * Deletes all Interceptors from a Api
+     *
+     * @param planId Plan with the attached Interceptors
+     */
+    @Transactional
+    public void deleteAllFromPlan(String planId) {
+        this.deleteAll(interceptorRepository.findAllByPlanId(planId));
+    }
+
+    /**
+     * Deletes all Interceptors from a Api
+     *
+     * @param apiId Api with the attached Interceptors
+     */
+    @Transactional
+    public void deleteAllFromApi(String apiId) {
+        this.deleteAll(interceptorRepository.findAllByApiId(apiId));
+    }
+
+    private void deleteAll(List<Interceptor> interceptors) {
         interceptors.forEach(interceptor -> this.delete(interceptor.getId()));
     }
 
@@ -246,65 +266,45 @@ public class InterceptorService {
      * @param interceptor The {@link Interceptor} to be validated
      * @return The validated {@link Interceptor}
      */
-    private Interceptor validateLifeCycle(Interceptor interceptor) {
+    private void updatesReferenceId(Interceptor interceptor) {
+
+        interceptor.setResourceId(null);
+        interceptor.setOperationId(null);
+        interceptor.setPlanId(null);
 
         switch (interceptor.getLifeCycle()) {
-            case API:
-                final Api api = apiService.find(interceptor.getReferenceId());
-                interceptor.setResourceId(null);
-                interceptor.setOperationId(null);
-                interceptor.setPlanId(null);
-                interceptor.setApiId(api.getId());
-                break;
             case PLAN:
                 final Plan plan = planService.find(interceptor.getReferenceId());
-                interceptor.setResourceId(null);
-                interceptor.setOperationId(null);
                 interceptor.setPlanId(plan.getId());
-                interceptor.setApiId(plan.getApiId());
                 break;
             case RESOURCE:
-                Resource resource = resourceService.find(interceptor.getReferenceId());
-                interceptor.setOperationId(null);
-                interceptor.setPlanId(null);
+                final Resource resource = resourceService.find(interceptor.getReferenceId());
                 interceptor.setResourceId(resource.getId());
-                interceptor.setApiId(resource.getApiId());
                 break;
             case OPERATION:
-                Operation operation = operationService.find(interceptor.getReferenceId());
-                interceptor.setResourceId(null);
-                interceptor.setPlanId(null);
+                final Operation operation = operationService.find(interceptor.getReferenceId());
                 interceptor.setOperationId(operation.getId());
-                interceptor.setApiId(operation.getApiId());
                 break;
             default:
                 break;
         }
-
-        return interceptor;
     }
 
-    private void validateFilterCors(Interceptor interceptor) {
-        HeimdallException.checkThrow(interceptor.getLifeCycle() != InterceptorLifeCycle.API, ExceptionMessage.CORS_INTERCEPTOR_NOT_API_LIFE_CYCLE);
-        HeimdallException.checkThrow(apiService.find(interceptor.getApiId()).isCors(),
-                ExceptionMessage.CORS_INTERCEPTOR_ALREADY_ASSIGNED_TO_THIS_API);
-    }
+    private Set<String> validateIgnoredOperations(Set<String> ignoredList) {
 
-//    private List<String> ignoredValidate(List<String> ignoredList, JpaRepository<?, String> repository) {
-//
-//        List<String> invalids = new ArrayList<>();
-//        if (ignoredList != null && !ignoredList.isEmpty()) {
-//
-//            for (String ignored : ignoredList) {
-//
-//                Object o = repository.find(ignored);
-//                if (o == null) {
-//                    invalids.add(ignored);
-//                }
-//            }
-//        }
-//
-//        return invalids;
-//    }
+        Set<String> invalids = new HashSet<>();
+        if (ignoredList != null && !ignoredList.isEmpty()) {
+
+            for (String ignored : ignoredList) {
+
+                Object o = operationService.find(ignored);
+                if (o == null) {
+                    invalids.add(ignored);
+                }
+            }
+        }
+
+        return invalids;
+    }
 
 }

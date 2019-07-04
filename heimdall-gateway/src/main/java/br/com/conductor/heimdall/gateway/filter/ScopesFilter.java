@@ -20,7 +20,11 @@
 package br.com.conductor.heimdall.gateway.filter;
 
 import br.com.conductor.heimdall.core.entity.App;
+import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.repository.AppRepository;
+import br.com.conductor.heimdall.core.service.AppService;
+import br.com.conductor.heimdall.core.service.PlanService;
+import br.com.conductor.heimdall.core.service.ScopeService;
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.core.trace.FilterDetail;
 import br.com.conductor.heimdall.core.trace.TraceContextHolder;
@@ -47,7 +51,13 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 public class ScopesFilter extends ZuulFilter {
 
     @Autowired
-    private AppRepository appRepository;
+    private AppService appService;
+
+    @Autowired
+    private PlanService planService;
+
+    @Autowired
+    private ScopeService scopeService;
 
     private FilterDetail detail = new FilterDetail();
 
@@ -93,26 +103,26 @@ public class ScopesFilter extends ZuulFilter {
 
         if (client_id != null) {
 
-            App app = appRepository.findByClientId(client_id);
+            App app = appService.findByClientId(client_id);
             if (app == null || app.getPlans() == null) return;
 
-            Set<Long> apis = app.getPlans().stream().map(plan -> plan.getApi().getId()).collect(Collectors.toSet());
-            Long apiId = (Long) context.get(API_ID);
+            Set<Plan> plans = app.getPlans().stream().map(plan -> planService.find(plan)).collect(Collectors.toSet());
+
+            Set<String> apis = plans.stream().map(Plan::getApiId).collect(Collectors.toSet());
+            String apiId = (String) context.get(API_ID);
             if (!apis.contains(apiId)) return;
 
-            final Set<Long> allowedOperations = new HashSet<>();
+            final Set<String> allowedOperations = new HashSet<>();
 
-            app.getPlans()
-                    .forEach(plan -> {
-                        if (plan != null && plan.getApi().getId().equals(apiId))
-                            plan.getScopes()
-                                    .forEach(scope -> {
-                                        if (scope != null)
-                                            allowedOperations.addAll(scope.getOperationsIds());
-                                    });
-                    });
+            plans.forEach(plan -> {
+                if (plan != null && plan.getApiId().equals(apiId)) {
+                    plan.getScopes().stream()
+                            .map(scopeId -> scopeService.find(apiId, scopeId))
+                            .forEach(scope -> allowedOperations.addAll(scope.getOperations()));
+                }
+            });
 
-            final Long operation = (Long) context.get(OPERATION_ID);
+            final String operation = (String) context.get(OPERATION_ID);
 
             if (operation == null) return;
 

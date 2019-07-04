@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import br.com.conductor.heimdall.api.entity.User;
 import br.com.conductor.heimdall.core.enums.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -30,10 +31,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import br.com.conductor.heimdall.api.entity.Privilege;
-import br.com.conductor.heimdall.api.enums.TypeUser;
-import br.com.conductor.heimdall.api.repository.PrivilegeRepository;
+import br.com.conductor.heimdall.api.enums.UserType;
 import br.com.conductor.heimdall.api.repository.UserRepository;
-import br.com.conductor.heimdall.api.security.CredentialSecurity;
 
 /**
  * Implements the {@link UserDetailsService} interface.
@@ -47,10 +46,10 @@ import br.com.conductor.heimdall.api.security.CredentialSecurity;
 public class CustomUserDetailsService implements UserDetailsService {
 
      @Autowired
-     private UserRepository repository;
+     private UserRepository userRepository;
      
      @Autowired
-     private PrivilegeRepository privRepository;
+     private PrivilegeService privilegeService;
 
      /**
       * Locates a User by its user name. Creates a {@link org.springframework.security.core.userdetails.User} that holds
@@ -61,10 +60,10 @@ public class CustomUserDetailsService implements UserDetailsService {
      @Override
      public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
 
-          final CredentialSecurity credential = repository.findCredentialByUserNameAndTypeAndStatus(username, TypeUser.DATABASE, Status.ACTIVE);
-          final Set<Privilege> privileges = privRepository.findPrivilegesByUserNameAndType(username, TypeUser.DATABASE);
+          final User user = userRepository.findByUserNameAndTypeAndStatus(username, UserType.DATABASE, Status.ACTIVE);
+          final Set<Privilege> privileges = privilegeService.list(user);
           
-          return new org.springframework.security.core.userdetails.User(credential.getUserName(), credential.getPassword(), getAuthoritiesFromPrivileges(privileges));
+          return new org.springframework.security.core.userdetails.User(user.getUserName(), user.getPassword(), getAuthoritiesFromPrivileges(privileges));
      }
      
      private final Collection<? extends GrantedAuthority> getAuthoritiesFromPrivileges(final Collection<Privilege> privileges) {

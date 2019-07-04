@@ -20,7 +20,7 @@
 package br.com.conductor.heimdall.api.dto;
 
 import br.com.conductor.heimdall.api.entity.Privilege;
-import br.com.conductor.heimdall.api.enums.TypeUser;
+import br.com.conductor.heimdall.api.enums.UserType;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -30,6 +30,9 @@ import java.util.Set;
 public class UserAuthenticateResponse implements Serializable {
 
     private String username;
-    private TypeUser type;
+
+    private UserType type;
+
     private Set<Privilege> privileges;
+
 }

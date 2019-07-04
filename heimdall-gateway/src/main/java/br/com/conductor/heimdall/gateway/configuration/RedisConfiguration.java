@@ -22,6 +22,8 @@ package br.com.conductor.heimdall.gateway.configuration;
 import br.com.conductor.heimdall.core.entity.RateLimit;
 import br.com.conductor.heimdall.core.environment.Property;
 import br.com.conductor.heimdall.core.util.ConstantsCache;
+import br.com.conductor.heimdall.gateway.service.RedisMessageSubscriber;
+import org.junit.Before;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -33,6 +35,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -51,7 +56,24 @@ public class RedisConfiguration {
      
      @Autowired
      Property property;
-     
+
+     @Bean
+     public MessageListenerAdapter messageListener() {
+          return new MessageListenerAdapter(new RedisMessageSubscriber());
+     }
+
+     @Bean
+     public RedisMessageListenerContainer redisContainer() {
+          RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+          container.setConnectionFactory(jedisConnectionFactory());
+          container.addMessageListener(messageListener(), topic());
+          return container;
+     }
+
+     @Bean
+     public ChannelTopic topic() {
+          return new ChannelTopic("messageQueue");
+     }
      /**
       * Configures and returns a {@link JedisConnectionFactory}.
       * 
@@ -88,7 +110,18 @@ public class RedisConfiguration {
           poolConfig.setBlockWhenExhausted(property.getRedis().isBlockWhenExhausted());
           return poolConfig;
      }
-     
+
+     @Bean
+     public RedisTemplate<String, Object> redisTemplate() {
+          RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+          redisTemplate.setConnectionFactory(jedisConnectionFactory());
+          redisTemplate.setKeySerializer(new StringRedisSerializer());
+          redisTemplate.setValueSerializer(new JdkSerializationRedisSerializer());
+          redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+          redisTemplate.setHashValueSerializer(new JdkSerializationRedisSerializer());
+          return redisTemplate;
+     }
+
      /**
       * Configures and returns {@link RedisTemplate} with Object and Object.
       * 
@@ -97,7 +130,7 @@ public class RedisConfiguration {
      @Bean
      public RedisTemplate<Object, Object> redisTemplateObject() {
 
-          RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<Object, Object>();
+          RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<>();
           redisTemplate.setConnectionFactory(jedisConnectionFactory());
           redisTemplate.setKeySerializer(new StringRedisSerializer());
           redisTemplate.setValueSerializer(new JdkSerializationRedisSerializer());

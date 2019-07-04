@@ -24,6 +24,7 @@ import br.com.conductor.heimdall.core.trace.FilterDetail;
 import br.com.conductor.heimdall.core.trace.TraceContextHolder;
 import com.netflix.zuul.context.RequestContext;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
 import org.springframework.cloud.netflix.zuul.filters.post.SendResponseFilter;
 
 /**
@@ -37,6 +38,10 @@ import org.springframework.cloud.netflix.zuul.filters.post.SendResponseFilter;
 public class CustomSendResponseFilter extends SendResponseFilter {
 
 	private FilterDetail detail = new FilterDetail();
+
+	public CustomSendResponseFilter() {
+		super(new ZuulProperties());
+	}
 
 	@Override
 	public boolean shouldFilter() {

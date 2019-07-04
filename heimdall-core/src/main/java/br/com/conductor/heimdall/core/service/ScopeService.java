@@ -108,23 +108,7 @@ public class ScopeService {
 
         final Api api = apiService.find(apiId);
 
-        final Scope scopeData = scopeRepository.findByApiAndName(apiId, scope.getName());
-        HeimdallException.checkThrow(scopeData != null, SCOPE_INVALID_NAME);
-
-        HeimdallException.checkThrow(scope.getOperations() == null || scope.getOperations().isEmpty(),
-                SCOPE_NO_OPERATION_FOUND);
-
-        scope.getOperations().forEach(op -> {
-            Operation operation = operationService.find(op);
-
-            HeimdallException.checkThrow(
-                    operation == null,
-                    SCOPE_INVALID_OPERATION, op);
-
-            HeimdallException.checkThrow(
-                    !operation.getApiId().equals(apiId),
-                    SCOPE_OPERATION_NOT_IN_API, operation.getId(), apiId);
-        });
+        validateScope(apiId, scope);
 
         scope.setApi(api.getId());
 
@@ -166,6 +150,8 @@ public class ScopeService {
 
         this.find(apiId, scopeId);
 
+        validateScope(apiId, scope);
+
         scope.setApi(api.getId());
         scope.setId(scopeId);
 
@@ -174,6 +160,21 @@ public class ScopeService {
         amqpCacheService.dispatchClean();
 
         return scope;
+    }
+
+    private void validateScope(String apiId, Scope scope) {
+        final Scope scopeData = scopeRepository.findByApiAndName(apiId, scope.getName());
+        HeimdallException.checkThrow(scopeData != null, SCOPE_INVALID_NAME);
+
+        HeimdallException.checkThrow(scope.getOperations() == null || scope.getOperations().isEmpty(),
+                SCOPE_NO_OPERATION_FOUND);
+
+        scope.getOperations().forEach(op -> {
+            Operation operation = operationService.find(op);
+
+            HeimdallException.checkThrow(operation == null, SCOPE_INVALID_OPERATION, op);
+            HeimdallException.checkThrow(!apiId.equals(operation.getApiId()), SCOPE_OPERATION_NOT_IN_API, op, apiId);
+        });
     }
 
 }

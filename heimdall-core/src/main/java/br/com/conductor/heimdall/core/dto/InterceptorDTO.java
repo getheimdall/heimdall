@@ -62,9 +62,7 @@ public class InterceptorDTO implements Serializable {
      private TypeExecutionPoint executionPoint;
 
      @NotNull
-     private Long referenceId;
-     
-     private Set<String> ignoredResources;
+     private String referenceId;
 
      private Set<String> ignoredOperations;
      

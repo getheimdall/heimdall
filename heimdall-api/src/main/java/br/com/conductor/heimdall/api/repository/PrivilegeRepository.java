@@ -23,7 +23,8 @@ import org.springframework.data.repository.query.Param;
 
 import br.com.conductor.heimdall.api.entity.Privilege;
 import br.com.conductor.heimdall.api.entity.User;
-import br.com.conductor.heimdall.api.enums.TypeUser;
+import br.com.conductor.heimdall.api.enums.UserType;
+import org.springframework.stereotype.Repository;
 
 /**
  * Extends {@link JpaRepository}. Provides method to find a {@link Set} of {@link Privilege}.
@@ -31,24 +32,7 @@ import br.com.conductor.heimdall.api.enums.TypeUser;
  * @author Marcos Filho
  * @author <a href="dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
-public interface PrivilegeRepository extends JpaRepository<Privilege, Long> {
+@Repository
+public interface PrivilegeRepository extends JpaRepository<Privilege, String> {
 
-    /**
-     * Finds a {@link Set} of {@link Privilege} by {@link User} username and {@link TypeUser}.
-     *
-     * @param username The User username
-     * @param type     {@link TypeUser}
-     * @return {@link Set} of {@link Privilege}
-     */
-    @Query(value = "select p from Privilege p join fetch p.roles r join fetch r.users u where u.userName = :username and u.type = :type")
-    Set<Privilege> findPrivilegesByUserNameAndType(@Param("username") String username, @Param("type") TypeUser type);
-
-    /**
-     * Finds a {@link Set} of {@link Privilege} by {@link User} username.
-     *
-     * @param username The User username
-     * @return {@link Set} of {@link Privilege}
-     */
-    @Query(value = "select p from Privilege p join fetch p.roles r join fetch r.users u where u.userName = :username")
-    Set<Privilege> findPrivilegeByUsername(@Param("username") String username);
 }

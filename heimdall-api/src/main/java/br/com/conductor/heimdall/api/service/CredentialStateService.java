@@ -71,7 +71,7 @@ public class CredentialStateService {
 
     public void revokeByUsername(String username) {
         List<CredentialState> credentials = credentialStateRepository.findByUsernameAndStateEquals(username, CredentialStateEnum.LOGIN);
-        credentials.forEach(credentialState -> credentialState.setState(CredentialStateEnum.REVOKE));
+        credentials.forEach(credentialState -> credentialState.setState(CredentialStateEnum.REVOKED));
         credentialStateRepository.save(credentials);
     }
 }

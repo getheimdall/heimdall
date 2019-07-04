@@ -19,6 +19,7 @@ import br.com.conductor.heimdall.api.dto.LdapDTO;
 import br.com.conductor.heimdall.api.entity.Ldap;
 import br.com.conductor.heimdall.api.service.LdapService;
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
+import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +48,9 @@ public class LdapResource {
     @PostMapping
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_LDAP)
     public ResponseEntity update(@RequestBody @Valid LdapDTO ldapDTO) {
+        Ldap ldap = GenericConverter.mapper(ldapDTO, Ldap.class);
 
-        Ldap ldap = ldapService.save(ldapDTO);
+        ldap = ldapService.save(ldap);
         if (Objects.nonNull(ldap)) {
             return ResponseEntity.ok().body(ldap);
         }

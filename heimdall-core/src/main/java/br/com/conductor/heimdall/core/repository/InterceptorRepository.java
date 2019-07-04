@@ -34,19 +34,10 @@ import br.com.conductor.heimdall.core.enums.TypeInterceptor;
  * @author Marcelo Aguiar Rodrigues
  */
 public interface InterceptorRepository extends JpaRepository<Interceptor, String> {
-	
-	@EntityGraph(attributePaths={"ignoredResources", "ignoredOperations"})
-	@Override
-	List<Interceptor> findAll();
 
-    /**
-     * Finds a List of Interceptors by Interceptor type and {@link Api} Id.
-     *
-     * @param type  The type of Interceptor
-     * @param apiId The Api Id
-     * @return The List of Interceptor associated
-     */
-    List<Interceptor> findByTypeAndOperationResourceApiId(TypeInterceptor type, String apiId);
+    @EntityGraph(attributePaths = {"ignoredOperations"})
+    @Override
+    List<Interceptor> findAll();
 
     /**
      * Finds all Interceptors by {@link Operation} Id.
@@ -54,7 +45,7 @@ public interface InterceptorRepository extends JpaRepository<Interceptor, String
      * @param operationId The Operation Id
      * @return The List of Interceptor associated
      */
-    List<Interceptor> findByOperationId(String operationId);
+    List<Interceptor> findAllByOperationId(String operationId);
 
     /**
      * Finds all Interceptors by {@link Resource} Id.
@@ -62,6 +53,10 @@ public interface InterceptorRepository extends JpaRepository<Interceptor, String
      * @param resourceId The Resource Id
      * @return The List of Interceptor associated
      */
-    List<Interceptor> findByResourceId(String resourceId);
+    List<Interceptor> findAllByResourceId(String resourceId);
+
+    List<Interceptor> findAllByPlanId(String planId);
+
+    List<Interceptor> findAllByApiId(String apiId);
 
 }
