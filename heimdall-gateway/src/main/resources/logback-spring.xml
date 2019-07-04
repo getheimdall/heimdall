@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-	<include resource="org/springframework/boot/logging/logback/base.xml"/>
+<!-- 	<include resource="org/springframework/boot/logging/logback/base.xml"/> -->
+	<include resource="org/springframework/boot/logging/logback/defaults.xml" />
+	<property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}}/spring.log}"/>
+	<include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+	<include resource="org/springframework/boot/logging/logback/file-appender.xml" />
 
 	<springProperty scope="context" name="app_name" source="info.app.name" />	
 	<springProperty scope="context" name="app_version" source="info.app.version"/>
 	<springProperty scope="context" name="app_profile" source="info.app.profile"/>
 	<springProperty scope="context" name="sentry_enabled" source="sentry.enabled"/>
-
 
 	<logger name="org.apache.catalina.startup.DigesterFactory" level="ERROR"/>
 	<logger name="org.apache.catalina.util.LifecycleBase" level="ERROR"/>
@@ -35,17 +38,6 @@
 			</appender>
 		</then>
 	</if>
-
-	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>/tmp/heimdall.%d{yyyy-MM-dd}.log</fileNamePattern>
-			<maxHistory>5</maxHistory>
-		</rollingPolicy>
-		<encoder>
-			<charset>utf-8</charset>
-			<Pattern>%d %-5level [%thread] %logger{0}: %msg%n</Pattern>
-		</encoder>
-	</appender>
 
 	<appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
 		<queueSize>512</queueSize>
