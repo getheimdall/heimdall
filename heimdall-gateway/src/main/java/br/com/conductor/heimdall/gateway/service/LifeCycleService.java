@@ -44,10 +44,10 @@ public class LifeCycleService {
     private AppRepository appRepository;
 
     public boolean should(InterceptorLifeCycle interceptorLifeCycle,
-                          Long referenceId,
-                          Long apiId,
-                          Set<Integer> ignoredResources,
-                          Set<Integer> ignoredOperations,
+                          String referenceId,
+                          String apiId,
+                          Set<String> ignoredResources,
+                          Set<String> ignoredOperations,
                           Boolean status) {
 
         if (!status) return false;
@@ -55,14 +55,14 @@ public class LifeCycleService {
         if (referenceId == null) return false;
         RequestContext context = RequestContext.getCurrentContext();
 
-        Long requestApiId = (Long) context.get(API_ID);
+        String requestApiId = (String) context.get(API_ID);
         if (!apiId.equals(requestApiId)) return false;
 
-        Long resourceId = (Long) context.get(RESOURCE_ID);
-        if (ignoredResources.contains(resourceId.intValue())) return false;
+        String resourceId = (String) context.get(RESOURCE_ID);
+        if (ignoredResources.contains(resourceId)) return false;
 
-        Long operationId = (Long) context.get(OPERATION_ID);
-        if (ignoredOperations.contains(operationId.intValue())) return false;
+        String operationId = (String) context.get(OPERATION_ID);
+        if (ignoredOperations.contains(operationId)) return false;
 
         switch (interceptorLifeCycle) {
             case API:
@@ -79,7 +79,7 @@ public class LifeCycleService {
 
     }
 
-    private boolean validatePlan(RequestContext context, Long referenceId) {
+    private boolean validatePlan(RequestContext context, String referenceId) {
 
         String client_id = context.getRequest().getHeader(CLIENT_ID);
 
@@ -90,8 +90,6 @@ public class LifeCycleService {
         if (app == null) return false;
         if (app.getPlans() == null || app.getPlans().isEmpty()) return false;
 
-        Set<Long> plansIds = app.getPlans().stream().map(Plan::getId).collect(Collectors.toSet());
-
-        return plansIds.contains(referenceId);
+        return app.getPlans().contains(referenceId);
     }
 }

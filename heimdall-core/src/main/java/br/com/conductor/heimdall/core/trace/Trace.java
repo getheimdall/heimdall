@@ -110,9 +110,6 @@ public class Trace {
     private boolean printAllTrace;
 
     @JsonIgnore
-    private boolean printMongo;
-
-    @JsonIgnore
     private boolean shouldPrint;
 
     @JsonIgnore
@@ -132,15 +129,13 @@ public class Trace {
      * @param printAllTrace
      * @param profile
      * @param servletRequest
-     * @param printMongo
      * @param printLogstash
      */
-    public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printMongo, boolean printLogstash, boolean printFilters){
+    public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printLogstash, boolean printFilters){
 
         this.shouldPrint = true;
         this.profile = profile;
         this.printAllTrace = printAllTrace;
-        this.printMongo = printMongo;
         this.printLogstash = printLogstash;
         this.printFilters = printFilters;
 
@@ -167,12 +162,11 @@ public class Trace {
      * @param printAllTrace
      * @param profile
      * @param servletRequest
-     * @param printMongo
      * @param printLogstash
      * @param version
      */
-    public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printMongo, boolean printLogstash, String version, boolean printFilters) {
-        this(printAllTrace, profile, servletRequest, printMongo, printLogstash, printFilters);
+    public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printLogstash, String version, boolean printFilters) {
+        this(printAllTrace, profile, servletRequest, printLogstash, printFilters);
         this.version = version;
     }
 
@@ -282,10 +276,6 @@ public class Trace {
 
                 log.error(append("call", this), " [HEIMDALL-TRACE] - " + url);
             }
-        }
-
-        if (this.printMongo) {
-            printInLogger(logMongo);
         }
 
         if (this.printLogstash) {
