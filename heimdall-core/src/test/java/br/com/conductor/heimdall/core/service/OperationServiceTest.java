@@ -13,7 +13,6 @@
 //import br.com.conductor.heimdall.core.repository.InterceptorRepository;
 //import br.com.conductor.heimdall.core.repository.OperationRepository;
 //import br.com.conductor.heimdall.core.repository.ResourceRepository;
-//import br.com.conductor.heimdall.core.repository.jdbc.OperationJDBCRepository;
 //import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 //import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
 //import org.junit.Before;
@@ -70,8 +69,6 @@
 //     @Mock
 //     private AMQPRouteService amqpRoute;
 //
-//     @Mock
-//     private OperationJDBCRepository operationJDBCRepository;
 //
 //     @Rule
 //     public ExpectedException thrown = ExpectedException.none();

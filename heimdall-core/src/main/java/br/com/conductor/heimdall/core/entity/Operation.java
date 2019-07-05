@@ -25,6 +25,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.index.Indexed;
 
 import java.io.Serializable;
 
@@ -47,14 +48,18 @@ public class Operation implements Serializable {
      @Id
      private String id;
 
+     @Indexed
      private HttpMethod method;
 
+     @Indexed
      private String path;
 
      private String description;
 
+     @Indexed
      private String resourceId;
 
+     @Indexed
      private String apiId;
 
      /**

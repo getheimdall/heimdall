@@ -218,7 +218,7 @@ public class OperationService {
         Operation operation = this.find(apiId, resourceId, operationId);
         final Api api = apiService.find(apiId);
 
-        Operation resData = operationRepository.findByResourceApiIdAndMethodAndPath(apiId, operationPersist.getMethod(), operationPersist.getPath());
+        Operation resData = operationRepository.findByApiIdAndMethodAndPath(apiId, operationPersist.getMethod(), operationPersist.getPath());
         HeimdallException.checkThrow(resData != null &&
                 resData.getResourceId().equals(operation.getResourceId()) &&
                 !resData.getId().equals(operation.getId()), ONLY_ONE_OPERATION_PER_RESOURCE);

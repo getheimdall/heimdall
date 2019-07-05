@@ -15,18 +15,10 @@
  */
 package br.com.conductor.heimdall.core.repository;
 
-import java.util.List;
-
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Operation;
-import br.com.conductor.heimdall.core.entity.Resource;
 import br.com.conductor.heimdall.core.enums.HttpMethod;
-import br.com.conductor.heimdall.core.util.ConstantsCache;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * Provides methods to access a {@link Operation}.
@@ -35,26 +27,7 @@ import br.com.conductor.heimdall.core.util.ConstantsCache;
  *
  */
 public interface OperationRepository extends JpaRepository<Operation, String> {
-     
-     /**
-      * Finds a Operation by its Id, {@link Api} Id and {@link Resource} Id.
-      * 
-      * @param apiId			The Api Id
-      * @param resourceId		The Resource Id
-      * @param id				The Operation Id
-      * @return					The Operation found
-      */
-     Operation findByResourceApiIdAndResourceIdAndId(String apiId, String resourceId, String id);
 
-     /**
-      * Returns a List of Operation from a {@link Api} Id and {@link Resource} Id.
-      * 
-      * @param apiId			The Api Id
-      * @param resourceId		The Resource Id
-      * @return					The List of Operation
-      */
-     List<Operation> findByResourceApiIdAndResourceId(String apiId, String resourceId);
-     
      /**
       * Find an Operation by {@link Api} Id, HTTP method and Operation path.
       * 
@@ -63,5 +36,5 @@ public interface OperationRepository extends JpaRepository<Operation, String> {
       * @param path
       * @return
       */
-     Operation findByResourceApiIdAndMethodAndPath(String apiId, HttpMethod method, String path);
+     Operation findByApiIdAndMethodAndPath(String apiId, HttpMethod method, String path);
 }

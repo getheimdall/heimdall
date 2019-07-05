@@ -63,6 +63,16 @@ public class EnvironmentService {
         return environment;
     }
 
+    public Environment find(String apiId, String inboundURL) {
+        final Api api = apiService.find(apiId);
+
+        final List<Environment> environments = environmentRepository.findAllById(api.getEnvironments());
+
+        return environments.stream()
+                .filter(environment -> inboundURL.equals(environment.getInboundURL()))
+                .findFirst().orElse(null);
+    }
+
     /**
      * Generates a paged list of {@link Environment} from a request.
      *

@@ -66,7 +66,7 @@ public class Trace {
 
     private Long durationMillis;
 
-    private Long apiId;
+    private String apiId;
 
     private String apiName;
 
@@ -78,11 +78,11 @@ public class Trace {
 
     private String clientId;
 
-    private Long resourceId;
+    private String resourceId;
 
     private String appDeveloper;
 
-    private Long operationId;
+    private String operationId;
 
     private RequestResponseParser request;
 
