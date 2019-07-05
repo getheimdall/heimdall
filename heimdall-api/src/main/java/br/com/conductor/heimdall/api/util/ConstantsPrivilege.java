@@ -36,11 +36,6 @@ public final class ConstantsPrivilege {
      public static final String PRIVILEGE_UPDATE_API = "hasAuthority('UPDATE_API')";
      public static final String PRIVILEGE_DELETE_API = "hasAuthority('DELETE_API')";
 
-     public static final String PRIVILEGE_READ_MIDDLEWARE = "hasAuthority('READ_MIDDLEWARE')";
-     public static final String PRIVILEGE_CREATE_MIDDLEWARE = "hasAuthority('CREATE_MIDDLEWARE')";
-     public static final String PRIVILEGE_UPDATE_MIDDLEWARE = "hasAuthority('UPDATE_MIDDLEWARE')";
-     public static final String PRIVILEGE_DELETE_MIDDLEWARE = "hasAuthority('DELETE_MIDDLEWARE')";
-
      public static final String PRIVILEGE_READ_APP = "hasAuthority('READ_APP')";
      public static final String PRIVILEGE_CREATE_APP = "hasAuthority('CREATE_APP')";
      public static final String PRIVILEGE_UPDATE_APP = "hasAuthority('UPDATE_APP')";
@@ -97,12 +92,8 @@ public final class ConstantsPrivilege {
      public static final String PRIVILEGE_READ_PROVIDER = "hasAuthority('READ_PROVIDER')";
      public static final String PRIVILEGE_CREATE_PROVIDER = "hasAuthority('CREATE_PROVIDER')";
 
-     public static final String PRIVILEGE_READ_TRACES = "hasAuthority('READ_TRACES')";
-
      public static final String PRIVILEGE_READ_LDAP = "hasAuthority('READ_LDAP')";
      public static final String PRIVILEGE_UPDATE_LDAP = "hasAuthority('UPDATE_LDAP')";
-
-     public static final String PRIVILEGE_READ_METRICS = "hasAuthority('READ_METRICS')";
 
      public static final String PRIVILEGE_READ_SCOPE = "hasAuthority('READ_SCOPE')";
      public static final String PRIVILEGE_CREATE_SCOPE = "hasAuthority('CREATE_SCOPE')";

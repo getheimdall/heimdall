@@ -21,7 +21,7 @@ package br.com.conductor.heimdall.api.dto;
 
 import br.com.conductor.heimdall.core.enums.Status;
 import lombok.Data;
-import org.hibernate.validator.constraints.Email;
+//import org.hibernate.validator.constraints.Email;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -49,7 +49,7 @@ public class UserEditDTO implements Serializable {
 
     @NotNull
     @Size(max = 80)
-    @Email
+//    @Email
     private String email;
 
     @NotNull

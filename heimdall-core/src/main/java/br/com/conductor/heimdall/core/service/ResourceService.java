@@ -78,7 +78,8 @@ public class ResourceService {
     }
 
     public Resource find(final String id) {
-        Resource resource = resourceRepository.findOne(id);
+
+        Resource resource = resourceRepository.findById(id).orElse(null);
         HeimdallException.checkThrow(resource == null, GLOBAL_NOT_FOUND, "Resource");
 
         return resource;
@@ -193,7 +194,7 @@ public class ResourceService {
         // Deletes all interceptors attached to the Resource
         interceptorService.deleteAllfromResource(resourceId);
 
-        resourceRepository.delete(resource.getId());
+        resourceRepository.delete(resource);
 
         apiService.removeResource(resource);
 

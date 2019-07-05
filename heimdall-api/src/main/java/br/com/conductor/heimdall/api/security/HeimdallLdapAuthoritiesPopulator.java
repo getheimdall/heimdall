@@ -37,8 +37,8 @@ import br.com.conductor.heimdall.api.entity.User;
 import br.com.conductor.heimdall.api.enums.UserType;
 import br.com.conductor.heimdall.api.repository.RoleRepository;
 import br.com.conductor.heimdall.api.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 
 /**
  * Implements the {@link LdapAuthoritiesPopulator}. Provides a method to get the granted authorities.
@@ -78,7 +78,7 @@ public class HeimdallLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
                addUser.setPassword(UUID.randomUUID().toString());
                addUser.setUserName(username);
                
-               Set<Role> roles = roleRepository.findByName(Role.DEFAULT);
+               Set<Role> roles = roleRepository.findAllByName(Role.DEFAULT);
                addUser.setRoles(roles.stream().map(Role::getId).collect(Collectors.toSet()));
                
                repository.save(addUser);

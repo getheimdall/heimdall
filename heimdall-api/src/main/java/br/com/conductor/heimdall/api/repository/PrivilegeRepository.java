@@ -15,16 +15,10 @@
  */
 package br.com.conductor.heimdall.api.repository;
 
-import java.util.Set;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-
 import br.com.conductor.heimdall.api.entity.Privilege;
-import br.com.conductor.heimdall.api.entity.User;
-import br.com.conductor.heimdall.api.enums.UserType;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Set;
 
 /**
  * Extends {@link JpaRepository}. Provides method to find a {@link Set} of {@link Privilege}.
@@ -32,7 +26,7 @@ import org.springframework.stereotype.Repository;
  * @author Marcos Filho
  * @author <a href="dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
-@Repository
 public interface PrivilegeRepository extends JpaRepository<Privilege, String> {
 
+    Privilege findByName(String name);
 }

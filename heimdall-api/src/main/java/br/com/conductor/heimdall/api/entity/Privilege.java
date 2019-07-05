@@ -19,9 +19,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
-
-import javax.persistence.Id;
+import org.springframework.data.redis.core.index.Indexed;
 
 /**
  * Data class that represents the Privilege.
@@ -39,6 +39,7 @@ public class Privilege {
      @Id
      private String id;
 
+     @Indexed
      private String name;
 
 }

@@ -61,7 +61,7 @@ public class PlanService {
     @Transactional(readOnly = true)
     public Plan find(String id) {
 
-        Plan plan = planRepository.findOne(id);
+        Plan plan = planRepository.findById(id).orElse(null);
         HeimdallException.checkThrow(plan == null, GLOBAL_NOT_FOUND, "Plan");
 
         return plan;

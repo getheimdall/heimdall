@@ -6,8 +6,9 @@ info:
         version: "@project.version@"
 
 server:
-    context-path: /
     port: 9090
+    servlet:
+        context-path: /
 
 heimdall:
     contextPath: /heimdall/v1
@@ -47,15 +48,6 @@ spring:
     pid:
         fail-on-write-error: false
         file: heimdall.pid
-#    jpa:
-#        database-platform: org.hibernate.dialect.PostgreSQLDialect
-#        database: POSTGRESQL
-#        openInView: false
-#        show_sql: true
-#        generate-ddl: false
-#        hibernate:
-#            ddl-auto: none
-#            naming-strategy: org.hibernate.cfg.EJB3NamingStrategy
     jackson:
         serialization:
             INDENT_OUTPUT: true
@@ -65,8 +57,8 @@ spring:
         port: 5672
         virtual-host: dev
         requested-heartbeat: 10
-    cache:
-        type: simple
+#    cache:
+#        type: simple
 
 springfox:
     documentation:
@@ -78,16 +70,10 @@ endpoints:
     routes:
         enabled: true
         sensitive: false
-    actuator:
-        enabled: true
-    trace:
-        filter:
-            enabled: false
+#    actuator:
+#        enabled: true
 
 management:
-    context-path: /manager
-    security:
-        enabled: false
     health:
         mongo:
             enabled: false
@@ -99,12 +85,16 @@ management:
             enabled: false
         refresh:
             enabled: false
+        ldap:
+            enabled: false
+    trace:
+        http:
+            enabled: false
+    server:
+        servlet:
+            context-path: /manager
 
 zuul:
     filter:
         root: /tmp/interceptors
         interval: 8
-
-security:
-    basic:
-        enabled: false

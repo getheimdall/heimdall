@@ -39,7 +39,7 @@ public class LdapService {
 
 
         if (Objects.nonNull(ldap.getId())) {
-            Ldap ldapFound = ldapRepository.findOne(ldap.getId());
+            Ldap ldapFound = ldapRepository.findById(ldap.getId()).orElse(null);
             ldap = GenericConverter.mapper(ldap, ldapFound);
         } else {
             ldap = GenericConverter.mapper(ldap, Ldap.class);

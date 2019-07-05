@@ -26,7 +26,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import br.com.conductor.heimdall.core.enums.Status;
-import org.hibernate.validator.constraints.Email;
+//import org.hibernate.validator.constraints.Email;
 
 import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
 import lombok.Data;
@@ -53,7 +53,7 @@ public class UserDTO implements Serializable {
 
      @NotNull
      @Size(max = 80)
-     @Email
+//     @Email
      private String email;
 
      @NotNull

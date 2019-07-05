@@ -15,15 +15,11 @@
  */
 package br.com.conductor.heimdall.api.repository;
 
-import br.com.conductor.heimdall.core.enums.Status;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-
 import br.com.conductor.heimdall.api.entity.User;
 import br.com.conductor.heimdall.api.enums.UserType;
 import br.com.conductor.heimdall.api.security.CredentialSecurity;
-import org.springframework.stereotype.Repository;
+import br.com.conductor.heimdall.core.enums.Status;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
  * Extends {@link JpaRepository}. Provides methods to find a {@link User} and the {@link CredentialSecurity}.
@@ -31,7 +27,6 @@ import org.springframework.stereotype.Repository;
  * @author Marcos Filho
  *
  */
-@Repository
 public interface UserRepository extends JpaRepository<User, String> {
 
 	 /**

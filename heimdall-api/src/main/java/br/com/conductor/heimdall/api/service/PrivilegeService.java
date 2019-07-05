@@ -26,9 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_NOT_FOUND;
@@ -58,7 +56,7 @@ public class PrivilegeService {
      */
     public Privilege find(String id) {
 
-        Privilege privilege = privilegeRepository.findOne(id);
+        Privilege privilege = privilegeRepository.findById(id).orElse(null);
         HeimdallException.checkThrow(privilege == null, GLOBAL_NOT_FOUND, "Privilege");
 
         return privilege;
@@ -104,9 +102,15 @@ public class PrivilegeService {
 
         user.getRoles().stream().map(roleId -> roleService.find(roleId)).collect(Collectors.toSet())
                 .forEach(role -> role.getPrivileges().stream()
-                        .map(privilegeId -> privilegeRepository.findOne(privilegeId))
+                        .map(privilegeId -> privilegeRepository.findById(privilegeId).orElse(null))
+                        .filter(Objects::nonNull)
                         .forEach(privileges::add));
 
         return privileges;
+    }
+
+    public Privilege save(Privilege privilege) {
+
+        return privilegeRepository.save(privilege);
     }
 }

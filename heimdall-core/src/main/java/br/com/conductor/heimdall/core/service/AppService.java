@@ -68,7 +68,7 @@ public class AppService {
      @Transactional(readOnly = true)
      public App find(String id) {
 
-          App app = appRepository.findOne(id);
+          App app = appRepository.findById(id).orElse(null);
           HeimdallException.checkThrow(app == null, GLOBAL_NOT_FOUND, "App");
           app.setAccessTokens(this.getAccessTokens(app));
 

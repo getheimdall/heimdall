@@ -16,6 +16,7 @@
 package br.com.conductor.heimdall.api.service;
 
 import br.com.conductor.heimdall.api.dto.RoleDTO;
+import br.com.conductor.heimdall.api.entity.Privilege;
 import br.com.conductor.heimdall.api.entity.Role;
 import br.com.conductor.heimdall.api.repository.RoleRepository;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
@@ -29,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_NOT_FOUND;
 
@@ -56,7 +58,7 @@ public class RoleService {
     @Transactional
     public Role save(Role role) {
 
-        Set<Role> nameRole = roleRepository.findByName(role.getName());
+        Set<Role> nameRole = roleRepository.findAllByName(role.getName());
 
         HeimdallException.checkThrow(nameRole.size() > 0, ExceptionMessage.ROLE_ALREADY_EXIST);
 
@@ -75,7 +77,15 @@ public class RoleService {
      */
     public Role find(String id) {
 
-        Role role = roleRepository.findOne(id);
+//        Role role = roleRepository.findOne(id);
+        Role role = roleRepository.findById(id).orElse(null);
+        HeimdallException.checkThrow(role == null, GLOBAL_NOT_FOUND, "Role");
+
+        return role;
+    }
+
+    public Role findByName(String name) {
+        Role role = roleRepository.findByName(name);
         HeimdallException.checkThrow(role == null, GLOBAL_NOT_FOUND, "Role");
 
         return role;
@@ -128,7 +138,7 @@ public class RoleService {
     public Role update(String roleId, Role rolePersist) {
 
         Role role = this.find(roleId);
-        Set<Role> roleByName = roleRepository.findByName(rolePersist.getName());
+        Set<Role> roleByName = roleRepository.findAllByName(rolePersist.getName());
 
         if (roleByName.size() > 0) {
             HeimdallException.checkThrow(roleByName.stream().anyMatch(r -> !r.getId().equals(roleId) && r.getName().equals(rolePersist.getName())), ExceptionMessage.ROLE_ALREADY_EXIST);
@@ -136,5 +146,20 @@ public class RoleService {
 
         Role roleMapper = GenericConverter.mapper(rolePersist, role);
         return roleRepository.save(roleMapper);
+    }
+
+    @Transactional
+    public Role createRole(String name, List<String> privilegeNames) {
+        Role role = new Role();
+        role.setName(name);
+
+        final List<Privilege> privileges = privilegeService.list();
+
+        role.setPrivileges(privileges.stream()
+                .filter(privilege -> privilegeNames.contains(privilege.getName()))
+                .map(Privilege::getId)
+                .collect(Collectors.toSet()));
+
+        return this.save(role);
     }
 }

@@ -2,7 +2,6 @@ package br.com.conductor.heimdall.api.resource;
 
 import br.com.conductor.heimdall.api.ApiApplication;
 import br.com.conductor.heimdall.api.service.TokenAuthenticationService;
-import br.com.conductor.heimdall.core.dto.persist.AccessTokenPersist;
 import br.com.conductor.heimdall.core.entity.AccessToken;
 import br.com.conductor.heimdall.core.service.AccessTokenService;
 import br.com.conductor.heimdall.core.util.ConstantsPath;

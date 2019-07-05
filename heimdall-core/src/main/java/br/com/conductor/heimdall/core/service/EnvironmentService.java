@@ -57,7 +57,7 @@ public class EnvironmentService {
      */
     public Environment find(String id) {
 
-        Environment environment = environmentRepository.findOne(id);
+        Environment environment = environmentRepository.findById(id).orElse(null);
         HeimdallException.checkThrow(environment == null, GLOBAL_NOT_FOUND, "Environment");
 
         return environment;

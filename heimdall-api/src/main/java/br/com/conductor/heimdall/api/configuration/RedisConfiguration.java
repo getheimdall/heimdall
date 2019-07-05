@@ -28,6 +28,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.cache.RedisCacheWriter;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -58,34 +61,31 @@ public class RedisConfiguration {
      @Bean
      public JedisConnectionFactory jedisConnectionFactory() {
           
-          JedisConnectionFactory factory = new JedisConnectionFactory();
-          
-          factory.setHostName(property.getRedis().getHost());
-          factory.setPort(property.getRedis().getPort());
-          factory.setUsePool(true);
-          factory.setPoolConfig(jediPoolConfig());
+          RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(property.getRedis().getHost(), property.getRedis().getPort());
+          JedisConnectionFactory factory = new JedisConnectionFactory(redisStandaloneConfiguration);
+
           return factory;
      }
      
-     /**
-      * Returns a configured {@link JedisPoolConfig}.
-      * 
-      * @return {@link JedisPoolConfig}
-      */
-     public JedisPoolConfig jediPoolConfig() {
-          final JedisPoolConfig poolConfig = new JedisPoolConfig();
-          poolConfig.setMaxTotal(property.getRedis().getMaxTotal());
-          poolConfig.setMaxIdle(property.getRedis().getMaxIdle());
-          poolConfig.setMinIdle(property.getRedis().getMinIdle());
-          poolConfig.setTestOnBorrow(property.getRedis().isTestOnBorrow());
-          poolConfig.setTestOnReturn(property.getRedis().isTestOnReturn());
-          poolConfig.setTestWhileIdle(property.getRedis().isTestWhileIdle());
-          poolConfig.setMinEvictableIdleTimeMillis(Duration.ofSeconds(property.getRedis().getMinEvictableIdleTimeSeconds()).toMillis());
-          poolConfig.setTimeBetweenEvictionRunsMillis(Duration.ofSeconds(property.getRedis().getTimeBetweenEvictionRunsSeconds()).toMillis());
-          poolConfig.setNumTestsPerEvictionRun(property.getRedis().getNumTestsPerEvictionRun());
-          poolConfig.setBlockWhenExhausted(property.getRedis().isBlockWhenExhausted());
-          return poolConfig;
-     }
+//     /**
+//      * Returns a configured {@link JedisPoolConfig}.
+//      *
+//      * @return {@link JedisPoolConfig}
+//      */
+//     public JedisPoolConfig jediPoolConfig() {
+//          final JedisPoolConfig poolConfig = new JedisPoolConfig();
+//          poolConfig.setMaxTotal(property.getRedis().getMaxTotal());
+//          poolConfig.setMaxIdle(property.getRedis().getMaxIdle());
+//          poolConfig.setMinIdle(property.getRedis().getMinIdle());
+//          poolConfig.setTestOnBorrow(property.getRedis().isTestOnBorrow());
+//          poolConfig.setTestOnReturn(property.getRedis().isTestOnReturn());
+//          poolConfig.setTestWhileIdle(property.getRedis().isTestWhileIdle());
+//          poolConfig.setMinEvictableIdleTimeMillis(Duration.ofSeconds(property.getRedis().getMinEvictableIdleTimeSeconds()).toMillis());
+//          poolConfig.setTimeBetweenEvictionRunsMillis(Duration.ofSeconds(property.getRedis().getTimeBetweenEvictionRunsSeconds()).toMillis());
+//          poolConfig.setNumTestsPerEvictionRun(property.getRedis().getNumTestsPerEvictionRun());
+//          poolConfig.setBlockWhenExhausted(property.getRedis().isBlockWhenExhausted());
+//          return poolConfig;
+//     }
      
      /**
       * Returns a configured {@link RedisTemplate}.
@@ -124,20 +124,22 @@ public class RedisConfiguration {
 
           return redisTemplate;
      }
-     
+
      /**
       * Returns a configured {@link CacheManager}.
-      * 
+      *
       * @return {@link CacheManager}
       */
      @Bean
-     public CacheManager cacheManager() {
-          RedisCacheManager redisCacheManager = new RedisCacheManager(redisTemplateObject());
-          redisCacheManager.setUsePrefix(true);
-          
+     public CacheManager cacheManager(RedisCacheManager redisCacheManager) {
+
           return redisCacheManager;
      }
-     
+
+     @Bean
+     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+          return RedisCacheManager.create(connectionFactory);
+     }
      /**
       * Returns a configured {@link RedissonClient}.
       * 

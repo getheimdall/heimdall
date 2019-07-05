@@ -32,6 +32,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.ldap.core.support.LdapContextSource;
@@ -62,6 +63,7 @@ import org.springframework.security.core.AuthenticationException;
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Service
+@ConditionalOnProperty("heimdall.security.enabled")
 @Slf4j
 public class TokenAuthenticationService {
 

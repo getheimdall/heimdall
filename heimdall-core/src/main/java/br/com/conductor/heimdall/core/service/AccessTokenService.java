@@ -59,7 +59,7 @@ public class AccessTokenService {
      */
     public AccessToken find(String id) {
 
-        AccessToken accessToken = accessTokenRepository.findOne(id);
+        AccessToken accessToken = accessTokenRepository.findById(id).orElse(null);
         HeimdallException.checkThrow(accessToken == null, GLOBAL_NOT_FOUND, "Access Token");
 
         return accessToken;

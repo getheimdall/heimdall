@@ -18,7 +18,6 @@ package br.com.conductor.heimdall.api.repository;
 import br.com.conductor.heimdall.api.entity.CredentialState;
 import br.com.conductor.heimdall.api.enums.CredentialStateEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -27,7 +26,6 @@ import java.util.List;
  *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
-@Repository
 public interface CredentialStateRepository extends JpaRepository<CredentialState, Long> {
 
     CredentialState findByJtiAndStateEquals(String jti, CredentialStateEnum credentialStateEnum);

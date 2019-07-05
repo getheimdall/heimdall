@@ -6,6 +6,9 @@
 	<springProperty scope="context" name="app_name" source="info.app.name" />	
 	<springProperty scope="context" name="app_version" source="info.app.version"/>
 	<springProperty scope="context" name="app_profile" source="info.app.profile"/>
+<!--	<logger name="org.springframework.boot.actuate.endpoint.jmx" additivity="false">-->
+<!--		<appender-ref ref="DEBUG_LEVEL_REMAPPER"/>-->
+<!--	</logger>-->
 
 	<logger name="org.apache.catalina.startup.DigesterFactory" level="ERROR"/>
 	<logger name="org.apache.catalina.util.LifecycleBase" level="ERROR"/>
@@ -17,9 +20,6 @@
 	<logger name="org.eclipse.jetty.util.component.AbstractLifeCycle" level="ERROR"/>
 	<logger name="org.hibernate.validator.internal.util.Version" level="WARN"/>
 	<logger name="org.springframework.boot.actuate.autoconfigure.CrshAutoConfiguration" level="WARN"/>
-	<logger name="org.springframework.boot.actuate.endpoint.jmx" additivity="false">
-		<appender-ref ref="DEBUG_LEVEL_REMAPPER"/>
-	</logger>
 	<logger name="com.netflix.zuul" level="INFO"/>
 	<logger name="org.springframework.cloud.netflix.zuul" level="INFO"/>
 	<logger name="io.sentry" level="OFF" />

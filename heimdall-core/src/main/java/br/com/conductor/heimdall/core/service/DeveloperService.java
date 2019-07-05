@@ -51,7 +51,7 @@ public class DeveloperService {
      */
     public Developer find(final String id) {
 
-        final Developer developer = developerRepository.findOne(id);
+        final Developer developer = developerRepository.findById(id).orElse(null);
         HeimdallException.checkThrow(developer == null, GLOBAL_NOT_FOUND, "Developer");
 
         return developer;

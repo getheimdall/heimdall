@@ -81,7 +81,8 @@ public class OperationService {
     }
 
     public Operation find(String id) {
-        Operation operation = operationRepository.findOne(id);
+
+        Operation operation = operationRepository.findById(id).orElse(null);
         HeimdallException.checkThrow(operation == null, GLOBAL_NOT_FOUND, "Operation");
 
         return operation;

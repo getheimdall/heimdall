@@ -16,16 +16,14 @@
 package br.com.conductor.heimdall.api.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
 
-import javax.persistence.*;
 import java.util.Set;
 
 /**
@@ -37,6 +35,7 @@ import java.util.Set;
 @EqualsAndHashCode(of = {"id"})
 @AllArgsConstructor
 @NoArgsConstructor
+@RedisHash("role")
 public class Role {
 
     public static final String DEFAULT = "DEFAULT";
@@ -46,9 +45,6 @@ public class Role {
 
     @Indexed
     private String name;
-
-    @JsonIgnore
-    private Set<String> users;
 
     private Set<String> privileges;
 

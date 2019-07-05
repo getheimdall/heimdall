@@ -56,6 +56,9 @@ public class UserService {
     @Autowired
     private CredentialStateService credentialStateService;
 
+    @Autowired
+    private RoleService roleService;
+
     /**
      * Saves a {@link User}.
      *
@@ -68,6 +71,8 @@ public class UserService {
         user.setType(UserType.DATABASE);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setCreationDate(LocalDateTime.now());
+
+        user.getRoles().forEach(roleId -> roleService.find(roleId));
 
         user = userRepository.save(user);
 
@@ -98,7 +103,7 @@ public class UserService {
      */
     public User find(String id) {
 
-        User user = userRepository.findOne(id);
+        User user = userRepository.findById(id).orElse(null);
         HeimdallException.checkThrow(user == null, GLOBAL_NOT_FOUND, "User");
         return user;
     }

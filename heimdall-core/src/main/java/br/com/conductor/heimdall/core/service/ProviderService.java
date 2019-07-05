@@ -129,7 +129,8 @@ public class ProviderService {
      * @return The {@link Provider}
      */
     public Provider find(String id) {
-        Provider provider = providerRepository.findOne(id);
+
+        Provider provider = providerRepository.findById(id).orElse(null);
 
         HeimdallException.checkThrow(Objects.isNull(provider), ExceptionMessage.GLOBAL_NOT_FOUND, "Provider");
 

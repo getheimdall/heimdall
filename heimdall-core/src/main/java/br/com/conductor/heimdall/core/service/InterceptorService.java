@@ -86,7 +86,7 @@ public class InterceptorService {
     @Transactional(readOnly = true)
     public Interceptor find(String id) {
 
-        Interceptor interceptor = interceptorRepository.findOne(id);
+        Interceptor interceptor = interceptorRepository.findById(id).orElse(null);
         HeimdallException.checkThrow(interceptor == null, GLOBAL_NOT_FOUND, "Interceptor");
 
         return interceptor;

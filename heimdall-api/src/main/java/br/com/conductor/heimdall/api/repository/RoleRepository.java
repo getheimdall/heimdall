@@ -15,26 +15,18 @@
  */
 package br.com.conductor.heimdall.api.repository;
 
+import br.com.conductor.heimdall.api.entity.Role;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.List;
 import java.util.Set;
 
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-
-import br.com.conductor.heimdall.api.entity.Role;
-import org.springframework.stereotype.Repository;
-
 /**
- * Extends {@link JpaRepository}. Provides method to find a {@link Set} of {@link Role}.
+ * Extends {@link JpaRepository}
  *
  * @author Marcos Filho
  *
  */
-@Repository
 public interface RoleRepository extends JpaRepository<Role, String> {
 
 	 /**
@@ -43,9 +35,9 @@ public interface RoleRepository extends JpaRepository<Role, String> {
 	  * @param name		The Role name
 	  * @return			{@link Set} of {@link Role}
 	  */
-     Set<Role> findByName(String name);
+     Set<Role> findAllByName(String name);
+
+     Role findByName(String name);
      
-     @Query(value = "select roles.* FROM ROLES roles, USERS_ROLES ur WHERE roles.ID = ur.ROLE_ID and ur.USER_ID = :id", nativeQuery = true)
-     Set<Role> findRolesByUserId(@Param("id") Long id);
 
 }
