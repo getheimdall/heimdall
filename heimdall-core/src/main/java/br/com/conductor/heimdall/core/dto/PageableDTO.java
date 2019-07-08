@@ -15,16 +15,14 @@
  */
 package br.com.conductor.heimdall.core.dto;
 
-import java.io.Serializable;
+import lombok.Data;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-
-import br.com.conductor.heimdall.core.util.Pageable;
-import lombok.Data;
+import java.io.Serializable;
 
 /**
- * Class is a Data Transfer Object for the {@link Pageable}.
+ * Class is a Data Transfer Object.
  *
  * @author Filipe Germano
  *
@@ -35,13 +33,13 @@ public class PageableDTO implements Serializable {
      private static final long serialVersionUID = -3593999942005387183L;
 
      @Min(0)
-     private Integer offset;
+     private Integer page;
 
      @Min(0)
      @Max(100)
      private Integer limit;
 
      public boolean isEmpty() {
-          return this.offset == null && this.limit == null;
+          return this.page == null && this.limit == null;
      }
 }

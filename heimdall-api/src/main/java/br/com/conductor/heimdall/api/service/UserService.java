@@ -17,17 +17,14 @@ package br.com.conductor.heimdall.api.service;
 
 import br.com.conductor.heimdall.api.dto.UserDTO;
 import br.com.conductor.heimdall.api.dto.UserEditDTO;
-//import br.com.conductor.heimdall.api.dto.page.UserPage;
 import br.com.conductor.heimdall.api.entity.User;
 import br.com.conductor.heimdall.api.enums.UserType;
-import br.com.conductor.heimdall.api.repository.RoleRepository;
 import br.com.conductor.heimdall.api.repository.UserRepository;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
-//import br.com.conductor.heimdall.core.dto.PageDTO;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
-import br.com.conductor.heimdall.core.util.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +34,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
+
+//import br.com.conductor.heimdall.api.dto.page.UserPage;
+//import br.com.conductor.heimdall.core.dto.PageDTO;
 
 /**
  * Provides methods to create, read, update and delete a {@link User}.

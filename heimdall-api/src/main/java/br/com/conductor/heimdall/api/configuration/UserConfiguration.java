@@ -155,11 +155,7 @@ public class UserConfiguration {
 
     private void createPrivileges() {
 
-        privilegeNames.forEach(name -> {
-            Privilege privilege = new Privilege();
-            privilege.setName(name);
-            privilegeService.save(privilege);
-        });
+        privilegeNames.forEach(name -> privilegeService.save(new Privilege(name)));
 
     }
 

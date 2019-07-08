@@ -23,10 +23,11 @@ import br.com.conductor.heimdall.core.entity.Environment;
 import br.com.conductor.heimdall.core.service.EnvironmentService;
 import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
-import br.com.conductor.heimdall.core.util.Pageable;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -85,7 +86,7 @@ public class EnvironmentResource {
 
         if (!pageableDTO.isEmpty()) {
 
-            Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+            final Pageable pageable = PageRequest.of(pageableDTO.getPage(), pageableDTO.getLimit());
             final Page<Environment> environments = environmentService.list(pageable);
 
             return ResponseEntity.ok(environments);

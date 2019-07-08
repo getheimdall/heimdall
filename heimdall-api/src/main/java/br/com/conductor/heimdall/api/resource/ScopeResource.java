@@ -22,10 +22,11 @@ import br.com.conductor.heimdall.core.dto.ScopeDTO;
 import br.com.conductor.heimdall.core.entity.Scope;
 import br.com.conductor.heimdall.core.service.ScopeService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
-import br.com.conductor.heimdall.core.util.Pageable;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -106,9 +107,10 @@ public class ScopeResource {
                                      @ModelAttribute PageableDTO pageableDTO) {
 
         if (!pageableDTO.isEmpty()) {
-            Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit(), new Sort(Sort.Direction.ASC, "id"));
 
+            final Pageable pageable = PageRequest.of(pageableDTO.getPage(), pageableDTO.getLimit(), new Sort(Sort.Direction.ASC, "id"));
             Page<Scope> scopePage = scopeService.list(apiId, pageable);
+
             return ResponseEntity.ok(scopePage);
         } else {
 

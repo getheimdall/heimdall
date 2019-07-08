@@ -30,16 +30,13 @@ import org.springframework.data.redis.core.index.Indexed;
  *
  */
 @Data
-@EqualsAndHashCode(of = { "id" })
+@EqualsAndHashCode(of = { "name" })
 @AllArgsConstructor
 @NoArgsConstructor
 @RedisHash("privilege")
 public class Privilege {
 
      @Id
-     private String id;
-
-     @Indexed
      private String name;
 
 }

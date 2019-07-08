@@ -36,6 +36,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
 import java.util.*;
@@ -415,7 +417,7 @@ public class ApiServiceTest {
     @Test
     public void listApiWithPageableTest() {
 
-        br.com.conductor.heimdall.core.util.Pageable pageable = br.com.conductor.heimdall.core.util.Pageable.setPageable(0, 10);
+        Pageable pageable = PageRequest.of(0, 10);
 
         List<Api> apis = new ArrayList<>();
         apis.add(api);

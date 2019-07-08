@@ -24,12 +24,12 @@ import br.com.conductor.heimdall.core.entity.ProviderParam;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.ProviderRepository;
-import br.com.conductor.heimdall.core.util.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -92,34 +92,22 @@ public class ProviderService {
     /**
      * Generates a paged list of {@link Provider} from a request
      *
-     * @param providerDTO The {@link ProviderDTO}
-     * @param pageableDTO The {@link PageableDTO}
+     * @param pageable The {@link Pageable}
      * @return The paged {@link Provider} list
      */
-    public Page<Provider> listWithPageableAndFilter(ProviderDTO providerDTO, PageableDTO pageableDTO) {
+    public Page<Provider> list(Pageable pageable) {
 
-        Provider provider = GenericConverter.mapper(providerDTO, Provider.class);
-        Example<Provider> example = Example.of(provider,
-                ExampleMatcher.matching().withIgnorePaths("providerDefault").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
-
-        Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
-
-        return this.providerRepository.findAll(example, pageable);
+        return this.providerRepository.findAll(pageable);
     }
 
     /**
      * Generates a list of {@link Provider} from a request
      *
-     * @param providerDTO The {@link ProviderDTO}
      * @return The list of {@link Provider}
      */
-    public List<Provider> listWithFilter(ProviderDTO providerDTO) {
+    public List<Provider> list() {
 
-        Provider provider = GenericConverter.mapper(providerDTO, Provider.class);
-        Example<Provider> example = Example.of(provider,
-                ExampleMatcher.matching().withIgnorePaths("providerDefault").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
-
-        return this.providerRepository.findAll(example);
+        return this.providerRepository.findAll();
     }
 
     /**

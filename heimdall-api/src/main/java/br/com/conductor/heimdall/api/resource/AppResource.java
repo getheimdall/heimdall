@@ -23,10 +23,11 @@ import br.com.conductor.heimdall.core.dto.persist.AppPersist;
 import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.service.AppService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
-import br.com.conductor.heimdall.core.util.Pageable;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -59,7 +60,7 @@ public class AppResource {
      * Finds a {@link App} by its Id.
      *
      * @param id The App Id
-     * @return                        {@link ResponseEntity}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Find App by id", response = App.class)
@@ -76,7 +77,7 @@ public class AppResource {
      * Finds all {@link App} from a request.
      *
      * @param pageableDTO {@link PageableDTO}
-     * @return                        {@link ResponseEntity}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Find all Apps", responseContainer = "List", response = App.class)
@@ -86,7 +87,7 @@ public class AppResource {
 
         if (!pageableDTO.isEmpty()) {
 
-            Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+            final Pageable pageable = PageRequest.of(pageableDTO.getPage(), pageableDTO.getLimit());
             Page<App> appPage = appService.list(pageable);
 
             return ResponseEntity.ok(appPage);
@@ -102,7 +103,7 @@ public class AppResource {
      * Saves a {@link App}.
      *
      * @param appDTO {@link AppDTO}
-     * @return                        {@link ResponseEntity}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Save a new App")
@@ -121,7 +122,7 @@ public class AppResource {
      *
      * @param id     The App Id
      * @param appDTO {@link AppDTO}
-     * @return                        {@link ResponseEntity}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Update App")
@@ -140,7 +141,7 @@ public class AppResource {
      * Deletes a {@link App}.
      *
      * @param id The App Id
-     * @return                        {@link ResponseEntity}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Delete App")

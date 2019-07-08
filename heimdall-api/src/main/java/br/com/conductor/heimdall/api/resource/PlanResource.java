@@ -22,10 +22,11 @@ import br.com.conductor.heimdall.core.dto.PlanDTO;
 import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.service.PlanService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
-import br.com.conductor.heimdall.core.util.Pageable;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -57,7 +58,7 @@ public class PlanResource {
      * Finds a {@link Plan} by its Id.
      *
      * @param id The Plan Id
-     * @return                        {@link ResponseEntity}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Find Plan by id", response = Plan.class)
@@ -74,7 +75,7 @@ public class PlanResource {
      * Finds all {@link Plan} from a request.
      *
      * @param pageableDTO {@link PageableDTO}
-     * @return                        {@link ResponseEntity}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Find all Plans", responseContainer = "List", response = Plan.class)
@@ -83,7 +84,7 @@ public class PlanResource {
     public ResponseEntity<?> findAll(@ModelAttribute PageableDTO pageableDTO) {
 
         if (!pageableDTO.isEmpty()) {
-            Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+            final Pageable pageable = PageRequest.of(pageableDTO.getPage(), pageableDTO.getLimit());
             Page<Plan> planPage = planService.list(pageable);
 
             return ResponseEntity.ok(planPage);
@@ -98,7 +99,7 @@ public class PlanResource {
      * Saves a {@link Plan}.
      *
      * @param planDTO {@link PlanDTO}
-     * @return                        {@link ResponseEntity}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Save a new Plan")
@@ -117,7 +118,7 @@ public class PlanResource {
      *
      * @param id      The Plan Id
      * @param planDTO {@link PlanDTO}
-     * @return                        {@link ResponseEntity}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Update Plan")
@@ -135,7 +136,7 @@ public class PlanResource {
      * Deletes a {@link Plan}.
      *
      * @param id The Plan Id
-     * @return                        {@link ResponseEntity}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Delete Plan")

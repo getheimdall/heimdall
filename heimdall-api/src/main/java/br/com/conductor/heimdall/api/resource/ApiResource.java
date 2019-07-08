@@ -22,11 +22,12 @@ import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.service.ApiService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
-import br.com.conductor.heimdall.core.util.Pageable;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.models.Swagger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -60,7 +61,7 @@ public class ApiResource {
      * Finds a {@link Api} by its Id.
      *
      * @param id The Api Id
-     * @return                        {@link ResponseEntity}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Find API by id", response = Api.class)
@@ -77,7 +78,7 @@ public class ApiResource {
      * Get {@link Swagger} by {@link Api} its Id.
      *
      * @param id The Api Id
-     * @return                        {@link ResponseEntity}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Get SwaggerJson by Api Id", response = Api.class)
@@ -94,7 +95,7 @@ public class ApiResource {
      * Fids all {@link Api} from a request.
      *
      * @param pageableDTO {@link PageableDTO}
-     * @return                        {@link ResponseEntity}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Find all APIs", responseContainer = "List", response = Api.class)
@@ -104,7 +105,7 @@ public class ApiResource {
 
         if (!pageableDTO.isEmpty()) {
 
-            Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+            final Pageable pageable = PageRequest.of(pageableDTO.getPage(), pageableDTO.getLimit());
             Page<Api> apiPage = apiService.list(pageable);
 
             return ResponseEntity.ok(apiPage);
@@ -120,7 +121,7 @@ public class ApiResource {
      * Saves a {@link Api}.
      *
      * @param apiDTO {@link ApiDTO}
-     * @return                        {@link ResponseEntity}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Save a new API")
@@ -139,7 +140,7 @@ public class ApiResource {
      *
      * @param id     The Api Id
      * @param apiDTO {@link ApiDTO}
-     * @return                        {@link ResponseEntity}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Update API")
@@ -158,7 +159,7 @@ public class ApiResource {
      * Deletes a {@link Api}.
      *
      * @param id The Api Id
-     * @return                        {@link ResponseEntity}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Delete API")

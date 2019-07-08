@@ -23,10 +23,11 @@ import br.com.conductor.heimdall.core.entity.Operation;
 import br.com.conductor.heimdall.core.service.OperationService;
 import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
-import br.com.conductor.heimdall.core.util.Pageable;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -96,9 +97,9 @@ public class OperationResource {
 
         if (!pageableDTO.isEmpty()) {
 
-            Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
-
+            final Pageable pageable = PageRequest.of(pageableDTO.getPage(), pageableDTO.getLimit());
             Page<Operation> operationPage = operationService.list(apiId, resourceId, pageable);
+
             return ResponseEntity.ok(operationPage);
         } else {
 

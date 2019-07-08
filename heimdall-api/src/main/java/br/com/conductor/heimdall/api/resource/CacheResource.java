@@ -38,101 +38,101 @@ import io.swagger.annotations.ApiOperation;
  * Uses a {@link CacheService} to provide methods to read and remove the cache.
  *
  * @author Filipe Germano
- *
  */
 @io.swagger.annotations.Api(
         value = PATH_CACHES,
         produces = MediaType.APPLICATION_JSON_VALUE,
-        tags = { ConstantsTag.TAG_CACHES })
+        tags = {ConstantsTag.TAG_CACHES})
 @RestController
 @RequestMapping(value = PATH_CACHES)
 public class CacheResource {
 
-     @Autowired
-     private CacheService cacheService;
-     
-     @Autowired
-     private AMQPCacheService amqpCacheService;
+    @Autowired
+    private CacheService cacheService;
 
-     /**
-      * Finds all caches.
-      * 
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Find all Caches")
-     @GetMapping
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_CACHES)
-     public ResponseEntity<?> findAll() {
+    @Autowired
+    private AMQPCacheService amqpCacheService;
 
-          return ResponseEntity.ok(cacheService.list());
-     }
+    /**
+     * Finds all caches.
+     *
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Find all Caches")
+    @GetMapping
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_CACHES)
+    public ResponseEntity<?> findAll() {
 
-     /**
-      * Deletes a cache by its key.
-      * 
-      * @param cacheKey				The cache key
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Delete Cache")
-     @DeleteMapping(value = "/{cacheKey}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_CACHES)
-     public ResponseEntity<?> delete(@PathVariable("cacheKey") String cacheKey) {
-          
-          amqpCacheService.dispatchClean(cacheKey);
+        return ResponseEntity.ok(cacheService.list());
+    }
 
-          return ResponseEntity.noContent().build();
-     }
+    /**
+     * Deletes a cache by its key.
+     *
+     * @param cacheKey The cache key
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Delete Cache")
+    @DeleteMapping(value = "/{cacheKey}")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_CACHES)
+    public ResponseEntity<?> delete(@PathVariable("cacheKey") String cacheKey) {
 
-     /**
-      * Deletes a cache by its key and Id.
-      * 
-      * @param cacheKey				The cache key
-      * @param cacheId				The cache Id
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Delete Cache")
-     @DeleteMapping(value = "/{cacheKey}/{cacheId}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_CACHES)
-     public ResponseEntity<?> delete(@PathVariable("cacheKey") String cacheKey, @PathVariable("cacheId") String cacheId) {
-          
-          amqpCacheService.dispatchClean(cacheKey, cacheId);
-          
-          return ResponseEntity.noContent().build();
-     }
+        amqpCacheService.dispatchClean(cacheKey);
 
-     /**
-      * Deletes all caches.
-      * 
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Delete All Caches")
-     @DeleteMapping
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_CACHES)
-     public ResponseEntity<?> delete() {
-          
-          amqpCacheService.dispatchClean();
-          
-          return ResponseEntity.noContent().build();
-     }
+        return ResponseEntity.noContent().build();
+    }
 
-     /**
-      * Deletes all caches created by Cache interceptors.
-      *
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Delete all caches created by Cache interceptors")
-     @DeleteMapping("/interceptors")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_CACHES)
-     public ResponseEntity<?> deleteInterceptors() {
+    /**
+     * Deletes a cache by its key and Id.
+     *
+     * @param cacheKey The cache key
+     * @param cacheId  The cache Id
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Delete Cache")
+    @DeleteMapping(value = "/{cacheKey}/{cacheId}")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_CACHES)
+    public ResponseEntity<?> delete(@PathVariable("cacheKey") String cacheKey,
+                                    @PathVariable("cacheId") String cacheId) {
 
-          amqpCacheService.dispatchCleanInterceptorsCache();
+        amqpCacheService.dispatchClean(cacheKey, cacheId);
 
-          return ResponseEntity.noContent().build();
-     }
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Deletes all caches.
+     *
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Delete All Caches")
+    @DeleteMapping
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_CACHES)
+    public ResponseEntity<?> delete() {
+
+        amqpCacheService.dispatchClean();
+
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Deletes all caches created by Cache interceptors.
+     *
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Delete all caches created by Cache interceptors")
+    @DeleteMapping("/interceptors")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_CACHES)
+    public ResponseEntity<?> deleteInterceptors() {
+
+        amqpCacheService.dispatchCleanInterceptorsCache();
+
+        return ResponseEntity.noContent().build();
+    }
 
 }
