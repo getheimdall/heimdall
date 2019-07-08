@@ -20,10 +20,10 @@
 package br.com.conductor.heimdall.gateway.listener;
 
 import br.com.conductor.heimdall.core.entity.Interceptor;
-import br.com.conductor.heimdall.core.repository.jdbc.InterceptorJDBCRepository;
+import br.com.conductor.heimdall.core.service.InterceptorService;
 import br.com.conductor.heimdall.gateway.configuration.HeimdallHandlerMapping;
 import br.com.conductor.heimdall.gateway.service.InterceptorFileService;
-import br.com.conductor.heimdall.gateway.util.HeimdallFilterFileManager;
+import com.netflix.zuul.FilterFileManager;
 import com.netflix.zuul.FilterLoader;
 import com.netflix.zuul.groovy.GroovyCompiler;
 import com.netflix.zuul.groovy.GroovyFileFilter;
@@ -62,7 +62,7 @@ public class StartServer implements ServletContextListener {
     private InterceptorFileService interceptorFileService;
 
     @Autowired
-    private InterceptorJDBCRepository interceptorJDBCRepository;
+    private InterceptorService interceptorService;
 
     @Autowired
     private HeimdallHandlerMapping heimdallHandlerMapping;
@@ -90,30 +90,20 @@ public class StartServer implements ServletContextListener {
 
         try {
 
-            Set<String> filesAbsolutePath = filesAbsolutePath();
-
             FilterLoader.getInstance().setCompiler(new GroovyCompiler());
 
-            HeimdallFilterFileManager.setFilenameFilter(new GroovyFileFilter());
-            HeimdallFilterFileManager.init(zuulFilterInterval, filesAbsolutePath);
+            FilterFileManager.setFilenameFilter(new GroovyFileFilter());
+
+            FilterFileManager.init(
+                    zuulFilterInterval,
+                    new File(zuulFilterRoot, PRE_TYPE).getAbsolutePath(),
+                    new File(zuulFilterRoot, POST_TYPE).getAbsolutePath()
+            );
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
-    }
-
-    private Set<String> filesAbsolutePath() {
-        String[] types = {PRE_TYPE, POST_TYPE, ROUTE_TYPE};
-
-        Set<String> filesAbsolutePath = new HashSet<>();
-
-        for (String t : types) {
-            File folder = new File(zuulFilterRoot, t);
-            filesAbsolutePath.add(folder.getAbsolutePath());
-        }
-
-        return filesAbsolutePath;
     }
 
     /**
@@ -138,7 +128,7 @@ public class StartServer implements ServletContextListener {
      */
     private void createInterceptors() {
 
-        List<Interceptor> interceptors = interceptorJDBCRepository.findAllInterceptorsSimplified();
+        List<Interceptor> interceptors = interceptorService.list();
         if (Objects.nonNull(interceptors)) {
 
             interceptors.forEach(interceptor -> interceptorFileService.createFileInterceptor(interceptor));
@@ -183,7 +173,7 @@ public class StartServer implements ServletContextListener {
         try (Stream<Path> walk = Files.walk(Paths.get(interceptorFolder))) {
 
             return walk.filter(Files::isRegularFile)
-                    .filter(path -> path.endsWith(".jar") || path.endsWith(".groovy") || path.endsWith(".java"))
+                    .filter(path -> path.endsWith(".groovy"))
                     .map(Path::toFile)
                     .collect(Collectors.toSet());
         } catch (IOException e) {

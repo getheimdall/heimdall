@@ -19,12 +19,24 @@
  */
 package br.com.conductor.heimdall.gateway.configuration;
 
+import br.com.conductor.heimdall.core.service.EnvironmentService;
+import br.com.conductor.heimdall.gateway.failsafe.CircuitBreakerManager;
+import br.com.conductor.heimdall.gateway.filter.CustomHostRoutingFilter;
+import br.com.conductor.heimdall.gateway.filter.CustomSendErrorFilter;
+import br.com.conductor.heimdall.gateway.filter.CustomSendResponseFilter;
+import br.com.conductor.heimdall.gateway.filter.HeimdallDecorationFilter;
+import br.com.conductor.heimdall.gateway.listener.StartServer;
+import br.com.conductor.heimdall.gateway.router.CredentialService;
+import br.com.conductor.heimdall.gateway.util.RequestHelper;
+import br.com.conductor.heimdall.gateway.zuul.route.ProxyRouteLocator;
+import br.com.conductor.heimdall.gateway.zuul.storage.CacheZuulRouteStorage;
+import br.com.conductor.heimdall.gateway.zuul.storage.ZuulRouteStorage;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.web.ErrorController;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
+import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.cloud.commons.httpclient.ApacheHttpClientConnectionManagerFactory;
 import org.springframework.cloud.commons.httpclient.ApacheHttpClientFactory;
@@ -38,19 +50,6 @@ import org.springframework.cloud.netflix.zuul.filters.pre.PreDecorationFilter;
 import org.springframework.cloud.netflix.zuul.filters.route.SimpleHostRoutingFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import br.com.conductor.heimdall.gateway.router.EnvironmentInfoRepository;
-import br.com.conductor.heimdall.gateway.failsafe.CircuitBreakerManager;
-import br.com.conductor.heimdall.gateway.filter.CustomHostRoutingFilter;
-import br.com.conductor.heimdall.gateway.filter.CustomSendErrorFilter;
-import br.com.conductor.heimdall.gateway.filter.CustomSendResponseFilter;
-import br.com.conductor.heimdall.gateway.filter.HeimdallDecorationFilter;
-import br.com.conductor.heimdall.gateway.listener.StartServer;
-import br.com.conductor.heimdall.gateway.router.CredentialRepository;
-import br.com.conductor.heimdall.gateway.util.RequestHelper;
-import br.com.conductor.heimdall.gateway.zuul.route.ProxyRouteLocator;
-import br.com.conductor.heimdall.gateway.zuul.storage.CacheZuulRouteStorage;
-import br.com.conductor.heimdall.gateway.zuul.storage.ZuulRouteStorage;
 
 /**
  * {@inheritDoc}
@@ -71,7 +70,7 @@ public class ZuulConfiguration extends ZuulProxyAutoConfiguration {
 	private ServerProperties server;
 
 	@Autowired
-	private EnvironmentInfoRepository environmentInfoRepository;
+	private EnvironmentService environmentService;
 
 	@Autowired
 	private RequestHelper requestHelper;
@@ -84,20 +83,20 @@ public class ZuulConfiguration extends ZuulProxyAutoConfiguration {
 	private CircuitBreakerManager circuitBreakerManager;
 	
 	@Autowired
-	private CredentialRepository credentialRepository;
+	private CredentialService credentialService;
 
 	@Bean
 	public ProxyRouteLocator proxyRouteLocator() {
 
-		return new ProxyRouteLocator(server.getServletPath(), discovery, zuulProperties, zuulRouteStore);
+		return new ProxyRouteLocator(server.getServlet().getContextPath(), discovery, zuulProperties, zuulRouteStore);
 
 	}
 
 	@Override
 	public PreDecorationFilter preDecorationFilter(RouteLocator routeLocator, ProxyRequestHelper proxyRequestHelper) {
 
-		return new HeimdallDecorationFilter(proxyRouteLocator(), this.server.getServletPrefix(), zuulProperties,
-				proxyRequestHelper, requestHelper, credentialRepository, environmentInfoRepository);
+		return new HeimdallDecorationFilter(proxyRouteLocator(), this.server.getServlet().getContextPath(), zuulProperties,
+				proxyRequestHelper, requestHelper, credentialService, environmentService);
 	}
 
 	@Bean
@@ -121,7 +120,7 @@ public class ZuulConfiguration extends ZuulProxyAutoConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean({ SimpleHostRoutingFilter.class })
-	public SimpleHostRoutingFilter simpleHostRoutingFilter2(ProxyRequestHelper helper, ZuulProperties zuulProperties,
+	public SimpleHostRoutingFilter simpleHostRoutingFilter(ProxyRequestHelper helper, ZuulProperties zuulProperties,
 															CloseableHttpClient httpClient) {
 		return new CustomHostRoutingFilter(helper, zuulProperties, httpClient, circuitBreakerManager);
 	}

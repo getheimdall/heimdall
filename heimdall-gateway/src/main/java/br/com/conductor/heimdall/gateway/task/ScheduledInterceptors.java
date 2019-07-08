@@ -23,14 +23,13 @@ package br.com.conductor.heimdall.gateway.task;
 import java.io.File;
 import java.util.List;
 
+import br.com.conductor.heimdall.core.service.InterceptorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import br.com.conductor.heimdall.core.entity.Interceptor;
-import br.com.conductor.heimdall.core.enums.TypeInterceptor;
-import br.com.conductor.heimdall.core.repository.jdbc.InterceptorJDBCRepository;
 import br.com.conductor.heimdall.core.util.StringUtils;
 import br.com.conductor.heimdall.gateway.service.InterceptorFileService;
 
@@ -44,14 +43,14 @@ public class ScheduledInterceptors {
     private InterceptorFileService interceptorFileService;
 
     @Autowired
-    private InterceptorJDBCRepository interceptorJDBCRepository;
+    private InterceptorService interceptorService;
 
     @Value("${zuul.filter.root}")
     private String path;
 
     @Scheduled(fixedRateString = "${heimdall.interceptor.health.fixedRate}")
     public void checkFilesInterceptors() {
-        List<Interceptor> interceptors = interceptorJDBCRepository.findAllInterceptorsSimplified();
+        List<Interceptor> interceptors = interceptorService.list();
 
         interceptors.forEach(interceptor -> {
             if (!checkInterceptorInDisk(interceptor)) {

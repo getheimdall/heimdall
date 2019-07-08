@@ -6,8 +6,6 @@
 //import java.time.LocalDateTime;
 //import java.util.*;
 //
-//import br.com.conductor.heimdall.core.repository.jdbc.ApiJDBCRepository;
-//import br.com.conductor.heimdall.core.repository.jdbc.OperationJDBCRepository;
 //import org.junit.Before;
 //import org.junit.Test;
 //import org.junit.runner.RunWith;
@@ -41,11 +39,6 @@
 //     @Mock
 //     private ResourceRepository resourceRepository;
 //
-//     @Mock
-//     private ApiJDBCRepository apiJDBCRepository;
-//
-//     @Mock
-//     private OperationJDBCRepository operationJDBCRepository;
 //
 //     @Before
 //     public void setup() {

@@ -1,6 +1,0 @@
-spring:
-  application:
-    name: application-api
-  cloud:
-    config:
-      enabled: false

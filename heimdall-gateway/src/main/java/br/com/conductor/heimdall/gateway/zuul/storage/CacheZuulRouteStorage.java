@@ -19,8 +19,10 @@
  */
 package br.com.conductor.heimdall.gateway.zuul.storage;
 
-import br.com.conductor.heimdall.core.repository.jdbc.ApiJDBCRepository;
-import br.com.conductor.heimdall.core.repository.jdbc.OperationJDBCRepository;
+import br.com.conductor.heimdall.core.entity.Api;
+import br.com.conductor.heimdall.core.entity.Operation;
+import br.com.conductor.heimdall.core.service.ApiService;
+import br.com.conductor.heimdall.core.service.OperationService;
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.gateway.util.RouteSort;
 import lombok.extern.slf4j.Slf4j;
@@ -28,10 +30,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties.ZuulRoute;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -44,10 +46,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class CacheZuulRouteStorage implements ZuulRouteStorage {
 
 	@Autowired
-	private ApiJDBCRepository apiJDBCRepository;
+	private ApiService apiService;
 
 	@Autowired
-	private OperationJDBCRepository operationJDBCRepository;
+	private OperationService operationService;
 
 	@Value("${info.app.profile}")
 	private String profile;
@@ -70,7 +72,8 @@ public class CacheZuulRouteStorage implements ZuulRouteStorage {
 
 		log.info("Initialize routes from profiles: " + profile);
 		List<ZuulRoute> routes = new LinkedList<>();
-		List<Long> apiIds = apiJDBCRepository.findAllIds();
+
+		final List<Api> apis = apiService.list();
 		boolean production = Constants.PRODUCTION.equals(profile);
 
 		String destination;
@@ -81,13 +84,18 @@ public class CacheZuulRouteStorage implements ZuulRouteStorage {
 			destination = "sandbox";
 		}
 		
-		List<String> apiPathConcatWithOperationPaths = null;
-		if (apiIds != null && !apiIds.isEmpty()) {
-			
-			apiPathConcatWithOperationPaths = operationJDBCRepository.findOperationsFromAllApis(apiIds);
+		final List<String> apiPathConcatWithOperationPaths = new ArrayList<>();
+		if (apis != null && !apis.isEmpty()) {
+
+			apis.forEach(api -> {
+				final List<Operation> operations = operationService.list(api.getId());
+				operations.forEach(operation -> apiPathConcatWithOperationPaths
+						.add(api.getBasePath() + operation.getPath()));
+			});
+
 		}
 
-		if (Objects.nonNull(apiPathConcatWithOperationPaths) && !apiPathConcatWithOperationPaths.isEmpty()) {
+		if (!apiPathConcatWithOperationPaths.isEmpty()) {
 
 			for (String completePath : apiPathConcatWithOperationPaths) {
 

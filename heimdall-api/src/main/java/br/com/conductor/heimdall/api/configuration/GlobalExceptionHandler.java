@@ -226,12 +226,12 @@ public class GlobalExceptionHandler {
             error.defaultMessage = message != null ? message : fieldError.getDefaultMessage();
             error.objectName = fieldError.getObjectName();
             error.field = fieldError.getField();
-            error.status = fieldError.getCode();
+            error.reason = fieldError.getCode();
 
             errors.add(error);
         });
 
-        bindException.erros = errors;
+        bindException.errors = errors;
 
         return bindException;
     }
@@ -264,12 +264,12 @@ public class GlobalExceptionHandler {
             error.defaultMessage = fieldError.getDefaultMessage();
             error.objectName = fieldError.getObjectName();
             error.field = fieldError.getField();
-            error.status = fieldError.getCode();
+            error.reason = fieldError.getCode();
 
             errors.add(error);
         });
 
-        bindException.erros = errors;
+        bindException.errors = errors;
 
         return bindException;
     }
@@ -434,7 +434,7 @@ public class GlobalExceptionHandler {
         private String exception;
 
         @Getter
-        private List<BindError> erros;
+        private List<BindError> errors;
 
         @Data
         public class BindError {
@@ -445,7 +445,7 @@ public class GlobalExceptionHandler {
 
             private String field;
 
-            private String status;
+            private String reason;
         }
 
     }

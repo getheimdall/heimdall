@@ -36,9 +36,9 @@ public class Credential implements Serializable {
     private String operationPath;
     private String apiBasePath;
     private String apiName;
-    private long operationId;
-    private long resourceId;
-    private long apiId;
+    private String operationId;
+    private String resourceId;
+    private String apiId;
     private boolean cors;
 
 }

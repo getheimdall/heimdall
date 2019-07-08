@@ -15,47 +15,34 @@
  */
 package br.com.conductor.heimdall.api.service;
 
-import br.com.conductor.heimdall.api.entity.Role;
-import br.com.conductor.heimdall.api.repository.RoleRepository;
-import br.com.conductor.heimdall.core.exception.BadRequestException;
+import br.com.conductor.heimdall.api.repository.PrivilegeRepository;
+import br.com.conductor.heimdall.core.exception.NotFoundException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.HashSet;
-import java.util.Set;
-
 @RunWith(MockitoJUnitRunner.class)
-public class RoleServiceTest {
+public class PrivilegeServiceTest {
 
-     @InjectMocks
-     private RoleService service;
+    @InjectMocks
+    private PrivilegeService privilegeService;
 
-     @Mock
-     private RoleRepository roleRepository;
+    @Mock
+    private PrivilegeRepository privilegeRepository;
 
-     @Rule
-     public ExpectedException thrown = ExpectedException.none();
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
-     @Test
-     public void rejectNewRoleWithInvalidPrivileges() {
-          thrown.expect(BadRequestException.class);
-          thrown.expectMessage("Role already exists");
 
-          Role role = new Role();
-          role.setName("name");
+    @Test
+    public void findInvalidPrivilege() {
+        thrown.expect(NotFoundException.class);
 
-          Set<Role> roles = new HashSet<>();
-          roles.add(role);
+        privilegeService.find("someInvalidId");
 
-          Mockito.when(roleRepository.findAllByName(Mockito.anyString())).thenReturn(roles);
-
-          service.save(role);
-     }
-
+    }
 }
