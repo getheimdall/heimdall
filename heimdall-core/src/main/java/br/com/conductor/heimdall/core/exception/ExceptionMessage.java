@@ -150,7 +150,7 @@ public enum ExceptionMessage {
 
     DEFAULT_PROVIDER_CAN_NOT_UPDATED_OR_REMOVED(FORBIDDEN.value(), "Default Provider can't to be updated or removed!", ForbiddenException.class),
 
-    ROLE_ALREADY_EXIST(BAD_REQUEST.value(), "Role already exist!", BadRequestException.class),
+    ROLE_ALREADY_EXIST(BAD_REQUEST.value(), "Role already exists", BadRequestException.class),
 
     SCOPE_INVALID_OPERATION(BAD_REQUEST.value(), "Operation with id '{}' does not exist", BadRequestException.class),
 

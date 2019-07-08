@@ -33,6 +33,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
@@ -155,18 +156,21 @@ public class RedisConfiguration {
           redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
           return redisTemplate;
      }
-     
+
      /**
-      * Configures and returns a {@link CacheManager}.
-      * 
+      * Returns a configured {@link CacheManager}.
+      *
       * @return {@link CacheManager}
       */
      @Bean
-     public CacheManager cacheManager() {
-          RedisCacheManager redisCacheManager = new RedisCacheManager(redisTemplateObject());
-          redisCacheManager.setUsePrefix(true);
-          
+     public CacheManager cacheManager(RedisCacheManager redisCacheManager) {
+
           return redisCacheManager;
+     }
+
+     @Bean
+     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
+          return RedisCacheManager.create(connectionFactory);
      }
      
      /**

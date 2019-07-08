@@ -19,16 +19,16 @@
  */
 package br.com.conductor.heimdall.gateway.filter;
 
+import br.com.conductor.heimdall.core.entity.Environment;
 import br.com.conductor.heimdall.core.enums.HttpMethod;
+import br.com.conductor.heimdall.core.service.EnvironmentService;
 import br.com.conductor.heimdall.core.trace.FilterDetail;
 import br.com.conductor.heimdall.core.trace.TraceContextHolder;
 import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.core.util.ConstantsPath;
 import br.com.conductor.heimdall.core.util.UrlUtil;
 import br.com.conductor.heimdall.gateway.router.Credential;
-import br.com.conductor.heimdall.gateway.router.CredentialRepository;
-import br.com.conductor.heimdall.gateway.router.EnvironmentInfo;
-import br.com.conductor.heimdall.gateway.router.EnvironmentInfoRepository;
+import br.com.conductor.heimdall.gateway.router.CredentialService;
 import br.com.conductor.heimdall.gateway.util.RequestHelper;
 import br.com.conductor.heimdall.gateway.zuul.route.HeimdallRoute;
 import br.com.conductor.heimdall.gateway.zuul.route.ProxyRouteLocator;
@@ -86,11 +86,11 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
 
     private FilterDetail detail = new FilterDetail();
     
-    private CredentialRepository credentialRepository;
-    
-    private EnvironmentInfoRepository environmentInfoRepository;
+    private CredentialService credentialService;
 
-    public HeimdallDecorationFilter(ProxyRouteLocator routeLocator, String dispatcherServletPath, ZuulProperties properties, ProxyRequestHelper proxyRequestHelper, RequestHelper requestHelper, CredentialRepository credentialRepository, EnvironmentInfoRepository environmentInfoRepository) {
+    private EnvironmentService environmentService;
+
+    public HeimdallDecorationFilter(ProxyRouteLocator routeLocator, String dispatcherServletPath, ZuulProperties properties, ProxyRequestHelper proxyRequestHelper, RequestHelper requestHelper, CredentialService credentialService, EnvironmentService environmentService) {
 
         super(routeLocator, dispatcherServletPath, properties, proxyRequestHelper);
         this.routeLocator = routeLocator;
@@ -100,8 +100,8 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
         this.proxyRequestHelper = proxyRequestHelper;
         this.zuulServletPath = properties.getServletPath();
         this.requestHelper = requestHelper;
-        this.credentialRepository = credentialRepository;
-        this.environmentInfoRepository = environmentInfoRepository;
+        this.credentialService = credentialService;
+        this.environmentService = environmentService;
     }
 
     @Override
@@ -254,7 +254,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                 if (this.pathMatcher.match(pattern, requestURI)) {
 
                     auxMatch = true;
-                    List<Credential> credentials = credentialRepository.findByPattern(pattern);
+                    List<Credential> credentials = credentialService.findByPattern(pattern);
                     Credential credential = null;
                     if (Objects.nonNull(credentials) && !credentials.isEmpty()) {
 
@@ -287,12 +287,12 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
 
                         String host = ctx.getRequest().getHeader("Host");
 
-                        EnvironmentInfo environment;
+                        Environment environment;
                         String location = null;
                         if (host != null && !host.isEmpty()) {
-                            environment = environmentInfoRepository.findByApiIdAndEnvironmentInboundURL(credential.getApiId(), host.toLowerCase());
+                            environment = environmentService.find(credential.getApiId(), host.toLowerCase());
                         } else {
-                            environment = environmentInfoRepository.findByApiIdAndEnvironmentInboundURL(credential.getApiId(), ctx.getRequest().getRequestURL().toString().toLowerCase());
+                            environment = environmentService.find(credential.getApiId(), ctx.getRequest().getRequestURL().toString().toLowerCase());
                         }
 
                         if (environment != null) {

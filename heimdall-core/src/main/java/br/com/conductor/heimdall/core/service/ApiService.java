@@ -264,13 +264,12 @@ public class ApiService {
     private boolean validateInboundsEnvironments(Api api) {
         final List<Environment> environments = api.getEnvironments().stream()
                 .map(environment -> environmentService.find(environment))
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
         List<String> inbounds = environments.stream()
-                .map(e -> environmentService.find(e.getId()))
-                .filter(Objects::nonNull)
                 .map(Environment::getInboundURL)
-                .filter(e -> e != null && !e.isEmpty())
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
         return inbounds.stream().anyMatch(inbound -> Collections.frequency(inbounds, inbound) > 1);
