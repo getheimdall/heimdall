@@ -38,10 +38,15 @@ heimdall:
     security:
         enabled: true
         jwt:
-            expiration-time: 900000000
+            expiration-time: 600
             secret: secretKey
 
 spring:
+    data:
+        web:
+            pageable:
+                default-page-size: 10
+                max-page-size: 100
     redis:
         host: 127.0.0.1
         port: 6379
@@ -53,7 +58,7 @@ spring:
             INDENT_OUTPUT: true
             WRITE-DATES-AS-TIMESTAMPS: false
     rabbitmq:
-        host: 192.168.10.200
+        host: 127.0.0.1
         port: 5672
         virtual-host: dev
         requested-heartbeat: 10
@@ -70,8 +75,6 @@ endpoints:
     routes:
         enabled: true
         sensitive: false
-#    actuator:
-#        enabled: true
 
 management:
     health:

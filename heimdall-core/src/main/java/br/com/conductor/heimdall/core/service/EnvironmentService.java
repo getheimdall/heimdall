@@ -21,7 +21,7 @@ import br.com.conductor.heimdall.core.entity.Environment;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.EnvironmentRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -43,11 +43,15 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 @Service
 public class EnvironmentService {
 
-    @Autowired
-    private EnvironmentRepository environmentRepository;
+    private final ApiService apiService;
+    private final EnvironmentRepository environmentRepository;
 
-    @Autowired
-    private ApiService apiService;
+    public EnvironmentService(EnvironmentRepository environmentRepository,
+                              @Lazy ApiService apiService) {
+        this.environmentRepository = environmentRepository;
+        this.apiService = apiService;
+    }
+
 
     /**
      * Finds a {@link Environment} by its ID.
@@ -136,10 +140,9 @@ public class EnvironmentService {
         this.getApisWithEnvironment(id)
                 .forEach(api -> {
                     final long count = api.getEnvironments().stream()
-                        .map(this::find)
-                        .filter(env -> env.getInboundURL().equals(environmentPersist.getInboundURL()))
-                        .count()
-                        ;
+                            .map(this::find)
+                            .filter(env -> env.getInboundURL().equals(environmentPersist.getInboundURL()))
+                            .count();
 
                     HeimdallException.checkThrow(count > 1, ExceptionMessage.API_CANT_ENVIRONMENT_INBOUND_URL_EQUALS);
                 });

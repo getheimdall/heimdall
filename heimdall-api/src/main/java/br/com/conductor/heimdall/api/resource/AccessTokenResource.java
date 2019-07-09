@@ -18,7 +18,7 @@ package br.com.conductor.heimdall.api.resource;
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
-import br.com.conductor.heimdall.core.dto.persist.AccessTokenPersist;
+import br.com.conductor.heimdall.core.dto.AccessTokenDTO;
 import br.com.conductor.heimdall.core.entity.AccessToken;
 import br.com.conductor.heimdall.core.service.AccessTokenService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
@@ -99,16 +99,16 @@ public class AccessTokenResource {
     /**
      * Saves a {@link AccessToken}.
      *
-     * @param accessTokenPersist {@link AccessTokenPersist}
+     * @param accessTokenDTO {@link AccessTokenDTO}
      * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Save a new AccessToken")
     @PostMapping
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_ACCESSTOKEN)
-    public ResponseEntity<?> save(@RequestBody @Valid AccessTokenPersist accessTokenPersist) {
+    public ResponseEntity<?> save(@RequestBody @Valid AccessTokenDTO accessTokenDTO) {
 
-        AccessToken accessToken = GenericConverter.mapper(accessTokenPersist, AccessToken.class);
+        AccessToken accessToken = GenericConverter.mapper(accessTokenDTO, AccessToken.class);
         accessToken = accessTokenService.save(accessToken);
 
         return ResponseEntity.created(URI.create(String.format("/%s/%s", "access-tokens", accessToken.getId()))).build();
@@ -118,7 +118,7 @@ public class AccessTokenResource {
      * Updates a {@link AccessToken}.
      *
      * @param id                 The AccessToken Id
-     * @param accessTokenPersist {@link AccessTokenPersist}
+     * @param accessTokenDTO {@link AccessTokenDTO}
      * @return {@link ResponseEntity}
      */
     @ResponseBody
@@ -126,16 +126,16 @@ public class AccessTokenResource {
     @PutMapping(value = "/{accessTokenId}")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_ACCESSTOKEN)
     public ResponseEntity<?> update(@PathVariable("accessTokenId") String id,
-                                    @RequestBody AccessTokenPersist accessTokenPersist) {
+                                    @RequestBody AccessTokenDTO accessTokenDTO) {
 
-        PropertyMap<AccessTokenPersist, AccessToken> propertyMap = new PropertyMap<AccessTokenPersist, AccessToken>() {
+        PropertyMap<AccessTokenDTO, AccessToken> propertyMap = new PropertyMap<AccessTokenDTO, AccessToken>() {
             @Override
             protected void configure() {
                 skip(destination.getCode());
             }
         };
 
-        AccessToken accessToken = GenericConverter.convertWithMapping(accessTokenPersist, AccessToken.class, propertyMap);
+        AccessToken accessToken = GenericConverter.convertWithMapping(accessTokenDTO, AccessToken.class, propertyMap);
         accessToken = accessTokenService.update(id, accessToken);
 
         return ResponseEntity.ok(accessToken);

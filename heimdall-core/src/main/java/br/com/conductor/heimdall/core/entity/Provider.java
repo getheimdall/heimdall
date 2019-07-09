@@ -28,6 +28,7 @@ import java.util.List;
  * This class represents a Provider registered to the system.
  *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ * @author Marcelo Aguiar Rodrigues
  */
 @Data
 @EqualsAndHashCode(of = {"id"})

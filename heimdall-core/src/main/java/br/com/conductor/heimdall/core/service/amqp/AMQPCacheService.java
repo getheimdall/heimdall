@@ -15,58 +15,57 @@
  */
 package br.com.conductor.heimdall.core.service.amqp;
 
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import br.com.conductor.heimdall.core.util.RabbitConstants;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.stereotype.Service;
 
 /**
  * This class controls a Advanced Message Queuing Protocol (AMQP) cache service.
  *
  * @author Filipe Germano
  * @author Marcos Filho
- *
  */
 @Service
 public class AMQPCacheService {
 
-     @Autowired
-     private RabbitTemplate rabbitTemplate;     
+    private final RabbitTemplate rabbitTemplate;
 
-     /**
-      * Dispatch a message to clean cache by key
-      * 
-      * @param key		The cache key
-      */
-     public void dispatchClean(String key) {
-          
-          rabbitTemplate.convertAndSend(RabbitConstants.EXCHANGE_FANOUT_HEIMDALL_CLEAN_ALL_CACHES, "", key);
-     }
+    public AMQPCacheService(RabbitTemplate rabbitTemplate) {
+        this.rabbitTemplate = rabbitTemplate;
+    }
 
-     /**
-      * Dispatch a message to clean cache by key and id
-      * 
-      * @param key		The cache key
-      * @param id		The cache id
-      */
-     public void dispatchClean(String key, String id) {
-          
-          rabbitTemplate.convertAndSend(RabbitConstants.EXCHANGE_FANOUT_HEIMDALL_CLEAN_ALL_CACHES, "", key + ";" + id);
-     }
+    /**
+     * Dispatch a message to clean cache by key
+     *
+     * @param key The cache key
+     */
+    public void dispatchClean(String key) {
 
-     /**
-      * Dispatch a message to clean all caches
-      * 
-      */
-     public void dispatchClean() {
-          
-          rabbitTemplate.convertAndSend(RabbitConstants.EXCHANGE_FANOUT_HEIMDALL_CLEAN_ALL_CACHES, "", "");
-     }
+        rabbitTemplate.convertAndSend(RabbitConstants.EXCHANGE_FANOUT_HEIMDALL_CLEAN_ALL_CACHES, "", key);
+    }
 
-     public void dispatchCleanInterceptorsCache() {
+    /**
+     * Dispatch a message to clean cache by key and id
+     *
+     * @param key The cache key
+     * @param id  The cache id
+     */
+    public void dispatchClean(String key, String id) {
 
-          rabbitTemplate.convertAndSend(RabbitConstants.EXCHANGE_FANOUT_HEIMDALL_CLEAN_INTERCEPTORS_CACHE, "", "");
-     }
+        rabbitTemplate.convertAndSend(RabbitConstants.EXCHANGE_FANOUT_HEIMDALL_CLEAN_ALL_CACHES, "", key + ";" + id);
+    }
+
+    /**
+     * Dispatch a message to clean all caches
+     */
+    public void dispatchClean() {
+
+        rabbitTemplate.convertAndSend(RabbitConstants.EXCHANGE_FANOUT_HEIMDALL_CLEAN_ALL_CACHES, "", "");
+    }
+
+    public void dispatchCleanInterceptorsCache() {
+
+        rabbitTemplate.convertAndSend(RabbitConstants.EXCHANGE_FANOUT_HEIMDALL_CLEAN_INTERCEPTORS_CACHE, "", "");
+    }
 
 }

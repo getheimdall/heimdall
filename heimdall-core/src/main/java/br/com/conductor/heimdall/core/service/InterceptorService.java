@@ -28,8 +28,8 @@ import br.com.conductor.heimdall.core.repository.RateLimitRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPInterceptorService;
 import br.com.conductor.heimdall.core.util.ConstantsCache;
 import br.com.conductor.heimdall.core.util.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -53,29 +53,32 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 @Service
 public class InterceptorService {
 
-    @Autowired
-    private InterceptorRepository interceptorRepository;
-
-    @Autowired
-    private PlanService planService;
-
-    @Autowired
-    private ResourceService resourceService;
-
-    @Autowired
-    private OperationService operationService;
-
-    @Autowired
-    private ApiService apiService;
-
-    @Autowired
-    private RateLimitRepository ratelimitRepository;
-
-    @Autowired
-    private AMQPInterceptorService amqpInterceptorService;
+    private final AMQPInterceptorService amqpInterceptorService;
+    private final ApiService apiService;
+    private final InterceptorRepository interceptorRepository;
+    private final OperationService operationService;
+    private final PlanService planService;
+    private final RateLimitRepository ratelimitRepository;
+    private final ResourceService resourceService;
 
     @Value("${zuul.filter.root}")
     private String zuulFilterRoot;
+
+    public InterceptorService(AMQPInterceptorService amqpInterceptorService,
+                              @Lazy ApiService apiService,
+                              InterceptorRepository interceptorRepository,
+                              @Lazy OperationService operationService,
+                              @Lazy PlanService planService,
+                              RateLimitRepository ratelimitRepository,
+                              @Lazy ResourceService resourceService) {
+        this.amqpInterceptorService = amqpInterceptorService;
+        this.apiService = apiService;
+        this.interceptorRepository = interceptorRepository;
+        this.operationService = operationService;
+        this.planService = planService;
+        this.ratelimitRepository = ratelimitRepository;
+        this.resourceService = resourceService;
+    }
 
     /**
      * Finds a {@link Interceptor} by its ID.

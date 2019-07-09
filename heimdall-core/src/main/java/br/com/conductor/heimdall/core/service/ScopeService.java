@@ -21,7 +21,7 @@ import br.com.conductor.heimdall.core.entity.Scope;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.ScopeRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -42,17 +42,20 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 @Service
 public class ScopeService {
 
-    @Autowired
-    private ScopeRepository scopeRepository;
+    private final AMQPCacheService amqpCacheService;
+    private final ApiService apiService;
+    private final OperationService operationService;
+    private final ScopeRepository scopeRepository;
 
-    @Autowired
-    private ApiService apiService;
-
-    @Autowired
-    private OperationService operationService;
-
-    @Autowired
-    private AMQPCacheService amqpCacheService;
+    public ScopeService(AMQPCacheService amqpCacheService,
+                        @Lazy ApiService apiService,
+                        OperationService operationService,
+                        ScopeRepository scopeRepository) {
+        this.amqpCacheService = amqpCacheService;
+        this.apiService = apiService;
+        this.operationService = operationService;
+        this.scopeRepository = scopeRepository;
+    }
 
     @Transactional(readOnly = true)
     public Scope find(final String apiId, final String scopeId) {

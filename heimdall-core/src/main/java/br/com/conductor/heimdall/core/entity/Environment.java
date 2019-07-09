@@ -31,7 +31,7 @@ import java.util.Map;
  * This class represents a Environment registered to the system.
  * 
  * @author Filipe Germano
- *
+ * @author Marcelo Aguiar Rodrigues
  */
 @Data
 @EqualsAndHashCode(of = { "id" })

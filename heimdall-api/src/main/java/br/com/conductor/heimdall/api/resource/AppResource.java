@@ -17,9 +17,9 @@ package br.com.conductor.heimdall.api.resource;
 
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.dto.AppDTO;
+import br.com.conductor.heimdall.core.dto.AppUpdateDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
-import br.com.conductor.heimdall.core.dto.persist.AppPersist;
+import br.com.conductor.heimdall.core.dto.AppDTO;
 import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.service.AppService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
@@ -102,14 +102,14 @@ public class AppResource {
     /**
      * Saves a {@link App}.
      *
-     * @param appDTO {@link AppDTO}
+     * @param appDTO {@link AppUpdateDTO}
      * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Save a new App")
     @PostMapping
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_APP)
-    public ResponseEntity<?> save(@RequestBody @Valid AppPersist appDTO) {
+    public ResponseEntity<?> save(@RequestBody @Valid AppDTO appDTO) {
 
         App app = GenericConverter.mapper(appDTO, App.class);
         app = appService.save(app);
@@ -121,7 +121,7 @@ public class AppResource {
      * Updates a {@link App}.
      *
      * @param id     The App Id
-     * @param appDTO {@link AppDTO}
+     * @param appUpdateDTO {@link AppUpdateDTO}
      * @return {@link ResponseEntity}
      */
     @ResponseBody
@@ -129,9 +129,9 @@ public class AppResource {
     @PutMapping(value = "/{appId}")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_APP)
     public ResponseEntity<?> update(@PathVariable("appId") String id,
-                                    @RequestBody AppDTO appDTO) {
+                                    @RequestBody AppUpdateDTO appUpdateDTO) {
 
-        App app = GenericConverter.mapper(appDTO, App.class);
+        App app = GenericConverter.mapper(appUpdateDTO, App.class);
         app = appService.update(id, app);
 
         return ResponseEntity.ok(app);

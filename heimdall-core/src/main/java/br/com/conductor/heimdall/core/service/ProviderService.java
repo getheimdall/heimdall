@@ -16,7 +16,6 @@
 package br.com.conductor.heimdall.core.service;
 
 import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.ProviderDTO;
 import br.com.conductor.heimdall.core.dto.ProviderParamsDTO;
 import br.com.conductor.heimdall.core.entity.Provider;
@@ -24,10 +23,6 @@ import br.com.conductor.heimdall.core.entity.ProviderParam;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.ProviderRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
-import org.springframework.data.domain.ExampleMatcher.StringMatcher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -45,8 +40,11 @@ import java.util.stream.Collectors;
 @Service
 public class ProviderService {
 
-    @Autowired
-    private ProviderRepository providerRepository;
+    private final ProviderRepository providerRepository;
+
+    public ProviderService(ProviderRepository providerRepository) {
+        this.providerRepository = providerRepository;
+    }
 
     /**
      * Saves a {@link Provider} to the repository
@@ -64,7 +62,7 @@ public class ProviderService {
     /**
      * Edits a {@link Provider} by its Id
      *
-     * @param id   The {@link Provider} Id
+     * @param id           The {@link Provider} Id
      * @param providerEdit The {@link ProviderDTO}
      * @return The edited {@link Provider}
      */

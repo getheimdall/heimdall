@@ -15,56 +15,55 @@
  */
 package br.com.conductor.heimdall.core.service.amqp;
 
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import br.com.conductor.heimdall.core.dto.InterceptorFileDTO;
 import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.util.RabbitConstants;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.stereotype.Service;
 
 /**
  * This class controls a {@link Interceptor} cache service.
  *
  * @author Filipe Germano
  * @author Marcos Filho
- *
  */
 @Service
 @Slf4j
 public class AMQPInterceptorService {
 
-     @Autowired
-     private RabbitTemplate rabbitTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
-     /**
-      * Dispatch a message to update/create a interceptors
-      * 
-      * @param id
-      */
-     public void dispatchInterceptor(String id) {
-          
-          rabbitTemplate.convertAndSend(RabbitConstants.EXCHANGE_FANOUT_HEIMDALL_ADD_INTERCEPTORS, "", id);
-          log.debug("Dispatch Interceptor");
-     }
+    public AMQPInterceptorService(RabbitTemplate rabbitTemplate) {
+        this.rabbitTemplate = rabbitTemplate;
+    }
 
-     /**
-      * Dispatch a message to refresh all interceptors
-      * 
-      */
-     public void dispatchRefreshAllInterceptors() {
-          
-          rabbitTemplate.convertAndSend(RabbitConstants.EXCHANGE_FANOUT_HEIMDALL_REFRESH_ALL_INTERCEPTORS, "", "");
-     }
-     
-     /**
-      * Dispatch a message to remove a {@link Interceptor}
-      * 
-      * @param interceptor			The {@link InterceptorFileDTO}
-      */
-     public void dispatchRemoveInterceptors(InterceptorFileDTO interceptor) {
-          rabbitTemplate.convertAndSend(RabbitConstants.EXCHANGE_FANOUT_HEIMDALL_REMOVE_INTERCEPTORS, "", interceptor);
-     }
+    /**
+     * Dispatch a message to update/create a interceptors
+     *
+     * @param id
+     */
+    public void dispatchInterceptor(String id) {
+
+        rabbitTemplate.convertAndSend(RabbitConstants.EXCHANGE_FANOUT_HEIMDALL_ADD_INTERCEPTORS, "", id);
+        log.debug("Dispatch Interceptor");
+    }
+
+    /**
+     * Dispatch a message to refresh all interceptors
+     */
+    public void dispatchRefreshAllInterceptors() {
+
+        rabbitTemplate.convertAndSend(RabbitConstants.EXCHANGE_FANOUT_HEIMDALL_REFRESH_ALL_INTERCEPTORS, "", "");
+    }
+
+    /**
+     * Dispatch a message to remove a {@link Interceptor}
+     *
+     * @param interceptor The {@link InterceptorFileDTO}
+     */
+    public void dispatchRemoveInterceptors(InterceptorFileDTO interceptor) {
+        rabbitTemplate.convertAndSend(RabbitConstants.EXCHANGE_FANOUT_HEIMDALL_REMOVE_INTERCEPTORS, "", interceptor);
+    }
 
 }

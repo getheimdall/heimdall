@@ -15,7 +15,6 @@
  */
 package br.com.conductor.heimdall.core.service;
 
-import static br.com.conductor.heimdall.core.util.ConstantsOAuth.*;
 import br.com.conductor.heimdall.core.dto.request.OAuthRequest;
 import br.com.conductor.heimdall.core.dto.response.TokenImplicit;
 import br.com.conductor.heimdall.core.entity.App;
@@ -28,12 +27,16 @@ import br.com.conductor.heimdall.core.repository.OAuthAuthorizeRepository;
 import br.com.conductor.heimdall.core.util.JwtUtils;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import static br.com.conductor.heimdall.core.util.ConstantsOAuth.*;
 
 /**
  * This class provides methods to create and validate the {@link TokenOAuth}
@@ -44,14 +47,18 @@ import java.util.stream.Collectors;
 @Service
 public class OAuthService {
 
-    @Autowired
-    private OAuthAuthorizeRepository oAuthAuthorizeRepository;
+    private final AppRepository appRepository;
+    private final OAuthAuthorizeRepository oAuthAuthorizeRepository;
+    private final ProviderService providerService;
 
-    @Autowired
-    private ProviderService providerService;
+    public OAuthService(OAuthAuthorizeRepository oAuthAuthorizeRepository,
+                        ProviderService providerService,
+                        AppRepository appRepository) {
+        this.oAuthAuthorizeRepository = oAuthAuthorizeRepository;
+        this.providerService = providerService;
+        this.appRepository = appRepository;
+    }
 
-    @Autowired
-    private AppRepository appRepository;
 
     /**
      * Generates {@link TokenOAuth} from Code Authorize or RefreshToken

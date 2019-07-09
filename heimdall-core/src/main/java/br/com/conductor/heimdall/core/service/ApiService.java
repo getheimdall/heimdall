@@ -27,8 +27,8 @@ import br.com.conductor.heimdall.core.util.ConstantsPath;
 import br.com.conductor.heimdall.core.util.StringUtils;
 import io.swagger.models.Swagger;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -52,26 +52,29 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 @Slf4j
 public class ApiService {
 
-    @Autowired
-    private ApiRepository apiRepository;
+    private final AMQPRouteService amqpRoute;
+    private final ApiRepository apiRepository;
+    private final EnvironmentService environmentService;
+    private final InterceptorService interceptorService;
+    private final PlanService planService;
+    private final ResourceService resourceService;
+    private final SwaggerService swaggerService;
 
-    @Autowired
-    private AMQPRouteService amqpRoute;
-
-    @Autowired
-    private EnvironmentService environmentService;
-
-    @Autowired
-    private ResourceService resourceService;
-
-    @Autowired
-    private InterceptorService interceptorService;
-
-    @Autowired
-    private PlanService planService;
-
-    @Autowired
-    private SwaggerService swaggerService;
+    public ApiService(AMQPRouteService amqpRoute,
+                      ApiRepository apiRepository,
+                      EnvironmentService environmentService,
+                      InterceptorService interceptorService,
+                      PlanService planService,
+                      ResourceService resourceService,
+                      SwaggerService swaggerService) {
+        this.amqpRoute = amqpRoute;
+        this.apiRepository = apiRepository;
+        this.environmentService = environmentService;
+        this.interceptorService = interceptorService;
+        this.planService = planService;
+        this.resourceService = resourceService;
+        this.swaggerService = swaggerService;
+    }
 
     /**
      * Finds a {@link Api} by its ID.

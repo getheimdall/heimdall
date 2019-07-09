@@ -15,30 +15,30 @@
  */
 package br.com.conductor.heimdall.core.service.amqp;
 
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import br.com.conductor.heimdall.core.util.RabbitConstants;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.stereotype.Service;
 
 /**
  * This class controls a route cache service.
  *
  * @author Marcos Filho
- *
  */
 @Service
 public class AMQPRouteService {
 
-     @Autowired
-     private RabbitTemplate rabbitTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
-     /**
-      * Dispatch a message to refresh zuul routes
-      */
-     public void dispatchRoutes() {
+    public AMQPRouteService(RabbitTemplate rabbitTemplate) {
+        this.rabbitTemplate = rabbitTemplate;
+    }
 
-          rabbitTemplate.convertAndSend(RabbitConstants.EXCHANGE_FANOUT_HEIMDALL_ROUTES, "", "");
-     }
+    /**
+     * Dispatch a message to refresh zuul routes
+     */
+    public void dispatchRoutes() {
+
+        rabbitTemplate.convertAndSend(RabbitConstants.EXCHANGE_FANOUT_HEIMDALL_ROUTES, "", "");
+    }
 
 }

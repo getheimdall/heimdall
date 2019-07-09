@@ -21,7 +21,7 @@ import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.PlanRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -42,20 +42,23 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 @Service
 public class PlanService {
 
-    @Autowired
-    private PlanRepository planRepository;
+    private final AMQPCacheService amqpCacheService;
+    private final ApiService apiService;
+    private final AppService appService;
+    private final InterceptorService interceptorService;
+    private final PlanRepository planRepository;
 
-    @Autowired
-    private ApiService apiService;
-
-    @Autowired
-    private AppService appService;
-
-    @Autowired
-    private InterceptorService interceptorService;
-
-    @Autowired
-    private AMQPCacheService amqpCacheService;
+    public PlanService(AMQPCacheService amqpCacheService,
+                       @Lazy ApiService apiService,
+                       AppService appService,
+                       InterceptorService interceptorService,
+                       PlanRepository planRepository) {
+        this.amqpCacheService = amqpCacheService;
+        this.apiService = apiService;
+        this.appService = appService;
+        this.interceptorService = interceptorService;
+        this.planRepository = planRepository;
+    }
 
     @Transactional(readOnly = true)
     public Plan find(String id) {

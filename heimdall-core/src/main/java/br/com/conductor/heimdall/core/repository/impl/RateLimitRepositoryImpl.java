@@ -15,80 +15,80 @@
  */
 package br.com.conductor.heimdall.core.repository.impl;
 
-import javax.annotation.PostConstruct;
-
+import br.com.conductor.heimdall.core.entity.RateLimit;
 import br.com.conductor.heimdall.core.enums.Interval;
+import br.com.conductor.heimdall.core.repository.RateLimitRepository;
 import br.com.conductor.heimdall.core.util.ConstantsCache;
 import org.redisson.api.RLock;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import br.com.conductor.heimdall.core.entity.RateLimit;
-import br.com.conductor.heimdall.core.repository.RateLimitRepository;
+import javax.annotation.PostConstruct;
 
 /**
  * This class provides methods to save, find and delete a {@link RateLimit}.
  *
  * @author Marcos Filho
- *
  */
 @Repository
 public class RateLimitRepositoryImpl implements RateLimitRepository {
 
-     private RMap<String, RateLimit> map;
+    private RMap<String, RateLimit> map;
 
-     @Autowired
-     private RedissonClient redissonClientRateLimitInterceptor;
+    private final RedissonClient redissonClientRateLimitInterceptor;
 
-     @PostConstruct
-     private void init() {
+    public RateLimitRepositoryImpl(RedissonClient redissonClientRateLimitInterceptor) {
+        this.redissonClientRateLimitInterceptor = redissonClientRateLimitInterceptor;
+    }
 
-          if (redissonClientRateLimitInterceptor != null) {
-               map = redissonClientRateLimitInterceptor.getMap(RateLimit.KEY);
-          }
+    @PostConstruct
+    private void init() {
 
-     }
+        if (redissonClientRateLimitInterceptor != null) {
+            map = redissonClientRateLimitInterceptor.getMap(RateLimit.KEY);
+        }
 
-     @Override
-     public RateLimit save(RateLimit rate) {
+    }
 
-          if (map != null) {
-               map.put(rate.getPath(), rate);
-          }
-          return find(rate.getPath());
-     }
+    @Override
+    public RateLimit save(RateLimit rate) {
 
-     @Override
-     public RateLimit find(String path) {
+        if (map != null) {
+            map.put(rate.getPath(), rate);
+        }
+        return find(rate.getPath());
+    }
 
-          RateLimit rateLimit = null;
-          if (map != null) {
-               rateLimit = map.get(path);
-          }
-          return rateLimit;
-     }
+    @Override
+    public RateLimit find(String path) {
 
-     @Override
-     public void delete(String path) {
+        RateLimit rateLimit = null;
+        if (map != null) {
+            rateLimit = map.get(path);
+        }
+        return rateLimit;
+    }
 
-          if (map != null) {
-               map.remove(path);
-          }
-     }
+    @Override
+    public void delete(String path) {
 
-     @Override
-     public RLock getLock(String key) {
-          return redissonClientRateLimitInterceptor.getLock(key);
-     }
+        if (map != null) {
+            map.remove(path);
+        }
+    }
 
-     @Override
-     public RateLimit mountRatelimit(String interceptorId, Long calls, Interval interval) {
+    @Override
+    public RLock getLock(String key) {
+        return redissonClientRateLimitInterceptor.getLock(key);
+    }
 
-          String path = ConstantsCache.RATE_LIMIT_KEY_PREFIX + interceptorId;
+    @Override
+    public RateLimit mountRatelimit(String interceptorId, Long calls, Interval interval) {
 
-          RateLimit rate = new RateLimit(path, calls, interval);
-          return this.save(rate);
-     }
+        String path = ConstantsCache.RATE_LIMIT_KEY_PREFIX + interceptorId;
+
+        RateLimit rate = new RateLimit(path, calls, interval);
+        return this.save(rate);
+    }
 }

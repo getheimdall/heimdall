@@ -35,7 +35,7 @@ import java.util.Set;
  * This class represents a Interceptor registered to the system.
  * 
  * @author Filipe Germano
- *
+ * @author Marcelo Aguiar Rodrigues
  */
 @Data
 @EqualsAndHashCode(of = { "id" })

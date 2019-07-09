@@ -25,7 +25,7 @@ import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
 import br.com.conductor.heimdall.core.util.ConstantsCache;
 import br.com.conductor.heimdall.core.util.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -49,23 +49,26 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 @Service
 public class OperationService {
 
-    @Autowired
-    private OperationRepository operationRepository;
+    private final OperationRepository operationRepository;
+    private final ResourceService resourceService;
+    private final InterceptorService interceptorService;
+    private final ApiService apiService;
+    private final AMQPRouteService amqpRoute;
+    private final AMQPCacheService amqpCacheService;
 
-    @Autowired
-    private ResourceService resourceService;
-
-    @Autowired
-    private InterceptorService interceptorService;
-
-    @Autowired
-    private ApiService apiService;
-
-    @Autowired
-    private AMQPRouteService amqpRoute;
-
-    @Autowired
-    private AMQPCacheService amqpCacheService;
+    public OperationService(OperationRepository operationRepository,
+                            @Lazy ResourceService resourceService,
+                            InterceptorService interceptorService,
+                            @Lazy ApiService apiService,
+                            AMQPRouteService amqpRoute,
+                            AMQPCacheService amqpCacheService) {
+        this.operationRepository = operationRepository;
+        this.resourceService = resourceService;
+        this.interceptorService = interceptorService;
+        this.apiService = apiService;
+        this.amqpRoute = amqpRoute;
+        this.amqpCacheService = amqpCacheService;
+    }
 
     /**
      * Finds a {@link Operation} by its Id, {@link Resource} Id and {@link Api} Id.
@@ -206,7 +209,6 @@ public class OperationService {
     }
 
     /**
-     * TODO
      * Updates a {@link Operation} by its Id, {@link Api} Id, {@link Resource} Id
      *
      * @param apiId            The {@link Api} Id

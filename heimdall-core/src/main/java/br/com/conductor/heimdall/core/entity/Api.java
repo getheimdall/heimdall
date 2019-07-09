@@ -33,7 +33,7 @@ import java.util.Set;
  * This class represents a Api registered to the system.<br/>
  * 
  * @author Filipe Germano
- *
+ * @author Marcelo Aguiar Rodrigues
  */
 @Data
 @EqualsAndHashCode(of = { "id" })

@@ -23,7 +23,7 @@ import br.com.conductor.heimdall.core.entity.Resource;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.ResourceRepository;
 import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -46,20 +46,23 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ONLY_ONE
 @Service
 public class ResourceService {
 
-    @Autowired
-    private ResourceRepository resourceRepository;
+    private final AMQPRouteService amqpRoute;
+    private final ApiService apiService;
+    private final InterceptorService interceptorService;
+    private final OperationService operationService;
+    private final ResourceRepository resourceRepository;
 
-    @Autowired
-    private ApiService apiService;
-
-    @Autowired
-    private OperationService operationService;
-
-    @Autowired
-    private InterceptorService interceptorService;
-
-    @Autowired
-    private AMQPRouteService amqpRoute;
+    public ResourceService(AMQPRouteService amqpRoute,
+                           @Lazy ApiService apiService,
+                           InterceptorService interceptorService,
+                           OperationService operationService,
+                           ResourceRepository resourceRepository) {
+        this.amqpRoute = amqpRoute;
+        this.apiService = apiService;
+        this.interceptorService = interceptorService;
+        this.operationService = operationService;
+        this.resourceRepository = resourceRepository;
+    }
 
 
     /**

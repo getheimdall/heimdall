@@ -15,78 +15,78 @@
  */
 package br.com.conductor.heimdall.core.service;
 
+import org.redisson.api.RedissonClient;
+import org.springframework.cache.CacheManager;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.redisson.api.RedissonClient;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.cache.CacheManager;
-import org.springframework.stereotype.Service;
-
 /**
  * This class provides a method for manipulate the cache.
- * 
- * @author Filipe Germano
  *
+ * @author Filipe Germano
  */
 @Service
 public class CacheService {
-     
-     @Autowired
-     CacheManager cacheManager;
 
-     @Autowired
-     private RedissonClient redissonClientCacheInterceptor;
+    private final CacheManager cacheManager;
+    private final RedissonClient redissonClientCacheInterceptor;
 
-     /**
-      * Returns the list of cached names.
-      * 
-      * @return	List of cached names
-      */
-     public List<String> list() {
-          
-          List<String> cacheNames = new ArrayList<>(cacheManager.getCacheNames());
-          
-          return cacheNames;
-     }
+    public CacheService(CacheManager cacheManager,
+                        RedissonClient redissonClientCacheInterceptor) {
+        this.cacheManager = cacheManager;
+        this.redissonClientCacheInterceptor = redissonClientCacheInterceptor;
+    }
 
-     /**
-      * Cleans a specific entry of a cache by key and id.
-      * 
-      * @param key The name of the cache
-      * @param id The id to remove
-      */
-     public void clean(String key, String id) {
-          
-          cacheManager.getCache(key).evict(id);
-     }
-     
-     /**
-      * Cleans the entire cache
-      */
-     public void clean() {
-          
-          Collection<String> cacheNames = cacheManager.getCacheNames();
-          for (String name : cacheNames) {
-               
-               cacheManager.getCache(name).clear();
-          }
-     }
+    /**
+     * Returns the list of cached names.
+     *
+     * @return List of cached names
+     */
+    public List<String> list() {
 
-     /**
-      * Cleans all references of a cache entry.
-      * 
-      * @param key The name of the cache
-      */
-     public void clean(String key) {
-          
-          cacheManager.getCache(key).clear();
-     }
+        List<String> cacheNames = new ArrayList<>(cacheManager.getCacheNames());
 
-     public void cleanInterceptorsCache() {
-          redissonClientCacheInterceptor.getKeys().flushdb();
-     }
+        return cacheNames;
+    }
+
+    /**
+     * Cleans a specific entry of a cache by key and id.
+     *
+     * @param key The name of the cache
+     * @param id  The id to remove
+     */
+    public void clean(String key, String id) {
+
+        cacheManager.getCache(key).evict(id);
+    }
+
+    /**
+     * Cleans the entire cache
+     */
+    public void clean() {
+
+        Collection<String> cacheNames = cacheManager.getCacheNames();
+        for (String name : cacheNames) {
+
+            cacheManager.getCache(name).clear();
+        }
+    }
+
+    /**
+     * Cleans all references of a cache entry.
+     *
+     * @param key The name of the cache
+     */
+    public void clean(String key) {
+
+        cacheManager.getCache(key).clear();
+    }
+
+    public void cleanInterceptorsCache() {
+        redissonClientCacheInterceptor.getKeys().flushdb();
+    }
 
 }
