@@ -15,39 +15,42 @@
  */
 package br.com.conductor.heimdall.core.dto;
 
+import java.io.Serializable;
+import java.util.List;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.enums.Status;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import java.io.Serializable;
-import java.util.Set;
-
 /**
  * Class is a Data Transfer Object for the {@link App}.
  *
- * @author Filipe Germano
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
 @Data
 public class AppDTO implements Serializable {
 
-     private static final long serialVersionUID = 4168592185106510648L;
+    private static final long serialVersionUID = 4168592185106510648L;
 
-     @NotNull
-     @Size(max = 180)
-     private String name;
+    @NotNull
+    @Size(max = 180)
+    private String name;
 
-     @Size(max = 200)
-     private String description;
-     
-     @NotNull
-     private String developerId;
+    @Size(max = 200)
+    private String description;
 
-     private Status status = Status.ACTIVE;
-     
-     @NotNull
-     @Size(min = 1)
-     private Set<String> plans;
+    @NotNull
+    private String developerId;
+
+    private Status status;
+
+    @NotNull
+    @Size(min = 1)
+    private List<String> plans;
+
+    private String clientId;
 }

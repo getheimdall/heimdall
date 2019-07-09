@@ -49,12 +49,6 @@ public class ApiDTO implements Serializable {
     @Size(max = 80)
     private String basePath;
 
-    @Size(max = 200)
-    private String destinationProduction;
-
-    @Size(max = 200)
-    private String destinationSandbox;
-
     private Status status = Status.ACTIVE;
 
     private Set<String> environments;

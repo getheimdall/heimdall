@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package br.com.conductor.heimdall.core.dto.persist;
+package br.com.conductor.heimdall.core.dto;
 
 import br.com.conductor.heimdall.core.entity.AccessToken;
 import br.com.conductor.heimdall.core.enums.Status;
@@ -30,7 +30,7 @@ import java.util.List;
  * @author Filipe Germano
  */
 @Data
-public class AccessTokenPersist implements Serializable {
+public class AccessTokenDTO implements Serializable {
 
     private static final long serialVersionUID = -9130167171077204284L;
 
