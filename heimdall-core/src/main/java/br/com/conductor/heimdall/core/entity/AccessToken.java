@@ -24,7 +24,7 @@ import org.springframework.data.redis.core.index.Indexed;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 
 /**
  *  The Access Token is required for a safe connection to be established.
@@ -50,7 +50,7 @@ public class AccessToken implements Serializable {
 
      private LocalDateTime creationDate;
      
-     private List<String> plans;
+     private Set<String> plans;
      
      private Status status;
 

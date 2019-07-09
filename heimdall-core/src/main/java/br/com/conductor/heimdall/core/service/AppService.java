@@ -177,7 +177,7 @@ public class AppService {
           if (Objects.nonNull(accessTokenList)) {
                accessTokenList.forEach(accessToken -> {
                     if (Objects.nonNull(accessToken.getPlans()) && !accessToken.getPlans().isEmpty()) {
-                         List<String> planList = accessToken.getPlans().stream().filter(plansIds::contains).collect(Collectors.toList());
+                         Set<String> planList = accessToken.getPlans().stream().filter(plansIds::contains).collect(Collectors.toSet());
                          accessToken.setPlans(planList);
                          accessTokenService.update(accessToken);
                     }
