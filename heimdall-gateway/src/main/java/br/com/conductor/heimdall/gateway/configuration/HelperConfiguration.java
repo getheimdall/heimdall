@@ -27,16 +27,24 @@ import br.com.conductor.heimdall.gateway.filter.helper.HelperImpl;
 import br.com.conductor.heimdall.middleware.spec.Helper;
 
 /**
- * 
+ *
  * @author marcos.filho
  *
  */
 @Configuration
 public class HelperConfiguration {
 
-	@Bean
-	public Helper helper() {
-		return new HelperImpl();
-	}
-	
+     @Bean
+     public Helper helper() {
+
+          return new HelperImpl();
+     }
+
+     @Bean
+     @RequestScope
+     public TimeoutCounter timeoutCounter() {
+
+          return new TimeoutCounter();
+     }
+
 }

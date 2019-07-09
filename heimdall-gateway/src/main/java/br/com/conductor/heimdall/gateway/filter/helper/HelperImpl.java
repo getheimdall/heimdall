@@ -20,6 +20,8 @@
 package br.com.conductor.heimdall.gateway.filter.helper;
 
 import br.com.conductor.heimdall.core.environment.Property;
+import br.com.conductor.heimdall.core.util.BeanManager;
+import br.com.conductor.heimdall.gateway.configuration.TimeoutCounter;
 import br.com.conductor.heimdall.gateway.failsafe.CircuitBreakerManager;
 import br.com.conductor.heimdall.gateway.filter.helper.http.HeimdallResponseErrorHandler;
 import br.com.conductor.heimdall.middleware.enums.DBType;
@@ -96,7 +98,8 @@ public class HelperImpl implements Helper {
 
 	@Override
 	public Http http() {
-		return new HttpImpl(rest(), circuitBreakerManager, property.getFailsafe().isEnabled());
+		TimeoutCounter timeoutCounter = (TimeoutCounter) BeanManager.getBean(TimeoutCounter.class);
+		return new HttpImpl(rest(), circuitBreakerManager, property.getFailsafe().isEnabled(), timeoutCounter);
 	}
 	
 	private RestTemplate rest() {
@@ -111,9 +114,10 @@ public class HelperImpl implements Helper {
     }
 	
 	private HttpComponentsClientHttpRequestFactory httpClientRequestFactory() {
+		TimeoutCounter timeoutCounter = (TimeoutCounter) BeanManager.getBean(TimeoutCounter.class);
 		HttpComponentsClientHttpRequestFactory httpClient = new HttpComponentsClientHttpRequestFactory();
 		httpClient.setConnectTimeout(zuulProperty.getHost().getConnectTimeoutMillis());
-		httpClient.setReadTimeout(zuulProperty.getHost().getSocketTimeoutMillis());
+		httpClient.setReadTimeout((int) timeoutCounter.getCounter());
 		return httpClient;
 	}
 

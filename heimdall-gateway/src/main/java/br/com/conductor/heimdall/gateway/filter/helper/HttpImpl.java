@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import br.com.conductor.heimdall.gateway.configuration.TimeoutCounter;
 import org.apache.http.entity.ContentType;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -65,15 +66,18 @@ public class HttpImpl implements Http {
     private MultiValueMap<String, String> formData;
 
     private RestTemplate restTemplate;
-    
+
     private MultiValueMap<String, String> queryParams;
 
     private CircuitBreakerManager circuitBreakerManager;
 
     private boolean isFailSafeEnabled;
 
-    public HttpImpl(RestTemplate restTemplate, CircuitBreakerManager circuitBreakerManager, boolean isFailSafeEnabled) {
-    	this.restTemplate = restTemplate;
+    private TimeoutCounter timeoutCounter;
+
+    public HttpImpl(RestTemplate restTemplate, CircuitBreakerManager circuitBreakerManager, boolean isFailSafeEnabled, TimeoutCounter timeoutCounter) {
+        this.timeoutCounter = timeoutCounter;
+    	   this.restTemplate = restTemplate;
         this.circuitBreakerManager = circuitBreakerManager;
         this.isFailSafeEnabled = isFailSafeEnabled;
         this.queryParams = new LinkedMultiValueMap<>();
@@ -152,7 +156,7 @@ public class HttpImpl implements Http {
 
         setUIDFromInterceptor();
         ResponseEntity<String> entity;
-    
+
         updateQueryParams();
         if (headers.isEmpty()) {
             entity = sendRequest(uriComponentsBuilder.build().encode().toUri(), HttpMethod.GET, new HttpEntity(new HttpHeaders()), String.class);
@@ -168,7 +172,7 @@ public class HttpImpl implements Http {
 
         setUIDFromInterceptor();
         ResponseEntity<String> entity;
-    
+
         updateQueryParams();
         if (headers.isEmpty()) {
 
@@ -197,7 +201,7 @@ public class HttpImpl implements Http {
 
         setUIDFromInterceptor();
         ResponseEntity<String> entity;
-    
+
         updateQueryParams();
         if (headers.isEmpty()) {
 
@@ -224,7 +228,7 @@ public class HttpImpl implements Http {
 
         setUIDFromInterceptor();
         ResponseEntity<String> entity;
-    
+
         updateQueryParams();
         if (headers.isEmpty()) {
             entity = sendRequest(uriComponentsBuilder.build().encode().toUri(), HttpMethod.DELETE, null, String.class);
@@ -240,7 +244,7 @@ public class HttpImpl implements Http {
 
         setUIDFromInterceptor();
         ResponseEntity<String> entity;
-    
+
         updateQueryParams();
         if (headers.isEmpty()) {
             requestBody = new HttpEntity<>(body);
@@ -260,17 +264,24 @@ public class HttpImpl implements Http {
 
     private <T> ResponseEntity<T> sendRequest(URI uri, HttpMethod method, HttpEntity httpEntity, Class<T> responseType) {
 
-        if (isFailSafeEnabled) {
+         long startRequestTime = System.currentTimeMillis();
+         if (isFailSafeEnabled) {
 
-            String url = method.name() + ":" + uri.toString();
+              String url = method.name() + ":" + uri.toString();
 
-            return circuitBreakerManager.failsafe(
-                    () -> this.restTemplate.exchange(uri, method, httpEntity, responseType),
-                    url
-            );
-        }
+              ResponseEntity<T> response = circuitBreakerManager
+                        .failsafe(() -> this.restTemplate.exchange(uri, method, httpEntity, responseType),
+                                  url
+                        );
+              long endRequestTime = System.currentTimeMillis();
+              timeoutCounter.decrementCounter(endRequestTime - startRequestTime);
+              return response;
+         }
 
-        return this.restTemplate.exchange(uri, method, httpEntity, responseType);
+         ResponseEntity<T> response = this.restTemplate.exchange(uri, method, httpEntity, responseType);
+         long endRequestTime = System.currentTimeMillis();
+         timeoutCounter.decrementCounter(endRequestTime - startRequestTime);
+         return response;
 
     }
 
