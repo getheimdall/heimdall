@@ -1,9 +1,6 @@
-/*-
- * =========================LICENSE_START==================================
- * heimdall-core
- * ========================================================================
+/*
  * Copyright (C) 2018 Conductor Tecnologia SA
- * ========================================================================
+ *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,12 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * ==========================LICENSE_END===================================
  */
 package br.com.conductor.heimdall.gateway.service;
 
 import br.com.conductor.heimdall.core.entity.App;
-import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.repository.AppRepository;
 import com.netflix.zuul.context.RequestContext;
@@ -28,7 +23,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static br.com.conductor.heimdall.gateway.util.ConstantsContext.*;
 
@@ -46,7 +40,6 @@ public class LifeCycleService {
     public boolean should(InterceptorLifeCycle interceptorLifeCycle,
                           String referenceId,
                           String apiId,
-                          Set<String> ignoredResources,
                           Set<String> ignoredOperations,
                           Boolean status) {
 
@@ -59,7 +52,6 @@ public class LifeCycleService {
         if (!apiId.equals(requestApiId)) return false;
 
         String resourceId = (String) context.get(RESOURCE_ID);
-        if (ignoredResources.contains(resourceId)) return false;
 
         String operationId = (String) context.get(OPERATION_ID);
         if (ignoredOperations.contains(operationId)) return false;
