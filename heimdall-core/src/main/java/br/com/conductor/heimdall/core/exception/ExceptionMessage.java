@@ -40,6 +40,8 @@ public enum ExceptionMessage {
 
     GLOBAL_NOT_FOUND(NOT_FOUND.value(), "{} not found", NotFoundException.class),
 
+    GLOBAL_ALREADY_REGISTERED(BAD_REQUEST.value(), "{} already registered", BadRequestException.class),
+
     GLOBAL_RESOURCE_NOT_FOUND(NOT_FOUND.value(), "Resource not found", NotFoundException.class),
 
     GLOBAL_JSON_INVALID_FORMAT(BAD_REQUEST.value(), "Json invalid format", BadRequestException.class),
@@ -48,45 +50,21 @@ public enum ExceptionMessage {
 
     GLOBAL_TIMEOUT(REQUEST_TIMEOUT.value(), REQUEST_TIMEOUT.getReasonPhrase(), TimeoutException.class),
 
-    ACCESS_TOKEN_ALREADY_EXISTS(BAD_REQUEST.value(), "Access Token already used", BadRequestException.class),
-
     INTERCEPTOR_LIMIT_REACHED(BAD_REQUEST.value(), "Intercept limit reached", BadRequestException.class),
 
     INTERCEPTOR_INVALID_CONTENT(BAD_REQUEST.value(), "Content for {} interceptor is incorrect. Use the standard: {}", BadRequestException.class),
-
-    INTERCEPTOR_NO_APP_FOUND(BAD_REQUEST.value(), "No App registered to this Api with client_id provided.", BadRequestException.class),
 
     INTERCEPTOR_NOT_EXIST(BAD_REQUEST.value(), "Interceptor defined not exist", BadRequestException.class),
 
     INTERCEPTOR_TEMPLATE_NOT_EXIST(BAD_REQUEST.value(), "Template interceptor not exist", BadRequestException.class),
 
-    INTERCEPTOR_REFERENCE_NOT_FOUND(BAD_REQUEST.value(), "Reference interceptor not found", BadRequestException.class),
-
     INTERCEPTOR_IGNORED_INVALID(BAD_REQUEST.value(), "Reference operations invalid: {}", BadRequestException.class),
 
     INTERCEPTOR_INVALID_LIFECYCLE(BAD_REQUEST.value(), "ClientID interceptor can not be attached to the Plan life cycle", BadRequestException.class),
 
-    ACCESS_TOKEN_NOT_FOUND(BAD_REQUEST.value(), "Access token not found", BadRequestException.class),
-
-    APP_REPEATED(BAD_REQUEST.value(), "App repeated", BadRequestException.class),
-
-    DEVELOPER_NOT_FOUND(BAD_REQUEST.value(), "Developer not found", BadRequestException.class),
-
-    RESOURCE_METHOD_NOT_ACCEPT(BAD_REQUEST.value(), "method not accepted please use: GET, POST, PUT, PATH or DELETE", BadRequestException.class),
-
-    APP_NOT_FOUND(BAD_REQUEST.value(), "App not found", BadRequestException.class),
-
-    API_NOT_EXIST(BAD_REQUEST.value(), "Api does not exist", BadRequestException.class),
-
-    API_BASEPATH_EXIST(BAD_REQUEST.value(), "The basepath defined exist", BadRequestException.class),
-
     API_BASEPATH_EMPTY(BAD_REQUEST.value(), "Basepath not defined", BadRequestException.class),
 
     API_CANT_ENVIRONMENT_INBOUND_URL_EQUALS(BAD_REQUEST.value(), "Apis can't have environments with the same inbound url", BadRequestException.class),
-
-    ONLY_ONE_OPERATION_PER_RESOURCE(BAD_REQUEST.value(), "Only one operation per resource", BadRequestException.class),
-
-    ONLY_ONE_RESOURCE_PER_API(BAD_REQUEST.value(), "Only one resource per api", BadRequestException.class),
 
     SOME_PLAN_NOT_PRESENT_IN_APP(BAD_REQUEST.value(), "Some of the informed plans do not belong to the App's plans", BadRequestException.class),
 
