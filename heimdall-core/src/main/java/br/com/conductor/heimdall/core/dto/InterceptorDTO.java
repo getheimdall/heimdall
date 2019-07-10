@@ -56,8 +56,6 @@ public class InterceptorDTO implements Serializable {
      @NotNull
      private InterceptorLifeCycle lifeCycle;
      
-     private String environmentId;
-     
      @NotNull
      private TypeExecutionPoint executionPoint;
 
