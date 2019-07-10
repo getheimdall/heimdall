@@ -55,61 +55,6 @@ public class Property {
           private String prefix;
 
      }
-
-     private Datasource datasource = new Datasource();
-
-     @Data
-     public class Datasource{
-
-          private Long initializationFailTimeout;
-
-          private String dataBaseType;
-
-          private Integer socketTimeout;
-
-          private String loginTimeout;
-
-          private Integer minimumIdle;
-
-          private Integer maximumPoolSize;
-
-          private Long validationTimeout;
-
-          private Long idleTimeout;
-
-          private Long connectionTimeout;
-
-          private Boolean autoCommit;
-
-          private String dataSourceClassName;
-
-          private String connectionTestQuery;
-
-          private String appName;
-
-          private String databaseName;
-
-          private String portNumber;
-
-          private String serverName;
-
-          private String username;
-
-          private String password;
-          
-          private Boolean encrypt;
-          
-          private Boolean trustServerCertificate;
-          
-          private String hostNameInCertificate;
-
-          private boolean sendStringParametersAsUnicode;
-
-          private boolean multiSubnetFailover;
-          
-          private String url;
-
-     }
      
      private Redis redis = new Redis();
      
