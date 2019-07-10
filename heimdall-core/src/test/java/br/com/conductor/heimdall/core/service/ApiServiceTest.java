@@ -24,7 +24,7 @@ import br.com.conductor.heimdall.core.repository.ApiRepository;
 import br.com.conductor.heimdall.core.repository.EnvironmentRepository;
 import br.com.conductor.heimdall.core.repository.PlanRepository;
 import br.com.conductor.heimdall.core.repository.ResourceRepository;
-import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
+//import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
 import io.swagger.models.Swagger;
 import org.junit.Before;
 import org.junit.Rule;
@@ -82,8 +82,8 @@ public class ApiServiceTest {
     @Mock
     private SwaggerService swaggerService;
 
-    @Mock
-    private AMQPRouteService amqpRoute;
+//    @Mock
+// TODO   private AMQPRouteService amqpRoute;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();

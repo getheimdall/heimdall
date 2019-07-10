@@ -23,7 +23,7 @@ import br.com.conductor.heimdall.core.exception.NotFoundException;
 import br.com.conductor.heimdall.core.repository.AccessTokenRepository;
 import br.com.conductor.heimdall.core.repository.AppRepository;
 import br.com.conductor.heimdall.core.repository.PlanRepository;
-import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
+//import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -60,30 +60,27 @@ public class AccessTokenServiceTest {
     @Mock
     private PlanRepository planRepository;
 
-    @Mock
-    private AMQPCacheService amqpCacheService;
+//    @Mock
+// TODO   private AMQPCacheService amqpCacheService;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
     private App app;
 
-    private Plan plan;
-
     private Set<String> plans;
 
     @Before
     public void setUp() {
         this.app = new App("10L", null, null, null, null, null, null, null, null);
-        this.plan = new Plan("1L", null, null, null, null, false, null, null);
         this.plans = new HashSet<>();
-        this.plans.add(plan.getId());
+        this.plans.add("1L");
     }
 
     @Test
     public void notPermitToSaveTheAccessTokenWithCodeExistent() {
         thrown.expect(BadRequestException.class);
-        thrown.expectMessage("Access Token already used");
+        thrown.expectMessage("Access Token already registered");
 
         AccessToken persist = new AccessToken();
         persist.setCode("123456");
