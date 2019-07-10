@@ -73,7 +73,7 @@ public class EnvironmentService {
         final List<Environment> environments = environmentRepository.findAllById(api.getEnvironments());
 
         return environments.stream()
-                .filter(environment -> inboundURL.equals(environment.getInboundURL()))
+                .filter(environment -> environment.getInboundURL().contains(inboundURL))
                 .findFirst().orElse(null);
     }
 
@@ -163,7 +163,6 @@ public class EnvironmentService {
         Environment environment = this.find(id);
 
         final long totalEnvironmentsAttached = this.getApisWithEnvironment(id).size();
-//        Integer totalEnvironmentsAttached = environmentRepository.findApisWithEnvironment(id);
         HeimdallException.checkThrow(totalEnvironmentsAttached > 0, ENVIRONMENT_ATTACHED_TO_API);
 
         environmentRepository.delete(environment);
