@@ -1,9 +1,6 @@
-/*-
- * =========================LICENSE_START==================================
- * heimdall-gateway
- * ========================================================================
+/*
  * Copyright (C) 2018 Conductor Tecnologia SA
- * ========================================================================
+ *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,7 +12,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * ==========================LICENSE_END===================================
  */
 
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
@@ -31,10 +27,10 @@ import java.util.Set;
 
 public class WhitelistInterceptor extends HeimdallFilter {
 
-    private static Set<Long> ignoredOperations;
+    private static Set<String> ignoredOperations;
     private static Set<String> whitelist;
-    private static Long referenceId;
-    private static Long apiId;
+    private static String referenceId;
+    private static String apiId;
     private static boolean status;
 
     public WhitelistInterceptor() {
@@ -49,8 +45,8 @@ public class WhitelistInterceptor extends HeimdallFilter {
         whitelist.add("{{.}}");
         {{/ips}}
 
-        referenceId = {{referenceId}};
-        apiId = {{apiId}};
+        referenceId = "{{referenceId}}";
+        apiId = "{{apiId}}";
         status = {{interceptorStatus}};
     }
 
