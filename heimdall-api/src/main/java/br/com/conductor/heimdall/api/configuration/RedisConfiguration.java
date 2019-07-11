@@ -16,25 +16,22 @@
 package br.com.conductor.heimdall.api.configuration;
 
 import br.com.conductor.heimdall.core.entity.RateLimit;
-import br.com.conductor.heimdall.core.environment.Property;
 import br.com.conductor.heimdall.core.publisher.MessagePublisher;
 import br.com.conductor.heimdall.core.publisher.RedisMessagePublisher;
 import br.com.conductor.heimdall.core.util.ConstantsCache;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import redis.clients.jedis.JedisPoolConfig;
-
-import java.time.Duration;
 
 /**
  * Class responsible for the Redis configuration.
@@ -47,8 +44,11 @@ import java.time.Duration;
 @Profile("!test")
 public class RedisConfiguration {
 
-    @Autowired
-    Property property;
+    @Value("${spring.redis.host}")
+    private String redisHost;
+
+    @Value("${spring.redis.port}")
+    private int redisPort;
 
     /**
      * Creates a new {@link JedisConnectionFactory}.
@@ -58,29 +58,12 @@ public class RedisConfiguration {
     @Bean
     public JedisConnectionFactory jedisConnectionFactory() {
 
-        return new JedisConnectionFactory(jediPoolConfig());
-    }
+        RedisStandaloneConfiguration redisStandaloneConfiguration
+                = new RedisStandaloneConfiguration(redisHost, redisPort);
 
-    /**
-     * Returns a configured {@link JedisPoolConfig}.
-     *
-     * @return {@link JedisPoolConfig}
-     */
-    public JedisPoolConfig jediPoolConfig() {
-        final JedisPoolConfig poolConfig = new JedisPoolConfig();
-        poolConfig.setMaxTotal(property.getRedis().getMaxTotal());
-        poolConfig.setMaxIdle(property.getRedis().getMaxIdle());
-        poolConfig.setMinIdle(property.getRedis().getMinIdle());
-        poolConfig.setTestOnBorrow(property.getRedis().isTestOnBorrow());
-        poolConfig.setTestOnReturn(property.getRedis().isTestOnReturn());
-        poolConfig.setTestWhileIdle(property.getRedis().isTestWhileIdle());
-        poolConfig.setMinEvictableIdleTimeMillis(Duration.ofSeconds(property.getRedis().getMinEvictableIdleTimeSeconds()).toMillis());
-        poolConfig.setTimeBetweenEvictionRunsMillis(Duration.ofSeconds(property.getRedis().getTimeBetweenEvictionRunsSeconds()).toMillis());
-        poolConfig.setNumTestsPerEvictionRun(property.getRedis().getNumTestsPerEvictionRun());
-        poolConfig.setBlockWhenExhausted(property.getRedis().isBlockWhenExhausted());
-        return poolConfig;
-    }
+        return new JedisConnectionFactory(redisStandaloneConfiguration);
 
+    }
 
     /**
      * Returns a configured {@link RedisTemplate}.
@@ -146,8 +129,7 @@ public class RedisConfiguration {
 
         Config config = new Config();
         config.useSingleServer()
-                .setAddress(property.getRedis().getHost() + ":" + property.getRedis().getPort())
-                .setConnectionPoolSize(property.getRedis().getConnectionPoolSize())
+                .setAddress(redisHost + ":" + redisPort)
                 .setDatabase(database);
 
         return Redisson.create(config);

@@ -29,20 +29,6 @@ heimdall:
         sanitizes:
             - access_token
             - client_id
-    redis:
-        host: 127.0.0.1
-        port: 6379
-        maxTotal: 128
-        maxIdle: 128
-        minIdle: 16
-        testOnBorrow: true
-        testOnReturn: true
-        testWhileIdle: true
-        minEvictableIdleTimeSeconds: 60
-        timeBetweenEvictionRunsSeconds: 30
-        numTestsPerEvictionRun: 3
-        blockWhenExhausted: true
-        connectionPoolSize: 10
     failsafe:
         enabled: false
         failureNumber: 4
@@ -60,8 +46,9 @@ sentry:
 
 spring:
     redis:
-        host: 127.0.0.1
-        port: 6379
+        host: 192.168.10.200
+        port: 6378
+
     pid:
         fail-on-write-error: false
         file: heimdall.pid

@@ -55,25 +55,6 @@ public class Property {
           private String prefix;
 
      }
-     
-     private Redis redis = new Redis();
-     
-     @Data
-     public class Redis {
-          private String host;
-          private Integer port;
-          private Integer maxTotal;
-          private Integer maxIdle;
-          private Integer minIdle;
-          private boolean testOnBorrow;
-          private boolean testOnReturn;
-          private boolean testWhileIdle;
-          private Long minEvictableIdleTimeSeconds;
-          private Long timeBetweenEvictionRunsSeconds;
-          private Integer numTestsPerEvictionRun;
-          private boolean blockWhenExhausted;
-          private Integer connectionPoolSize;
-     }
 
      private Trace trace = new Trace();
 
