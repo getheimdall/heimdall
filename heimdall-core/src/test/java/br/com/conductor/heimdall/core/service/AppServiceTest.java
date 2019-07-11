@@ -20,13 +20,10 @@
 // * ==========================LICENSE_END===================================
 // */
 //
-//import br.com.conductor.heimdall.core.dto.AppDTO;
+//import br.com.conductor.heimdall.core.dto.AppUpdateDTO;
 //import br.com.conductor.heimdall.core.dto.PageableDTO;
 //import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
-//import br.com.conductor.heimdall.core.dto.integration.AppCallbackDTO;
-//import br.com.conductor.heimdall.core.dto.page.AppPage;
-//import br.com.conductor.heimdall.core.dto.persist.AppPersist;
-//import br.com.conductor.heimdall.core.dto.request.AppRequestDTO;
+//import br.com.conductor.heimdall.core.dto.AppDTO;
 //import br.com.conductor.heimdall.core.entity.AccessToken;
 //import br.com.conductor.heimdall.core.entity.App;
 //import br.com.conductor.heimdall.core.entity.Developer;
@@ -47,7 +44,7 @@
 //import org.mockito.InjectMocks;
 //import org.mockito.Mock;
 //import org.mockito.Mockito;
-//import org.mockito.runners.MockitoJUnitRunner;
+//import org.mockito.junit.MockitoJUnitRunner;
 //import org.springframework.data.domain.Example;
 //import org.springframework.data.domain.Page;
 //import org.springframework.data.domain.PageImpl;
@@ -93,8 +90,8 @@
 //    private App app;
 //    private App app1;
 //    private Developer developer;
-//    private AppPersist appPersist;
-//    private AppDTO appDTO;
+//    private AppDTO appPersist;
+//    private AppUpdateDTO appDTO;
 //    private List<ReferenceIdDTO> referenceIdDTOList = Lists.newArrayList(new ReferenceIdDTO(0L));
 //
 //    @Before
@@ -112,12 +109,12 @@
 //        developer.setName("dev");
 //        developer.setEmail("dev@email.com");
 //
-//        appPersist = new AppPersist();
+//        appPersist = new AppDTO();
 //        appPersist.setName("App test");
 //        appPersist.setDescription("App test description");
 //        appPersist.setDeveloper(new ReferenceIdDTO(1L));
 //
-//        appDTO = new AppDTO();
+//        appDTO = new AppUpdateDTO();
 //        appDTO.setName("App name");
 //        appDTO.setDeveloper(new ReferenceIdDTO(1l));
 //    }
@@ -210,7 +207,7 @@
 //
 //        PageableDTO pageableDTO = new PageableDTO();
 //        pageableDTO.setLimit(10);
-//        pageableDTO.setOffset(0);
+//        pageableDTO.setPage(0);
 //
 //        List<App> apps = new ArrayList<>();
 //        apps.add(app);
@@ -293,7 +290,7 @@
 //        Mockito.when(appRepository.findOne(Mockito.anyLong())).thenReturn(app);
 //        Mockito.when(accessTokenRepository.findByAppId(app.getId())).thenReturn(accessTokens);
 //
-//        AppDTO appDTO = new AppDTO();
+//        AppUpdateDTO appDTO = new AppUpdateDTO();
 //        List<ReferenceIdDTO> referenceIdDTOS = new ArrayList<>();
 //        ReferenceIdDTO referenceIdDTO = new ReferenceIdDTO();
 //        referenceIdDTO.setId(1L);

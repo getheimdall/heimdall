@@ -38,16 +38,12 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 public class ClientIdInterceptorServiceTest {
@@ -141,7 +137,6 @@ public class ClientIdInterceptorServiceTest {
         clientIdInterceptorService.validate( "10L");
 
         assertEquals(HttpStatus.UNAUTHORIZED.value(), this.ctx.getResponseStatusCode());
-        assertTrue((Boolean) this.ctx.get(INTERRUPT));
         assertFalse(ctx.sendZuulResponse());
     }
 
@@ -151,7 +146,6 @@ public class ClientIdInterceptorServiceTest {
         clientIdInterceptorService.validate(null);
 
         assertEquals(HttpStatus.UNAUTHORIZED.value(), this.ctx.getResponseStatusCode());
-        assertTrue((Boolean) this.ctx.get(INTERRUPT));
         assertFalse(ctx.sendZuulResponse());
 
     }
@@ -166,7 +160,6 @@ public class ClientIdInterceptorServiceTest {
         clientIdInterceptorService.validate(api1.getId());
 
         assertEquals(HttpStatus.UNAUTHORIZED.value(), this.ctx.getResponseStatusCode());
-        assertTrue((Boolean) this.ctx.get(INTERRUPT));
         assertFalse(ctx.sendZuulResponse());
 
     }
@@ -182,7 +175,6 @@ public class ClientIdInterceptorServiceTest {
         clientIdInterceptorService.validate(api.getId());
 
         assertEquals(HttpStatus.UNAUTHORIZED.value(), this.ctx.getResponseStatusCode());
-        assertTrue((Boolean) this.ctx.get(INTERRUPT));
         assertFalse(ctx.sendZuulResponse());
     }
 
@@ -200,7 +192,6 @@ public class ClientIdInterceptorServiceTest {
         clientIdInterceptorService.validate(api.getId());
 
         assertEquals(HttpStatus.UNAUTHORIZED.value(), this.ctx.getResponseStatusCode());
-        assertTrue((Boolean) this.ctx.get(INTERRUPT));
         assertFalse(ctx.sendZuulResponse());
     }
 }

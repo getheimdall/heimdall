@@ -20,7 +20,6 @@ import br.com.conductor.heimdall.api.entity.Role;
 import br.com.conductor.heimdall.api.service.RoleService;
 import br.com.conductor.heimdall.api.service.TokenAuthenticationService;
 import br.com.conductor.heimdall.core.util.ConstantsPath;
-import br.com.conductor.heimdall.core.util.RabbitQueueUtils;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -69,11 +68,6 @@ public class RoleResourceTest {
 
      @Autowired
      private FilterChainProxy filterChain;
-
-     @BeforeClass
-     public static void setup() {
-          RabbitQueueUtils.init();
-     }
 
      @Before
      public void setupTest() {

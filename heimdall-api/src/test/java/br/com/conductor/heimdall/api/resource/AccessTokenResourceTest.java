@@ -20,9 +20,7 @@ import br.com.conductor.heimdall.api.service.TokenAuthenticationService;
 import br.com.conductor.heimdall.core.entity.AccessToken;
 import br.com.conductor.heimdall.core.service.AccessTokenService;
 import br.com.conductor.heimdall.core.util.ConstantsPath;
-import br.com.conductor.heimdall.core.util.RabbitQueueUtils;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -68,11 +66,6 @@ public class AccessTokenResourceTest {
 
      @Autowired
      private FilterChainProxy filterChain;
-
-     @BeforeClass
-     public static void setup() {
-          RabbitQueueUtils.init();
-     }
 
      @Before
      public void setupTest() {

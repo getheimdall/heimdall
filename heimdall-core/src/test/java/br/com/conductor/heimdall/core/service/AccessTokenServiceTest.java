@@ -60,9 +60,6 @@ public class AccessTokenServiceTest {
     @Mock
     private PlanRepository planRepository;
 
-//    @Mock
-// TODO   private AMQPCacheService amqpCacheService;
-
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 

@@ -70,9 +70,6 @@ public class ScopeServiceTest {
     @Mock
     private OperationService operationService;
 
-//    @Mock
-// TODO   private AMQPCacheService amqpCacheService;
-
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 

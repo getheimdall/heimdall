@@ -138,7 +138,7 @@
 //    public void listPageable() {
 //        PageableDTO pageableDTO = new PageableDTO();
 //        pageableDTO.setLimit(10);
-//        pageableDTO.setOffset(0);
+//        pageableDTO.setPage(0);
 //        List<Developer> developers = new ArrayList<>();
 //        developers.add(developer);
 //
@@ -157,7 +157,7 @@
 //    public void listArray() {
 //        PageableDTO pageableDTO = new PageableDTO();
 //        pageableDTO.setLimit(10);
-//        pageableDTO.setOffset(0);
+//        pageableDTO.setPage(0);
 //        List<Developer> developers = new ArrayList<>();
 //        developers.add(developer);
 //
