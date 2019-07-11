@@ -19,17 +19,14 @@
  */
 package br.com.conductor.heimdall.api.dto;
 
-import java.io.Serializable;
-import java.util.List;
+import br.com.conductor.heimdall.core.enums.Status;
+import lombok.Data;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import br.com.conductor.heimdall.core.enums.Status;
-//import org.hibernate.validator.constraints.Email;
-
-import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
-import lombok.Data;
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * Data transference object class that represents a Heimdall user.
@@ -53,7 +50,7 @@ public class UserDTO implements Serializable {
 
      @NotNull
      @Size(max = 80)
-//     @Email
+     @Email
      private String email;
 
      @NotNull

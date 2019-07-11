@@ -11,7 +11,6 @@
     <name>heimdall-core</name>
     <packaging>jar</packaging>
 
-
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -71,10 +70,6 @@
                     <artifactId>android-json</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-actuator</artifactId>
         </dependency>
         <dependency>
             <groupId>io.swagger</groupId>
