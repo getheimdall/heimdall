@@ -13,7 +13,6 @@ server:
 heimdall:
     contextPath: /heimdall/v1
     hostname: hostname
-    excludeRabbit: true
     retryable: false
     interceptor:
         health:
@@ -70,11 +69,6 @@ spring:
         serialization:
             INDENT_OUTPUT: true
             WRITE-DATES-AS-TIMESTAMPS: false
-    rabbitmq:
-        host: 192.168.10.200
-        port: 5672
-        virtual-host: dev
-        requested-heartbeat: 10
 
 endpoints:
     routes:
@@ -84,11 +78,7 @@ endpoints:
 
 management:
     health:
-        mongo:
-            enabled: false
         redis:
-            enabled: false
-        rabbit:
             enabled: false
         hystrix:
             enabled: false
@@ -96,13 +86,16 @@ management:
             enabled: false
     server:
         servlet:
-            context-path: /manager
+            context-path: /
     trace:
         http:
             enabled: false
     endpoint:
         env:
             keys-to-sanitize: url, host, serverName
+    endpoints:
+        web:
+            base-path: /manager
 
 zuul:
     ignoredPatterns: /manager/**

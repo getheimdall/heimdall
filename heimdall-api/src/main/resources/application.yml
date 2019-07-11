@@ -13,7 +13,6 @@ server:
 heimdall:
     contextPath: /heimdall/v1
     hostname: hostname
-    excludeRabbit: true
     retryable: false
     logstash:
         enabled: true
@@ -57,13 +56,6 @@ spring:
         serialization:
             INDENT_OUTPUT: true
             WRITE-DATES-AS-TIMESTAMPS: false
-    rabbitmq:
-        host: 127.0.0.1
-        port: 5672
-        virtual-host: dev
-        requested-heartbeat: 10
-#    cache:
-#        type: simple
 
 springfox:
     documentation:
@@ -82,8 +74,6 @@ management:
             enabled: false
         redis:
             enabled: false
-        rabbit:
-            enabled: false
         hystrix:
             enabled: false
         refresh:
@@ -95,7 +85,10 @@ management:
             enabled: false
     server:
         servlet:
-            context-path: /manager
+            context-path: /
+    endpoints:
+        web:
+            base-path: /manager
 
 zuul:
     filter:
