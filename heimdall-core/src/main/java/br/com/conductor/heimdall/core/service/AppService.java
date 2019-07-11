@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -193,10 +194,16 @@ public class AppService {
     }
 
     private Set<String> getAccessTokens(App app) {
-        return accessTokenService.findByAppId(app.getId()).stream()
-                .map(AccessToken::getId)
-                .collect(Collectors.toSet())
-                ;
+        final List<AccessToken> accessTokens = accessTokenService.findByAppId(app.getId());
+
+        if (accessTokens != null && !accessTokens.isEmpty()) {
+
+            return accessTokens.stream()
+                    .map(AccessToken::getId)
+                    .collect(Collectors.toSet())
+                    ;
+        }
+        return new HashSet<>();
     }
 
 }
