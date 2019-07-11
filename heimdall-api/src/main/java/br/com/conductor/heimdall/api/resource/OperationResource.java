@@ -21,7 +21,7 @@ import br.com.conductor.heimdall.core.dto.OperationDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.entity.Operation;
 import br.com.conductor.heimdall.core.service.OperationService;
-import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
+//import br.com.conductor.heimdall.core.publisher.AMQPRouteService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,8 +55,8 @@ public class OperationResource {
     @Autowired
     private OperationService operationService;
 
-    @Autowired
-    private AMQPRouteService aMQPRouteService;
+//    @Autowired
+//    private AMQPRouteService aMQPRouteService;
 
     /**
      * Finds a {@link Operation} by its Id.
@@ -184,24 +184,24 @@ public class OperationResource {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Refreshes all {@link Operation}.
-     *
-     * @param apiId      The Api Id
-     * @param resourceId The Resource Id
-     * @return {@link ResponseEntity}
-     */
-    @ResponseBody
-    @ApiOperation(value = "Refresh all Operations")
-    @PostMapping(value = "/resources/{resourceId}/operations/refresh")
-    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_REFRESH_OPERATION)
-    public ResponseEntity<?> refresh(@PathVariable("apiId") Long apiId,
-                                     @PathVariable("resourceId") Long resourceId) {
-
-        aMQPRouteService.dispatchRoutes();
-
-        return ResponseEntity.noContent().build();
-    }
+//    /**
+//     * Refreshes all {@link Operation}.
+//     *
+//     * @param apiId      The Api Id
+//     * @param resourceId The Resource Id
+//     * @return {@link ResponseEntity}
+//     */
+//    @ResponseBody
+//    @ApiOperation(value = "Refresh all Operations")
+//    @PostMapping(value = "/resources/{resourceId}/operations/refresh")
+//    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_REFRESH_OPERATION)
+//    public ResponseEntity<?> refresh(@PathVariable("apiId") Long apiId,
+//                                     @PathVariable("resourceId") Long resourceId) {
+//
+//        aMQPRouteService.dispatchRoutes();
+//
+//        return ResponseEntity.noContent().build();
+//    }
 
     /**
      * Lists all Operations from an Api

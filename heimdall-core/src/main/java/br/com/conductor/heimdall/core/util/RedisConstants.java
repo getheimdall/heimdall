@@ -15,22 +15,18 @@
  */
 package br.com.conductor.heimdall.core.util;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-
 /**
- * This class holds miscellaneous constants.
- *
- * @author Filipe Germano
- * @author Marcos Filho
- * @author Marcelo Rodrigues
- *
+ * This class holds the Redis Pub/Sub Constants.
+ * 
+ * @author Marcelo Aguiar Rodrigues
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Constants {
+public final class RedisConstants {
 
-     public static final String PRODUCTION = "prod";
-     public static final String SUCCESS = "SUCCESS";
-     public static final String FAILED = "FAILED";
+     private RedisConstants() { }
+
+     public static final String INTERCEPTORS_ADD = "interceptors:add";
+     public static final String INTERCEPTORS_REMOVE = "interceptors:remove";
+     public static final String INTERCEPTORS_REFRESH = "interceptors:refresh-all";
+     public static final String ROUTES_REFRESH = "routes:refresh";
 
 }

@@ -98,7 +98,7 @@ public class CustomHostRoutingFilter extends SimpleHostRoutingFilter {
 		HttpHost httpHost = new HttpHost(context.getRouteHost().getHost(), context.getRouteHost().getPort(),
 				context.getRouteHost().getProtocol());
 
-		Long operationId = (Long) context.get(OPERATION_ID);
+		String operationId = (String) context.get(OPERATION_ID);
 		String operationPath = (String) context.get(OPERATION_PATH);
 
 		try {

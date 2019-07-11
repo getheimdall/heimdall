@@ -20,7 +20,7 @@ import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.PlanRepository;
-import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
+//import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -42,18 +42,15 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 @Service
 public class PlanService {
 
-    private final AMQPCacheService amqpCacheService;
     private final ApiService apiService;
     private final AppService appService;
     private final InterceptorService interceptorService;
     private final PlanRepository planRepository;
 
-    public PlanService(AMQPCacheService amqpCacheService,
-                       @Lazy ApiService apiService,
+    public PlanService(@Lazy ApiService apiService,
                        AppService appService,
                        InterceptorService interceptorService,
                        PlanRepository planRepository) {
-        this.amqpCacheService = amqpCacheService;
         this.apiService = apiService;
         this.appService = appService;
         this.interceptorService = interceptorService;
@@ -115,8 +112,6 @@ public class PlanService {
 
         apiService.update(api);
 
-        amqpCacheService.dispatchClean();
-
         return plan;
     }
 
@@ -142,8 +137,6 @@ public class PlanService {
 
         plan = planRepository.save(plan);
 
-        amqpCacheService.dispatchClean();
-
         return plan;
     }
 
@@ -164,8 +157,6 @@ public class PlanService {
         interceptorService.deleteAllFromPlan(id);
 
         planRepository.delete(plan);
-
-        amqpCacheService.dispatchClean();
     }
 
 }

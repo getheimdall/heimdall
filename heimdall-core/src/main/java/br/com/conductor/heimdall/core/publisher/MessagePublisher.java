@@ -13,24 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package br.com.conductor.heimdall.core.util;
-
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+package br.com.conductor.heimdall.core.publisher;
 
 /**
- * This class holds miscellaneous constants.
  *
- * @author Filipe Germano
- * @author Marcos Filho
- * @author Marcelo Rodrigues
- *
+ * @author Marcelo Aguiar Rodrigues
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Constants {
+public interface MessagePublisher {
 
-     public static final String PRODUCTION = "prod";
-     public static final String SUCCESS = "SUCCESS";
-     public static final String FAILED = "FAILED";
+    void publish(String channel, String message);
 
 }

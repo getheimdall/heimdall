@@ -21,9 +21,7 @@ import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.AppRepository;
-import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 import net.bytebuddy.utility.RandomString;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -48,16 +46,13 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_N
 public class AppService {
 
     private final AccessTokenService accessTokenService;
-    private final AMQPCacheService amqpCacheService;
     private final AppRepository appRepository;
     private final DeveloperService developerService;
 
     public AppService(AccessTokenService accessTokenService,
-                      AMQPCacheService amqpCacheService,
                       AppRepository appRepository,
                       DeveloperService developerService) {
         this.accessTokenService = accessTokenService;
-        this.amqpCacheService = amqpCacheService;
         this.appRepository = appRepository;
         this.developerService = developerService;
     }
@@ -134,8 +129,6 @@ public class AppService {
 
         developerService.find(app.getDeveloperId());
 
-        amqpCacheService.dispatchClean();
-
         return appRepository.save(app);
 
     }
@@ -157,8 +150,6 @@ public class AppService {
         app.setAccessTokens(this.getAccessTokens(app));
         app = GenericConverter.mapper(appPersist, app);
         app = appRepository.save(app);
-
-        amqpCacheService.dispatchClean();
 
         return app;
     }
@@ -197,8 +188,6 @@ public class AppService {
     public void delete(String id) {
 
         App app = this.find(id);
-
-        amqpCacheService.dispatchClean();
 
         appRepository.delete(app);
     }

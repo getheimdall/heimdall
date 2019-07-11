@@ -13,24 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package br.com.conductor.heimdall.core.service.amqp;
+package br.com.conductor.heimdall.core.publisher;
 
-import br.com.conductor.heimdall.core.util.RabbitConstants;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import br.com.conductor.heimdall.core.util.RedisConstants;
 import org.springframework.stereotype.Service;
 
 /**
- * This class controls a route cache service.
+ * Publisher to refresh the routes.
  *
- * @author Marcos Filho
+ * @author Marcelo Aguiar Rodrigues
  */
 @Service
-public class AMQPRouteService {
+public class RedisRoutePublisher {
 
-    private final RabbitTemplate rabbitTemplate;
+    private final RedisMessagePublisher redisMessagePublisher;
 
-    public AMQPRouteService(RabbitTemplate rabbitTemplate) {
-        this.rabbitTemplate = rabbitTemplate;
+    public RedisRoutePublisher(RedisMessagePublisher redisMessagePublisher) {
+        this.redisMessagePublisher = redisMessagePublisher;
     }
 
     /**
@@ -38,7 +37,7 @@ public class AMQPRouteService {
      */
     public void dispatchRoutes() {
 
-        rabbitTemplate.convertAndSend(RabbitConstants.EXCHANGE_FANOUT_HEIMDALL_ROUTES, "", "");
+        redisMessagePublisher.publish(RedisConstants.ROUTES_REFRESH, "");
     }
 
 }

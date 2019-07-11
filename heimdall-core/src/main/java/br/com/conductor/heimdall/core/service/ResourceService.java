@@ -22,7 +22,7 @@ import br.com.conductor.heimdall.core.entity.Operation;
 import br.com.conductor.heimdall.core.entity.Resource;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.ResourceRepository;
-import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
+import br.com.conductor.heimdall.core.publisher.RedisRoutePublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -34,8 +34,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_NOT_FOUND;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ONLY_ONE_RESOURCE_PER_API;
+import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 
 /**
  * This class provides methos to create, read, update and delete a {@link Resource} resource.
@@ -46,13 +45,13 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ONLY_ONE
 @Service
 public class ResourceService {
 
-    private final AMQPRouteService amqpRoute;
+    private final RedisRoutePublisher amqpRoute;
     private final ApiService apiService;
     private final InterceptorService interceptorService;
     private final OperationService operationService;
     private final ResourceRepository resourceRepository;
 
-    public ResourceService(AMQPRouteService amqpRoute,
+    public ResourceService(RedisRoutePublisher amqpRoute,
                            @Lazy ApiService apiService,
                            InterceptorService interceptorService,
                            OperationService operationService,
@@ -133,7 +132,7 @@ public class ResourceService {
         final boolean anyMatch = this.list(apiId).stream()
                 .anyMatch(res -> resource.getName().equals(res.getName()));
 
-        HeimdallException.checkThrow(anyMatch, ONLY_ONE_RESOURCE_PER_API);
+        HeimdallException.checkThrow(anyMatch, GLOBAL_ALREADY_REGISTERED, "Resource");
 
         resource.setApiId(apiId);
 
@@ -142,8 +141,6 @@ public class ResourceService {
         api.addResource(savedResource.getId());
 
         apiService.update(api.getId(), api);
-
-        amqpRoute.dispatchRoutes();
 
         return savedResource;
     }
@@ -165,13 +162,11 @@ public class ResourceService {
                 .findAny()
                 .orElse(null);
         HeimdallException.checkThrow(resData != null &&
-                !Objects.equals(resData.getId(), resource.getId()), ONLY_ONE_RESOURCE_PER_API);
+                !Objects.equals(resData.getId(), resource.getId()), GLOBAL_ALREADY_REGISTERED, "Resource");
 
         final Resource updatedResource = GenericConverter.mapper(resourcePersist, resource);
 
         final Resource savedResource = resourceRepository.save(updatedResource);
-
-        amqpRoute.dispatchRoutes();
 
         return savedResource;
     }
@@ -181,7 +176,6 @@ public class ResourceService {
     }
 
     /**
-     * TODO
      * Deletes a {@link Resource} by its Id.
      *
      * @param apiId      The {@link Api} Id
@@ -205,7 +199,7 @@ public class ResourceService {
     }
 
     /**
-     * Deletes all Resources from a Api TODO
+     * Deletes all Resources from a Api
      *
      * @param apiId Api with the Resources
      */

@@ -21,7 +21,7 @@ import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.ResourceDTO;
 import br.com.conductor.heimdall.core.entity.Resource;
 import br.com.conductor.heimdall.core.service.ResourceService;
-import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
+//import br.com.conductor.heimdall.core.publisher.AMQPRouteService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,8 +56,8 @@ public class ResourceResource {
     @Autowired
     private ResourceService resourceService;
 
-    @Autowired
-    private AMQPRouteService aMQPRouteService;
+//    @Autowired
+//    private AMQPRouteService aMQPRouteService;
 
     /**
      * Finds a {@link Resource} by its Id.
@@ -165,21 +165,21 @@ public class ResourceResource {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Refreshes all {@link Resource}.
-     *
-     * @param apiId The Api Id
-     * @return {@link ResponseEntity}
-     */
-    @ResponseBody
-    @ApiOperation(value = "Refresh all Resources")
-    @PostMapping(value = "/refresh")
-    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_REFRESH_RESOURCE)
-    public ResponseEntity<?> refresh(@PathVariable("apiId") Long apiId) {
-
-        aMQPRouteService.dispatchRoutes();
-
-        return ResponseEntity.noContent().build();
-    }
+//    /**
+//     * Refreshes all {@link Resource}.
+//     *
+//     * @param apiId The Api Id
+//     * @return {@link ResponseEntity}
+//     */
+//    @ResponseBody
+//    @ApiOperation(value = "Refresh all Resources")
+//    @PostMapping(value = "/refresh")
+//    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_REFRESH_RESOURCE)
+//    public ResponseEntity<?> refresh(@PathVariable("apiId") Long apiId) {
+//
+//        aMQPRouteService.dispatchRoutes();
+//
+//        return ResponseEntity.noContent().build();
+//    }
 
 }

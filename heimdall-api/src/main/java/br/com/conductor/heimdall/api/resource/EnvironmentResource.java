@@ -21,7 +21,7 @@ import br.com.conductor.heimdall.core.dto.EnvironmentDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.entity.Environment;
 import br.com.conductor.heimdall.core.service.EnvironmentService;
-import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
+//import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,8 +49,8 @@ import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_ENVIRONMENT
 @RequestMapping(value = PATH_ENVIRONMENTS)
 public class EnvironmentResource {
 
-    @Autowired
-    private AMQPCacheService amqpCacheService;
+//    @Autowired
+//    private AMQPCacheService amqpCacheService;
 
     @Autowired
     private EnvironmentService environmentService;
@@ -132,7 +132,7 @@ public class EnvironmentResource {
         Environment environment = GenericConverter.mapper(environmentDTO, Environment.class);
 
         environment = environmentService.update(id, environment);
-        amqpCacheService.dispatchClean();
+//        amqpCacheService.dispatchClean();
 
         return ResponseEntity.ok(environment);
     }
@@ -150,7 +150,7 @@ public class EnvironmentResource {
     public ResponseEntity<?> delete(@PathVariable("environmentId") String id) {
 
         environmentService.delete(id);
-        amqpCacheService.dispatchClean();
+//        amqpCacheService.dispatchClean();
 
         return ResponseEntity.noContent().build();
     }

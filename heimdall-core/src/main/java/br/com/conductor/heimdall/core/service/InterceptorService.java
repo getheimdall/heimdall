@@ -17,7 +17,6 @@ package br.com.conductor.heimdall.core.service;
 
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.InterceptorDTO;
-import br.com.conductor.heimdall.core.dto.InterceptorFileDTO;
 import br.com.conductor.heimdall.core.entity.*;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.enums.TypeInterceptor;
@@ -25,7 +24,7 @@ import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.InterceptorRepository;
 import br.com.conductor.heimdall.core.repository.RateLimitRepository;
-import br.com.conductor.heimdall.core.service.amqp.AMQPInterceptorService;
+import br.com.conductor.heimdall.core.publisher.RedisInterceptorPublisher;
 import br.com.conductor.heimdall.core.util.ConstantsCache;
 import br.com.conductor.heimdall.core.util.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,7 +52,7 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 @Service
 public class InterceptorService {
 
-    private final AMQPInterceptorService amqpInterceptorService;
+    private final RedisInterceptorPublisher redisInterceptorPublisher;
     private final ApiService apiService;
     private final InterceptorRepository interceptorRepository;
     private final OperationService operationService;
@@ -64,14 +63,14 @@ public class InterceptorService {
     @Value("${zuul.filter.root}")
     private String zuulFilterRoot;
 
-    public InterceptorService(AMQPInterceptorService amqpInterceptorService,
+    public InterceptorService(RedisInterceptorPublisher redisInterceptorPublisher,
                               @Lazy ApiService apiService,
                               InterceptorRepository interceptorRepository,
                               @Lazy OperationService operationService,
                               @Lazy PlanService planService,
                               RateLimitRepository ratelimitRepository,
                               @Lazy ResourceService resourceService) {
-        this.amqpInterceptorService = amqpInterceptorService;
+        this.redisInterceptorPublisher = redisInterceptorPublisher;
         this.apiService = apiService;
         this.interceptorRepository = interceptorRepository;
         this.operationService = operationService;
@@ -152,7 +151,7 @@ public class InterceptorService {
             apiService.update(api);
         }
 
-        amqpInterceptorService.dispatchInterceptor(savedInterceptor.getId());
+        redisInterceptorPublisher.dispatchInterceptor(savedInterceptor.getId());
 
         return savedInterceptor;
     }
@@ -182,7 +181,7 @@ public class InterceptorService {
         }
 
         final Interceptor updatedInterceptor = interceptorRepository.save(interceptor);
-        amqpInterceptorService.dispatchInterceptor(updatedInterceptor.getId());
+        redisInterceptorPublisher.dispatchInterceptor(updatedInterceptor.getId());
 
         return updatedInterceptor;
     }
@@ -215,7 +214,7 @@ public class InterceptorService {
 
         interceptorRepository.delete(interceptor);
 
-        amqpInterceptorService.dispatchRemoveInterceptors(new InterceptorFileDTO(interceptor.getId(), pathName));
+        redisInterceptorPublisher.dispatchRemoveInterceptors(id + "|" + pathName);
     }
 
     /**

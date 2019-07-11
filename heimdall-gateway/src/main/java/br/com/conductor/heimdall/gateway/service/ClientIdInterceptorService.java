@@ -33,7 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
 import static br.com.conductor.heimdall.gateway.util.ConstantsContext.CLIENT_ID;
 
 /**
@@ -104,7 +103,6 @@ public class ClientIdInterceptorService {
     private void buildResponse(String message) {
         RequestContext ctx = RequestContext.getCurrentContext();
         ctx.setSendZuulResponse(false);
-        ctx.put(INTERRUPT, true);
         ctx.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
         ctx.setResponseBody(message);
     }

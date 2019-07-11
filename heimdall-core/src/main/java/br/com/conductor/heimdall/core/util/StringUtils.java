@@ -27,8 +27,7 @@ import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 
 public final class StringUtils {
 
-    private StringUtils() {
-    }
+    private StringUtils() { }
 
     /**
      * Creates a String that represents a order. It adds leading zeros ("0").

@@ -31,6 +31,7 @@ import br.com.conductor.heimdall.gateway.util.RequestHelper;
 import br.com.conductor.heimdall.gateway.zuul.route.ProxyRouteLocator;
 import br.com.conductor.heimdall.gateway.zuul.storage.CacheZuulRouteStorage;
 import br.com.conductor.heimdall.gateway.zuul.storage.ZuulRouteStorage;
+import com.netflix.zuul.monitoring.CounterFactory;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -48,6 +49,7 @@ import org.springframework.cloud.netflix.zuul.filters.post.SendErrorFilter;
 import org.springframework.cloud.netflix.zuul.filters.post.SendResponseFilter;
 import org.springframework.cloud.netflix.zuul.filters.pre.PreDecorationFilter;
 import org.springframework.cloud.netflix.zuul.filters.route.SimpleHostRoutingFilter;
+import org.springframework.cloud.netflix.zuul.metrics.EmptyCounterFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -137,6 +139,11 @@ public class ZuulConfiguration extends ZuulProxyAutoConfiguration {
 
 		return new CacheZuulRouteStorage();
 
+	}
+
+	@Bean
+	public CounterFactory counterFactory() {
+		return new EmptyCounterFactory();
 	}
 
 	@Override

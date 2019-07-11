@@ -17,20 +17,16 @@ package br.com.conductor.heimdall.api.configuration;
 
 import br.com.conductor.heimdall.core.entity.RateLimit;
 import br.com.conductor.heimdall.core.environment.Property;
+import br.com.conductor.heimdall.core.publisher.MessagePublisher;
+import br.com.conductor.heimdall.core.publisher.RedisMessagePublisher;
 import br.com.conductor.heimdall.core.util.ConstantsCache;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
-import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.redis.cache.RedisCacheManager;
-import org.springframework.data.redis.cache.RedisCacheWriter;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
@@ -44,127 +40,116 @@ import java.time.Duration;
  * Class responsible for the Redis configuration.
  *
  * @author Marcos Filho
+ * @author Marcelo Aguiar Rodrigues
  * @see <a href="https://redis.io/">https://redis.io/</a>
  */
 @Configuration
 @Profile("!test")
 public class RedisConfiguration {
-     
-     @Autowired
-     Property property;
-     
-     /**
-      * Creates a new {@link JedisConnectionFactory}.
-      * 
-      * @return {@link JedisConnectionFactory}
-      */
-     @Bean
-     public JedisConnectionFactory jedisConnectionFactory() {
-          
-          RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(property.getRedis().getHost(), property.getRedis().getPort());
-          JedisConnectionFactory factory = new JedisConnectionFactory(redisStandaloneConfiguration);
 
-          return factory;
-     }
-     
-//     /**
-//      * Returns a configured {@link JedisPoolConfig}.
-//      *
-//      * @return {@link JedisPoolConfig}
-//      */
-//     public JedisPoolConfig jediPoolConfig() {
-//          final JedisPoolConfig poolConfig = new JedisPoolConfig();
-//          poolConfig.setMaxTotal(property.getRedis().getMaxTotal());
-//          poolConfig.setMaxIdle(property.getRedis().getMaxIdle());
-//          poolConfig.setMinIdle(property.getRedis().getMinIdle());
-//          poolConfig.setTestOnBorrow(property.getRedis().isTestOnBorrow());
-//          poolConfig.setTestOnReturn(property.getRedis().isTestOnReturn());
-//          poolConfig.setTestWhileIdle(property.getRedis().isTestWhileIdle());
-//          poolConfig.setMinEvictableIdleTimeMillis(Duration.ofSeconds(property.getRedis().getMinEvictableIdleTimeSeconds()).toMillis());
-//          poolConfig.setTimeBetweenEvictionRunsMillis(Duration.ofSeconds(property.getRedis().getTimeBetweenEvictionRunsSeconds()).toMillis());
-//          poolConfig.setNumTestsPerEvictionRun(property.getRedis().getNumTestsPerEvictionRun());
-//          poolConfig.setBlockWhenExhausted(property.getRedis().isBlockWhenExhausted());
-//          return poolConfig;
-//     }
-     
-     /**
-      * Returns a configured {@link RedisTemplate}.
-      * 
-      * @return {@link RedisTemplate} Object, Object
-      */
-     @Bean
-     public RedisTemplate<Object, Object> redisTemplateObject() {
+    @Autowired
+    Property property;
 
-          RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<Object, Object>();
-          redisTemplate.setConnectionFactory(jedisConnectionFactory());
-          redisTemplate.setKeySerializer(new StringRedisSerializer());
-          redisTemplate.setValueSerializer(new JdkSerializationRedisSerializer());
-          redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-          redisTemplate.setHashValueSerializer(new JdkSerializationRedisSerializer());
-          redisTemplate.setEnableTransactionSupport(true);
+    /**
+     * Creates a new {@link JedisConnectionFactory}.
+     *
+     * @return {@link JedisConnectionFactory}
+     */
+    @Bean
+    public JedisConnectionFactory jedisConnectionFactory() {
 
-          return redisTemplate;
-     }
-     
-     /**
-      * Returns a configured {@link RedisTemplate}.
-      * 
-      * @return {@link RedisTemplate} String, {@link RateLimit}
-      */
-     @Bean
-     public RedisTemplate<String, RateLimit> redisTemplateRate() {
-          
-          RedisTemplate<String, RateLimit> redisTemplate = new RedisTemplate<>();
-          redisTemplate.setConnectionFactory(jedisConnectionFactory());
-          redisTemplate.setKeySerializer(new StringRedisSerializer());
-          redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-          redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-          redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
-          redisTemplate.setEnableTransactionSupport(true);
+        return new JedisConnectionFactory(jediPoolConfig());
+    }
 
-          return redisTemplate;
-     }
+    /**
+     * Returns a configured {@link JedisPoolConfig}.
+     *
+     * @return {@link JedisPoolConfig}
+     */
+    public JedisPoolConfig jediPoolConfig() {
+        final JedisPoolConfig poolConfig = new JedisPoolConfig();
+        poolConfig.setMaxTotal(property.getRedis().getMaxTotal());
+        poolConfig.setMaxIdle(property.getRedis().getMaxIdle());
+        poolConfig.setMinIdle(property.getRedis().getMinIdle());
+        poolConfig.setTestOnBorrow(property.getRedis().isTestOnBorrow());
+        poolConfig.setTestOnReturn(property.getRedis().isTestOnReturn());
+        poolConfig.setTestWhileIdle(property.getRedis().isTestWhileIdle());
+        poolConfig.setMinEvictableIdleTimeMillis(Duration.ofSeconds(property.getRedis().getMinEvictableIdleTimeSeconds()).toMillis());
+        poolConfig.setTimeBetweenEvictionRunsMillis(Duration.ofSeconds(property.getRedis().getTimeBetweenEvictionRunsSeconds()).toMillis());
+        poolConfig.setNumTestsPerEvictionRun(property.getRedis().getNumTestsPerEvictionRun());
+        poolConfig.setBlockWhenExhausted(property.getRedis().isBlockWhenExhausted());
+        return poolConfig;
+    }
 
-     /**
-      * Returns a configured {@link CacheManager}.
-      *
-      * @return {@link CacheManager}
-      */
-     @Bean
-     public CacheManager cacheManager(RedisCacheManager redisCacheManager) {
 
-          return redisCacheManager;
-     }
+    /**
+     * Returns a configured {@link RedisTemplate}.
+     *
+     * @return {@link RedisTemplate} Object, Object
+     */
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate() {
 
-     @Bean
-     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
-          return RedisCacheManager.create(connectionFactory);
-     }
-     /**
-      * Returns a configured {@link RedissonClient}.
-      * 
-      * @return {@link RedissonClient}
-      */
-     @Bean(autowire = Autowire.BY_NAME)
-     public RedissonClient redissonClientRateLimitInterceptor() {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(jedisConnectionFactory());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new JdkSerializationRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new JdkSerializationRedisSerializer());
+        redisTemplate.setEnableTransactionSupport(true);
 
-          return createConnection(ConstantsCache.RATE_LIMIT_DATABASE);
-     }
+        return redisTemplate;
+    }
 
-     @Bean(autowire = Autowire.BY_NAME)
-     public RedissonClient redissonClientCacheInterceptor() {
+    @Bean
+    MessagePublisher redisPublisher() {
+        return new RedisMessagePublisher(redisTemplate());
+    }
 
-          return createConnection(ConstantsCache.CACHE_INTERCEPTOR_DATABASE);
-     }
+    /**
+     * Returns a configured {@link RedisTemplate}.
+     *
+     * @return {@link RedisTemplate} String, {@link RateLimit}
+     */
+    @Bean
+    public RedisTemplate<String, RateLimit> redisTemplateRate() {
 
-     private RedissonClient createConnection(int database) {
+        RedisTemplate<String, RateLimit> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(jedisConnectionFactory());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+        redisTemplate.setEnableTransactionSupport(true);
 
-          Config config = new Config();
-          config.useSingleServer()
-                  .setAddress(property.getRedis().getHost() + ":" + property.getRedis().getPort())
-                  .setConnectionPoolSize(property.getRedis().getConnectionPoolSize())
-                  .setDatabase(database);
+        return redisTemplate;
+    }
 
-          return Redisson.create(config);
-     }
+    /**
+     * Returns a configured {@link RedissonClient}.
+     *
+     * @return {@link RedissonClient}
+     */
+    @Bean
+    public RedissonClient redissonClientRateLimitInterceptor() {
+
+        return createConnection(ConstantsCache.RATE_LIMIT_DATABASE);
+    }
+
+    @Bean
+    public RedissonClient redissonClientCacheInterceptor() {
+
+        return createConnection(ConstantsCache.CACHE_INTERCEPTOR_DATABASE);
+    }
+
+    private RedissonClient createConnection(int database) {
+
+        Config config = new Config();
+        config.useSingleServer()
+                .setAddress(property.getRedis().getHost() + ":" + property.getRedis().getPort())
+                .setConnectionPoolSize(property.getRedis().getConnectionPoolSize())
+                .setDatabase(database);
+
+        return Redisson.create(config);
+    }
 }

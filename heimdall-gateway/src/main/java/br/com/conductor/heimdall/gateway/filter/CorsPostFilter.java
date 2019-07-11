@@ -94,6 +94,7 @@ public class CorsPostFilter extends ZuulFilter {
     private void process() {
         RequestContext requestContext = RequestContext.getCurrentContext();
 
+        @SuppressWarnings("unchecked")
         Map<String, String> cors = (Map<String, String>) requestContext.get(ConstantsContext.CORS_FILTER);
         corsInterceptorService.executeCorsPostFilter(cors);
     }

@@ -13,24 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package br.com.conductor.heimdall.core.util;
+package br.com.conductor.heimdall.core.publisher;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
 
 /**
- * This class holds miscellaneous constants.
  *
- * @author Filipe Germano
- * @author Marcos Filho
- * @author Marcelo Rodrigues
- *
+ * @author Marcelo Aguiar Rodrigues
  */
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class Constants {
+@Service
+public class RedisMessagePublisher implements MessagePublisher {
 
-     public static final String PRODUCTION = "prod";
-     public static final String SUCCESS = "SUCCESS";
-     public static final String FAILED = "FAILED";
+    private RedisTemplate<String, Object> redisTemplate;
 
+    public RedisMessagePublisher(RedisTemplate<String, Object> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
+
+    @Override
+    public void publish(String channel, String message) {
+        this.redisTemplate.convertAndSend(channel, message);
+    }
 }

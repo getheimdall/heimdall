@@ -20,7 +20,6 @@ import br.com.conductor.heimdall.core.entity.AccessToken;
 import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.AccessTokenRepository;
-import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
@@ -45,14 +44,11 @@ public class AccessTokenService {
     private final AccessTokenRepository accessTokenRepository;
 
 
-    private final AMQPCacheService amqpCacheService;
     private final AppService appService;
 
     public AccessTokenService(AccessTokenRepository accessTokenRepository,
-                              AMQPCacheService amqpCacheService,
                               @Lazy AppService appService) {
         this.accessTokenRepository = accessTokenRepository;
-        this.amqpCacheService = amqpCacheService;
         this.appService = appService;
     }
 
@@ -115,7 +111,7 @@ public class AccessTokenService {
 
         if (accessToken.getCode() != null) {
 
-            HeimdallException.checkThrow(accessTokenRepository.findByCode(accessToken.getCode()) != null, ACCESS_TOKEN_ALREADY_EXISTS);
+            HeimdallException.checkThrow(accessTokenRepository.findByCode(accessToken.getCode()) != null, GLOBAL_ALREADY_REGISTERED, "Access Token");
         } else {
 
             RandomString randomString = new RandomString(12);
@@ -157,8 +153,6 @@ public class AccessTokenService {
 
         accessToken = accessTokenRepository.save(accessToken);
 
-        amqpCacheService.dispatchClean();
-
         return accessToken;
     }
 
@@ -176,8 +170,6 @@ public class AccessTokenService {
     public void delete(String id) {
 
         AccessToken accessToken = this.find(id);
-
-        amqpCacheService.dispatchClean();
 
         accessTokenRepository.delete(accessToken);
     }

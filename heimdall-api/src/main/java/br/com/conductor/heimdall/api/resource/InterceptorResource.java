@@ -22,7 +22,7 @@ import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.enums.TypeInterceptor;
 import br.com.conductor.heimdall.core.service.InterceptorService;
-import br.com.conductor.heimdall.core.service.amqp.AMQPInterceptorService;
+import br.com.conductor.heimdall.core.publisher.RedisInterceptorPublisher;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
@@ -61,7 +61,7 @@ public class InterceptorResource {
     private InterceptorService interceptorService;
 
     @Autowired
-    private AMQPInterceptorService amqpInterceptorService;
+    private RedisInterceptorPublisher redisInterceptorPublisher;
 
     /**
      * Finds a {@link Interceptor} by its Id.
@@ -192,7 +192,7 @@ public class InterceptorResource {
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_REFRESH_INTERCEPTOR)
     public ResponseEntity<?> refresh() {
 
-        amqpInterceptorService.dispatchRefreshAllInterceptors();
+        redisInterceptorPublisher.dispatchRefreshAllInterceptors();
 
         return ResponseEntity.noContent().build();
     }
