@@ -1,7 +1,0 @@
-heimdall-gateway-vVERSAO:
-  image: conductorcr.azurecr.io/@conductorcr.namespace@/heimdall-gateway:@versao@
-  labels:
-    aplicacao: heimdall-gateway-prod
-    io.rancher.scheduler.affinity:host_label: tipo=node
-    io.rancher.container.pull_image: always
-    io.rancher.scheduler.affinity:container_label_soft_ne: io.rancher.stack_service.name=heimdall-gateway-vVERSAO/heimdall-gateway-vVERSAO
