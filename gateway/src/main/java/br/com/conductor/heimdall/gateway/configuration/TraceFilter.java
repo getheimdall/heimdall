@@ -63,9 +63,6 @@ public class TraceFilter implements Filter {
 
 	@Autowired
 	private Property prop;
-	
-	@Autowired
-	private BuildProperties buildProperties;
 
 	@Override
 	public void destroy() {
@@ -81,7 +78,7 @@ public class TraceFilter implements Filter {
 		try {
 
 			trace = TraceContextHolder.getInstance().init(prop.getTrace().isPrintAllTrace(), profile, request,
-			prop.getLogstash().getEnabled(), buildProperties.getVersion(), prop.getTrace().isPrintHeimdallFilters());
+			prop.getLogstash().getEnabled(), prop.getTrace().isPrintHeimdallFilters());
 			if (shouldDisableTrace(request)) {
 				trace.setShouldPrint(false);
 			}

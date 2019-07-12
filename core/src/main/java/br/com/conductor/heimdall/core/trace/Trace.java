@@ -128,7 +128,7 @@ public class Trace {
      * @param servletRequest
      * @param printLogstash
      */
-    public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printLogstash, String version, boolean printFilters){
+    public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printLogstash, boolean printFilters){
 
         this.shouldPrint = true;
         this.profile = profile;

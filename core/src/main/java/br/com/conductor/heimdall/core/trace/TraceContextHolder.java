@@ -68,10 +68,10 @@ public class TraceContextHolder {
       * @param version 
       * @return					{@link Trace}
       */
-     public Trace init(boolean printAllTrace, String profile, ServletRequest request, boolean printLogstash, String version, boolean printFilters) {
+     public Trace init(boolean printAllTrace, String profile, ServletRequest request, boolean printLogstash, boolean printFilters) {
           String uuid = UUID.randomUUID().toString();
           contextHolder.set(uuid);
-          traceMap.put(uuid, new Trace(printAllTrace, profile, request, printLogstash, version, printFilters));
+          traceMap.put(uuid, new Trace(printAllTrace, profile, request, printLogstash, printFilters));
           
           log.debug("Initializing TraceContext with ID: {}", uuid);
           return getActualTrace();

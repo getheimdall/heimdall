@@ -42,7 +42,7 @@ public class LogMaskerServiceTest {
     @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        TraceContextHolder.getInstance().init(true,"developer", new MockHttpServletRequest(),false,"",true);
+        TraceContextHolder.getInstance().init(true,"developer", new MockHttpServletRequest(),false,true);
 
         Map<String, String> headers = new HashMap<>();
         headers.put("connection", "Keep-alive");

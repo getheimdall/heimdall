@@ -46,8 +46,8 @@ sentry:
 
 spring:
     redis:
-        host: 192.168.10.200
-        port: 6378
+        host: 127.0.0.1
+        port: 6379
 
     pid:
         fail-on-write-error: false
