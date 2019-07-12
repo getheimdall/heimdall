@@ -39,8 +39,8 @@ public class CustomSendResponseFilter extends SendResponseFilter {
 
 	private FilterDetail detail = new FilterDetail();
 
-	public CustomSendResponseFilter() {
-		super(new ZuulProperties());
+	public CustomSendResponseFilter(ZuulProperties zuulProperties) {
+		super(zuulProperties);
 	}
 
 	@Override

@@ -159,7 +159,7 @@ public class StartServer implements ServletContextListener {
      */
     private void createFolders() {
 
-        String[] types = {PRE_TYPE, POST_TYPE, ROUTE_TYPE};
+        String[] types = {PRE_TYPE, POST_TYPE};
 
         for (String t : types) {
             File folder = new File(zuulFilterRoot, t);

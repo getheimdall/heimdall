@@ -19,20 +19,22 @@
  */
 package br.com.conductor.heimdall.gateway.zuul.route;
 
-import br.com.conductor.heimdall.gateway.zuul.storage.ZuulRouteStorage;
-import lombok.extern.slf4j.Slf4j;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.springframework.cloud.client.discovery.DiscoveryClient;
+import org.springframework.cloud.client.serviceregistry.Registration;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties.ZuulRoute;
 import org.springframework.cloud.netflix.zuul.filters.discovery.DiscoveryClientRouteLocator;
 import org.springframework.util.PatternMatchUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicReference;
+import br.com.conductor.heimdall.gateway.zuul.storage.ZuulRouteStorage;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Represents the Heimdall route manager.
@@ -51,9 +53,9 @@ public class ProxyRouteLocator extends DiscoveryClientRouteLocator {
 
      private AtomicReference<Map<String, ZuulRoute>> routes = new AtomicReference<>();
 
-     public ProxyRouteLocator(String servletPath, DiscoveryClient discovery, ZuulProperties properties, ZuulRouteStorage storage) {
+     public ProxyRouteLocator(String servletPath, DiscoveryClient discovery, ZuulProperties properties, Registration registration, ZuulRouteStorage storage) {
 
-          super(servletPath, discovery, properties);
+          super(servletPath, discovery, properties, registration);
           this.storage = storage;
           this.discovery = discovery;
           this.properties = properties;

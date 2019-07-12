@@ -39,29 +39,29 @@ import org.springframework.stereotype.Component;
 @Component
 public class RouteListener {
 
-     @Autowired
-     private CacheService cacheService;
+	@Autowired
+	private CacheService cacheService;
 
-     @Autowired
-     private HeimdallHandlerMapping heimdallHandlerMapping;
+	@Autowired
+	private HeimdallHandlerMapping heimdallHandlerMapping;
 
-     @Autowired
-     private StartServer startServer;
+	@Autowired
+	private StartServer startServer;
 
-     /**
-      * Updates the {@link ZuulRoute} repository.
-      * 
-      * @param message {@link Message}
-      */
-     @RabbitListener(queues = RabbitConstants.LISTENER_HEIMDAL_ROUTES)
-     public void updateZuulRoutes(final Message message) {
-          try {
-               log.info("Updating Zuul Routes");
-               cacheService.clean();
-               heimdallHandlerMapping.setDirty(false);
-               startServer.initApplication();
-          } catch (Exception e) {
-               log.error(e.getMessage(), e);
-          }
-     }
+	/**
+	 * Updates the {@link ZuulRoute} repository.
+	 * 
+	 * @param message {@link Message}
+	 */
+	@RabbitListener(queues = RabbitConstants.LISTENER_HEIMDAL_ROUTES)
+	public void updateZuulRoutes(final Message message) {
+		try {
+			log.info("Updating Zuul Routes");
+			cacheService.clean();
+			heimdallHandlerMapping.setDirty(false);
+			startServer.initApplication();
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
+	}
 }

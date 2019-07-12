@@ -19,14 +19,15 @@
  */
 package br.com.conductor.heimdall.gateway.listener;
 
-import br.com.conductor.heimdall.core.service.CacheService;
-import br.com.conductor.heimdall.core.util.RabbitConstants;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import br.com.conductor.heimdall.core.service.CacheService;
+import br.com.conductor.heimdall.core.util.RabbitConstants;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Keeps track of the Rabbit Cache to clean it when necessary.
@@ -37,54 +38,53 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class CacheListener {
-     
-     @Autowired
-     private RabbitTemplate rabbitTemplate;
-     
-     @Autowired
-     private CacheService cacheService;
 
-     /**
-      * Cleans the Rabbit cache with specific message.
-      * 
-      * @param message	{@link Message}
-      */
-     @RabbitListener( queues = RabbitConstants.LISTENER_HEIMDALL_CLEAN_CACHE)
-     public void cleanCaches(final Message message) {
-          
-          String key = (String) rabbitTemplate.getMessageConverter().fromMessage(message);
-          
-          
-          if (key != null && !key.isEmpty()) {
-               
-               if (key.contains(";")) {
-                    
-                    String[] split = key.split(";");
-                    log.info("Clean cache with key: {} and id: {} ", split[0], split[1]);
-                    cacheService.clean(split[0], split[1]);
-               } else {
-                    
-                    log.info("Clean cache with key: {}", key);
-                    cacheService.clean(key);
-               }
-          } else {
-               
-               log.info("Clean all caches");
-               cacheService.clean();
-          }
-          
-     }
+	@Autowired
+	private RabbitTemplate rabbitTemplate;
 
-     /**
-      * Cleans the Rabbit cache with specific message.
-      *
-      * @param message	{@link Message}
-      */
-     @RabbitListener( queues = RabbitConstants.LISTENER_HEIMDALL_CLEAN_INTERCEPTORS_CACHE)
-     public void cleanInterceptorsCache(final Message message) {
+	@Autowired
+	private CacheService cacheService;
 
-          log.info("Clean all caches from Cache interceptors");
-          cacheService.cleanInterceptorsCache();
-     }
+	/**
+	 * Cleans the Rabbit cache with specific message.
+	 * 
+	 * @param message {@link Message}
+	 */
+	@RabbitListener(queues = RabbitConstants.LISTENER_HEIMDALL_CLEAN_CACHE)
+	public void cleanCaches(final Message message) {
+
+		String key = (String) rabbitTemplate.getMessageConverter().fromMessage(message);
+
+		if (key != null && !key.isEmpty()) {
+
+			if (key.contains(";")) {
+
+				String[] split = key.split(";");
+				log.info("Clean cache with key: {} and id: {} ", split[0], split[1]);
+				cacheService.clean(split[0], split[1]);
+			} else {
+
+				log.info("Clean cache with key: {}", key);
+				cacheService.clean(key);
+			}
+		} else {
+
+			log.info("Clean all caches");
+			cacheService.clean();
+		}
+
+	}
+
+	/**
+	 * Cleans the Rabbit cache with specific message.
+	 *
+	 * @param message {@link Message}
+	 */
+	@RabbitListener(queues = RabbitConstants.LISTENER_HEIMDALL_CLEAN_INTERCEPTORS_CACHE)
+	public void cleanInterceptorsCache(final Message message) {
+
+		log.info("Clean all caches from Cache interceptors");
+		cacheService.cleanInterceptorsCache();
+	}
 
 }

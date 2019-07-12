@@ -43,73 +43,73 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class InterceptorListener {
-     
-     @Autowired
-     private RabbitTemplate rabbitTemplate;
-     
-     @Autowired
-     private InterceptorFileService interceptorFileService;
 
-     @Autowired
-     private InterceptorService interceptorService;
+	@Autowired
+	private RabbitTemplate rabbitTemplate;
 
-     @Autowired
-     private StartServer startServer;
+	@Autowired
+	private InterceptorFileService interceptorFileService;
 
-     /**
-      * Updates the {@link Interceptor} repository.
-      * 
-      * @param message {@link Message}
-      */
-     @RabbitListener(queues = RabbitConstants.LISTENER_HEIMDALL_INTERCEPTORS)
-     public void updateInterceptors(final Message message) {
+	@Autowired
+	private InterceptorService interceptorService;
 
-          String interceptorId = (String) rabbitTemplate.getMessageConverter().fromMessage(message);
+	@Autowired
+	private StartServer startServer;
 
-          Interceptor interceptor = interceptorService.find(interceptorId);
-          if (Objects.nonNull(interceptor)) {
-               
-               log.info("Updating/Creating Interceptor id: " + interceptorId);
-               interceptorFileService.createFileInterceptor(interceptor);
-          } else {
-               
-               log.info("It was not possible Updating/Creating Interceptor id: " + interceptorId);
-          }
+	/**
+	 * Updates the {@link Interceptor} repository.
+	 * 
+	 * @param message {@link Message}
+	 */
+	@RabbitListener(queues = RabbitConstants.LISTENER_HEIMDALL_INTERCEPTORS)
+	public void updateInterceptors(final Message message) {
 
-     }
+		String interceptorId = (String) rabbitTemplate.getMessageConverter().fromMessage(message);
 
-     /**
-      * Refreshs all {@link Interceptor}.
-      * 
-      * @param message {@link Message}
-      */
-     @RabbitListener(queues = RabbitConstants.LISTENER_HEIMDALL_REFRESH_INTERCEPTORS)
-     public void refreshAllInterceptors(final Message message) {
+		Interceptor interceptor = interceptorService.find(interceptorId);
+		if (Objects.nonNull(interceptor)) {
 
-          log.info("Refresh all Interceptors");
+			log.info("Updating/Creating Interceptor id: " + interceptorId);
+			interceptorFileService.createFileInterceptor(interceptor);
+		} else {
 
-          try {
+			log.info("It was not possible Updating/Creating Interceptor id: " + interceptorId);
+		}
 
-               startServer.initApplication();
-          } catch (Exception e) {
+	}
 
-               log.error(e.getMessage(), e);
-          }
+	/**
+	 * Refreshs all {@link Interceptor}.
+	 * 
+	 * @param message {@link Message}
+	 */
+	@RabbitListener(queues = RabbitConstants.LISTENER_HEIMDALL_REFRESH_INTERCEPTORS)
+	public void refreshAllInterceptors(final Message message) {
 
-     }
-     
-     /**
-      * Removes a {@link Interceptor}.
-      * 
-      * @param message {@link Message}
-      */
-     @RabbitListener(queues = RabbitConstants.LISTENER_HEIMDALL_REMOVE_INTERCEPTORS)
-     public void removeInterceptor(final Message message) {
-          
-          InterceptorFileDTO interceptor = (InterceptorFileDTO) rabbitTemplate.getMessageConverter().fromMessage(message);
-          log.info("Removing Interceptor id: " + interceptor.getId());
-          
-          interceptorFileService.removeFileInterceptor(interceptor);
-     }
+		log.info("Refresh all Interceptors");
+
+		try {
+
+			startServer.initApplication();
+		} catch (Exception e) {
+
+			log.error(e.getMessage(), e);
+		}
+
+	}
+
+	/**
+	 * Removes a {@link Interceptor}.
+	 * 
+	 * @param message {@link Message}
+	 */
+	@RabbitListener(queues = RabbitConstants.LISTENER_HEIMDALL_REMOVE_INTERCEPTORS)
+	public void removeInterceptor(final Message message) {
+
+		InterceptorFileDTO interceptor = (InterceptorFileDTO) rabbitTemplate.getMessageConverter().fromMessage(message);
+		log.info("Removing Interceptor id: " + interceptor.getId());
+
+		interceptorFileService.removeFileInterceptor(interceptor);
+	}
 
 }

@@ -15,31 +15,38 @@
  */
 package br.com.conductor.heimdall.core.trace;
 
-import br.com.conductor.heimdall.core.exception.ExceptionMessage;
-import br.com.conductor.heimdall.core.exception.HeimdallException;
-import br.com.conductor.heimdall.core.util.UrlUtil;
-import com.fasterxml.jackson.annotation.JsonFilter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ser.FilterProvider;
-import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
-import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
-import lombok.Data;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
+import static net.logstash.logback.marker.Markers.append;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.*;
 
-import static net.logstash.logback.marker.Markers.append;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ser.FilterProvider;
+import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
+import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
+
+import br.com.conductor.heimdall.core.exception.ExceptionMessage;
+import br.com.conductor.heimdall.core.exception.HeimdallException;
+import br.com.conductor.heimdall.core.util.UrlUtil;
+import lombok.Data;
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Represents the trace message.
@@ -110,8 +117,6 @@ public class Trace {
     @JsonIgnore
     private boolean printFilters;
 
-    private String version;
-
     public Trace() {
 
     }
@@ -123,7 +128,7 @@ public class Trace {
      * @param servletRequest
      * @param printLogstash
      */
-    public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printLogstash, boolean printFilters){
+    public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printLogstash, String version, boolean printFilters){
 
         this.shouldPrint = true;
         this.profile = profile;
@@ -149,20 +154,6 @@ public class Trace {
     }
 
     /**
-     * Create a Trace.
-     *
-     * @param printAllTrace
-     * @param profile
-     * @param servletRequest
-     * @param printLogstash
-     * @param version
-     */
-    public Trace(boolean printAllTrace, String profile, ServletRequest servletRequest, boolean printLogstash, String version, boolean printFilters) {
-        this(printAllTrace, profile, servletRequest, printLogstash, printFilters);
-        this.version = version;
-    }
-
-    /**
      * Adds a {@link FilterDetail} to the List.
      *
      * @param detail {@link FilterDetail}
@@ -182,7 +173,6 @@ public class Trace {
     public Trace trace(String msg) {
 
         return this.trace(msg, null);
-
     }
 
     /**
@@ -199,7 +189,6 @@ public class Trace {
         traces.add(new GeneralTrace(msg, object));
 
         return this;
-
     }
 
     /**
@@ -218,93 +207,26 @@ public class Trace {
                 this.filters = null;
             }
 
-            writeTrace();
+            ObjectMapper mapper = mapper();
 
+            if (this.printAllTrace) {
+            	MessageDelegate.send(log, this.resultStatus, " [HEIMDALL-TRACE] - " + mapper.writeValueAsString(this));
+            } else {
+                String url = Objects.nonNull(this.url) ? this.url : "";
+                MessageDelegate.send(log, this.resultStatus, append("call", this), " [HEIMDALL-TRACE] - " + url);
+            }
+
+            if (this.printLogstash) {
+            	MessageDelegate.send(logstash, this.resultStatus, append("trace", mapper.convertValue(this, Map.class)), null);
+            }
         } catch (Exception e) {
 
             log.error(e.getMessage(), e);
-
         } finally {
 
             TraceContextHolder.getInstance().clearActual();
         }
 
-    }
-
-    /*
-     * Heimdall uses three levels of log depending on the status code of the response.
-     *
-     * Levels per status code range:
-     *   * 1xx~2xx = INFO
-     *   * 3xx~4xx = WARN
-     *   * OTHER   = ERROR
-     */
-    private void writeTrace() throws JsonProcessingException {
-
-        ObjectMapper mapper = mapper();
-
-        if (this.printAllTrace) {
-
-            if (isInfo(this.resultStatus)) {
-
-                log.info(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
-            } else if (isWarn(this.resultStatus)) {
-
-                log.warn(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
-            } else {
-
-                log.error(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
-            }
-        } else {
-            String url = Objects.nonNull(this.url) ? this.url : "";
-
-            if (isInfo(this.resultStatus)) {
-
-                log.info(append("call", this), " [HEIMDALL-TRACE] - " + url);
-            } else if (isWarn(this.resultStatus)) {
-
-                log.warn(append("call", this), " [HEIMDALL-TRACE] - " + url);
-            } else {
-
-                log.error(append("call", this), " [HEIMDALL-TRACE] - " + url);
-            }
-        }
-
-        if (this.printLogstash) {
-            this.version = null;
-            printInLogger(logstash);
-        }
-    }
-
-    private void printInLogger(Logger logger) throws JsonProcessingException {
-        ObjectMapper mapper = mapper();
-
-        if (isInfo(this.resultStatus)) {
-
-            logger.info(mapper.writeValueAsString(this));
-        } else if (isWarn(this.resultStatus)) {
-
-            logger.warn(mapper.writeValueAsString(this));
-        } else {
-
-            logger.error(mapper.writeValueAsString(this));
-        }
-    }
-
-    /*
-     * Checks if the status code is in range 1xx to 2xx
-     */
-    private static boolean isInfo(Integer statusCode) {
-        return HttpStatus.valueOf(statusCode).is1xxInformational() ||
-                HttpStatus.valueOf(statusCode).is2xxSuccessful();
-    }
-
-    /*
-     * Checks if the status code is in range 3xx to 4xx
-     */
-    private static boolean isWarn(Integer statusCode) {
-        return HttpStatus.valueOf(statusCode).is3xxRedirection() ||
-                HttpStatus.valueOf(statusCode).is4xxClientError();
     }
 
     private ObjectMapper mapper() {
@@ -319,6 +241,5 @@ public class Trace {
         FilterProvider filters = new SimpleFilterProvider().addFilter("customFilter", customFilter);
 
         return new ObjectMapper().setFilterProvider(filters);
-
     }
 }
