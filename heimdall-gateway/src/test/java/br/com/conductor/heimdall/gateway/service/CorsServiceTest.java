@@ -1,11 +1,6 @@
-package br.com.conductor.heimdall.gateway.service;
-
-/*-
- * =========================LICENSE_START==================================
- * heimdall-gateway
- * ========================================================================
+/*
  * Copyright (C) 2018 Conductor Tecnologia SA
- * ========================================================================
+ *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,8 +12,8 @@ package br.com.conductor.heimdall.gateway.service;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.service;
 
 import br.com.conductor.heimdall.core.enums.HttpMethod;
 import br.com.conductor.heimdall.gateway.util.ConstantsContext;

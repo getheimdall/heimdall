@@ -1,9 +1,6 @@
-/*-
- * =========================LICENSE_START==================================
- * heimdall-gateway
- * ========================================================================
+/*
  * Copyright (C) 2018 Conductor Tecnologia SA
- * ========================================================================
+ *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,7 +12,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * ==========================LICENSE_END===================================
  */
 package br.com.conductor.heimdall.gateway.service;
 
@@ -23,7 +19,9 @@ import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.entity.Developer;
 import br.com.conductor.heimdall.core.entity.Plan;
-import br.com.conductor.heimdall.core.repository.AppRepository;
+import br.com.conductor.heimdall.core.service.AppService;
+import br.com.conductor.heimdall.core.service.DeveloperService;
+import br.com.conductor.heimdall.core.service.PlanService;
 import br.com.conductor.heimdall.core.trace.TraceContextHolder;
 import com.netflix.zuul.context.RequestContext;
 import org.junit.Before;
@@ -52,7 +50,13 @@ public class ClientIdInterceptorServiceTest {
     private ClientIdInterceptorService clientIdInterceptorService;
 
     @Mock
-    private AppRepository appRepository;
+    private AppService appService;
+
+    @Mock
+    private PlanService planService;
+
+    @Mock
+    private DeveloperService developerService;
 
     private RequestContext ctx;
 
@@ -69,6 +73,12 @@ public class ClientIdInterceptorServiceTest {
     private Api api2;
 
     private App app;
+
+    private Plan plan1 = new Plan();
+
+    private Plan plan2 = new Plan();
+
+    private Developer developer = new Developer();
 
     @Before
     public void initTest() {
@@ -91,15 +101,11 @@ public class ClientIdInterceptorServiceTest {
         api2 = new Api();
         api2.setId("20L");
 
-        Plan plan1 = new Plan();
-        plan1.setApiId("10L");
+        plan1.setApiId(api1.getId());
+        plan2.setApiId(api2.getId());
 
-        Plan plan2 = new Plan();
-        plan2.setApiId("20L");
+        Set<String> planList = Stream.of(api1.getId(), api2.getId()).collect(Collectors.toSet());
 
-        Set<String> planList = Stream.of("10L", "20L").collect(Collectors.toSet());
-
-        Developer developer = new Developer();
         developer.setEmail("some@email.com");
 
         app = new App();
@@ -112,7 +118,9 @@ public class ClientIdInterceptorServiceTest {
     @Test
     public void successCaseTest() {
 
-        Mockito.when(appRepository.findByClientId(clientId)).thenReturn(app);
+        Mockito.when(appService.findByClientId(clientId)).thenReturn(app);
+        Mockito.when(planService.find(Mockito.anyString())).thenReturn(plan1);
+        Mockito.when(developerService.find(Mockito.anyString())).thenReturn(developer);
 
         clientIdInterceptorService.validate(api1.getId());
 
@@ -123,7 +131,9 @@ public class ClientIdInterceptorServiceTest {
     @Test
     public void successCase2Test() {
 
-        Mockito.when(appRepository.findByClientId(clientId)).thenReturn(app);
+        Mockito.when(appService.findByClientId(clientId)).thenReturn(app);
+        Mockito.when(planService.find(Mockito.anyString())).thenReturn(plan2);
+        Mockito.when(developerService.find(Mockito.anyString())).thenReturn(developer);
 
         clientIdInterceptorService.validate(api2.getId());
 
@@ -155,7 +165,7 @@ public class ClientIdInterceptorServiceTest {
 
         this.request.addHeader("client_id", someOtherClientId);
 
-        Mockito.when(appRepository.findByClientId(someOtherClientId)).thenReturn(null);
+        Mockito.when(appService.findByClientId(someOtherClientId)).thenReturn(null);
 
         clientIdInterceptorService.validate(api1.getId());
 
@@ -170,7 +180,8 @@ public class ClientIdInterceptorServiceTest {
         Api api = new Api();
         api.setId("30L");
 
-        Mockito.when(appRepository.findByClientId(clientId)).thenReturn(app);
+        Mockito.when(appService.findByClientId(clientId)).thenReturn(app);
+        Mockito.when(planService.find(Mockito.anyString())).thenReturn(plan1);
 
         clientIdInterceptorService.validate(api.getId());
 
@@ -187,7 +198,8 @@ public class ClientIdInterceptorServiceTest {
         Plan plan = new Plan();
         plan.setApiId("30L");
 
-        Mockito.when(appRepository.findByClientId(clientId)).thenReturn(app);
+        Mockito.when(appService.findByClientId(clientId)).thenReturn(app);
+        Mockito.when(planService.find(Mockito.anyString())).thenReturn(plan1);
 
         clientIdInterceptorService.validate(api.getId());
 

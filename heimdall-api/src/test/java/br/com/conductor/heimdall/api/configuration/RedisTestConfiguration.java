@@ -16,22 +16,21 @@
 package br.com.conductor.heimdall.api.configuration;
 
 import br.com.conductor.heimdall.core.entity.RateLimit;
-import br.com.conductor.heimdall.core.environment.Property;
+import br.com.conductor.heimdall.core.publisher.MessagePublisher;
+import br.com.conductor.heimdall.core.publisher.RedisMessagePublisher;
 import org.mockito.Mockito;
 import org.redisson.api.RedissonClient;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import redis.clients.jedis.JedisPoolConfig;
 
 /**
  * <h1>RedisTestConfiguration</h1><br/>
- * 
+ * <p>
  * Class responsible for the Redis configuration.
  *
  * @author Marcos Filho
@@ -40,78 +39,72 @@ import redis.clients.jedis.JedisPoolConfig;
 @Configuration
 @Profile("test")
 public class RedisTestConfiguration {
-     
-     @Autowired
-     Property property;
-     
-     /**
-      * Creates a new {@link JedisConnectionFactory}.
-      * 
-      * @return {@link JedisConnectionFactory}
-      */
-     @Bean
-     public JedisConnectionFactory jedisConnectionFactory() {
 
-          return Mockito.mock(JedisConnectionFactory.class);
-          
-     }
-     
-     /**
-      * Returns a configured {@link JedisPoolConfig}.
-      * 
-      * @return {@link JedisPoolConfig}
-      */
-     public JedisPoolConfig jediPoolConfig() {
-          
-          return Mockito.mock(JedisPoolConfig.class);
-          
-     }
-     
-     /**
-      * Returns a configured {@link RedisTemplate}.
-      * 
-      * @return {@link RedisTemplate} Object, Object
-      */
-     @Bean
-     public RedisTemplate<Object, Object> redisTemplateObject() {
+    @Value("${spring.redis.host}")
+    private String redisHost;
 
-          return Mockito.mock(RedisTemplate.class);
-          
-     }
-     
-     /**
-      * Returns a configured {@link RedisTemplate}.
-      * 
-      * @return {@link RedisTemplate} String, {@link RateLimit}
-      */
-     @Bean
-     public RedisTemplate<String, RateLimit> redisTemplateRate() {
-          
-          return Mockito.mock(RedisTemplate.class);
-          
-     }
-     
-     /**
-      * Returns a configured {@link CacheManager}.
-      * 
-      * @return {@link CacheManager}
-      */
-     @Bean
-     public CacheManager cacheManager() {
-          
-          return Mockito.mock(RedisCacheManager.class);
-          
-     }
-     
-     /**
-      * Returns a configured {@link RedissonClient}.
-      * 
-      * @return {@link RedissonClient}
-      */
-     @Bean
-     public RedissonClient redissonClient() {
+    @Value("${spring.redis.port}")
+    private int redisPort;
 
-          return Mockito.mock(RedissonClient.class);
-          
-     }
+    /**
+     * Creates a new {@link JedisConnectionFactory}.
+     *
+     * @return {@link JedisConnectionFactory}
+     */
+    @Bean
+    public JedisConnectionFactory jedisConnectionFactory() {
+
+        RedisStandaloneConfiguration redisStandaloneConfiguration
+                = new RedisStandaloneConfiguration(redisHost, redisPort);
+
+        return new JedisConnectionFactory(redisStandaloneConfiguration);
+
+    }
+
+    @Bean
+    public MessagePublisher redisPublisher() {
+        return Mockito.mock(RedisMessagePublisher.class);
+    }
+
+    /**
+     * Returns a configured {@link RedisTemplate}.
+     *
+     * @return {@link RedisTemplate} Object, Object
+     */
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate() {
+
+        return Mockito.mock(RedisTemplate.class);
+
+    }
+
+    /**
+     * Returns a configured {@link RedisTemplate}.
+     *
+     * @return {@link RedisTemplate} String, {@link RateLimit}
+     */
+    @Bean
+    public RedisTemplate<String, RateLimit> redisTemplateRate() {
+
+        return Mockito.mock(RedisTemplate.class);
+
+    }
+
+    /**
+     * Returns a configured {@link RedissonClient}.
+     *
+     * @return {@link RedissonClient}
+     */
+    @Bean
+    public RedissonClient redissonClient() {
+
+        return Mockito.mock(RedissonClient.class);
+
+    }
+
+//    @Bean
+//    public RedisKeyValueTemplate redisKeyValueTemplate() {
+//        return Mockito.mock(RedisKeyValueTemplate.class);
+//    }
+
 }

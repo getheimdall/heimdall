@@ -1,9 +1,6 @@
-/*-
- * =========================LICENSE_START==================================
- * heimdall-core
- * ========================================================================
+/*
  * Copyright (C) 2018 Conductor Tecnologia SA
- * ========================================================================
+ *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,21 +12,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * ==========================LICENSE_END===================================
  */
 package br.com.conductor.heimdall.core.service;
 
-import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.ScopeDTO;
 import br.com.conductor.heimdall.core.entity.*;
 import br.com.conductor.heimdall.core.enums.HttpMethod;
 import br.com.conductor.heimdall.core.enums.Status;
 import br.com.conductor.heimdall.core.exception.BadRequestException;
 import br.com.conductor.heimdall.core.exception.NotFoundException;
-import br.com.conductor.heimdall.core.repository.ApiRepository;
-import br.com.conductor.heimdall.core.repository.OperationRepository;
 import br.com.conductor.heimdall.core.repository.ScopeRepository;
-//import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,11 +30,18 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.internal.util.collections.Sets;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.testng.collections.Lists;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 
@@ -62,12 +61,6 @@ public class ScopeServiceTest {
     private ApiService apiService;
 
     @Mock
-    private ApiRepository apiRepository;
-
-    @Mock
-    private OperationRepository operationRepository;
-
-    @Mock
     private OperationService operationService;
 
     @Rule
@@ -77,7 +70,6 @@ public class ScopeServiceTest {
 
     private Operation operation;
     private Operation operation2;
-    private Operation operation3;
 
     private Api api;
 
@@ -118,21 +110,16 @@ public class ScopeServiceTest {
         operation2.setMethod(HttpMethod.POST);
         operation2.setApiId(api.getId());
 
-        operation3 = new Operation();
+        Operation operation3 = new Operation();
         operation3.setId("3L");
         operation3.setResourceId(resource.getId());
         operation3.setPath("/operation-3");
         operation3.setMethod(HttpMethod.GET);
         operation3.setApiId(api.getId());
 
-        List<Operation> operations = new ArrayList<>();
-        operations.add(operation);
-        operations.add(operation2);
-        operations.add(operation3);
+        List<String> operations = Lists.newArrayList(operation.getId(), operation2.getId(), operation3.getId());
 
-        Set<String> operationsSet = new HashSet<>();
-        operationsSet.add(operation.getId());
-        operationsSet.add(operation2.getId());
+        Set<String> operationsSet = Sets.newSet(operation.getId(), operation2.getId());
 
         resource.setOperations(operations);
 

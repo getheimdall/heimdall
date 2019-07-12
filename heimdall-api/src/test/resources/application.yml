@@ -25,20 +25,6 @@ heimdall:
         sanitizes:
             - access_token
             - client_id
-    redis:
-        host: 127.0.0.1
-        port: 6379
-        maxTotal: 128
-        maxIdle: 128
-        minIdle: 16
-        testOnBorrow: true
-        testOnReturn: true
-        testWhileIdle: true
-        minEvictableIdleTimeSeconds: 60
-        timeBetweenEvictionRunsSeconds: 30
-        numTestsPerEvictionRun: 3
-        blockWhenExhausted: true
-        connectionPoolSize: 10
     security:
         enabled: true
         ldap:
@@ -50,6 +36,9 @@ heimdall:
             #userSearchFilter: sAMAccountName={0}    
 
 spring:
+    redis:
+        host: localhost
+        port: 6379
     pid:
         fail-on-write-error: false
         file: heimdall.pid
@@ -57,11 +46,6 @@ spring:
         serialization:
             INDENT_OUTPUT: true
             WRITE-DATES-AS-TIMESTAMPS: false
-    rabbitmq:
-        host: 127.0.0.1
-        port: 5672
-        #virtual-host: dev
-        requested-heartbeat: 10
     profiles:
         active: test
 

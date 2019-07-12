@@ -20,7 +20,8 @@ import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.entity.Developer;
 import br.com.conductor.heimdall.core.exception.BadRequestException;
 import br.com.conductor.heimdall.core.repository.AppRepository;
-import br.com.conductor.heimdall.core.repository.PlanRepository;
+import org.assertj.core.util.Lists;
+import org.mockito.internal.util.collections.Sets;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -137,10 +138,7 @@ public class AppServiceTest {
 
         Pageable pageable = PageRequest.of(0, 10);
 
-        List<App> apps = new ArrayList<>();
-        apps.add(app);
-
-        Page<App> page = new PageImpl<>(apps);
+        Page<App> page = new PageImpl<>(Lists.newArrayList(app));
 
         Mockito.when(appRepository.findAll(pageable)).thenReturn(page);
 
@@ -154,8 +152,7 @@ public class AppServiceTest {
     @Test
     public void listAppWithoutPageableTest() {
 
-        List<App> apps = new ArrayList<>();
-        apps.add(app);
+        List<App> apps = Lists.newArrayList(app);
 
         Mockito.when(this.appRepository.findAll()).thenReturn(apps);
         List<App> listAppResp = appService.list();
@@ -188,13 +185,10 @@ public class AppServiceTest {
 
         String plan2 = "2L";
 
-        Set<String> plans = new HashSet<>();
-        plans.add(plan1);
-        plans.add(plan2);
+        Set<String> plans = Sets.newSet(plan1, plan2);
+
         app.setPlans(plans);
 
-        Set<String> accessTokens = new HashSet<>();
-        List<AccessToken> accessTokensReturned = new ArrayList<>();
         AccessToken act1 = new AccessToken();
         act1.setId("1L");
         act1.setApp(app.getId());
@@ -205,11 +199,8 @@ public class AppServiceTest {
         act2.setApp(app.getId());
         act2.setPlans(plans);
 
-        accessTokens.add(act1.getId());
-        accessTokens.add(act2.getId());
-
-        accessTokensReturned.add(act1);
-        accessTokensReturned.add(act2);
+        Set<String> accessTokens = Sets.newSet(act1.getId(), act2.getId());
+        List<AccessToken> accessTokensReturned = Lists.newArrayList(act1, act2);
 
         app.setAccessTokens(accessTokens);
 
@@ -217,8 +208,7 @@ public class AppServiceTest {
         Mockito.when(accessTokenService.findByAppId(app.getId())).thenReturn(accessTokensReturned);
 
         App appDTO = new App();
-        Set<String> referenceIdDTOS = new HashSet<>();
-        referenceIdDTOS.add("1L");
+        Set<String> referenceIdDTOS = Sets.newSet("1L");
         appDTO.setPlans(referenceIdDTOS);
 
         App update = appService.update("1L", appDTO);
