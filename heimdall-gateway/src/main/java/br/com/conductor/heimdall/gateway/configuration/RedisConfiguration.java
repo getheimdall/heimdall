@@ -20,7 +20,6 @@
 package br.com.conductor.heimdall.gateway.configuration;
 
 import br.com.conductor.heimdall.core.entity.RateLimit;
-import br.com.conductor.heimdall.core.util.BeanManager;
 import br.com.conductor.heimdall.core.util.ConstantsCache;
 import br.com.conductor.heimdall.core.util.RedisConstants;
 import br.com.conductor.heimdall.gateway.listener.AddInterceptorsListener;
@@ -33,6 +32,7 @@ import org.redisson.config.Config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -57,27 +57,41 @@ public class RedisConfiguration {
     @Value("${spring.redis.port}")
     private int redisPort;
 
+    private final AddInterceptorsListener addInterceptorsListener;
+
+    private final RefreshInterceptorsListener refreshInterceptorsListener;
+
+    private final RemoveInterceptorsListener removeInterceptorsListener;
+
+    private final RefreshRoutesListener refreshRoutesListener;
+
+    public RedisConfiguration(@Lazy AddInterceptorsListener addInterceptorsListener,
+                              @Lazy RefreshInterceptorsListener refreshInterceptorsListener,
+                              @Lazy RemoveInterceptorsListener removeInterceptorsListener,
+                              @Lazy RefreshRoutesListener refreshRoutesListener) {
+        this.addInterceptorsListener = addInterceptorsListener;
+        this.refreshInterceptorsListener = refreshInterceptorsListener;
+        this.removeInterceptorsListener = removeInterceptorsListener;
+        this.refreshRoutesListener = refreshRoutesListener;
+    }
+
     @Bean
     public MessageListenerAdapter addInterceptor() {
-        final AddInterceptorsListener addInterceptorsListener = (AddInterceptorsListener) BeanManager.getBean(AddInterceptorsListener.class);
         return new MessageListenerAdapter(addInterceptorsListener);
     }
 
     @Bean
     public MessageListenerAdapter refreshInterceptor() {
-        final RefreshInterceptorsListener refreshInterceptorsListener = (RefreshInterceptorsListener) BeanManager.getBean(RefreshInterceptorsListener.class);
         return new MessageListenerAdapter(refreshInterceptorsListener);
     }
 
     @Bean
     public MessageListenerAdapter removeInterceptor() {
-        final RemoveInterceptorsListener removeInterceptorsListener = (RemoveInterceptorsListener) BeanManager.getBean(RemoveInterceptorsListener.class);
         return new MessageListenerAdapter(removeInterceptorsListener);
     }
 
     @Bean
     public MessageListenerAdapter refreshRoutes() {
-        final RefreshRoutesListener refreshRoutesListener = (RefreshRoutesListener) BeanManager.getBean(RefreshRoutesListener.class);
         return new MessageListenerAdapter(refreshRoutesListener);
     }
 

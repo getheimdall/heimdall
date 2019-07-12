@@ -21,7 +21,6 @@ package br.com.conductor.heimdall.gateway.listener;
 
 import br.com.conductor.heimdall.core.entity.Interceptor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Component;
@@ -35,9 +34,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class RefreshInterceptorsListener implements MessageListener {
 
-    @Autowired
-    private StartServer startServer;
+    private final StartServer startServer;
 
+    public RefreshInterceptorsListener(StartServer startServer) {
+        this.startServer = startServer;
+    }
 
     @Override
     public void onMessage(Message message, byte[] pattern) {
