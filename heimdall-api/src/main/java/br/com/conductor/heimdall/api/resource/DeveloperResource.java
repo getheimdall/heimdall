@@ -20,6 +20,7 @@ import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.DeveloperDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.request.DeveloperLogin;
+import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.entity.Developer;
 import br.com.conductor.heimdall.core.service.DeveloperService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
@@ -164,4 +165,14 @@ public class DeveloperResource {
         return ResponseEntity.noContent().build();
     }
 
+    @ResponseBody
+    @ApiOperation(value = "Find All Apps of a Developer")
+    @GetMapping(value = "/{developerId}/apps")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_APP)
+    public ResponseEntity<?> findByDeveloper(@PathVariable("developerId") String developerId) {
+
+        final List<App> apps = developerService.list(developerId);
+
+        return ResponseEntity.ok(apps);
+    }
 }

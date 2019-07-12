@@ -45,18 +45,18 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 @Service
 public class ResourceService {
 
-    private final RedisRoutePublisher amqpRoute;
+    private final RedisRoutePublisher redisRoutePublisher;
     private final ApiService apiService;
     private final InterceptorService interceptorService;
     private final OperationService operationService;
     private final ResourceRepository resourceRepository;
 
-    public ResourceService(RedisRoutePublisher amqpRoute,
+    public ResourceService(RedisRoutePublisher redisRoutePublisher,
                            @Lazy ApiService apiService,
                            InterceptorService interceptorService,
                            OperationService operationService,
                            ResourceRepository resourceRepository) {
-        this.amqpRoute = amqpRoute;
+        this.redisRoutePublisher = redisRoutePublisher;
         this.apiService = apiService;
         this.interceptorService = interceptorService;
         this.operationService = operationService;
@@ -156,19 +156,13 @@ public class ResourceService {
     public Resource update(String apiId, String resourceId, Resource resourcePersist) {
 
         final Resource resource = this.find(apiId, resourceId);
+        final boolean anyMatch = this.list(apiId).stream().anyMatch(resource1 -> resourcePersist.getName().equals(resource1.getName()));
 
-        final Resource resData = this.list(apiId).stream()
-                .filter(res -> resourcePersist.getName().equals(res.getName()))
-                .findAny()
-                .orElse(null);
-        HeimdallException.checkThrow(resData != null &&
-                !Objects.equals(resData.getId(), resource.getId()), GLOBAL_ALREADY_REGISTERED, "Resource");
+        HeimdallException.checkThrow(anyMatch, GLOBAL_ALREADY_REGISTERED, "Resource");
 
         final Resource updatedResource = GenericConverter.mapper(resourcePersist, resource);
 
-        final Resource savedResource = resourceRepository.save(updatedResource);
-
-        return savedResource;
+        return resourceRepository.save(updatedResource);
     }
 
     public Resource update(Resource resource) {
@@ -195,7 +189,7 @@ public class ResourceService {
 
         apiService.removeResource(resource);
 
-        amqpRoute.dispatchRoutes();
+        redisRoutePublisher.dispatchRoutes();
     }
 
     /**

@@ -53,19 +53,13 @@ public class Resource implements Serializable {
      @Indexed
      private String apiId;
 
-     private List<Operation> operations = new ArrayList<>();
+     private List<String> operations = new ArrayList<>();
 
      public void addOperation(String id) {
-          Operation operation = new Operation();
-          operation.setId(id);
-
-          this.operations.add(operation);
+          this.operations.add(id);
      }
 
      public void removeOperation(String id) {
-          Operation operation = new Operation();
-          operation.setId(id);
-
-          this.operations.remove(operation);
+          this.operations.remove(id);
      }
 }

@@ -182,7 +182,7 @@ public class SwaggerService {
                 resources.add(resource);
             }
 
-            List<Operation> operations = resource.getOperations();
+            List<Operation> operations = operationService.list(apiId, resource.getId());
             if (Objects.isNull(operations)) {
                 operations = new ArrayList<>();
             }
@@ -221,28 +221,32 @@ public class SwaggerService {
 
         Map<String, Path> pathMap = new HashMap<>();
 
-//        api.getResources().forEach(resource -> resource.getOperations().forEach(operation -> {
-//            String pathOperation = operation.getPath();
-//            if (Objects.isNull(pathMap.get(pathOperation))) {
-//                pathMap.put(pathOperation, new Path());
-//            }
-//
-//            Path path = pathMap.get(pathOperation);
-//
-//            io.swagger.models.Operation operationSwagger = new io.swagger.models.Operation();
-//            if (operation.getDescription() != null) {
-//                operationSwagger.setOperationId(operation.getDescription().trim().concat(operation.getMethod().name()));
-//                operationSwagger.setSummary(operation.getDescription());
-//            }
-//            operationSwagger.setConsumes(new ArrayList<>());
-//            operationSwagger.setTags(Collections.singletonList(resource.getName()));
-//            operationSwagger.setDeprecated(false);
-//            operationSwagger.setParameters(new ArrayList<>());
-//            operationSwagger.setProduces(new ArrayList<>());
-//            operationSwagger.setResponses(new HashMap<>());
-//
-//            path.set(operation.getMethod().name().toLowerCase(), operationSwagger);
-//        }));
+        api.getResources().forEach(resource -> {
+            final List<Operation> operations = operationService.list(api.getId(), resource);
+            final Resource res = resourceService.find(resource);
+            operations.forEach(operation -> {
+                String pathOperation = operation.getPath();
+                if (Objects.isNull(pathMap.get(pathOperation))) {
+                    pathMap.put(pathOperation, new Path());
+                }
+
+                Path path = pathMap.get(pathOperation);
+
+                io.swagger.models.Operation operationSwagger = new io.swagger.models.Operation();
+                if (operation.getDescription() != null) {
+                    operationSwagger.setOperationId(operation.getDescription().trim().concat(operation.getMethod().name()));
+                    operationSwagger.setSummary(operation.getDescription());
+                }
+                operationSwagger.setConsumes(new ArrayList<>());
+                operationSwagger.setTags(Collections.singletonList(res.getName()));
+                operationSwagger.setDeprecated(false);
+                operationSwagger.setParameters(new ArrayList<>());
+                operationSwagger.setProduces(new ArrayList<>());
+                operationSwagger.setResponses(new HashMap<>());
+
+                path.set(operation.getMethod().name().toLowerCase(), operationSwagger);
+            });
+        });
 
         return pathMap;
     }

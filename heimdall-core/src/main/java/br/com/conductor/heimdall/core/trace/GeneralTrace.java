@@ -15,52 +15,32 @@
  */
 package br.com.conductor.heimdall.core.trace;
 
-import java.time.LocalDateTime;
-
-import br.com.conductor.heimdall.core.util.LocalDateTimeSerializer;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
-
-import java.time.LocalDateTime;
 
 /**
  * Data class that represents a General Trace
  *
  * @author Thiago Sampaio
- *
+ * @author Marcelo Aguiar Rodrigues
  */
 @Data
 public class GeneralTrace {
 
-     private String description;
+    private String description;
 
-     @JsonSerialize(using = LocalDateTimeSerializer.class)
-     private LocalDateTime insertedOnDate = LocalDateTime.now();
+    private Object content;
 
-     private Object content;
+    /**
+     * Adds a description and Object to the trace.
+     *
+     * @param description Trace message
+     * @param content     Object with content
+     */
+    public GeneralTrace(String description, Object content) {
 
-     /**
-      * Adds a description to the trace.
-      *
-      * @param description	Trace message
-      */
-     public GeneralTrace(String description) {
-
-          super();
-          this.description = description;
-     }
-
-     /**
-      * Adds a description and Object to the trace.
-      *
-      * @param description	Trace message
-      * @param content		Object with content
-      */
-     public GeneralTrace(String description, Object content) {
-
-          super();
-          this.description = description;
-          this.content = content;
-     }
+        super();
+        this.description = description;
+        this.content = content;
+    }
 
 }

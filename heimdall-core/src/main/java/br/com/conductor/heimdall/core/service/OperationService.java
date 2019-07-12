@@ -51,18 +51,18 @@ public class OperationService {
     private final ResourceService resourceService;
     private final InterceptorService interceptorService;
     private final ApiService apiService;
-    private final RedisRoutePublisher amqpRoute;
+    private final RedisRoutePublisher redisRoutePublisher;
 
     public OperationService(OperationRepository operationRepository,
                             @Lazy ResourceService resourceService,
                             InterceptorService interceptorService,
                             @Lazy ApiService apiService,
-                            RedisRoutePublisher amqpRoute) {
+                            RedisRoutePublisher redisRoutePublisher) {
         this.operationRepository = operationRepository;
         this.resourceService = resourceService;
         this.interceptorService = interceptorService;
         this.apiService = apiService;
-        this.amqpRoute = amqpRoute;
+        this.redisRoutePublisher = redisRoutePublisher;
     }
 
     /**
@@ -154,8 +154,8 @@ public class OperationService {
     @Transactional
     public Operation save(String apiId, String resourceId, final Operation operation) {
 
-        final Resource resource = resourceService.find(apiId, resourceId);
         final Api api = apiService.find(apiId);
+        final Resource resource = resourceService.find(apiId, resourceId);
 
         operation.setPath(StringUtils.removeMultipleSlashes(operation.getPath()));
         operation.fixBasePath();
@@ -179,7 +179,7 @@ public class OperationService {
 
         resourceService.update(apiId, resourceId, resource);
 
-        amqpRoute.dispatchRoutes();
+        redisRoutePublisher.dispatchRoutes();
 
         return savedOperation;
     }
@@ -225,7 +225,7 @@ public class OperationService {
 
         operation = operationRepository.save(operation);
 
-        amqpRoute.dispatchRoutes();
+        redisRoutePublisher.dispatchRoutes();
 
         return operation;
     }
@@ -251,7 +251,7 @@ public class OperationService {
 
         operationRepository.delete(operation);
 
-        amqpRoute.dispatchRoutes();
+        redisRoutePublisher.dispatchRoutes();
     }
 
     /**

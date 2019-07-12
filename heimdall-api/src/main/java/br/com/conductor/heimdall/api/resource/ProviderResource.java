@@ -16,6 +16,7 @@
 package br.com.conductor.heimdall.api.resource;
 
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
+import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.ProviderDTO;
 import br.com.conductor.heimdall.core.entity.Provider;
@@ -64,7 +65,9 @@ public class ProviderResource {
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_PROVIDER)
     public ResponseEntity<?> save(@RequestBody ProviderDTO providerPersist) {
 
-        Provider saved = this.providerService.save(providerPersist);
+        Provider provider = GenericConverter.mapper(providerPersist, Provider.class);
+
+        Provider saved = this.providerService.save(provider);
 
         return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
@@ -121,8 +124,9 @@ public class ProviderResource {
     @PutMapping(value = "/{idProvider}")
     public ResponseEntity<?> update(@PathVariable String idProvider,
                                     @RequestBody ProviderDTO providerDTO) {
+        Provider provider = GenericConverter.mapper(providerDTO, Provider.class);
 
-        Provider providerEdit = this.providerService.edit(idProvider, providerDTO);
+        Provider providerEdit = this.providerService.edit(idProvider, provider);
 
         return ResponseEntity.ok(providerEdit);
     }

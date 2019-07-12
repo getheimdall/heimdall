@@ -17,16 +17,20 @@ package br.com.conductor.heimdall.core.service;
 
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.request.DeveloperLogin;
+import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.entity.Developer;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.DeveloperRepository;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_NOT_FOUND;
 
@@ -40,9 +44,12 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_N
 public class DeveloperService {
 
     private final DeveloperRepository developerRepository;
+    private final AppService appService;
 
-    public DeveloperService(DeveloperRepository developerRepository) {
+    public DeveloperService(DeveloperRepository developerRepository,
+                            @Lazy AppService appService) {
         this.developerRepository = developerRepository;
+        this.appService = appService;
     }
 
     /**
@@ -132,6 +139,18 @@ public class DeveloperService {
         Developer developer = this.find(id);
 
         developerRepository.delete(developer);
+    }
+
+    public List<App> list(String developerId) {
+        final List<App> apps = this.appService.list();
+
+        if (apps != null && !apps.isEmpty()) {
+            return apps.stream()
+                    .filter(app -> developerId.equals(app.getDeveloperId()))
+                    .collect(Collectors.toList());
+        }
+
+        return new ArrayList<>();
     }
 
 }

@@ -15,9 +15,7 @@
  */
 package br.com.conductor.heimdall.core.service;
 
-import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.ProviderDTO;
-import br.com.conductor.heimdall.core.dto.ProviderParamsDTO;
 import br.com.conductor.heimdall.core.entity.Provider;
 import br.com.conductor.heimdall.core.entity.ProviderParam;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
@@ -28,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -49,13 +48,13 @@ public class ProviderService {
     /**
      * Saves a {@link Provider} to the repository
      *
-     * @param providerPersist The {@link ProviderDTO}
+     * @param provider The {@link Provider}
      * @return The saved {@link Provider}
      */
-    public Provider save(ProviderDTO providerPersist) {
-        Provider provider = GenericConverter.mapper(providerPersist, Provider.class);
+    public Provider save(Provider provider) {
         provider.setProviderDefault(false);
         provider.getProviderParams().forEach(p -> p.setProvider(provider));
+        provider.setCreationDate(LocalDateTime.now());
         return this.providerRepository.save(provider);
     }
 
@@ -67,7 +66,7 @@ public class ProviderService {
      * @return The edited {@link Provider}
      */
     @Transactional
-    public Provider edit(String id, ProviderDTO providerEdit) {
+    public Provider edit(String id, Provider providerEdit) {
         Provider found = this.find(id);
 
         HeimdallException.checkThrow(found.isProviderDefault(), ExceptionMessage.DEFAULT_PROVIDER_CAN_NOT_UPDATED_OR_REMOVED);
@@ -79,7 +78,7 @@ public class ProviderService {
         }
 
         List<ProviderParam> providers = providerEdit.getProviderParams().stream()
-                .map(providerParamsDTO -> getProviderParam(providerParamsDTO, found)).collect(Collectors.toList());
+                .map(providerParams -> getProviderParam(providerParams, found)).collect(Collectors.toList());
 
         found.getProviderParams().clear();
         found.getProviderParams().addAll(providers);
@@ -134,7 +133,7 @@ public class ProviderService {
         this.providerRepository.delete(provider);
     }
 
-    protected ProviderParam getProviderParam(ProviderParamsDTO p, Provider provider) {
+    protected ProviderParam getProviderParam(ProviderParam p, Provider provider) {
         ProviderParam providerParam = new ProviderParam();
         providerParam.setProvider(provider);
         providerParam.setValue(p.getValue());

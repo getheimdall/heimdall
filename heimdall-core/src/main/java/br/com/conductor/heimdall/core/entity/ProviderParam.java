@@ -49,12 +49,6 @@ public class ProviderParam implements Serializable {
 
     private String value;
 
-    private LocalDateTime creationDate;
-
     private Provider provider;
 
-    private void initValuesPersist() {
-
-        creationDate = LocalDateTime.now();
-    }
 }
