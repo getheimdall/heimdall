@@ -52,11 +52,9 @@ public class CircuitBreakerManager {
 	@Autowired
 	private Property property;
 
-	private static final ConcurrentHashMap<Long, CircuitBreakerHolder> circuits = new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<String, CircuitBreakerHolder> circuits = new ConcurrentHashMap<>();
 
-	private static final ConcurrentHashMap<String, CircuitBreakerHolder> middlewareCircuits = new ConcurrentHashMap<>();
-
-	public <T> T failsafe(Callable<T> callable, Long operationId, String operationPath) {
+	public <T> T failsafe(Callable<T> callable, String operationId, String operationPath) {
 		CircuitBreakerHolder circuitBreakerHolder = getCircuitHolder(operationId, circuits);
 		CircuitBreaker circuitBreaker = circuitBreakerHolder.getCircuitBreaker();
 		
@@ -75,31 +73,6 @@ public class CircuitBreakerManager {
 						context.getResponse().setContentType(MediaType.APPLICATION_JSON_VALUE);
 					})
 					.get(callable);
-		}
-
-		return Failsafe.with(circuitBreaker)
-				.onFailure((ignored, throwable) -> circuitBreakerHolder.setThrowable(throwable))
-				.get(callable);
-	}
-
-	public <T> T failsafe(Callable<T> callable, String url) {
-		CircuitBreakerHolder circuitBreakerHolder = getCircuitHolder(url, middlewareCircuits);
-		CircuitBreaker circuitBreaker = circuitBreakerHolder.getCircuitBreaker();
-
-		if (circuitBreaker.isOpen()) {
-			return Failsafe.with(circuitBreaker)
-					.withFallback(() -> {
-
-						String body = logAndCreateBody("CircuitBreaker ENABLED | URL: {0}, Exception: {1}",
-								url,
-                                circuitBreakerHolder.getMessage());
-
-						return ResponseEntity
-								.status(HttpStatus.SERVICE_UNAVAILABLE.value())
-								.header(ConstantsContext.CIRCUIT_BREAKER_ENABLED, "enabled")
-								.body(body);
-
-					}).get(callable);
 		}
 
 		return Failsafe.with(circuitBreaker)

@@ -25,6 +25,7 @@ import org.springframework.data.redis.core.RedisHash;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -32,7 +33,7 @@ import java.util.Set;
  * 
  * @author Filipe Germano
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
- *
+ * @author Marcelo Aguiar Rodrigues
  */
 @Data
 @AllArgsConstructor
@@ -58,7 +59,7 @@ public class Plan implements Serializable {
      
      private Status status;
 
-     private Set<String> scopes;
+     private Set<String> scopes = new HashSet<>();
 
      public void addScope(String id) {
           this.scopes.add(id);

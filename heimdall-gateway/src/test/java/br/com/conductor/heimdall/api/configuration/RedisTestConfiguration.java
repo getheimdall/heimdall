@@ -60,6 +60,7 @@ public class RedisTestConfiguration {
       * @return {@link RedisTemplate} Object, Object
       */
      @Bean
+     @SuppressWarnings("unchecked")
      public RedisTemplate<Object, Object> redisTemplateObject() {
 
           return Mockito.mock(RedisTemplate.class);
@@ -72,6 +73,7 @@ public class RedisTestConfiguration {
       * @return {@link RedisTemplate} String, {@link RateLimit}
       */
      @Bean
+     @SuppressWarnings("unchecked")
      public RedisTemplate<String, RateLimit> redisTemplateRate() {
           
           return Mockito.mock(RedisTemplate.class);

@@ -22,14 +22,16 @@ import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.entity.Resource;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.ApiRepository;
-import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
+//import br.com.conductor.heimdall.core.publisher.AMQPRouteService;
+import br.com.conductor.heimdall.core.publisher.RedisRoutePublisher;
 import br.com.conductor.heimdall.core.util.ConstantsPath;
-import br.com.conductor.heimdall.core.util.Pageable;
 import br.com.conductor.heimdall.core.util.StringUtils;
 import io.swagger.models.Swagger;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,28 +49,32 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Service
+@Slf4j
 public class ApiService {
 
-    @Autowired
-    private ApiRepository apiRepository;
+    private final RedisRoutePublisher amqpRoute;
+    private final ApiRepository apiRepository;
+    private final EnvironmentService environmentService;
+    private final InterceptorService interceptorService;
+    private final PlanService planService;
+    private final ResourceService resourceService;
+    private final SwaggerService swaggerService;
 
-    @Autowired
-    private AMQPRouteService amqpRoute;
-
-    @Autowired
-    private EnvironmentService environmentService;
-
-    @Autowired
-    private ResourceService resourceService;
-
-    @Autowired
-    private InterceptorService interceptorService;
-
-    @Autowired
-    private PlanService planService;
-
-    @Autowired
-    private SwaggerService swaggerService;
+    public ApiService(RedisRoutePublisher amqpRoute,
+                      ApiRepository apiRepository,
+                      EnvironmentService environmentService,
+                      InterceptorService interceptorService,
+                      PlanService planService,
+                      ResourceService resourceService,
+                      SwaggerService swaggerService) {
+        this.amqpRoute = amqpRoute;
+        this.apiRepository = apiRepository;
+        this.environmentService = environmentService;
+        this.interceptorService = interceptorService;
+        this.planService = planService;
+        this.resourceService = resourceService;
+        this.swaggerService = swaggerService;
+    }
 
     /**
      * Finds a {@link Api} by its ID.
@@ -142,7 +148,7 @@ public class ApiService {
             basepath = basepath.substring(0, basepath.length() - 1);
         }
 
-        HeimdallException.checkThrow(apiRepository.findByBasePath(basepath) != null, API_BASEPATH_EXIST);
+        HeimdallException.checkThrow(apiRepository.findByBasePath(basepath) != null, GLOBAL_ALREADY_REGISTERED, "Api basepath");
         HeimdallException.checkThrow(validateInboundsEnvironments(api), API_CANT_ENVIRONMENT_INBOUND_URL_EQUALS);
 
         api.setBasePath(basepath);
@@ -169,7 +175,7 @@ public class ApiService {
         HeimdallException.checkThrow(checkWildCardsInBasepath(apiPersist.getBasePath()), API_BASEPATH_MALFORMED);
 
         final Api validateApi = apiRepository.findByBasePath(apiPersist.getBasePath());
-        HeimdallException.checkThrow(validateApi != null && !Objects.equals(validateApi.getId(), api.getId()), API_BASEPATH_EXIST);
+        HeimdallException.checkThrow(validateApi != null && !Objects.equals(validateApi.getId(), api.getId()), GLOBAL_ALREADY_REGISTERED, "Api basepath");
 
         final Api updatedApi = GenericConverter.mapper(apiPersist, api);
         updatedApi.setBasePath(StringUtils.removeMultipleSlashes(api.getBasePath()));
@@ -238,7 +244,7 @@ public class ApiService {
 
         Api found = this.find(id);
 
-        return found.getPlans().stream().map(planId -> planService.find(planId)).collect(Collectors.toSet());
+        return found.getPlans().stream().map(planService::find).collect(Collectors.toSet());
     }
 
     /*
@@ -260,7 +266,7 @@ public class ApiService {
      */
     private boolean validateInboundsEnvironments(Api api) {
         final List<Environment> environments = api.getEnvironments().stream()
-                .map(environment -> environmentService.find(environment))
+                .map(environmentService::find)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 

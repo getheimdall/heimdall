@@ -121,7 +121,7 @@
 //
 //		PageableDTO pageableDTO = new PageableDTO();
 //		pageableDTO.setLimit(10);
-//		pageableDTO.setOffset(0);
+//		pageableDTO.setPage(0);
 //
 //		ArrayList<Provider> listProviders = new ArrayList<>();
 //
@@ -133,7 +133,7 @@
 //
 //		Mockito.when(this.providerRepository.findAll(Mockito.any(Example.class), Mockito.any(Pageable.class))).thenReturn(page);
 //
-//		ProviderPage providerPageResp = this.providerService.listWithPageableAndFilter(this.providerDTO, pageableDTO);
+//		ProviderPage providerPageResp = this.providerService.list(this.providerDTO, pageableDTO);
 //
 //		assertEquals(1L, providerPageResp.getTotalElements());
 //		Mockito.verify(this.providerRepository, Mockito.times(1)).findAll(Mockito.any(Example.class), Mockito.any(Pageable.class));
@@ -149,7 +149,7 @@
 //
 //		Mockito.when(providerRepository.findAll(Mockito.any(Example.class))).thenReturn(listProviders);
 //
-//		List<Provider> listProvidersResp = this.providerService.listWithFilter(providerDTO);
+//		List<Provider> listProvidersResp = this.providerService.list(providerDTO);
 //
 //		assertEquals(listProviders.size(), listProvidersResp.size());
 //		Mockito.verify(this.providerRepository, Mockito.times(1)).findAll(Mockito.any(Example.class));

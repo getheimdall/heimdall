@@ -24,7 +24,7 @@ import br.com.conductor.heimdall.core.repository.ApiRepository;
 import br.com.conductor.heimdall.core.repository.EnvironmentRepository;
 import br.com.conductor.heimdall.core.repository.PlanRepository;
 import br.com.conductor.heimdall.core.repository.ResourceRepository;
-import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
+import br.com.conductor.heimdall.core.publisher.RedisRoutePublisher;
 import io.swagger.models.Swagger;
 import org.junit.Before;
 import org.junit.Rule;
@@ -36,6 +36,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.io.IOException;
 import java.util.*;
@@ -81,7 +83,7 @@ public class ApiServiceTest {
     private SwaggerService swaggerService;
 
     @Mock
-    private AMQPRouteService amqpRoute;
+    private RedisRoutePublisher amqpRoute;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -415,7 +417,7 @@ public class ApiServiceTest {
     @Test
     public void listApiWithPageableTest() {
 
-        br.com.conductor.heimdall.core.util.Pageable pageable = br.com.conductor.heimdall.core.util.Pageable.setPageable(0, 10);
+        Pageable pageable = PageRequest.of(0, 10);
 
         List<Api> apis = new ArrayList<>();
         apis.add(api);

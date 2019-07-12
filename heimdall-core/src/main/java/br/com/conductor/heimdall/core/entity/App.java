@@ -36,6 +36,7 @@ import java.util.Set;
  * This class represents a App registered to the system.
  *
  * @author Filipe Germano
+ * @author Marcelo Aguiar Rodrigues
  */
 @Data
 @EqualsAndHashCode(of = {"id"})
@@ -43,7 +44,7 @@ import java.util.Set;
 @NoArgsConstructor
 @JsonInclude(Include.NON_NULL)
 @RedisHash("app")
-public class App implements Serializable {
+public class    App implements Serializable {
 
     private static final long serialVersionUID = -8080005929936415705L;
 

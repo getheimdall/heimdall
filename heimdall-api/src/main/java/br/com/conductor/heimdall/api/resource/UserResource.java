@@ -24,12 +24,13 @@ import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
-import br.com.conductor.heimdall.core.util.Pageable;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -47,134 +48,133 @@ import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_USERS;
  *
  * @author Marcos Filho
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
- *
  */
-@io.swagger.annotations.Api(value = PATH_USERS, produces = MediaType.APPLICATION_JSON_VALUE, tags = { ConstantsTag.TAG_USERS })
+@io.swagger.annotations.Api(value = PATH_USERS, produces = MediaType.APPLICATION_JSON_VALUE, tags = {ConstantsTag.TAG_USERS})
 @RestController
 @RequestMapping(value = PATH_USERS)
 public class UserResource {
 
-     @Autowired
-     private UserService userService;    
+    @Autowired
+    private UserService userService;
 
-     /**
-      * Saves a {@link User}.
-      * 
-      * @param userDTO				{@link UserDTO}
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Save a new User")
-     @PostMapping
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_USER)
-     public ResponseEntity<?> save(@RequestBody @Valid UserDTO userDTO) {
+    /**
+     * Saves a {@link User}.
+     *
+     * @param userDTO {@link UserDTO}
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Save a new User")
+    @PostMapping
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_USER)
+    public ResponseEntity<?> save(@RequestBody @Valid UserDTO userDTO) {
 
-          User user = GenericConverter.mapper(userDTO, User.class);
-          user = userService.save(user);
+        User user = GenericConverter.mapper(userDTO, User.class);
+        user = userService.save(user);
 
-          return ResponseEntity.created(URI.create(String.format("/%s/%s", "users", user.getId()))).build();
-     }
-     
-     /**
-      * Finds a {@link User} by its Id.
-      * 
-      * @param userId				The User Id
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Find User by id", response = User.class)
-     @GetMapping(value = "/{userId}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_USER)
-     public ResponseEntity<?> findById(@PathVariable("userId") String userId) {
+        return ResponseEntity.created(URI.create(String.format("/%s/%s", "users", user.getId()))).build();
+    }
 
-          User user = userService.find(userId);
+    /**
+     * Finds a {@link User} by its Id.
+     *
+     * @param userId The User Id
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Find User by id", response = User.class)
+    @GetMapping(value = "/{userId}")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_USER)
+    public ResponseEntity<?> findById(@PathVariable("userId") String userId) {
 
-          return ResponseEntity.ok(user);
-     }
+        User user = userService.find(userId);
 
-     /**
-      * Finds all {@link User} from a request.
-      * 
-      * @param pageableDTO			{@link PageableDTO}
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Find all Users", responseContainer = "List", response = User.class)
-     @GetMapping
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_USER)
-     public ResponseEntity<?> findAll(@ModelAttribute PageableDTO pageableDTO) {
-          
-          if (!pageableDTO.isEmpty()) {
-               Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+        return ResponseEntity.ok(user);
+    }
 
-               Page<User> userPage = userService.list(pageable);
-               List<User> users = userPage.getContent();
-               if (!users.isEmpty()) {
-                    users.forEach(user -> user.setRoles(null));
-               }
-               return ResponseEntity.ok(new PageImpl<>(users, pageable, users.size()));
-          } else {
-               
-               List<User> users = userService.list();
-               if (!users.isEmpty()) {
-                    users.forEach(user -> user.setRoles(null));
-               }
-               return ResponseEntity.ok(users);
-          }
-     }
-     
-     /**
-      * Updates a {@link User}.
-      * 
-      * @param userId				The User Id
-      * @param userDTO				{@link UserEditDTO}
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Update User")
-     @PutMapping(value = "/{userId}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_USER)
-     public ResponseEntity<?> update(@PathVariable("userId") String userId,
-                                     @RequestBody UserEditDTO userDTO) {
+    /**
+     * Finds all {@link User} from a request.
+     *
+     * @param pageableDTO {@link PageableDTO}
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Find all Users", responseContainer = "List", response = User.class)
+    @GetMapping
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_USER)
+    public ResponseEntity<?> findAll(@ModelAttribute PageableDTO pageableDTO) {
 
-          User user = userService.update(userId, userDTO);
+        if (!pageableDTO.isEmpty()) {
+            final Pageable pageable = PageRequest.of(pageableDTO.getPage(), pageableDTO.getLimit());
+            Page<User> userPage = userService.list(pageable);
 
-          return ResponseEntity.ok(user);
-     }
+            List<User> users = userPage.getContent();
+            if (!users.isEmpty()) {
+                users.forEach(user -> user.setRoles(null));
+            }
+            return ResponseEntity.ok(new PageImpl<>(users, pageable, users.size()));
+        } else {
 
-     /**
-      * Updates a password of the {@link User}.
-      *
-      * @param principal           {@link Principal}
-      * @param userPasswordDTO     {@link UserPasswordDTO}
-      * @return                    {@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Update password of the User")
-     @PutMapping(value = "/password")
-     public ResponseEntity<?> updatePassword(@ApiParam(hidden = true) Principal principal,
-                                             @RequestBody @Valid UserPasswordDTO userPasswordDTO) {
+            List<User> users = userService.list();
+            if (!users.isEmpty()) {
+                users.forEach(user -> user.setRoles(null));
+            }
+            return ResponseEntity.ok(users);
+        }
+    }
 
-          userService.updatePassword(principal, userPasswordDTO.getCurrentPassword(), userPasswordDTO.getNewPassword(), userPasswordDTO.getConfirmNewPassword());
+    /**
+     * Updates a {@link User}.
+     *
+     * @param userId  The User Id
+     * @param userDTO {@link UserEditDTO}
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Update User")
+    @PutMapping(value = "/{userId}")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_USER)
+    public ResponseEntity<?> update(@PathVariable("userId") String userId,
+                                    @RequestBody UserEditDTO userDTO) {
 
-          return ResponseEntity.ok().build();
-     }
+        User user = userService.update(userId, userDTO);
 
-     /**
-      * Deletes a {@link User}.
-      * 
-      * @param userId				The User Id
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Delete User")
-     @DeleteMapping(value = "/{userId}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_USER)
-     public ResponseEntity<?> delete( @PathVariable("userId") String userId) {
+        return ResponseEntity.ok(user);
+    }
 
-          userService.delete(userId);
+    /**
+     * Updates a password of the {@link User}.
+     *
+     * @param principal       {@link Principal}
+     * @param userPasswordDTO {@link UserPasswordDTO}
+     * @return {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Update password of the User")
+    @PutMapping(value = "/password")
+    public ResponseEntity<?> updatePassword(@ApiParam(hidden = true) Principal principal,
+                                            @RequestBody @Valid UserPasswordDTO userPasswordDTO) {
 
-          return ResponseEntity.noContent().build();
-     }
-     
+        userService.updatePassword(principal, userPasswordDTO.getCurrentPassword(), userPasswordDTO.getNewPassword(), userPasswordDTO.getConfirmNewPassword());
+
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Deletes a {@link User}.
+     *
+     * @param userId The User Id
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Delete User")
+    @DeleteMapping(value = "/{userId}")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_USER)
+    public ResponseEntity<?> delete(@PathVariable("userId") String userId) {
+
+        userService.delete(userId);
+
+        return ResponseEntity.noContent().build();
+    }
+
 }

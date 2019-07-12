@@ -1,9 +1,6 @@
-/*-
- * =========================LICENSE_START==================================
- * heimdall-gateway
- * ========================================================================
+/*
  * Copyright (C) 2018 Conductor Tecnologia SA
- * ========================================================================
+ *
  * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,13 +12,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * ==========================LICENSE_END===================================
  */
 package br.com.conductor.heimdall.gateway.filter;
 
 import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.entity.Plan;
-import br.com.conductor.heimdall.core.repository.AppRepository;
+import br.com.conductor.heimdall.core.repository.ScopeRepository;
 import br.com.conductor.heimdall.core.service.AppService;
 import br.com.conductor.heimdall.core.service.PlanService;
 import br.com.conductor.heimdall.core.service.ScopeService;
@@ -36,6 +32,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -50,16 +47,21 @@ import static org.springframework.cloud.netflix.zuul.filters.support.FilterConst
 @Component
 public class ScopesFilter extends ZuulFilter {
 
-    @Autowired
-    private AppService appService;
+    private final AppService appService;
 
-    @Autowired
-    private PlanService planService;
+    private final PlanService planService;
 
-    @Autowired
-    private ScopeService scopeService;
+    private final ScopeRepository scopeRepository;
 
     private FilterDetail detail = new FilterDetail();
+
+    public ScopesFilter(AppService appService,
+                        PlanService planService,
+                        ScopeRepository scopeRepository) {
+        this.appService = appService;
+        this.planService = planService;
+        this.scopeRepository = scopeRepository;
+    }
 
     @Override
     public String filterType() {
@@ -106,7 +108,7 @@ public class ScopesFilter extends ZuulFilter {
             App app = appService.findByClientId(client_id);
             if (app == null || app.getPlans() == null) return;
 
-            Set<Plan> plans = app.getPlans().stream().map(plan -> planService.find(plan)).collect(Collectors.toSet());
+            Set<Plan> plans = app.getPlans().stream().map(planService::find).collect(Collectors.toSet());
 
             Set<String> apis = plans.stream().map(Plan::getApiId).collect(Collectors.toSet());
             String apiId = (String) context.get(API_ID);
@@ -117,7 +119,8 @@ public class ScopesFilter extends ZuulFilter {
             plans.forEach(plan -> {
                 if (plan != null && plan.getApiId().equals(apiId)) {
                     plan.getScopes().stream()
-                            .map(scopeId -> scopeService.find(apiId, scopeId))
+                            .map(scopeId -> scopeRepository.findByApiAndId(apiId, scopeId))
+                            .filter(Objects::nonNull)
                             .forEach(scope -> allowedOperations.addAll(scope.getOperations()));
                 }
             });

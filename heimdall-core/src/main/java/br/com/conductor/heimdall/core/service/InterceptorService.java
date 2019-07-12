@@ -17,20 +17,20 @@ package br.com.conductor.heimdall.core.service;
 
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.InterceptorDTO;
-import br.com.conductor.heimdall.core.dto.InterceptorFileDTO;
 import br.com.conductor.heimdall.core.entity.*;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.enums.TypeInterceptor;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
-import br.com.conductor.heimdall.core.repository.*;
-import br.com.conductor.heimdall.core.service.amqp.AMQPInterceptorService;
+import br.com.conductor.heimdall.core.repository.InterceptorRepository;
+import br.com.conductor.heimdall.core.repository.RateLimitRepository;
+import br.com.conductor.heimdall.core.publisher.RedisInterceptorPublisher;
 import br.com.conductor.heimdall.core.util.ConstantsCache;
-import br.com.conductor.heimdall.core.util.Pageable;
 import br.com.conductor.heimdall.core.util.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,7 +39,6 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 
@@ -53,29 +52,32 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 @Service
 public class InterceptorService {
 
-    @Autowired
-    private InterceptorRepository interceptorRepository;
-
-    @Autowired
-    private PlanService planService;
-
-    @Autowired
-    private ResourceService resourceService;
-
-    @Autowired
-    private OperationService operationService;
-
-    @Autowired
-    private ApiService apiService;
-
-    @Autowired
-    private RateLimitRepository ratelimitRepository;
-
-    @Autowired
-    private AMQPInterceptorService amqpInterceptorService;
+    private final RedisInterceptorPublisher redisInterceptorPublisher;
+    private final ApiService apiService;
+    private final InterceptorRepository interceptorRepository;
+    private final OperationService operationService;
+    private final PlanService planService;
+    private final RateLimitRepository ratelimitRepository;
+    private final ResourceService resourceService;
 
     @Value("${zuul.filter.root}")
     private String zuulFilterRoot;
+
+    public InterceptorService(RedisInterceptorPublisher redisInterceptorPublisher,
+                              @Lazy ApiService apiService,
+                              InterceptorRepository interceptorRepository,
+                              @Lazy OperationService operationService,
+                              @Lazy PlanService planService,
+                              RateLimitRepository ratelimitRepository,
+                              @Lazy ResourceService resourceService) {
+        this.redisInterceptorPublisher = redisInterceptorPublisher;
+        this.apiService = apiService;
+        this.interceptorRepository = interceptorRepository;
+        this.operationService = operationService;
+        this.planService = planService;
+        this.ratelimitRepository = ratelimitRepository;
+        this.resourceService = resourceService;
+    }
 
     /**
      * Finds a {@link Interceptor} by its ID.
@@ -149,7 +151,7 @@ public class InterceptorService {
             apiService.update(api);
         }
 
-        amqpInterceptorService.dispatchInterceptor(savedInterceptor.getId());
+        redisInterceptorPublisher.dispatchInterceptor(savedInterceptor.getId());
 
         return savedInterceptor;
     }
@@ -179,7 +181,7 @@ public class InterceptorService {
         }
 
         final Interceptor updatedInterceptor = interceptorRepository.save(interceptor);
-        amqpInterceptorService.dispatchInterceptor(updatedInterceptor.getId());
+        redisInterceptorPublisher.dispatchInterceptor(updatedInterceptor.getId());
 
         return updatedInterceptor;
     }
@@ -212,7 +214,7 @@ public class InterceptorService {
 
         interceptorRepository.delete(interceptor);
 
-        amqpInterceptorService.dispatchRemoveInterceptors(new InterceptorFileDTO(interceptor.getId(), pathName));
+        redisInterceptorPublisher.dispatchRemoveInterceptors(id + "|" + pathName);
     }
 
     /**

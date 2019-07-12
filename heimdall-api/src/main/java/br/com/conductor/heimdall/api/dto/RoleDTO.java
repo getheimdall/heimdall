@@ -19,26 +19,23 @@
  */
 package br.com.conductor.heimdall.api.dto;
 
-import java.util.List;
+import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import br.com.conductor.heimdall.core.dto.ReferenceIdDTO;
-import lombok.Data;
+import java.util.List;
 
 /**
  * Data transference object class that represents a Heimdall role.
  *
  * @author Marcos Filho
- *
  */
 @Data
 public class RoleDTO {
 
-     @NotNull
-     @Size(max = 80, min = 6)
-     private String name;
+    @NotNull
+    @Size(max = 80, min = 6)
+    private String name;
 
-     private List<String> privileges;
+    private List<String> privileges;
 }

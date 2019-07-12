@@ -32,7 +32,7 @@
 //import br.com.conductor.heimdall.core.repository.ApiRepository;
 //import br.com.conductor.heimdall.core.repository.PlanRepository;
 //import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
-//import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
+//import br.com.conductor.heimdall.core.publisher.AMQPRouteService;
 //import org.junit.Before;
 //import org.junit.Rule;
 //import org.junit.Test;
@@ -187,7 +187,7 @@
 //
 //          PageableDTO pageableDTO = new PageableDTO();
 //          pageableDTO.setLimit(10);
-//          pageableDTO.setOffset(0);
+//          pageableDTO.setPage(0);
 //
 //          ArrayList<Plan> listPlans = new ArrayList<>();
 //

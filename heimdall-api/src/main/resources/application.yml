@@ -13,7 +13,6 @@ server:
 heimdall:
     contextPath: /heimdall/v1
     hostname: hostname
-    excludeRabbit: true
     retryable: false
     logstash:
         enabled: true
@@ -21,30 +20,21 @@ heimdall:
     rewrite:
         enable: false
         prefix: heimdall
-    redis:
-        host: 127.0.0.1
-        port: 6379
-        maxTotal: 128
-        maxIdle: 128
-        minIdle: 16
-        testOnBorrow: true
-        testOnReturn: true
-        testWhileIdle: true
-        minEvictableIdleTimeSeconds: 60
-        timeBetweenEvictionRunsSeconds: 30
-        numTestsPerEvictionRun: 3
-        blockWhenExhausted: true
-        connectionPoolSize: 10
     security:
         enabled: true
         jwt:
-            expiration-time: 900000000
+            expiration-time: 600
             secret: secretKey
 
 spring:
+    data:
+        web:
+            pageable:
+                default-page-size: 10
+                max-page-size: 100
     redis:
-        host: 127.0.0.1
-        port: 6379
+        host: 192.168.10.200
+        port: 6378
     pid:
         fail-on-write-error: false
         file: heimdall.pid
@@ -52,13 +42,6 @@ spring:
         serialization:
             INDENT_OUTPUT: true
             WRITE-DATES-AS-TIMESTAMPS: false
-    rabbitmq:
-        host: 192.168.10.200
-        port: 5672
-        virtual-host: dev
-        requested-heartbeat: 10
-#    cache:
-#        type: simple
 
 springfox:
     documentation:
@@ -70,16 +53,12 @@ endpoints:
     routes:
         enabled: true
         sensitive: false
-#    actuator:
-#        enabled: true
 
 management:
     health:
         mongo:
             enabled: false
         redis:
-            enabled: false
-        rabbit:
             enabled: false
         hystrix:
             enabled: false
@@ -92,7 +71,10 @@ management:
             enabled: false
     server:
         servlet:
-            context-path: /manager
+            context-path: /
+    endpoints:
+        web:
+            base-path: /manager
 
 zuul:
     filter:

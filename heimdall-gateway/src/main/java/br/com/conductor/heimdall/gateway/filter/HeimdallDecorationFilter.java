@@ -54,7 +54,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 
-import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
 import static br.com.conductor.heimdall.gateway.util.ConstantsContext.*;
 import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.*;
 
@@ -85,7 +84,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
     private RequestHelper requestHelper;
 
     private FilterDetail detail = new FilterDetail();
-    
+
     private CredentialService credentialService;
 
     private EnvironmentService environmentService;
@@ -261,12 +260,12 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                         if (method.equals(HttpMethod.OPTIONS.name())) {
                             Optional<Credential> first = credentials.stream().findFirst();
                             if (first.get().isCors()) {
-                            	credential = first.get();
+                                credential = first.get();
                             }
                         }
 
                         if (Objects.isNull(credential)) {
-                        	credential = credentials.stream()
+                            credential = credentials.stream()
                                     .filter(o -> o.getMethod().equals(HttpMethod.ALL.name()) || method.equals(o.getMethod().toUpperCase()))
                                     .findFirst().orElse(null);
                         }
@@ -315,9 +314,6 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                         traceContextHolder.getActualTrace().setOperationId(credential.getOperationId());
 
                         return new HeimdallRoute(pattern, route, false);
-                    } else {
-
-                        ctx.put(INTERRUPT, true);
                     }
                 }
             }

@@ -23,10 +23,11 @@ import br.com.conductor.heimdall.core.dto.request.DeveloperLogin;
 import br.com.conductor.heimdall.core.entity.Developer;
 import br.com.conductor.heimdall.core.service.DeveloperService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
-import br.com.conductor.heimdall.core.util.Pageable;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -43,125 +44,124 @@ import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_DEVELOPERS;
  * Uses a {@link DeveloperService} to provide methods to create, read, update and delete a {@link Developer}.
  *
  * @author Filipe Germano
- *
  */
-@io.swagger.annotations.Api(value = PATH_DEVELOPERS, produces = MediaType.APPLICATION_JSON_VALUE, tags = { ConstantsTag.TAG_DEVELOPERS })
+@io.swagger.annotations.Api(value = PATH_DEVELOPERS, produces = MediaType.APPLICATION_JSON_VALUE, tags = {ConstantsTag.TAG_DEVELOPERS})
 @RestController
 @RequestMapping(value = PATH_DEVELOPERS)
 public class DeveloperResource {
 
-     @Autowired
-     private DeveloperService developerService;
+    @Autowired
+    private DeveloperService developerService;
 
-     @ResponseBody
-     @ApiOperation(value = "Find Developer by its email and password", response = Developer.class)
-     @PostMapping("/login")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_DEVELOPER)
-     public ResponseEntity login(@RequestBody DeveloperLogin developerLogin) {
-          Developer developer = developerService.login(developerLogin);
+    @ResponseBody
+    @ApiOperation(value = "Find Developer by its email and password", response = Developer.class)
+    @PostMapping("/login")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_DEVELOPER)
+    public ResponseEntity login(@RequestBody DeveloperLogin developerLogin) {
+        Developer developer = developerService.login(developerLogin);
 
-          if (Objects.nonNull(developer)) {
-               return ResponseEntity.ok(developer);
-          }
+        if (Objects.nonNull(developer)) {
+            return ResponseEntity.ok(developer);
+        }
 
-          return ResponseEntity.notFound().build();
-     }
+        return ResponseEntity.notFound().build();
+    }
 
-     /**
-      * Finds a {@link Developer} by its Id.
-      * 
-      * @param id					The Developer Id
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Find Developer by id", response = Developer.class)
-     @GetMapping(value = "/{developerId}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_DEVELOPER)
-     public ResponseEntity<?> findById(@PathVariable("developerId") String id) {
+    /**
+     * Finds a {@link Developer} by its Id.
+     *
+     * @param id The Developer Id
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Find Developer by id", response = Developer.class)
+    @GetMapping(value = "/{developerId}")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_DEVELOPER)
+    public ResponseEntity<?> findById(@PathVariable("developerId") String id) {
 
-          Developer developer = developerService.find(id);
+        Developer developer = developerService.find(id);
 
-          return ResponseEntity.ok(developer);
-     }
+        return ResponseEntity.ok(developer);
+    }
 
-     /**
-      * Finds all {@link Developer} from a request.
-      * 
-      * @param pageableDTO			{@link PageableDTO}
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Find all Developers", responseContainer = "List", response = Developer.class)
-     @GetMapping
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_DEVELOPER)
-     public ResponseEntity<?> findAll(@ModelAttribute PageableDTO pageableDTO) {
+    /**
+     * Finds all {@link Developer} from a request.
+     *
+     * @param pageableDTO {@link PageableDTO}
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Find all Developers", responseContainer = "List", response = Developer.class)
+    @GetMapping
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_DEVELOPER)
+    public ResponseEntity<?> findAll(@ModelAttribute PageableDTO pageableDTO) {
 
-          if (!pageableDTO.isEmpty()) {
+        if (!pageableDTO.isEmpty()) {
 
-               Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
-               Page<Developer> developerPage = developerService.list(pageable);
+            final Pageable pageable = PageRequest.of(pageableDTO.getPage(), pageableDTO.getLimit());
+            Page<Developer> developerPage = developerService.list(pageable);
 
-               return ResponseEntity.ok(developerPage);
-          } else {
-               
-               List<Developer> developers = developerService.list();
+            return ResponseEntity.ok(developerPage);
+        } else {
 
-               return ResponseEntity.ok(developers);
-          }
-     }
+            List<Developer> developers = developerService.list();
 
-     /**
-      * Saves a {@link Developer}.
-      * 
-      * @param developerDTO			{@link DeveloperDTO}
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Save a new Developer")
-     @PostMapping
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_DEVELOPER)
-     public ResponseEntity<?> save(@RequestBody @Valid DeveloperDTO developerDTO) {
+            return ResponseEntity.ok(developers);
+        }
+    }
 
-          Developer developer = GenericConverter.mapper(developerDTO, Developer.class);
-          developer = developerService.save(developer);
+    /**
+     * Saves a {@link Developer}.
+     *
+     * @param developerDTO {@link DeveloperDTO}
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Save a new Developer")
+    @PostMapping
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_DEVELOPER)
+    public ResponseEntity<?> save(@RequestBody @Valid DeveloperDTO developerDTO) {
 
-          return ResponseEntity.created(URI.create(String.format("/%s/%s", "developers", developer.getId()))).build();
-     }
+        Developer developer = GenericConverter.mapper(developerDTO, Developer.class);
+        developer = developerService.save(developer);
 
-     /**
-      * Updates a {@link Developer}.
-      * 
-      * @param id					The Developer Id
-      * @param developerDTO			{@link DeveloperDTO}
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Update Developer")
-     @PutMapping(value = "/{developerId}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_DEVELOPER)
-     public ResponseEntity<?> update(@PathVariable("developerId") String id, @RequestBody DeveloperDTO developerDTO) {
+        return ResponseEntity.created(URI.create(String.format("/%s/%s", "developers", developer.getId()))).build();
+    }
 
-          Developer developer = GenericConverter.mapper(developerDTO, Developer.class);
-          developer = developerService.update(id, developer);
-          
-          return ResponseEntity.ok(developer);
-     }
+    /**
+     * Updates a {@link Developer}.
+     *
+     * @param id           The Developer Id
+     * @param developerDTO {@link DeveloperDTO}
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Update Developer")
+    @PutMapping(value = "/{developerId}")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_DEVELOPER)
+    public ResponseEntity<?> update(@PathVariable("developerId") String id, @RequestBody DeveloperDTO developerDTO) {
 
-     /**
-      * Deletes a {@link Developer}.
-      * 
-      * @param id					The Developer Id
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Delete Developer")
-     @DeleteMapping(value = "/{developerId}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_DEVELOPER)
-     public ResponseEntity<?> delete(@PathVariable("developerId") String id) {
+        Developer developer = GenericConverter.mapper(developerDTO, Developer.class);
+        developer = developerService.update(id, developer);
 
-          developerService.delete(id);
-          
-          return ResponseEntity.noContent().build();
-     }
+        return ResponseEntity.ok(developer);
+    }
+
+    /**
+     * Deletes a {@link Developer}.
+     *
+     * @param id The Developer Id
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Delete Developer")
+    @DeleteMapping(value = "/{developerId}")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_DEVELOPER)
+    public ResponseEntity<?> delete(@PathVariable("developerId") String id) {
+
+        developerService.delete(id);
+
+        return ResponseEntity.noContent().build();
+    }
 
 }

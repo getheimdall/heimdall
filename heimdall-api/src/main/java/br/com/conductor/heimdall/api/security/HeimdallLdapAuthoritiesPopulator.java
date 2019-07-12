@@ -93,7 +93,7 @@ public class HeimdallLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
       */
      private final Collection<? extends GrantedAuthority> getAuthorities(final User user) {
 
-          return getGrantedAuthorities(privilegeService.list(user).stream().map(Privilege::getId).collect(Collectors.toSet()));
+          return getGrantedAuthorities(privilegeService.list(user).stream().map(Privilege::getName).collect(Collectors.toSet()));
      }
 
      /*

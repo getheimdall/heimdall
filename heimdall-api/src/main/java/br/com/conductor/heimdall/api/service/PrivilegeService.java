@@ -16,14 +16,13 @@
 package br.com.conductor.heimdall.api.service;
 
 import br.com.conductor.heimdall.api.entity.Privilege;
-import br.com.conductor.heimdall.api.entity.Role;
 import br.com.conductor.heimdall.api.entity.User;
 import br.com.conductor.heimdall.api.enums.UserType;
 import br.com.conductor.heimdall.api.repository.PrivilegeRepository;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
-import br.com.conductor.heimdall.core.util.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;

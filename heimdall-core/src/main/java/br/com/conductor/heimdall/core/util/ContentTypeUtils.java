@@ -17,37 +17,36 @@ package br.com.conductor.heimdall.core.util;
 
 import java.util.Arrays;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.springframework.http.MediaType;
 
 /**
  * This class provides a method to verify if any content is part of the blacklisted types.
  *
  * @author Marcos Filho
- *
  */
 public final class ContentTypeUtils {
 
-	private ContentTypeUtils() { }
+    private ContentTypeUtils() {
+    }
 
-	/**
-	  * The list of blacklisted types
-	  */
-	 private static final String[] blackList = new String[] { 
-    		 MediaType.APPLICATION_PDF_VALUE,
-    		 MediaType.IMAGE_GIF_VALUE,
-    		 MediaType.IMAGE_JPEG_VALUE,
-    		 MediaType.IMAGE_PNG_VALUE };
+    /**
+     * The list of blacklisted types
+     */
+    private static final String[] blackList = new String[]{
+            MediaType.APPLICATION_PDF_VALUE,
+            MediaType.IMAGE_GIF_VALUE,
+            MediaType.IMAGE_JPEG_VALUE,
+            MediaType.IMAGE_PNG_VALUE};
 
-     /**
-      * Checks if any of a list of files is part of the blacklisted types.
-      * 
-      * @param  content			The strings to be tested.
-      * @return					boolean value if any of the types is blacklisted
-      */
-     public static boolean belongsToBlackList(String... content) {
-          if (ArrayUtils.isEmpty(content)) return false;
-          
-          return Arrays.stream(blackList).anyMatch(Arrays.asList(content)::contains);
-     }
+    /**
+     * Checks if any of a list of files is part of the blacklisted types.
+     *
+     * @param content The strings to be tested.
+     * @return boolean value if any of the types is blacklisted
+     */
+    public static boolean belongsToBlackList(String... content) {
+        if (content == null || content.length == 0) return false;
+
+        return Arrays.stream(blackList).anyMatch(Arrays.asList(content)::contains);
+    }
 }

@@ -25,7 +25,6 @@ import io.swagger.models.Path;
 import io.swagger.models.Swagger;
 import io.swagger.models.Tag;
 import io.swagger.parser.Swagger20Parser;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -40,14 +39,17 @@ import java.util.stream.Collectors;
 @Service
 public class SwaggerService {
 
-    @Autowired
-    private ResourceService resourceService;
+    private final EnvironmentService environmentService;
+    private final OperationService operationService;
+    private final ResourceService resourceService;
 
-    @Autowired
-    private OperationService operationService;
-
-    @Autowired
-    private EnvironmentService environmentService;
+    public SwaggerService(ResourceService resourceService,
+                          OperationService operationService,
+                          EnvironmentService environmentService) {
+        this.resourceService = resourceService;
+        this.operationService = operationService;
+        this.environmentService = environmentService;
+    }
 
     public Swagger exportApiToSwaggerJSON(Api api) {
         Swagger swagger = new Swagger();

@@ -21,18 +21,19 @@ import br.com.conductor.heimdall.core.entity.Operation;
 import br.com.conductor.heimdall.core.entity.Resource;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.OperationRepository;
-import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
-import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
-import br.com.conductor.heimdall.core.util.ConstantsCache;
-import br.com.conductor.heimdall.core.util.Pageable;
+import br.com.conductor.heimdall.core.publisher.RedisRoutePublisher;
 import br.com.conductor.heimdall.core.util.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
@@ -46,23 +47,23 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 @Service
 public class OperationService {
 
-    @Autowired
-    private OperationRepository operationRepository;
+    private final OperationRepository operationRepository;
+    private final ResourceService resourceService;
+    private final InterceptorService interceptorService;
+    private final ApiService apiService;
+    private final RedisRoutePublisher amqpRoute;
 
-    @Autowired
-    private ResourceService resourceService;
-
-    @Autowired
-    private InterceptorService interceptorService;
-
-    @Autowired
-    private ApiService apiService;
-
-    @Autowired
-    private AMQPRouteService amqpRoute;
-
-    @Autowired
-    private AMQPCacheService amqpCacheService;
+    public OperationService(OperationRepository operationRepository,
+                            @Lazy ResourceService resourceService,
+                            InterceptorService interceptorService,
+                            @Lazy ApiService apiService,
+                            RedisRoutePublisher amqpRoute) {
+        this.operationRepository = operationRepository;
+        this.resourceService = resourceService;
+        this.interceptorService = interceptorService;
+        this.apiService = apiService;
+        this.amqpRoute = amqpRoute;
+    }
 
     /**
      * Finds a {@link Operation} by its Id, {@link Resource} Id and {@link Api} Id.
@@ -135,21 +136,12 @@ public class OperationService {
 
         final List<Operation> allOperations = operationRepository.findAll();
 
-        final List<Operation> operations = allOperations.stream()
+        return allOperations.stream()
                 .filter(operation -> {
                     final Resource resource = resourceService.find(apiId, operation.getResourceId());
                     return apiId.equals(resource.getApiId());
                 })
                 .collect(Collectors.toList());
-
-        if (!operations.isEmpty()) {
-            for (Operation operation : operations) {
-                operation.setDescription(null);
-                operation.setResourceId(null);
-            }
-        }
-
-        return operations;
     }
 
     /**
@@ -171,7 +163,7 @@ public class OperationService {
         HeimdallException.checkThrow(
                 this.list(apiId).stream()
                         .anyMatch(op -> op.getPath().equals(operation.getPath()) && op.getMethod().equals(operation.getMethod())),
-                ONLY_ONE_OPERATION_PER_RESOURCE);
+                GLOBAL_ALREADY_REGISTERED, "Operation");
 
         HeimdallException.checkThrow(validatePath(api.getBasePath() + "/" + operation.getPath()), OPERATION_ROUTE_ALREADY_EXISTS);
 
@@ -203,7 +195,6 @@ public class OperationService {
     }
 
     /**
-     * TODO
      * Updates a {@link Operation} by its Id, {@link Api} Id, {@link Resource} Id
      *
      * @param apiId            The {@link Api} Id
@@ -221,7 +212,7 @@ public class OperationService {
         Operation resData = operationRepository.findByApiIdAndMethodAndPath(apiId, operationPersist.getMethod(), operationPersist.getPath());
         HeimdallException.checkThrow(resData != null &&
                 resData.getResourceId().equals(operation.getResourceId()) &&
-                !resData.getId().equals(operation.getId()), ONLY_ONE_OPERATION_PER_RESOURCE);
+                !resData.getId().equals(operation.getId()), GLOBAL_ALREADY_REGISTERED, "Operation");
 
         operation = GenericConverter.mapper(operationPersist, operation);
         operation.setPath(StringUtils.removeMultipleSlashes(operation.getPath()));
@@ -235,8 +226,6 @@ public class OperationService {
         operation = operationRepository.save(operation);
 
         amqpRoute.dispatchRoutes();
-
-        amqpCacheService.dispatchClean(ConstantsCache.OPERATION_ACTIVE_FROM_ENDPOINT, api.getBasePath() + operation.getPath());
 
         return operation;
     }
@@ -261,8 +250,6 @@ public class OperationService {
         resourceService.removeOperation(operation);
 
         operationRepository.delete(operation);
-
-        amqpCacheService.dispatchClean(ConstantsCache.OPERATION_ACTIVE_FROM_ENDPOINT, api.getBasePath() + operation.getPath());
 
         amqpRoute.dispatchRoutes();
     }

@@ -13,33 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package br.com.conductor.heimdall.core.dto;
-
-import lombok.Data;
-
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import java.io.Serializable;
+package br.com.conductor.heimdall.core.util;
 
 /**
- * Class is a Data Transfer Object.
- *
- * @author Filipe Germano
- *
+ * This class holds the Redis Pub/Sub Constants.
+ * 
+ * @author Marcelo Aguiar Rodrigues
  */
-@Data
-public class PageableDTO implements Serializable {
+public final class RedisConstants {
 
-     private static final long serialVersionUID = -3593999942005387183L;
+     private RedisConstants() { }
 
-     @Min(0)
-     private Integer page;
+     public static final String INTERCEPTORS_ADD = "interceptors:add";
+     public static final String INTERCEPTORS_REMOVE = "interceptors:remove";
+     public static final String INTERCEPTORS_REFRESH = "interceptors:refresh-all";
+     public static final String ROUTES_REFRESH = "routes:refresh";
 
-     @Min(0)
-     @Max(100)
-     private Integer limit;
-
-     public boolean isEmpty() {
-          return this.page == null && this.limit == null;
-     }
 }

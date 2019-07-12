@@ -31,7 +31,7 @@ import java.util.List;
  * This class represents a Resource registered to the system.
  * 
  * @author Filipe Germano
- *
+ * @author Marcelo Aguiar Rodrigues
  */
 @Data
 @EqualsAndHashCode(of = { "id" })

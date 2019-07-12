@@ -18,13 +18,12 @@ package br.com.conductor.heimdall.core.service;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Plan;
-import br.com.conductor.heimdall.core.enums.Status;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.PlanRepository;
-import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
-import br.com.conductor.heimdall.core.util.Pageable;
-import org.springframework.beans.factory.annotation.Autowired;
+//import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,20 +42,20 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 @Service
 public class PlanService {
 
-    @Autowired
-    private PlanRepository planRepository;
+    private final ApiService apiService;
+    private final AppService appService;
+    private final InterceptorService interceptorService;
+    private final PlanRepository planRepository;
 
-    @Autowired
-    private ApiService apiService;
-
-    @Autowired
-    private AppService appService;
-
-    @Autowired
-    private InterceptorService interceptorService;
-
-    @Autowired
-    private AMQPCacheService amqpCacheService;
+    public PlanService(@Lazy ApiService apiService,
+                       AppService appService,
+                       InterceptorService interceptorService,
+                       PlanRepository planRepository) {
+        this.apiService = apiService;
+        this.appService = appService;
+        this.interceptorService = interceptorService;
+        this.planRepository = planRepository;
+    }
 
     @Transactional(readOnly = true)
     public Plan find(String id) {
@@ -113,8 +112,6 @@ public class PlanService {
 
         apiService.update(api);
 
-        amqpCacheService.dispatchClean();
-
         return plan;
     }
 
@@ -140,8 +137,6 @@ public class PlanService {
 
         plan = planRepository.save(plan);
 
-        amqpCacheService.dispatchClean();
-
         return plan;
     }
 
@@ -162,8 +157,6 @@ public class PlanService {
         interceptorService.deleteAllFromPlan(id);
 
         planRepository.delete(plan);
-
-        amqpCacheService.dispatchClean();
     }
 
 }

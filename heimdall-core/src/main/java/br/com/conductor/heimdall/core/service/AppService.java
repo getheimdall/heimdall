@@ -21,15 +21,14 @@ import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.AppRepository;
-import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
-import br.com.conductor.heimdall.core.util.Pageable;
 import net.bytebuddy.utility.RandomString;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -47,164 +46,164 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_N
 @Service
 public class AppService {
 
-     @Autowired
-     private AppRepository appRepository;
+    private final AccessTokenService accessTokenService;
+    private final AppRepository appRepository;
+    private final DeveloperService developerService;
 
-     @Autowired
-     private DeveloperService developerService;
+    public AppService(AccessTokenService accessTokenService,
+                      AppRepository appRepository,
+                      DeveloperService developerService) {
+        this.accessTokenService = accessTokenService;
+        this.appRepository = appRepository;
+        this.developerService = developerService;
+    }
 
-     @Autowired
-     private AccessTokenService accessTokenService;
+    /**
+     * Finds a {@link App} by its ID.
+     *
+     * @param id The id of the {@link App}
+     * @return The {@link App} that was found
+     */
+    @Transactional(readOnly = true)
+    public App find(String id) {
 
-     @Autowired
-     private AMQPCacheService amqpCacheService;
+        App app = appRepository.findById(id).orElse(null);
+        HeimdallException.checkThrow(app == null, GLOBAL_NOT_FOUND, "App");
+        app.setAccessTokens(this.getAccessTokens(app));
 
-     /**
-      * Finds a {@link App} by its ID.
-      *
-      * @param 	id						The id of the {@link App}
-      * @return							The {@link App} that was found
-      */
-     @Transactional(readOnly = true)
-     public App find(String id) {
+        return app;
+    }
 
-          App app = appRepository.findById(id).orElse(null);
-          HeimdallException.checkThrow(app == null, GLOBAL_NOT_FOUND, "App");
-          app.setAccessTokens(this.getAccessTokens(app));
+    public App findByClientId(String clientId) {
+        return appRepository.findByClientId(clientId);
+    }
 
-          return app;
-     }
+    /**
+     * Generates a paged list of App.
+     *
+     * @param pageable The {@link Pageable}
+     * @return The paged {@link App} list
+     */
+    @Transactional(readOnly = true)
+    public Page<App> list(Pageable pageable) {
 
-     public App findByClientId(String clientId) {
-          return appRepository.findByClientId(clientId);
-     }
+        return appRepository.findAll(pageable);
+    }
 
-     /**
-      * Generates a paged list of App.
-      *
-      * @param 	pageable				The {@link Pageable}
-      * @return							The paged {@link App} list
-      */
-     @Transactional(readOnly = true)
-     public Page<App> list(Pageable pageable) {
+    /**
+     * Generates a list of {@link App}.
+     *
+     * @return The list of {@link App}'s
+     */
+    @Transactional(readOnly = true)
+    public List<App> list() {
 
-          return appRepository.findAll(pageable);
-     }
+        return appRepository.findAll();
+    }
 
-     /**
-      * Generates a list of {@link App}.
-      *
-      * @return							The list of {@link App}'s
-      */
-     @Transactional(readOnly = true)
-     public List<App> list() {
+    /**
+     * Saves a {@link App} to the repository.
+     *
+     * @param app The {@link App}
+     * @throws HeimdallException Developer not exist, ClientId already used
+     * @return The saved {@link App}
+     */
+    @Transactional
+    public App save(App app) {
 
-          return appRepository.findAll();
-     }
+        if (app.getClientId() != null) {
 
-     /**
-      * Saves a {@link App} to the repository.
-      * 
-      * @param 	app					The {@link App}
-      * @return							The saved {@link App}
-      * @throws HeimdallException		Developer not exist, ClientId already used
-      */
-     @Transactional
-     public App save(App app) {
+            HeimdallException.checkThrow(appRepository.findByClientId(app.getClientId()) != null, APP_CLIENT_ID_ALREADY_USED);
+        } else {
+            RandomString randomString = new RandomString(12);
+            String token = randomString.nextString();
 
-          if (app.getClientId() != null) {
+            while (appRepository.findByClientId(token) != null) {
+                token = randomString.nextString();
+            }
 
-               HeimdallException.checkThrow(appRepository.findByClientId(app.getClientId()) != null, APP_CLIENT_ID_ALREADY_USED);
-          } else {
-               RandomString randomString = new RandomString(12);
-               String token = randomString.nextString();
+            app.setClientId(token);
+        }
 
-               while (appRepository.findByClientId(token) != null) {
-                    token = randomString.nextString();
-               }
+        app.setCreationDate(LocalDateTime.now());
+        app.setClientId(app.getClientId().trim());
 
-               app.setClientId(token);
-          }
+        developerService.find(app.getDeveloperId());
 
-          app.setCreationDate(LocalDateTime.now());
-          app.setClientId(app.getClientId().trim());
+        return appRepository.save(app);
 
-          developerService.find(app.getDeveloperId());
+    }
 
-          amqpCacheService.dispatchClean();
+    /**
+     * Updates a {@link App} by its ID.
+     *
+     * @param id         The ID of the {@link App}
+     * @param appPersist {@link App}
+     * @throws HeimdallException Resource not found
+     * @return The updated {@link App}
+     */
+    public App update(String id, App appPersist) {
 
-          return appRepository.save(app);
+        App app = this.find(id);
 
-     }
+        updateTokensPlansByApp(id, appPersist.getPlans());
 
-     /**
-      * Updates a {@link App} by its ID.
-      *
-      * @param 	id						The ID of the {@link App}
-      * @param 	appPersist					{@link App}
-      * @return							The updated {@link App}
-      * @throws HeimdallException		Resource not found
-      */
-     public App update(String id, App appPersist) {
+        app.setAccessTokens(this.getAccessTokens(app));
+        app = GenericConverter.mapper(appPersist, app);
+        app = appRepository.save(app);
 
-          App app = this.find(id);
+        return app;
+    }
 
-          updateTokensPlansByApp(id, appPersist.getPlans());
-          
-          app.setAccessTokens(this.getAccessTokens(app));
-          app = GenericConverter.mapper(appPersist, app);
-          app = appRepository.save(app);
-          
-          amqpCacheService.dispatchClean();
-          
-          return app;
-     }
+    public App update(App app) {
+        return this.update(app.getId(), app);
+    }
 
-     public App update(App app) {
-          return this.update(app.getId(), app);
-     }
+    /**
+     * Updates app's access tokens.
+     * This is used for removing the access token to plan association, only if an app removes one of it's plans.
+     *
+     * @param appId    The ID of the {@link App}
+     * @param plansIds List of {@link Plan}'s IDs
+     */
+    private void updateTokensPlansByApp(String appId, Set<String> plansIds) {
+        List<AccessToken> accessTokenList = accessTokenService.findByAppId(appId);
 
-     /**
-      * Updates app's access tokens.
-      * This is used for removing the access token to plan association, only if an app removes one of it's plans. 
-      * 
-      * @param appId The ID of the {@link App}
-      * @param plansIds List of {@link Plan}'s IDs 
-      */
-     private void updateTokensPlansByApp(String appId, Set<String> plansIds) {
-          List<AccessToken> accessTokenList = accessTokenService.findByAppId(appId);
+        if (Objects.nonNull(accessTokenList)) {
+            accessTokenList.forEach(accessToken -> {
+                if (Objects.nonNull(accessToken.getPlans()) && !accessToken.getPlans().isEmpty()) {
+                    Set<String> planList = accessToken.getPlans().stream().filter(plansIds::contains).collect(Collectors.toSet());
+                    accessToken.setPlans(planList);
+                    accessTokenService.update(accessToken);
+                }
+            });
+        }
+    }
 
-          if (Objects.nonNull(accessTokenList)) {
-               accessTokenList.forEach(accessToken -> {
-                    if (Objects.nonNull(accessToken.getPlans()) && !accessToken.getPlans().isEmpty()) {
-                         List<String> planList = accessToken.getPlans().stream().filter(plansIds::contains).collect(Collectors.toList());
-                         accessToken.setPlans(planList);
-                         accessTokenService.update(accessToken);
-                    }
-               });
-          }
-     }
-     
-     /**
-      * Deletes a {@link App} by its ID.
-      * 
-      * @param  id						The ID of the {@link App}
-      * @throws HeimdallException		Resource not found
-      */
-     public void delete(String id) {
+    /**
+     * Deletes a {@link App} by its ID.
+     *
+     * @param id The ID of the {@link App}
+     * @throws HeimdallException Resource not found
+     */
+    public void delete(String id) {
 
-          App app = this.find(id);
+        App app = this.find(id);
 
-          amqpCacheService.dispatchClean();
+        appRepository.delete(app);
+    }
 
-          appRepository.delete(app);
-     }
+    private Set<String> getAccessTokens(App app) {
+        final List<AccessToken> accessTokens = accessTokenService.findByAppId(app.getId());
 
-     private Set<String> getAccessTokens(App app) {
-          return accessTokenService.findByAppId(app.getId()).stream()
-                  .map(AccessToken::getId)
-                  .collect(Collectors.toSet())
-                  ;
-     }
+        if (accessTokens != null && !accessTokens.isEmpty()) {
+
+            return accessTokens.stream()
+                    .map(AccessToken::getId)
+                    .collect(Collectors.toSet())
+                    ;
+        }
+        return new HashSet<>();
+    }
 
 }

@@ -15,16 +15,15 @@
  */
 package br.com.conductor.heimdall.core.service;
 
-import br.com.conductor.heimdall.core.dto.persist.AccessTokenPersist;
+import br.com.conductor.heimdall.core.dto.AccessTokenDTO;
 import br.com.conductor.heimdall.core.entity.AccessToken;
 import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.AccessTokenRepository;
-import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
-import br.com.conductor.heimdall.core.util.Pageable;
 import net.bytebuddy.utility.RandomString;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,14 +41,16 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 @Service
 public class AccessTokenService {
 
-    @Autowired
-    private AccessTokenRepository accessTokenRepository;
+    private final AccessTokenRepository accessTokenRepository;
 
-    @Autowired
-    private AppService appService;
 
-    @Autowired
-    private AMQPCacheService amqpCacheService;
+    private final AppService appService;
+
+    public AccessTokenService(AccessTokenRepository accessTokenRepository,
+                              @Lazy AppService appService) {
+        this.accessTokenRepository = accessTokenRepository;
+        this.appService = appService;
+    }
 
     /**
      * Looks for a {@link AccessToken} based on it's.
@@ -99,7 +100,7 @@ public class AccessTokenService {
      * Saves a new {@link AccessToken} for a {@link App}. If the {@link AccessToken} does not
      * have a token it generates a new token for it.
      *
-     * @param accessToken {@link AccessTokenPersist}
+     * @param accessToken {@link AccessTokenDTO}
      * @return The {@link AccessToken} that was saved to the repository
      */
     @Transactional
@@ -110,7 +111,7 @@ public class AccessTokenService {
 
         if (accessToken.getCode() != null) {
 
-            HeimdallException.checkThrow(accessTokenRepository.findByCode(accessToken.getCode()) != null, ACCESS_TOKEN_ALREADY_EXISTS);
+            HeimdallException.checkThrow(accessTokenRepository.findByCode(accessToken.getCode()) != null, GLOBAL_ALREADY_REGISTERED, "Access Token");
         } else {
 
             RandomString randomString = new RandomString(12);
@@ -139,7 +140,7 @@ public class AccessTokenService {
      * Updates a {@link AccessToken} by its ID.
      *
      * @param id                 The ID of the {@link AccessToken} to be updated
-     * @param accessTokenPersist {@link AccessTokenPersist} The request for {@link AccessToken}
+     * @param accessTokenPersist {@link AccessTokenDTO} The request for {@link AccessToken}
      * @return The {@link AccessToken} updated
      */
     @Transactional
@@ -151,8 +152,6 @@ public class AccessTokenService {
         HeimdallException.checkThrow(!app.getPlans().containsAll(accessTokenPersist.getPlans()), SOME_PLAN_NOT_PRESENT_IN_APP);
 
         accessToken = accessTokenRepository.save(accessToken);
-
-        amqpCacheService.dispatchClean();
 
         return accessToken;
     }
@@ -171,8 +170,6 @@ public class AccessTokenService {
     public void delete(String id) {
 
         AccessToken accessToken = this.find(id);
-
-        amqpCacheService.dispatchClean();
 
         accessTokenRepository.delete(accessToken);
     }

@@ -17,16 +17,17 @@ package br.com.conductor.heimdall.api.resource;
 
 import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
-import br.com.conductor.heimdall.core.dto.AppDTO;
+import br.com.conductor.heimdall.core.dto.AppUpdateDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
-import br.com.conductor.heimdall.core.dto.persist.AppPersist;
+import br.com.conductor.heimdall.core.dto.AppDTO;
 import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.service.AppService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
-import br.com.conductor.heimdall.core.util.Pageable;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -59,7 +60,7 @@ public class AppResource {
      * Finds a {@link App} by its Id.
      *
      * @param id The App Id
-     * @return                        {@link ResponseEntity}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Find App by id", response = App.class)
@@ -76,7 +77,7 @@ public class AppResource {
      * Finds all {@link App} from a request.
      *
      * @param pageableDTO {@link PageableDTO}
-     * @return                        {@link ResponseEntity}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Find all Apps", responseContainer = "List", response = App.class)
@@ -86,7 +87,7 @@ public class AppResource {
 
         if (!pageableDTO.isEmpty()) {
 
-            Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+            final Pageable pageable = PageRequest.of(pageableDTO.getPage(), pageableDTO.getLimit());
             Page<App> appPage = appService.list(pageable);
 
             return ResponseEntity.ok(appPage);
@@ -101,14 +102,14 @@ public class AppResource {
     /**
      * Saves a {@link App}.
      *
-     * @param appDTO {@link AppDTO}
-     * @return                        {@link ResponseEntity}
+     * @param appDTO {@link AppUpdateDTO}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Save a new App")
     @PostMapping
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_APP)
-    public ResponseEntity<?> save(@RequestBody @Valid AppPersist appDTO) {
+    public ResponseEntity<?> save(@RequestBody @Valid AppDTO appDTO) {
 
         App app = GenericConverter.mapper(appDTO, App.class);
         app = appService.save(app);
@@ -120,17 +121,17 @@ public class AppResource {
      * Updates a {@link App}.
      *
      * @param id     The App Id
-     * @param appDTO {@link AppDTO}
-     * @return                        {@link ResponseEntity}
+     * @param appUpdateDTO {@link AppUpdateDTO}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Update App")
     @PutMapping(value = "/{appId}")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_APP)
     public ResponseEntity<?> update(@PathVariable("appId") String id,
-                                    @RequestBody AppDTO appDTO) {
+                                    @RequestBody AppUpdateDTO appUpdateDTO) {
 
-        App app = GenericConverter.mapper(appDTO, App.class);
+        App app = GenericConverter.mapper(appUpdateDTO, App.class);
         app = appService.update(id, app);
 
         return ResponseEntity.ok(app);
@@ -140,7 +141,7 @@ public class AppResource {
      * Deletes a {@link App}.
      *
      * @param id The App Id
-     * @return                        {@link ResponseEntity}
+     * @return {@link ResponseEntity}
      */
     @ResponseBody
     @ApiOperation(value = "Delete App")

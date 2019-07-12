@@ -21,16 +21,16 @@ package br.com.conductor.heimdall.core.util;
  * @author Filipe Germano
  * @author Marcos Filho
  * @author Marcelo Aguiar Rodrigues
- *
  */
 public final class ConstantsInterceptors {
 
-     private ConstantsInterceptors() { }
+    private ConstantsInterceptors() {
+    }
 
-     public static final String GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND = "Could not find a required %s or it is not valid";
+    public static final String GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND = "Could not find a required %s or it is not valid";
 
-     public static final String GLOBAL_ACCESS_NOT_ALLOWED_API = "Access not allowed for this API";
+    public static final String GLOBAL_ACCESS_NOT_ALLOWED_API = "Access not allowed for this API";
 
-     public static final String IDENTIFIER_ID = "identifier_id";
+    public static final String IDENTIFIER_ID = "identifier_id";
 
 }

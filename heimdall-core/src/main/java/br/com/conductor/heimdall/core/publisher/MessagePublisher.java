@@ -13,27 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package br.com.conductor.heimdall.core.dto;
-
-import java.io.Serializable;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+package br.com.conductor.heimdall.core.publisher;
 
 /**
- * Class is a Data Transfer Object for the ReferenceId.
  *
- * @author Filipe Germano
- *
+ * @author Marcelo Aguiar Rodrigues
  */
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class ReferenceIdDTO implements Serializable {
+public interface MessagePublisher {
 
-     private static final long serialVersionUID = -7325639885315556027L;
-     
-     private String id;
+    void publish(String channel, String message);
 
 }

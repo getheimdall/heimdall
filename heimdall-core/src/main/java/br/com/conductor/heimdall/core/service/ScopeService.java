@@ -20,11 +20,10 @@ import br.com.conductor.heimdall.core.entity.Operation;
 import br.com.conductor.heimdall.core.entity.Scope;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.ScopeRepository;
-import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
-import br.com.conductor.heimdall.core.util.Pageable;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,17 +41,17 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.*;
 @Service
 public class ScopeService {
 
-    @Autowired
-    private ScopeRepository scopeRepository;
+    private final ApiService apiService;
+    private final OperationService operationService;
+    private final ScopeRepository scopeRepository;
 
-    @Autowired
-    private ApiService apiService;
-
-    @Autowired
-    private OperationService operationService;
-
-    @Autowired
-    private AMQPCacheService amqpCacheService;
+    public ScopeService(@Lazy ApiService apiService,
+                        OperationService operationService,
+                        ScopeRepository scopeRepository) {
+        this.apiService = apiService;
+        this.operationService = operationService;
+        this.scopeRepository = scopeRepository;
+    }
 
     @Transactional(readOnly = true)
     public Scope find(final String apiId, final String scopeId) {
@@ -114,8 +113,6 @@ public class ScopeService {
 
         scope = scopeRepository.save(scope);
 
-        amqpCacheService.dispatchClean();
-
         return scope;
     }
 
@@ -131,8 +128,6 @@ public class ScopeService {
         Scope scope = this.find(apiId, scopeId);
 
         scopeRepository.delete(scope);
-
-        amqpCacheService.dispatchClean();
     }
 
     /**
@@ -156,8 +151,6 @@ public class ScopeService {
         scope.setId(scopeId);
 
         scope = scopeRepository.save(scope);
-
-        amqpCacheService.dispatchClean();
 
         return scope;
     }

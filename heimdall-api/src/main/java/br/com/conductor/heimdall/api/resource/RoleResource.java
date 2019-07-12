@@ -22,10 +22,11 @@ import br.com.conductor.heimdall.api.util.ConstantsPrivilege;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
-import br.com.conductor.heimdall.core.util.Pageable;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -41,111 +42,110 @@ import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_ROLES;
  * Uses a {@link RoleService} to provide methods to create, read, update and delete a {@link Role}.
  *
  * @author Marcos Filho
- *
  */
-@io.swagger.annotations.Api(value = PATH_ROLES, produces = MediaType.APPLICATION_JSON_VALUE, tags = { ConstantsTag.TAG_ROLES })
+@io.swagger.annotations.Api(value = PATH_ROLES, produces = MediaType.APPLICATION_JSON_VALUE, tags = {ConstantsTag.TAG_ROLES})
 @RestController
 @RequestMapping(value = PATH_ROLES)
 public class RoleResource {
 
-     @Autowired
-     private RoleService roleService;    
+    @Autowired
+    private RoleService roleService;
 
-     /**
-      * Saves a {@link Role}.
-      * 
-      * @param roleDTO				{@link RoleDTO}
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Save a new Role")
-     @PostMapping
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_ROLE)
-     public ResponseEntity<?> save(@RequestBody @Valid RoleDTO roleDTO) {
+    /**
+     * Saves a {@link Role}.
+     *
+     * @param roleDTO {@link RoleDTO}
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Save a new Role")
+    @PostMapping
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_ROLE)
+    public ResponseEntity<?> save(@RequestBody @Valid RoleDTO roleDTO) {
 
-          Role role = GenericConverter.mapper(roleDTO, Role.class);
+        Role role = GenericConverter.mapper(roleDTO, Role.class);
 
-          role = roleService.save(role);
+        role = roleService.save(role);
 
-          return ResponseEntity.created(URI.create(String.format("/%s/%s", "roles", role.getId()))).build();
-     }
-     
-     /**
-      * Finds a {@link Role} by its Id.
-      * 
-      * @param roleId				The Role Id
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Find Role by id", response = Role.class)
-     @GetMapping(value = "/{roleId}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_ROLE)
-     public ResponseEntity<?> findById(@PathVariable("roleId") String roleId) {
+        return ResponseEntity.created(URI.create(String.format("/%s/%s", "roles", role.getId()))).build();
+    }
 
-          Role resource = roleService.find(roleId);
+    /**
+     * Finds a {@link Role} by its Id.
+     *
+     * @param roleId The Role Id
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Find Role by id", response = Role.class)
+    @GetMapping(value = "/{roleId}")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_ROLE)
+    public ResponseEntity<?> findById(@PathVariable("roleId") String roleId) {
 
-          return ResponseEntity.ok(resource);
-     }
+        Role resource = roleService.find(roleId);
 
-     /**
-      * Finds all {@link Role} from a request.
-      * 
-      * @param roleDTO				{@link RoleDTO}
-      * @param pageableDTO			{@link PageableDTO}
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Find all Resources", responseContainer = "List", response = Role.class)
-     @GetMapping
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_ROLE)
-     public ResponseEntity<?> findAll(@ModelAttribute RoleDTO roleDTO, @ModelAttribute PageableDTO pageableDTO) {
-          
-          if (!pageableDTO.isEmpty()) {
-               Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
-               Page<Role> rolePage = roleService.list(pageable);
+        return ResponseEntity.ok(resource);
+    }
 
-               return ResponseEntity.ok(rolePage);
-          } else {
-               
-               List<Role> roles = roleService.list();
-               return ResponseEntity.ok(roles);
-          }
-     }
-     
-     /**
-      * Updates a {@link Role}.
-      * 
-      * @param roleId				The Role Id
-      * @param roleDTO				{@link RoleDTO}
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Update Role")
-     @PutMapping(value = "/{roleId}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_ROLE)
-     public ResponseEntity<?> update(@PathVariable("roleId") String roleId, @RequestBody RoleDTO roleDTO) {
+    /**
+     * Finds all {@link Role} from a request.
+     *
+     * @param roleDTO     {@link RoleDTO}
+     * @param pageableDTO {@link PageableDTO}
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Find all Resources", responseContainer = "List", response = Role.class)
+    @GetMapping
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_ROLE)
+    public ResponseEntity<?> findAll(@ModelAttribute RoleDTO roleDTO, @ModelAttribute PageableDTO pageableDTO) {
 
-          Role role = GenericConverter.mapper(roleDTO, Role.class);
+        if (!pageableDTO.isEmpty()) {
+            final Pageable pageable = PageRequest.of(pageableDTO.getPage(), pageableDTO.getLimit());
+            Page<Role> rolePage = roleService.list(pageable);
 
-          role = roleService.update(roleId, role);
+            return ResponseEntity.ok(rolePage);
+        } else {
 
-          return ResponseEntity.ok(role);
-     }
-     
-     /**
-      * Deletes a {@link Role}.
-      * 
-      * @param roleId				The Role Id
-      * @return						{@link ResponseEntity}
-      */
-     @ResponseBody
-     @ApiOperation(value = "Delete Role")
-     @DeleteMapping(value = "/{roleId}")
-     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_ROLE)
-     public ResponseEntity<?> delete( @PathVariable("roleId") String roleId) {
+            List<Role> roles = roleService.list();
+            return ResponseEntity.ok(roles);
+        }
+    }
 
-          roleService.delete(roleId);
+    /**
+     * Updates a {@link Role}.
+     *
+     * @param roleId  The Role Id
+     * @param roleDTO {@link RoleDTO}
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Update Role")
+    @PutMapping(value = "/{roleId}")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_ROLE)
+    public ResponseEntity<?> update(@PathVariable("roleId") String roleId, @RequestBody RoleDTO roleDTO) {
 
-          return ResponseEntity.noContent().build();
-     }
+        Role role = GenericConverter.mapper(roleDTO, Role.class);
+
+        role = roleService.update(roleId, role);
+
+        return ResponseEntity.ok(role);
+    }
+
+    /**
+     * Deletes a {@link Role}.
+     *
+     * @param roleId The Role Id
+     * @return                        {@link ResponseEntity}
+     */
+    @ResponseBody
+    @ApiOperation(value = "Delete Role")
+    @DeleteMapping(value = "/{roleId}")
+    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_ROLE)
+    public ResponseEntity<?> delete(@PathVariable("roleId") String roleId) {
+
+        roleService.delete(roleId);
+
+        return ResponseEntity.noContent().build();
+    }
 }

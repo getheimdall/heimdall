@@ -24,6 +24,8 @@ import br.com.conductor.heimdall.core.util.ConstantsTag;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -70,7 +72,6 @@ public class ProviderResource {
     /**
      * Finds all {@link Provider} from a request.
      *
-     * @param providerDTO {@link ProviderDTO}
      * @param pageableDTO {@link PageableDTO}
      * @return {@link ResponseEntity}
      */
@@ -78,15 +79,15 @@ public class ProviderResource {
     @ApiOperation(value = "Find all Providers with filter and pageable", responseContainer = "List", response = Provider.class)
     @GetMapping
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_PROVIDER)
-    public ResponseEntity<?> findAll(@ModelAttribute ProviderDTO providerDTO,
-                                     @ModelAttribute PageableDTO pageableDTO) {
+    public ResponseEntity<?> findAll(@ModelAttribute PageableDTO pageableDTO) {
 
         if (!pageableDTO.isEmpty()) {
-            Page<Provider> providerPage = providerService.listWithPageableAndFilter(providerDTO, pageableDTO);
+            Pageable pageable = PageRequest.of(pageableDTO.getPage(), pageableDTO.getLimit());
+            Page<Provider> providerPage = providerService.list(pageable);
 
             return ResponseEntity.ok(providerPage);
         } else {
-            List<Provider> listProviders = providerService.listWithFilter(providerDTO);
+            List<Provider> listProviders = providerService.list();
 
             return ResponseEntity.ok(listProviders);
         }

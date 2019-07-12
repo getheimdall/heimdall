@@ -21,12 +21,13 @@ import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.dto.ResourceDTO;
 import br.com.conductor.heimdall.core.entity.Resource;
 import br.com.conductor.heimdall.core.service.ResourceService;
-import br.com.conductor.heimdall.core.service.amqp.AMQPRouteService;
+//import br.com.conductor.heimdall.core.publisher.AMQPRouteService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
-import br.com.conductor.heimdall.core.util.Pageable;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -55,8 +56,8 @@ public class ResourceResource {
     @Autowired
     private ResourceService resourceService;
 
-    @Autowired
-    private AMQPRouteService aMQPRouteService;
+//    @Autowired
+//    private AMQPRouteService aMQPRouteService;
 
     /**
      * Finds a {@link Resource} by its Id.
@@ -92,7 +93,7 @@ public class ResourceResource {
                                      @ModelAttribute PageableDTO pageableDTO) {
 
         if (!pageableDTO.isEmpty()) {
-            Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
+            final Pageable pageable = PageRequest.of(pageableDTO.getPage(), pageableDTO.getLimit());
             Page<Resource> resourcePage = resourceService.list(apiId, pageable);
 
             return ResponseEntity.ok(resourcePage);
@@ -164,21 +165,21 @@ public class ResourceResource {
         return ResponseEntity.noContent().build();
     }
 
-    /**
-     * Refreshes all {@link Resource}.
-     *
-     * @param apiId The Api Id
-     * @return {@link ResponseEntity}
-     */
-    @ResponseBody
-    @ApiOperation(value = "Refresh all Resources")
-    @PostMapping(value = "/refresh")
-    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_REFRESH_RESOURCE)
-    public ResponseEntity<?> refresh(@PathVariable("apiId") Long apiId) {
-
-        aMQPRouteService.dispatchRoutes();
-
-        return ResponseEntity.noContent().build();
-    }
+//    /**
+//     * Refreshes all {@link Resource}.
+//     *
+//     * @param apiId The Api Id
+//     * @return {@link ResponseEntity}
+//     */
+//    @ResponseBody
+//    @ApiOperation(value = "Refresh all Resources")
+//    @PostMapping(value = "/refresh")
+//    @PreAuthorize(ConstantsPrivilege.PRIVILEGE_REFRESH_RESOURCE)
+//    public ResponseEntity<?> refresh(@PathVariable("apiId") Long apiId) {
+//
+//        aMQPRouteService.dispatchRoutes();
+//
+//        return ResponseEntity.noContent().build();
+//    }
 
 }

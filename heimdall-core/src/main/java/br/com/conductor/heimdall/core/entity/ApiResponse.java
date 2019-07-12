@@ -19,6 +19,11 @@ import lombok.Data;
 
 import java.util.Map;
 
+/**
+ * Holds the response to create the cache
+ *
+ * @author Marcelo Aguiar Rodrigues
+ */
 @Data
 public class ApiResponse {
 

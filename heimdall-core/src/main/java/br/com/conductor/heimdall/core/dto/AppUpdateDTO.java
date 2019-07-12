@@ -13,44 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package br.com.conductor.heimdall.core.dto.persist;
-
-import java.io.Serializable;
-import java.util.List;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+package br.com.conductor.heimdall.core.dto;
 
 import br.com.conductor.heimdall.core.entity.App;
 import br.com.conductor.heimdall.core.enums.Status;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.util.Set;
+
 /**
  * Class is a Data Transfer Object for the {@link App}.
  *
- * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ * @author Filipe Germano
  *
  */
 @Data
-public class AppPersist implements Serializable {
+public class AppUpdateDTO implements Serializable {
 
-    private static final long serialVersionUID = 4168592185106510648L;
+     private static final long serialVersionUID = 4168592185106510648L;
 
-    @NotNull
-    @Size(max = 180)
-    private String name;
+     @NotNull
+     @Size(max = 180)
+     private String name;
 
-    @Size(max = 200)
-    private String description;
+     @Size(max = 200)
+     private String description;
+     
+     @NotNull
+     private String developerId;
 
-    @NotNull
-    private String developerId;
-
-    private Status status;
-
-    @NotNull
-    @Size(min = 1)
-    private List<String> plans;
-
-    private String clientId;
+     private Status status = Status.ACTIVE;
+     
+     @NotNull
+     @Size(min = 1)
+     private Set<String> plans;
 }

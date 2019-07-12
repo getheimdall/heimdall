@@ -22,9 +22,9 @@ import br.com.conductor.heimdall.api.repository.RoleRepository;
 import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
-import br.com.conductor.heimdall.core.util.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,7 +53,7 @@ public class RoleService {
      * Saves a {@link Role}.
      *
      * @param role {@link Role}
-     * @return                {@link Role} saved
+     * @return {@link Role} saved
      */
     @Transactional
     public Role save(Role role) {
@@ -73,7 +73,7 @@ public class RoleService {
      * Finds a {@link Role} by its Id.
      *
      * @param id The Role Id
-     * @return                {@link Role}
+     * @return {@link Role}
      */
     public Role find(String id) {
 
@@ -106,7 +106,7 @@ public class RoleService {
     /**
      * Creates a list of {@link Role} from a request.
      *
-     * @return                {@link List} of {@link Role}
+     * @return {@link List} of {@link Role}
      */
     @Transactional
     public List<Role> list() {
@@ -132,7 +132,7 @@ public class RoleService {
      *
      * @param roleId      The Role Id
      * @param rolePersist {@link RoleDTO}
-     * @return                {@link Role}
+     * @return {@link Role}
      */
     @Transactional
     public Role update(String roleId, Role rolePersist) {
@@ -157,7 +157,7 @@ public class RoleService {
 
         role.setPrivileges(privileges.stream()
                 .filter(privilege -> privilegeNames.contains(privilege.getName()))
-                .map(Privilege::getId)
+                .map(Privilege::getName)
                 .collect(Collectors.toSet()));
 
         return this.save(role);

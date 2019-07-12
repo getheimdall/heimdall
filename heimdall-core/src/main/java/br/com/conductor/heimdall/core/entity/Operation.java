@@ -22,7 +22,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
@@ -33,7 +32,7 @@ import java.io.Serializable;
  * This class represents a Operation registered to the system.
  *
  * @author Filipe Germano
- *
+ * @author Marcelo Aguiar Rodrigues
  */
 @Data
 @EqualsAndHashCode(of = { "id" })
@@ -68,7 +67,7 @@ public class Operation implements Serializable {
      public void fixBasePath() {
           this.path = this.path.trim();
           if (this.path.endsWith(ConstantsPath.PATH_ROOT)) {
-               this.path = StringUtils.removeEnd(path, ConstantsPath.PATH_ROOT);
+               this.path = path.substring(0, path.length()-1);
           }
      }
 

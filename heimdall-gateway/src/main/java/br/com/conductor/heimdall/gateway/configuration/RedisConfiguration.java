@@ -20,20 +20,20 @@
 package br.com.conductor.heimdall.gateway.configuration;
 
 import br.com.conductor.heimdall.core.entity.RateLimit;
-import br.com.conductor.heimdall.core.environment.Property;
+import br.com.conductor.heimdall.core.util.BeanManager;
 import br.com.conductor.heimdall.core.util.ConstantsCache;
-import br.com.conductor.heimdall.gateway.service.RedisMessageSubscriber;
-import org.junit.Before;
+import br.com.conductor.heimdall.core.util.RedisConstants;
+import br.com.conductor.heimdall.gateway.listener.AddInterceptorsListener;
+import br.com.conductor.heimdall.gateway.listener.RefreshInterceptorsListener;
+import br.com.conductor.heimdall.gateway.listener.RefreshRoutesListener;
+import br.com.conductor.heimdall.gateway.listener.RemoveInterceptorsListener;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
-import org.springframework.beans.factory.annotation.Autowire;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.cache.RedisCacheManager;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
@@ -42,162 +42,124 @@ import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import redis.clients.jedis.JedisPoolConfig;
-
-import java.time.Duration;
 
 /**
  * Class responsible for configuring the Redis.
  *
  * @author Marcos Filho
- *
  */
 @Configuration
 public class RedisConfiguration {
-     
-     @Autowired
-     Property property;
 
-     @Bean
-     public MessageListenerAdapter messageListener() {
-          return new MessageListenerAdapter(new RedisMessageSubscriber());
-     }
+    @Value("${spring.redis.host}")
+    private String redisHost;
 
-     @Bean
-     public RedisMessageListenerContainer redisContainer() {
-          RedisMessageListenerContainer container = new RedisMessageListenerContainer();
-          container.setConnectionFactory(jedisConnectionFactory());
-          container.addMessageListener(messageListener(), topic());
-          return container;
-     }
+    @Value("${spring.redis.port}")
+    private int redisPort;
 
-     @Bean
-     public ChannelTopic topic() {
-          return new ChannelTopic("messageQueue");
-     }
-     /**
-      * Configures and returns a {@link JedisConnectionFactory}.
-      * 
-      * @return {@link JedisConnectionFactory}
-      */
-     @Bean
-     public JedisConnectionFactory jedisConnectionFactory() {
-          
-          JedisConnectionFactory factory = new JedisConnectionFactory();
-          
-          factory.setHostName(property.getRedis().getHost());
-          factory.setPort(property.getRedis().getPort());
-          factory.setUsePool(true);
-          factory.setPoolConfig(jediPoolConfig());
-          return factory;
-     }
-     
-     /**
-      * Configures and returns a {@link JedisPoolConfig}.
-      * 
-      * @return {@link JedisPoolConfig}
-      */
-     public JedisPoolConfig jediPoolConfig() {
-          final JedisPoolConfig poolConfig = new JedisPoolConfig();
-          poolConfig.setMaxTotal(property.getRedis().getMaxTotal());
-          poolConfig.setMaxIdle(property.getRedis().getMaxIdle());
-          poolConfig.setMinIdle(property.getRedis().getMinIdle());
-          poolConfig.setTestOnBorrow(property.getRedis().isTestOnBorrow());
-          poolConfig.setTestOnReturn(property.getRedis().isTestOnReturn());
-          poolConfig.setTestWhileIdle(property.getRedis().isTestWhileIdle());
-          poolConfig.setMinEvictableIdleTimeMillis(Duration.ofSeconds(property.getRedis().getMinEvictableIdleTimeSeconds()).toMillis());
-          poolConfig.setTimeBetweenEvictionRunsMillis(Duration.ofSeconds(property.getRedis().getTimeBetweenEvictionRunsSeconds()).toMillis());
-          poolConfig.setNumTestsPerEvictionRun(property.getRedis().getNumTestsPerEvictionRun());
-          poolConfig.setBlockWhenExhausted(property.getRedis().isBlockWhenExhausted());
-          return poolConfig;
-     }
+    @Bean
+    public MessageListenerAdapter addInterceptor() {
+        final AddInterceptorsListener addInterceptorsListener = (AddInterceptorsListener) BeanManager.getBean(AddInterceptorsListener.class);
+        return new MessageListenerAdapter(addInterceptorsListener);
+    }
 
-     @Bean
-     public RedisTemplate<String, Object> redisTemplate() {
-          RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
-          redisTemplate.setConnectionFactory(jedisConnectionFactory());
-          redisTemplate.setKeySerializer(new StringRedisSerializer());
-          redisTemplate.setValueSerializer(new JdkSerializationRedisSerializer());
-          redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-          redisTemplate.setHashValueSerializer(new JdkSerializationRedisSerializer());
-          return redisTemplate;
-     }
+    @Bean
+    public MessageListenerAdapter refreshInterceptor() {
+        final RefreshInterceptorsListener refreshInterceptorsListener = (RefreshInterceptorsListener) BeanManager.getBean(RefreshInterceptorsListener.class);
+        return new MessageListenerAdapter(refreshInterceptorsListener);
+    }
 
-     /**
-      * Configures and returns {@link RedisTemplate} with Object and Object.
-      * 
-      * @return {@link RedisTemplate}
-      */
-     @Bean
-     public RedisTemplate<Object, Object> redisTemplateObject() {
+    @Bean
+    public MessageListenerAdapter removeInterceptor() {
+        final RemoveInterceptorsListener removeInterceptorsListener = (RemoveInterceptorsListener) BeanManager.getBean(RemoveInterceptorsListener.class);
+        return new MessageListenerAdapter(removeInterceptorsListener);
+    }
 
-          RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<>();
-          redisTemplate.setConnectionFactory(jedisConnectionFactory());
-          redisTemplate.setKeySerializer(new StringRedisSerializer());
-          redisTemplate.setValueSerializer(new JdkSerializationRedisSerializer());
-          redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-          redisTemplate.setHashValueSerializer(new JdkSerializationRedisSerializer());
-          return redisTemplate;
-     }
-     
-     /**
-      * Configures and returns a {@link RedisTemplate} with String and {@link RateLimit}
-      * 
-      * @return {@link RedisTemplate}
-      */
-     @Bean
-     public RedisTemplate<String, RateLimit> redisTemplateRate() {
-          
-          RedisTemplate<String, RateLimit> redisTemplate = new RedisTemplate<>();
-          redisTemplate.setConnectionFactory(jedisConnectionFactory());
-          redisTemplate.setKeySerializer(new StringRedisSerializer());
-          redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
-          redisTemplate.setHashKeySerializer(new StringRedisSerializer());
-          redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
-          return redisTemplate;
-     }
+    @Bean
+    public MessageListenerAdapter refreshRoutes() {
+        final RefreshRoutesListener refreshRoutesListener = (RefreshRoutesListener) BeanManager.getBean(RefreshRoutesListener.class);
+        return new MessageListenerAdapter(refreshRoutesListener);
+    }
 
-     /**
-      * Returns a configured {@link CacheManager}.
-      *
-      * @return {@link CacheManager}
-      */
-     @Bean
-     public CacheManager cacheManager(RedisCacheManager redisCacheManager) {
+    @Bean
+    public RedisMessageListenerContainer redisContainer() {
+        RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+        container.setConnectionFactory(jedisConnectionFactory());
+        container.addMessageListener(addInterceptor(), new ChannelTopic(RedisConstants.INTERCEPTORS_ADD));
+        container.addMessageListener(refreshInterceptor(), new ChannelTopic(RedisConstants.INTERCEPTORS_REFRESH));
+        container.addMessageListener(removeInterceptor(), new ChannelTopic(RedisConstants.INTERCEPTORS_REMOVE));
+        container.addMessageListener(refreshRoutes(), new ChannelTopic(RedisConstants.ROUTES_REFRESH));
 
-          return redisCacheManager;
-     }
+        return container;
+    }
 
-     @Bean
-     public RedisCacheManager cacheManager(RedisConnectionFactory connectionFactory) {
-          return RedisCacheManager.create(connectionFactory);
-     }
-     
-     /**
-      * Configures and returns a {@link RedissonClient}.
-      * 
-      * @return {@link RedissonClient}
-      */
-     @Bean(autowire = Autowire.BY_NAME)
-     public RedissonClient redissonClientRateLimitInterceptor() {
+    /**
+     * Creates a new {@link JedisConnectionFactory}.
+     *
+     * @return {@link JedisConnectionFactory}
+     */
+    @Bean
+    public JedisConnectionFactory jedisConnectionFactory() {
 
-          return createConnection(ConstantsCache.RATE_LIMIT_DATABASE);
-     }
+        RedisStandaloneConfiguration redisStandaloneConfiguration
+                = new RedisStandaloneConfiguration(redisHost, redisPort);
 
-     @Bean(autowire = Autowire.BY_NAME)
-     public RedissonClient redissonClientCacheInterceptor() {
+        return new JedisConnectionFactory(redisStandaloneConfiguration);
 
-          return createConnection(ConstantsCache.CACHE_INTERCEPTOR_DATABASE);
-     }
+    }
 
-     private RedissonClient createConnection(int database) {
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate() {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(jedisConnectionFactory());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new JdkSerializationRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new JdkSerializationRedisSerializer());
+        return redisTemplate;
+    }
 
-          Config config = new Config();
-          config.useSingleServer()
-                  .setAddress(property.getRedis().getHost() + ":" + property.getRedis().getPort())
-                  .setConnectionPoolSize(property.getRedis().getConnectionPoolSize())
-                  .setDatabase(database);
+    /**
+     * Configures and returns a {@link RedisTemplate} with String and {@link RateLimit}
+     *
+     * @return {@link RedisTemplate}
+     */
+    @Bean
+    public RedisTemplate<String, RateLimit> redisTemplateRate() {
 
-          return Redisson.create(config);
-     }
+        RedisTemplate<String, RateLimit> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(jedisConnectionFactory());
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+        return redisTemplate;
+    }
+
+    /**
+     * Configures and returns a {@link RedissonClient}.
+     *
+     * @return {@link RedissonClient}
+     */
+    @Bean
+    public RedissonClient redissonClientRateLimitInterceptor() {
+
+        return createConnection(ConstantsCache.RATE_LIMIT_DATABASE);
+    }
+
+    @Bean
+    public RedissonClient redissonClientCacheInterceptor() {
+
+        return createConnection(ConstantsCache.CACHE_INTERCEPTOR_DATABASE);
+    }
+
+    private RedissonClient createConnection(int database) {
+
+        Config config = new Config();
+        config.useSingleServer()
+                .setAddress(redisHost + ":" + redisPort)
+                .setDatabase(database);
+
+        return Redisson.create(config);
+    }
 }

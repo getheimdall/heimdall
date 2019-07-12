@@ -15,40 +15,23 @@
  */
 package br.com.conductor.heimdall.core.util;
 
-import org.junit.Ignore;
-
 /**
  * This class holds the cache constants.
  *
- * @author Thiago Sampaio
- *
+ * @author Marcelo Aguiar Rodrigues
  */
-@Ignore
 public final class ConstantsCache {
 
-     private ConstantsCache() { }
+    private ConstantsCache() {
+    }
 
-     public static final String OPERATION_ACTIVE_FROM_ENDPOINT = "OPERATION_ACTIVE_FROM_ENDPOINT";
-     
-     public static final String CREDENTIAL_ACTIVE_FROM_ENDPOINT = "CREDENTIAL_ACTIVE_FROM_ENDPOINT";
-     
-     public static final String API_ACTIVE_FROM_ACCESS_TOKEN = "API_ACTIVE_FROM_ACCESS_TOKEN";
-     
-     public static final String ACCESS_TOKENS_ACTIVE_CACHE = "ACCESS_TOKENS_ACTIVE_CACHE";
+    public static final String CACHE_TIME_TO_LIVE = "CACHE_TIME_TO_LIVE";
 
-     public static final String ENVIRONMENT_ACTIVE_CACHE = "ENVIRONMENT_ACTIVE_CACHE";
+    public static final String CACHE_BUCKET = "CACHE_BUCKET";
 
-     public static final String APPS_ACTIVE_CACHE = "APPS_ACTIVE_CACHE";
+    public static final String RATE_LIMIT_KEY_PREFIX = "ratelimit-interceptor:";
 
-     public static final String APPS_CLIENT_ID = "APPS_CLIENT_ID";
+    public static final int RATE_LIMIT_DATABASE = 2;
 
-     public static final String CACHE_TIME_TO_LIVE = "CACHE_TIME_TO_LIVE";
-
-     public static final String CACHE_BUCKET = "CACHE_BUCKET";
-
-     public static final String RATE_LIMIT_KEY_PREFIX = "ratelimit-interceptor:";
-
-     public static final int RATE_LIMIT_DATABASE = 2;
-
-     public static final int CACHE_INTERCEPTOR_DATABASE = 4;
+    public static final int CACHE_INTERCEPTOR_DATABASE = 4;
 }

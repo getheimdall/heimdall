@@ -17,7 +17,6 @@ package br.com.conductor.heimdall.api;
 
 import br.com.conductor.heimdall.api.environment.JwtProperty;
 import br.com.conductor.heimdall.core.environment.Property;
-import br.com.conductor.heimdall.core.util.RabbitQueueUtils;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -42,7 +41,6 @@ public class ApiApplication {
 
      public static void main(String[] args) {
 
-          RabbitQueueUtils.init();
           SpringApplication.run(ApiApplication.class, args);
      }
      

@@ -19,49 +19,36 @@
  */
 package br.com.conductor.heimdall.gateway.listener;
 
-import br.com.conductor.heimdall.core.service.CacheService;
-import br.com.conductor.heimdall.core.util.RabbitConstants;
-import br.com.conductor.heimdall.gateway.configuration.HeimdallHandlerMapping;
+import br.com.conductor.heimdall.core.entity.Interceptor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.netflix.zuul.filters.ZuulProperties.ZuulRoute;
+import org.springframework.data.redis.connection.Message;
+import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Component;
 
 /**
- * Listener that controls the Routes.
+ * Listener that controls the {@link Interceptor} repository.
  *
- * @author Marcos Filho
- *
+ * @author Filipe Germano
  */
 @Slf4j
 @Component
-public class RouteListener {
+public class RefreshInterceptorsListener implements MessageListener {
 
-	@Autowired
-	private CacheService cacheService;
+    @Autowired
+    private StartServer startServer;
 
-	@Autowired
-	private HeimdallHandlerMapping heimdallHandlerMapping;
 
-	@Autowired
-	private StartServer startServer;
+    @Override
+    public void onMessage(Message message, byte[] pattern) {
+        log.info("Refresh all Interceptors");
 
-	/**
-	 * Updates the {@link ZuulRoute} repository.
-	 * 
-	 * @param message {@link Message}
-	 */
-	@RabbitListener(queues = RabbitConstants.LISTENER_HEIMDAL_ROUTES)
-	public void updateZuulRoutes(final Message message) {
-		try {
-			log.info("Updating Zuul Routes");
-			cacheService.clean();
-			heimdallHandlerMapping.setDirty(false);
-			startServer.initApplication();
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-		}
-	}
+        try {
+
+            startServer.initApplication();
+        } catch (Exception e) {
+
+            log.error(e.getMessage(), e);
+        }
+    }
 }

@@ -13,33 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package br.com.conductor.heimdall.core.dto;
+package br.com.conductor.heimdall.core.publisher;
 
-import lombok.Data;
-
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import java.io.Serializable;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
 
 /**
- * Class is a Data Transfer Object.
  *
- * @author Filipe Germano
- *
+ * @author Marcelo Aguiar Rodrigues
  */
-@Data
-public class PageableDTO implements Serializable {
+@Service
+public class RedisMessagePublisher implements MessagePublisher {
 
-     private static final long serialVersionUID = -3593999942005387183L;
+    private RedisTemplate<String, Object> redisTemplate;
 
-     @Min(0)
-     private Integer page;
+    public RedisMessagePublisher(RedisTemplate<String, Object> redisTemplate) {
+        this.redisTemplate = redisTemplate;
+    }
 
-     @Min(0)
-     @Max(100)
-     private Integer limit;
-
-     public boolean isEmpty() {
-          return this.page == null && this.limit == null;
-     }
+    @Override
+    public void publish(String channel, String message) {
+        this.redisTemplate.convertAndSend(channel, message);
+    }
 }
