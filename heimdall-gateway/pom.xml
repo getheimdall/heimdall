@@ -167,5 +167,5 @@
 		</profile>
 	</profiles>
 
-	<description>In this project we built our algorithm over the Netflix Zuul. We put some steroids on the Zuul Filters, add some criterias to make the match routes more rigid (like the HTTP Verb on the match). And to manager the request/response and Zuul Filters flow we put a message broker (RabbitMQ) to communicate with the API.</description>
+	<description>In this project we built our algorithm over the Netflix Zuul. We pushed some steroids on the Zuul Filters, added some criterias to make the routes matching more rigid (like the HTTP Verb on the match).</description>
 </project>

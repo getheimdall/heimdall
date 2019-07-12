@@ -27,11 +27,10 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * This is the main Heimdall Gateway Application class. <br>
- * Heimdall Gateway is a SpringBoot based application that uses RabbitMQ as a message broker
- * This class starts the RabbitQueue then runs the Gateway Application as a SpringBoot application.
  *
  * @author Filipe Germano
  * @author Marcos Filho
+ * @author Marcelo Aguiar Rodrigues
  */
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 @EnableConfigurationProperties({Property.class})
