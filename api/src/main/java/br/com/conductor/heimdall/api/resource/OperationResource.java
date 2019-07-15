@@ -55,9 +55,6 @@ public class OperationResource {
     @Autowired
     private OperationService operationService;
 
-//    @Autowired
-//    private AMQPRouteService aMQPRouteService;
-
     /**
      * Finds a {@link Operation} by its Id.
      *

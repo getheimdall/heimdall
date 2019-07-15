@@ -20,7 +20,7 @@ class Scopes extends Component {
 
     componentDidMount() {
         this.props.dispatch(initLoading())
-        this.props.dispatch(getScopes(this.props.api.id, { offset: 0, limit: 10 }))
+        this.props.dispatch(getScopes(this.props.api.id, { page: 0, limit: 10 }))
     }
 
     componentWillReceiveProps(newProps) {
