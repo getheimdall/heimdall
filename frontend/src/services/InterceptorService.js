@@ -1,4 +1,3 @@
-import i18n from "../i18n/i18n"
 import { HTTPv1 } from '../utils/Http'
 
 const getInterceptors = (params = {params: {}}) => {
@@ -30,10 +29,6 @@ const getInterceptorTypes = () => {
 }
 
 const getInterceptor = (interceptorId) => {
-    if (isNaN(interceptorId)) {
-        return Promise.reject(new Error(i18n.t('invalid_parameter')))
-    }
-
     return HTTPv1.get('/interceptors/' + interceptorId)
         .then(res => {
             return Promise.resolve(res.data)

@@ -20,7 +20,7 @@ class NewApiOverview extends Component {
         this.props.form.validateFieldsAndScroll((err, payload) => {
             if (!err) {
                 if (payload.environments) {
-                    payload.environments = payload.environments.map((env) => ({ id: env }))
+                    payload.environments = payload.environments.map((env) => (env))
                 }
                 payload.status = payload.status ? 'ACTIVE' : 'INACTIVE'
 

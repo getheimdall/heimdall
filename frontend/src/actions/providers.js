@@ -12,7 +12,7 @@ export const finishLoading = () => dispatch => {
     dispatch({ type: ProviderConstants.PROVIDER_LOADING_FINISH })
 }
 
-export const getAllProviders = (query = {offset: 0, limit: 10}) => dispatch => {
+export const getAllProviders = (query = {page: 0, limit: 10}) => dispatch => {
     const parameters = { params: query }
     providerService.getProviders(parameters)
         .then(data => {

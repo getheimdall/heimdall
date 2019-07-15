@@ -16,7 +16,7 @@ export const sendNotification = notification => dispatch => {
     dispatch({ type: DeveloperConstants.DEVELOPER_NOTIFICATION, notification })
 }
 
-export const getAllDevelopers = (query = {offset: 0, limit: 10} ) => dispatch => {
+export const getAllDevelopers = (query = {page: 0, limit: 10} ) => dispatch => {
     const parameters = { params: query }
     developerService.getDevelopers(parameters)
         .then(data => {

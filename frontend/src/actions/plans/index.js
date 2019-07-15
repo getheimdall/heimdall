@@ -12,7 +12,7 @@ export const finishLoading = () => dispatch => {
     dispatch({ type: PlanConstants.PLAN_LOADING_FINISH })
 }
 
-export const getAllPlans = (query = {offset: 0, limit: 10}) => dispatch => {
+export const getAllPlans = (query = {page: 0, limit: 10}) => dispatch => {
     const parameters = { params: query }
     planService.getPlans(parameters)
         .then(data => {
