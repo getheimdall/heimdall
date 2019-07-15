@@ -46,9 +46,10 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import redis.embedded.RedisServerBuilder;
+import redis.embedded.RedisServer;
 
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.Collections;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -73,6 +74,20 @@ public class AccessTokenResourceTest {
      @Autowired
      private FilterChainProxy filterChain;
 
+     private static RedisServer redisServer;
+
+     @BeforeClass
+     public static void setUp() throws IOException {
+          redisServer = new RedisServer(getTemporaryPort());
+          redisServer.start();
+
+     }
+
+     @AfterClass
+     public static void destroy() {
+          redisServer.stop();
+     }
+
      @Before
      public void setupTest() {
 
@@ -93,7 +108,7 @@ public class AccessTokenResourceTest {
                                                 .content("{\"code\":\"!!@!##1212\", \"plans\": [\"abc123\"]}")
                                                 .contentType(MediaType.APPLICATION_JSON))
                  .andExpect(MockMvcResultMatchers.status().is4xxClientError())
-                 .andExpect(MockMvcResultMatchers.content().json("{\"status\":400,\"exception\":\"MethodArgumentNotValidException\",\"errors\":[{\"defaultMessage\":\"must not be null\",\"objectName\":\"accessTokenPersist\",\"field\":\"app\",\"reason\":\"NotNull\"}]}"));
+                 .andExpect(MockMvcResultMatchers.content().json("{\"status\":400,\"exception\":\"MethodArgumentNotValidException\",\"errors\":[{\"defaultMessage\":\"must not be null\",\"objectName\":\"accessTokenDTO\",\"field\":\"app\",\"reason\":\"NotNull\"}]}"));
      }
 
      @Test
@@ -104,7 +119,7 @@ public class AccessTokenResourceTest {
                                                 .content("{\"code\":\"!!@!##1212\",\"app\":\"10L\",\"plans\":[]}")
                                                 .contentType(MediaType.APPLICATION_JSON))
                  .andExpect(MockMvcResultMatchers.status().is4xxClientError())
-                 .andExpect(MockMvcResultMatchers.content().json("{\"status\":400,\"exception\":\"MethodArgumentNotValidException\",\"errors\":[{\"defaultMessage\":\"size must be between 1 and 2147483647\",\"objectName\":\"accessTokenPersist\",\"field\":\"plans\",\"reason\":\"Size\"}]}"));
+                 .andExpect(MockMvcResultMatchers.content().json("{\"status\":400,\"exception\":\"MethodArgumentNotValidException\",\"errors\":[{\"defaultMessage\":\"size must be between 1 and 2147483647\",\"objectName\":\"accessTokenDTO\",\"field\":\"plans\",\"reason\":\"Size\"}]}"));
      }
 
      @Test
@@ -115,7 +130,7 @@ public class AccessTokenResourceTest {
                                                 .content("{\"code\":\"!!@!##1212\",\"app\":\"10\"}")
                                                 .contentType(MediaType.APPLICATION_JSON))
                  .andExpect(MockMvcResultMatchers.status().is4xxClientError())
-                 .andExpect(MockMvcResultMatchers.content().json("{\"status\":400,\"exception\":\"MethodArgumentNotValidException\",\"errors\":[{\"defaultMessage\":\"must not be null\",\"objectName\":\"accessTokenPersist\",\"field\":\"plans\",\"reason\":\"NotNull\"}]}"));
+                 .andExpect(MockMvcResultMatchers.content().json("{\"status\":400,\"exception\":\"MethodArgumentNotValidException\",\"errors\":[{\"defaultMessage\":\"must not be null\",\"objectName\":\"accessTokenDTO\",\"field\":\"plans\",\"reason\":\"NotNull\"}]}"));
      }
 
      @Test
@@ -131,5 +146,12 @@ public class AccessTokenResourceTest {
                  .content("{\"code\":\"!!@!##1212\",\"app\":\"10\",\"plans\":[\"20\"]}")
                  .contentType(MediaType.APPLICATION_JSON))
                  .andExpect(MockMvcResultMatchers.status().isCreated());
+     }
+
+     private static int getTemporaryPort() throws IOException {
+          ServerSocket socket = new ServerSocket(0);
+          int port = socket.getLocalPort();
+          socket.close();
+          return port;
      }
 }

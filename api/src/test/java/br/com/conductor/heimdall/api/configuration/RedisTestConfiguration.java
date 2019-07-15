@@ -15,15 +15,13 @@
  */
 package br.com.conductor.heimdall.api.configuration;
 
-import br.com.conductor.heimdall.core.entity.RateLimit;
 import br.com.conductor.heimdall.core.publisher.MessagePublisher;
 import br.com.conductor.heimdall.core.publisher.RedisMessagePublisher;
 import org.mockito.Mockito;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -36,8 +34,7 @@ import org.springframework.data.redis.core.RedisTemplate;
  * @author Marcos Filho
  * @see <a href="https://redis.io/">https://redis.io/</a>
  */
-@Configuration
-@Profile("test")
+@TestConfiguration
 public class RedisTestConfiguration {
 
     @Value("${spring.redis.host}")
@@ -73,20 +70,10 @@ public class RedisTestConfiguration {
      */
     @Bean
     public RedisTemplate<String, Object> redisTemplate() {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(jedisConnectionFactory());
 
-        return Mockito.mock(RedisTemplate.class);
-
-    }
-
-    /**
-     * Returns a configured {@link RedisTemplate}.
-     *
-     * @return {@link RedisTemplate} String, {@link RateLimit}
-     */
-    @Bean
-    public RedisTemplate<String, RateLimit> redisTemplateRate() {
-
-        return Mockito.mock(RedisTemplate.class);
+        return redisTemplate;
 
     }
 
@@ -101,10 +88,5 @@ public class RedisTestConfiguration {
         return Mockito.mock(RedissonClient.class);
 
     }
-
-//    @Bean
-//    public RedisKeyValueTemplate redisKeyValueTemplate() {
-//        return Mockito.mock(RedisKeyValueTemplate.class);
-//    }
 
 }
