@@ -1,8 +1,50 @@
-${AnsiColor.GREEN}    _    _      _               _       _ _         _____       _                           
-${AnsiColor.GREEN}   | |  | |    (_)             | |     | | |       / ____|     | |                          
-${AnsiColor.GREEN}   | |__| | ___ _ _ __ ___   __| | __ _| | |______| |  __  __ _| |_ _____      ____ _ _   _ 
-${AnsiColor.GREEN}   |  __  |/ _ \ | '_ ` _ \ / _` |/ _` | | |______| | |_ |/ _` | __/ _ \ \ /\ / / _` | | | |
-${AnsiColor.GREEN}   | |  | |  __/ | | | | | | (_| | (_| | | |      | |__| | (_| | ||  __/\ V  V / (_| | |_| |
-${AnsiColor.GREEN}   |_|  |_|\___|_|_| |_| |_|\__,_|\__,_|_|_|       \_____|\__,_|\__\___| \_/\_/ \__,_|\__, |
-${AnsiColor.GREEN}                                                                                       __/ |
-${AnsiColor.GREEN}                                                                                      |___/                                   
+                                                                                                          .,,...
+                                                                        ..                                'dOxl;....
+                                                                      .....                               ,k00OOxl;...
+                                                                      .cdc..                              ,k00000Okdc,.
+                                                                    .,okkkc.                              .oO000000Okxo;.
+                                                                   .:xOkxkkl.                              .:dO000000Okxd:.
+                                                                  .lkOkxxxkkc.                               .,ok00000Okkxd:.
+                                                                 .oOOkxxxxxo,.                                 .,dO0000OOkxxo,.
+                                                                'dOOkxxxxxl.                                     .cO00000Okxkxc.
+                                                               'oOOkxxxxxl.                                       .cO00000Okxxxo,.
+                                                              .lOOkxxxxkl.                                         .o000000kxxxkd;.
+                                                             .cO0kxxxxkd,                                           ;k00000Okxxxkx;.
+                                                             ,x0Okxxxxx:.                                           'd000000Okxxxkd;.
+                                                            .o00Oxxxxkd'                                            .d000000Okxxxxkd,
+                                                           .;k0Okxxxxkl.                                            'd000000Okxxxxxkl.
+                                                           .o00Okxxxxkc.                                            ;k000000Okxxxxxkx,
+                                                           ,x00Okxxxxkc.                                           .l0000000Okxxxxxxx:.
+                                                          .:O00Okxxxxkl.                                          .:k0000000Oxxxxxxxkc.
+                                                          .l000Okxxxxkd,                                         .ck0000000Okxxxxxxkk:.
+                                                          .o000Okxxxxxkc.                                      .'lO0000000Okxxxxxxxkd,
+                                                          .o000Okxxxxxkx:.                                   .'ck00000000Okxxxxxxxxkc.
+                                                          .o000Okxxxxxxkx:.             ....................,lk000000000Okxxxxxxxxko.
+        _____       _                                     .l0000kxxxxxxxkxl'......',;:clodxxxxxxxddddooooodxO0000000000Okxxxxxxxxkx:..
+       / ____|     | |                                    .cO000OkxxxxxxxkkxdooodxxkkkkO00000000000000000000000000000OOkxxxxxxxxxkkxdol:,.
+      | |  __  __ _| |_ _____      ____ _ _   _           ,x000OkxxxxxxxxxxkkkkkxxxxkO00000000000000000000000000000Okxxxxxxxxxxxxxxxkkd;.
+      | | |_ |/ _` | __/ _ \ \ /\ / / _` | | | |          .l0000OkxxxxxxxxxxxxxxxxxkO0000000000000000000000000000Okkxxxxxxxxxxxxxxxxdc.
+      | |__| | (_| | ||  __/\ V  V / (_| | |_| |           ,x0000OxxxxxxxxxxxxxxxxkO000000000000000000000000000Okkxxxxxxxxxxxxxxxxxl,.
+       \_____|\__,_|\__\___| \_/\_/ \__,_|\__, |            .cO000OkxxxxxxxxxxxxxxxO0000000000000000000000000OOkxxxxxxxxxxxxxxxxxxd:.
+                                           __/ |             .o0000OkxxxxxxxxxxxxxkO00000000000000000000000Okkxxxxxxxxxxxxxxxxxxdl'.
+                                          |___/               'd0000OkxxxxxxxxxxxxO000000000000000000000Okkxxxxxxxxxxxxxxxxxxxxo;.
+                                                               'oO000OOkkxxxxxxxxkO000000000000OOOkkkkkOOOkkkkxxxxxxxxxxxxxxxxc'.
+                                                               .lO0OOOOkxkkkxxxxkO0000000Oxoc:;,'....'';lxOOOOOkkxxxxxxxxxxd;.
+                                                                ,x0Okxxdc;:oxkkxkO0000ko:'..          .'cxkO0000OOkkxxxxxxd:.
+                                                                'd0Okxxxo,..'cdxkO00xc'.            ..:oxkOO0000000OOkxxxxd:.
+                                                                ;k00Okxxxo,.  .;:cc:..           ..'cdxkOO000000000000Okkxxdl:'.
+                                                               .l0000Okkxxd;.                ..,:odxkOO0000000000000000OOkkxxxl'
+                                                               .;dOOOO0Okxxdc.            .';cdkkOOO0000000000000OOOOkl;;ccll;.
+                                                                 .,'':x0Okxxx:.           'oxO000000000000000000Okkxxo'    ..
+                                                                     .cO0kxxxl.           'okO00000000000000000Okxxxx:.
+                                                                      ,x0Oxxxd,           'okO0000000000000000Okxxxxl.
+                                                                      .lOOkxxx:.          'okO000000000000000Okxxxxd,.
+                                                                       ,xOkxxxo'          'okO0000000000000Okxxxxxd;.
+                                                                       .:kOkxxd;.         'ok0000000000000kc',;;:;'.
+                                                                        .lkkxxxo'         ,dk00000000000Oo,.
+                                                                         .lkxxxx:.        ,dk0000000000kc.
+                                                                          .:dxxxd,.      .;xk00000000Oo,.
+                                                                           .,oxxxl.      .;dO000000Ox;.
+                                                                            ..co:'.       .,oO00Oxoc.
+                                                                              ...   ...     .,cl;..
+                                                                                 ..,cllc::;'.
