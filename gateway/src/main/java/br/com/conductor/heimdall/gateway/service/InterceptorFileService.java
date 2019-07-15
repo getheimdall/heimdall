@@ -23,7 +23,7 @@ import br.com.conductor.heimdall.core.dto.InterceptorFileDTO;
 import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.enums.TypeExecutionPoint;
-import br.com.conductor.heimdall.core.enums.TypeInterceptor;
+import br.com.conductor.heimdall.core.enums.InterceptorType;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.util.GenerateMustache;
@@ -156,7 +156,7 @@ public class InterceptorFileService {
     /*
      * Recovers the String representation of the template for the interceptor
      */
-    private String templateInterceptor(TypeInterceptor type, TypeExecutionPoint executionPoint) {
+    private String templateInterceptor(InterceptorType type, TypeExecutionPoint executionPoint) {
 
         String result = null;
         String filePath = "template-interceptor";

@@ -19,7 +19,7 @@ import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.InterceptorDTO;
 import br.com.conductor.heimdall.core.entity.*;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
-import br.com.conductor.heimdall.core.enums.TypeInterceptor;
+import br.com.conductor.heimdall.core.enums.InterceptorType;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.repository.InterceptorRepository;
@@ -129,7 +129,7 @@ public class InterceptorService {
 
         validateTemplate(interceptor.getType(), interceptor.getContent());
 
-        if (TypeInterceptor.CORS.equals(interceptor.getType())) {
+        if (InterceptorType.CORS.equals(interceptor.getType())) {
             HeimdallException.checkThrow(!InterceptorLifeCycle.API.equals(interceptor.getLifeCycle()), ExceptionMessage.CORS_INTERCEPTOR_NOT_API_LIFE_CYCLE);
             HeimdallException.checkThrow(apiService.find(interceptor.getApiId()).isCors(), ExceptionMessage.CORS_INTERCEPTOR_ALREADY_ASSIGNED_TO_THIS_API);
         }
@@ -138,14 +138,14 @@ public class InterceptorService {
         HeimdallException.checkThrow(!ignoredOperations.isEmpty(), INTERCEPTOR_IGNORED_INVALID, ignoredOperations.toString());
 
         HeimdallException.checkThrow(
-                (TypeInterceptor.CLIENT_ID.equals(interceptor.getType()) && InterceptorLifeCycle.PLAN.equals(interceptor.getLifeCycle())),
+                (InterceptorType.CLIENT_ID.equals(interceptor.getType()) && InterceptorLifeCycle.PLAN.equals(interceptor.getLifeCycle())),
                 INTERCEPTOR_INVALID_LIFECYCLE);
 
         interceptor.setCreationDate(LocalDateTime.now());
 
         final Interceptor savedInterceptor = interceptorRepository.save(interceptor);
 
-        if (TypeInterceptor.CORS.equals(savedInterceptor.getType())) {
+        if (InterceptorType.CORS.equals(savedInterceptor.getType())) {
             Api api = apiService.find(savedInterceptor.getApiId());
             api.setCors(true);
             apiService.update(api);
@@ -156,7 +156,7 @@ public class InterceptorService {
         return savedInterceptor;
     }
 
-    private void validateTemplate(TypeInterceptor type, String content) {
+    private void validateTemplate(InterceptorType type, String content) {
         type.getHeimdallInterceptor().parseContent(content);
     }
 
@@ -176,7 +176,7 @@ public class InterceptorService {
 
         validateTemplate(interceptor.getType(), interceptor.getContent());
 
-        if (TypeInterceptor.CORS.equals(interceptor.getType())) {
+        if (InterceptorType.CORS.equals(interceptor.getType())) {
             HeimdallException.checkThrow(!InterceptorLifeCycle.API.equals(interceptor.getLifeCycle()), ExceptionMessage.CORS_INTERCEPTOR_NOT_API_LIFE_CYCLE);
         }
 
@@ -199,14 +199,14 @@ public class InterceptorService {
         String fileName = StringUtils.concatCamelCase(interceptor.getLifeCycle().name(), interceptor.getType().name(), interceptor.getExecutionPoint().getFilterType(), interceptor.getId()) + ".groovy";
         String pathName = String.join(File.separator, zuulFilterRoot, interceptor.getExecutionPoint().getFilterType(), fileName);
 
-        if (TypeInterceptor.RATTING == interceptor.getType()) {
+        if (InterceptorType.RATELIMIT == interceptor.getType()) {
 
             String path = ConstantsCache.RATE_LIMIT_KEY_PREFIX + interceptor.getId();
 
             ratelimitRepository.delete(path);
         }
 
-        if (TypeInterceptor.CORS.equals(interceptor.getType())) {
+        if (InterceptorType.CORS.equals(interceptor.getType())) {
             final Api api = apiService.find(interceptor.getApiId());
             api.setCors(false);
             apiService.update(api);

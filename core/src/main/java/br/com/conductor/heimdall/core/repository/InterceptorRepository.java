@@ -20,12 +20,9 @@ import java.util.List;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import br.com.conductor.heimdall.core.entity.Api;
 import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.entity.Operation;
-import br.com.conductor.heimdall.core.entity.Plan;
 import br.com.conductor.heimdall.core.entity.Resource;
-import br.com.conductor.heimdall.core.enums.TypeInterceptor;
 
 /**
  * Provides methods to access a {@link Interceptor}

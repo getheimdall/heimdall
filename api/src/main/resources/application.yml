@@ -1,80 +1,80 @@
 info:
-    app:
-        profile: developer
-        name: "@name@"
-        description: "@description@"
-        version: "@project.version@"
+  app:
+    profile: developer
+    name: "@name@"
+    description: "@description@"
+    version: "@project.version@"
 
 server:
-    port: 9090
-    servlet:
-        context-path: /
+  port: 9090
+  servlet:
+    context-path: /
 
 heimdall:
-    contextPath: /heimdall/v1
-    hostname: hostname
-    retryable: false
-    logstash:
-        enabled: true
-        destination: 127.0.0.1
-    rewrite:
-        enable: false
-        prefix: heimdall
-    security:
-        enabled: true
-        jwt:
-            expiration-time: 600
-            secret: secretKey
+  contextPath: /heimdall/v1
+  hostname: hostname
+  retryable: false
+  logstash:
+    enabled: true
+    destination: 127.0.0.1
+  rewrite:
+    enable: false
+    prefix: heimdall
+  security:
+    enabled: true
+    jwt:
+      expiration-time: 600
+      secret: secretKey
 
 spring:
-    data:
-        web:
-            pageable:
-                default-page-size: 10
-                max-page-size: 100
-    redis:
-        host: 127.0.0.1
-        port: 6379
-    pid:
-        fail-on-write-error: false
-        file: heimdall.pid
-    jackson:
-        serialization:
-            INDENT_OUTPUT: true
-            WRITE-DATES-AS-TIMESTAMPS: false
+  data:
+    web:
+      pageable:
+        default-page-size: 10
+        max-page-size: 100
+  redis:
+    host: 127.0.0.1
+    port: 6379
+  pid:
+    fail-on-write-error: false
+    file: heimdall.pid
+  jackson:
+    serialization:
+      INDENT_OUTPUT: true
+      WRITE-DATES-AS-TIMESTAMPS: false
 
 springfox:
-    documentation:
-        swagger:
-            v2:
-                path: /docs
+  documentation:
+    swagger:
+      v2:
+        path: /docs
 
 endpoints:
-    routes:
-        enabled: true
-        sensitive: false
+  routes:
+    enabled: true
+    sensitive: false
 
 management:
-    health:
-        redis:
-            enabled: false
-        hystrix:
-            enabled: false
-        refresh:
-            enabled: false
-        ldap:
-            enabled: false
-    trace:
-        http:
-            enabled: false
-    server:
-        servlet:
-            context-path: /
-    endpoints:
-        web:
-            base-path: /manager
+  health:
+    redis:
+      enabled: false
+    hystrix:
+      enabled: false
+    refresh:
+      enabled: false
+    ldap:
+      enabled: false
+  trace:
+    http:
+      enabled: false
+  server:
+    servlet:
+      context-path: /
+  endpoints:
+    web:
+      base-path: /manager
 
 zuul:
-    filter:
-        root: /tmp/interceptors
-        interval: 8
+  filter:
+    root: /tmp/interceptors
+    interval: 8

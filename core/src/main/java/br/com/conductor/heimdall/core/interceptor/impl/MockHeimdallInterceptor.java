@@ -18,7 +18,7 @@ package br.com.conductor.heimdall.core.interceptor.impl;
 import br.com.conductor.heimdall.core.dto.interceptor.MockDTO;
 import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.enums.TypeExecutionPoint;
-import br.com.conductor.heimdall.core.enums.TypeInterceptor;
+import br.com.conductor.heimdall.core.enums.InterceptorType;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.interceptor.HeimdallInterceptor;
 import br.com.conductor.heimdall.core.util.JsonUtils;
@@ -48,7 +48,7 @@ public class MockHeimdallInterceptor implements HeimdallInterceptor {
             return JsonUtils.convertJsonToObject(content, MockDTO.class);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(TypeInterceptor.MOCK.name(), TemplateUtils.TEMPLATE_MOCK);
+            ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(InterceptorType.MOCK.name(), TemplateUtils.TEMPLATE_MOCK);
         }
 
         return null;

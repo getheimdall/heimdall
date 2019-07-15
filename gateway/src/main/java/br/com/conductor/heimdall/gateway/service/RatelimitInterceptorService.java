@@ -37,7 +37,7 @@ import java.time.LocalDateTime;
  * @author Marcelo Aguiar Rodrigues
  */
 @Service
-public class RattingInterceptorService {
+public class RatelimitInterceptorService {
 
     @Autowired
     private RateLimitRepository rateLimitRepository;

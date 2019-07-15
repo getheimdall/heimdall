@@ -18,7 +18,7 @@ package br.com.conductor.heimdall.core.dto;
 import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.enums.TypeExecutionPoint;
-import br.com.conductor.heimdall.core.enums.TypeInterceptor;
+import br.com.conductor.heimdall.core.enums.InterceptorType;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -45,7 +45,7 @@ public class InterceptorDTO implements Serializable {
      private String description;
      
      @NotNull
-     private TypeInterceptor type;
+     private InterceptorType type;
      
      @NotNull
      private Integer order;

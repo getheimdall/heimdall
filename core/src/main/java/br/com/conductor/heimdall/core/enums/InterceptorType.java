@@ -29,10 +29,10 @@ import lombok.Getter;
  *
  */
 @Getter
-public enum TypeInterceptor {
+public enum InterceptorType {
 
 	MOCK(new MockHeimdallInterceptor()),
-	RATTING(new RattingHeimdallInterceptor()),
+	RATELIMIT(new RateLimitHeimdallInterceptor()),
 	ACCESS_TOKEN(new AccessTokenHeimdallInterceptor()),
 	CLIENT_ID(new ClientIdHeimdallInterceptor()),
 	CUSTOM(new CustomHeimdallInterceptor()),
@@ -49,7 +49,7 @@ public enum TypeInterceptor {
 
 	private HeimdallInterceptor heimdallInterceptor;
 
-	TypeInterceptor(HeimdallInterceptor heimdallInterceptor) {
+	InterceptorType(HeimdallInterceptor heimdallInterceptor) {
 		this.heimdallInterceptor = heimdallInterceptor;
 	}
 

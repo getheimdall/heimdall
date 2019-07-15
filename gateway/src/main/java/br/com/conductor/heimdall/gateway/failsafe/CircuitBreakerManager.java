@@ -26,10 +26,8 @@ import com.netflix.zuul.context.RequestContext;
 import lombok.extern.slf4j.Slf4j;
 import net.jodah.failsafe.CircuitBreaker;
 import net.jodah.failsafe.Failsafe;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.text.MessageFormat;
@@ -49,21 +47,22 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class CircuitBreakerManager {
 	
-	@Autowired
-	private Property property;
+	private final Property property;
 
 	private static final ConcurrentHashMap<String, CircuitBreakerHolder> circuits = new ConcurrentHashMap<>();
 
+	public CircuitBreakerManager(Property property) {
+		this.property = property;
+	}
+
 	public <T> T failsafe(Callable<T> callable, String operationId, String operationPath) {
-		CircuitBreakerHolder circuitBreakerHolder = getCircuitHolder(operationId, circuits);
+		CircuitBreakerHolder circuitBreakerHolder = getCircuitHolder(operationId);
 		CircuitBreaker circuitBreaker = circuitBreakerHolder.getCircuitBreaker();
 		
 		if (circuitBreaker.isOpen()) {
 			return Failsafe.with(circuitBreaker)
 					.withFallback(() ->  {
-						String body = logAndCreateBody("CircuitBreaker ENABLED | Operation: {0}, Exception: {1}",
-								operationPath,
-                                circuitBreakerHolder.getMessage());
+						String body = logAndCreateBody(operationPath, circuitBreakerHolder.getMessage());
 
 						RequestContext context = RequestContext.getCurrentContext();
 						context.setSendZuulResponse(false);
@@ -80,9 +79,9 @@ public class CircuitBreakerManager {
 				.get(callable);
 	}
 
-	private <T> CircuitBreakerHolder getCircuitHolder(T key, ConcurrentHashMap<T, CircuitBreakerHolder> concurrentHashMap) {
+	private CircuitBreakerHolder getCircuitHolder(String key) {
 
-		CircuitBreakerHolder breakerHolder = concurrentHashMap.get(key);
+		CircuitBreakerHolder breakerHolder = circuits.get(key);
 
 		if (Objects.isNull(breakerHolder)) {
 			breakerHolder = new CircuitBreakerHolder();
@@ -91,14 +90,14 @@ public class CircuitBreakerManager {
 					.withSuccessThreshold(property.getFailsafe().getSuccessNumber())
 					.withDelay(property.getFailsafe().getDelayTimeSeconds(), TimeUnit.SECONDS));
 
-			concurrentHashMap.put(key, breakerHolder);
+			circuits.put(key, breakerHolder);
 		}
 
 		return breakerHolder;
 	}
 
-	private String logAndCreateBody(String message, String... args) {
-		String finalMessage = new MessageFormat(message).format(args);
+	private String logAndCreateBody(String... args) {
+		String finalMessage = new MessageFormat("CircuitBreaker ENABLED | Operation: {0}, Exception: {1}").format(args);
 
 		log.info(finalMessage);
 		TraceContextHolder.getInstance().getActualTrace().trace("CircuitBreaker Enabled" , finalMessage);

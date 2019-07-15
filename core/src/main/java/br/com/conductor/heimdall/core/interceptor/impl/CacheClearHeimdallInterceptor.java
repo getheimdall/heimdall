@@ -18,7 +18,7 @@ package br.com.conductor.heimdall.core.interceptor.impl;
 import br.com.conductor.heimdall.core.dto.interceptor.CacheDTO;
 import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.enums.TypeExecutionPoint;
-import br.com.conductor.heimdall.core.enums.TypeInterceptor;
+import br.com.conductor.heimdall.core.enums.InterceptorType;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.interceptor.HeimdallInterceptor;
 import br.com.conductor.heimdall.core.util.JsonUtils;
@@ -47,7 +47,7 @@ public class CacheClearHeimdallInterceptor implements HeimdallInterceptor {
             return JsonUtils.convertJsonToObject(content, CacheDTO.class);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(TypeInterceptor.CACHE_CLEAR.name(), TemplateUtils.TEMPLATE_CACHE_CLEAR);
+            ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(InterceptorType.CACHE_CLEAR.name(), TemplateUtils.TEMPLATE_CACHE_CLEAR);
         }
 
         return null;    }

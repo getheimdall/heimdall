@@ -58,7 +58,7 @@ public class TraceFilter implements Filter {
 	@Value("${info.app.profile}")
 	private String profile;
 
-	@Value("${management.server.servlet.context-path}")
+	@Value("${management.endpoints.web.base-path}")
 	private String managerPath;
 
 	@Autowired

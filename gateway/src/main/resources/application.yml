@@ -1,98 +1,101 @@
 info:
-    app:
-        profile: developer
-        name: "@name@"
-        description: "@description@"
-        version: "@project.version@"
+  app:
+    profile: developer
+    name: "@name@"
+    description: "@description@"
+    version: "@project.version@"
 
 server:
-    servlet:
-        context-path: /
-        application-display-name: heimdall
+  servlet:
+    context-path: /
+    application-display-name: heimdall
 
 heimdall:
-    contextPath: /heimdall/v1
-    hostname: hostname
-    retryable: false
-    interceptor:
-        health:
-            fixedRate: 600000
-    logstash:
-        enabled: true
-        destination: 127.0.0.1
-    rewrite:
-        enable: false
-        prefix: heimdall
-    trace:
-        printHeimdallFilters: true
-        printAllTrace: true
-        sanitizes:
-            - access_token
-            - client_id
-    failsafe:
-        enabled: false
-        failureNumber: 4
-        successNumber: 4
-        delayTimeSeconds: 30
+  contextPath: /heimdall/v1
+  hostname: hostname
+  retryable: false
+  interceptor:
+    health:
+      fixedRate: 600000
+  logstash:
+    enabled: true
+    destination: 127.0.0.1
+  rewrite:
+    enable: false
+    prefix: heimdall
+  trace:
+    printHeimdallFilters: true
+    printAllTrace: true
+    sanitizes:
+      - access_token
+      - client_id
+  failsafe:
+    enabled: false
+    failureNumber: 4
+    successNumber: 4
+    delayTimeSeconds: 30
 
 sentry:
-    enabled: false
-    dsn: http://127.0.0.1:9000
-    environment: developer
-    release: @project.version@
-    tags: heimdall-gateway
-    profiles:
-        active: dev
+  enabled: false
+  dsn: http://127.0.0.1:9000
+  environment: developer
+  release: @project.version@
+  tags: heimdall-gateway
+  profiles:
+    active: dev
 
 spring:
-    redis:
-        host: 127.0.0.1
-        port: 6379
+  redis:
+    host: 127.0.0.1
+    port: 6379
 
-    pid:
-        fail-on-write-error: false
-        file: heimdall.pid
-    jackson:
-        serialization:
-            INDENT_OUTPUT: true
-            WRITE-DATES-AS-TIMESTAMPS: false
+  pid:
+    fail-on-write-error: false
+    file: heimdall.pid
+  jackson:
+    serialization:
+      INDENT_OUTPUT: true
+      WRITE-DATES-AS-TIMESTAMPS: false
+  groovy:
+    template:
+      check-template-location: false
 
 endpoints:
-    routes:
-        enabled: true
-        sensitive: false
+  routes:
+    enabled: true
+    sensitive: false
 
 
 management:
-    health:
-        redis:
-            enabled: false
-        hystrix:
-            enabled: false
-        refresh:
-            enabled: false
-    server:
-        servlet:
-            context-path: /
-    trace:
-        http:
-            enabled: false
-    endpoint:
-        env:
-            keys-to-sanitize: url, host, serverName
-    endpoints:
-        web:
-            base-path: /manager
+  health:
+    redis:
+      enabled: false
+    hystrix:
+      enabled: false
+    refresh:
+      enabled: false
+  server:
+    servlet:
+      context-path: /
+  trace:
+    http:
+      enabled: false
+  endpoint:
+    env:
+      keys-to-sanitize: url, host, serverName
+  endpoints:
+    web:
+      base-path: /manager
 
 zuul:
-    ignoredPatterns: /manager/**
-    include-debug-header: false
-    debug:
-        parameter: debug
-        request: false
-    filter:
-        root: /tmp/interceptors
-        interval: 8
-    host:
-        socket-timeout-millis: 40000
-        connect-timeout-millis: 40000
+  ignoredPatterns: /manager/**
+  include-debug-header: false
+  debug:
+    parameter: debug
+    request: false
+  filter:
+    root: /tmp/interceptors
+    interval: 8
+  host:
+    socket-timeout-millis: 40000
+    connect-timeout-millis: 40000
