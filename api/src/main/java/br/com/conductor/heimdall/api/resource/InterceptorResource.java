@@ -20,7 +20,7 @@ import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.InterceptorDTO;
 import br.com.conductor.heimdall.core.dto.PageableDTO;
 import br.com.conductor.heimdall.core.entity.Interceptor;
-import br.com.conductor.heimdall.core.enums.TypeInterceptor;
+import br.com.conductor.heimdall.core.enums.InterceptorType;
 import br.com.conductor.heimdall.core.service.InterceptorService;
 import br.com.conductor.heimdall.core.publisher.RedisInterceptorPublisher;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
@@ -116,7 +116,7 @@ public class InterceptorResource {
     public ResponseEntity<?> types() {
 
         List<Option> types = new ArrayList<>();
-        for (TypeInterceptor type : TypeInterceptor.values()) {
+        for (InterceptorType type : InterceptorType.values()) {
             types.add(new Option(type.name()));
         }
 

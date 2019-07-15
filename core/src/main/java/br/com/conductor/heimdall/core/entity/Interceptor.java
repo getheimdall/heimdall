@@ -17,12 +17,11 @@ package br.com.conductor.heimdall.core.entity;
 
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.enums.TypeExecutionPoint;
-import br.com.conductor.heimdall.core.enums.TypeInterceptor;
+import br.com.conductor.heimdall.core.enums.InterceptorType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.data.redis.core.index.Indexed;
 
@@ -51,7 +50,7 @@ public class Interceptor implements Serializable {
      
      private String description;
      
-     private TypeInterceptor type;
+     private InterceptorType type;
 
      private InterceptorLifeCycle lifeCycle;
 

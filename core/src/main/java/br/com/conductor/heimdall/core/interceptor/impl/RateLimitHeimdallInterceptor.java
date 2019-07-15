@@ -18,7 +18,7 @@ package br.com.conductor.heimdall.core.interceptor.impl;
 import br.com.conductor.heimdall.core.dto.interceptor.RateLimitDTO;
 import br.com.conductor.heimdall.core.entity.Interceptor;
 import br.com.conductor.heimdall.core.enums.TypeExecutionPoint;
-import br.com.conductor.heimdall.core.enums.TypeInterceptor;
+import br.com.conductor.heimdall.core.enums.InterceptorType;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.interceptor.HeimdallInterceptor;
 import br.com.conductor.heimdall.core.util.ConstantsCache;
@@ -30,16 +30,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Implementation of the HeimdallInterceptor to type Ratting.
+ * Implementation of the HeimdallInterceptor for rate limit.
  *
  * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Slf4j
-public class RattingHeimdallInterceptor implements HeimdallInterceptor {
+public class RateLimitHeimdallInterceptor implements HeimdallInterceptor {
 
     @Override
     public String getFile(TypeExecutionPoint typeExecutionPoint) {
-        return "ratting.mustache";
+        return "ratelimit.mustache";
     }
 
     @Override
@@ -48,7 +48,7 @@ public class RattingHeimdallInterceptor implements HeimdallInterceptor {
             return JsonUtils.convertJsonToObject(content, RateLimitDTO.class);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(TypeInterceptor.RATTING.name(), TemplateUtils.TEMPLATE_RATTING);
+            ExceptionMessage.INTERCEPTOR_INVALID_CONTENT.raise(InterceptorType.RATELIMIT.name(), TemplateUtils.TEMPLATE_RATELIMIT);
         }
 
         return null;
