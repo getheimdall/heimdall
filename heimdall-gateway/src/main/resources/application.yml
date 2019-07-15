@@ -163,3 +163,8 @@ zuul:
 security:
     basic:
         enabled: false
+
+logging:
+    file:
+        max-history: 7
+        

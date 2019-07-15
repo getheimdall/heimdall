@@ -26,6 +26,9 @@ import br.com.conductor.heimdall.gateway.failsafe.CircuitBreakerManager;
 import com.netflix.zuul.context.RequestContext;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.springframework.cloud.commons.httpclient.ApacheHttpClientConnectionManagerFactory;
+import org.springframework.cloud.commons.httpclient.ApacheHttpClientFactory;
 import org.springframework.cloud.netflix.zuul.filters.ProxyRequestHelper;
 import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
 import org.springframework.cloud.netflix.zuul.filters.route.SimpleHostRoutingFilter;
@@ -45,36 +48,38 @@ import static br.com.conductor.heimdall.gateway.util.ConstantsContext.OPERATION_
 @Slf4j
 public class CustomHostRoutingFilter extends SimpleHostRoutingFilter {
 
-     private FilterDetail detail = new FilterDetail();
-     private final CircuitBreakerManager circuitBreakerManager;
+	private FilterDetail detail = new FilterDetail();
+	private final CircuitBreakerManager circuitBreakerManager;
 
-     /**
-      * Creates a CustomHostRoutingFilter from a {@link ProxyRequestHelper} and a {@link ZuulProperties}.
-      * 
-      * @param helper		{@link ProxyRequestHelper}
-      * @param properties	{@link ZuulProperties}
-      */
-     public CustomHostRoutingFilter(ProxyRequestHelper helper, ZuulProperties properties, CircuitBreakerManager circuitBreakerManager) {
-          super(helper, properties);
-          this.circuitBreakerManager = circuitBreakerManager;
-     }
-     
-     /**
-      * Checks if it should filter and sets the duration time.
-      */
-     @Override
-     public boolean shouldFilter() {
-          long startTime = System.currentTimeMillis();
-          
-          boolean should = super.shouldFilter();
-          
-          long endTime = System.currentTimeMillis();
-          long duration = (endTime - startTime);
-          
-          detail.setTimeInMillisShould(duration);
-          return should;
-     }
-     
+	public CustomHostRoutingFilter(ProxyRequestHelper helper, ZuulProperties properties,
+			ApacheHttpClientConnectionManagerFactory connectionManagerFactory,
+			ApacheHttpClientFactory httpClientFactory, CircuitBreakerManager circuitBreakerManager) {
+		super(helper, properties, connectionManagerFactory, httpClientFactory);
+		this.circuitBreakerManager = circuitBreakerManager;
+	}
+
+	public CustomHostRoutingFilter(ProxyRequestHelper helper, ZuulProperties properties, CloseableHttpClient httpClient,
+			CircuitBreakerManager circuitBreakerManager) {
+		super(helper, properties, httpClient);
+		this.circuitBreakerManager = circuitBreakerManager;
+	}
+
+	/**
+	 * Checks if it should filter and sets the duration time.
+	 */
+	@Override
+	public boolean shouldFilter() {
+		long startTime = System.currentTimeMillis();
+
+		boolean should = super.shouldFilter();
+
+		long endTime = System.currentTimeMillis();
+		long duration = (endTime - startTime);
+
+		detail.setTimeInMillisShould(duration);
+		return should;
+	}
+
 	/**
 	 * Runs the custom routing filter.
 	 */
@@ -84,9 +89,7 @@ public class CustomHostRoutingFilter extends SimpleHostRoutingFilter {
 
 		RequestContext context = RequestContext.getCurrentContext();
 		HttpServletRequest request = context.getRequest();
-		HttpHost httpHost = new HttpHost(
-				context.getRouteHost().getHost(),
-				context.getRouteHost().getPort(),
+		HttpHost httpHost = new HttpHost(context.getRouteHost().getHost(), context.getRouteHost().getPort(),
 				context.getRouteHost().getProtocol());
 
 		Long operationId = (Long) context.get(OPERATION_ID);
@@ -102,9 +105,9 @@ public class CustomHostRoutingFilter extends SimpleHostRoutingFilter {
 			log.error("Exception: {} - Message: {} - during routing request to (hostPath + uri): {} - Verb: {} - HostName: {} - Port: {} - SchemeName: {}",
 					e.getClass().getName(), 
 					e.getMessage(), 
-					request.getRequestURI(),
+					request.getRequestURI(), 
 					request.getMethod().toUpperCase(),
-					httpHost.getHostName(),
+					httpHost.getHostName(), 
 					httpHost.getPort(), 
 					httpHost.getSchemeName());
 			throw e;

@@ -23,3 +23,6 @@ yarn-error.log*
 
 # build artifacts
 src/**/*.css
+
+env-config.js
+public/env-config.js
