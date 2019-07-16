@@ -42,241 +42,236 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ResourceServiceTest {
 
-     @InjectMocks
-     private ResourceService resourceService;
+    @InjectMocks
+    private ResourceService resourceService;
 
-     @Mock
-     private ResourceRepository resourceRepository;
+    @Mock
+    private ResourceRepository resourceRepository;
 
-     @Mock
-     private ApiService apiService;
+    @Mock
+    private ApiService apiService;
 
-     @Mock
-     private OperationService operationService;
+    @Mock
+    private OperationService operationService;
 
-     @Mock
-     private InterceptorService interceptorService;
+    @Mock
+    private InterceptorService interceptorService;
 
-     @Mock
-     private RedisRoutePublisher redisRoutePublisher;
+    @Mock
+    private RedisRoutePublisher redisRoutePublisher;
 
-     @Rule
-     public ExpectedException thrown = ExpectedException.none();
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
-     private Resource resource;
+    private Resource resource;
 
-     private Api api;
+    private Api api;
 
-     private Resource resourceDTO;
+    private Resource resourceDTO;
 
-     @Before
-     public void initAttributes() {
+    @Before
+    public void initAttributes() {
 
-          api = new Api();
-          api.setId("10L");
+        api = new Api();
+        api.setId("10L");
 
-          resource = new Resource();
-          resource.setId("1L");
-          resource.setName("Local Resource");
-          resource.setDescription("My Resource Description");
-          resource.setApiId(api.getId());
+        resource = new Resource();
+        resource.setId("1L");
+        resource.setName("Local Resource");
+        resource.setDescription("My Resource Description");
+        resource.setApiId(api.getId());
 
-          List<String> operations = new ArrayList<>();
-          operations.add("");
-          operations.add("");
-          resource.setOperations(operations);
+        List<String> operations = new ArrayList<>();
+        operations.add("");
+        operations.add("");
+        resource.setOperations(operations);
 
-          resourceDTO = new Resource();
-          resourceDTO.setName("Local Resource");
-          resourceDTO.setDescription("My Resource Description");
-     }
+        resourceDTO = new Resource();
+        resourceDTO.setName("Local Resource");
+        resourceDTO.setDescription("My Resource Description");
+    }
 
-     @Test
-     public void rejectNewResourceWithNameExistent() {
+    @Test
+    public void rejectNewResourceWithNameExistent() {
 
-          thrown.expect(BadRequestException.class);
-          thrown.expectMessage("Resource already registered");
+        thrown.expect(BadRequestException.class);
+        thrown.expectMessage("Resource already registered");
 
-          Resource res = new Resource();
-          res.setId("resId");
-          res.setName("name");
-          res.setApiId("10L");
+        Resource res = new Resource();
+        res.setId("resId");
+        res.setName("name");
+        res.setApiId("10L");
 
-          Api api = new Api();
-          api.setId("10L");
-          api.setResources(Sets.newSet(res.getId()));
+        Api api = new Api();
+        api.setId("10L");
+        api.setResources(Sets.newSet(res.getId()));
 
-          Mockito.when(apiService.find(Mockito.anyString())).thenReturn(api);
-         Mockito.when(resourceRepository.findAll()).thenReturn(Lists.list(res));
+        Mockito.when(apiService.find(Mockito.anyString())).thenReturn(api);
+        Mockito.when(resourceRepository.findAll()).thenReturn(Lists.list(res));
 
-          resourceService.save("10L", res);
-     }
+        resourceService.save("10L", res);
+    }
 
-     @Test
-     public void acceptNewResourceWithPathExistentInDifferentApi() {
+    @Test
+    public void acceptNewResourceWithPathExistentInDifferentApi() {
 
-          Resource res = new Resource();
-          res.setName("name");
-          res.setDescription("description");
+        Resource res = new Resource();
+        res.setName("name");
+        res.setDescription("description");
 
-          Api api = new Api();
-          api.setId("10L");
+        Api api = new Api();
+        api.setId("10L");
 
-          Api diffApi = new Api();
-          diffApi.setId("20L");
+        Api diffApi = new Api();
+        diffApi.setId("20L");
 
-          Resource resData = new Resource();
-          resData.setApiId(diffApi.getId());
+        Resource resData = new Resource();
+        resData.setApiId(diffApi.getId());
 
-          Resource newRes = new Resource();
-          newRes.setId("40L");
-          newRes.setName("name");
-          newRes.setApiId(diffApi.getId());
-          newRes.setDescription("foo description");
+        Resource newRes = new Resource();
+        newRes.setId("40L");
+        newRes.setName("name");
+        newRes.setApiId(diffApi.getId());
+        newRes.setDescription("foo description");
 
-          Mockito.when(apiService.find("10L")).thenReturn(api);
-          Mockito.when(resourceRepository.save(Mockito.any(Resource.class))).thenReturn(newRes);
+        Mockito.when(apiService.find("10L")).thenReturn(api);
+        Mockito.when(resourceRepository.save(Mockito.any(Resource.class))).thenReturn(newRes);
 
-          Resource resource = resourceService.save("10L", res);
+        Resource resource = resourceService.save("10L", res);
 
-          assertEquals(res.getName(), resource.getName());
-          assertNotEquals(api.getId(), resource.getApiId());
-     }
+        assertEquals(res.getName(), resource.getName());
+        assertNotEquals(api.getId(), resource.getApiId());
+    }
 
-     @Test
-     public void findResource() {
+    @Test
+    public void findResource() {
 
-         Mockito.when(resourceRepository.findById(Mockito.anyString())).thenReturn(Optional.of(resource));
+        Mockito.when(resourceRepository.findById(Mockito.anyString())).thenReturn(Optional.of(resource));
 
-          Resource resourceResp = resourceService.find(api.getId(), "1L");
-          assertEquals(resourceResp.getId(), resource.getId());
-          Mockito.verify(this.resourceRepository, Mockito.times(1))
-                 .findById(Mockito.anyString());
-     }
+        Resource resourceResp = resourceService.find(api.getId(), "1L");
+        assertEquals(resourceResp.getId(), resource.getId());
+        Mockito.verify(this.resourceRepository, Mockito.times(1))
+                .findById(Mockito.anyString());
+    }
 
-     @Test
-     public void listResources() {
+    @Test
+    public void listResources() {
 
-          List<Resource> resources = new ArrayList<>();
-          resources.add(resource);
+        List<Resource> resources = new ArrayList<>();
+        resources.add(resource);
 
-          Mockito.when(this.apiService.find(api.getId())).thenReturn(api);
-          Mockito.when(this.resourceRepository.findAll()).thenReturn(resources);
+        Mockito.when(this.apiService.find(api.getId())).thenReturn(api);
+        Mockito.when(this.resourceRepository.findAll()).thenReturn(resources);
 
-          List<Resource> environmentResp = this.resourceService.list(api.getId());
+        List<Resource> environmentResp = this.resourceService.list(api.getId());
 
-          assertEquals(resources.size(), environmentResp.size());
-          Mockito.verify(this.resourceRepository, Mockito.times(1)).findAll();
-     }
+        assertEquals(resources.size(), environmentResp.size());
+        Mockito.verify(this.resourceRepository, Mockito.times(1)).findAll();
+    }
 
-     @Test
-     public void listResourcesWithPageable() {
+    @Test
+    public void listResourcesWithPageable() {
 
-          PageableDTO pageableDTO = new PageableDTO();
-          pageableDTO.setLimit(10);
-          pageableDTO.setPage(0);
+        PageableDTO pageableDTO = new PageableDTO();
+        pageableDTO.setLimit(10);
+        pageableDTO.setPage(0);
 
-          Pageable pageable = PageRequest.of(0, 10);
+        Pageable pageable = PageRequest.of(0, 10);
 
-          ArrayList<Resource> listResources = new ArrayList<>();
+        ArrayList<Resource> listResources = new ArrayList<>();
 
-          this.resource.setName("Resource Name");
-          this.resource.setApiId(api.getId());
+        this.resource.setName("Resource Name");
+        this.resource.setApiId(api.getId());
 
-          listResources.add(resource);
+        listResources.add(resource);
 
-          Mockito.when(apiService.find(Mockito.anyString())).thenReturn(api);
-          Mockito.when(this.resourceRepository.findAll()).thenReturn(listResources);
+        Mockito.when(apiService.find(Mockito.anyString())).thenReturn(api);
+        Mockito.when(this.resourceRepository.findAll()).thenReturn(listResources);
 
-         Page<Resource> resourcePageResp = this.resourceService.list(api.getId(), pageable);
+        Page<Resource> resourcePageResp = this.resourceService.list(api.getId(), pageable);
 
-          assertEquals(1L, resourcePageResp.getTotalElements());
-          Mockito.verify(this.resourceRepository, Mockito.times(1)).findAll();
-     }
+        assertEquals(1L, resourcePageResp.getTotalElements());
+        Mockito.verify(this.resourceRepository, Mockito.times(1)).findAll();
+    }
 
-     @Test
-     public void updateResourceSuccess() {
+    @Test
+    public void updateResourceSuccess() {
 
-          Mockito.when(apiService.find(Mockito.anyString())).thenReturn(api);
-          Mockito.when(resourceRepository.save(Mockito.any(Resource.class))).thenReturn(resource);
+        Mockito.when(apiService.find(Mockito.anyString())).thenReturn(api);
+        Mockito.when(resourceRepository.findById(Mockito.anyString())).thenReturn(Optional.of(resource));
+        Mockito.when(resourceRepository.findAll()).thenReturn(Lists.list(resource));
+        Mockito.when(resourceRepository.save(Mockito.any(Resource.class))).thenReturn(resourceDTO);
 
-          resourceDTO.setName("Another name");
-          resourceDTO.setDescription("Anoter description");
+        resourceDTO.setName("Updated name");
 
-          Resource saved = resourceService.save("1L", resourceDTO);
+        Resource update = resourceService.update("10L", "1L", resourceDTO);
 
-          assertEquals(saved.getId(), resource.getId());
+        assertNotNull(update);
+        assertEquals(update.getId(), resourceDTO.getId());
+        assertEquals(update.getName(), resourceDTO.getName());
+    }
 
-          Mockito.when(resourceRepository.save(Mockito.any(Resource.class))).thenReturn(resource);
-          Mockito.when(resourceRepository.findById(Mockito.anyString())).thenReturn(Optional.of(resource));
+    @Test
+    public void updateResourceAlreadyRegistered() {
 
-          Resource update = resourceService.update("1L", "1L", resourceDTO);
+        thrown.expect(BadRequestException.class);
+        thrown.expectMessage("Resource already registered");
 
-          assertEquals(update.getId(), resource.getId());
-     }
+        Api resApi = new Api();
+        resApi.setId("10L");
 
-     @Test
-     public void updateResourceErrorOnePerAPI() {
+        Resource resData = new Resource();
+        resData.setApiId(resApi.getId());
 
-          thrown.expect(BadRequestException.class);
-          thrown.expectMessage("Resource already registered");
+        resourceDTO.setDescription("Another description");
+        resourceDTO.setId("10L");
 
-          Api resApi = new Api();
-          resApi.setId("10L");
+        Mockito.when(apiService.find(Mockito.anyString())).thenReturn(api);
+        Mockito.when(resourceRepository.findById(Mockito.anyString())).thenReturn(Optional.of(resource));
+        Mockito.when(resourceRepository.findAll()).thenReturn(Lists.list(resource));
 
-          Resource resData = new Resource();
-          resData.setApiId(resApi.getId());
+        Resource update = resourceService.update("10L", resourceDTO.getId(), resourceDTO);
 
-          resourceDTO.setDescription("Another description");
-          resourceDTO.setId("10L");
+        assertEquals(update.getId(), resource.getId());
+    }
 
-         Mockito.when(apiService.find(Mockito.anyString())).thenReturn(api);
-         Mockito.when(resourceRepository.findById(Mockito.anyString())).thenReturn(Optional.of(resource));
-         Mockito.when(resourceRepository.findAll()).thenReturn(Lists.list(resource));
+    @Test
+    public void deleteResourceFromAPI() {
 
-          Resource update = resourceService.update("10L", resourceDTO.getId(), resourceDTO);
+        List<Resource> resources = new ArrayList<>();
 
-          assertEquals(update.getId(), resource.getId());
-     }
+        Operation operation = new Operation();
+        operation.setId("1L");
+        operation.setPath("path example");
+        operation.setResourceId(resource.getId());
+        operation.setMethod(HttpMethod.GET);
 
-     @Test
-     public void deleteResourceFromAPI() {
+        resources.add(resource);
 
-          List<Resource> resources = new ArrayList<>();
+        Mockito.doNothing().when(operationService).deleteAllfromResource(Mockito.anyString(), Mockito.anyString());
+        Mockito.doNothing().when(interceptorService).deleteAllfromResource(Mockito.anyString());
 
-          Operation operation = new Operation();
-          operation.setId("1L");
-          operation.setPath("path example");
-          operation.setResourceId(resource.getId());
-          operation.setMethod(HttpMethod.GET);
+        Mockito.when(resourceRepository.findById(Mockito.anyString())).thenReturn(Optional.of(resource));
+        Mockito.when(resourceRepository.findAll()).thenReturn(resources);
 
-          resources.add(resource);
+        resourceService.deleteAllFromApi(api.getId());
+        Mockito.verify(this.resourceRepository, Mockito.times(1)).delete(Mockito.any(Resource.class));
+    }
 
-          Mockito.doNothing().when(operationService).deleteAllfromResource(Mockito.anyString(), Mockito.anyString());
-          Mockito.doNothing().when(interceptorService).deleteAllfromResource(Mockito.anyString());
+    @Test
+    public void saveResource() {
 
-          Mockito.when(resourceRepository.findById(Mockito.anyString())).thenReturn(Optional.of(resource));
-          Mockito.when(resourceRepository.findAll()).thenReturn(resources);
+        Mockito.when(apiService.find(Mockito.anyString())).thenReturn(api);
+        Mockito.when(resourceRepository.save(Mockito.any(Resource.class))).thenReturn(resource);
 
-          resourceService.deleteAllFromApi(api.getId());
-          Mockito.verify(this.resourceRepository, Mockito.times(1)).delete(Mockito.any(Resource.class));
-     }
+        Resource saved = resourceService.save("1L", resource);
 
-     @Test
-     public void saveResource() {
-
-          Mockito.when(apiService.find(Mockito.anyString())).thenReturn(api);
-          Mockito.when(resourceRepository.save(Mockito.any(Resource.class))).thenReturn(resource);
-
-          Resource saved = resourceService.save("1L", resource);
-
-          assertEquals(saved.getId(), resource.getId());
-     }
+        assertEquals(saved.getId(), resource.getId());
+    }
 
 }

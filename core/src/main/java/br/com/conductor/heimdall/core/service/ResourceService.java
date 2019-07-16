@@ -156,9 +156,12 @@ public class ResourceService {
     public Resource update(String apiId, String resourceId, Resource resourcePersist) {
 
         final Resource resource = this.find(apiId, resourceId);
-        final boolean noneMatch = this.list(apiId).stream().noneMatch(resource1 -> resourcePersist.getName().equals(resource1.getName()));
+        final boolean anyMatch = this.list(apiId).stream()
+                .anyMatch(res ->
+                        resourcePersist.getName().equals(res.getName())
+                );
 
-        HeimdallException.checkThrow(noneMatch, GLOBAL_NOT_FOUND, "Resource");
+        HeimdallException.checkThrow(anyMatch, GLOBAL_ALREADY_REGISTERED, "Resource");
 
         GenericConverter.mapper(resourcePersist, resource);
 
@@ -167,6 +170,11 @@ public class ResourceService {
 
     public Resource update(Resource resource) {
         return this.update(resource.getApiId(), resource.getId(), resource);
+    }
+
+    public void updateOperations(Resource resource) {
+        final Resource res = this.find(resource.getApiId(), resource.getId());
+        GenericConverter.mapper(resource, res);
     }
 
     /**

@@ -177,7 +177,7 @@ public class OperationService {
 
         resource.addOperation(savedOperation.getId());
 
-        resourceService.update(resource);
+        resourceService.updateOperations(resource);
 
         redisRoutePublisher.dispatchRoutes();
 
