@@ -16,10 +16,6 @@ const getDevelopers = (params = { params: {} }) => {
 }
 
 const getDeveloper = (idDeveloper) => {
-    if (isNaN(idDeveloper)) {
-        return Promise.reject(new Error(i18n.t('invalid_parameter')))
-    }
-
     return HTTPv1.get('/developers/' + idDeveloper)
         .then(res => {
             return Promise.resolve(res.data)
