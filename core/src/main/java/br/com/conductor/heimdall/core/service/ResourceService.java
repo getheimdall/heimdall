@@ -157,9 +157,8 @@ public class ResourceService {
 
         final Resource resource = this.find(apiId, resourceId);
         final boolean anyMatch = this.list(apiId).stream()
-                .anyMatch(res ->
-                        resourcePersist.getName().equals(res.getName())
-                );
+                .filter(res -> !resourceId.equals(res.getId()))
+                .anyMatch(res -> resourcePersist.getName().equals(res.getName()));
 
         HeimdallException.checkThrow(anyMatch, GLOBAL_ALREADY_REGISTERED, "Resource");
 
@@ -170,11 +169,6 @@ public class ResourceService {
 
     public Resource update(Resource resource) {
         return this.update(resource.getApiId(), resource.getId(), resource);
-    }
-
-    public void updateOperations(Resource resource) {
-        final Resource res = this.find(resource.getApiId(), resource.getId());
-        GenericConverter.mapper(resource, res);
     }
 
     /**
