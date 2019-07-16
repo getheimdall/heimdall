@@ -180,7 +180,6 @@ export const TraceConstants = {
 }
 
 export const CacheConstants = {
-    CLEAR_CACHE: 'CLEAR_CACHE',
     CACHE_LOADING: 'CACHE_LOADING',
     CACHE_LOADING_FINISH: 'CACHE_LOADING_FINISH',
     CACHE_NOTIFICATION: 'CACHE_NOTIFICATION'
