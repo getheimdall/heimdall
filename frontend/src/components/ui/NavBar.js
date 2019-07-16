@@ -8,7 +8,6 @@ import languages from '../../constants/languages'
 import { logout, getUser } from '../../actions/auth'
 import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
 import {privileges} from "../../constants/privileges-types"
-import { clearCaches, initLoading } from '../../actions/cache'
 import { initLoading as initLoadingInterceptors, refreshInterceptors } from '../../actions/interceptors'
 
 const SubMenu = Menu.SubMenu
@@ -50,10 +49,6 @@ class NavBar extends Component {
                 this.props.history.push('/users/change-password')
                 break;
             case 'heimdall:2':
-                this.props.initLoading()
-                this.props.clearCaches()
-                break;
-            case 'heimdall:3':
                 this.props.initLoadingInterceptors()
                 this.props.refreshInterceptors()
                 break;
@@ -74,14 +69,11 @@ class NavBar extends Component {
                     <Menu id="top-bar-menu" mode="horizontal" theme="light" style={{ lineHeight: '62px' }} onClick={this.handleClick}>
                         <SubMenu title={<span><Icon type="info-circle-o" /></span>}>
                             <MenuItemGroup title={t('heimdall_project')}>
-                                {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_DELETE_CACHES]) &&
-                                <Menu.Item key="heimdall:2">{t('clear_cache')}</Menu.Item>
-                                }
                                 {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR]) &&
-                                <Menu.Item key="heimdall:3">{t('refresh_interceptors')}</Menu.Item>
+                                <Menu.Item key="heimdall:2">{t('refresh_interceptors')}</Menu.Item>
                                 }
                                 {/* <Menu.Item key="heimdall:2">About</Menu.Item> */}
-                                <Menu.Item key="heimdall:4">{t('license')}</Menu.Item>
+                                <Menu.Item key="heimdall:3">{t('license')}</Menu.Item>
                             </MenuItemGroup>
                             <MenuItemGroup title={t('developers')}>
                                 {/* <Menu.Item key="setting:3">API Reference</Menu.Item> */}
@@ -126,10 +118,8 @@ const mapDispatchToProps = (dispatch) => {
     return {
         logout: bindActionCreators(logout, dispatch),
         getUser: bindActionCreators(getUser, dispatch),
-        clearCaches: bindActionCreators(clearCaches, dispatch),
         refreshInterceptors: bindActionCreators(refreshInterceptors, dispatch),
         initLoadingInterceptors: bindActionCreators(initLoadingInterceptors, dispatch),
-        initLoading: bindActionCreators(initLoading, dispatch),
     }
 }
 
