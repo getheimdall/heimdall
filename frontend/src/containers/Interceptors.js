@@ -309,7 +309,7 @@ class Interceptors extends Component {
         let interceptorsPostFiltered
 
         if (this.props.interceptors) {
-            allInterceptors = interceptors.content
+            allInterceptors = interceptors
             allInterceptors = this.filterByLifeCycle(allInterceptors)
             if (this.state.planSelected || this.state.resourceSelected || this.state.operationSelected) {
                 allInterceptors = allInterceptors.concat(interceptors.content.filter(item => item.lifeCycle === 'API'))
@@ -377,7 +377,7 @@ class Interceptors extends Component {
                                 <Form.Item label={i18n.t('plans')}>
                                     <Select defaultValue={0} onChange={this.handleSelectChange('PLAN')} disabled={!this.props.plans} className="heimdall-select-filter-complete">
                                         <Option value={0}>{i18n.t('all')}</Option>
-                                        {this.props.plans && this.props.plans.content.map((plan, index) => (
+                                        {this.props.plans && this.props.plans.map((plan, index) => (
                                             <Option key={index} value={plan.id}>{plan.name}
                                                 <Badge title="Numbers of interceptors" className="heimdall-badge-interceptors-count" count={countInterceptorsByCycle(interceptors && interceptors.content, 'PLAN', plan.id)}/>
                                             </Option>

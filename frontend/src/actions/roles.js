@@ -12,7 +12,7 @@ export const finishLoading = () => dispatch => {
     dispatch({ type: RoleConstants.ROLE_LOADING_FINISH })
 }
 
-export const getAllRoles = (query = {offset: 0, limit: 10}) => dispatch => {
+export const getAllRoles = (query = {page: 0, limit: 10}) => dispatch => {
     const parameters = { params: query }
     roleService.getRoles(parameters)
         .then(data => {

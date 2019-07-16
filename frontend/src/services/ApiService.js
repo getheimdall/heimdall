@@ -17,59 +17,55 @@ const getApis = (params = {params: {}}) => {
 
 const getApiById = (id) => {
 
-    if (isNaN(id)) {
-        return Promise.reject(new Error(i18n.t('invalid_parameter')))
-    }
-
     return HTTPv1.get('/apis/' + id)
-    .then(res => {
+        .then(res => {
 
-        return Promise.resolve(res.data)
-    })
-    .catch(error => {
-        console.log('Error: ', error)
-        if (error.response && error.response.status === 404) {
-            return Promise.reject(new Error(i18n.t('resource_not_found')));
-        }
-        throw error;
-    })
+            return Promise.resolve(res.data)
+        })
+        .catch(error => {
+            console.log('Error: ', error)
+            if (error.response && error.response.status === 404) {
+                return Promise.reject(new Error(i18n.t('resource_not_found')));
+            }
+            throw error;
+        })
 }
 
 const updateApi = (api) => {
     // api = JSON.stringify(api)
     return HTTPv1.put('/apis/' + api.id, JSON.stringify(api))
-    .then(res => {
-        console.log(res)
-        // if (res.status >= 200 && res.status < 300) {
-        //     return Promise.reject(res.statusText)
-        // }
+        .then(res => {
+            console.log(res)
+            // if (res.status >= 200 && res.status < 300) {
+            //     return Promise.reject(res.statusText)
+            // }
 
-        return Promise.resolve(res.data)
-    })
-    .catch(error => {
-        console.log('Error: ', error)
-        if (error.response && error.response.status === 404) {
-            return Promise.reject(new Error(i18n.t('resource_not_found')));
-        }
-        throw error;
-    })
+            return Promise.resolve(res.data)
+        })
+        .catch(error => {
+            console.log('Error: ', error)
+            if (error.response && error.response.status === 404) {
+                return Promise.reject(new Error(i18n.t('resource_not_found')));
+            }
+            throw error;
+        })
 }
 
 const saveApi = (api) => {
-    
+
     api = JSON.stringify(api)
     return HTTPv1.post('/apis', api)
-    .then(res => {
+        .then(res => {
 
-        return Promise.resolve(res.data)
-    })
-    .catch(error => {
-        console.log('Error: ', error)
-        if (error.response && error.response.status === 404) {
-            return Promise.reject(new Error(i18n.t('resource_not_found')));
-        }
-        throw error;
-    })
+            return Promise.resolve(res.data)
+        })
+        .catch(error => {
+            console.log('Error: ', error)
+            if (error.response && error.response.status === 404) {
+                return Promise.reject(new Error(i18n.t('resource_not_found')));
+            }
+            throw error;
+        })
 }
 
 const deleteApi = id => {
@@ -78,17 +74,17 @@ const deleteApi = id => {
     }
 
     return HTTPv1.delete('/apis/' + id)
-    .then(res => {
+        .then(res => {
 
-        return Promise.resolve(res.data)
-    })
-    .catch(error => {
-        console.log('Error: ', error)
-        if (error.response && error.response.status === 404) {
-            return Promise.reject(new Error(i18n.t('resource_not_found')));
-        }
-        throw error;
-    })
+            return Promise.resolve(res.data)
+        })
+        .catch(error => {
+            console.log('Error: ', error)
+            if (error.response && error.response.status === 404) {
+                return Promise.reject(new Error(i18n.t('resource_not_found')));
+            }
+            throw error;
+        })
 }
 
 const getSwagger = apiId => {

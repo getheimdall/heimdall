@@ -97,9 +97,9 @@ class OperationForm extends Component {
 }
 
 OperationForm.propTypes = {
-    idApi: PropTypes.number.isRequired,
-    idResource: PropTypes.number.isRequired,
-    apiBasepath: PropTypes.number.isRequired
+    idApi: PropTypes.string.isRequired,
+    idResource: PropTypes.string.isRequired,
+    apiBasepath: PropTypes.string.isRequired
 }
 
 const mapStateToProps = state => {

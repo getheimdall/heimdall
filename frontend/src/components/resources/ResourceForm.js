@@ -81,7 +81,7 @@ class ResourceForm extends Component {
 }
 
 ResourceForm.propTypes = {
-    idApi: PropTypes.number.isRequired
+    idApi: PropTypes.string.isRequired
 }
 
 const mapStateToProps = state => {

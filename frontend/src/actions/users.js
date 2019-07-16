@@ -13,7 +13,7 @@ export const finishLoading = () => dispatch => {
     dispatch({ type: UserConstants.USER_LOADING_FINISH })
 }
 
-export const getAllUsers = (query = {offset: 0, limit: 10}) => dispatch => {
+export const getAllUsers = (query = {page: 0, limit: 10}) => dispatch => {
     const parameters = { params: query }
     userService.getUsers(parameters)
         .then(data => {

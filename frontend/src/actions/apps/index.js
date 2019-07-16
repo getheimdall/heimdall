@@ -13,7 +13,7 @@ export const finishLoading = () => dispatch => {
     dispatch({ type: AppConstants.APP_LOADING_FINISH })
 }
 
-export const getAllApps = (query = {offset: 0, limit: 10}) => dispatch => {
+export const getAllApps = (query = {page: 0, limit: 10}) => dispatch => {
     const parameters = { params: query }
     appService.getApps(parameters)
         .then(data => {

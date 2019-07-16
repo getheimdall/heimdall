@@ -11,7 +11,7 @@ export const finishLoading = () => dispatch => {
     dispatch({ type: AccessTokenConstants.ACCESS_TOKEN_LOADING_FINISH })
 }
 
-export const getAllAccessTokens = (query = {offset: 0, limit: 10}) => dispatch => {
+export const getAllAccessTokens = (query = {page: 0, limit: 10}) => dispatch => {
     const parameters = { params: query }
     accessTokenService.getAccessTokens(parameters)
         .then(data => {

@@ -26,7 +26,7 @@ class ApiDefinition extends Component {
             if (!err) {
                 if (payload.environments) {
                     let environments = payload.environments;
-                    payload.environments = environments.map((env) => ({id: env}))
+                    payload.environments = environments.map((env) => (env))
                 }
                 payload.status = payload.status ? 'ACTIVE' : 'INACTIVE'
 
@@ -142,7 +142,7 @@ class ApiDefinition extends Component {
                                     <FormItem label={i18n.t('environments')}>
                                         {
                                             getFieldDecorator('environments', {
-                                                initialValue: api.environments ? api.environments.map(env => env.id) : [],
+                                                initialValue: api.environments ? api.environments.map(env => env) : [],
                                                 rules: [{required: true, message: i18n.t('please_select_an_environment') }]
                                             })(<Checkbox.Group className='checkbox-conductor' options={options} disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_API])}/>)
                                         }
