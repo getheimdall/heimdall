@@ -27,7 +27,6 @@ export const TEMPLATES = (form, content, type) => ({
     LOG_MASKER: <LogMasker form={form} content={parseContentByType(content, type)}/>,
     OAUTH: <OAuth form={form} content={parseContentByType(content, type)}/>,
     IDENTIFIER: <Identifier form={form} content={parseContentByType(content, type)}/>,
-    MIDDLEWARE: <Default form={form} content={parseContentByType(content, type)}/>,
 })
 
 const parseContentByType = (content, type) => {
@@ -37,7 +36,6 @@ const parseContentByType = (content, type) => {
     }
 
     switch (type) {
-        case 'MIDDLEWARE':
         case 'CUSTOM':
             return content
         default:
@@ -55,7 +53,6 @@ export const CONTENTS = (content, type) => {
             return InterceptorContent.cacheContent(content)
         case 'LOG_MASKER':
             return InterceptorContent.logMaskerContent(content)
-        case 'MIDDLEWARE':
         case 'CUSTOM':
             return InterceptorContent.simpleContent(content)
         default:
