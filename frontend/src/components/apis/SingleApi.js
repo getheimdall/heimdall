@@ -8,7 +8,6 @@ import Loading from '../ui/Loading'
 import PageHeader from '../ui/PageHeader' // best way?
 import ApiDefinition from './ApiDefinition'
 import Resources from '../../containers/Resources'
-import Middlewares from '../../containers/Middlewares'
 import Interceptors from '../../containers/Interceptors'
 import Scopes from '../../containers/Scopes';
 import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
@@ -69,11 +68,6 @@ class SingleApi extends Component {
                             <TabPane tab={<div role="tab" className="ant-tabs-tab interceptors">{i18n.t('interceptors')}</div>}
                                      key="3">
                                 <Interceptors api={api}/>
-                            </TabPane>}
-                            {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_MIDDLEWARE]) &&
-                            <TabPane tab={<div role="tab" className="ant-tabs-tab middlewares">{i18n.t('middlewares')}</div>}
-                                     key="4">
-                                <Middlewares api={api}/>
                             </TabPane>}
                             {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_SCOPE]) &&
                             <TabPane tab={<div role="tab" className="ant-tabs-tab">{i18n.t('scopes')}</div>} key="5">

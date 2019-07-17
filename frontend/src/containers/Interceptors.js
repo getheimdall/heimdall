@@ -312,7 +312,7 @@ class Interceptors extends Component {
             allInterceptors = interceptors
             allInterceptors = this.filterByLifeCycle(allInterceptors)
             if (this.state.planSelected || this.state.resourceSelected || this.state.operationSelected) {
-                allInterceptors = allInterceptors.concat(interceptors.content.filter(item => item.lifeCycle === 'API'))
+                allInterceptors = allInterceptors.concat(interceptors.filter(item => item.lifeCycle === 'API'))
             }
 
             if (this.state.candidatesToSave.length > 0) {

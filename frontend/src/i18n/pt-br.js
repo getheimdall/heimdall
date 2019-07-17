@@ -35,7 +35,6 @@ export default {
         'no_data': 'Sem resultados',
         'add_new_access_token': 'Adicionar novo Token de Acesso',
         'heimdall_project': 'Projeto Heimdall',
-        'clear_cache': 'Limpar cache',
         'license': 'Licença',
         'developer_web_page': 'Página do desenvolvedor',
         'inbound_url': 'URL de entrada',

@@ -33,20 +33,20 @@ class Developers extends Component {
     handleDelete = (developerId) => {
         this.props.dispatch(initLoading())
         this.props.dispatch(clearDevelopers())
-        this.props.dispatch(remove(developerId, {offset: this.state.page, limit: this.state.pageSize}))
+        this.props.dispatch(remove(developerId, {page: this.state.page, limit: this.state.pageSize}))
     }
 
     handlePagination = (page, pageSize) => {
         this.setState({ ...this.state, page: page - 1, pageSize: pageSize })
         this.props.dispatch(initLoading())
-        this.props.dispatch(getAllDevelopers({offset: page - 1, limit: 10, ...this.state.searchQuery}))
+        this.props.dispatch(getAllDevelopers({page: page - 1, limit: 10, ...this.state.searchQuery}))
     }
 
     onSearchForm = () => {
         this.props.form.validateFieldsAndScroll((err, payload) => {
             if (!err) {
                 this.props.dispatch(initLoading())
-                this.props.dispatch(getAllDevelopers({ offset: 0, limit: 10, ...payload }))
+                this.props.dispatch(getAllDevelopers({ page: 0, limit: 10, ...payload }))
                 this.setState({ ...this.state, searchQuery: payload })
             }
         });
