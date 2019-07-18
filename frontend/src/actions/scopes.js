@@ -14,7 +14,7 @@ export const formLoading = (loading) => dispatch => {
     dispatch({ type: ScopeConstants.FORM_LOADING, loading: loading })
 }
 
-export const getScopes = (apiId, query = { offset: 0, limit: 10 }) => dispatch => {
+export const getScopes = (apiId, query = { page: 0, limit: 10 }) => dispatch => {
     const parameters = { params: query }
     scopeService.getScopes(parameters, apiId)
         .then(data => {

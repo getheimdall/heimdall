@@ -1,4 +1,3 @@
-import i18n from "../i18n/i18n"
 import { HTTPv1 } from '../utils/Http'
 
 const getPlans = (params = {params: {}}) => {
@@ -16,10 +15,6 @@ const getPlans = (params = {params: {}}) => {
 }
 
 const getPlan = (planId) => {
-    if (isNaN(planId)) {
-        return Promise.reject(new Error(i18n.t('invalid_parameter')))
-    }
-
     return HTTPv1.get('/plans/' + planId)
         .then(res => {
             return Promise.resolve(res.data)
@@ -34,6 +29,9 @@ const getPlan = (planId) => {
 }
 
 const save = (plan) => {
+    plan.apiId = plan.api;
+    delete plan.api;
+    console.log(plan)
     return HTTPv1.post('/plans', JSON.stringify(plan))
         .then(res => Promise.resolve(res.data))
         .catch(error => {

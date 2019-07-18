@@ -41,14 +41,14 @@ class Plans extends Component {
     handlePagination = (page, pageSize) => {
         this.setState({ ...this.state, page: page - 1, pageSize: pageSize })
         this.props.dispatch(initLoading())
-        this.props.dispatch(getAllPlans({ offset: page - 1, limit: 10, ...this.state.searchQuery }))
+        this.props.dispatch(getAllPlans({ page: page - 1, limit: 10, ...this.state.searchQuery }))
     }
 
     onSearchForm = () => {
         this.props.form.validateFieldsAndScroll((err, payload) => {
             if (!err) {
                 this.props.dispatch(initLoading())
-                this.props.dispatch(getAllPlans({ offset: 0, limit: 10, ...payload }))
+                this.props.dispatch(getAllPlans({ page: 0, limit: 10, ...payload }))
                 this.setState({ ...this.state, searchQuery: payload })
             }
         });

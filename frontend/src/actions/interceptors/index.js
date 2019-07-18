@@ -13,7 +13,7 @@ export const finishLoading = () => dispatch => {
     dispatch({ type: InterceptorConstants.INTERCEPTOR_LOADING_FINISH })
 }
 
-export const getAllInterceptors = (query = { offset: 0, limit: 10 }) => dispatch => {
+export const getAllInterceptors = (query = { page: 0, limit: 10 }) => dispatch => {
     const parameters = { params: query }
     interceptorService.getInterceptors(parameters)
         .then(data => {
