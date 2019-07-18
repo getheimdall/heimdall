@@ -11,7 +11,7 @@ import Loading from '../components/ui/Loading'
 import { isEmpty } from '../utils/CommonUtils'
 import PlanForm from '../components/plans/PlanForm'
 import PageHeader from '../components/ui/PageHeader'
-import { apiSource, getApiSourceByName, clearApiSource, fetchingApi } from '../actions/apis'
+import {apiSource, getApiSourceByName, clearApiSource, fetchingApi, getApiById} from '../actions/apis'
 import { getPlan, initLoading, clearPlan, clearPlans, update, save, remove } from '../actions/plans'
 
 class SinglePlan extends Component {
@@ -27,13 +27,17 @@ class SinglePlan extends Component {
     }
 
     componentWillReceiveProps(newProps) {
+        if(newProps.plan && newProps.plan.apiId && newProps.plan !== this.props.plan) {
+            this.props.dispatch(getApiById(newProps.plan.apiId))
+        }
+
         if (newProps.notification && newProps.notification !== this.props.notification) {
             const { type, message, description } = newProps.notification
             notification[type]({ message, description })
         }
 
-        if (newProps.plan && newProps.plan !== this.props.plan) {
-            this.props.dispatch(apiSource([newProps.plan.api]))
+        if(newProps.api && newProps.api !== this.props.api) {
+            this.props.dispatch(apiSource([newProps.api]))
         }
     }
 
@@ -77,6 +81,7 @@ class SinglePlan extends Component {
         if (this.state.loadEntity && !plan) return <Loading />
         const title = plan ? i18n.t('edit') : i18n.t('add')
         const { apiSource } = this.props
+        const { api } = this.props
 
         return (
             <div>
@@ -84,12 +89,13 @@ class SinglePlan extends Component {
                 <Row className="h-row bg-white">
                     <Card style={{ width: '100%' }} title={title + ' ' + i18n.t('plan')}>
                         <PlanForm plan={plan}
-                            handleDelete={this.handleDelete}
-                            handleSubmit={this.handleSubmit}
-                            handleSearch={this.handleSearch}
-                            loading={this.props.loading}
-                            apiSource={apiSource}
-                            fetching={this.props.fetching} />
+                                  api={api}
+                                  handleDelete={this.handleDelete}
+                                  handleSubmit={this.handleSubmit}
+                                  handleSearch={this.handleSearch}
+                                  loading={this.props.loading}
+                                  apiSource={apiSource}
+                                  fetching={this.props.fetching}/>
                     </Card>
                 </Row>
             </div>
@@ -102,6 +108,7 @@ const mapStateToProps = state => {
         plan: state.plans.plan,
         loading: state.plans.loading,
         apiSource: state.apis.apiSource,
+        api: state.apis.api,
         fetching: state.apis.fetching,
         notification: state.plans.notification
     }

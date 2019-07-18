@@ -26,7 +26,7 @@ class SingleAccessToken extends Component {
             this.props.dispatch(getAccessToken(idAccessToken))
             this.setState({ ...this.state, loadEntity: true })
         }
-        this.props.dispatch(getAllPlans({offset: 0, limit: 50}))
+        this.props.dispatch(getAllPlans({page: 0, limit: 50}))
     }
 
     componentWillReceiveProps(newProps) {

@@ -69,10 +69,6 @@ const saveApi = (api) => {
 }
 
 const deleteApi = id => {
-    if (isNaN(id)) {
-        return Promise.reject(new Error(i18n.t('invalid_parameter')))
-    }
-
     return HTTPv1.delete('/apis/' + id)
         .then(res => {
 

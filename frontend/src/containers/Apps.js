@@ -32,20 +32,20 @@ class Apps extends Component {
 
     handleDelete = (appId) => {
         this.props.dispatch(initLoading())
-        this.props.dispatch(remove(appId, { offset: this.state.page, limit: this.state.pageSize }))
+        this.props.dispatch(remove(appId, { page: this.state.page, limit: this.state.pageSize }))
     }
 
     handlePagination = (page, pageSize) => {
         this.setState({ ...this.state, page: page - 1, pageSize: pageSize })
         this.props.dispatch(initLoading())
-        this.props.dispatch(getAllApps({ offset: page - 1, limit: 10, ...this.state.searchQuery }))
+        this.props.dispatch(getAllApps({ page: page - 1, limit: 10, ...this.state.searchQuery }))
     }
 
     onSearchForm = () => {
         this.props.form.validateFieldsAndScroll((err, payload) => {
             if (!err) {
                 this.props.dispatch(initLoading())
-                this.props.dispatch(getAllApps({ offset: 0, limit: 10, ...payload }))
+                this.props.dispatch(getAllApps({ page: 0, limit: 10, ...payload }))
                 this.setState({ ...this.state, searchQuery: payload })
             }
         });

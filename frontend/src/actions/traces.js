@@ -9,7 +9,7 @@ export const finishLoading = () => dispatch => {
     dispatch({type: TraceConstants.TRACE_LOADING_FINISH})
 }
 
-export const getAllTraces = (query = {offset: 0, limit: 10}) => dispatch => {
+export const getAllTraces = (query = {page: 0, limit: 10}) => dispatch => {
     const parameters = {params: query}
     traceService.getTraces(parameters)
         .then(data => {

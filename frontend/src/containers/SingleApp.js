@@ -14,7 +14,13 @@ import AppForm from '../components/apps/AppForm'
 import PageHeader from '../components/ui/PageHeader'
 import {getAllPlans, clearPlans} from '../actions/plans'
 import {getApp, initLoading, clearApp, clearApps, update, save, remove} from '../actions/apps'
-import {developerSource, getDeveloperSourceByEmail, clearDeveloperSource, fetchingDeveloper} from '../actions/developers'
+import {
+    developerSource,
+    getDeveloperSourceByEmail,
+    clearDeveloperSource,
+    fetchingDeveloper,
+    getDeveloper
+} from '../actions/developers'
 
 
 class SingleApp extends Component {
@@ -27,12 +33,16 @@ class SingleApp extends Component {
             this.props.dispatch(getApp(idApp))
             this.setState({...this.state, loadEntity: true})
         }
-        this.props.dispatch(getAllPlans({offset: 0, limit: 50}))
+        this.props.dispatch(getAllPlans({page: 0, limit: 50}))
     }
 
     componentWillReceiveProps(newProps) {
-        if (newProps.app && newProps.app !== this.props.app) {
-            this.props.dispatch(developerSource([newProps.app.developer]))
+        if(newProps.app && newProps.app.developerId && newProps.app !== this.props.app) {
+            this.props.dispatch(getDeveloper(newProps.app.developerId))
+        }
+
+        if (newProps.developer && newProps.developer !== this.props.developer) {
+            this.props.dispatch(developerSource([newProps.developer]))
         }
     }
 
@@ -73,6 +83,7 @@ class SingleApp extends Component {
 
     render() {
         const {app} = this.props
+        const {developer} = this.props
 
         if (this.state.loadEntity && !app) return <Loading/>
         const title = app ? i18n.t('edit') : i18n.t('add')
@@ -90,6 +101,7 @@ class SingleApp extends Component {
                                  handleSearch={this.handleSearch}
                                  loading={this.props.loading}
                                  developerSource={developerSource}
+                                 developer={developer}
                                  fetching={this.props.fetching}/>
                     </Card>
                 </Row>
@@ -103,6 +115,7 @@ const mapStateToProps = state => {
         app: state.apps.app,
         loading: state.apps.loading,
         developerSource: state.developers.developerSource,
+        developer: state.developers.developer,
         fetching: state.developers.fetching,
         plans: state.plans.plans
     }

@@ -33,7 +33,7 @@ class ListPlans extends Component {
                     <Column title={i18n.t('id')} dataIndex="id" id="id" />
                     <Column title={i18n.t('name')} dataIndex="name" id="name" />
                     <Column title={i18n.t('description')} dataIndex="description" id="description" />
-                    <Column title={i18n.t('api')} dataIndex="api.name" id="apiName" />
+                    <Column title={i18n.t('api')} dataIndex="apiId" id="apiName" />
                     <Column title={i18n.t('status')} id="status" key="status" render={(record) => (
                         <span style={{textTransform: 'uppercase'}}>
                             {record.status === 'ACTIVE' && <Tag color="green">{i18n.t('active')}</Tag>}

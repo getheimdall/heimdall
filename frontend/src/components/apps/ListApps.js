@@ -34,7 +34,7 @@ class ListApps extends Component {
                     <Column title={i18n.t('name')} dataIndex="name" id="name" />
                     <Column title={i18n.t('description')} dataIndex="description" id="name" />
                     <Column title={i18n.t('client_id')} dataIndex="clientId" id="clientId" width={150} />
-                    <Column title={i18n.t('developer')} dataIndex="developer.name" id="developer" />
+                    <Column title={i18n.t('developer')} dataIndex="developerId" id="developer" />
                     <Column title={i18n.t('status')} id="status" key="status" render={(record) => (
                         <span style={{textTransform: 'uppercase'}}>
                             {record.status === 'ACTIVE' && <Tag color="green">{i18n.t('active')}</Tag>}

@@ -19,10 +19,10 @@ class AppForm extends Component {
         this.props.form.validateFieldsAndScroll((err, payload) => {
             if (!err) {
                 payload.status = payload.status ? 'ACTIVE' : 'INACTIVE'
-                payload.developer.id = Number(payload.developer.id)
+                payload.developer = payload.developer.id
                 if (payload.plans) {
                     const plans = payload.plans;
-                    payload.plans = plans.map((planId) => ({id: planId}))
+                    payload.plans = plans.map((planId) => (planId))
                 }
 
                 this.props.handleSubmit(payload)
@@ -65,6 +65,7 @@ class AppForm extends Component {
         const {app} = this.props
         const {loading} = this.props
         const {developerSource} = this.props
+        const {developer} = this.props
         const {fetching} = this.props
         const childrenAutoComplete = developerSource.map((dev, index) => {
             return <Option key={dev.id}>{dev.email}</Option>
@@ -129,13 +130,12 @@ class AppForm extends Component {
                             <FormItem label={i18n.t('developer')}>
                                 {
                                     getFieldDecorator('developer.id', {
-                                        initialValue: app && app.developer.id.toString(),
+                                        initialValue: app && developer && developer.email.toString(),
                                         validateTrigger: 'onSelect',
                                         rules: [
                                             {required: true, message: i18n.t('please_input_email_developer')},
                                             {
                                                 validator: this.checkDeveloper,
-                                                transform: (value) => Number(value),
                                                 required: true
                                             }
                                         ]
@@ -166,7 +166,7 @@ class AppForm extends Component {
                                 <FormItem label={i18n.t('plans')}>
                                     {
                                         getFieldDecorator('plans', {
-                                            initialValue: app && app.plans.map(plan => plan.id),
+                                            initialValue: app && app.plans.map(plan => plan),
                                             rules: [
                                                 {required: true, message: i18n.t('please_pick_plan')}
                                             ]

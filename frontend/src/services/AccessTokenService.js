@@ -1,4 +1,3 @@
-import i18n from '../i18n/i18n'
 import { HTTPv1 } from '../utils/Http'
 
 const getAccessTokens = (params = {params: {}}) => {
@@ -16,10 +15,6 @@ const getAccessTokens = (params = {params: {}}) => {
 }
 
 const getAccessToken = (accessTokenId) => {
-    if (isNaN(accessTokenId)) {
-        return Promise.reject(new Error(i18n.t('invalid_parameter')))
-    }
-
     return HTTPv1.get('/access_tokens/' + accessTokenId)
         .then(res => {
             return Promise.resolve(res.data)

@@ -7,6 +7,7 @@ import ComponentAuthority from "../policy/ComponentAuthority"
 import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
 import {privileges} from "../../constants/privileges-types"
 import {scopeService} from "../../services"
+import Loading from "../../containers/SingleApp";
 
 const FormItem = Form.Item
 const confirm = Modal.confirm
@@ -75,7 +76,7 @@ class PlanForm extends Component {
         this.props.form.validateFieldsAndScroll((err, payload) => {
             if (!err) {
                 payload.status = payload.status ? 'ACTIVE' : 'INACTIVE'
-                payload.api.id = Number(payload.api.id)
+                payload.api = payload.api.id
                 payload.scopes = this.state.transferSelected.map(p => {
                     return { id: p }
                 })
@@ -112,6 +113,7 @@ class PlanForm extends Component {
     render() {
         const { getFieldDecorator } = this.props.form
 
+        const {api} = this.props
         const { plan } = this.props
         const { loading } = this.props
         const { apiSource } = this.props
@@ -156,10 +158,10 @@ class PlanForm extends Component {
                             <FormItem label={i18n.t('api')}>
                                 {
                                     getFieldDecorator('api.id', {
-                                        initialValue: plan && plan.api.id.toString(),
+                                        initialValue: plan && api && api.name.toString(),
                                         validateTrigger: 'onSelect',
                                         rules: [
-                                            { validator: this.checkApi, transform: (value) => Number(value), required: true }
+                                            { validator: this.checkApi, required: true }
                                         ]
                                     })(
                                         <AutoComplete
