@@ -30,11 +30,9 @@ class ListApps extends Component {
         return (
             <div>
                 <Table dataSource={dataSource.content} rowKey={record => record.id} loading={loading} scroll={{x: 990}} pagination={false}>
-                    <Column title={i18n.t('id')} dataIndex="id" id="id" width={90} />
                     <Column title={i18n.t('name')} dataIndex="name" id="name" />
                     <Column title={i18n.t('description')} dataIndex="description" id="name" />
                     <Column title={i18n.t('client_id')} dataIndex="clientId" id="clientId" width={150} />
-                    <Column title={i18n.t('developer')} dataIndex="developerId" id="developer" />
                     <Column title={i18n.t('status')} id="status" key="status" render={(record) => (
                         <span style={{textTransform: 'uppercase'}}>
                             {record.status === 'ACTIVE' && <Tag color="green">{i18n.t('active')}</Tag>}
