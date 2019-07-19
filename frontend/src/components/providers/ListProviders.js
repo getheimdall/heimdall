@@ -30,7 +30,6 @@ class ListProviders extends React.Component {
         return (
             <div>
                 <Table dataSource={dataSource.content} rowKey={record => record.id} scroll={{x:694}} loading={loading} pagination={false}>
-                    <Column title={i18n.t('id')} dataIndex="id" id="id" />
                     <Column title={i18n.t('name')} dataIndex="name" id="name" />
                     <Column title={i18n.t('description')} dataIndex="description" id="description" />
                     <Column title={i18n.t('path')} dataIndex="path" id="path" />

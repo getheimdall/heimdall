@@ -27,10 +27,10 @@ class AccessTokenForm extends Component {
         this.props.form.validateFieldsAndScroll((err, payload) => {
             if (!err) {
                 payload.status = payload.status ? 'ACTIVE' : 'INACTIVE'
-                payload.app.id = Number(payload.app.id)
+                payload.app = payload.app.id
                 if (payload.plans) {
                     const plans = payload.plans;
-                    payload.plans = plans.map((planId) => ({id: planId}))
+                    payload.plans = plans.map((planId) => (planId))
                 }
                 this.props.handleSubmit(payload)
             }
@@ -73,7 +73,7 @@ class AccessTokenForm extends Component {
     render() {
         const {getFieldDecorator} = this.props.form
 
-        const {accessToken, loading, appSource, fetching} = this.props
+        const {accessToken, loading, appSource, fetching, app} = this.props
         const {plans} = this.state
 
         const appAutocompleteSource = appSource.map((app, index) => {
@@ -104,12 +104,11 @@ class AccessTokenForm extends Component {
                             <FormItem label={i18n.t('app')}>
                                 {
                                     getFieldDecorator('app.id', {
-                                        initialValue: accessToken && accessToken.app.id.toString(),
+                                        initialValue: accessToken && app && accessToken.app.toString(),
                                         validateTrigger: 'onSelect',
                                         rules: [
                                             {
                                                 validator: this.checkApp,
-                                                transform: (value) => Number(value),
                                                 required: true
                                             }
                                         ]
@@ -143,12 +142,12 @@ class AccessTokenForm extends Component {
                             <FormItem label={i18n.t('plans')}>
                                 {
                                     getFieldDecorator('plans', {
-                                        initialValue: accessToken && accessToken.plans.map(plan => plan.id),
+                                        initialValue: accessToken && accessToken.plans.map(plan => plan),
                                         rules: [
                                             {required: true, message: i18n.t('please_pick_plan')}
                                         ]
                                     })(<Checkbox.Group className='checkbox-conductor'>
-                                        {plans && plans.map((plan, index) => {
+                                        {this.props.plans && this.props.plans.content.map((plan, index) => {
                                             return <Checkbox key={index} value={plan.id}
                                                              disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_ACCESSTOKEN, privileges.PRIVILEGE_UPDATE_ACCESSTOKEN])}>{plan.name}</Checkbox>
                                         })}

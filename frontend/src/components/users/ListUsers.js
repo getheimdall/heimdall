@@ -29,7 +29,6 @@ class ListUsers extends Component {
         return (
             <div>
                 <Table dataSource={dataSource.content} rowKey={record => record.id} scroll={{x: 626}} loading={loading} pagination={false}>
-                    <Column title={i18n.t('id')} dataIndex="id" id="id" />
                     <Column title={i18n.t('username')} dataIndex="userName" id="name" />
                     <Column title={i18n.t('email')} dataIndex="email" id="email" />
                     <Column title={i18n.t('status')} id="status" key="status" render={(record) => (

@@ -15,6 +15,7 @@
  */
 package br.com.conductor.heimdall.core.service;
 
+import br.com.conductor.heimdall.core.converter.GenericConverter;
 import br.com.conductor.heimdall.core.dto.AccessTokenDTO;
 import br.com.conductor.heimdall.core.entity.AccessToken;
 import br.com.conductor.heimdall.core.entity.App;
@@ -150,6 +151,8 @@ public class AccessTokenService {
 
         App app = appService.find(accessTokenPersist.getApp());
         HeimdallException.checkThrow(!app.getPlans().containsAll(accessTokenPersist.getPlans()), SOME_PLAN_NOT_PRESENT_IN_APP);
+
+        GenericConverter.mapper(accessTokenPersist, accessToken);
 
         accessToken = accessTokenRepository.save(accessToken);
 

@@ -14,6 +14,7 @@ import RouteButton from '../components/ui/RouteButton'
 import { privileges } from "../constants/privileges-types"
 import ComponentAuthority from "../components/policy/ComponentAuthority"
 import ListAccessTokens from '../components/access-tokens/ListAccessTokens'
+import {getAllApps} from "../actions/apps";
 
 class AccessTokens extends Component {
 
@@ -22,6 +23,7 @@ class AccessTokens extends Component {
     componentDidMount() {
         this.props.dispatch(initLoading())
         this.props.dispatch(getAllAccessTokens())
+        this.props.dispatch(getAllApps())
     }
 
     componentWillReceiveProps(newProps) {
@@ -39,14 +41,14 @@ class AccessTokens extends Component {
     handlePagination = (page, pageSize) => {
         this.setState({...this.state, page: page - 1, pageSize: pageSize})
         this.props.dispatch(initLoading())
-        this.props.dispatch(getAllAccessTokens({offset: page - 1, limit: 10, ...this.state.searchQuery}))
+        this.props.dispatch(getAllAccessTokens({page: page - 1, limit: 10, ...this.state.searchQuery}))
     }
 
     onSearchForm = () => {
         this.props.form.validateFieldsAndScroll((err, payload) => {
             if (!err) {
                 this.props.dispatch(initLoading())
-                this.props.dispatch(getAllAccessTokens({offset: 0, limit: 10, ...payload}))
+                this.props.dispatch(getAllAccessTokens({page: 0, limit: 10, ...payload}))
                 this.setState({...this.state, searchQuery: payload})
             }
         });
@@ -54,7 +56,7 @@ class AccessTokens extends Component {
 
     render() {
         const {getFieldDecorator} = this.props.form
-        const {accessTokens, loading, history} = this.props
+        const {accessTokens, loading, history, apps} = this.props
 
         if (!accessTokens) return <Loading/>
 
@@ -76,7 +78,7 @@ class AccessTokens extends Component {
                     </Card>
                 </Row>
                 <Row className="h-row bg-white">
-                    <ListAccessTokens dataSource={accessTokens} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading}/>
+                    <ListAccessTokens dataSource={accessTokens} apps={apps} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading}/>
                     <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_ACCESSTOKEN]}>
                         <RouteButton idButton="addAccessToken" history={history} to="/tokens/new" label={i18n.t('add_new_access_token')} />
                     </ComponentAuthority>
@@ -89,6 +91,7 @@ class AccessTokens extends Component {
 const mapStateToProps = state => {
     return {
         accessTokens: state.accessTokens.accessTokens,
+        apps: state.apps.apps,
         loading: state.accessTokens.loading,
         notification: state.accessTokens.notification
     }

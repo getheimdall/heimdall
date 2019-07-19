@@ -27,11 +27,12 @@ class ListAccessTokens extends Component {
     render() {
         const {dataSource} = this.props
         const {loading} = this.props
+        const {apps} = this.props
+
         return (
             <div>
                 <Table dataSource={dataSource.content} rowKey={record => record.id} scroll={{x: 1155}} loading={loading}
                        pagination={false}>
-                    <Column title={i18n.t('id')} dataIndex="id" id="id" width={200}/>
                     <Column title="Status" id="status" key="status" width={200} render={(record) => (
                         <span>
                             {record.status === 'ACTIVE' && <Tag color="green">{i18n.t('active')}</Tag>}
@@ -39,7 +40,12 @@ class ListAccessTokens extends Component {
                         </span>
                     )}/>
                     <Column title={i18n.t('token')} dataIndex="code" id="code" width={400}/>
-                    <Column title={i18n.t('app')} dataIndex="app.name" id="name"/>
+                    <Column title={i18n.t('app')} dataIndex="app" id="name"
+                            render={(text) => (
+                                apps && apps.content
+                                    .filter(app => app.id === text)
+                                    .map(app => <span key={app.id}>{app.name}</span>)
+                            )}/>
                     <Column
                         id="action"
                         key="action"
