@@ -29,7 +29,6 @@ class ListRoles extends Component {
         return (
             <div>
                 <Table dataSource={dataSource.content} rowKey={record => record.id} loading={loading} pagination={false}>
-                    <Column title={i18n.t('id')} dataIndex="id" id="id" width={100}/>
                     <Column title={i18n.t('name')} dataIndex="name" id="name"/>
                     <Column
                         id="action"

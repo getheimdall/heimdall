@@ -73,7 +73,7 @@ export const update = accessToken => dispatch => {
 export const remove = (accessTokenId, offset) => dispatch => {
     accessTokenService.remove(accessTokenId)
         .then(data => {
-            dispatch(getAllAccessTokens({offset: offset, limit: 10}))
+            dispatch(getAllAccessTokens({page: offset, limit: 10}))
             dispatch(sendNotification({ type: 'success', message: i18n.t('access_token_removed') }))
         })
         .catch(error => {

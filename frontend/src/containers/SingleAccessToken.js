@@ -12,7 +12,7 @@ import Loading from '../components/ui/Loading'
 import PageHeader from '../components/ui/PageHeader'
 import { getAllPlans, clearPlans } from '../actions/plans'
 import AccessTokenForm from '../components/access-tokens/AccessTokenForm'
-import { appSource, getAppSourceByName, clearAppSource, fetchingApp } from '../actions/apps'
+import {appSource, getAppSourceByName, clearAppSource, fetchingApp, getApp} from '../actions/apps'
 import { getAccessToken, initLoading, clearAccessToken, clearAccessTokens, update, save, remove } from '../actions/access-tokens'
 
 
@@ -30,8 +30,12 @@ class SingleAccessToken extends Component {
     }
 
     componentWillReceiveProps(newProps) {
-        if (newProps.accessToken && newProps.accessToken !== this.props.accessToken) {
-            this.props.dispatch(appSource([newProps.accessToken.app]))
+        if(newProps.accessToken && newProps.accessToken.app && newProps.accessToken !== this.props.accessToken) {
+            this.props.dispatch(getApp(newProps.accessToken.app))
+        }
+
+        if (newProps.app && newProps.app !== this.props.app) {
+            this.props.dispatch(appSource([newProps.app]))
         }
 
         if (newProps.notification && newProps.notification !== this.props.notification) {
@@ -76,7 +80,7 @@ class SingleAccessToken extends Component {
     }
 
     render() {
-        const { accessToken } = this.props
+        const { accessToken, app } = this.props
 
         if (this.state.loadEntity && !accessToken) return <Loading />
         const title = accessToken ? i18n.t('edit') : i18n.t('add')
@@ -88,13 +92,14 @@ class SingleAccessToken extends Component {
                 <Row className="h-row bg-white">
                     <Card style={{ width: '100%' }} title={title + ' ' + i18n.t('access_token')}>
                         <AccessTokenForm accessToken={accessToken}
-                            plans={this.props.plans}
-                            handleDelete={this.handleDelete}
-                            handleSubmit={this.handleSubmit}
-                            handleSearch={this.handleSearch}
-                            loading={this.props.loading}
-                            appSource={appSource}
-                            fetching={this.props.fetching} />
+                                         app={app}
+                                         plans={this.props.plans}
+                                         handleDelete={this.handleDelete}
+                                         handleSubmit={this.handleSubmit}
+                                         handleSearch={this.handleSearch}
+                                         loading={this.props.loading}
+                                         appSource={appSource}
+                                         fetching={this.props.fetching}/>
                     </Card>
                 </Row>
             </div>
@@ -107,6 +112,7 @@ const mapStateToProps = state => {
         accessToken: state.accessTokens.accessToken,
         loading: state.accessTokens.loading,
         appSource: state.apps.appSource,
+        app: state.apps.app,
         fetching: state.apps.fetching,
         plans: state.plans.plans,
         notification: state.accessTokens.notification

@@ -30,7 +30,6 @@ class ListDevelopers extends Component {
         return (    
             <div>
                 <Table dataSource={dataSource.content} rowKey={record => record.id} scroll={{x: 672}} loading={loading} pagination={false}>
-                    <Column title={i18n.t('id')} dataIndex="id" id="id" />
                     <Column title={i18n.t('name')} dataIndex="name" id="name" />
                     <Column title={i18n.t('email')} dataIndex="email" id="email" />
                     <Column title={i18n.t('status')} id="status" key="status" render={(record) => (
