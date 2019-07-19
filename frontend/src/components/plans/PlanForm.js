@@ -7,7 +7,6 @@ import ComponentAuthority from "../policy/ComponentAuthority"
 import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
 import {privileges} from "../../constants/privileges-types"
 import {scopeService} from "../../services"
-import Loading from "../../containers/SingleApp";
 
 const FormItem = Form.Item
 const confirm = Modal.confirm
