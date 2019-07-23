@@ -23,7 +23,7 @@ class AccessTokens extends Component {
     componentDidMount() {
         this.props.dispatch(initLoading())
         this.props.dispatch(getAllAccessTokens())
-        this.props.dispatch(getAllApps())
+        this.props.dispatch(getAllApps({page: 0, limit: 100000}))
     }
 
     componentWillReceiveProps(newProps) {
