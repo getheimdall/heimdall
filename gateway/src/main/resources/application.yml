@@ -48,7 +48,11 @@ spring:
   redis:
     host: 127.0.0.1
     port: 6379
-
+    jedis:
+      pool:
+        min-idle: 10
+        max-active: 512
+        max-idle: 128
   pid:
     fail-on-write-error: false
     file: heimdall.pid
