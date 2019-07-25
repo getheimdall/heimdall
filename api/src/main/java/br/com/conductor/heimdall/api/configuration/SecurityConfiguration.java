@@ -65,7 +65,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests().antMatchers("/error").permitAll()
                 .and()
                 .authorizeRequests().antMatchers("/v1/api/integrations/**").permitAll()
-                .antMatchers("/v1/index.html", "/v1/swagger**", "/docs", "/v1/favicon**").permitAll()
+                .antMatchers("/v1/index.html", "/v1/swagger**", "/docs", "/v1/favicon**", "/manager/info").permitAll()
                 .antMatchers(HttpMethod.POST, ConstantsPath.PATH_LOGIN).permitAll()
                 .anyRequest().authenticated()
                 .and()
