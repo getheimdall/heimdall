@@ -11,6 +11,7 @@ import Loading from '../components/ui/Loading'
 import {PrivilegeUtils} from "../utils/PrivilegeUtils"
 import {privileges} from "../constants/privileges-types"
 import { getAllPlans, clearPlans } from '../actions/plans'
+import {getAllEnvironments, clearEnvironments } from "../actions/environments";
 import { interceptorSort } from '../utils/InterceptorUtils'
 import { receiveQueue, clearQueue } from '../actions/queues'
 import {countInterceptorsByCycle} from "../utils/BadgeUtils"
@@ -96,6 +97,7 @@ class Interceptors extends Component {
         this.props.dispatch(getAllInterceptors(query))
         this.props.dispatch(getAllInterceptorsTypes())
         this.props.dispatch(getAllPlans(query))
+        this.props.dispatch(getAllEnvironments())
         this.props.dispatch(getAllResourcesByApi(id))
     }
 
@@ -103,6 +105,7 @@ class Interceptors extends Component {
         this.props.dispatch(clearInterceptors())
         this.props.dispatch(clearInterceptorsTypes())
         this.props.dispatch(clearPlans())
+        this.props.dispatch(clearEnvironments())
         this.props.dispatch(clearResources())
     }
 
@@ -137,11 +140,13 @@ class Interceptors extends Component {
 
             this.props.dispatch(clearInterceptors())
             this.props.dispatch(clearPlans())
+            this.props.dispatch(clearEnvironments())
             this.props.dispatch(clearResources())
 
             const query = {'api.id': this.props.api.id, offset: 0}
             this.props.dispatch(getAllInterceptors(query))
             this.props.dispatch(getAllPlans(query))
+            this.props.dispatch(getAllEnvironments())
             this.props.dispatch(getAllResourcesByApi(this.props.api.id))
         }
     }
@@ -367,9 +372,10 @@ class Interceptors extends Component {
                                 <Form.Item label={i18n.t('environments')}>
                                     <Select defaultValue={0} onChange={this.handleSelectChange('ENV')}>
                                         <Option value={0}>{i18n.t('all')}</Option>
-                                        {api && api.environments.map((env, index) => (
-                                            <Option key={index} value={env.id}>{env.name}</Option>
-                                        ))}
+                                        {api && api.environments && this.props.environments && this.props.environments
+                                            .filter((env, index) => api.environments.includes(env.id))
+                                            .map((env, index) => {
+                                                return <Option key={index} value={env.id}>{env.name}</Option>})}
                                     </Select>
                                 </Form.Item>
                             </Col>
@@ -487,6 +493,7 @@ const mapStateToProps = state => {
         loading: state.interceptors.loading,
         interceptorTypes: state.interceptors.interceptorTypes,
         plans: state.plans.plans,
+        environments: state.environments.environments,
         resources: state.resources.resources,
         operations: state.operations.operations,
         notification: state.interceptors.notification,

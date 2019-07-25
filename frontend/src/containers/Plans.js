@@ -80,7 +80,7 @@ class Plans extends Component {
                 </Row>
 
                 <Row className="h-row bg-white">
-                    <ListPlans dataSource={plans} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading} />
+                    {plans && plans.content &&  <ListPlans dataSource={plans} handleDelete={this.handleDelete} handlePagination={this.handlePagination} loading={loading} />}
                     <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_PLAN]}>
                         <RouteButton idButton="addPlan" history={history} to="/plans/new" label={i18n.t('add_new_plan')} />
                     </ComponentAuthority>
