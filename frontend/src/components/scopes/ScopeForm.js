@@ -80,7 +80,7 @@ class ScopeForm extends Component {
         this.props.form.validateFieldsAndScroll((err, payload) => {
             if (!err) {
                 payload.operations = this.state.transferSelected.map(p => {
-                    return { id: p }
+                    return p
                 })
 
                 this.props.onSubmit(payload)
@@ -149,7 +149,7 @@ class ScopeForm extends Component {
 }
 
 ScopeForm.propTypes = {
-    idApi: PropTypes.number.isRequired,
+    idApi: PropTypes.string.isRequired,
     operations: PropTypes.array
 }
 
