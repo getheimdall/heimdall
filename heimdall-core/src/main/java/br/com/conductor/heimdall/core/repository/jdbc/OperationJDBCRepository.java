@@ -77,17 +77,18 @@ public class OperationJDBCRepository {
 		return jdbcTemplate.queryForList(sql.toString(), new Object[] { interceptorId }, Long.class);
 	}
   
-  public boolean patternExists(String pattern) {
+  public boolean patternExists(String pattern, Long apiId) {
 
-		StringBuilder sql = new StringBuilder(180);
+		StringBuilder sql = new StringBuilder(300);
 		sql.append("SELECT ");
 		sql.append("count(*) ");
 		sql.append("FROM OPERATIONS OP ");
 		sql.append("INNER JOIN RESOURCES RES ON OP.RESOURCE_ID = RES.ID ");
 		sql.append("INNER JOIN APIS API ON RES.API_ID = API.ID ");
-		sql.append("WHERE CONCAT(API.BASE_PATH, OP.PATH) = ?");
+	  	sql.append("WHERE CONCAT(API.BASE_PATH, OP.PATH) = ?");
+		sql.append("AND API.ID <> ?");
 
-		int count = jdbcTemplate.queryForObject(sql.toString(), new Object[] { pattern }, Integer.class);
+		int count = jdbcTemplate.queryForObject(sql.toString(), new Object[] { pattern, apiId }, Integer.class);
 
 		return count > 0;
 	}

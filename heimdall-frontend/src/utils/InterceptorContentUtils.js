@@ -65,6 +65,10 @@ const logWriterContent = content => {
     return JSON.stringify(defaultContent)
 }
 
+const corsContent = content => {
+    return JSON.stringify(content.cors)
+}
+
 const stringifyContent = content => {
     if (content) {
         return JSON.stringify(content)
@@ -84,5 +88,6 @@ export const InterceptorContent = {
     logMaskerContent,
     logWriterContent,
     stringifyContent,
-    simpleContent
+    simpleContent,
+    corsContent
 }

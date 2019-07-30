@@ -60,6 +60,8 @@ export const CONTENTS = (content, type) => {
             return InterceptorContent.simpleContent(content)
         case 'LOG_WRITER':
             return InterceptorContent.logWriterContent(content)
+        case 'CORS':
+            return InterceptorContent.corsContent(content)
         default:
             return InterceptorContent.stringifyContent(content)
     }
