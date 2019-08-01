@@ -5,7 +5,6 @@ import { connect } from 'react-redux'
 import Logo from './Logo'
 import i18n from "../../i18n/i18n"
 import SidebarLink from './SidebarLink'
-import { infoService } from "../../services/InfoService"
 import { PrivilegeUtils } from "../../utils/PrivilegeUtils"
 import { privileges } from "../../constants/privileges-types"
 import { menuitem } from "../../constants/sidebar-items"
@@ -14,10 +13,6 @@ import { updateKeys } from '../../actions/navbar'
 const { Sider } = Layout
 
 class SideBar extends Component {
-
-    state = {
-        traces: false
-    }
 
     componentWillMount() {
         const pathname = this.props.history.location.pathname
@@ -29,12 +24,6 @@ class SideBar extends Component {
             this.props.dispatch(updateKeys([key[1]]))
         }
 
-    }
-
-    componentDidMount() {
-        infoService.getManagerInfo().then(data => {
-            this.setState({ ...this.state, traces: data.traces })
-        })
     }
 
     constructor(props) {
@@ -52,7 +41,6 @@ class SideBar extends Component {
 
     render() {
         const { history } = this.props;
-        const { traces } = this.state
 
         return (
             <Sider collapsible collapsed={this.state.collapsed} onCollapse={this.onCollapse} >
@@ -104,12 +92,6 @@ class SideBar extends Component {
                         {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_USER]) &&
                             <Menu.Item key={menuitem.USERS} className="users">
                                 <SidebarLink to="/users" label={i18n.t('users')} history={history} icon="user" />
-                            </Menu.Item>
-                        }
-
-                        {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_TRACES]) && traces &&
-                            <Menu.Item key={menuitem.TRACES} className="traces">
-                                <SidebarLink to="/traces" label={i18n.t('traces')} history={history} icon="sync" />
                             </Menu.Item>
                         }
 
