@@ -8,7 +8,6 @@ export const menuitem = {
     DEVELOPERS: 'developers',
     ROLES: 'roles',
     USERS: 'users',
-    TRACES: 'traces',
     LDAP: 'ldap',
     PROVIDERS: 'providers'
 }

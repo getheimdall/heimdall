@@ -36,8 +36,6 @@ import AccessTokens from '../containers/AccessTokens';
 import SingleAccessToken from '../containers/SingleAccessToken';
 import Users from '../containers/Users';
 import SingleUser from '../containers/SingleUser';
-import Traces from "../containers/Traces";
-import SingleTrace from "../containers/SingleTrace";
 import Roles from "../containers/Roles";
 import SingleRole from "../containers/SingleRole";
 import SingleLdap from "../containers/SingleLdap";
@@ -76,8 +74,6 @@ const routes = ({ history }) => (
         <AppRoute layout={MainLayout} history={history} exact path="/users/change-password" component={FadeIn(UsersChangePassword)} />
         <AppRoute layout={MainLayout} history={history} exact path="/users/new" component={Authorization([privileges.PRIVILEGE_CREATE_USER, privileges.PRIVILEGE_UPDATE_USER])(FadeIn(SingleUser))} />
         <AppRoute layout={MainLayout} history={history} exact path="/users/:id" component={Authorization([privileges.PRIVILEGE_READ_USER])(FadeIn(SingleUser))} />
-        <AppRoute layout={MainLayout} history={history} exact path="/traces" component={Authorization([privileges.PRIVILEGE_READ_TRACES])(FadeIn(Traces))} />
-        <AppRoute layout={MainLayout} history={history} exact path="/traces/:id" component={Authorization([privileges.PRIVILEGE_READ_TRACES])(FadeIn(SingleTrace))} />
         <AppRoute layout={MainLayout} history={history} exact path="/roles" component={Authorization([privileges.PRIVILEGE_READ_ROLE])(FadeIn(Roles))} />
         <AppRoute layout={MainLayout} history={history} exact path="/roles/new" component={Authorization([privileges.PRIVILEGE_READ_ROLE])(FadeIn(SingleRole))} />
         <AppRoute layout={MainLayout} history={history} exact path="/roles/:id" component={Authorization([privileges.PRIVILEGE_READ_ROLE])(FadeIn(SingleRole))} />

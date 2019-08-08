@@ -14,7 +14,6 @@ import queue from './Queue'
 import users from './Users'
 import roles from './Roles'
 import caches from './Caches'
-import traces from './Traces'
 import privileges from './Privileges'
 import ldap from './Ldap'
 import providers from './Providers'
@@ -37,7 +36,6 @@ export default combineReducers({
     users,
     roles,
     caches,
-    traces,
     privileges,
     ldap,
     providers,
