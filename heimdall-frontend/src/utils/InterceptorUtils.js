@@ -58,6 +58,8 @@ export const CONTENTS = (content, type) => {
         case 'MIDDLEWARE':
         case 'CUSTOM':
             return InterceptorContent.simpleContent(content)
+        case 'LOG_WRITER':
+            return InterceptorContent.logWriterContent(content)
         case 'CORS':
             return InterceptorContent.corsContent(content)
         default:
