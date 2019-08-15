@@ -59,6 +59,16 @@ const logMaskerContent = content => {
     return content
 }
 
+const logWriterContent = content => {
+    const defaultContent = {"body": true, "uri": true, "headers": true, "requiredHeaders": ["headerName"]};
+
+    return JSON.stringify(defaultContent)
+}
+
+const corsContent = content => {
+    return JSON.stringify(content.cors)
+}
+
 const stringifyContent = content => {
     if (content) {
         return JSON.stringify(content)
@@ -76,6 +86,8 @@ export const InterceptorContent = {
     cacheContent,
     ipsContent,
     logMaskerContent,
+    logWriterContent,
     stringifyContent,
-    simpleContent
+    simpleContent,
+    corsContent
 }

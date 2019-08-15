@@ -196,7 +196,7 @@ public class OperationService {
           HeimdallException.checkThrow(resData != null &&
                   Objects.equals(resData.getResource().getId(), resource.getId()), ONLY_ONE_OPERATION_PER_RESOURCE);
 
-          boolean patternExists = operationJDBCRepository.patternExists(resource.getApi().getBasePath() + "/" + operation.getPath());
+          boolean patternExists = operationJDBCRepository.patternExists(resource.getApi().getBasePath() + "/" + operation.getPath(), apiId);
           HeimdallException.checkThrow(patternExists, OPERATION_ROUTE_ALREADY_EXISTS);
 
           operation.setResource(resource);
@@ -235,7 +235,7 @@ public class OperationService {
           operation = GenericConverter.mapper(operationDTO, operation);
           operation.setPath(StringUtils.removeMultipleSlashes(operation.getPath()));
 
-          boolean patternExists = operationJDBCRepository.patternExists(operation.getResource().getApi().getBasePath() + "/" + operation.getPath());
+          boolean patternExists = operationJDBCRepository.patternExists(operation.getResource().getApi().getBasePath() + "/" + operation.getPath(), apiId);
           HeimdallException.checkThrow(patternExists, OPERATION_ROUTE_ALREADY_EXISTS);
 
           HeimdallException.checkThrow(validateSingleWildCardOperationPath(operation), OPERATION_CANT_HAVE_SINGLE_WILDCARD);
