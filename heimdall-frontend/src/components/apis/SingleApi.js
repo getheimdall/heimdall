@@ -1,4 +1,4 @@
-import React, {Component} from 'react'
+import React, {Component, Suspense, lazy} from 'react'
 import {connect} from 'react-redux'
 import {bindActionCreators} from 'redux'
 import {Button, Card, Icon, Row, Tabs} from 'antd'
@@ -7,14 +7,16 @@ import i18n from "../../i18n/i18n"
 import Loading from '../ui/Loading'
 import PageHeader from '../ui/PageHeader' // best way?
 import ApiDefinition from './ApiDefinition'
-import Resources from '../../containers/Resources'
-import Middlewares from '../../containers/Middlewares'
-import Interceptors from '../../containers/Interceptors'
-import Scopes from '../../containers/Scopes';
+
 import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
 import { privileges } from '../../constants/privileges-types'
 import {clearEnvironments, getAllEnvironments} from '../../actions/environments'
 import {deleteApi, getApiById, resetApiAction, updateApi} from '../../actions/apis'
+
+const Resources = lazy(() => import('../../containers/Resources'))
+const Middlewares = lazy(() => import('../../containers/Middlewares'))
+const Interceptors = lazy(() => import('../../containers/Interceptors'))
+const Scopes = lazy(() => import('../../containers/Scopes'))
 
 const TabPane = Tabs.TabPane;
 
@@ -63,21 +65,29 @@ class SingleApi extends Component {
                             {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_RESOURCE]) &&
                             <TabPane tab={<div role="tab" className="ant-tabs-tab resource">{i18n.t('resources')}</div>}
                                      key="2">
-                                <Resources api={api}/>
+                                <Suspense fallback={<Loading/>}>
+                                    <Resources api={api}/>
+                                </Suspense>
                             </TabPane>}
                             {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_INTERCEPTOR]) &&
                             <TabPane tab={<div role="tab" className="ant-tabs-tab interceptors">{i18n.t('interceptors')}</div>}
                                      key="3">
-                                <Interceptors api={api}/>
+                                <Suspense fallback={<Loading/>}>
+                                    <Interceptors api={api}/>
+                                </Suspense>
                             </TabPane>}
                             {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_MIDDLEWARE]) &&
                             <TabPane tab={<div role="tab" className="ant-tabs-tab middlewares">{i18n.t('middlewares')}</div>}
                                      key="4">
-                                <Middlewares api={api}/>
+                                <Suspense fallback={<Loading/>}>
+                                    <Middlewares api={api}/>
+                                </Suspense>
                             </TabPane>}
                             {PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_READ_SCOPE]) &&
                             <TabPane tab={<div role="tab" className="ant-tabs-tab">{i18n.t('scopes')}</div>} key="5">
-                                <Scopes api={api}/>
+                                <Suspense fallback={<Loading/>}>
+                                    <Scopes api={api}/>
+                                </Suspense>
                             </TabPane>}
                         </Tabs>
                     </Card>
