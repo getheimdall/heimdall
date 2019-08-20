@@ -31,7 +31,6 @@ const getPlan = (planId) => {
 const save = (plan) => {
     plan.apiId = plan.api;
     delete plan.api;
-    console.log(plan)
     return HTTPv1.post('/plans', JSON.stringify(plan))
         .then(res => Promise.resolve(res.data))
         .catch(error => {

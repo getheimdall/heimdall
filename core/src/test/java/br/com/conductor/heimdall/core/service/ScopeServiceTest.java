@@ -137,7 +137,8 @@ public class ScopeServiceTest {
 
     @Test
     public void findTest() {
-        Mockito.when(scopeRepository.findByApiAndId(Mockito.anyString(), Mockito.anyString())).thenReturn(scope);
+        Mockito.when(scopeRepository.findById(Mockito.anyString())).thenReturn(
+                  java.util.Optional.ofNullable(scope));
         Scope scopeActual = scopeService.find(this.scope.getApi(), this.scope.getId());
 
         assertEquals(scope, scopeActual);
@@ -148,7 +149,7 @@ public class ScopeServiceTest {
         thrown.expect(NotFoundException.class);
         thrown.expectMessage("Scope not found");
 
-        Mockito.when(scopeRepository.findByApiAndId(Mockito.anyString(), Mockito.anyString())).thenReturn(null);
+        Mockito.when(scopeRepository.findById(Mockito.anyString())).thenReturn(java.util.Optional.empty());
         Scope scopeActual = scopeService.find(this.scope.getApi(), this.scope.getId());
 
         assertEquals(scope, scopeActual);
@@ -274,11 +275,12 @@ public class ScopeServiceTest {
     @Test
     public void deleteTest() {
 
-        Mockito.when(scopeRepository.findByApiAndId(Mockito.anyString(), Mockito.anyString())).thenReturn(scope);
+        Mockito.when(scopeRepository.findById(Mockito.anyString())).thenReturn(
+                  java.util.Optional.ofNullable(scope));
 
         scopeService.delete(scope.getApi(), scope.getId());
 
-        Mockito.verify(scopeRepository, Mockito.times(1)).findByApiAndId(Mockito.anyString(), Mockito.anyString());
+        Mockito.verify(scopeRepository, Mockito.times(1)).findById(Mockito.anyString());
     }
 
     @Test
@@ -286,7 +288,7 @@ public class ScopeServiceTest {
 
         thrown.expect(NotFoundException.class);
         thrown.expectMessage("Scope not found");
-        Mockito.when(scopeRepository.findByApiAndId(Mockito.anyString(), Mockito.anyString())).thenReturn(null);
+        Mockito.when(scopeRepository.findById(Mockito.anyString())).thenReturn(java.util.Optional.empty());
         scopeService.delete(scope.getApi(), scope.getId());
     }
 
@@ -294,7 +296,8 @@ public class ScopeServiceTest {
     public void updateTest() {
 
         Mockito.when(apiService.find(Mockito.anyString())).thenReturn(api);
-        Mockito.when(scopeRepository.findByApiAndId(Mockito.anyString(), Mockito.anyString())).thenReturn(scope);
+        Mockito.when(scopeRepository.findById(Mockito.anyString())).thenReturn(
+                  java.util.Optional.ofNullable(scope));
         Mockito.when(operationService.find(Mockito.anyString())).thenReturn(operation);
 
         scope.setName("Scope new name");
@@ -311,7 +314,7 @@ public class ScopeServiceTest {
         thrown.expectMessage("Scope not found");
 
         Mockito.when(apiService.find(Mockito.anyString())).thenReturn(api);
-        Mockito.when(scopeRepository.findByApiAndId(Mockito.anyString(), Mockito.anyString())).thenReturn(null);
+        Mockito.when(scopeRepository.findById(Mockito.anyString())).thenReturn(java.util.Optional.empty());
 
         scope.setName("Scope new name");
 //        Mockito.when(scopeRepository.save(scope)).thenReturn(scope);

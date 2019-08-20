@@ -28,7 +28,6 @@ class ListScopes extends Component {
         return (
             <div>
                 <Table dataSource={dataSource.content} rowKey={record => record.id} loading={loading} pagination={false}>
-                    <Column title={i18n.t('id')} dataIndex="id" id="id" />
                     <Column title={i18n.t('name')} dataIndex="name" id="name" />
                     <Column title={i18n.t('description')} dataIndex="description" id="description" />
                     <Column

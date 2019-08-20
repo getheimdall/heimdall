@@ -56,8 +56,10 @@ public class ScopeService {
     @Transactional(readOnly = true)
     public Scope find(final String apiId, final String scopeId) {
 
-        final Scope scope = scopeRepository.findByApiAndId(apiId, scopeId);
+        final Scope scope = scopeRepository.findById(scopeId).orElse(null);
         HeimdallException.checkThrow(scope == null, GLOBAL_NOT_FOUND, "Scope");
+
+        HeimdallException.checkThrow(!scope.getApi().equals(apiId), GLOBAL_NOT_FOUND, "Scope");
 
         return scope;
     }
