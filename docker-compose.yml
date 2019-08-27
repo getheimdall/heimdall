@@ -23,16 +23,13 @@ services:
     volumes_from:
     - postgres-data
     ports:
-    - 5433:5432/tcp        
-  heimdall-config:
-    image: getheimdall/heimdall-config:latest
+    - 5433:5432/tcp
   heimdall-api:
     image: getheimdall/heimdall-api:latest
     environment:
     - SPRING_PROFILES_ACTIVE=docker
     links:
     - postgres:postgres
-    - heimdall-config:heimdall-config
     - redis:redis
     - mongo:mongo
     - rabbitmq:rabbitmq
@@ -44,7 +41,6 @@ services:
     - SPRING_PROFILES_ACTIVE=docker
     links:
     - postgres:postgres
-    - heimdall-config:heimdall-config
     - redis:redis
     - mongo:mongo
     - rabbitmq:rabbitmq
