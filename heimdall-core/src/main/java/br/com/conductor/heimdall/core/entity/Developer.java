@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.entity;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -44,7 +44,6 @@ import org.hibernate.annotations.DynamicUpdate;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import br.com.conductor.heimdall.core.enums.Status;
-import br.com.twsoftware.alfred.object.Objeto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -52,6 +51,7 @@ import lombok.EqualsAndHashCode;
  * This class represents a Developer registered to the system.
  * 
  * @author Filipe Germano
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
 @Data
@@ -75,6 +75,9 @@ public class Developer implements Serializable {
      @Column(name = "EMAIL", length = 180, nullable = false, unique = true)
      private String email;
 
+     @Column(name = "PASSWORD", length = 300)
+     private String password;
+
      @Column(name = "CREATION_DATE", nullable = false)
      private LocalDateTime creationDate;
 
@@ -89,10 +92,8 @@ public class Developer implements Serializable {
      @PrePersist
      private void initValuesPersist() {
 
-          if (Objeto.isBlank(status)) {
+          status = (status == null) ? Status.ACTIVE : status;
 
-               status = Status.ACTIVE;
-          }
           creationDate = LocalDateTime.now();
      }
 }

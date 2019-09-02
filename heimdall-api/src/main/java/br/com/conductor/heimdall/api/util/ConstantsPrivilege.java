@@ -1,18 +1,15 @@
-
-package br.com.conductor.heimdall.api.util;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-api
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,15 +17,19 @@ package br.com.conductor.heimdall.api.util;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.api.util;
 
 /**
  * Class that holds the Privilege constants.
  *
  * @author Marcos Filho
- *
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ * 
  */
-public class ConstantsPrivilege {
-     
+public final class ConstantsPrivilege {
+
+     private ConstantsPrivilege() { }
+
      public static final String PRIVILEGE_READ_ACCESSTOKEN = "hasAuthority('READ_ACCESSTOKEN')";
      public static final String PRIVILEGE_CREATE_ACCESSTOKEN = "hasAuthority('CREATE_ACCESSTOKEN')";
      public static final String PRIVILEGE_UPDATE_ACCESSTOKEN = "hasAuthority('UPDATE_ACCESSTOKEN')";
@@ -97,9 +98,19 @@ public class ConstantsPrivilege {
      public static final String PRIVILEGE_UPDATE_USER = "hasAuthority('UPDATE_USER')";
      public static final String PRIVILEGE_DELETE_USER = "hasAuthority('DELETE_USER')";
      
-     
-     
-     
-     
-     
+     public static final String PRIVILEGE_READ_PROVIDER = "hasAuthority('READ_PROVIDER')";
+     public static final String PRIVILEGE_CREATE_PROVIDER = "hasAuthority('CREATE_PROVIDER')";
+
+     public static final String PRIVILEGE_READ_TRACES = "hasAuthority('READ_TRACES')";
+
+     public static final String PRIVILEGE_READ_LDAP = "hasAuthority('READ_LDAP')";
+     public static final String PRIVILEGE_UPDATE_LDAP = "hasAuthority('UPDATE_LDAP')";
+
+     public static final String PRIVILEGE_READ_METRICS = "hasAuthority('READ_METRICS')";
+
+     public static final String PRIVILEGE_READ_SCOPE = "hasAuthority('READ_SCOPE')";
+     public static final String PRIVILEGE_CREATE_SCOPE = "hasAuthority('CREATE_SCOPE')";
+     public static final String PRIVILEGE_UPDATE_SCOPE = "hasAuthority('UPDATE_SCOPE')";
+     public static final String PRIVILEGE_DELETE_SCOPE = "hasAuthority('DELETE_SCOPE')";
+
 }

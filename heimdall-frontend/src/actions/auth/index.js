@@ -1,7 +1,10 @@
-import { AuthConstants } from '../../constants/actions-types'
-import { userService } from '../../services'
 import { notification } from 'antd'
-import { push } from 'connected-react-router';
+import {push} from 'connected-react-router'
+
+import i18n from "../../i18n/i18n"
+import {userService} from '../../services'
+import {closeModalSession} from "../session"
+import { AuthConstants } from '../../constants/actions-types'
 
 const loginFailed = message => ({
     type: AuthConstants.LOGIN_FAILED,
@@ -26,17 +29,22 @@ export const finishLoading = () => dispatch => {
     dispatch({ type: AuthConstants.AUTH_LOADING_FINISH })
 }
 
-export const login = (login, password) => dispatch => {
+export const login = (login, password, renderToHomePage) => dispatch => {
     dispatch(initLoading())
     userService.login(login, password)
     .then(data => {
-        notification['success']({ message: 'Welcome to Heimdall' })
         dispatch(loginSuccessful(data))
-        dispatch(push('/'))
+        if (renderToHomePage) {
+            notification['success']({ message: i18n.t('welcome_heimdall') })
+            dispatch(push('/'))
+        } else {
+            dispatch(closeModalSession())
+        }
         dispatch(finishLoading())
     }).catch(error => {
-        notification['error']({ message: 'Login or password incorrect' })
-        dispatch(loginFailed('Login or password incorrect'))
+        notification['error']({ message: i18n.t('username_password_incorrect') })
+        dispatch(loginFailed(i18n.t('username_password_incorrect')))
+        dispatch(closeModalSession())
         dispatch(push('/login'))
         dispatch(finishLoading())
     })

@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.entity;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -44,7 +44,6 @@ import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import br.com.conductor.heimdall.core.enums.Status;
-import br.com.twsoftware.alfred.object.Objeto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -97,10 +96,8 @@ public class Environment implements Serializable {
      @PrePersist
      private void initValuesPersist() {
 
-          if (Objeto.isBlank(status)) {
-               
-               status = Status.ACTIVE;
-          }
+          status = (status == null) ? Status.ACTIVE : status;
+
           creationDate = LocalDateTime.now();
      }
 

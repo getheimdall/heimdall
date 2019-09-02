@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
-import PageHeader from '../ui/PageHeader'
 import { Row, Button, Card, notification } from 'antd'
 
+import i18n from "../../i18n/i18n"
+import PageHeader from '../ui/PageHeader'
 import { getAllEnvironments, clearEnvironments } from '../../actions/environments'
 import { saveApi, getNewApi } from '../../actions/apis'
-
 import NewApiOverview from './NewApiOverview'
 import Loading from '../ui/Loading'
 
@@ -32,7 +32,6 @@ class NewApi extends Component {
     componentDidMount() {
         this.props.clearEnvironments()
         this.props.getAllEnvironments()
-        console.log(this.props.newApi)
         if (!this.props.newApi) {
             this.props.apiInit()
         }
@@ -76,7 +75,7 @@ class NewApi extends Component {
 
         return (
             <div>
-                <PageHeader title="APIs" icon="api" />
+                <PageHeader title={i18n.t('apis')} icon="api" />
 
                 <Row>
                     <div className="steps-content">
@@ -88,8 +87,8 @@ class NewApi extends Component {
 
                 <Row className="h-row">
                     <div className="steps-action">
-                        <Button ghost type="primary" style={{ marginRight: 8 }} onClick={() => history.goBack()} >Cancel</Button>
-                        <Button type="primary" onClick={() => this.validateSubmition(this.state.current)}>Save</Button>
+                        <Button id="cancelNewApi" ghost type="primary" style={{ marginRight: 8 }} onClick={() => history.goBack()} >{i18n.t('cancel')}</Button>
+                        <Button id="saveApi" type="primary" onClick={() => this.validateSubmition(this.state.current)}>{i18n.t('save')}</Button>
                     </div>
                 </Row>
             </div>

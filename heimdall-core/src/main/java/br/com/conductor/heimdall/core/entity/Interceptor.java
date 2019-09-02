@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.entity;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -23,9 +23,11 @@ package br.com.conductor.heimdall.core.entity;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.util.Set;
 
+import javax.persistence.CollectionTable;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -34,8 +36,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.PostLoad;
 import javax.persistence.PrePersist;
@@ -44,8 +44,6 @@ import javax.persistence.Transient;
 
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -106,20 +104,16 @@ public class Interceptor implements Serializable {
      
      @Column(name = "CREATION_DATE", nullable = false)
      private LocalDateTime creationDate;
-     
-     @ManyToMany
-     @LazyCollection(LazyCollectionOption.FALSE)
-     @JoinTable(name = "IGNORED_INTERCEPTORS_RESOURCES", 
-     joinColumns = @JoinColumn(name = "INTERCEPTOR_ID", referencedColumnName = "ID"), 
-     inverseJoinColumns = @JoinColumn(name = "RESOURCE_ID", referencedColumnName = "ID"))
-     private List<Resource> ignoredResources;
 
-     @ManyToMany
-     @LazyCollection(LazyCollectionOption.FALSE)
-     @JoinTable(name = "IGNORED_INTERCEPTORS_OPERATIONS", 
-          joinColumns = @JoinColumn(name = "INTERCEPTOR_ID", referencedColumnName = "ID"), 
-          inverseJoinColumns = @JoinColumn(name = "OPERATION_ID", referencedColumnName = "ID"))
-     private List<Operation> ignoredOperations;
+     @ElementCollection(fetch=FetchType.EAGER)
+     @CollectionTable(name="IGNORED_INTERCEPTORS_RESOURCES", joinColumns = @JoinColumn(name = "INTERCEPTOR_ID", referencedColumnName = "ID"))
+     @Column(name="RESOURCE_ID")
+     private Set<Long> ignoredResources;
+
+     @ElementCollection(fetch=FetchType.EAGER)
+     @CollectionTable(name="IGNORED_INTERCEPTORS_OPERATIONS", joinColumns = @JoinColumn(name = "INTERCEPTOR_ID", referencedColumnName = "ID"))
+     @Column(name="OPERATION_ID")
+     private Set<Long> ignoredOperations;
      
      @JsonIgnore
      @ManyToOne(fetch = FetchType.EAGER)
@@ -135,14 +129,7 @@ public class Interceptor implements Serializable {
      @ManyToOne(fetch = FetchType.EAGER)
      @JoinColumn(name = "OPERATION_ID")
      private Operation operation;
-     
-     @JsonIgnore
-     @ManyToMany
-     @JoinTable(name = "MIDDLEWARES_INTERCEPTORS", 
-          joinColumns = @JoinColumn(name = "INTERCEPTOR_ID", referencedColumnName = "ID"), 
-          inverseJoinColumns = @JoinColumn(name = "MIDDLEWARE_ID", referencedColumnName = "ID"))
-     private List<Middleware> middlewares;
-     
+
      @Transient
      private Long referenceId;
      
@@ -150,6 +137,9 @@ public class Interceptor implements Serializable {
      @JoinColumn(name = "API_ID")
      @JsonIgnore
      private Api api;
+
+     @Column(name = "STATUS", nullable = false)
+     private Boolean status;
      
      @PrePersist
      private void initValuesPersist() {
@@ -157,6 +147,10 @@ public class Interceptor implements Serializable {
           creationDate = LocalDateTime.now();
           
           switch (lifeCycle) {
+               case API:
+                    api = new Api();
+                    api.setId(referenceId);
+                    break;
                case PLAN:
                     plan = new Plan();
                     plan.setId(referenceId);
@@ -178,6 +172,9 @@ public class Interceptor implements Serializable {
      private void initValuesLoad() {
           
           switch (lifeCycle) {
+               case API:
+                    referenceId = api.getId();
+                    break;
                case PLAN:
                     referenceId = plan.getId();
                     break;
@@ -191,5 +188,5 @@ public class Interceptor implements Serializable {
                     break;
           }
      }
-     
+
 }

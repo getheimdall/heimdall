@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.middleware.spec;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -61,6 +61,13 @@ public interface Header {
       * @param value	The value of the header
       */
      public void add(String name, String value);
+
+    /**
+     * Adds a Map of headers
+     *
+     * @param values    The headers to be added
+     */
+    public void addAll(Map<String, String> values);
      
      /**
       * Removes a header.

@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.repository;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -22,6 +22,8 @@ package br.com.conductor.heimdall.core.repository;
  */
 
 import br.com.conductor.heimdall.core.entity.RateLimit;
+import br.com.conductor.heimdall.core.enums.Interval;
+import org.redisson.api.RLock;
 
 /**
  * Provides methods to save, find and delete a {@link RateLimit}.
@@ -53,5 +55,23 @@ public interface RateLimitRepository {
       * @param path			The path to the RateLimit
       */
      void delete(String path);
+
+    /**
+     * Gets a lock to access Redis connection
+     *
+     * @param key lock key
+     * @return RLock
+     */
+     RLock getLock(String key);
+
+    /**
+     * Creates the rate limit structure in Redis
+     *
+     * @param interceptorId interceptor id
+     * @param calls number of calls per interval
+     * @param interval time interval
+     * @return rate limit created
+     */
+     RateLimit mountRatelimit(Long interceptorId, Long calls, Interval interval);
 
 }

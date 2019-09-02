@@ -1,18 +1,15 @@
-
-package br.com.conductor.heimdall.gateway.listener;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +17,9 @@ package br.com.conductor.heimdall.gateway.listener;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.listener;
+
+import java.util.Objects;
 
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -29,10 +29,9 @@ import org.springframework.stereotype.Component;
 
 import br.com.conductor.heimdall.core.dto.InterceptorFileDTO;
 import br.com.conductor.heimdall.core.entity.Interceptor;
-import br.com.conductor.heimdall.core.repository.InterceptorRepository;
+import br.com.conductor.heimdall.core.repository.jdbc.InterceptorJDBCRepository;
 import br.com.conductor.heimdall.core.util.RabbitConstants;
 import br.com.conductor.heimdall.gateway.service.InterceptorFileService;
-import br.com.twsoftware.alfred.object.Objeto;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -50,9 +49,12 @@ public class InterceptorListener {
      
      @Autowired
      private InterceptorFileService interceptorFileService;
-
+//
+//     @Autowired
+//     private InterceptorRepository interceptorRepository;
+     
      @Autowired
-     private InterceptorRepository interceptorRepository;
+     private InterceptorJDBCRepository interceptorJdbcRepository;
 
      @Autowired
      private StartServer startServer;
@@ -67,12 +69,11 @@ public class InterceptorListener {
 
           Long interceptorId = (Long) rabbitTemplate.getMessageConverter().fromMessage(message);
 
-
-          Interceptor interceptor = interceptorRepository.findOne(interceptorId);
-          if (Objeto.notBlank(interceptor)) {
+          Interceptor interceptor = interceptorJdbcRepository.findOneInterceptorSimplified(interceptorId);
+          if (Objects.nonNull(interceptor)) {
                
                log.info("Updating/Creating Interceptor id: " + interceptorId);
-               interceptorFileService.createFileInterceptor(interceptorId);
+               interceptorFileService.createFileInterceptor(interceptor);
           } else {
                
                log.info("It was not possible Updating/Creating Interceptor id: " + interceptorId);
@@ -88,7 +89,7 @@ public class InterceptorListener {
      @RabbitListener(queues = RabbitConstants.LISTENER_HEIMDALL_REFRESH_INTERCEPTORS)
      public void refreshAllInterceptors(final Message message) {
 
-          log.info("Refreshc all Interceptors");
+          log.info("Refresh all Interceptors");
 
           try {
 

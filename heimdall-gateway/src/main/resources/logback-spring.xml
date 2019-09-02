@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-	<include resource="org/springframework/boot/logging/logback/base.xml"/>
+<!-- 	<include resource="org/springframework/boot/logging/logback/base.xml"/> -->
+	<include resource="org/springframework/boot/logging/logback/defaults.xml" />
+	<property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}}/spring.log}"/>
+	<include resource="org/springframework/boot/logging/logback/console-appender.xml" />
+	<include resource="org/springframework/boot/logging/logback/file-appender.xml" />
 
 	<springProperty scope="context" name="app_name" source="info.app.name" />	
 	<springProperty scope="context" name="app_version" source="info.app.version"/>
 	<springProperty scope="context" name="app_profile" source="info.app.profile"/>
+	<springProperty scope="context" name="sentry_enabled" source="sentry.enabled"/>
 
 	<logger name="org.apache.catalina.startup.DigesterFactory" level="ERROR"/>
 	<logger name="org.apache.catalina.util.LifecycleBase" level="ERROR"/>
@@ -24,15 +29,29 @@
 	<logger name="org.springframework.cloud.netflix.zuul" level="INFO"/>
 	<logger name="io.sentry" level="OFF" />
 
-	<appender name="APPENDER_SENTRY_LOGS" class="io.sentry.logback.SentryAppender">
-		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-			<level>ERROR</level>
-		</filter>
+	<if condition='"true".equals(p("sentry_enabled"))'>
+		<then>
+			<appender name="APPENDER_SENTRY_LOGS" class="io.sentry.logback.SentryAppender">
+				<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+					<level>ERROR</level>
+				</filter>
+			</appender>
+		</then>
+	</if>
+
+	<appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+		<queueSize>512</queueSize>
+		<appender-ref ref="FILE"/>
 	</appender>
-    
+
     <root level="INFO">
         <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="APPENDER_SENTRY_LOGS"/> 
-    </root>	
+		<appender-ref ref="ASYNC"/>
+		<if condition='"true".equals(p("sentry_enabled"))'>
+			<then>
+				<appender-ref ref="APPENDER_SENTRY_LOGS"/>
+			</then>
+		</if>
+    </root>
 
 </configuration>

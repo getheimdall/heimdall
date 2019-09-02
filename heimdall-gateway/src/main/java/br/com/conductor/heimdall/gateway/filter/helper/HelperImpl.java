@@ -1,119 +1,138 @@
-
+/*-
+ * =========================LICENSE_START==================================
+ * heimdall-gateway
+ * ========================================================================
+ * Copyright (C) 2018 Conductor Tecnologia SA
+ * ========================================================================
+ * Licensed under the Apache License, Version 2.0 (the "License")
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ==========================LICENSE_END===================================
+ */
 package br.com.conductor.heimdall.gateway.filter.helper;
 
-/*-
- * =========================LICENSE_START==================================
- * heimdall-gateway
- * ========================================================================
- * Copyright (C) 2018 Conductor Tecnologia SA
- * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * ==========================LICENSE_END===================================
- */
-
+import br.com.conductor.heimdall.core.environment.Property;
+import br.com.conductor.heimdall.gateway.failsafe.CircuitBreakerManager;
+import br.com.conductor.heimdall.gateway.filter.helper.http.HeimdallResponseErrorHandler;
 import br.com.conductor.heimdall.middleware.enums.DBType;
-
-/*-
- * =========================LICENSE_START==================================
- * heimdall-gateway
- * ========================================================================
- * Copyright (C) 2018 Conductor Tecnologia SA
- * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- * ==========================LICENSE_END===================================
- */
-
-import br.com.conductor.heimdall.middleware.spec.ApiResponse;
-import br.com.conductor.heimdall.middleware.spec.Call;
-import br.com.conductor.heimdall.middleware.spec.DB;
-import br.com.conductor.heimdall.middleware.spec.DBMongo;
-import br.com.conductor.heimdall.middleware.spec.Helper;
-import br.com.conductor.heimdall.middleware.spec.Http;
-import br.com.conductor.heimdall.middleware.spec.Json;
-import br.com.conductor.heimdall.middleware.spec.Xml;
+import br.com.conductor.heimdall.middleware.spec.*;
+import com.mongodb.MongoClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.netflix.zuul.filters.ZuulProperties;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.web.client.RestTemplate;
 
 /**
  * Implementation of the {@link Helper} interface.
  *
  * @author Filipe Germano
- *
+ * @author marcos.filho
  */
 public class HelperImpl implements Helper {
+	
+	@Autowired(required = false)
+	private MongoClient mongoClient;
+	
+	private ThreadLocal<byte[]> buffers;
 
-     @Override
-     public ApiResponse apiResponse() {
+	private boolean enableHandler;
 
-          ApiResponse apiResponse = new ApiResponseImpl();
-          return apiResponse;
-     }
+	@Autowired
+	private Property property;
+	
+	@Autowired
+	private ZuulProperties zuulProperty;
 
-     @Override
-     public Call call() {
+	@Autowired
+	private CircuitBreakerManager circuitBreakerManager;
+	
+	private RestTemplate restTemplate;
 
-          Call call = new CallImpl();
-          return call;
-     }
+	public HelperImpl() {
+		enableHandler = false;
+		buffers = ThreadLocal.withInitial(() -> new byte[8192]);
+	}
 
-     @Override
-     public DB db(String databaseName) {
+	@Override
+	public ApiResponse apiResponse() {
 
-          return db(databaseName, DBType.MONGODB);
-     }
+		ApiResponse apiResponse = new ApiResponseImpl();
+		return apiResponse;
+	}
 
-     private DB db(String databaseName, DBType type) {
+	@Override
+	public Call call() {
 
-          switch (type) {
-               case MONGODB:
-                    return new DBMongoImpl(databaseName);
-               default:
-                    return new DBMongoImpl(databaseName);
-          }
-     }
+		return new CallImpl(buffers);
+	}
 
-     @Override
-     public DBMongo dbMongo(String databaseName) {
+	@Override
+	public DB db(String databaseName) {
 
-          return (DBMongo) db(databaseName, DBType.MONGODB);
-     }
+		return db(databaseName, DBType.MONGODB);
+	}
 
-     @Override
-     public Http http() {
+	private DB db(String databaseName, DBType type) {
 
-          Http http = new HttpImpl();
-          return http;
-     }
+		switch (type) {
+		default:
+			return new DBMongoImpl(databaseName, mongoClient);
+		}
+	}
 
-     @Override
-     public Json json() {
+	@Override
+	public DBMongo dbMongo(String databaseName) {
 
-          Json json = new JsonImpl();
-          return json;
-     }
+		return (DBMongo) db(databaseName, DBType.MONGODB);
+	}
 
-     @Override
-     public Xml xml() {
+	@Override
+	public Http http() {
+		return new HttpImpl(rest(), circuitBreakerManager, property.getFailsafe().isEnabled());
+	}
+	
+	private RestTemplate rest() {
+        if (this.restTemplate == null) {
+            this.restTemplate = new RestTemplate(httpClientRequestFactory());
+        }
 
-          return new XmlImpl();
-     }
+        if (enableHandler) {
+            this.restTemplate.setErrorHandler(new HeimdallResponseErrorHandler());
+        }
+        return this.restTemplate;
+    }
+	
+	private HttpComponentsClientHttpRequestFactory httpClientRequestFactory() {
+		HttpComponentsClientHttpRequestFactory httpClient = new HttpComponentsClientHttpRequestFactory();
+		httpClient.setConnectTimeout(zuulProperty.getHost().getConnectTimeoutMillis());
+		httpClient.setReadTimeout(zuulProperty.getHost().getSocketTimeoutMillis());
+		return httpClient;
+	}
+
+	@Override
+	public Json json() {
+
+		Json json = new JsonImpl();
+		return json;
+	}
+
+	@Override
+	public Xml xml() {
+
+		return new XmlImpl();
+	}
+
+	@Override
+	public void httpHandler(boolean useHandler) {
+		this.enableHandler = useHandler;
+	}
 
 }

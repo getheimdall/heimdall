@@ -1,18 +1,15 @@
-
-package br.com.conductor.heimdall.api.resource;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-api
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +17,7 @@ package br.com.conductor.heimdall.api.resource;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.api.resource;
 
 import static br.com.conductor.heimdall.core.util.ConstantsPath.PATH_CACHES;
 
@@ -119,6 +117,22 @@ public class CacheResource {
           
           amqpCacheService.dispatchClean();
           
+          return ResponseEntity.noContent().build();
+     }
+
+     /**
+      * Deletes all caches created by Cache interceptors.
+      *
+      * @return						{@link ResponseEntity}
+      */
+     @ResponseBody
+     @ApiOperation(value = "Delete all caches created by Cache interceptors")
+     @DeleteMapping("/interceptors")
+     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_CACHES)
+     public ResponseEntity<?> deleteInterceptors() {
+
+          amqpCacheService.dispatchCleanInterceptorsCache();
+
           return ResponseEntity.noContent().build();
      }
 

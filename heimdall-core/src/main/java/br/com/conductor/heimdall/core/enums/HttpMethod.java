@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.enums;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -25,10 +25,11 @@ package br.com.conductor.heimdall.core.enums;
  * This enum lists the HTTP methods that can be used.
  * 
  * @author Filipe Germano
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
 public enum HttpMethod {
      
-     GET, POST, PUT, DELETE, PATCH, OPTIONS;
+     GET, POST, PUT, DELETE, PATCH, OPTIONS, ALL
 
 }

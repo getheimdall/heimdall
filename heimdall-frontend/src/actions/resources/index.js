@@ -1,7 +1,8 @@
-import { ResourceConstants } from '../../constants/actions-types'
-import { resourceService } from '../../services'
-
 import { notification } from 'antd'
+
+import i18n from "../../i18n/i18n"
+import { resourceService } from '../../services'
+import { ResourceConstants } from '../../constants/actions-types'
 
 const getAllResourcesAction = resources => ({ type: ResourceConstants.ALL_RESOURCES, resources })
 
@@ -17,6 +18,10 @@ export const getAllResourcesByApi = idApi => dispatch => {
 }
 
 const clearResourcesAction = () => ({ type: ResourceConstants.CLEAR_RESOURCES })
+
+export const sendNotification = notification => dispatch => {
+    dispatch({ type: ResourceConstants.RESOURCE_NOTIFICATION, notification })
+}
 
 export const clearResources = () => dispatch => {
     dispatch(clearResourcesAction())
@@ -55,11 +60,12 @@ export const save = (idApi, resource) => dispatch => {
     .catch(error => {
         console.log(error)
         if (error.response && error.response.status === 400) {
-            notification['error']({ message: 'Error', description: error.response.data.message})
+            notification['error']({ message: i18n.t('error'), description: error.response.data.message})
         }
     })
     .then(() => {
         // console.log('finally')
+        dispatch(sendNotification({ type: 'success', message: i18n.t('resource_saved') }))
         dispatch(getAllResourcesByApi(idApi))
         dispatch(toggleModal(false))
         dispatch(finishLoading())
@@ -70,13 +76,14 @@ export const update = (idApi, resource) => dispatch => {
     dispatch(initLoading())
     resourceService.update(idApi, resource)
     .then(data => {
+        dispatch(sendNotification({ type: 'success', message: i18n.t('resource_updated') }))
         dispatch(getAllResourcesByApi(idApi))
         dispatch(toggleModal(false))
         dispatch(finishLoading())
     })
     .catch(error => {
         if (error.response && error.response.status === 400) {
-            notification['error']({ message: 'Error', description: error.response.data.message})
+            notification['error']({ message: i18n.t('error'), description: error.response.data.message})
             dispatch(getAllResourcesByApi(idApi))
         }
         console.log(error)
@@ -89,10 +96,11 @@ export const remove = (idApi, idResource) => dispatch => {
     .catch(error => {
         console.log(error)
         if (error.response && error.response.status === 400) {
-            notification['error']({ message: 'Error', description: error.response.data.message})
+            notification['error']({ message: i18n.t('error'), description: error.response.data.message})
         }
     })
     .then(() => {
+        dispatch(sendNotification({ type: 'success', message: i18n.t('resource_removed') }))
         dispatch(getAllResourcesByApi(idApi))
         dispatch(finishLoading())
     })

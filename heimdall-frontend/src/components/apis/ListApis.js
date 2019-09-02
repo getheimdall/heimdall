@@ -7,6 +7,10 @@ import {
     Tooltip,
     Icon,
 } from 'antd'
+import SwaggerIcon from "../icons/SwaggerIcon"
+import {Link} from "react-router-dom"
+
+import i18n from "../../i18n/i18n"
 
 class ListApis extends Component {
 
@@ -30,7 +34,12 @@ class ListApis extends Component {
                                         </div>
                                     }
                                     actions={[
-                                        <Tooltip title="View" onClick={this.redirect('/apis/' + api.id)}><Icon type="search" /></Tooltip>
+                                        <Tooltip title={i18n.t('view')} onClick={this.redirect('/apis/' + api.id)}><Icon type="search" /></Tooltip>,
+                                        <Tooltip title={i18n.t('swagger-editor')}>
+                                            <Link to={`/apis/${api.id}/swagger-editor`}>
+                                                <SwaggerIcon width={24} height={24}/>
+                                            </Link>
+                                        </Tooltip>
                                     ]}
                                 >
                                     <div className="heimdall-card-body" onClick={this.redirect('/apis/' + api.id)}>

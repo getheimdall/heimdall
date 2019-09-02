@@ -1,0 +1,86 @@
+/*-
+ * =========================LICENSE_START==================================
+ * heimdall-gateway
+ * ========================================================================
+ * Copyright (C) 2018 Conductor Tecnologia SA
+ * ========================================================================
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ==========================LICENSE_END===================================
+ */
+
+import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
+import br.com.conductor.heimdall.core.util.BeanManager;
+import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
+import br.com.conductor.heimdall.gateway.service.LifeCycleService;
+import br.com.conductor.heimdall.gateway.service.LogWriterService;
+
+import java.util.*;
+
+public class LogWriterInterceptor extends HeimdallFilter {
+
+    private static Set<Long> ignoredOperations;
+    private static Set<Long> ignoredResources;
+    private static List<String> requiredHeaders;
+    private static Long referenceId;
+    private static Long apiId;
+    private static boolean status;
+
+    public LogWriterInterceptor() {
+
+        ignoredOperations = new HashSet<>();
+        {{#ignoredOperations}}
+        ignoredOperations.add({{.}});
+        {{/ignoredOperations}}
+
+        ignoredResources = new HashSet<>();
+        {{#ignoredResources}}
+        ignoredResources.add({{.}});
+        {{/ignoredResources}}
+
+        requiredHeaders = new ArrayList<>();
+        {{#requiredHeaders}}
+        requiredHeaders.add("{{.}}");
+        {{/requiredHeaders}}
+
+        referenceId = {{referenceId}};
+        apiId = {{apiId}};
+        status = {{interceptorStatus}};
+    }
+
+    @Override
+    public String filterType() {
+        return "{{executionPoint}}";
+    }
+
+    @Override
+    public int filterOrder() {
+        return {{order}};
+    }
+
+    @Override
+    public String getName() {
+        return "{{name}}";
+    }
+
+    @Override
+    public boolean should() {
+        LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredResources, ignoredOperations, status);
+    }
+
+    @Override
+    public void execute() throws Throwable {
+        LogWriterService logWriterService = (LogWriterService) BeanManager.getBean(LogWriterService.class);
+        logWriterService.execute(filterType(), {{body}}, {{headers}}, requiredHeaders);
+    }
+}

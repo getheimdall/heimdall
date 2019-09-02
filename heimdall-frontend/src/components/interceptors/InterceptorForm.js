@@ -1,16 +1,31 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
+import { Row, Form, Input, Col, Select, Switch, Button } from 'antd'
 
-import { Row, Form, Input, InputNumber, Col, Select } from 'antd'
-import { getTemplate } from '../../utils/InterceptorUtils'
+import i18n from "../../i18n/i18n"
+import {PrivilegeUtils} from "../../utils/PrivilegeUtils"
+import {TEMPLATES, CONTENTS} from '../../utils/InterceptorUtils'
+import {privileges} from "../../constants/privileges-types"
 
 const FormItem = Form.Item
-const { TextArea } = Input
 
 class InterceptorForm extends Component {
 
+    state = {
+        ignoredOperations: []
+    }
+
     componentDidMount() {
         this.props.onRef(this)
+
+        const { interceptor } = this.props
+
+        if (interceptor) {
+            this.setState({
+                ...this.state,
+                ignoredOperations: interceptor.ignoredOperations
+            })
+        }
     }
 
     componentWillUnmount() {
@@ -20,10 +35,8 @@ class InterceptorForm extends Component {
     onSubmitForm = () => {
         this.props.form.validateFieldsAndScroll((err, payload) => {
             if (!err) {
-                // if (payload.plans) {
-                //     const plans = payload.plans;
-                //     payload.plans = plans.map((planId) => ({ id: planId }))
-                // }
+                payload.content = CONTENTS(payload.content, this.props.type)
+
                 if (payload.environment) {
                     payload.environment = { id: payload.environment }
                 }
@@ -35,7 +48,9 @@ class InterceptorForm extends Component {
 
     handleLifeCycle = (value) => {
         let referenceValue = 0;
-        if (value === 'PLAN') {
+        if (value === 'API') {
+            referenceValue = this.props.apiId
+        } else if (value === 'PLAN') {
             referenceValue = this.props.planId
         } else if (value === 'RESOURCE') {
             referenceValue = this.props.resourceId
@@ -48,26 +63,48 @@ class InterceptorForm extends Component {
         });
     }
 
-    formatContent = (type) => {
-        return getTemplate(type)
+    isIgnore = () => {
+        const { interceptor } = this.props
+
+        if (!interceptor) {
+            return false
+        }
+
+        return !!(interceptor.candidateToIgnoreId && this.state.ignoredOperations.find(operation => operation === interceptor.candidateToIgnoreId))
+    }
+
+    handleOnChangeCandidateToIgnore = value => {
+        const { interceptor } = this.props
+
+        if (value) {
+            this.setState({ ...this.state, ignoredOperations: this.state.ignoredOperations.concat([interceptor.candidateToIgnoreId]) })
+        } else {
+            this.setState({ ...this.state, ignoredOperations: this.state.ignoredOperations.filter(ignored => ignored !== interceptor.candidateToIgnoreId) })
+        }
+
     }
 
     render() {
-        const { getFieldDecorator } = this.props.form
-
+        const { getFieldDecorator, getFieldValue } = this.props.form
+        
         const {
+            apiId,
             interceptor,
             planId,
             resourceId,
             operationId,
             executionPoint,
-            type,
-            environmentId
+            type
         } = this.props
 
 
         let lifeCycleInitial
         let referenceId
+
+        if (apiId) {
+            lifeCycleInitial = 'API'
+            referenceId = apiId
+        }
 
         if (planId) {
             lifeCycleInitial = 'PLAN'
@@ -84,101 +121,90 @@ class InterceptorForm extends Component {
             referenceId = operationId
         }
 
+        let status
+        if (getFieldValue('status') === undefined) {
+            if (interceptor) {
+                status = interceptor.status
+            } else {
+                status = true
+            }
+        } else {
+            status = getFieldValue('status')
+        }
 
         return (
             <Row>
                 <Form>
                     {interceptor && getFieldDecorator('id', { initialValue: interceptor.id })(<Input type='hidden' />)}
+                    {interceptor && interceptor.uuid && getFieldDecorator('uuid', { initialValue: interceptor.uuid })(<Input type='hidden' />)}
                     {getFieldDecorator('referenceId', { initialValue: interceptor ? interceptor.referenceId : referenceId })(<Input type='hidden' />)}
-                    {environmentId && getFieldDecorator('environment', { initialValue: environmentId })(<Input type='hidden' />)}
+                    {interceptor && interceptor.environment && getFieldDecorator('environment', { initialValue: interceptor.environment.id })(<Input type='hidden' />)}
+                    {getFieldDecorator('order', { initialValue: interceptor && interceptor.order ? interceptor.order : this.props.order})(<Input type='hidden' />)}
+                    {getFieldDecorator('type', { initialValue: type})(<Input type='hidden' />)}
+                    {getFieldDecorator('executionPoint', { initialValue: executionPoint })(<Input type='hidden' />)}
+                    {getFieldDecorator('ignoredOperations', { initialValue: this.state.ignoredOperations })(<Input type='hidden' />)}
 
                     <Row gutter={24}>
-                        <Col sm={24} md={12} >
-                            <FormItem label="Type">
-                                {
-                                    getFieldDecorator('type', {
-                                        initialValue: type,
-                                    })(<Select disabled>
-                                        <Select.Option value="LOG">LOG</Select.Option>
-                                        <Select.Option value="MOCK">MOCK</Select.Option>
-                                        <Select.Option value="RATTING">RATTING</Select.Option>
-                                        <Select.Option value="ACCESS_TOKEN">ACCESS TOKEN</Select.Option>
-                                        <Select.Option value="CLIENT_ID">CLIENT ID</Select.Option>
-                                        <Select.Option value="CUSTOM">CUSTOM</Select.Option>
-                                    </Select>)
-                                }
-                            </FormItem>
-                        </Col>
-                        <Col sm={24} md={12} >
-                            <FormItem label="Execution Point">
-                                {
-                                    getFieldDecorator('executionPoint', {
-                                        initialValue: executionPoint,
-                                    })(<Select disabled>
-                                        <Select.Option value="FIRST">PRE</Select.Option>
-                                        <Select.Option value="SECOND">POST</Select.Option>
-                                    </Select>)
-                                }
-                            </FormItem>
-                        </Col>
-                        <Col sm={24} md={24} >
-                            <FormItem label="Name">
+                        <Col sm={24} md={interceptor && interceptor.candidateToIgnoreId ? 15 : 20} >
+                            <FormItem label={i18n.t('name')}>
                                 {
                                     getFieldDecorator('name', {
                                         initialValue: interceptor && interceptor.name,
                                         rules: [
-                                            { required: true, message: 'Please define the name!' }
+                                            { required: true, message: i18n.t('please_define_name') }
                                         ]
-                                    })(<Input required />)
+                                    })(<Input autoFocus required disabled={!(PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR]) && status)}/>)
                                 }
                             </FormItem>
                         </Col>
+                        <Col sm={24} md={4} >
+                            <FormItem label={i18n.t('status')}>
+                                {
+                                    getFieldDecorator('status', {
+                                        initialValue: interceptor && interceptor.status
+                                    })(<Switch disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR])}
+                                               defaultChecked={interceptor ? interceptor.status : true}>
+                                        </Switch>
+                                    )
+                                }
+                            </FormItem>
+                        </Col>
+                        {
+                            interceptor && interceptor.candidateToIgnoreId &&
+                            <Col sm={24} md={5}>
+                                <FormItem label=" " colon={false}>
+                                    <Button className={this.isIgnore() ? 'button-ignored': 'button-not-ignored'} onClick={() => this.handleOnChangeCandidateToIgnore(!this.isIgnore())}>{i18n.t(this.isIgnore() ? 'ignored' : 'ignore')}</Button>
+                                </FormItem>
+                            </Col>
+                        }
                         <Col sm={24} md={24} >
-                            <FormItem label="Description">
+                            <FormItem label={i18n.t('description')}>
                                 {
                                     getFieldDecorator('description', {
                                         initialValue: interceptor && interceptor.description
-                                    })(<Input />)
+                                    })(<Input disabled={!(PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR]) && status)}/>)
                                 }
                             </FormItem>
                         </Col>
-                        <Col sm={24} md={18}>
-                            <FormItem label="Life Cycle">
+                        <Col sm={24} md={24}>
+                            <FormItem label={i18n.t('life_cycle')}>
                                 {
                                     getFieldDecorator('lifeCycle', {
                                         initialValue: interceptor ? interceptor.lifeCycle : lifeCycleInitial,
                                         rules: [
-                                            { required: true, message: 'Please select the life cycle!' }
+                                            { required: true, message: i18n.t('please_select_life_cycle') }
                                         ]
-                                    })(<Select onChange={this.handleLifeCycle}>
-                                        {planId && <Select.Option value="PLAN">PLAN</Select.Option>}
-                                        {resourceId && <Select.Option value="RESOURCE">RESOURCE</Select.Option>}
-                                        {operationId && <Select.Option value="OPERATION">OPERATION</Select.Option>}
+                                    })(<Select onChange={this.handleLifeCycle} disabled={!(PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_INTERCEPTOR, privileges.PRIVILEGE_CREATE_INTERCEPTOR]) && status)}>
+                                        {apiId && <Select.Option value="API">{i18n.t('api')}</Select.Option>}
+                                        {planId && <Select.Option value="PLAN">{i18n.t('plan')}</Select.Option>}
+                                        {resourceId && <Select.Option value="RESOURCE">{i18n.t('resource')}</Select.Option>}
+                                        {operationId && <Select.Option value="OPERATION">{i18n.t('operation')}</Select.Option>}
                                     </Select>)
                                 }
                             </FormItem>
                         </Col>
-                        <Col sm={24} md={6} >
-                            <FormItem label="Order">
-                                {
-                                    getFieldDecorator('order', {
-                                        initialValue: interceptor ? interceptor.order : 0
-                                    })(<InputNumber min={0} max={99} />)
-                                }
-                            </FormItem>
-                        </Col>
-                        {type !== 'LOG' && <Col sm={24} md={24} >
-                            <FormItem label="Content">
-                                {
-                                    getFieldDecorator('content', {
-                                        initialValue: interceptor ? interceptor.content : this.formatContent(type),
-                                        rules: [
-                                            { required: true, message: 'Please select the execution point!' }
-                                        ]
-                                    })(<TextArea rows={6} required />)
-                                }
-                            </FormItem>
-                        </Col>}
+                        { interceptor && interceptor.content && TEMPLATES(this.props.form, interceptor.content, type)[type] }
+                        { (!interceptor || !interceptor.content) && TEMPLATES(this.props.form, undefined, type )[type] }
                     </Row>
                 </Form>
             </Row >
@@ -189,7 +215,8 @@ class InterceptorForm extends Component {
 InterceptorForm.propTypes = {
     fetching: PropTypes.bool,
     loading: PropTypes.bool,
-    plans: PropTypes.array.isRequired
+    plans: PropTypes.array.isRequired,
+    order: PropTypes.number,
 }
 
 InterceptorForm.defaultProps = {

@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.middleware.spec;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -36,6 +36,7 @@ import br.com.conductor.heimdall.middleware.util.Page;
  *
  * @author Filipe Germano
  * @author Jefferson X. Cardoso
+ * @author marcos.filho
  *
  */
 

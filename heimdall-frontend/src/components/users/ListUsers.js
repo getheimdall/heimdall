@@ -1,8 +1,11 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
+import { Modal, Table, Divider, Tag, Tooltip, Button, Row, Pagination } from 'antd'
 
-import { Modal, Table, Divider, Tag, Tooltip, Button, Row, Pagination } from 'antd';
+import i18n from "../../i18n/i18n"
+import ComponentAuthority from "../policy/ComponentAuthority"
+import {privileges} from "../../constants/privileges-types"
 
 const confirm = Modal.confirm;
 const { Column } = Table;
@@ -11,10 +14,10 @@ class ListUsers extends Component {
 
     showDeleteConfirm = (userId) => (e) => {
         confirm({
-            title: 'Are you sure?',
-            okText: 'Yes',
+            title: i18n.t('are_you_sure'),
+            okText: i18n.t('yes'),
             okType: 'danger',
-            cancelText: 'No',
+            cancelText: i18n.t('no'),
             onOk: () => {
                 this.props.handleDelete(userId)
             }
@@ -25,28 +28,32 @@ class ListUsers extends Component {
         const { dataSource, loading } = this.props
         return (
             <div>
-                <Table dataSource={dataSource.content} rowKey={record => record.id} loading={loading} pagination={false}>
-                    <Column title="ID" dataIndex="id" id="id" />
-                    <Column title="Username" dataIndex="userName" id="name" />
-                    <Column title="Email" dataIndex="email" id="email" />
-                    <Column title="Status" id="status" key="status" render={(record) => (
-                        <span>
-                            {record.status === 'ACTIVE' && <Tag color="green">{record.status}</Tag>}
-                            {record.status === 'INACTIVE' && <Tag color="red">{record.status}</Tag>}
+                <Table dataSource={dataSource.content} rowKey={record => record.id} scroll={{x: 626}} loading={loading} pagination={false}>
+                    <Column title={i18n.t('id')} dataIndex="id" id="id" />
+                    <Column title={i18n.t('username')} dataIndex="userName" id="name" />
+                    <Column title={i18n.t('email')} dataIndex="email" id="email" />
+                    <Column title={i18n.t('status')} id="status" key="status" render={(record) => (
+                        <span style={{textTransform: 'uppercase'}}>
+                            {record.status === 'ACTIVE' && <Tag color="green">{i18n.t('active')}</Tag>}
+                            {record.status === 'INACTIVE' && <Tag color="red">{i18n.t('inactive')}</Tag>}
                         </span>
                     )} />
                     <Column
+                        align="right"
                         id="action"
                         key="action"
+                        width={180}
                         render={(text, record) => (
                             <span>
-                                <Tooltip title="Edit">
+                                <Tooltip title={i18n.t('edit')}>
                                     <Link to={"/users/" + record.id}><Button type="primary" icon="edit" /></Link>
                                 </Tooltip>
-                                <Divider type="vertical" />
-                                <Tooltip title="Delete">
-                                    <Button type="danger" icon="delete" onClick={this.showDeleteConfirm(record.id)} />
-                                </Tooltip>
+                                <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_DELETE_USER]}>
+                                    <Divider type="vertical" />
+                                    <Tooltip title={i18n.t('delete')}>
+                                        <Button type="danger" icon="delete" onClick={this.showDeleteConfirm(record.id)} />
+                                    </Tooltip>
+                                </ComponentAuthority>
                             </span>
                         )}
                     />

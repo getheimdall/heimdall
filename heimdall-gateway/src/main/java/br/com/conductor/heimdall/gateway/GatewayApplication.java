@@ -1,6 +1,3 @@
-
-package br.com.conductor.heimdall.gateway;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
@@ -20,6 +17,7 @@ package br.com.conductor.heimdall.gateway;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -34,9 +32,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import br.com.conductor.heimdall.core.environment.Property;
 import br.com.conductor.heimdall.core.util.RabbitQueueUtils;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
- * This is the main Heimdall Gateway Application class. <br/>
+ * This is the main Heimdall Gateway Application class. <br>
  * Heimdall Gateway is a SpringBoot based application that uses RabbitMQ as a message broker
  * This class starts the RabbitQueue then runs the Gateway Application as a SpringBoot application.
  *
@@ -50,6 +49,7 @@ import br.com.conductor.heimdall.core.util.RabbitQueueUtils;
 @EntityScan("br.com.conductor.heimdall.core.entity")
 @EnableJpaRepositories("br.com.conductor.heimdall.core.repository")
 @EnableCaching
+@EnableScheduling
 public class GatewayApplication extends SpringBootServletInitializer  {
      
      public static void main(String[] args) {

@@ -1,18 +1,15 @@
-
-package br.com.conductor.heimdall.core.repository.impl;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-core
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,9 +17,13 @@ package br.com.conductor.heimdall.core.repository.impl;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.core.repository.impl;
 
 import javax.annotation.PostConstruct;
 
+import br.com.conductor.heimdall.core.enums.Interval;
+import br.com.conductor.heimdall.core.util.ConstantsCache;
+import org.redisson.api.RLock;
 import org.redisson.api.RMap;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,13 +44,13 @@ public class RateLimitRepositoryImpl implements RateLimitRepository {
      private RMap<String, RateLimit> map;
 
      @Autowired
-     private RedissonClient redisson;
+     private RedissonClient redissonClientRateLimitInterceptor;
 
      @PostConstruct
      private void init() {
 
-          if (redisson != null) {
-               map = redisson.getMap(RateLimit.KEY);
+          if (redissonClientRateLimitInterceptor != null) {
+               map = redissonClientRateLimitInterceptor.getMap(RateLimit.KEY);
           }
 
      }
@@ -81,4 +82,17 @@ public class RateLimitRepositoryImpl implements RateLimitRepository {
           }
      }
 
+     @Override
+     public RLock getLock(String key) {
+          return redissonClientRateLimitInterceptor.getLock(key);
+     }
+
+     @Override
+     public RateLimit mountRatelimit(Long interceptorId, Long calls, Interval interval) {
+
+          String path = ConstantsCache.RATE_LIMIT_KEY_PREFIX + interceptorId;
+
+          RateLimit rate = new RateLimit(path, calls, interval);
+          return this.save(rate);
+     }
 }

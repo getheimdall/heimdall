@@ -1,3 +1,4 @@
+import i18n from "../i18n/i18n"
 import { HTTPv1 } from '../utils/Http'
 
 const getInterceptors = (params = {params: {}}) => {
@@ -30,7 +31,7 @@ const getInterceptorTypes = () => {
 
 const getInterceptor = (interceptorId) => {
     if (isNaN(interceptorId)) {
-        return Promise.reject(new Error('Invalid parameter'))
+        return Promise.reject(new Error(i18n.t('invalid_parameter')))
     }
 
     return HTTPv1.get('/interceptors/' + interceptorId)
@@ -81,11 +82,24 @@ const remove = (interceptorId) => {
         })
 }
 
+const refresh = () => {
+    return HTTPv1.post('/interceptors/refresh')
+        .then(res => Promise.resolve(res.data))
+        .catch(error => {
+            console.log('Error: ', error)
+            if (error.response && error.response.status === 404) {
+                return null;
+            }
+            throw error;
+        })
+}
+
 export const interceptorService = {
     getInterceptors,
     getInterceptorTypes,
     getInterceptor,
     save,
     update,
-    remove
+    remove,
+    refresh,
 }

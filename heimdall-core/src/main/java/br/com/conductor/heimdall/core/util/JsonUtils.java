@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.util;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -32,15 +32,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Filipe Germano
  *
  */
-public abstract class JsonUtils {
-     
-	 /**
-	  * Converts a java Object to a <i>json</i> String representation.
-	  * 
-	  * @param  object						The object to be converter
-	  * @return								The json String representation of the object
-	  * @throws JsonProcessingException
-	  */
+public final class JsonUtils {
+
+    private JsonUtils() { }
+
+    /**
+     * Converts a java Object to a <i>json</i> String representation.
+     *
+     * @param  object						The object to be converter
+     * @return								The json String representation of the object
+     * @throws JsonProcessingException
+     */
      public static <T> String convertObjectToJson(T object) throws JsonProcessingException {
           
           ObjectMapper mapper = new ObjectMapper();

@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.dto;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -34,6 +34,7 @@ import lombok.Data;
  * Class is a Data Transfer Object for the {@link Developer}.
  *
  * @author Filipe Germano
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  *
  */
 @Data
@@ -48,6 +49,9 @@ public class DeveloperDTO implements Serializable {
      @NotNull
      @Size(max = 180)
      private String email;
+
+     @Size(max = 300)
+     private String password;
      
      private Status status;
 

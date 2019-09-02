@@ -1,132 +1,89 @@
-import java.util.*;
+/*-
+ * =========================LICENSE_START==================================
+ * heimdall-gateway
+ * ========================================================================
+ * Copyright (C) 2018 Conductor Tecnologia SA
+ * ========================================================================
+ * Licensed under the Apache License, Version 2.0 (the "License")
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ==========================LICENSE_END===================================
+ */
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-
-import org.redisson.api.RLock;
-import org.redisson.api.RedissonClient;
-
-import org.springframework.cloud.netflix.zuul.filters.support.FilterConstants;
-import org.springframework.http.HttpStatus;
-import org.springframework.util.AntPathMatcher;
-import org.springframework.util.PathMatcher;
-
-import com.google.common.collect.Sets;
-import com.netflix.zuul.context.RequestContext;
-
-import br.com.conductor.heimdall.core.entity.Interceptor;
-import br.com.conductor.heimdall.core.entity.RateLimit;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.enums.Interval;
-import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
-import br.com.conductor.heimdall.gateway.filter.helper.*;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
-import br.com.conductor.heimdall.core.repository.RateLimitRepository;
 import br.com.conductor.heimdall.core.util.BeanManager;
-import br.com.conductor.heimdall.middleware.spec.*;
+import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
+import br.com.conductor.heimdall.gateway.service.LifeCycleService;
+import br.com.conductor.heimdall.gateway.service.RattingInterceptorService;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class RateLimitInterceptor extends HeimdallFilter {
 
-     private static Set<String> pathsAllowed;
+    private static Set<Long> ignoredOperations;
+    private static Set<Long> ignoredResources;
+    private static Long referenceId;
+    private static Long apiId;
+    private static boolean status;
+    private static Long calls;
+    private static Long interceptorId;
+    private static Interval interval;
 
-     private static Set<String> pathsNotAllowed;
+    public RateLimitInterceptor() {
 
-     private RateLimitRepository repository;
+        ignoredOperations = new HashSet<>();
+        {{#ignoredOperations}}
+        ignoredOperations.add({{.}});
+        {{/ignoredOperations}}
 
-     private static String inboundURL;
+        ignoredResources = new HashSet<>();
+        {{#ignoredResources}}
+        ignoredResources.add({{.}});
+        {{/ignoredResources}}
 
-     private static String method;
+        referenceId = {{referenceId}};
+        apiId = {{apiId}};
+        status = {{interceptorStatus}};
+        calls = {{calls}};
+        interceptorId = {{interceptor-id}};
+        interval = Interval.{{interval}};
+    }
 
-     private PathMatcher pathMatcher = new AntPathMatcher();
+    @Override
+    public String filterType() {
+        return "{{executionPoint}}";
+    }
 
-     private RedissonClient redisson;
+    @Override
+    public int filterOrder() {
+        return {{order}};
+    }
 
-     private Helper helper;
+    @Override
+    public String getName() {
+        return "{{name}}"
+    }
 
-     public RateLimitInterceptor() {
+    @Override
+    public boolean should() {
+        LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredResources, ignoredOperations, status);
+    }
 
-          method = "{{method}}";
-
-          pathsAllowed = Sets.newHashSet();
-          {{#pathsAllowed}}
-               pathsAllowed.add("{{.}}");
-          {{/pathsAllowed}}      
-
-          pathsNotAllowed = Sets.newHashSet();
-          {{#pathsNotAllowed}}
-               pathsNotAllowed.add("{{.}}");
-          {{/pathsNotAllowed}}           
-
-          inboundURL = "{{inboundURL}}";
-
-          this.helper = new HelperImpl();
-     }
-
-     @Override
-     public boolean should() {
-
-          return InterceptorLifeCycle.{{lifeCycle}}.filter(pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest());
-     }
-     
-     @Override
-     public String getName() {
-     	return "{{name}}"
-     }
-
-     @Override
-     public void execute() throws Throwable {
-          repository = (RateLimitRepository) BeanManager.getBean(RateLimitRepository.class);
-          redisson = (RedissonClient) BeanManager.getBean(RedissonClient.class);
-          RequestContext ctx = RequestContext.getCurrentContext();
-          
-          RLock lock = redisson.getLock({{name}});
-          lock.lock();
-
-          RateLimit rate = repository.find("{{path}}");
-          if (rate.getLastRequest() == null) {
-               rate.setLastRequest(LocalDateTime.now());
-          }
-          
-          
-          if (isIntervalEnded(rate)) {
-               rate.reset();
-               rate.decreaseRemaining();
-               repository.save(rate);
-          } else {
-               if (rate.hasRemaining()) {
-                    rate.decreaseRemaining();
-                    repository.save(rate);
-               } else {
-                    ctx.setSendZuulResponse(false);
-                    ctx.setResponseStatusCode(HttpStatus.TOO_MANY_REQUESTS.value());
-                    ctx.setResponseBody(HttpStatus.TOO_MANY_REQUESTS.getReasonPhrase());
-               }
-               
-          }
-          lock.unlock();
-     }
-
-     private boolean isIntervalEnded(RateLimit rate) {         
-
-          if (rate.getInterval() == Interval.SECONDS) {
-               return Duration.between(LocalDateTime.now(), rate.getLastRequest()).getSeconds() != 0;
-          } else if (rate.getInterval() == Interval.MINUTES) {
-               return Duration.between(LocalDateTime.now(), rate.getLastRequest()).toMinutes() != 0;
-          } else {
-               return Duration.between(LocalDateTime.now(), rate.getLastRequest()).toHours() != 0;
-          }
-     }
-
-     @Override
-     public String filterType() {
-
-          return "{{executionPoint}}";
-     }
-
-     @Override
-     public int filterOrder() {
-
-          return {{order}};
-     }
+    @Override
+    public void execute() throws Throwable {
+        RattingInterceptorService rattingInterceptorService = (RattingInterceptorService) BeanManager.getBean(RattingInterceptorService.class);
+        rattingInterceptorService.execute("{{name}}", "{{cache-key}}", calls, interval, interceptorId);
+    }
 
 }

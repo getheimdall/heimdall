@@ -1,18 +1,15 @@
-
-package br.com.conductor.heimdall.gateway.util;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-gateway
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,31 +17,27 @@ package br.com.conductor.heimdall.gateway.util;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.gateway.util;
 
+import br.com.conductor.heimdall.core.environment.Property;
+import br.com.conductor.heimdall.core.util.DigestUtils;
+import br.com.conductor.heimdall.core.util.UrlUtil;
+import br.com.conductor.heimdall.core.trace.RequestResponseParser;
+import br.com.conductor.heimdall.middleware.spec.Request;
+import com.netflix.zuul.context.RequestContext;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.util.StreamUtils;
+
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Enumeration;
 import java.util.HashMap;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.util.StreamUtils;
-
-import com.netflix.zuul.context.RequestContext;
-
-import br.com.conductor.heimdall.core.environment.Property;
-import br.com.conductor.heimdall.core.util.DigestUtils;
-import br.com.conductor.heimdall.core.util.UrlUtil;
-import br.com.conductor.heimdall.gateway.trace.RequestResponseParser;
-import br.com.conductor.heimdall.middleware.spec.Request;
-import br.com.twsoftware.alfred.object.Objeto;
-import lombok.extern.slf4j.Slf4j;
-
 /**
- * <h1>RequestHelper</h1><br/>
- * 
+ *
  * Provides methods to dump {@link Request} and get the info from the headers of a request.
  *
  * @author Marcos Filho
@@ -88,14 +81,13 @@ public class RequestHelper {
       */
      public HashMap<String, String> getRequestHeadersInfo(HttpServletRequest request) {
           
-          HashMap<String, String> map = new HashMap<String, String>();
+          HashMap<String, String> map = new HashMap<>();
           Enumeration<String> headerNames = request.getHeaderNames();
           while (headerNames.hasMoreElements()) {
-               String key = (String) headerNames.nextElement();               
-               String value = null;
+               String key = headerNames.nextElement();
+               String value;
 
-
-               if (Objeto.notBlank(props.getTrace().getSanitizes())) {
+               if (props.getTrace().getSanitizes() != null) {
                     if (props.getTrace().getSanitizes().contains(key)) {
                          value = DigestUtils.digestMD5(request.getHeader(key));
                     } else {

@@ -1,36 +1,43 @@
-import { HTTP } from '../utils/Http'
-import { HTTPv1 } from '../utils/Http'
+import i18n from "../i18n/i18n"
+import {HTTP, HTTPv1} from '../utils/Http'
 
 const login = (login, password) => {
-    let auth = {
+    let accountCredentials = {
         username: login,
         password: password
     }
 
-    return HTTP.get('/v1/index.html', { auth })
-    .then(res => {
-        localStorage.setItem('user', JSON.stringify(auth))
-        return Promise.resolve(auth)
-    })
-    .catch(error => {
-        console.log('Error: ', error)
-        throw error;
-    })
+    return HTTP.post('/v1/api/login', accountCredentials)
+        .then(res => {
+            const user = res.data
+            const token = res.headers.authorization
+            localStorage.setItem('token', token)
+            localStorage.setItem('user', user.username)
+            localStorage.setItem('privileges', JSON.stringify(user.privileges))
+            localStorage.setItem('type', user.type)
+            return Promise.resolve(accountCredentials)
+        })
+        .catch(error => {
+            console.log('Error: ', error)
+            throw error;
+        })
 }
 
 const logout = () => {
-    localStorage.removeItem('user')
+    if (localStorage.getItem('token')) {
+        const headers = {'Authorization': localStorage.getItem('token')}
+        HTTP.get('/v1/api/logout', {headers}).then(res => {
+            localStorage.clear()
+        });
+    }
 }
 
 const getUserLocal = () => {
-    return JSON.parse(localStorage.getItem('user'))
+    return {username: localStorage.getItem('user')};
 }
 
 const isUserLogged = () => {
-    if (localStorage.getItem('user')) {
-        return true
-    }
-    return false
+    return !!localStorage.getItem('token');
 }
 
 const getUsers = (params = {params: {}}) => {
@@ -49,7 +56,7 @@ const getUsers = (params = {params: {}}) => {
 
 const getUser = (userId) => {
     if (isNaN(userId)) {
-        return Promise.reject(new Error('Invalid parameter'))
+        return Promise.reject(new Error(i18n.t('invalid_parameter')))
     }
 
     return HTTPv1.get('/users/' + userId)
@@ -89,6 +96,17 @@ const update = (user) => {
         })
 }
 
+const updatePassword = (userPasswords) => {
+    return HTTPv1.put('/users/password', JSON.stringify(userPasswords))
+        .then(res => Promise.resolve(res.data))
+        .catch(error => {
+            console.log('Error: ', error)
+            if (error.response && error.response.status === 404)
+                return null
+            throw error
+        })
+}
+
 const remove = (userId) => {
     return HTTPv1.delete('/users/' + userId)
         .catch(error => {
@@ -109,5 +127,6 @@ export const userService = {
     update,
     save,
     getUser,
-    getUsers
+    getUsers,
+    updatePassword
 }

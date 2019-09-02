@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.environment;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -31,7 +31,8 @@ import lombok.Data;
  * This class represents the environment.
  * 
  * @author Filipe Germano
- *
+ * @author Marcelo Aguiar Rodrigues
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Data
 @ConfigurationProperties(prefix = "heimdall", ignoreUnknownFields = true)
@@ -39,10 +40,10 @@ public class Property {
 
      private String contextPath;
 
-     private Splunk splunk = new Splunk();
+     private Logstash logstash = new Logstash();
 
      @Data
-     public class Splunk{
+     public class Logstash {
 
           private Boolean enabled;
 
@@ -150,6 +151,9 @@ public class Property {
           private String collection;
           private String username;
           private String password;
+          private Long queueSize;
+          private Long discardingThreshold;
+          private String zoneId;
           
      }
 
@@ -159,6 +163,35 @@ public class Property {
      public class Trace {
           private boolean printAllTrace = false;
           private List<String> sanitizes = new ArrayList<>();
+          private boolean printHeimdallFilters = false;
+     }
+     
+     private Middlewares middlewares = new Middlewares();
+     
+     @Data
+     public class Middlewares {
+    	 private Integer allowInactive;
+    	 private Boolean deleteDeprecated;
+     }
+     
+     private FailSafe failsafe = new FailSafe();
+     
+     @Data
+     public class FailSafe {
+        private boolean enabled = true;
+    	private int failureNumber = 3;
+    	private int successNumber = 3;
+    	private int delayTimeSeconds = 30;
+     }
+
+     @Data
+     public class Interceptor {
+        private Health health = new Health();
+     }
+
+     @Data
+     public class Health {
+          private Long fixedRate;
      }
 
 }

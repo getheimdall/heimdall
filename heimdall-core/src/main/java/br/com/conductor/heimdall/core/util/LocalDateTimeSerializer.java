@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.util;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -39,8 +39,6 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 public class LocalDateTimeSerializer extends JsonSerializer<TemporalAccessor> {
 
      private static final DateTimeFormatter ISOFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'").withZone(ZoneId.systemDefault());
-
-     public static final LocalDateTimeSerializer INSTANCE = new LocalDateTimeSerializer();
 
      LocalDateTimeSerializer(){}
 

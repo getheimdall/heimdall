@@ -1,5 +1,6 @@
-import { push } from 'connected-react-router';
+import { push } from 'connected-react-router'
 
+import i18n from "../../i18n/i18n"
 import { EnvironmentConstants } from '../../constants/actions-types'
 import { environmentService } from '../../services'
 
@@ -35,13 +36,13 @@ export const save = environment => dispatch => {
     environmentService.save(environment)
         .then(data => {
             dispatch(getAllEnvironments())
-            dispatch(sendNotification({ type: 'success', message: 'Environment saved' }))
+            dispatch(sendNotification({ type: 'success', message: i18n.t('environment_saved') }))
             dispatch(push('/environments'))
             dispatch(finishLoading())
         })
         .catch(error => {
             if (error.response && error.response.status === 400) {
-                dispatch(sendNotification({ type: 'error', message: 'Error', description: error.response.data.message }))
+                dispatch(sendNotification({ type: 'error', message: i18n.t('error'), description: error.response.data.message }))
             }
             dispatch(finishLoading())
         })
@@ -51,13 +52,14 @@ export const update = environment => dispatch => {
     environmentService.update(environment)
         .then(data => {
             dispatch(getEnvironment(environment.id))
-            dispatch(sendNotification({ type: 'success', message: 'Environment updated' }))
+            dispatch(sendNotification({ type: 'success', message: i18n.t('environment_updated') }))
             dispatch(finishLoading())
         })
         .catch(error => {
             if (error.response && error.response.status === 400) {
-                dispatch(sendNotification({ type: 'error', message: 'Error', description: error.response.data.message }))
+                dispatch(sendNotification({ type: 'error', message: i18n.t('error'), description: error.response.data.message }))
             }
+            dispatch(getEnvironment(environment.id))
             dispatch(finishLoading())
         })
 }
@@ -66,12 +68,13 @@ export const remove = environmentId => dispatch => {
     environmentService.remove(environmentId)
         .then(data => {
             dispatch(getAllEnvironments())
-            dispatch(sendNotification({ type: 'success', message: 'Environment removed' }))
+            dispatch(sendNotification({ type: 'success', message: i18n.t('environment_removed') }))
         })
         .catch(error => {
             if (error.response && error.response.status === 400) {
-                dispatch(sendNotification({ type: 'error', message: 'Error', description: error.response.data.message }))
+                dispatch(sendNotification({ type: 'error', message: i18n.t('error'), description: error.response.data.message }))
             }
+            dispatch(getAllEnvironments())
             dispatch(finishLoading())
         })
 }

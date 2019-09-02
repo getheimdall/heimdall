@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.util;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -34,7 +34,9 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
-public class RabbitQueueUtils {
+public final class RabbitQueueUtils {
+
+     private RabbitQueueUtils() { }
 
      public static void init() {
           try {
@@ -46,6 +48,7 @@ public class RabbitQueueUtils {
                System.setProperty("heimdall.queue.interceptors-remove", RabbitConstants.QUEUE_HEIMDALL_REMOVE_INTERCEPTORS + "." + InetAddress.getLocalHost().getHostName());
                System.setProperty("heimdall.queue.middlewares", RabbitConstants.QUEUE_HEIMDALL_MIDDLEWARES + "." + InetAddress.getLocalHost().getHostName());
                System.setProperty("heimdall.queue.remove-middlewares", RabbitConstants.QUEUE_HEIMDALL_REMOVE_MIDDLEWARES + "." + InetAddress.getLocalHost().getHostName());
+               System.setProperty("heimdall.queue.clean-interceptors-cache", RabbitConstants.QUEUE_HEIMDALL_CLEAN_INTERCEPTORS_CACHE + "." + InetAddress.getLocalHost().getHostName());
           } catch (UnknownHostException e) {
                
         	  log.error(e.getMessage(), e);

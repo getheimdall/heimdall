@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import { Row, Col, Form, Icon, Input, Button } from 'antd';
+import i18n from '../../i18n/i18n'
 
 const FormItem = Form.Item;
 
@@ -9,7 +10,7 @@ class LoginForm extends Component {
         e.preventDefault();
         this.props.form.validateFields((err, values) => {
             if (!err) {
-                this.props.submit(values.userName, values.password)
+                this.props.submit(values.userName, values.password, true)
             }
         });
     }
@@ -17,23 +18,23 @@ class LoginForm extends Component {
     render() {
         const { getFieldDecorator } = this.props.form;
         return (
-            <Form onSubmit={this.handleSubmit} className="login-form">
+            <Form onSubmit={this.handleSubmit}>
                 <Row>
                     <Col>
                         <FormItem>
                             {getFieldDecorator('userName', {
-                                rules: [{ required: true, message: 'Please input your username!' }],
+                                rules: [{ required: true, message: i18n.t('insert_username') }],
                             })(
-                                <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Username" />
+                                <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder={i18n.t('username')} autoFocus/>
                             )}
                         </FormItem>
                     </Col>
                 </Row>
                 <FormItem>
                     {getFieldDecorator('password', {
-                        rules: [{ required: true, message: 'Please input your Password!' }],
+                        rules: [{ required: true, message: i18n.t('insert_password') }],
                     })(
-                        <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="Password" />
+                        <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder={i18n.t('password')} />
                     )}
                 </FormItem>
                 {/* <Row >
@@ -50,8 +51,8 @@ class LoginForm extends Component {
                     </Col>
                 </Row> */}
                 <Col>
-                    <Button style={{ width: '100%' }} type="primary" htmlType="submit" className="login-form-button" loading={this.props.loading}>
-                        Log in
+                    <Button id="login" style={{ width: '100%', background: 'transparent', border: '1px solid #D9B217' }} type="primary" htmlType="submit" className="login-form-button" loading={this.props.loading}>
+                        { i18n.t('sign_in') }
                     </Button>
                 </Col>
             </Form>

@@ -6,12 +6,12 @@ package br.com.conductor.heimdall.core.entity;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,7 +29,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -46,15 +45,16 @@ import org.hibernate.annotations.DynamicUpdate;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import br.com.conductor.heimdall.core.enums.Status;
-import br.com.twsoftware.alfred.object.Objeto;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 /**
  *  The Access Token is required for a safe connection to be established.
  * 
  * @author Filipe Germano
- *
+ * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
  */
 @Data
 @Table(name = "ACCESS_TOKENS")
@@ -76,7 +76,7 @@ public class AccessToken implements Serializable {
 
      @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.REFRESH})
      @JoinColumn(name = "APP_ID")
-     @JsonIgnoreProperties({ "accessTokens", "plans", "developer" })
+     @JsonIgnoreProperties({ "accessTokens", "developer" })
      private App app;
      
      @Column(name = "EXPIRED_DATE")
@@ -85,7 +85,8 @@ public class AccessToken implements Serializable {
      @Column(name = "CREATION_DATE", nullable = false)
      private LocalDateTime creationDate;
      
-     @ManyToMany(fetch = FetchType.EAGER)
+     @ManyToMany
+     @LazyCollection(LazyCollectionOption.FALSE)
      @JoinTable(name = "ACCESS_TOKENS_PLANS", 
           joinColumns = @JoinColumn(name = "ACCESS_TOKEN_ID", referencedColumnName = "ID"), 
           inverseJoinColumns = @JoinColumn(name = "PLAN_ID", referencedColumnName = "ID"))
@@ -99,10 +100,10 @@ public class AccessToken implements Serializable {
      @PrePersist
      private void initValuesPersist() {
 
-          if (Objeto.isBlank(status)) {
-               status = Status.ACTIVE;
-          }
+          status = (status == null) ? Status.ACTIVE : status;
+
           creationDate = LocalDateTime.now();
+          code = code.trim();
      }
 
 }

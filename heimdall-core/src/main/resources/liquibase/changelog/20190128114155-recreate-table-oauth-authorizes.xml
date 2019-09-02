@@ -1,0 +1,46 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+
+    <changeSet id="01" author="conductor\dijalma.silva">
+        <dropTable tableName="OAUTH_AUTHORIZES"/>
+    </changeSet>
+
+    <changeSet id="02" author="conductor\dijalma.silva">
+        <createTable tableName="OAUTH_AUTHORIZES">
+            <column name="ID" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="PK_OAUTH_AUTHORIZES" nullable="false"/>
+            </column>
+            <column name="CLIENT_ID" type="VARCHAR(250)">
+                <constraints nullable="false" />
+            </column>
+            <column name="TOKEN_AUTHORIZE" type="VARCHAR(250)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="GRANT_TYPE" type="varchar(100)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="EXPIRATION_DATE" type="datetime">
+                <constraints nullable="true"/>
+            </column>
+            <column name="EXPIRATION_TIME" type="bigint">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="03" author="conductor\dijalma.silva">
+        <addUniqueConstraint tableName="OAUTH_AUTHORIZES" columnNames="ID" constraintName="UQ_OAUTH_AUTHORIZES"/>
+        <addForeignKeyConstraint
+                baseTableName="OAUTH_AUTHORIZES" baseColumnNames="CLIENT_ID"
+                constraintName="FK_CLIENT_ID" deferrable="false"
+                initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION"
+                referencedTableName="APPS" referencedColumnNames="CLIENT_ID"
+                validate="true" />
+    </changeSet>
+
+</databaseChangeLog>

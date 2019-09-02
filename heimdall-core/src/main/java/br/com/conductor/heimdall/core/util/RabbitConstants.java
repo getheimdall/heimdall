@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.util;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -28,7 +28,9 @@ package br.com.conductor.heimdall.core.util;
  * @author Marcos Filho
  *
  */
-public class RabbitConstants {
+public final class RabbitConstants {
+
+     private RabbitConstants() { }
 
      //EXCHANGES
      public static final String EXCHANGE_FANOUT_HEIMDALL_REMOVE_INTERCEPTORS = "heimdall.EXCHANGE_FANOUT_HEIMDALL_REMOVE_INTERCEPTORS";
@@ -38,6 +40,7 @@ public class RabbitConstants {
      public static final String EXCHANGE_FANOUT_HEIMDALL_ROUTES = "heimdall.EXCHANGE_FANOUT_HEIMDALL_ROUTES";
      public static final String EXCHANGE_FANOUT_HEIMDALL_MIDDLEWARES = "heimdall.EXCHANGE_FANOUT_HEIMDALL_MIDDLEWARES";
      public static final String EXCHANGE_FANOUT_HEIMDALL_REMOVE_MIDDLEWARES = "heimdall.EXCHANGE_FANOUT_HEIMDALL_REMOVE_MIDDLEWARES";
+     public static final String EXCHANGE_FANOUT_HEIMDALL_CLEAN_INTERCEPTORS_CACHE = "heimdall.EXCHANGE_FANOUT_HEIMDALL_CLEAN_INTERCEPTORS_CACHE";
 
      //QUEUE's
      public static final String QUEUE_HEIMDALL_REMOVE_INTERCEPTORS = "heimdall.QUEUE_REMOVE_INTERCEPTORS";
@@ -47,6 +50,7 @@ public class RabbitConstants {
      public static final String QUEUE_HEIMDALL_ROUTES = "heimdall.QUEUE_ROUTES";
      public static final String QUEUE_HEIMDALL_MIDDLEWARES = "heimdall.QUEUE_MIDDLEWARES";
      public static final String QUEUE_HEIMDALL_REMOVE_MIDDLEWARES = "heimdall.QUEUE_REMOVE_MIDDLEWARES";
+     public static final String QUEUE_HEIMDALL_CLEAN_INTERCEPTORS_CACHE = "heimdall.QUEUE_CLEAN_INTERCEPTORS_CACHE";
 
      //Listeners
      public static final String LISTENER_HEIMDAL_ROUTES = "${heimdall.queue.routes}";
@@ -56,4 +60,5 @@ public class RabbitConstants {
      public static final String LISTENER_HEIMDALL_REFRESH_INTERCEPTORS = "${heimdall.queue.refresh-interceptors}";
      public static final String LISTENER_HEIMDALL_MIDDLEWARES = "${heimdall.queue.middlewares}";
      public static final String LISTENER_HEIMDALL_REMOVE_MIDDLEWARES = "${heimdall.queue.remove-middlewares}";
+     public static final String LISTENER_HEIMDALL_CLEAN_INTERCEPTORS_CACHE = "${heimdall.queue.clean-interceptors-cache}";
 }

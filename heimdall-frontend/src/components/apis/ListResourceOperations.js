@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactTable from 'react-table'
-import tagColor from '../../utils/tagColor'
+import tagColor from '../../utils/TagColorUtils'
 import { Select, Tag, Switch, Button, Tooltip } from 'antd'
 
 const Option = Select.Option

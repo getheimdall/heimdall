@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.converter;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -53,7 +53,7 @@ public abstract class GenericConverter {
 
      /**
       * Converts a source to a type destination.
-      * 
+      *
       * @param source				The source object
       * @param destination			The destination object
       * @return						The object created
@@ -67,46 +67,11 @@ public abstract class GenericConverter {
           return destination;
      }
 
-     /**
-      * Converts a source to a type destination.
-      * 
-      * @param source				The souce object
-      * @param typeDestination		The type destination 
-      * @param mapping				The properties for the mapping process
-      * @return						The object created
-      */
-     public static <T, E> E mapperWithMapping(T source, Class<E> typeDestination, PropertyMap<T, E> mapping) {
-
-          ModelMapper modelMapper = new ModelMapper();
-          modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-          modelMapper.addMappings(mapping);
-
-          return modelMapper.map(source, typeDestination);
-     }
 
      /**
       * Converts a source to a type destination.
       * 
       * @param source				The souce object
-      * @param destination			The destination object
-      * @param mapping				The properties for the mapping process
-      * @return						The object created
-      */
-     public static <T, E> E mapperWithMapping(T source, E destination, PropertyMap<T, E> mapping) {
-          
-          ModelMapper modelMapper = new ModelMapper();
-          modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-          modelMapper.addMappings(mapping);
-          modelMapper.map(source, destination);
-          
-          return destination; 
-     }
-     
-     /**
-      * Converts a source to a type destination.
-      * 
-      * @param source				The souce object
-      * @param typeDestination		The type destination 
       * @return						The object created
       */
      public static <E, T> List<E> mapper(List<T> source, Type destinationType) {
@@ -121,5 +86,17 @@ public abstract class GenericConverter {
           }
 
           return model;
+     }
+
+     public static <T, E> void convertWithMapping(T source, E destination, PropertyMap<T, E> mapping) {
+
+          if (source != null && destination != null) {
+
+               ModelMapper modelMapper = new ModelMapper();
+
+               modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+               modelMapper.addMappings(mapping);
+               modelMapper.map(source, destination);
+          }
      }
 }

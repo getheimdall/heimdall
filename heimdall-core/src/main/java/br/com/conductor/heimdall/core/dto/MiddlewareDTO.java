@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.dto;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -23,6 +23,7 @@ package br.com.conductor.heimdall.core.dto;
 
 import java.io.Serializable;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import br.com.conductor.heimdall.core.entity.Middleware;
@@ -39,7 +40,8 @@ import lombok.Data;
 public class MiddlewareDTO implements Serializable {
 
      private static final long serialVersionUID = 1539726604929323247L;
-     
+
+     @NotNull
      @Size(min = 3, max = 20)
      private String version;
      

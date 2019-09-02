@@ -1,18 +1,15 @@
-
-package br.com.conductor.heimdall.api.service;
-
 /*-
  * =========================LICENSE_START==================================
  * heimdall-api
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,12 +17,14 @@ package br.com.conductor.heimdall.api.service;
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
+package br.com.conductor.heimdall.api.service;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import br.com.conductor.heimdall.core.enums.Status;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -66,14 +65,14 @@ public class CustomUserDetailsService implements UserDetailsService {
      @Override
      public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
 
-          final CredentialSecurity credential = repository.findCredentialByUserNameAndType(username, TypeUser.DATABASE);
+          final CredentialSecurity credential = repository.findCredentialByUserNameAndTypeAndStatus(username, TypeUser.DATABASE, Status.ACTIVE);
           final Set<Privilege> privileges = privRepository.findPrivilegesByUserNameAndType(username, TypeUser.DATABASE);
           
           return new org.springframework.security.core.userdetails.User(credential.getUserName(), credential.getPassword(), getAuthoritiesFromPrivileges(privileges));
      }
      
      private final Collection<? extends GrantedAuthority> getAuthoritiesFromPrivileges(final Collection<Privilege> privileges) {
-          final List<String> auths = new ArrayList<String>();
+          final List<String> auths = new ArrayList<>();
           
           for (final Privilege item : privileges) {
                auths.add(item.getName());

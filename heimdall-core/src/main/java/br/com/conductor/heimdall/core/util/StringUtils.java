@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.util;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -23,7 +23,6 @@ package br.com.conductor.heimdall.core.util;
 
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
-import br.com.twsoftware.alfred.object.Objeto;
 
 /**
  * This class provides a methods to format {@link String}s to be used by Heimdall. 
@@ -31,15 +30,17 @@ import br.com.twsoftware.alfred.object.Objeto;
  * @author Filipe Germano
  *
  */
-public abstract class StringUtils {
 
-	/**
+public final class StringUtils {
+
+    private StringUtils() { }
+
+    /**
 	 * Creates a String that represents a order. It adds leading zeros ("0").
 	 * 
 	 * @param  prefix					The number to be prefixed
 	 * @param  order					The order
 	 * @return							The prefixed order created
-	 * @throws BadRequestException
 	 */
      public static String generateOrder(Integer prefix, Integer order) {
 
@@ -57,45 +58,33 @@ public abstract class StringUtils {
       */
      public static String concatCamelCase(String... strings) {
           
-          String value = "";
+          StringBuilder value = new StringBuilder();
           for (String string : strings) {
                
                String[] splits = string.split("_");
                for (String split : splits) {
                     
-                    if (Objeto.notBlank(split)) {
+                    if (split != null && !split.isEmpty()) {
                          
-                         value += split.substring(0, 1).toUpperCase() + split.substring(1).toLowerCase();
+                         value.append(split.substring(0, 1).toUpperCase()).append(split.substring(1).toLowerCase());
                     }
                }
           }
           
-          return value;          
+          return value.toString();
      }
 
-     /**
-      * Concatenates multiple strings.
-      * 
-      * @param  strings				Multiple String parameters 
-      * @return						The concatenated String
-      */
-     public static String join(String... strings) {
-          
-          return org.apache.commons.lang.StringUtils.join(strings);
-          
+    /**
+     * Removes all instances of double forward slash from a path and
+     * makes sure that there is one forward slash at the start of the
+     * path.
+     *
+     * @param path Path to be parsed
+     * @return     The path with one forward slash at the start and
+     *             single forward slashes where there were double
+     */
+     public static String removeMultipleSlashes(String path) {
+         path = "/" + path;
+         return path.replaceAll("//+", "/");
      }
-
-     /**
-      * Concatenates multiple strings with a specific separator.
-      * 
-      * @param 	separator			The separator to be used.
-      * @param  strings				Multiple String parameters 
-      * @return						The concatenated String
-      */
-     public static String join(String separator, String... strings) {
-          
-          return org.apache.commons.lang.StringUtils.join(strings, separator);
-          
-     }
-
 }

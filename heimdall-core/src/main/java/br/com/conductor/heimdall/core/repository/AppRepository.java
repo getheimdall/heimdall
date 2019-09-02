@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.repository;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -21,19 +21,17 @@ package br.com.conductor.heimdall.core.repository;
  * ==========================LICENSE_END===================================
  */
 
-import java.util.List;
-
-import javax.persistence.LockModeType;
-
+import br.com.conductor.heimdall.core.entity.App;
+import br.com.conductor.heimdall.core.entity.Plan;
+import br.com.conductor.heimdall.core.util.ConstantsCache;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import br.com.conductor.heimdall.core.entity.App;
-import br.com.conductor.heimdall.core.entity.Plan;
-import br.com.conductor.heimdall.core.util.ConstantsCache;
+import javax.persistence.LockModeType;
+import java.util.List;
 
 /**
  * Provides methods to access a {@link App}.

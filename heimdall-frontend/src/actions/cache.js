@@ -1,3 +1,4 @@
+import i18n from "../i18n/i18n"
 import { CacheConstants } from '../constants/actions-types'
 import { cacheService } from '../services'
 
@@ -16,7 +17,7 @@ export const sendNotification = notification => dispatch => {
 export const clearCaches = () => dispatch => {
     cacheService.clearCaches()
         .then(data => {
-            dispatch(sendNotification({ type: 'success', message: 'Cache cleared' }))
+            dispatch(sendNotification({ type: 'success', message: i18n.t('cache_cleared') }))
             dispatch(finishLoading())
         })
 }

@@ -1,114 +1,80 @@
+/*-
+ * =========================LICENSE_START==================================
+ * heimdall-gateway
+ * ========================================================================
+ * Copyright (C) 2018 Conductor Tecnologia SA
+ * ========================================================================
+ * Licensed under the Apache License, Version 2.0 (the "License")
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ==========================LICENSE_END===================================
+ */
 
-import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
-
-import java.util.*;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.http.HttpStatus;
-import org.springframework.util.ReflectionUtils;
-
-import com.google.common.collect.Sets;
-import com.netflix.zuul.context.RequestContext;
-
-import br.com.conductor.heimdall.gateway.filter.helper.*;
-import br.com.conductor.heimdall.core.entity.AccessToken;
 import br.com.conductor.heimdall.core.enums.InterceptorLifeCycle;
 import br.com.conductor.heimdall.core.enums.Location;
-import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
-import br.com.conductor.heimdall.gateway.service.SecurityService;
-import br.com.conductor.heimdall.gateway.trace.TraceContextHolder;
 import br.com.conductor.heimdall.core.util.BeanManager;
-import br.com.conductor.heimdall.core.util.ConstantsInterceptors;
-import br.com.conductor.heimdall.core.util.DigestUtils;
-import br.com.conductor.heimdall.middleware.spec.*;
-import br.com.twsoftware.alfred.object.Objeto;
+import br.com.conductor.heimdall.gateway.service.LifeCycleService;
+import br.com.conductor.heimdall.gateway.filter.HeimdallFilter;
+import br.com.conductor.heimdall.gateway.service.AccessTokenInterceptorService;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class AccessTokenInterceptor extends HeimdallFilter {
 
-     private static Set<String> pathsAllowed;
+    private static Set<Long> ignoredOperations;
+    private static Set<Long> ignoredResources;
+    private static Long referenceId;
+    private static Long apiId;
 
-     private static Set<String> pathsNotAllowed;
+    public AccessTokenInterceptor() {
+        ignoredOperations = new HashSet<>();
+        {{#ignoredOperations}}
+        ignoredOperations.add({{.}});
+        {{/ignoredOperations}}
 
-     private static String inboundURL;
+        ignoredResources = new HashSet<>();
+        {{#ignoredResources}}
+        ignoredResources.add({{.}});
+        {{/ignoredResources}}
 
-     private static String method;
+        referenceId = {{referenceId}};
+        apiId = {{apiId}};
+    }
 
-     private SecurityService securityService;
+    @Override
+    public int filterOrder() {
+        return {{order}};
+    }
 
-     private Helper helper;
+    @Override
+    public String filterType() {
+        return "{{executionPoint}}";
+    }
 
-     public AccessTokenInterceptor() {
+    @Override
+    public boolean should() {
+        LifeCycleService lifeCycleService = (LifeCycleService) BeanManager.getBean(LifeCycleService.class);
+        return lifeCycleService.should(InterceptorLifeCycle.{{lifeCycle}}, referenceId, apiId, ignoredResources, ignoredOperations, {{interceptorStatus}});
+    }
 
-          method = "{{method}}";
+    @Override
+    public String getName() {
+        return "{{name}}"
+    }
 
-          pathsAllowed = Sets.newHashSet();
-     {{#pathsAllowed}}
-          pathsAllowed.add("{{.}}");
-     {{/pathsAllowed}}      
-
-          pathsNotAllowed = Sets.newHashSet();
-     {{#pathsNotAllowed}}
-          pathsNotAllowed.add("{{.}}");
-     {{/pathsNotAllowed}}           
-
-          inboundURL = "{{inboundURL}}";
-
-          this.helper = new HelperImpl();
-
-     }
-
-     @Override
-     public int filterOrder() {
-
-          return {{order}};
-     }
-
-     @Override
-     public String filterType() {
-
-          return "{{executionPoint}}";
-     }
-
-     @Override
-     public boolean should() {
-
-          return InterceptorLifeCycle.{{lifeCycle}}.filter(pathsAllowed, pathsNotAllowed, inboundURL, method, RequestContext.getCurrentContext().getRequest());
-     }
-     
-     @Override
-     public String getName() {
-     	return "{{name}}"
-     }
-
-     public Long getApiId() {
-          return {{apiId}};
-     }
-
-     @Override
-     public void execute() throws Throwable {
-
-          securityService = (SecurityService) BeanManager.getBean(SecurityService.class);
-          RequestContext ctx = RequestContext.getCurrentContext();
-          HttpServletRequest request = ctx.getRequest();          
-
-          String accessToken = null;
-          String clientId = null;
-          Location location = Location.valueOf("{{location}}");
-          String nameAccessToken = Objeto.notBlank("{{name}}") ? "{{name}}" : "access_token";
-          String nameClientId = Objeto.notBlank("{{client_id}}") ? "{{client_id}}" : "client_id";
-          if (Location.HEADER.equals(location)) {
-               
-               accessToken = helper.call().request().header().get(nameAccessToken);
-               clientId = helper.call().request().header().get(nameClientId);
-          } else {
-               
-               accessToken = request.getParameter(nameAccessToken);               
-               clientId = request.getParameter(nameClientId);       
-          }
-
-          securityService.validadeAccessToken(ctx, helper, getApiId(), clientId, accessToken);       
-
-     }     
+    @Override
+    public void execute() throws Throwable {
+        AccessTokenInterceptorService accessTokenInterceptorService = (AccessTokenInterceptorService) BeanManager.getBean(AccessTokenInterceptorService.class);
+        accessTokenInterceptorService.validate(apiId, Location.{{location}});
+    }
 
 }

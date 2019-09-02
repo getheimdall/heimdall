@@ -7,7 +7,7 @@ package br.com.conductor.heimdall.core.util;
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  * 
@@ -21,17 +21,17 @@ package br.com.conductor.heimdall.core.util;
  * ==========================LICENSE_END===================================
  */
 
-import br.com.twsoftware.alfred.object.Objeto;
-
 /**
  * DigestMD5 wrapper class
  * 
  * @author Marcos Filho
  *
  */
-public abstract class DigestUtils {
+public final class DigestUtils {
 
-	 /**
+    private DigestUtils() { }
+
+    /**
 	  * Return a hexadecimal string representation of the MD5 digest of the given bytes.
 	  * 
 	  * @param  value		The value to be converted
@@ -39,7 +39,7 @@ public abstract class DigestUtils {
 	  */
      public static String digestMD5(String value) {
 
-          if (Objeto.notBlank(value)) {
+          if (value != null && !value.isEmpty()) {
 
                return org.springframework.util.DigestUtils.md5DigestAsHex(value.getBytes());
           } else {

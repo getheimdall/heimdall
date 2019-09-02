@@ -2,12 +2,14 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { Row, notification } from 'antd'
 
-import { getAllEnvironments, remove, initLoading } from '../actions/environments'
-
+import i18n from "../i18n/i18n"
+import Loading from '../components/ui/Loading'
 import PageHeader from '../components/ui/PageHeader'
-import ListEnvironments from '../components/environments/ListEnvironments';
-import Loading from '../components/ui/Loading';
-import FloatButton from '../components/ui/FloatButton'
+import RouteButton from '../components/ui/RouteButton'
+import {privileges} from "../constants/privileges-types"
+import ComponentAuthority from "../components/policy/ComponentAuthority"
+import ListEnvironments from '../components/environments/ListEnvironments'
+import { getAllEnvironments, remove, initLoading } from '../actions/environments'
 
 class Environments extends Component {
 
@@ -35,12 +37,13 @@ class Environments extends Component {
 
         return (
             <div>
-                <PageHeader title="Environments" icon="codepen" />
+                <PageHeader title={i18n.t('environments')} icon="codepen" />
                 <Row className="h-row bg-white">
                     <ListEnvironments environments={environments} handleDelete={this.handleDelete} />
                     {loading && <Loading />}
-
-                    <FloatButton history={history} to="/environments/new" label="Add new Environment" />
+                    <ComponentAuthority privilegesAllowed={[privileges.PRIVILEGE_CREATE_ENVIRONMENT]}>
+                        <RouteButton idButton="addEnvironment" history={history} to="/environments/new" label={i18n.t('add_new_environment')} />
+                    </ComponentAuthority>
                 </Row>
             </div>
         )
