@@ -27,6 +27,7 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.MIDDLEWA
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ONLY_ONE_MIDDLEWARE_PER_VERSION_AND_API;
 
 import java.util.*;
+import java.util.stream.Collectors;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
