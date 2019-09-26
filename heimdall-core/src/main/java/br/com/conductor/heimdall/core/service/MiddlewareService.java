@@ -291,9 +291,9 @@ public class MiddlewareService {
 
 			if (allowInactive != null && allowInactive > 0) {
 
-				List<Middleware> active = middlewareMap.get(Status.ACTIVE);
-				List<Middleware> inactive = middlewareMap.get(Status.INACTIVE);
-				List<Middleware> deprecated = middlewareMap.get(Status.DEPRECATED);
+				List<Middleware> active = middlewareMap.get(Status.ACTIVE) != null ? middlewareMap.get(Status.ACTIVE) : Collections.emptyList();
+				List<Middleware> inactive = new ArrayList<>(middlewareMap.get(Status.INACTIVE) != null ? middlewareMap.get(Status.INACTIVE) : Collections.emptyList());
+				List<Middleware> deprecated = new ArrayList<>(middlewareMap.get(Status.DEPRECATED) != null ? middlewareMap.get(Status.DEPRECATED) : Collections.emptyList());
 
                 active.forEach(m -> m.setStatus(Status.INACTIVE));
 
