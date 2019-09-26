@@ -26,11 +26,7 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.MIDDLEWA
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.MIDDLEWARE_UNSUPPORTED_TYPE;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ONLY_ONE_MIDDLEWARE_PER_VERSION_AND_API;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-
+import java.util.*;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
