@@ -85,7 +85,7 @@ public class OperationJDBCRepository {
 		sql.append("FROM OPERATIONS OP ");
 		sql.append("INNER JOIN RESOURCES RES ON OP.RESOURCE_ID = RES.ID ");
 		sql.append("INNER JOIN APIS API ON RES.API_ID = API.ID ");
-	  	sql.append("WHERE CONCAT(API.BASE_PATH, OP.PATH) = ? ");
+	  sql.append("WHERE CONCAT(API.BASE_PATH, OP.PATH) = ? ");
 		sql.append("AND API.ID <> ?");
 
 		int count = jdbcTemplate.queryForObject(sql.toString(), new Object[] { pattern, apiId }, Integer.class);
