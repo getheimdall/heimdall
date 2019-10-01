@@ -2,7 +2,6 @@ import { NavbarConstants } from '../constants/actions-types'
 import { menuitem } from '../constants/sidebar-items'
 
 const activeRoutingMiddleWare = store => next => action => {
-    console.log("Middleware triggered:", action);
     if (action.type === "@@router/LOCATION_CHANGE") {
         const pathname = action.payload.location.pathname
 
