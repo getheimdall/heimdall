@@ -22,7 +22,7 @@ class Cors extends React.Component {
         const { content } = this.props
 
         if (content) {
-            this.setState({ ...this.state, cors: content.cors })
+            this.setState({ ...this.state, cors: content })
         }
     }
 
