@@ -1,3 +1,24 @@
+import qs from 'qs'
+import {EnumFilters} from "./EnumFiltersUtils"
+
+const completeFilters = filters => {
+
+    if (filters) {
+        const filtersResult = JSON.parse(JSON.stringify(filters))
+
+        filtersResult.forEach(filter => {
+            const filterEqual = getFilters().find(f => f.name === filter.name)
+            filter.operations = filterEqual.operations
+            filter.possibleValues = filterEqual.possibleValues
+            filter.label = filterEqual.label
+        })
+
+        return filtersResult
+    }
+
+    return filters
+}
+
 const getFilters = () => {
     return [
         {
@@ -202,8 +223,6 @@ const getOperations = (type) => {
             ]
         case "date":
             return [
-                "equals",
-                "not equals",
                 "between",
                 "less than",
                 "greater than",
@@ -216,6 +235,7 @@ const getOperations = (type) => {
                 "this month",
                 "last month",
                 "this year",
+                "not equals",
                 "none",
                 "all"
             ]
@@ -248,8 +268,80 @@ const getPossibleValues = (field) => {
     }
 }
 
+const filtersToURLSearch = filters => {
+    filters.forEach(filter => {
+        if (filter.type === 'date') {
+            filter.firstValue = (new Date(filter.firstValue).getTime() / 1000).toFixed(0)
+            if (filter.operationSelected === 'between') {
+                filter.secondValue = (new Date(filter.secondValue).getTime() / 1000).toFixed(0)
+            }
+        }
+    })
+    return qs.stringify(filters)
+}
+
+const URLSearchToFilters = urlSearch => {
+    const filtersObject = qs.parse(urlSearch)
+    const result = Object.keys(filtersObject).map(key => filtersObject[key])
+
+    result.forEach(filter => {
+        if (filter.type === 'date') {
+            filter.firstValue = new Date(filter.firstValue * 1000).toISOString()
+            if (filter.operationSelected === 'between') {
+                filter.secondValue = new Date(filter.secondValue * 1000).toISOString()
+            }
+        }
+    })
+
+    return result
+}
+
+const updateOperationSelectedToEnum = (filters) => {
+
+    let filtersToSend = [];
+
+    if (filters) {
+        filters.forEach((f) => {
+            let filter = {};
+            filter['operationSelected'] = EnumFilters[f.operationSelected]
+            filter['firstValue'] = f.firstValue
+            filter['secondValue'] = f.secondValue
+            filter['name'] = f.name
+            filter['type'] = f.type
+
+            filtersToSend.push(filter)
+        })
+    }
+
+    return filtersToSend;
+}
+
+const reduceFilterToURL = filters => {
+    let filtersToSend = [];
+
+    if (filters) {
+        filters.forEach((f) => {
+            let filter = {};
+            filter['operationSelected'] = f.operationSelected
+            filter['firstValue'] = f.firstValue
+            filter['secondValue'] = f.secondValue
+            filter['name'] = f.name
+            filter['type'] = f.type
+
+            filtersToSend.push(filter)
+        })
+    }
+
+    return filtersToSend;
+}
+
 export default {
     getFilters,
     getOperations,
-    getPossibleValues
+    getPossibleValues,
+    filtersToURLSearch,
+    URLSearchToFilters,
+    updateOperationSelectedToEnum,
+    completeFilters,
+    reduceFilterToURL
 }

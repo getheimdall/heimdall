@@ -4,12 +4,13 @@ import {connect} from 'react-redux'
 //components
 import {Card, Col, Form, notification, Row, Select, Input, Button, DatePicker, TimePicker} from 'antd'
 //actions
+import i18n from "../i18n/i18n"
 import Loading from '../components/ui/Loading'
 import PageHeader from '../components/ui/PageHeader'
 import ListTraces from '../components/traces/ListTraces'
 import FilterTraceUtils from "../utils/FilterTraceUtils"
 import {getAllTraces, initLoading} from "../actions/traces"
-import i18n from "../i18n/i18n";
+import moment from 'moment'
 
 const {Option} = Select
 
@@ -22,12 +23,27 @@ class Traces extends Component {
         searchQuery: {},
         filters: FilterTraceUtils.getFilters(),
         filtersSelected: [],
-        filterOrder: 0
+        filterOrder: 0,
+        search: false
     }
 
     componentDidMount() {
-        this.props.dispatch(initLoading())
-        this.props.dispatch(getAllTraces({offset: 0, limit: 10, filtersSelected: this.state.filtersSelected}))
+        const urlSearch = this.props.history.location.search.replace('?', '')
+        const filters = FilterTraceUtils.URLSearchToFilters(urlSearch)
+        if (filters) {
+            const filtersComplete = FilterTraceUtils.completeFilters(filters)
+            this.setState({ ...this.state, filtersSelected: filtersComplete, search: true })
+        } else {
+            this.setState({ ...this.state, filtersSelected: [], search: true })
+        }
+    }
+
+    componentWillUpdate(nextProps, nextState) {
+        if (nextState.search) {
+            this.props.dispatch(initLoading())
+            this.props.dispatch(getAllTraces({offset: 0, limit: 10, filtersSelected: nextState.filtersSelected }))
+            this.setState({ ...nextState, search: false })
+        }
     }
 
     componentWillReceiveProps(newProps) {
@@ -44,8 +60,9 @@ class Traces extends Component {
     }
 
     sendFilters = () => {
-        this.props.dispatch(initLoading())
-        this.props.dispatch(getAllTraces({offset: 0, limit: 10, filtersSelected: this.state.filtersSelected}))
+        const { filtersSelected } = this.state
+        const urlSearch = FilterTraceUtils.filtersToURLSearch(FilterTraceUtils.reduceFilterToURL(filtersSelected))
+        this.props.history.push(`?${urlSearch}`)
     }
 
     updateFiltersSelected = (element) => {
@@ -57,7 +74,7 @@ class Traces extends Component {
         const newFiltersSelected = filtersSelected.filter((e) => e.name !== element.name)
         newFiltersSelected.push(element)
         newFiltersSelected.sort(this.orderFiltersSelected)
-        this.setState({...this.state, filtersSelected: newFiltersSelected, filterOrder: orderFilter})
+        this.setState({...this.state, filtersSelected: newFiltersSelected, filterOrder: orderFilter, search: false })
     }
 
     removeFromFiltersSelected = (element) => {
@@ -153,7 +170,6 @@ class Traces extends Component {
                                             const options = element.operations.map((operation) => {
                                                 return <Option key={operation}>{operation}</Option>
                                             })
-
                                             return (
                                                 <Row key={element.name} gutter={16} justify="left"
                                                      className="heimdall-select-filters">
@@ -176,6 +192,7 @@ class Traces extends Component {
                                                             {
                                                                 element.type === "date" &&
                                                                 <DatePicker
+                                                                    defaultValue={element.firstValue && element.firstValue.length > 0 && moment(element.firstValue, formatDate)}
                                                                     showTime={timeInput} format={formatDate}
                                                                     onChange={this.handleChangeValueFilter(element)}
                                                                     style={{width: "100%"}}/>
@@ -206,6 +223,7 @@ class Traces extends Component {
                                                             {
                                                                 element.type === "date" ?
                                                                     <DatePicker
+                                                                        defaultValue={element.secondValue && element.secondValue.length > 0 && moment(element.secondValue, formatDate)}
                                                                         showTime={timeInput} format={formatDate}
                                                                         onChange={this.handleChangeValue2Filter(element)}
                                                                         style={{width: "100%"}}/>

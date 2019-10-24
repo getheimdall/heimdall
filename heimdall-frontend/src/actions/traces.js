@@ -1,3 +1,4 @@
+import i18n from "../i18n/i18n"
 import {TraceConstants} from '../constants/actions-types'
 import {traceService} from '../services'
 
@@ -17,6 +18,13 @@ export const getAllTraces = (query = {offset: 0, limit: 10}) => dispatch => {
                 data.content = data.content.filter((objectTrace) => objectTrace.trace !== null)
             }
             dispatch({type: TraceConstants.GET_TRACES, traces: data})
+            dispatch(finishLoading())
+        })
+        .catch(error => {
+            console.log(error)
+            if (error.response && error.response.status === 400) {
+                dispatch(sendNotification({ type: 'error', message: i18n.t('error'), description: error.response.data.message }))
+            }
             dispatch(finishLoading())
         })
 }
