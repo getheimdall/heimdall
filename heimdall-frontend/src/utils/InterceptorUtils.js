@@ -12,6 +12,7 @@ import OAuth from '../components/interceptors/wrappers/OAuth'
 import Identifier from '../components/interceptors/wrappers/Identifier'
 import LogMasker from '../components/interceptors/wrappers/LogMasker'
 import { InterceptorContent } from './InterceptorContentUtils'
+import LogWriter from "../components/interceptors/wrappers/LogWriter";
 
 export const TEMPLATES = (form, content, type) => ({
     ACCESS_TOKEN: <AccessToken form={form} content={parseContentByType(content, type)}/>,
@@ -28,6 +29,8 @@ export const TEMPLATES = (form, content, type) => ({
     OAUTH: <OAuth form={form} content={parseContentByType(content, type)}/>,
     IDENTIFIER: <Identifier form={form} content={parseContentByType(content, type)}/>,
     MIDDLEWARE: <Default form={form} content={parseContentByType(content, type)}/>,
+    LOG_WRITER: <LogWriter form={form} content={parseContentByType(content, type)}/>
+
 })
 
 const parseContentByType = (content, type) => {
