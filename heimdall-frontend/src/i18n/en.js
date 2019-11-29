@@ -316,6 +316,7 @@ export default {
         'time_refresh_token': 'Refresh Token Time',
         'uri': 'URI',
         'ignored_headers': 'Ignored Headers',
+        'required_headers': 'Required Headers',
         'param_name': 'Param Name',
         'param_value': 'Param Value',
         'add_new_param': 'Add new param',
