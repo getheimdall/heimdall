@@ -170,7 +170,7 @@ class AppForm extends Component {
                                             rules: [
                                                 {required: true, message: i18n.t('please_pick_plan')}
                                             ]
-                                        })(<Checkbox.Group className='checkbox-conductor'>
+                                        })(<Checkbox.Group className='checkbox-conductor checkbox-conductor-plans'>
                                             {this.props.plans && this.props.plans.content.map((plan, index) => {
                                                 return <Checkbox key={index} value={plan.id}
                                                                  disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_APP, privileges.PRIVILEGE_UPDATE_APP])}>{plan.name}</Checkbox>
