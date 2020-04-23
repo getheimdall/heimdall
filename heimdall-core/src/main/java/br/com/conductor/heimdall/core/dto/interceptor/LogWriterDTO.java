@@ -11,6 +11,8 @@ public class LogWriterDTO {
 
     private Boolean headers = false;
 
+    private Boolean uri = false;
+
     private List<String> requiredHeaders = null;
 
 }

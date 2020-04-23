@@ -86,7 +86,7 @@ public class PlanService {
 
           Plan plan = GenericConverter.mapper(planDTO, Plan.class);
           
-          Example<Plan> example = Example.of(plan, ExampleMatcher.matching().withIgnorePaths("defaultPlan").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+          Example<Plan> example = Example.of(plan, ExampleMatcher.matching().withIgnorePaths("defaultPlan", "api.cors").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
           
           Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
           Page<Plan> page = planRepository.findAll(example, pageable);
@@ -107,7 +107,7 @@ public class PlanService {
           
           Plan plan = GenericConverter.mapper(planDTO, Plan.class);
           
-          Example<Plan> example = Example.of(plan, ExampleMatcher.matching().withIgnorePaths("defaultPlan").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
+          Example<Plan> example = Example.of(plan, ExampleMatcher.matching().withIgnorePaths("defaultPlan", "api.cors").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
           
           List<Plan> plans = planRepository.findAll(example);
           

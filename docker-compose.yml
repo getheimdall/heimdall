@@ -23,16 +23,18 @@ services:
     volumes_from:
     - postgres-data
     ports:
-    - 5433:5432/tcp        
-  heimdall-config:
-    image: getheimdall/heimdall-config:latest
+    - 5432:5432/tcp
   heimdall-api:
     image: getheimdall/heimdall-api:latest
     environment:
     - SPRING_PROFILES_ACTIVE=docker
+    - HEIMDALL_DATASOURCE_SERVERNAME=postgres
+    - HEIMDALL_REDIS_HOST=redis
+    - HEIMDALL_MONGO_SERVERNAME=mongo
+    - HEIMDALL_MONGO_URL=mongodb://admin:admin@mongo
+    - SPRING_RABBITMQ_HOST=rabbitmq
     links:
     - postgres:postgres
-    - heimdall-config:heimdall-config
     - redis:redis
     - mongo:mongo
     - rabbitmq:rabbitmq
@@ -42,9 +44,13 @@ services:
     image: getheimdall/heimdall-gateway:latest
     environment:
     - SPRING_PROFILES_ACTIVE=docker
+    - HEIMDALL_DATASOURCE_SERVERNAME=postgres
+    - HEIMDALL_REDIS_HOST=redis
+    - HEIMDALL_MONGO_SERVERNAME=mongo
+    - HEIMDALL_MONGO_URL=mongodb://admin:admin@mongo
+    - SPRING_RABBITMQ_HOST=rabbitmq
     links:
     - postgres:postgres
-    - heimdall-config:heimdall-config
     - redis:redis
     - mongo:mongo
     - rabbitmq:rabbitmq
@@ -52,5 +58,9 @@ services:
     - 8080:8080/tcp        
   heimdall-frontend:
     image: getheimdall/heimdall-frontend:latest   
+    environment:
+    - REACT_APP_SCHEME=HTTP
+    - REACT_APP_ADDRESS=heimdall-api
+    - REACT_APP_PORT=9090
     ports:
     - 80:5000/tcp        

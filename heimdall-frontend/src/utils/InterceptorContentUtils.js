@@ -59,6 +59,10 @@ const logMaskerContent = content => {
     return content
 }
 
+const corsContent = content => {
+    return JSON.stringify(content.cors)
+}
+
 const stringifyContent = content => {
     if (content) {
         return JSON.stringify(content)
@@ -71,11 +75,31 @@ const simpleContent = content => {
     return content
 }
 
+const logWriterContent = content => {
+    if (content) {
+
+        const { requiredHeaders } = content
+
+        if (requiredHeaders && typeof requiredHeaders === 'string') {
+            const requiredHeadersSplit = requiredHeaders.split(',')
+            content.requiredHeaders = requiredHeadersSplit.map(requiredHeader => requiredHeader.trim())
+        } else {
+            content.requiredHeaders = []
+        }
+
+        return JSON.stringify(content)
+    }
+
+    return content
+}
+
 
 export const InterceptorContent = {
     cacheContent,
     ipsContent,
     logMaskerContent,
     stringifyContent,
-    simpleContent
+    simpleContent,
+    corsContent,
+    logWriterContent
 }
