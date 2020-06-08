@@ -98,6 +98,7 @@ public class DataBaseConfiguration implements EnvironmentAware {
           hikariConfig.addDataSourceProperty("loginTimeout", property.getDatasource().getLoginTimeout());
           hikariConfig.addDataSourceProperty("applicationName", property.getDatasource().getAppName());
           hikariConfig.addDataSourceProperty("portNumber", property.getDatasource().getPortNumber());
+          hikariConfig.addDataSourceProperty("ssl", property.getDatasource().getSsl());
           
           if (SQL_SERVER.equals(database)) {
                

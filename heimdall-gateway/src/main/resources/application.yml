@@ -42,6 +42,7 @@ heimdall:
         serverName: 127.0.0.1
         username: postgres
         password: 123456
+        ssl: false
         runLiquibase: true
         sendStringParametersAsUnicode: false
     mongo:
@@ -76,6 +77,10 @@ heimdall:
         numTestsPerEvictionRun: 3
         blockWhenExhausted: true
         connectionPoolSize: 10
+        ssl: false
+        cacheDatabase: 0
+        rateLimitDatabase: 2
+        cacheInterceptorDatabase: 4
     middlewares:
         allowInactive: 0
         deleteDeprecated: false

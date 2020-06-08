@@ -53,8 +53,4 @@ public final class ConstantsCache {
      public static final String CACHE_BUCKET = "CACHE_BUCKET";
 
      public static final String RATE_LIMIT_KEY_PREFIX = "ratelimit-interceptor:";
-
-     public static final int RATE_LIMIT_DATABASE = 2;
-
-     public static final int CACHE_INTERCEPTOR_DATABASE = 4;
 }
