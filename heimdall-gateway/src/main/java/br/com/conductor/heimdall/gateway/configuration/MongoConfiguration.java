@@ -22,6 +22,7 @@ package br.com.conductor.heimdall.gateway.configuration;
 import br.com.conductor.heimdall.core.environment.Property;
 import com.mongodb.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -31,6 +32,7 @@ import org.springframework.context.annotation.Configuration;
  *
  */
 @Configuration
+@ConditionalOnProperty("heimdall.mongo.enabled")
 public class MongoConfiguration {
 
 	@Autowired

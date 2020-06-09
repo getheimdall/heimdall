@@ -39,16 +39,13 @@ import lombok.Data;
 public class Property {
 
      private String contextPath;
-
      private Logstash logstash = new Logstash();
 
      @Data
      public class Logstash {
 
           private Boolean enabled;
-
           private String destination;
-
      }
      
      private Rewrite rewrite = new Rewrite();
@@ -57,9 +54,7 @@ public class Property {
      public class Rewrite{
 
           private Boolean enable;
-
           private String prefix;
-
      }
 
      private Datasource datasource = new Datasource();
@@ -68,55 +63,31 @@ public class Property {
      public class Datasource{
 
           private Long initializationFailTimeout;
-
           private String dataBaseType;
-
           private Integer socketTimeout;
-
           private String loginTimeout;
-
           private Integer minimumIdle;
-
           private Integer maximumPoolSize;
-
           private Long validationTimeout;
-
           private Long idleTimeout;
-
           private Long connectionTimeout;
-
           private Boolean autoCommit;
-
           private String dataSourceClassName;
-
           private String connectionTestQuery;
-
           private String appName;
-
           private String databaseName;
-
           private String portNumber;
-
           private String serverName;
-
           private String username;
-
-          private String password;
-          
-          private Boolean encrypt;
-          
-          private Boolean trustServerCertificate;
-          
+          private String password;         
+          private Boolean ssl;         
+          private Boolean encrypt;        
+          private Boolean trustServerCertificate;        
           private String hostNameInCertificate;          
-
           private boolean runLiquibase;
-
           private boolean sendStringParametersAsUnicode;
-
-          private boolean multiSubnetFailover;
-          
+          private boolean multiSubnetFailover;      
           private String url;
-
      }
      
      private Redis redis = new Redis();
@@ -125,6 +96,7 @@ public class Property {
      public class Redis {
           private String host;
           private Integer port;
+          private String password;
           private Integer maxTotal;
           private Integer maxIdle;
           private Integer minIdle;
@@ -136,6 +108,10 @@ public class Property {
           private Integer numTestsPerEvictionRun;
           private boolean blockWhenExhausted;
           private Integer connectionPoolSize;
+          private boolean ssl;
+          private Integer cacheDatabase;
+          private Integer rateLimitDatabase;
+          private Integer cacheInterceptorDatabase;
      }
      
      private Mongo mongo = new Mongo();

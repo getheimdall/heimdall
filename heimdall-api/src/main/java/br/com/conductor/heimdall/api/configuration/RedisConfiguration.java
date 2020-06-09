@@ -19,9 +19,8 @@
  */
 package br.com.conductor.heimdall.api.configuration;
 
-import br.com.conductor.heimdall.core.entity.RateLimit;
-import br.com.conductor.heimdall.core.environment.Property;
-import br.com.conductor.heimdall.core.util.ConstantsCache;
+import java.time.Duration;
+
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.config.Config;
@@ -37,9 +36,10 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-import redis.clients.jedis.JedisPoolConfig;
 
-import java.time.Duration;
+import br.com.conductor.heimdall.core.entity.RateLimit;
+import br.com.conductor.heimdall.core.environment.Property;
+import redis.clients.jedis.JedisPoolConfig;
 
 /**
  * Class responsible for the Redis configuration.
@@ -66,7 +66,10 @@ public class RedisConfiguration {
           
           factory.setHostName(property.getRedis().getHost());
           factory.setPort(property.getRedis().getPort());
+          factory.setPassword(property.getRedis().getPassword());
+          factory.setUseSsl(property.getRedis().isSsl());
           factory.setUsePool(true);
+          factory.setDatabase(property.getRedis().getCacheDatabase());
           factory.setPoolConfig(jediPoolConfig());
           return factory;
      }
@@ -146,13 +149,13 @@ public class RedisConfiguration {
      @Bean(autowire = Autowire.BY_NAME)
      public RedissonClient redissonClientRateLimitInterceptor() {
 
-          return createConnection(ConstantsCache.RATE_LIMIT_DATABASE);
+    	 return createConnection(property.getRedis().getRateLimitDatabase());
      }
 
      @Bean(autowire = Autowire.BY_NAME)
      public RedissonClient redissonClientCacheInterceptor() {
 
-          return createConnection(ConstantsCache.CACHE_INTERCEPTOR_DATABASE);
+          return createConnection(property.getRedis().getCacheInterceptorDatabase());
      }
 
      private RedissonClient createConnection(int database) {

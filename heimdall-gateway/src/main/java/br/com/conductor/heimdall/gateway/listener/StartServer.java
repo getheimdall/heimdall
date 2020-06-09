@@ -38,12 +38,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
-import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.event.ContextStartedEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.stereotype.Component;
 
 import com.netflix.zuul.FilterLoader;
 import com.netflix.zuul.groovy.GroovyCompiler;
@@ -58,6 +61,7 @@ import br.com.conductor.heimdall.core.repository.jdbc.InterceptorJDBCRepository;
 import br.com.conductor.heimdall.core.repository.jdbc.MiddlewareJDBCRepository;
 import br.com.conductor.heimdall.core.service.FileService;
 import br.com.conductor.heimdall.core.util.Constants;
+import br.com.conductor.heimdall.gateway.configuration.DataBaseConfiguration;
 import br.com.conductor.heimdall.gateway.configuration.HeimdallHandlerMapping;
 import br.com.conductor.heimdall.gateway.service.InterceptorFileService;
 import br.com.conductor.heimdall.gateway.util.HeimdallFilterFileManager;
@@ -74,7 +78,9 @@ import lombok.extern.slf4j.Slf4j;
  *
  */
 @Slf4j
-public class StartServer implements ServletContextListener {
+@Component
+@ConditionalOnBean(DataBaseConfiguration.class)
+public class StartServer {
 
 	@Autowired
 	private InterceptorFileService interceptorFileService;
@@ -102,17 +108,13 @@ public class StartServer implements ServletContextListener {
 
 	private List<Long> apiIds;
 
-	@Override
-	public void contextInitialized(ServletContextEvent sce) {
+	@EventListener(ContextStartedEvent.class)
+	public void contextInitialized() {
 
 		log.info("Initializing Groovy Interceptors");
 		heimdallHandlerMapping.initHandlers();
 		initGroovyFilterManager();
 
-	}
-
-	@Override
-	public void contextDestroyed(ServletContextEvent sce) {
 	}
 
 	private void initGroovyFilterManager() {
