@@ -46,7 +46,7 @@ public class RouteListener {
      private HeimdallHandlerMapping heimdallHandlerMapping;
 
      @Autowired
-     private StartServer startServer;
+     private InterceptorContext startServer;
 
      /**
       * Updates the {@link ZuulRoute} repository.

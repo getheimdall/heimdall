@@ -45,7 +45,7 @@ import br.com.conductor.heimdall.gateway.filter.CustomHostRoutingFilter;
 import br.com.conductor.heimdall.gateway.filter.CustomSendErrorFilter;
 import br.com.conductor.heimdall.gateway.filter.CustomSendResponseFilter;
 import br.com.conductor.heimdall.gateway.filter.HeimdallDecorationFilter;
-import br.com.conductor.heimdall.gateway.listener.StartServer;
+import br.com.conductor.heimdall.gateway.listener.InterceptorContext;
 import br.com.conductor.heimdall.gateway.router.CredentialRepository;
 import br.com.conductor.heimdall.gateway.util.RequestHelper;
 import br.com.conductor.heimdall.gateway.zuul.route.ProxyRouteLocator;
@@ -124,13 +124,6 @@ public class ZuulConfiguration extends ZuulProxyAutoConfiguration {
 	public SimpleHostRoutingFilter simpleHostRoutingFilter2(ProxyRequestHelper helper, ZuulProperties zuulProperties,
 			CloseableHttpClient httpClient) {
 		return new CustomHostRoutingFilter(helper, zuulProperties, httpClient, circuitBreakerManager);
-	}
-
-	@Bean
-	public StartServer startServeltListenerZuul() {
-
-		return new StartServer();
-
 	}
 
 	@Bean
