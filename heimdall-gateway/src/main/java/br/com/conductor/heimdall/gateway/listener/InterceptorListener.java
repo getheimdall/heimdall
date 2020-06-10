@@ -57,7 +57,7 @@ public class InterceptorListener {
      private InterceptorJDBCRepository interceptorJdbcRepository;
 
      @Autowired
-     private StartServer startServer;
+     private InterceptorContext startServer;
 
      /**
       * Updates the {@link Interceptor} repository.

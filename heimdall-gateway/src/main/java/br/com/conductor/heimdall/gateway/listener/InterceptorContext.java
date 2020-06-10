@@ -44,6 +44,7 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.ContextStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -80,7 +81,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 @ConditionalOnBean(DataBaseConfiguration.class)
-public class StartServer {
+public class InterceptorContext {
 
 	@Autowired
 	private InterceptorFileService interceptorFileService;
@@ -108,10 +109,11 @@ public class StartServer {
 
 	private List<Long> apiIds;
 
-	@EventListener(ContextStartedEvent.class)
+	@EventListener(ApplicationReadyEvent.class)
 	public void contextInitialized() {
 
 		log.info("Initializing Groovy Interceptors");
+		initApplication();
 		heimdallHandlerMapping.initHandlers();
 		initGroovyFilterManager();
 
@@ -155,7 +157,6 @@ public class StartServer {
 	/**
 	 * Initializes the application
 	 */
-	@PostConstruct
 	public void initApplication() {
 
 		try {

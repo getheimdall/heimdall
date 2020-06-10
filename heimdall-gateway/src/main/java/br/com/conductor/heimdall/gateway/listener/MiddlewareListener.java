@@ -46,7 +46,7 @@ public class MiddlewareListener {
      private MiddlewareRepository middlewareRepository;
 
      @Autowired
-     private StartServer startServer;
+     private InterceptorContext startServer;
 
      /**
       * Updates the {@link Middleware} repository.
