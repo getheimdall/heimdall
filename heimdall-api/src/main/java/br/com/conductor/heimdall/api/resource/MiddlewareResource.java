@@ -68,7 +68,7 @@ public class MiddlewareResource {
      @ApiOperation(value = "Find Middleware by id", response = Api.class)
      @GetMapping(value = "/{middlewareId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_MIDDLEWARE)
-     public ResponseEntity<?> findById(@PathVariable("apiId") Long apiId, @PathVariable("middlewareId") Long middlewareId) {
+     public ResponseEntity<Middleware> findById(@PathVariable("apiId") Long apiId, @PathVariable("middlewareId") Long middlewareId) {
 
           Middleware middleware = middlewareService.find(apiId, middlewareId);
 
@@ -113,7 +113,7 @@ public class MiddlewareResource {
      @ApiOperation(value = "Save a new Middleware")
      @PostMapping(consumes = {MediaType.APPLICATION_JSON_UTF8_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_OCTET_STREAM_VALUE })
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_MIDDLEWARE)
-     public ResponseEntity<?> save(@PathVariable("apiId") Long apiId,
+     public ResponseEntity<String> save(@PathVariable("apiId") Long apiId,
                @RequestParam("file") MultipartFile file,
                @Valid
                MiddlewareDTO middlewareDTO) {
@@ -135,7 +135,7 @@ public class MiddlewareResource {
      @ApiOperation(value = "Update Middleware")
      @PutMapping(value = "/{middlewareId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_MIDDLEWARE)
-     public ResponseEntity<?> update(@PathVariable("apiId") Long apiId, @PathVariable("middlewareId") Long middlewareId, @RequestBody MiddlewareDTO middlewareDTO) {
+     public ResponseEntity<Middleware> update(@PathVariable("apiId") Long apiId, @PathVariable("middlewareId") Long middlewareId, @RequestBody MiddlewareDTO middlewareDTO) {
 
           Middleware middleware = middlewareService.update(apiId, middlewareId, middlewareDTO);
 
@@ -153,7 +153,7 @@ public class MiddlewareResource {
      @ApiOperation(value = "Delete Middleware")
      @DeleteMapping(value = "/{middlewareId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_MIDDLEWARE)
-     public ResponseEntity<?> delete(@PathVariable("apiId") Long apiId, @PathVariable("middlewareId") Long middlewareId) {
+     public ResponseEntity<Void> delete(@PathVariable("apiId") Long apiId, @PathVariable("middlewareId") Long middlewareId) {
 
           middlewareService.delete(apiId, middlewareId);
 
@@ -170,7 +170,7 @@ public class MiddlewareResource {
      @ApiOperation(value = "Download Middleware file by id", response = Api.class)
      @GetMapping(value = "/download/{middlewareId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_MIDDLEWARE)
-     public ResponseEntity<?> downloadFileById(@PathVariable("apiId") Long apiId, @PathVariable("middlewareId") Long middlewareId){
+     public ResponseEntity downloadFileById(@PathVariable("apiId") Long apiId, @PathVariable("middlewareId") Long middlewareId){
 
           Middleware middleware = middlewareService.find(apiId, middlewareId);
           ByteArrayResource resource = new ByteArrayResource(middleware.getFile());

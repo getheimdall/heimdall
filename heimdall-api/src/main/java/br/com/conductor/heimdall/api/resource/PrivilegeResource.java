@@ -62,7 +62,7 @@ public class PrivilegeResource {
      @ApiOperation(value = "Find Privileges by id", response = Privilege.class)
      @GetMapping(value = "/{apiId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_PRIVILEGE)
-     public ResponseEntity<?> findById(@PathVariable("apiId") Long id) {
+     public ResponseEntity<Privilege> findById(@PathVariable("apiId") Long id) {
 
           Privilege privilege = privilegeService.find(id);
 
