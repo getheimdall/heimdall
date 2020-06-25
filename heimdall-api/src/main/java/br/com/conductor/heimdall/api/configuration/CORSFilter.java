@@ -72,6 +72,6 @@ public class CORSFilter implements Filter {
 
     @Override
     public void destroy() {
-
+            // Esse método é chamado para indicar ao container que o Filter está sendo destruido.
     }
 }

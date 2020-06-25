@@ -49,6 +49,8 @@ import java.util.List;
 @EnableSwagger2
 public class SwaggerConfiguration {
 
+    private static final String AUTHORIZATION = "authorization";
+
 	/**
 	 * Returns a {@link Docket} with the Heimdall information.
 	 *
@@ -63,7 +65,7 @@ public class SwaggerConfiguration {
                     .paths(PathSelectors.any())
                     .build()
                     .apiInfo(apiInfo())
-                    .securitySchemes(Collections.singletonList(new ApiKey("authorization", "authorization", "header")))
+                    .securitySchemes(Collections.singletonList(new ApiKey(AUTHORIZATION, AUTHORIZATION, "header")))
                     .securityContexts(Collections.singletonList(securityContext()));
 
           return docket;
@@ -91,6 +93,6 @@ public class SwaggerConfiguration {
         AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessNothing");
         AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
         authorizationScopes[0] = authorizationScope;
-        return Collections.singletonList(new SecurityReference("authorization", authorizationScopes));
+        return Collections.singletonList(new SecurityReference(AUTHORIZATION, authorizationScopes));
     }
 }
