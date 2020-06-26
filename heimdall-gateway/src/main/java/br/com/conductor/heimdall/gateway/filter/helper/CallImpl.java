@@ -34,11 +34,21 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.GZIPInputStream;
 
@@ -230,9 +240,9 @@ public class CallImpl implements Call {
                try (InputStream in = (InputStream) context.get("requestEntity")) {
                     String bodyText;
             	    if (in == null) {
-                         bodyText = StreamUtils.copyToString(context.getRequest().getInputStream(), Charset.forName("UTF-8"));
+                         bodyText = StreamUtils.copyToString(context.getRequest().getInputStream(), StandardCharsets.UTF_8);
                     } else {
-                         bodyText = StreamUtils.copyToString(in, Charset.forName("UTF-8"));
+                         bodyText = StreamUtils.copyToString(in, StandardCharsets.UTF_8);
                     }
 
                     return bodyText;
@@ -249,7 +259,7 @@ public class CallImpl implements Call {
                
                try {
                     
-                    context.set("requestEntity", new ByteArrayInputStream(body.getBytes("UTF-8")));
+                    context.set("requestEntity", new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8)));
                } catch (Exception e) {
                     
                     log.error(e.getMessage(), e);
