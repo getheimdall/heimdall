@@ -37,6 +37,8 @@ public final class ConstantsPath {
      
      public static final String PATH_API = "/v1/api";
 
+     public static final String APIID = "/{apiId}";
+
      public static final String PATH_MANAGER_PATTERN = "/manager/**";
      
      public static final String PATH_APIS = PATH_API + "/apis";
@@ -47,11 +49,11 @@ public final class ConstantsPath {
 
      public static final String PATH_PLANS = PATH_API + "/plans";
 
-     public static final String PATH_RESOURCES = PATH_APIS + "/{apiId}" + "/resources";
+     public static final String PATH_RESOURCES = PATH_APIS + APIID + "/resources";
 
-     public static final String PATH_MIDDLEWARES = PATH_APIS + "/{apiId}" + "/middlewares";
+     public static final String PATH_MIDDLEWARES = PATH_APIS + APIID + "/middlewares";
      
-     public static final String PATH_OPERATIONS = PATH_APIS + "/{apiId}";
+     public static final String PATH_OPERATIONS = PATH_APIS + APIID;
 
      public static final String PATH_ACCESS_TOKENS = PATH_API + "/access_tokens";
 
@@ -81,6 +83,6 @@ public final class ConstantsPath {
 
      public static final String PATH_METRICS = PATH_API + "/metrics";
 
-     public static final String PATH_SCOPES = PATH_APIS + "/{apiId}" + "/scopes";
+     public static final String PATH_SCOPES = PATH_APIS + APIID + "/scopes";
 
 }

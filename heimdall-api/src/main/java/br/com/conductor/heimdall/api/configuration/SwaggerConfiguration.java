@@ -50,6 +50,7 @@ import java.util.List;
 public class SwaggerConfiguration {
 
     private static final String AUTHORIZATION = "authorization";
+    private static final String HEADER = "header";
 
 	/**
 	 * Returns a {@link Docket} with the Heimdall information.
@@ -65,7 +66,7 @@ public class SwaggerConfiguration {
                   .paths(PathSelectors.any())
                   .build()
                   .apiInfo(apiInfo())
-                  .securitySchemes(Collections.singletonList(new ApiKey(AUTHORIZATION, AUTHORIZATION, "header")))
+                  .securitySchemes(Collections.singletonList(new ApiKey(AUTHORIZATION, AUTHORIZATION, HEADER)))
                   .securityContexts(Collections.singletonList(securityContext()));
      }
 

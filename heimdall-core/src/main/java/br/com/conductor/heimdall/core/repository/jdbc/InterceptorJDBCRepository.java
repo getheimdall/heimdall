@@ -36,7 +36,7 @@ public class InterceptorJDBCRepository {
 
     private JdbcTemplate jdbcTemplate;
 
-    private static final String SQL = "SELECT I.ID, I.API_ID, I.EXECUTION_POINT, I.LIFE_CYCLE, I.TYPE, I.NAME, I.CONTENT, I.EXECUTION_ORDER, I.STATUS, " +
+    private static final String LIST_INTERCEPTOR = "SELECT I.ID, I.API_ID, I.EXECUTION_POINT, I.LIFE_CYCLE, I.TYPE, I.NAME, I.CONTENT, I.EXECUTION_ORDER, I.STATUS, " +
                                         "CASE " +
                                         "   WHEN LIFE_CYCLE = 'OPERATION' THEN I.OPERATION_ID " +
                                         "   WHEN LIFE_CYCLE = 'RESOURCE' THEN I.RESOURCE_ID " +
@@ -44,9 +44,9 @@ public class InterceptorJDBCRepository {
                                         "   ELSE I.API_ID " +
                                         "END AS REFERENCEID " +
                                         "FROM INTERCEPTORS I";
-    private static final String FINDINTERCEPTORSFROMMIDDLEWARE = SQL + "INNER JOIN MIDDLEWARES_INTERCEPTORS MID ON MID.INTERCEPTOR_ID = I.ID " +
+    private static final String FINDINTERCEPTORSFROMMIDDLEWARE = LIST_INTERCEPTOR + "INNER JOIN MIDDLEWARES_INTERCEPTORS MID ON MID.INTERCEPTOR_ID = I.ID " +
                                                                 "WHERE MID.MIDDLEWARE_ID = ? ";
-    private static final String FINDONEINTERCEPTOR = SQL + "WHERE I.ID = ?";
+    private static final String FINDONEINTERCEPTOR = LIST_INTERCEPTOR + "WHERE I.ID = ?";
 
 
     public InterceptorJDBCRepository(DataSource dataSource) {
@@ -55,7 +55,7 @@ public class InterceptorJDBCRepository {
 
     public List<Interceptor> findAllInterceptorsSimplified() {
 
-        return jdbcTemplate.query(SQL, (resultSet, i) -> {
+        return jdbcTemplate.query(LIST_INTERCEPTOR, (resultSet, i) -> {
             Interceptor interceptor = new Interceptor();
             interceptor.setId(resultSet.getLong(1));
             Api api = new Api();
