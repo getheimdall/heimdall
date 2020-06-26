@@ -52,11 +52,31 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Optional;
 
 import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
-import static br.com.conductor.heimdall.gateway.util.ConstantsContext.*;
-import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.*;
+import static br.com.conductor.heimdall.gateway.util.ConstantsContext.API_ID;
+import static br.com.conductor.heimdall.gateway.util.ConstantsContext.API_NAME;
+import static br.com.conductor.heimdall.gateway.util.ConstantsContext.ENVIRONMENT_VARIABLES;
+import static br.com.conductor.heimdall.gateway.util.ConstantsContext.OPERATION_ID;
+import static br.com.conductor.heimdall.gateway.util.ConstantsContext.OPERATION_PATH;
+import static br.com.conductor.heimdall.gateway.util.ConstantsContext.PATTERN;
+import static br.com.conductor.heimdall.gateway.util.ConstantsContext.RESOURCE_ID;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.FORWARD_LOCATION_PREFIX;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.FORWARD_TO_KEY;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.HTTPS_PORT;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.HTTPS_SCHEME;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.HTTP_PORT;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.HTTP_SCHEME;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.PROXY_KEY;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.REQUEST_URI_KEY;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.RETRYABLE_KEY;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SERVICE_HEADER;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SERVICE_ID_HEADER;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.SERVICE_ID_KEY;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_FOR_HEADER;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_HOST_HEADER;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_PORT_HEADER;
+import static org.springframework.cloud.netflix.zuul.filters.support.FilterConstants.X_FORWARDED_PROTO_HEADER;
 
 /**
  * Extends the {@link PreDecorationFilter}.
@@ -146,7 +166,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
         RequestContext ctx = RequestContext.getCurrentContext();
         final String requestURI = getPathWithoutStripSuffix(ctx.getRequest());
 
-        if (pathMatcher.match(ConstantsPath.PATH_MANAGER_PATTERN, requestURI) || "/error".equals(requestURI)) {
+        if (pathMatcher.match(ConstantsPath.PATH_MANAGER_PATTERN, requestURI) || requestURI.equals("/error")) {
             ctx.set(FORWARD_TO_KEY, requestURI);
             return;
         }
@@ -154,7 +174,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
         final String method = ctx.getRequest().getMethod().toUpperCase();
         HeimdallRoute heimdallRoute = getMatchingHeimdallRoute(requestURI, method, ctx);
 
-        if (heimdallRoute != null) {
+        if (Objects.nonNull(heimdallRoute)) {
 
             if (heimdallRoute.isMethodNotAllowed()) {
                 ctx.setSendZuulResponse(false);
@@ -227,18 +247,12 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
 
         String adjustedPath = path;
 
-        if (RequestUtils.isDispatcherServletRequest() && StringUtils.hasText(this.dispatcherServletPath)) {
-            if (!this.dispatcherServletPath.equals("/")) {
-                adjustedPath = path.substring(this.dispatcherServletPath.length());
-                log.debug("Stripped dispatcherServletPath");
-            }
-        } else if (RequestUtils.isZuulServletRequest()) {
-            if (StringUtils.hasText(this.zuulServletPath) && !this.zuulServletPath.equals("/")) {
-                adjustedPath = path.substring(this.zuulServletPath.length());
-                log.debug("Stripped zuulServletPath");
-            }
-        } else {
-            // do nothing
+        if (RequestUtils.isDispatcherServletRequest() && StringUtils.hasText(this.dispatcherServletPath) && !this.dispatcherServletPath.equals("/")) {
+            adjustedPath = path.substring(this.dispatcherServletPath.length());
+            log.debug("Stripped dispatcherServletPath");
+        } else if (RequestUtils.isZuulServletRequest() && StringUtils.hasText(this.zuulServletPath) && !this.zuulServletPath.equals("/")) {
+            adjustedPath = path.substring(this.zuulServletPath.length());
+            log.debug("Stripped zuulServletPath");
         }
 
         log.debug("adjustedPath=" + adjustedPath);
@@ -249,76 +263,68 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
 
         boolean auxMatch = false;
         for (Entry<String, ZuulRoute> entry : routeLocator.getAtomicRoutes().get().entrySet()) {
-            if (entry.getKey() != null) {
-                String pattern = entry.getKey();
-                if (this.pathMatcher.match(pattern, requestURI)) {
+            if (Objects.nonNull(entry.getKey()) && this.pathMatcher.match(entry.getKey(), requestURI)) {
+                auxMatch = true;
+                List<Credential> credentials = credentialRepository.findByPattern(entry.getKey());
+                Credential credential = null;
+                if (Objects.nonNull(credentials) && !credentials.isEmpty()) {
 
-                    auxMatch = true;
-                    List<Credential> credentials = credentialRepository.findByPattern(pattern);
-                    Credential credential = null;
-                    if (Objects.nonNull(credentials) && !credentials.isEmpty()) {
-
-                        if (method.equals(HttpMethod.OPTIONS.name())) {
-                            Optional<Credential> first = credentials.stream().findFirst();
-                            if (first.get().isCors()) {
-                            	credential = first.get();
-                            }
-                        }
-
-                        if (Objects.isNull(credential)) {
-                        	credential = credentials.stream()
-                                    .filter(o -> o.getMethod().equals(HttpMethod.ALL.name()) || method.equals(o.getMethod().toUpperCase()))
-                                    .findFirst().orElse(null);
-                        }
+                    if (method.equals(HttpMethod.OPTIONS.name()) && credentials.stream().findFirst().get().isCors()) {
+                        credential = credentials.stream().findFirst().get();
                     }
 
-                    if (credential != null) {
-                        ZuulRoute zuulRoute = entry.getValue();
+                    if (Objects.isNull(credential)) {
+                        credential = credentials.stream()
+                                .filter(o -> o.getMethod().equals(HttpMethod.ALL.name()) || method.equals(o.getMethod().toUpperCase()))
+                                .findFirst().orElse(null);
+                    }
+                }
 
-                        String basePath = credential.getApiBasePath();
-                        requestURI = org.apache.commons.lang.StringUtils.removeStart(requestURI, basePath);
+                if (credential != null) {
+                    ZuulRoute zuulRoute = entry.getValue();
 
-                        ctx.put(PATTERN, org.apache.commons.lang.StringUtils.removeStart(pattern, basePath));
-                        ctx.put(API_NAME, credential.getApiName());
-                        ctx.put(API_ID, credential.getApiId());
-                        ctx.put(RESOURCE_ID, credential.getResourceId());
-                        ctx.put(OPERATION_ID, credential.getOperationId());
-                        ctx.put(OPERATION_PATH, credential.getOperationPath());
+                    String basePath = credential.getApiBasePath();
+                    requestURI = org.apache.commons.lang.StringUtils.removeStart(requestURI, basePath);
 
-                        String host = ctx.getRequest().getHeader("Host");
+                    ctx.put(PATTERN, org.apache.commons.lang.StringUtils.removeStart(entry.getKey(), basePath));
+                    ctx.put(API_NAME, credential.getApiName());
+                    ctx.put(API_ID, credential.getApiId());
+                    ctx.put(RESOURCE_ID, credential.getResourceId());
+                    ctx.put(OPERATION_ID, credential.getOperationId());
+                    ctx.put(OPERATION_PATH, credential.getOperationPath());
 
-                        EnvironmentInfo environment;
-                        String location = null;
-                        if (host != null && !host.isEmpty()) {
-                            environment = environmentInfoRepository.findByApiIdAndEnvironmentInboundURL(credential.getApiId(), host.toLowerCase());
-                        } else {
-                            environment = environmentInfoRepository.findByApiIdAndEnvironmentInboundURL(credential.getApiId(), ctx.getRequest().getRequestURL().toString().toLowerCase());
-                        }
+                    String host = ctx.getRequest().getHeader("Host");
 
-                        if (environment != null) {
-                            location = environment.getOutboundURL();
-                            ctx.put(ENVIRONMENT_VARIABLES, environment.getVariables());
-                        }
-
-                        Route route = new Route(zuulRoute.getId(),
-                                requestURI,
-                                location,
-                                "",
-                                zuulRoute.getRetryable() != null ? zuulRoute.getRetryable() : false,
-                                zuulRoute.isCustomSensitiveHeaders() ? zuulRoute.getSensitiveHeaders() : null);
-
-                        TraceContextHolder traceContextHolder = TraceContextHolder.getInstance();
-
-                        traceContextHolder.getActualTrace().setApiId(credential.getApiId());
-                        traceContextHolder.getActualTrace().setApiName(credential.getApiName());
-                        traceContextHolder.getActualTrace().setResourceId(credential.getResourceId());
-                        traceContextHolder.getActualTrace().setOperationId(credential.getOperationId());
-
-                        return new HeimdallRoute(pattern, route, false);
+                    EnvironmentInfo environment;
+                    String location = null;
+                    if (Objects.nonNull(host) && !host.isEmpty()) {
+                        environment = environmentInfoRepository.findByApiIdAndEnvironmentInboundURL(credential.getApiId(), host.toLowerCase());
                     } else {
-
-                        ctx.put(INTERRUPT, true);
+                        environment = environmentInfoRepository.findByApiIdAndEnvironmentInboundURL(credential.getApiId(), ctx.getRequest().getRequestURL().toString().toLowerCase());
                     }
+
+                    if (Objects.nonNull(environment)) {
+                        location = environment.getOutboundURL();
+                        ctx.put(ENVIRONMENT_VARIABLES, environment.getVariables());
+                    }
+
+                    Route route = new Route(zuulRoute.getId(),
+                            requestURI,
+                            location,
+                            "",
+                            zuulRoute.getRetryable() != null ? zuulRoute.getRetryable() : false,
+                            zuulRoute.isCustomSensitiveHeaders() ? zuulRoute.getSensitiveHeaders() : null);
+
+                    TraceContextHolder traceContextHolder = TraceContextHolder.getInstance();
+
+                    traceContextHolder.getActualTrace().setApiId(credential.getApiId());
+                    traceContextHolder.getActualTrace().setApiName(credential.getApiName());
+                    traceContextHolder.getActualTrace().setResourceId(credential.getResourceId());
+                    traceContextHolder.getActualTrace().setOperationId(credential.getOperationId());
+
+                    return new HeimdallRoute(entry.getKey(), route, false);
+                } else {
+                    ctx.put(INTERRUPT, true);
                 }
             }
         }
@@ -352,18 +358,16 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
         if (hasHeader(request, X_FORWARDED_HOST_HEADER)) {
             host = request.getHeader(X_FORWARDED_HOST_HEADER) + "," + host;
         }
-        if (!hasHeader(request, X_FORWARDED_PORT_HEADER)) {
-            if (hasHeader(request, X_FORWARDED_PROTO_HEADER)) {
-                StringBuilder builder = new StringBuilder();
-                for (String previous : StringUtils.commaDelimitedListToStringArray(request.getHeader(X_FORWARDED_PROTO_HEADER))) {
-                    if (builder.length() > 0) {
-                        builder.append(",");
-                    }
-                    builder.append(HTTPS_SCHEME.equals(previous) ? HTTPS_PORT : HTTP_PORT);
+        if (!hasHeader(request, X_FORWARDED_PORT_HEADER) && hasHeader(request, X_FORWARDED_PROTO_HEADER)) {
+            StringBuilder builder = new StringBuilder();
+            for (String previous : StringUtils.commaDelimitedListToStringArray(request.getHeader(X_FORWARDED_PROTO_HEADER))) {
+                if (builder.length() > 0) {
+                    builder.append(",");
                 }
-                builder.append(",").append(port);
-                port = builder.toString();
+                builder.append(HTTPS_SCHEME.equals(previous) ? HTTPS_PORT : HTTP_PORT);
             }
+            builder.append(",").append(port);
+            port = builder.toString();
         } else {
             port = request.getHeader(X_FORWARDED_PORT_HEADER) + "," + port;
         }

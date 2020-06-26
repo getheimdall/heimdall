@@ -32,6 +32,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -87,34 +88,29 @@ public class AccessTokenInterceptorService {
 
         TraceContextHolder.getInstance().getActualTrace().setAccessToken(DigestUtils.digestMD5(accessToken));
 
-        if (clientId == null || clientId.isEmpty()) {
+        if (Objects.isNull(clientId) || clientId.isEmpty()) {
             buildResponse(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, "Client Id"));
             return;
         }
 
-        if (accessToken != null && !accessToken.isEmpty()) {
+        if (Objects.nonNull(accessToken) &&
+                !accessToken.isEmpty() &&
+                Objects.nonNull(accessTokenRepository.findAccessTokenActive(accessToken)) &&
+                Objects.nonNull(accessTokenRepository.findAccessTokenActive(accessToken).getApp())) {
 
             AccessToken token = accessTokenRepository.findAccessTokenActive(accessToken);
 
-            if (token != null && token.getApp() != null) {
-
-                List<Plan> plans = token.getApp().getPlans();
-                Set<Long> collect = plans.parallelStream().map(plan -> plan.getApi().getId()).collect(Collectors.toSet());
-                if (collect.contains(apiId)) {
-
-                    String cId = token.getApp().getClientId();
-                    if (clientId.equals(cId)) {
-
-                        TraceContextHolder.getInstance().getActualTrace().setApp(token.getApp().getName());
-
-                    } else {
-                        buildResponse(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, ACCESS_TOKEN));
-                    }
+            List<Plan> plans = token.getApp().getPlans();
+            Set<Long> collect = plans.parallelStream().map(plan -> plan.getApi().getId()).collect(Collectors.toSet());
+            if (collect.contains(apiId)) {
+                String cId = token.getApp().getClientId();
+                if (clientId.equals(cId)) {
+                    TraceContextHolder.getInstance().getActualTrace().setApp(token.getApp().getName());
                 } else {
-                    buildResponse(ConstantsInterceptors.GLOBAL_ACCESS_NOT_ALLOWED_API);
+                    buildResponse(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, ACCESS_TOKEN));
                 }
             } else {
-                buildResponse(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, ACCESS_TOKEN));
+                buildResponse(ConstantsInterceptors.GLOBAL_ACCESS_NOT_ALLOWED_API);
             }
         } else {
             buildResponse(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, ACCESS_TOKEN));
