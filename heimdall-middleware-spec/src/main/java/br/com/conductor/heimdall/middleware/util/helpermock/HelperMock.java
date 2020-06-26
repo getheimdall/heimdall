@@ -74,6 +74,6 @@ public class HelperMock implements Helper {
 
 	@Override
 	public void httpHandler(boolean useHandler) {
-		
+
 	}
 }
