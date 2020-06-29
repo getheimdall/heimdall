@@ -151,14 +151,14 @@ public class Trace {
         this.printLogstash = printLogstash;
         this.printFilters = printFilters;
 
-        HttpServletRequest request = (HttpServletRequest) servletRequest;
+        HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
         HeimdallException.checkThrow(request == null, ExceptionMessage.GLOBAL_REQUEST_NOT_FOUND);
 
         this.initialTime = System.currentTimeMillis();
-        this.method = request.getMethod();
-        this.url = UrlUtil.getCurrentUrl(request);
+        this.method = httpServletRequest.getMethod();
+        this.url = UrlUtil.getCurrentUrl(httpServletRequest);
 
-        Enumeration<String> headers = request.getHeaders("x-forwarded-for");
+        Enumeration<String> headers = httpServletRequest.getHeaders("x-forwarded-for");
 
         if (headers != null) {
             List<String> listIps = Collections.list(headers);
@@ -277,17 +277,17 @@ public class Trace {
                 log.error(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
             }
         } else {
-            String url = Objects.nonNull(this.url) ? this.url : "";
+            String urlCurrent = Objects.nonNull(this.url) ? this.url : "";
 
             if (isInfo(this.resultStatus)) {
 
-                log.info(append("call", this), " [HEIMDALL-TRACE] - " + url);
+                log.info(append("call", this), " [HEIMDALL-TRACE] - " + urlCurrent);
             } else if (isWarn(this.resultStatus)) {
 
-                log.warn(append("call", this), " [HEIMDALL-TRACE] - " + url);
+                log.warn(append("call", this), " [HEIMDALL-TRACE] - " + urlCurrent);
             } else {
 
-                log.error(append("call", this), " [HEIMDALL-TRACE] - " + url);
+                log.error(append("call", this), " [HEIMDALL-TRACE] - " + urlCurrent);
             }
         }
 
@@ -353,9 +353,9 @@ public class Trace {
             customFilter = SimpleBeanPropertyFilter.serializeAll();
         }
 
-        FilterProvider filters = new SimpleFilterProvider().addFilter("customFilter", customFilter);
+        FilterProvider filterProvider = new SimpleFilterProvider().addFilter("customFilter", customFilter);
 
-        return new ObjectMapper().setFilterProvider(filters);
+        return new ObjectMapper().setFilterProvider(filterProvider);
 
     }
 }
