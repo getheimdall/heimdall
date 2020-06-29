@@ -36,6 +36,10 @@ import org.modelmapper.convention.MatchingStrategies;
  */
 public abstract class GenericConverter {
 
+     private GenericConverter(){
+          // not called
+     }
+
 	 /**
 	  * Converts a source to a type destination.
 	  * 

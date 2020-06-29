@@ -26,12 +26,15 @@ import org.apache.commons.io.IOUtils;
 import java.io.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import lombok.extern.slf4j.Slf4j;
+
 
 /**
  * Provides a method to zip a Middleware file
  *
  * @author Marcelo Aguiar Rodrigues
  */
+@Slf4j
 public final class ZipUtils {
 
     private ZipUtils() { }
@@ -64,7 +67,9 @@ public final class ZipUtils {
             zipOutputStream.flush();
             return byteArrayOutputStream.toByteArray();
 
-        } catch (IOException ignored) { }
+        } catch (IOException exception) {
+            log.error(exception.getMessage(), exception);
+        }
 
         return new byte[0];
     }
