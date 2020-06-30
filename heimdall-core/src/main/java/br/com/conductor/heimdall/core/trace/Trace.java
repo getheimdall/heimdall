@@ -152,7 +152,7 @@ public class Trace {
         this.printFilters = printFilters;
 
         HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
-        HeimdallException.checkThrow(request == null, ExceptionMessage.GLOBAL_REQUEST_NOT_FOUND);
+        HeimdallException.checkThrow(httpServletRequest == null, ExceptionMessage.GLOBAL_REQUEST_NOT_FOUND);
 
         this.initialTime = System.currentTimeMillis();
         this.method = httpServletRequest.getMethod();
@@ -268,26 +268,26 @@ public class Trace {
             heimdallTrace = " [HEIMDALL-TRACE] - {} ";
             if (isInfo(this.resultStatus)) {
 
-                log.info(heimdallTrace, mapper.writeValueAsString(this));
+                log.info(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
             } else if (isWarn(this.resultStatus)) {
 
-                log.warn(heimdallTrace, mapper.writeValueAsString(this));
+                log.warn(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
             } else {
 
-                log.error(heimdallTrace, mapper.writeValueAsString(this));
+                log.error(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
             }
         } else {
             String urlCurrent = Objects.nonNull(this.url) ? this.url : "";
             heimdallTrace = " [HEIMDALL-TRACE] - ";
             if (isInfo(this.resultStatus)) {
 
-                log.info(append("call", this), heimdallTrace + urlCurrent);
+                log.info(append("call", this), " [HEIMDALL-TRACE] - " + urlCurrent);
             } else if (isWarn(this.resultStatus)) {
 
-                log.warn(append("call", this), heimdallTrace + urlCurrent);
+                log.warn(append("call", this), " [HEIMDALL-TRACE] - " + urlCurrent);
             } else {
 
-                log.error(append("call", this), heimdallTrace + urlCurrent);
+                log.error(append("call", this), " [HEIMDALL-TRACE] - " + urlCurrent);
             }
         }
 
@@ -308,21 +308,21 @@ public class Trace {
 
 		if (isInfo(this.resultStatus)) {
 			if (isMongo(logger))
-				logger.info(message);
+				logger.info(mapper().writeValueAsString(this));
 			else
-				logger.info(append(trace, mapper.convertValue(this, Map.class)), null);
+				logger.info(append("trace", mapper.convertValue(this, Map.class)), null);
 		} else if (isWarn(this.resultStatus)) {
 
 			if (isMongo(logger))
-				logger.warn(message);
+				logger.warn(mapper().writeValueAsString(this));
 			else
-				logger.warn(append(trace, mapper.convertValue(this, Map.class)), null);
+				logger.warn(append("trace", mapper.convertValue(this, Map.class)), null);
 		} else {
 
 			if (isMongo(logger))
-				logger.error(message);
+				logger.error(mapper().writeValueAsString(this));
 			else
-				logger.error(append(trace, mapper.convertValue(this, Map.class)), null);
+				logger.error(append("trace", mapper.convertValue(this, Map.class)), null);
 		}
 	}
 
