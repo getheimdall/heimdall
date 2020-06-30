@@ -170,7 +170,7 @@ public class MiddlewareResource {
      @ApiOperation(value = "Download Middleware file by id", response = Api.class)
      @GetMapping(value = "/download/{middlewareId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_MIDDLEWARE)
-     public ResponseEntity downloadFileById(@PathVariable("apiId") Long apiId, @PathVariable("middlewareId") Long middlewareId){
+     public ResponseEntity<ByteArrayResource> downloadFileById(@PathVariable("apiId") Long apiId, @PathVariable("middlewareId") Long middlewareId){
 
           Middleware middleware = middlewareService.find(apiId, middlewareId);
           ByteArrayResource resource = new ByteArrayResource(middleware.getFile());
