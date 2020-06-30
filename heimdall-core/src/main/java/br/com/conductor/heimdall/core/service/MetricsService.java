@@ -35,6 +35,13 @@ import java.util.List;
 @Service
 public class MetricsService {
 
+    private static final String TRACE_APP = "trace.app";
+    private static final String TRACE_APINAME = "trace.apiName";
+    private static final String TRACE_ACCESSTOKEN = "trace.accessToken";
+    private static final String TRACE_RESULTSTATUS = "trace.resultStatus";
+    private static final String TRACE_PATTERN = "trace.pattern";
+    private static final String TRACE_DURATIONMILLIS = "trace.durationMillis";
+
     @Autowired
     private MongoLogConnector mongoLogConnector;
 
@@ -48,7 +55,7 @@ public class MetricsService {
     public List<Metric> findByTopApps(Integer limit, Periods period) {
         limit = validateLimit(limit);
 
-        return this.findTop("trace.app", limit, period);
+        return this.findTop(TRACE_APP, limit, period);
     }
 
     /**
@@ -61,7 +68,7 @@ public class MetricsService {
     public List<Metric> findByTopApis(Integer limit, Periods period) {
         limit = validateLimit(limit);
 
-        return this.findTop("trace.apiName", limit, period);
+        return this.findTop(TRACE_APINAME, limit, period);
     }
 
     /**
@@ -74,7 +81,7 @@ public class MetricsService {
     public List<Metric> findByTopAccessTokens(Integer limit, Periods period) {
         limit = validateLimit(limit);
 
-        return this.findTop("trace.accessToken", limit, period);
+        return this.findTop(TRACE_ACCESSTOKEN, limit, period);
     }
 
     /**
@@ -87,7 +94,7 @@ public class MetricsService {
     public List<Metric> findByTopResultStatus(Integer limit, Periods period) {
         limit = validateLimit(limit);
 
-        return this.findTop("trace.resultStatus", limit, period);
+        return this.findTop(TRACE_RESULTSTATUS, limit, period);
     }
 
 
@@ -99,7 +106,7 @@ public class MetricsService {
      * @return list of metrics found
      */
     public List<Metric> findMetricApiPerResultStatus(String id, Periods period) {
-        return this.findMetricXperSumY(id, "trace.apiName", "trace.resultStatus", period);
+        return this.findMetricXperSumY(id, TRACE_APINAME, TRACE_RESULTSTATUS, period);
     }
 
     /**
@@ -110,7 +117,7 @@ public class MetricsService {
      * @return list of metrics found
      */
     public List<Metric> findMetricApiPerOperation(String id, Periods period) {
-        return this.findMetricXperSumY(id, "trace.apiName", "trace.pattern", period);
+        return this.findMetricXperSumY(id, TRACE_APINAME, TRACE_PATTERN, period);
     }
 
     /**
@@ -121,7 +128,7 @@ public class MetricsService {
      * @return list of metrics found
      */
     public List<Metric> findMetricAccessTokenPerResultStatus(String id, Periods period) {
-        return this.findMetricXperSumY(id, "trace.accessToken", "trace.resultStatus", period);
+        return this.findMetricXperSumY(id, TRACE_ACCESSTOKEN, TRACE_RESULTSTATUS, period);
     }
 
     /**
@@ -132,7 +139,7 @@ public class MetricsService {
      * @return list of metrics found
      */
     public List<Metric> findMetricAppPerResultStatus(String id, Periods period) {
-        return this.findMetricXperSumY(id, "trace.app", "trace.resultStatus", period);
+        return this.findMetricXperSumY(id, TRACE_APP, TRACE_RESULTSTATUS, period);
     }
 
 
@@ -144,7 +151,7 @@ public class MetricsService {
      * @return list of metrics found
      */
     public List<Metric> findMetricAppPerAvgResponseTime(String id, Periods period) {
-        return this.findMetricXperAvgY(id, "trace.app", "trace.durationMillis", period);
+        return this.findMetricXperAvgY(id, TRACE_APP, TRACE_DURATIONMILLIS, period);
     }
 
     /**
@@ -155,7 +162,7 @@ public class MetricsService {
      * @return list of metrics found
      */
     public List<Metric> findMetricApiPerAvgResponseTime(String id, Periods period) {
-        return this.findMetricXperAvgY(id, "trace.apiName", "trace.durationMillis", period);
+        return this.findMetricXperAvgY(id, TRACE_APINAME, TRACE_DURATIONMILLIS, period);
     }
 
     /**
@@ -166,7 +173,7 @@ public class MetricsService {
      * @return list of metrics found
      */
     public List<Metric> findMetricAccessTokenPerAvgResponseTime(String id, Periods period) {
-        return this.findMetricXperAvgY(id, "trace.accessToken", "trace.durationMillis", period);
+        return this.findMetricXperAvgY(id, TRACE_ACCESSTOKEN, TRACE_DURATIONMILLIS, period);
     }
 
 

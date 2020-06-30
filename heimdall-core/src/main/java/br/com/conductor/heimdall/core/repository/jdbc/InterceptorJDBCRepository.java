@@ -70,7 +70,7 @@ public class InterceptorJDBCRepository {
             return interceptor;
         });
     }
-    
+
     public List<Interceptor> findInterceptorsSimplifiedFromMiddleware(Long middlewareId) {
 
         StringBuilder sql = new StringBuilder();
@@ -103,7 +103,7 @@ public class InterceptorJDBCRepository {
             return interceptor;
         });
     }
-    
+
     public Interceptor findOneInterceptorSimplified(Long interceptorId) {
 
         StringBuilder sql = new StringBuilder();

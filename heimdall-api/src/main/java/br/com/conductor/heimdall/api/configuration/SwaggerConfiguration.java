@@ -49,6 +49,9 @@ import java.util.List;
 @EnableSwagger2
 public class SwaggerConfiguration {
 
+    private static final String AUTHORIZATION = "authorization";
+    private static final String HEADER = "header";
+
 	/**
 	 * Returns a {@link Docket} with the Heimdall information.
 	 *
@@ -56,17 +59,15 @@ public class SwaggerConfiguration {
 	 */
      @Bean
      public Docket swaggerSpringFoxDocket() {
-
-          Docket docket = new Docket(DocumentationType.SWAGGER_2)
-                    .select()
-                    .apis(RequestHandlerSelectors.basePackage("br.com.conductor.heimdall.api.resource"))
-                    .paths(PathSelectors.any())
-                    .build()
-                    .apiInfo(apiInfo())
-                    .securitySchemes(Collections.singletonList(new ApiKey("authorization", "authorization", "header")))
-                    .securityContexts(Collections.singletonList(securityContext()));
-
-          return docket;
+         
+          return new Docket(DocumentationType.SWAGGER_2)
+                  .select()
+                  .apis(RequestHandlerSelectors.basePackage("br.com.conductor.heimdall.api.resource"))
+                  .paths(PathSelectors.any())
+                  .build()
+                  .apiInfo(apiInfo())
+                  .securitySchemes(Collections.singletonList(new ApiKey(AUTHORIZATION, AUTHORIZATION, HEADER)))
+                  .securityContexts(Collections.singletonList(securityContext()));
      }
 
      /*
@@ -74,13 +75,11 @@ public class SwaggerConfiguration {
       */
      private ApiInfo apiInfo() {
 
-          ApiInfo apiInfo = new ApiInfoBuilder()
-                    .title("Heimdall API Gateway")
-                    .description("API Gateway for managing APIs")
-                    .version("1")
-                    .build();
-
-          return apiInfo;
+          return new ApiInfoBuilder()
+                  .title("Heimdall API Gateway")
+                  .description("API Gateway for managing APIs")
+                  .version("1")
+                  .build();
      }
 
     private SecurityContext securityContext() {
@@ -91,6 +90,6 @@ public class SwaggerConfiguration {
         AuthorizationScope authorizationScope = new AuthorizationScope("global", "accessNothing");
         AuthorizationScope[] authorizationScopes = new AuthorizationScope[1];
         authorizationScopes[0] = authorizationScope;
-        return Collections.singletonList(new SecurityReference("authorization", authorizationScopes));
+        return Collections.singletonList(new SecurityReference(AUTHORIZATION, authorizationScopes));
     }
 }

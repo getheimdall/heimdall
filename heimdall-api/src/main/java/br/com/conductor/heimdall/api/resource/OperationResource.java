@@ -73,7 +73,7 @@ public class OperationResource {
      @ApiOperation(value = "Find Operation by id", response = Operation.class)
      @GetMapping(value = "/resources/{resourceId}/operations/{operationId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_OPERATION)
-     public ResponseEntity<?> findById(@PathVariable("apiId") Long apiId, @PathVariable("resourceId") Long resourceId, @PathVariable("operationId") Long operationId) {
+     public ResponseEntity<Operation> findById(@PathVariable("apiId") Long apiId, @PathVariable("resourceId") Long resourceId, @PathVariable("operationId") Long operationId) {
 
           Operation operation = operationService.find(apiId, resourceId, operationId);
 
@@ -150,7 +150,7 @@ public class OperationResource {
      @ApiOperation(value = "Update Operation")
      @PutMapping(value = "/resources/{resourceId}/operations/{operationId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_OPERATION)
-     public ResponseEntity<?> update(@PathVariable("apiId") Long apiId, @PathVariable("resourceId") Long resourceId, @PathVariable("operationId") Long operationId, @RequestBody OperationDTO operationDTO) {
+     public ResponseEntity<Operation> update(@PathVariable("apiId") Long apiId, @PathVariable("resourceId") Long resourceId, @PathVariable("operationId") Long operationId, @RequestBody OperationDTO operationDTO) {
 
           Operation operation = operationService.update(apiId, resourceId, operationId, operationDTO);
 
@@ -172,7 +172,7 @@ public class OperationResource {
      @ApiOperation(value = "Delete Operation")
      @DeleteMapping(value = "/resources/{resourceId}/operations/{operationId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_OPERATION)
-     public ResponseEntity<?> delete(@PathVariable("apiId") Long apiId, @PathVariable("resourceId") Long resourceId, @PathVariable("operationId") Long operationId) {
+     public ResponseEntity<Void> delete(@PathVariable("apiId") Long apiId, @PathVariable("resourceId") Long resourceId, @PathVariable("operationId") Long operationId) {
 
           operationService.delete(apiId, resourceId, operationId);
 
@@ -192,7 +192,7 @@ public class OperationResource {
      @ApiOperation(value = "Refresh all Operations")
      @PostMapping(value = "/resources/{resourceId}/operations/refresh")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_REFRESH_OPERATION)
-     public ResponseEntity<?> refresh(@PathVariable("apiId") Long apiId, @PathVariable("resourceId") Long resourceId) {
+     public ResponseEntity<Void> refresh(@PathVariable("apiId") Long apiId, @PathVariable("resourceId") Long resourceId) {
 
           aMQPRouteService.dispatchRoutes();
 
@@ -209,7 +209,7 @@ public class OperationResource {
      @ApiOperation(value = "Find all Operations", responseContainer = "List", response = Operation.class)
      @GetMapping(value = "/operations")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_OPERATION)
-     public ResponseEntity<?> findAllOperations(@PathVariable("apiId") Long apiId) {
+     public ResponseEntity<List<Operation>> findAllOperations(@PathVariable("apiId") Long apiId) {
 
           List<Operation> operations = operationService.list(apiId);
           return ResponseEntity.ok(operations);
