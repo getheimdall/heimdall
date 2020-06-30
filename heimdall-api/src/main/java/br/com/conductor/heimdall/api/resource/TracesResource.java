@@ -74,9 +74,8 @@ public class TracesResource {
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_TRACES)
     public ResponseEntity<?> findOne(@PathVariable("traceId") String id) {
 
-    	if (!property.getMongo().getEnabled()){
+    	if (!property.getMongo().getEnabled())
     	    return ResponseEntity.ok(new JSONObject().toString());
-        }
     	
         LogTraceDTO logTrace = traceService.findById(id);
 
@@ -96,9 +95,8 @@ public class TracesResource {
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_TRACES)
     public ResponseEntity<?> find(@RequestBody List<FiltersDTO> filtersSelected, @ModelAttribute PageableDTO pageableDTO) {
 
-        if (!property.getMongo().getEnabled()){
+        if (!property.getMongo().getEnabled())
             return ResponseEntity.ok(new JSONObject().toString());
-        }
 
         LogTraceDTOPage logTrace = traceService.find(filtersSelected, pageableDTO);
 
