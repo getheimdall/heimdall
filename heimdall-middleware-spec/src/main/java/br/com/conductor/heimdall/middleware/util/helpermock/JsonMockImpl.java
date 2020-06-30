@@ -23,6 +23,7 @@ package br.com.conductor.heimdall.middleware.util.helpermock;
 
 import java.util.Map;
 
+import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,6 +42,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
  *
  * @author Marcelo Aguiar
  */
+@Slf4j
 public class JsonMockImpl implements Json {
 
     public String parse(Map<String, Object> body) {
@@ -137,7 +139,7 @@ public class JsonMockImpl implements Json {
 
         boolean valid = false;
         try {
-            JSONObject jsonObject = new JSONObject(string);
+            new JSONObject(string);
 
             valid = true;
         } catch (JSONException e) {
@@ -145,7 +147,9 @@ public class JsonMockImpl implements Json {
             try {
                 new JSONArray(string);
                 valid = true;
-            } catch (JSONException ignored) { }
+            } catch (JSONException exception) {
+                log.error(exception.getMessage(), exception);
+            }
         }
 
         return valid;

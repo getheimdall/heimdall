@@ -31,6 +31,7 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.mockito.Mockito;
@@ -51,15 +52,16 @@ import java.util.List;
  *
  * @author Marcelo Aguiar
  */
+@Slf4j
 public class DBMockImpl implements DBMongo {
 
     private Json json = new JsonMockImpl();
 
     private String databaseName;
 
-    private final static Integer PAGE = 0;
+    private static final Integer PAGE = 0;
 
-    private final static Integer LIMIT = 100;
+    private static final Integer LIMIT = 100;
 
     private Helper helper = new HelperMock();
 
@@ -156,7 +158,8 @@ public class DBMockImpl implements DBMongo {
                 ts.add(Document.parse(json.parse(t)));
             }
             collection.insertMany(ts);
-        } catch (Exception ignored) {
+        } catch (Exception exception) {
+            log.error(exception.getMessage(), exception);
         } finally {
 
             createMongoClient().close();
@@ -170,7 +173,8 @@ public class DBMockImpl implements DBMongo {
 
             Document document = Document.parse(json.parse(object));
             collection.insertOne(document);
-        } catch (Exception ignored) {
+        } catch (Exception exception) {
+            log.error(exception.getMessage(), exception);
         } finally {
 
             createMongoClient().close();
@@ -291,7 +295,9 @@ public class DBMockImpl implements DBMongo {
         id.setAccessible(true);
         try {
             return id.get(object);
-        } catch (IllegalArgumentException | IllegalAccessException ignored) { }
+        } catch (IllegalArgumentException | IllegalAccessException exception) {
+            log.error(exception.getMessage(), exception);
+        }
         return null;
     }
 
@@ -305,7 +311,9 @@ public class DBMockImpl implements DBMongo {
             Object value = null;
             try {
                 value = field.get(criteria);
-            } catch (IllegalArgumentException | IllegalAccessException ignored) {}
+            } catch (IllegalArgumentException | IllegalAccessException exception){
+                log.error(exception.getMessage(), exception);
+            }
 
             if (value != null) {
                 query.criteria(field.getName()).equal(value);
