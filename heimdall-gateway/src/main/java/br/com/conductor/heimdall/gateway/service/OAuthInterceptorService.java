@@ -80,6 +80,8 @@ public class OAuthInterceptorService {
      */
     private static final int TIME_REFRESH_TOKEN = 180;
 
+    private static final String BEARER = "bearer";
+
     @Autowired
     private OAuthService oAuthService;
 
@@ -87,8 +89,6 @@ public class OAuthInterceptorService {
     private AppRepository appRepository;
 
     private RequestContext context;
-
-    private static final String BEARER = "bearer";
 
     /**
      * Runs the service for the OAuth
