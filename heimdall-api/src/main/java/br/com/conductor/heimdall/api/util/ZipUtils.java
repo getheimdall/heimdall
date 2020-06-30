@@ -67,8 +67,8 @@ public final class ZipUtils {
             zipOutputStream.flush();
             return byteArrayOutputStream.toByteArray();
 
-        } catch (IOException exception) {
-            log.error(exception.getMessage(), exception);
+        } catch (IOException ignored) {
+            // This exception should be ignored.
         }
 
         return new byte[0];

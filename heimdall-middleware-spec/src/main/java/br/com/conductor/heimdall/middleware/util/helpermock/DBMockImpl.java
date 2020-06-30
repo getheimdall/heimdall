@@ -31,7 +31,6 @@ import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
-import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.mockito.Mockito;
@@ -52,7 +51,6 @@ import java.util.List;
  *
  * @author Marcelo Aguiar
  */
-@Slf4j
 public class DBMockImpl implements DBMongo {
 
     private Json json = new JsonMockImpl();
@@ -158,8 +156,8 @@ public class DBMockImpl implements DBMongo {
                 ts.add(Document.parse(json.parse(t)));
             }
             collection.insertMany(ts);
-        } catch (Exception exception) {
-            log.error(exception.getMessage(), exception);
+        } catch (Exception ignored) {
+            // This exception should be ignored
         } finally {
 
             createMongoClient().close();
@@ -173,8 +171,8 @@ public class DBMockImpl implements DBMongo {
 
             Document document = Document.parse(json.parse(object));
             collection.insertOne(document);
-        } catch (Exception exception) {
-            log.error(exception.getMessage(), exception);
+        } catch (Exception ignored) {
+            // This exception should be ignored
         } finally {
 
             createMongoClient().close();
@@ -295,8 +293,8 @@ public class DBMockImpl implements DBMongo {
         id.setAccessible(true);
         try {
             return id.get(object);
-        } catch (IllegalArgumentException | IllegalAccessException exception) {
-            log.error(exception.getMessage(), exception);
+        } catch (IllegalArgumentException | IllegalAccessException ignored) {
+             // This exception should be ignored
         }
         return null;
     }
@@ -311,8 +309,8 @@ public class DBMockImpl implements DBMongo {
             Object value = null;
             try {
                 value = field.get(criteria);
-            } catch (IllegalArgumentException | IllegalAccessException exception){
-                log.error(exception.getMessage(), exception);
+            } catch (IllegalArgumentException | IllegalAccessException ignored){
+                // This exception should be ignored
             }
 
             if (value != null) {

@@ -58,9 +58,7 @@ public class JsonImpl implements Json {
 	public String parse(Map<String, Object> body) {
 
 		try {
-			String json = mapper().writeValueAsString(body);
-
-			return json;
+			return mapper().writeValueAsString(body);
 		} catch (JsonProcessingException e) {
 
 			log.error(e.getMessage(), e);
@@ -92,10 +90,7 @@ public class JsonImpl implements Json {
 	public <T> String parse(T object) {
 
 		try {
-
-			String jsonInString = mapper().writeValueAsString(object);
-
-			return jsonInString;
+			return mapper().writeValueAsString(object);
 		} catch (Exception e) {
 
 			log.error(e.getMessage(), e);
@@ -201,7 +196,7 @@ public class JsonImpl implements Json {
 
 		try (JsonParser parser = new ObjectMapper().getFactory().createParser(string)) {
 
-			while (parser.nextToken() != null) {}
+			while (parser.nextToken() != null);
 
 			return true;
 		} catch (IOException e) {

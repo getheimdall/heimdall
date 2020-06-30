@@ -32,7 +32,7 @@ import lombok.Data;
 public class Metric {
 
     @JsonIgnore
-    private String id;
+    private String _id;
 
     private String metrics;
 
