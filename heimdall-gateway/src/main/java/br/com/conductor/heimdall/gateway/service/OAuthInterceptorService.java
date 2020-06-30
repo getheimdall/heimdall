@@ -21,7 +21,12 @@ package br.com.conductor.heimdall.gateway.service;
 
 import br.com.conductor.heimdall.core.dto.request.OAuthRequest;
 import br.com.conductor.heimdall.core.dto.response.TokenImplicit;
-import br.com.conductor.heimdall.core.entity.*;
+import br.com.conductor.heimdall.core.entity.AccessToken;
+import br.com.conductor.heimdall.core.entity.App;
+import br.com.conductor.heimdall.core.entity.OAuthAuthorize;
+import br.com.conductor.heimdall.core.entity.Provider;
+import br.com.conductor.heimdall.core.entity.ProviderParam;
+import br.com.conductor.heimdall.core.entity.TokenOAuth;
 import br.com.conductor.heimdall.core.enums.TypeOAuth;
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
@@ -33,7 +38,6 @@ import br.com.conductor.heimdall.core.trace.TraceContextHolder;
 import br.com.conductor.heimdall.middleware.enums.HttpStatus;
 import br.com.conductor.heimdall.middleware.enums.HttpStatus.Series;
 import br.com.conductor.heimdall.middleware.spec.Http;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
@@ -55,10 +59,16 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static br.com.conductor.heimdall.core.util.ConstantsOAuth.*;
+import static br.com.conductor.heimdall.core.util.ConstantsOAuth.GRANT_TYPE_IMPLICIT;
+import static br.com.conductor.heimdall.core.util.ConstantsOAuth.GRANT_TYPE_PASSWORD;
+import static br.com.conductor.heimdall.core.util.ConstantsOAuth.GRANT_TYPE_REFRESH_TOKEN;
 
 /**
  * Provides methods to validate request with OAuthInterceptor.
@@ -197,6 +207,7 @@ public class OAuthInterceptorService {
             default:
                 ExceptionMessage.WRONG_GRANT_TYPE_INFORMED.raise();
         }
+
 
     }
 
@@ -492,20 +503,19 @@ public class OAuthInterceptorService {
         mapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_PROPERTIES, true);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         mapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        mapper.configure(DeserializationFeature.FAIL_ON_TRAILING_TOKENS, true);
+        mapper.configure(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY, true);
 
         return mapper;
     }
 
     public boolean isJson(String string) {
 
-        try (JsonParser parser = mapper().getFactory().createParser(string)) {
-
-            while (parser.nextToken() != null) {}
-
+        try{
+            mapper().readTree(string);
             return true;
         } catch (IOException e) {
             return false;
         }
-
     }
 }
