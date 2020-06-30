@@ -34,7 +34,7 @@ public class Metric {
     @JsonIgnore
     private String _id;
 
-    private String metrics;
+    private String metric;
 
     private Double value;
 

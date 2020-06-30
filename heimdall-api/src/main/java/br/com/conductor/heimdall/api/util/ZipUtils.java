@@ -26,7 +26,6 @@ import org.apache.commons.io.IOUtils;
 import java.io.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-import lombok.extern.slf4j.Slf4j;
 
 
 /**
@@ -34,7 +33,6 @@ import lombok.extern.slf4j.Slf4j;
  *
  * @author Marcelo Aguiar Rodrigues
  */
-@Slf4j
 public final class ZipUtils {
 
     private ZipUtils() { }
