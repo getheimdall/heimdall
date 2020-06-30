@@ -130,6 +130,15 @@ public class Trace {
 
     private String version;
 
+    @JsonIgnore
+    private static final String HEIMDALL_TRACE = " [HEIMDALL-TRACE] - {} ";
+
+    @JsonIgnore
+    private static final String TRACE = "trace";
+
+    @JsonIgnore
+    private static final String HEIMDALL_TRACE_PREFIX = " [HEIMDALL-TRACE] - ";
+
     public Trace() {
 
     }
@@ -151,14 +160,14 @@ public class Trace {
         this.printLogstash = printLogstash;
         this.printFilters = printFilters;
 
-        HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
-        HeimdallException.checkThrow(httpServletRequest == null, ExceptionMessage.GLOBAL_REQUEST_NOT_FOUND);
+        HttpServletRequest request = (HttpServletRequest) servletRequest;
+        HeimdallException.checkThrow(request == null, ExceptionMessage.GLOBAL_REQUEST_NOT_FOUND);
 
         this.initialTime = System.currentTimeMillis();
-        this.method = httpServletRequest.getMethod();
-        this.url = UrlUtil.getCurrentUrl(httpServletRequest);
+        this.method = request.getMethod();
+        this.url = UrlUtil.getCurrentUrl(request);
 
-        Enumeration<String> headers = httpServletRequest.getHeaders("x-forwarded-for");
+        Enumeration<String> headers = request.getHeaders("x-forwarded-for");
 
         if (headers != null) {
             List<String> listIps = Collections.list(headers);
@@ -261,33 +270,33 @@ public class Trace {
      *   * OTHER   = ERROR
      */
     private void writeTrace() throws JsonProcessingException {
-        String heimdallTrace;
+
         ObjectMapper mapper = mapper();
 
         if (this.printAllTrace) {
-            heimdallTrace = " [HEIMDALL-TRACE] - {} ";
+
             if (isInfo(this.resultStatus)) {
 
-                log.info(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
+                log.info(HEIMDALL_TRACE, mapper.writeValueAsString(this));
             } else if (isWarn(this.resultStatus)) {
 
-                log.warn(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
+                log.warn(HEIMDALL_TRACE, mapper.writeValueAsString(this));
             } else {
 
-                log.error(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
+                log.error(HEIMDALL_TRACE, mapper.writeValueAsString(this));
             }
         } else {
             String urlCurrent = Objects.nonNull(this.url) ? this.url : "";
-            heimdallTrace = " [HEIMDALL-TRACE] - ";
+
             if (isInfo(this.resultStatus)) {
 
-                log.info(append("call", this), " [HEIMDALL-TRACE] - " + urlCurrent);
+                log.info(append("call", this), HEIMDALL_TRACE_PREFIX + urlCurrent);
             } else if (isWarn(this.resultStatus)) {
 
-                log.warn(append("call", this), " [HEIMDALL-TRACE] - " + urlCurrent);
+                log.warn(append("call", this), HEIMDALL_TRACE_PREFIX + urlCurrent);
             } else {
 
-                log.error(append("call", this), " [HEIMDALL-TRACE] - " + urlCurrent);
+                log.error(append("call", this), HEIMDALL_TRACE_PREFIX + urlCurrent);
             }
         }
 
@@ -304,25 +313,24 @@ public class Trace {
 	private void printInLogger(Logger logger) throws JsonProcessingException {
 		ObjectMapper mapper = mapper();
 		String message = mapper().writeValueAsString(this);
-		String trace = "trace";
 
 		if (isInfo(this.resultStatus)) {
 			if (isMongo(logger))
-				logger.info(mapper().writeValueAsString(this));
+				logger.info(message);
 			else
-				logger.info(append("trace", mapper.convertValue(this, Map.class)), null);
+				logger.info(append(TRACE, mapper.convertValue(this, Map.class)), null);
 		} else if (isWarn(this.resultStatus)) {
 
 			if (isMongo(logger))
-				logger.warn(mapper().writeValueAsString(this));
+				logger.warn(message);
 			else
-				logger.warn(append("trace", mapper.convertValue(this, Map.class)), null);
+				logger.warn(append(TRACE, mapper.convertValue(this, Map.class)), null);
 		} else {
 
 			if (isMongo(logger))
-				logger.error(mapper().writeValueAsString(this));
+				logger.error(message);
 			else
-				logger.error(append("trace", mapper.convertValue(this, Map.class)), null);
+				logger.error(append(TRACE, mapper.convertValue(this, Map.class)), null);
 		}
 	}
 

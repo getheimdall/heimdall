@@ -63,7 +63,7 @@ public class IntegrationResource {
       * @return			{@link ResponseEntity}
       */
      @PostMapping(value = "/access-token/callback", produces = MediaType.APPLICATION_JSON_VALUE)
-     public ResponseEntity<?> accessTokenCallback(@RequestBody @Valid AccessTokenDTO reqBody) {
+     public ResponseEntity<Void> accessTokenCallback(@RequestBody @Valid AccessTokenDTO reqBody) {
           
           tokenService.save(reqBody);
           return ResponseEntity.ok().build();
@@ -76,7 +76,7 @@ public class IntegrationResource {
       * @return			{@link ResponseEntity}
       */
      @PostMapping(value = "/developer/callback", produces = MediaType.APPLICATION_JSON_VALUE)
-     public ResponseEntity<?> developerCallback(@RequestBody @Valid DeveloperDTO reqBody) {
+     public ResponseEntity<Void> developerCallback(@RequestBody @Valid DeveloperDTO reqBody) {
           
           developerService.save(reqBody);
           return ResponseEntity.ok().build();
@@ -89,7 +89,7 @@ public class IntegrationResource {
       * @return			{@link ResponseEntity}
       */
      @PostMapping(value = "/app/callback", produces = MediaType.APPLICATION_JSON_VALUE)
-     public ResponseEntity<?> appCallback(@RequestBody @Valid AppCallbackDTO reqBody) {
+     public ResponseEntity<Void> appCallback(@RequestBody @Valid AppCallbackDTO reqBody) {
           
           appService.save(reqBody);
           return ResponseEntity.ok().build();
