@@ -261,33 +261,33 @@ public class Trace {
      *   * OTHER   = ERROR
      */
     private void writeTrace() throws JsonProcessingException {
-
+        String heimdallTrace;
         ObjectMapper mapper = mapper();
 
         if (this.printAllTrace) {
-
+            heimdallTrace = " [HEIMDALL-TRACE] - {} ";
             if (isInfo(this.resultStatus)) {
 
-                log.info(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
+                log.info(heimdallTrace, mapper.writeValueAsString(this));
             } else if (isWarn(this.resultStatus)) {
 
-                log.warn(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
+                log.warn(heimdallTrace, mapper.writeValueAsString(this));
             } else {
 
-                log.error(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
+                log.error(heimdallTrace, mapper.writeValueAsString(this));
             }
         } else {
             String urlCurrent = Objects.nonNull(this.url) ? this.url : "";
-
+            heimdallTrace = " [HEIMDALL-TRACE] - ";
             if (isInfo(this.resultStatus)) {
 
-                log.info(append("call", this), " [HEIMDALL-TRACE] - " + urlCurrent);
+                log.info(append("call", this), heimdallTrace + urlCurrent);
             } else if (isWarn(this.resultStatus)) {
 
-                log.warn(append("call", this), " [HEIMDALL-TRACE] - " + urlCurrent);
+                log.warn(append("call", this), heimdallTrace + urlCurrent);
             } else {
 
-                log.error(append("call", this), " [HEIMDALL-TRACE] - " + urlCurrent);
+                log.error(append("call", this), heimdallTrace + urlCurrent);
             }
         }
 
@@ -303,24 +303,26 @@ public class Trace {
 
 	private void printInLogger(Logger logger) throws JsonProcessingException {
 		ObjectMapper mapper = mapper();
+		String message = mapper().writeValueAsString(this);
+		String trace = "trace";
 
 		if (isInfo(this.resultStatus)) {
 			if (isMongo(logger))
-				logger.info(mapper.writeValueAsString(this));
+				logger.info(message);
 			else
-				logger.info(append("trace", mapper.convertValue(this, Map.class)), null);
+				logger.info(append(trace, mapper.convertValue(this, Map.class)), null);
 		} else if (isWarn(this.resultStatus)) {
 
 			if (isMongo(logger))
-				logger.warn(mapper.writeValueAsString(this));
+				logger.warn(message);
 			else
-				logger.warn(append("trace", mapper.convertValue(this, Map.class)), null);
+				logger.warn(append(trace, mapper.convertValue(this, Map.class)), null);
 		} else {
 
 			if (isMongo(logger))
-				logger.error(mapper.writeValueAsString(this));
+				logger.error(message);
 			else
-				logger.error(append("trace", mapper.convertValue(this, Map.class)), null);
+				logger.error(append(trace, mapper.convertValue(this, Map.class)), null);
 		}
 	}
 
