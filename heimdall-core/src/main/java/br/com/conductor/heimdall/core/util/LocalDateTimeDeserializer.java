@@ -31,9 +31,6 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 
-import static com.fasterxml.jackson.core.JsonToken.START_ARRAY;
-import static com.fasterxml.jackson.core.JsonToken.VALUE_STRING;
-
 /**
  * This class provides a method to deserialize a <i>json</i> to a data and time format.
  * 
@@ -53,43 +50,46 @@ public class LocalDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
      @Override
      public LocalDateTime deserialize(JsonParser parser, DeserializationContext context) throws IOException {
 
-          if (parser.getCurrentToken().equals(START_ARRAY)) {
-               if (parser.nextToken() == JsonToken.END_ARRAY) {
-                    return null;
-               }
-               int year = parser.getIntValue();
+          switch (parser.getCurrentToken()) {
+               case START_ARRAY:
+                    if (parser.nextToken() == JsonToken.END_ARRAY) {
+                         return null;
+                    }
+                    int year = parser.getIntValue();
 
-               parser.nextToken();
-               int month = parser.getIntValue();
+                    parser.nextToken();
+                    int month = parser.getIntValue();
 
-               parser.nextToken();
-               int day = parser.getIntValue();
+                    parser.nextToken();
+                    int day = parser.getIntValue();
 
-               parser.nextToken();
-               int hour = parser.getIntValue();
+                    parser.nextToken();
+                    int hour = parser.getIntValue();
 
-               parser.nextToken();
-               int minute = parser.getIntValue();
+                    parser.nextToken();
+                    int minute = parser.getIntValue();
 
-               parser.nextToken();
-               int second = parser.getIntValue();
+                    parser.nextToken();
+                    int second = parser.getIntValue();
 
-               parser.nextToken();
-               int nanosecond = parser.getIntValue();
+                    parser.nextToken();
+                    int nanosecond = parser.getIntValue();
 
-               if (parser.nextToken() != JsonToken.END_ARRAY) {
-                    context.reportWrongTokenException(JsonToken.class, JsonToken.END_ARRAY, "Expected array to end.");
-               }
-               return LocalDateTime.of(year, month, day, hour, minute, second, nanosecond);
-          }else if(parser.getCurrentToken().equals(VALUE_STRING)){
-               String string = parser.getText().trim();
-               if (string.length() == 0) {
-                    return null;
-               }
-               return LocalDateTime.parse(string, ISO_DATE_TIME);
+                    if (parser.nextToken() != JsonToken.END_ARRAY) {
+                         context.reportWrongTokenException(JsonToken.class, JsonToken.END_ARRAY, "Expected array to end.");
+                    }
+                    return LocalDateTime.of(year, month, day, hour, minute, second, nanosecond);
+
+               case VALUE_STRING:
+                    String string = parser.getText().trim();
+                    if (string.length() == 0) {
+                         return null;
+                    }
+                    return LocalDateTime.parse(string, ISO_DATE_TIME);
+               default:
+                    break;
           }
-          context.reportWrongTokenException(JsonToken.class, START_ARRAY, "Expected array or string.");
+          context.reportWrongTokenException(JsonToken.class, JsonToken.START_ARRAY, "Expected array or string.");
           return null;
      }
-
 }
