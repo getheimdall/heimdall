@@ -28,14 +28,11 @@ public class LogWriterService {
                         List<String> requiredHeaders) throws Throwable {
 
         if (!writeBody && !writeHeaders) return;
-
-        switch (filterType) {
-            case "pre":
-                writeRequest(writeBody, writeHeaders, requiredHeaders);
-                break;
-            case "post":
-                writeResponse(writeBody,  writeHeaders, requiredHeaders);
-                break;
+        
+        if(filterType.equals("pre")){
+            writeRequest(writeBody, writeHeaders, requiredHeaders);
+        }else if(filterType.equals("post")){
+            writeResponse(writeBody,  writeHeaders, requiredHeaders);
         }
     }
 
