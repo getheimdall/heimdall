@@ -63,7 +63,7 @@ public class RoleResource {
      @ApiOperation(value = "Save a new Role")
      @PostMapping
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_ROLE)
-     public ResponseEntity<?> save(@RequestBody @Valid RoleDTO roleDTO) {
+     public ResponseEntity<String> save(@RequestBody @Valid RoleDTO roleDTO) {
 
           Role role = roleService.save(roleDTO);
 
@@ -80,7 +80,7 @@ public class RoleResource {
      @ApiOperation(value = "Find Role by id", response = Role.class)
      @GetMapping(value = "/{roleId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_ROLE)
-     public ResponseEntity<?> findById(@PathVariable("roleId") Long roleId) {
+     public ResponseEntity<Role> findById(@PathVariable("roleId") Long roleId) {
 
           Role resource = roleService.find(roleId);
 
@@ -122,7 +122,7 @@ public class RoleResource {
      @ApiOperation(value = "Update Role")
      @PutMapping(value = "/{roleId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_ROLE)
-     public ResponseEntity<?> update(@PathVariable("roleId") Long roleId, @RequestBody RoleDTO roleDTO) {
+     public ResponseEntity<Role> update(@PathVariable("roleId") Long roleId, @RequestBody RoleDTO roleDTO) {
 
           Role role = roleService.update(roleId, roleDTO);
 
@@ -139,7 +139,7 @@ public class RoleResource {
      @ApiOperation(value = "Delete Role")
      @DeleteMapping(value = "/{roleId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_ROLE)
-     public ResponseEntity<?> delete( @PathVariable("roleId") Long roleId) {
+     public ResponseEntity<Void> delete( @PathVariable("roleId") Long roleId) {
 
           roleService.delete(roleId);
 

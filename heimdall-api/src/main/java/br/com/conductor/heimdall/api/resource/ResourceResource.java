@@ -68,7 +68,7 @@ public class ResourceResource {
     @ApiOperation(value = "Find Resource by id", response = Resource.class)
     @GetMapping(value = "/{resourceId}")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_RESOURCE)
-    public ResponseEntity<?> findById(@PathVariable("apiId") Long apiId, @PathVariable("resourceId") Long resourceId) {
+    public ResponseEntity<Resource> findById(@PathVariable("apiId") Long apiId, @PathVariable("resourceId") Long resourceId) {
 
         Resource resource = resourceService.find(apiId, resourceId);
 
@@ -111,7 +111,7 @@ public class ResourceResource {
     @ApiOperation(value = "Save a new Resource")
     @PostMapping
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_RESOURCE)
-    public ResponseEntity<?> save(@PathVariable("apiId") Long apiId, @RequestBody @Valid ResourceDTO resourceDTO) {
+    public ResponseEntity<String> save(@PathVariable("apiId") Long apiId, @RequestBody @Valid ResourceDTO resourceDTO) {
 
         Resource resource = resourceService.save(apiId, resourceDTO);
 
@@ -130,7 +130,7 @@ public class ResourceResource {
     @ApiOperation(value = "Update Resource")
     @PutMapping(value = "/{resourceId}")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_RESOURCE)
-    public ResponseEntity<?> update(@PathVariable("apiId") Long apiId, @PathVariable("resourceId") Long resourceId, @RequestBody ResourceDTO resourceDTO) {
+    public ResponseEntity<Resource> update(@PathVariable("apiId") Long apiId, @PathVariable("resourceId") Long resourceId, @RequestBody ResourceDTO resourceDTO) {
 
         Resource resource = resourceService.update(apiId, resourceId, resourceDTO);
 
@@ -148,7 +148,7 @@ public class ResourceResource {
     @ApiOperation(value = "Delete Resource")
     @DeleteMapping(value = "/{resourceId}")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_RESOURCE)
-    public ResponseEntity<?> delete(@PathVariable("apiId") Long apiId, @PathVariable("resourceId") Long resourceId) {
+    public ResponseEntity<Void> delete(@PathVariable("apiId") Long apiId, @PathVariable("resourceId") Long resourceId) {
 
         resourceService.delete(apiId, resourceId);
 
@@ -165,7 +165,7 @@ public class ResourceResource {
     @ApiOperation(value = "Refresh all Resources")
     @PostMapping(value = "/refresh")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_REFRESH_RESOURCE)
-    public ResponseEntity<?> refresh(@PathVariable("apiId") Long apiId) {
+    public ResponseEntity<Void> refresh(@PathVariable("apiId") Long apiId) {
 
         aMQPRouteService.dispatchRoutes();
 

@@ -63,7 +63,7 @@ public class PlanResource {
      @ApiOperation(value = "Find Plan by id", response = Plan.class)
      @GetMapping(value = "/{planId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_PLAN)
-     public ResponseEntity<?> findById(@PathVariable("planId") Long id) {
+     public ResponseEntity<Plan> findById(@PathVariable("planId") Long id) {
 
           Plan plan = planService.find(id);
 
@@ -104,7 +104,7 @@ public class PlanResource {
      @ApiOperation(value = "Save a new Plan")
      @PostMapping
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_PLAN)
-     public ResponseEntity<?> save(@RequestBody @Valid PlanDTO planDTO) {
+     public ResponseEntity<String> save(@RequestBody @Valid PlanDTO planDTO) {
 
           Plan plan = planService.save(planDTO);
 
@@ -122,7 +122,7 @@ public class PlanResource {
      @ApiOperation(value = "Update Plan")
      @PutMapping(value = "/{planId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_PLAN)
-     public ResponseEntity<?> update(@PathVariable("planId") Long id, @RequestBody PlanDTO planDTO) {
+     public ResponseEntity<Plan> update(@PathVariable("planId") Long id, @RequestBody PlanDTO planDTO) {
 
           Plan plan = planService.update(id, planDTO);
           
@@ -139,7 +139,7 @@ public class PlanResource {
      @ApiOperation(value = "Delete Plan")
      @DeleteMapping(value = "/{planId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_PLAN)
-     public ResponseEntity<?> delete(@PathVariable("planId") Long id) {
+     public ResponseEntity<Void> delete(@PathVariable("planId") Long id) {
 
           planService.delete(id);
           
