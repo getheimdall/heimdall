@@ -220,9 +220,9 @@ public class MongoLogConnector implements Serializable {
 			break;
 
 		case LAST_WEEK:
-			Map<String, LocalDate> week = CalendarUtils.firstAndLastDaysOfWeek(LocalDate.now().minusWeeks(1));
-			query.field(insertedOnDate).greaterThanOrEq(week.get(FIRST).format(DateTimeFormatter.ISO_DATE));
-			query.field(insertedOnDate).lessThanOrEq(week.get(LAST).format(DateTimeFormatter.ISO_DATE));
+			Map<String, LocalDate> lastWeek = CalendarUtils.firstAndLastDaysOfWeek(LocalDate.now().minusWeeks(1));
+			query.field(insertedOnDate).greaterThanOrEq(lastWeek.get(FIRST).format(DateTimeFormatter.ISO_DATE));
+			query.field(insertedOnDate).lessThanOrEq(lastWeek.get(LAST).format(DateTimeFormatter.ISO_DATE));
 			break;
 
 		case THIS_MONTH:
@@ -316,9 +316,9 @@ public class MongoLogConnector implements Serializable {
 				break;
 
 			case LAST_WEEK:
-				Map<String, LocalDate> week = CalendarUtils.firstAndLastDaysOfWeek(LocalDate.now().minusWeeks(1));
-				query.field(filtersDTO.getName()).greaterThanOrEq(week.get(FIRST).format(DateTimeFormatter.ISO_DATE));
-				query.field(filtersDTO.getName()).lessThanOrEq(week.get(LAST).format(DateTimeFormatter.ISO_DATE));
+				Map<String, LocalDate> lastWeek = CalendarUtils.firstAndLastDaysOfWeek(LocalDate.now().minusWeeks(1));
+				query.field(filtersDTO.getName()).greaterThanOrEq(lastWeek.get(FIRST).format(DateTimeFormatter.ISO_DATE));
+				query.field(filtersDTO.getName()).lessThanOrEq(lastWeek.get(LAST).format(DateTimeFormatter.ISO_DATE));
 				break;
 
 			case THIS_MONTH:
