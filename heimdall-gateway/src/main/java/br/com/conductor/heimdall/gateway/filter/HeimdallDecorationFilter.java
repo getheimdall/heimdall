@@ -263,68 +263,71 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
 
         boolean auxMatch = false;
         for (Entry<String, ZuulRoute> entry : routeLocator.getAtomicRoutes().get().entrySet()) {
-            if (Objects.nonNull(entry.getKey()) && this.pathMatcher.match(entry.getKey(), requestURI)) {
-                auxMatch = true;
-                List<Credential> credentials = credentialRepository.findByPattern(entry.getKey());
-                Credential credential = null;
-                if (Objects.nonNull(credentials) && !credentials.isEmpty()) {
+            if (Objects.nonNull(entry.getKey())){
+                String pattern = entry.getKey();
+                if (this.pathMatcher.match(pattern, requestURI)) {
+                    auxMatch = true;
+                    List<Credential> credentials = credentialRepository.findByPattern(entry.getKey());
+                    Credential credential = null;
+                    if (Objects.nonNull(credentials) && !credentials.isEmpty()) {
 
-                    if (method.equals(HttpMethod.OPTIONS.name()) && credentials.stream().findFirst().get().isCors()) {
-                        credential = credentials.stream().findFirst().get();
+                        if (method.equals(HttpMethod.OPTIONS.name()) && credentials.stream().findFirst().get().isCors()) {
+                            credential = credentials.stream().findFirst().get();
+                        }
+
+                        if (Objects.isNull(credential)) {
+                            credential = credentials.stream()
+                                    .filter(o -> o.getMethod().equals(HttpMethod.ALL.name()) || method.equals(o.getMethod().toUpperCase()))
+                                    .findFirst().orElse(null);
+                        }
                     }
 
-                    if (Objects.isNull(credential)) {
-                        credential = credentials.stream()
-                                .filter(o -> o.getMethod().equals(HttpMethod.ALL.name()) || method.equals(o.getMethod().toUpperCase()))
-                                .findFirst().orElse(null);
-                    }
-                }
+                    if (credential != null) {
+                        ZuulRoute zuulRoute = entry.getValue();
 
-                if (credential != null) {
-                    ZuulRoute zuulRoute = entry.getValue();
+                        String basePath = credential.getApiBasePath();
+                        requestURI = org.apache.commons.lang.StringUtils.removeStart(requestURI, basePath);
 
-                    String basePath = credential.getApiBasePath();
-                    requestURI = org.apache.commons.lang.StringUtils.removeStart(requestURI, basePath);
+                        ctx.put(PATTERN, org.apache.commons.lang.StringUtils.removeStart(entry.getKey(), basePath));
+                        ctx.put(API_NAME, credential.getApiName());
+                        ctx.put(API_ID, credential.getApiId());
+                        ctx.put(RESOURCE_ID, credential.getResourceId());
+                        ctx.put(OPERATION_ID, credential.getOperationId());
+                        ctx.put(OPERATION_PATH, credential.getOperationPath());
 
-                    ctx.put(PATTERN, org.apache.commons.lang.StringUtils.removeStart(entry.getKey(), basePath));
-                    ctx.put(API_NAME, credential.getApiName());
-                    ctx.put(API_ID, credential.getApiId());
-                    ctx.put(RESOURCE_ID, credential.getResourceId());
-                    ctx.put(OPERATION_ID, credential.getOperationId());
-                    ctx.put(OPERATION_PATH, credential.getOperationPath());
+                        String host = ctx.getRequest().getHeader("Host");
 
-                    String host = ctx.getRequest().getHeader("Host");
+                        EnvironmentInfo environment;
+                        String location = null;
+                        if (Objects.nonNull(host) && !host.isEmpty()) {
+                            environment = environmentInfoRepository.findByApiIdAndEnvironmentInboundURL(credential.getApiId(), host.toLowerCase());
+                        } else {
+                            environment = environmentInfoRepository.findByApiIdAndEnvironmentInboundURL(credential.getApiId(), ctx.getRequest().getRequestURL().toString().toLowerCase());
+                        }
 
-                    EnvironmentInfo environment;
-                    String location = null;
-                    if (Objects.nonNull(host) && !host.isEmpty()) {
-                        environment = environmentInfoRepository.findByApiIdAndEnvironmentInboundURL(credential.getApiId(), host.toLowerCase());
+                        if (Objects.nonNull(environment)) {
+                            location = environment.getOutboundURL();
+                            ctx.put(ENVIRONMENT_VARIABLES, environment.getVariables());
+                        }
+
+                        Route route = new Route(zuulRoute.getId(),
+                                requestURI,
+                                location,
+                                "",
+                                zuulRoute.getRetryable() != null ? zuulRoute.getRetryable() : false,
+                                zuulRoute.isCustomSensitiveHeaders() ? zuulRoute.getSensitiveHeaders() : null);
+
+                        TraceContextHolder traceContextHolder = TraceContextHolder.getInstance();
+
+                        traceContextHolder.getActualTrace().setApiId(credential.getApiId());
+                        traceContextHolder.getActualTrace().setApiName(credential.getApiName());
+                        traceContextHolder.getActualTrace().setResourceId(credential.getResourceId());
+                        traceContextHolder.getActualTrace().setOperationId(credential.getOperationId());
+
+                        return new HeimdallRoute(entry.getKey(), route, false);
                     } else {
-                        environment = environmentInfoRepository.findByApiIdAndEnvironmentInboundURL(credential.getApiId(), ctx.getRequest().getRequestURL().toString().toLowerCase());
+                        ctx.put(INTERRUPT, true);
                     }
-
-                    if (Objects.nonNull(environment)) {
-                        location = environment.getOutboundURL();
-                        ctx.put(ENVIRONMENT_VARIABLES, environment.getVariables());
-                    }
-
-                    Route route = new Route(zuulRoute.getId(),
-                            requestURI,
-                            location,
-                            "",
-                            zuulRoute.getRetryable() != null ? zuulRoute.getRetryable() : false,
-                            zuulRoute.isCustomSensitiveHeaders() ? zuulRoute.getSensitiveHeaders() : null);
-
-                    TraceContextHolder traceContextHolder = TraceContextHolder.getInstance();
-
-                    traceContextHolder.getActualTrace().setApiId(credential.getApiId());
-                    traceContextHolder.getActualTrace().setApiName(credential.getApiName());
-                    traceContextHolder.getActualTrace().setResourceId(credential.getResourceId());
-                    traceContextHolder.getActualTrace().setOperationId(credential.getOperationId());
-
-                    return new HeimdallRoute(entry.getKey(), route, false);
-                } else {
-                    ctx.put(INTERRUPT, true);
                 }
             }
         }

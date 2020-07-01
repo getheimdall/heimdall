@@ -93,28 +93,31 @@ public class AccessTokenInterceptorService {
             return;
         }
 
-        if (Objects.nonNull(accessToken) &&
-                !accessToken.isEmpty() &&
-                Objects.nonNull(accessTokenRepository.findAccessTokenActive(accessToken)) &&
-                Objects.nonNull(accessTokenRepository.findAccessTokenActive(accessToken).getApp())) {
-
+        if (Objects.nonNull(accessToken) && !accessToken.isEmpty()){
             AccessToken token = accessTokenRepository.findAccessTokenActive(accessToken);
 
-            List<Plan> plans = token.getApp().getPlans();
-            Set<Long> collect = plans.parallelStream().map(plan -> plan.getApi().getId()).collect(Collectors.toSet());
-            if (collect.contains(apiId)) {
-                String cId = token.getApp().getClientId();
-                if (clientId.equals(cId)) {
-                    TraceContextHolder.getInstance().getActualTrace().setApp(token.getApp().getName());
+            if(Objects.nonNull(token) && Objects.nonNull(token.getApp())){
+
+                List<Plan> plans = token.getApp().getPlans();
+                Set<Long> collect = plans.parallelStream().map(plan -> plan.getApi().getId()).collect(Collectors.toSet());
+                if (collect.contains(apiId)) {
+
+                    String cId = token.getApp().getClientId();
+                    if (clientId.equals(cId)) {
+                        TraceContextHolder.getInstance().getActualTrace().setApp(token.getApp().getName());
+                    } else {
+                        buildResponse(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, ACCESS_TOKEN));
+                    }
                 } else {
-                    buildResponse(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, ACCESS_TOKEN));
+                    buildResponse(ConstantsInterceptors.GLOBAL_ACCESS_NOT_ALLOWED_API);
                 }
             } else {
-                buildResponse(ConstantsInterceptors.GLOBAL_ACCESS_NOT_ALLOWED_API);
+                buildResponse(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, ACCESS_TOKEN));
             }
-        } else {
+        }else {
             buildResponse(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, ACCESS_TOKEN));
         }
+
     }
 
     private void buildResponse(String message) {
