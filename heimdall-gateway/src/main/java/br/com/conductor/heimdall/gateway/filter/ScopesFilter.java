@@ -31,7 +31,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -73,7 +72,7 @@ public class ScopesFilter extends ZuulFilter {
         try {
             process();
             detail.setStatus(Constants.SUCCESS);
-        } catch (IOException e) {
+        } catch (Exception e) {
             detail.setStatus(Constants.FAILED);
             throw e;
         } finally {
