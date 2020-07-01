@@ -64,8 +64,7 @@ public class HelperImpl implements Helper {
 	@Override
 	public ApiResponse apiResponse() {
 
-		ApiResponse apiResponse = new ApiResponseImpl();
-		return apiResponse;
+		return new ApiResponseImpl();
 	}
 
 	@Override
@@ -119,9 +118,7 @@ public class HelperImpl implements Helper {
 
 	@Override
 	public Json json() {
-
-		Json json = new JsonImpl();
-		return json;
+		return new JsonImpl();
 	}
 
 	@Override
