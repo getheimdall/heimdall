@@ -27,6 +27,7 @@ import org.springframework.util.StreamUtils;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -65,7 +66,7 @@ public class ResponseHelper {
         return headers;
     }
 
-    public static String getResponseBody(RequestContext context, Map<String, String> headers) throws Throwable {
+    public static String getResponseBody(RequestContext context, Map<String, String> headers) throws IOException {
         String content = headers.get(HttpHeaders.CONTENT_TYPE);
         String response = null;
 
