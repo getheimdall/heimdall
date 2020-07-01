@@ -52,9 +52,7 @@ public class CacheService {
       */
      public List<String> list() {
           
-          List<String> cacheNames = new ArrayList<>(cacheManager.getCacheNames());
-          
-          return cacheNames;
+          return new ArrayList<>(cacheManager.getCacheNames());
      }
 
      /**
