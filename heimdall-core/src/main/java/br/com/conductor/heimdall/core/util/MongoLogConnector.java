@@ -242,7 +242,8 @@ public class MongoLogConnector implements Serializable {
 
 		filtersDTOs.forEach(filtersDTO -> {
 
-			Object value1, value2;
+			Object value1;
+			Object value2;
 
 			try {
 				value1 = Integer.parseInt(filtersDTO.getFirstValue());
