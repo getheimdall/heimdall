@@ -33,9 +33,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+
 
 import br.com.conductor.heimdall.core.exception.ExceptionMessage;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
@@ -63,9 +63,9 @@ public class HeimdallErrorController implements ErrorController {
       * @param request		The {@link HttpServletRequest}
       * @return				{@link ResponseEntity}
       */
-     @RequestMapping(value = "${error.path:/error}", produces = MediaType.APPLICATION_JSON_VALUE, method=RequestMethod.GET)
+     @GetMapping(value = "${error.path:/error}", produces = MediaType.APPLICATION_JSON_VALUE)
      public @ResponseBody ResponseEntity<Map<String, Object>> error(HttpServletRequest request) {
-          Map<String, Object> errorAttributes = new LinkedHashMap<String, Object>();
+          Map<String, Object> errorAttributes = new LinkedHashMap<>();
           errorAttributes.put("timestamp", LocalDateTime.now());
           final int status = getErrorStatus(request);
           errorAttributes.put("status", status);

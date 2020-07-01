@@ -51,7 +51,7 @@ public class DataBaseConfiguration implements EnvironmentAware {
      @Autowired
      Property property;
 
-     private final String SQL_SERVER = "SQL_SERVER";
+     private static final String SERVER = "SQL_SERVER";
 
      @Value("${spring.jpa.database}")
      private String database;
@@ -95,7 +95,7 @@ public class DataBaseConfiguration implements EnvironmentAware {
           hikariConfig.addDataSourceProperty("applicationName", property.getDatasource().getAppName());
           hikariConfig.addDataSourceProperty("portNumber", property.getDatasource().getPortNumber());
           
-          if (SQL_SERVER.equals(database)) {
+          if (SERVER.equals(database)) {
                
                hikariConfig.addDataSourceProperty("sendStringParametersAsUnicode", property.getDatasource().isSendStringParametersAsUnicode());
                hikariConfig.addDataSourceProperty("multiSubnetFailover", property.getDatasource().isMultiSubnetFailover());

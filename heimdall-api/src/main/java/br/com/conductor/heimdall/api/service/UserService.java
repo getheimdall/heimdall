@@ -126,9 +126,7 @@ public class UserService {
           Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
           Page<User> page = userRepository.findAll(example, pageable);
 
-          UserPage userPage = new UserPage(PageDTO.build(page));
-
-          return userPage;
+          return new UserPage(PageDTO.build(page));
      }
 
      /**
@@ -144,9 +142,7 @@ public class UserService {
 
           Example<User> example = Example.of(user, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 
-          List<User> users = userRepository.findAll(example);
-
-          return users;
+          return userRepository.findAll(example);
      }
 
      /**

@@ -30,7 +30,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import br.com.conductor.heimdall.api.entity.Privilege;
@@ -63,7 +62,7 @@ public class CustomUserDetailsService implements UserDetailsService {
       * {@link UserDetailsService} documentation: {@inheritDoc}
       */
      @Override
-     public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
+     public UserDetails loadUserByUsername(final String username) {
 
           final CredentialSecurity credential = repository.findCredentialByUserNameAndTypeAndStatus(username, TypeUser.DATABASE, Status.ACTIVE);
           final Set<Privilege> privileges = privRepository.findPrivilegesByUserNameAndType(username, TypeUser.DATABASE);
@@ -83,7 +82,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
      private final List<GrantedAuthority> getGrantedAuthorities(final List<String> privileges) {
 
-          final List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+          final List<GrantedAuthority> authorities = new ArrayList<>();
           for (final String privilege : privileges) {
                authorities.add(new SimpleGrantedAuthority(privilege));
           }

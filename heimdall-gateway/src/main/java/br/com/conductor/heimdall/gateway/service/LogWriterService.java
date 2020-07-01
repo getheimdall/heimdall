@@ -12,6 +12,7 @@ import org.springframework.util.StreamUtils;
 import javax.servlet.http.HttpServletRequest;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -127,9 +128,9 @@ public class LogWriterService {
 
             String bodyText;
             if (in == null) {
-                bodyText = StreamUtils.copyToString(context.getRequest().getInputStream(), Charset.forName("UTF-8"));
+                bodyText = StreamUtils.copyToString(context.getRequest().getInputStream(), StandardCharsets.UTF_8);
             } else {
-                bodyText = StreamUtils.copyToString(in, Charset.forName("UTF-8"));
+                bodyText = StreamUtils.copyToString(in, StandardCharsets.UTF_8);
             }
 
             return bodyText;
