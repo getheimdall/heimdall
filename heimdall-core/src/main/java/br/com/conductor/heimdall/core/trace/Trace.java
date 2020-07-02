@@ -312,23 +312,22 @@ public class Trace {
 
 	private void printInLogger(Logger logger) throws JsonProcessingException {
 		ObjectMapper mapper = mapper();
-		String message = mapper().writeValueAsString(this);
 
 		if (isInfo(this.resultStatus)) {
 			if (isMongo(logger))
-				logger.info(message);
+				logger.info(mapper().writeValueAsString(this));
 			else
 				logger.info(append(TRACE, mapper.convertValue(this, Map.class)), null);
 		} else if (isWarn(this.resultStatus)) {
 
 			if (isMongo(logger))
-				logger.warn(message);
+				logger.warn(mapper().writeValueAsString(this));
 			else
 				logger.warn(append(TRACE, mapper.convertValue(this, Map.class)), null);
 		} else {
 
 			if (isMongo(logger))
-				logger.error(message);
+				logger.error(mapper().writeValueAsString(this));
 			else
 				logger.error(append(TRACE, mapper.convertValue(this, Map.class)), null);
 		}
