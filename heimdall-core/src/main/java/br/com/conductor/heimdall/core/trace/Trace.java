@@ -286,17 +286,17 @@ public class Trace {
                 log.error(HEIMDALL_TRACE, mapper.writeValueAsString(this));
             }
         } else {
-            String urlCurrent = Objects.nonNull(this.url) ? this.url : "";
+            String currentUrl = Objects.nonNull(this.url) ? this.url : "";
 
             if (isInfo(this.resultStatus)) {
 
-                log.info(append("call", this), HEIMDALL_TRACE_PREFIX + urlCurrent);
+                log.info(append("call", this), HEIMDALL_TRACE_PREFIX + currentUrl);
             } else if (isWarn(this.resultStatus)) {
 
-                log.warn(append("call", this), HEIMDALL_TRACE_PREFIX + urlCurrent);
+                log.warn(append("call", this), HEIMDALL_TRACE_PREFIX + currentUrl);
             } else {
 
-                log.error(append("call", this), HEIMDALL_TRACE_PREFIX + urlCurrent);
+                log.error(append("call", this), HEIMDALL_TRACE_PREFIX + currentUrl);
             }
         }
 
