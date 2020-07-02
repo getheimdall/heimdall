@@ -84,7 +84,8 @@ public final class StringUtils {
      *             single forward slashes where there were double
      */
      public static String removeMultipleSlashes(String path) {
-         path = "/" + path;
+         final String SLASH = "/";
+         path = SLASH + path;
          return path.replaceAll("//+", "/");
      }
 }

@@ -267,7 +267,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
 
                         if (Objects.isNull(credential)) {
                         	credential = credentials.stream()
-                                    .filter(o -> o.getMethod().equals(HttpMethod.ALL.name()) || method.equals(o.getMethod().toUpperCase()))
+                                    .filter(o -> o.getMethod().equals(HttpMethod.ALL.name()) || method.equalsIgnoreCase(o.getMethod()))
                                     .findFirst().orElse(null);
                         }
                     }
@@ -304,7 +304,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                                 requestURI,
                                 location,
                                 "",
-                                zuulRoute.getRetryable() != null ? zuulRoute.getRetryable() : false,
+                                zuulRoute.getRetryable() != null ? zuulRoute.getRetryable() : Boolean.FALSE,
                                 zuulRoute.isCustomSensitiveHeaders() ? zuulRoute.getSensitiveHeaders() : null);
 
                         TraceContextHolder traceContextHolder = TraceContextHolder.getInstance();
@@ -332,15 +332,15 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
 
     protected String getPathWithoutStripSuffix(HttpServletRequest request) {
 
-        String URI = this.urlPathHelper.getPathWithinApplication(request);
+        String uri = this.urlPathHelper.getPathWithinApplication(request);
 
-        if (URI.endsWith(ConstantsPath.PATH_ROOT)) {
-            URI = org.apache.commons.lang.StringUtils.removeEnd(URI, ConstantsPath.PATH_ROOT);
+        if (uri.endsWith(ConstantsPath.PATH_ROOT)) {
+            uri = org.apache.commons.lang.StringUtils.removeEnd(uri, ConstantsPath.PATH_ROOT);
         }
 
-        URI = adjustPath(URI);
+        uri = adjustPath(uri);
 
-        return URI;
+        return uri;
     }
 
     protected void addProxyHeaders(RequestContext ctx) {
