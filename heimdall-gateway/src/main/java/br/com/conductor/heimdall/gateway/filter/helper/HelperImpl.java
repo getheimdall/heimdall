@@ -80,11 +80,10 @@ public class HelperImpl implements Helper {
 	}
 
 	private DB db(String databaseName, DBType type) {
-
-		switch (type) {
-		default:
+		if(type.equals(DBType.MONGODB)){
 			return new DBMongoImpl(databaseName, mongoClient);
 		}
+		return null;
 	}
 
 	@Override
