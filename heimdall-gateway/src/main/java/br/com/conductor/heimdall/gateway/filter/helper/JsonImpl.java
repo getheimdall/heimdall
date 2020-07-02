@@ -222,9 +222,7 @@ public class JsonImpl implements Json {
         	
         	Set<ConstraintViolation<T>> violations = validator.validate(bean);
         	
-        	return violations.stream().map(v -> {
-				return new BeanValidationErrorDTO(v.getPropertyPath().toString(), v.getMessage());
-			}).collect(Collectors.toList());
+        	return violations.stream().map(v -> new BeanValidationErrorDTO(v.getPropertyPath().toString(), v.getMessage())).collect(Collectors.toList());
         }
    }
 }
