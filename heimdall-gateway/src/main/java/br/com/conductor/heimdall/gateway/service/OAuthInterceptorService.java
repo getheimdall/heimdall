@@ -158,14 +158,7 @@ public class OAuthInterceptorService {
             .checkThrow(Objects.isNull(oAuthRequest.getGrantType()) || oAuthRequest.getGrantType().isEmpty(), ExceptionMessage.GRANT_TYPE_NOT_FOUND);
 
         HttpServletRequest request = context.getRequest();
-        String body = "";
-
-        try {
-
-            body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        }
+        String body = getBodyRequest(request);
 
         timeAccessToken = (timeAccessToken <= 0) ? TIME_ACCESS_TOKEN : timeAccessToken;
         timeRefreshToken = (timeRefreshToken <= 0) ? TIME_REFRESH_TOKEN : timeRefreshToken;
@@ -290,13 +283,7 @@ public class OAuthInterceptorService {
     private OAuthRequest recoverOAuthRequest() {
         HttpServletRequest request = context.getRequest();
 
-        String body = null;
-        try {
-            body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        }
-
+        String body = getBodyRequest(request);
         OAuthRequest oAuthRequest;
 
         if (Objects.isNull(body) || body.isEmpty()) {
@@ -398,13 +385,7 @@ public class OAuthInterceptorService {
      */
 
     private void passwordFlow(Provider provider, OAuthRequest oAuthRequest, HttpServletRequest request, String privateKey, int timeAccessToken, int timeRefreshToken) {
-        String body = "";
-
-        try {
-            body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        }
+        String body = getBodyRequest(request);
         validateClientId(request.getHeader(CLIENT_ID));
         validateInProvider(provider, request.getHeader(CLIENT_ID), request.getHeader(ACESS_TOKEN));
 
@@ -423,13 +404,7 @@ public class OAuthInterceptorService {
      * OAuth2.0 Implicit Flow
      */
     private void implicitFlow(Provider provider, OAuthRequest oAuthRequest, HttpServletRequest request, String privateKey, int timeAccessToken) {
-        String body = "";
-
-        try {
-            body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        }
+        String body = getBodyRequest(request);
         validateClientId(request.getHeader(CLIENT_ID));
         validateInProvider(provider, request.getHeader(CLIENT_ID), request.getHeader(ACESS_TOKEN));
 
@@ -448,13 +423,7 @@ public class OAuthInterceptorService {
      * OAuth2.0 Refresh Flow
      */
     private void refreshFlow(OAuthRequest oAuthRequest, HttpServletRequest request, String privateKey, int timeAccessToken, int timeRefreshToken) {
-        String claimsJson = "";
-
-        try {
-            claimsJson = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
-        } catch (IOException e) {
-            log.error(e.getMessage(), e);
-        }
+        String claimsJson = getBodyRequest(request);
         TokenOAuth tokenOAuth = oAuthService.generateTokenOAuth(oAuthRequest, oAuthRequest.getClientId(), privateKey, timeAccessToken, timeRefreshToken, claimsJson);
         if (Objects.nonNull(tokenOAuth)) {
             tokenOAuth.setToken_type("bearer");
@@ -517,5 +486,17 @@ public class OAuthInterceptorService {
         } catch (IOException e) {
             return false;
         }
+    }
+
+    public static String getBodyRequest(HttpServletRequest request){
+        String body = "";
+
+        try {
+            body = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
+        } catch (IOException e) {
+            log.error(e.getMessage(), e);
+        }
+
+        return body;
     }
 }
