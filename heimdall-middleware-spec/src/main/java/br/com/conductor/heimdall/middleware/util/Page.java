@@ -1,5 +1,5 @@
 
-     package br.com.conductor.heimdall.middleware.util;
+package br.com.conductor.heimdall.middleware.util;
 
 /*-
  * =========================LICENSE_START==================================
