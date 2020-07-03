@@ -442,27 +442,28 @@ public class CallImpl implements Call {
               setBody(body, false);
           }
 
-         @Override
-         public void setBody(byte[] body, boolean gzip) {
+          @Override
+          public void setBody(byte[] body, boolean gzip) {
 
-             InputStream stream;
-             try {
-                 if (body != null) {
-                     stream = new ByteArrayInputStream(body);
-                     if (gzip) {
-                         stream = new GZIPInputStream(stream);
-                     }
-                 } else {
-                     stream = new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8));
-                 }
-                 context.setSendZuulResponse(false);
-                 context.setResponseDataStream(stream);
-                 writeResponse(stream, context.getResponse().getOutputStream());
+               InputStream stream;
+               try {
+                    if (body != null) {
+                         stream = new ByteArrayInputStream(body);
+                         if (gzip) {
+                              stream = new GZIPInputStream(stream);
+                         }
+                    } else {
+                         stream = new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8));
+                    }
+                    context.setSendZuulResponse(false);
+                    context.setResponseDataStream(stream);
+                    writeResponse(stream, context.getResponse().getOutputStream());
 
-             } catch (IOException e) {
-                 log.error(e.getMessage(), e);
-             }
-
+               } catch (UnsupportedEncodingException e) {
+                    log.error(e.getMessage(), e);
+               } catch (IOException e) {
+                    log.error(e.getMessage(), e);
+               }
          }
 
          private void writeResponse(InputStream zin, OutputStream out) throws IOException {

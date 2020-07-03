@@ -302,7 +302,9 @@ public class DBMongoImpl implements DBMongo {
                id.setAccessible(true);
                try {
                     return id.get(object);
-               } catch (IllegalArgumentException | IllegalAccessException ignored) { }
+               } catch (IllegalArgumentException | IllegalAccessException e) {
+                    log.error(e.getMessage(), e);
+               }
           }
           return null;
      }

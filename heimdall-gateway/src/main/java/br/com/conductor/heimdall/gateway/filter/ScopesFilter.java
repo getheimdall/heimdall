@@ -72,7 +72,7 @@ public class ScopesFilter extends ZuulFilter {
         try {
             process();
             detail.setStatus(Constants.SUCCESS);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             detail.setStatus(Constants.FAILED);
             throw e;
         } finally {

@@ -28,8 +28,6 @@ import br.com.conductor.heimdall.core.util.Constants;
 import br.com.conductor.heimdall.core.trace.FilterDetail;
 import br.com.conductor.heimdall.core.trace.TraceContextHolder;
 
-import java.io.IOException;
-
 /**
  * HeimdallFilter is a extension of a {@link ZuulFilter}.
  *
@@ -99,7 +97,7 @@ public abstract class HeimdallFilter extends ZuulFilter {
           return null;
      }     
 
-     public abstract void execute() throws IOException;
+     public abstract void execute() throws Throwable;
      public abstract String getName();
 
 }
