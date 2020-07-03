@@ -19,7 +19,6 @@
  */
 package br.com.conductor.heimdall.gateway.service;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
@@ -51,9 +50,9 @@ public class IpsInterceptorService {
      * Checks if the request ip is in the whitelist
      *
      * @param whitelist Set of allowed ids
-     * @throws IOException
-     */
-    public void executeWhiteList(Set<String> whitelist) throws IOException {
+     * @throws Throwable
+	 */
+    public void executeWhiteList(Set<String> whitelist) throws Throwable{
     	isAuthorized = false;
 
         RequestContext ctx = RequestContext.getCurrentContext();
@@ -130,9 +129,9 @@ public class IpsInterceptorService {
      * Checks if the request ip is in the blacklist
      *
      * @param blacklist Set of blocked ids
-     * @throws IOException
+     * @throws Throwable
      */
-	public void executeBlackList(Set<String> blacklist) throws IOException {
+	public void executeBlackList(Set<String> blacklist) throws Throwable{
 		isAuthorized = true;
 
 		RequestContext ctx = RequestContext.getCurrentContext();
