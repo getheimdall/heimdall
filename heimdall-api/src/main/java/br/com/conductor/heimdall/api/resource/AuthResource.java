@@ -55,7 +55,7 @@ public class AuthResource {
 
     @ApiOperation(value = "Login Authentication")
     @PostMapping(ConstantsPath.PATH_LOGIN)
-    public ResponseEntity<?> login(@RequestBody AccountCredentials accountCredentials, HttpServletResponse response) {
+    public ResponseEntity<UserAuthenticateResponse> login(@RequestBody AccountCredentials accountCredentials, HttpServletResponse response) {
         UserAuthenticateResponse userLogged = tokenAuthenticationService.login(accountCredentials, response);
 
         return ResponseEntity.ok(userLogged);
@@ -64,7 +64,7 @@ public class AuthResource {
     @ResponseBody
     @ApiOperation(value = "Logout Authentication", response = String.class)
     @GetMapping(ConstantsPath.PATH_LOGOUT)
-    public ResponseEntity logout(HttpServletRequest request) {
+    public ResponseEntity<String> logout(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
 
         if (token != null) {

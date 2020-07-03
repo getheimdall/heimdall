@@ -69,7 +69,7 @@ public class UserResource {
      @ApiOperation(value = "Save a new User")
      @PostMapping
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_USER)
-     public ResponseEntity<?> save(@RequestBody @Valid UserDTO userDTO) {
+     public ResponseEntity<String> save(@RequestBody @Valid UserDTO userDTO) {
 
           User user = userService.save(userDTO);
 
@@ -86,7 +86,7 @@ public class UserResource {
      @ApiOperation(value = "Find User by id", response = User.class)
      @GetMapping(value = "/{userId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_USER)
-     public ResponseEntity<?> findById(@PathVariable("userId") Long userId) {
+     public ResponseEntity<User> findById(@PathVariable("userId") Long userId) {
 
           User user = userService.find(userId);
 
@@ -136,7 +136,7 @@ public class UserResource {
      @ApiOperation(value = "Update User")
      @PutMapping(value = "/{userId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_USER)
-     public ResponseEntity<?> update(@PathVariable("userId") Long userId, @RequestBody UserEditDTO userDTO) {
+     public ResponseEntity<User> update(@PathVariable("userId") Long userId, @RequestBody UserEditDTO userDTO) {
 
           User user = userService.update(userId, userDTO);
 
@@ -153,7 +153,7 @@ public class UserResource {
      @ResponseBody
      @ApiOperation(value = "Update password of the User")
      @PutMapping(value = "/password")
-     public ResponseEntity<?> updatePassword(@ApiParam(hidden = true) Principal principal, @RequestBody @Valid UserPasswordDTO userPasswordDTO) {
+     public ResponseEntity<Void> updatePassword(@ApiParam(hidden = true) Principal principal, @RequestBody @Valid UserPasswordDTO userPasswordDTO) {
 
           userService.updatePassword(principal, userPasswordDTO.getCurrentPassword(), userPasswordDTO.getNewPassword(), userPasswordDTO.getConfirmNewPassword());
 
@@ -170,7 +170,7 @@ public class UserResource {
      @ApiOperation(value = "Delete User")
      @DeleteMapping(value = "/{userId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_USER)
-     public ResponseEntity<?> delete( @PathVariable("userId") Long userId) {
+     public ResponseEntity<Void> delete( @PathVariable("userId") Long userId) {
 
           userService.delete(userId);
 

@@ -67,7 +67,7 @@ public class EnvironmentResource {
      @ApiOperation(value = "Find Environment by id", response = Environment.class)
      @GetMapping(value = "/{environmentId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_ENVIRONMENT)
-     public ResponseEntity<?> findById(@PathVariable("environmentId") Long id) {
+     public ResponseEntity<Environment> findById(@PathVariable("environmentId") Long id) {
 
           Environment environment = environmentService.find(id);
 
@@ -108,7 +108,7 @@ public class EnvironmentResource {
      @ApiOperation(value = "Save a new Environment")
      @PostMapping
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_ENVIRONMENT)
-     public ResponseEntity<?> save(@RequestBody @Valid EnvironmentDTO environmentDTO) {
+     public ResponseEntity<String> save(@RequestBody @Valid EnvironmentDTO environmentDTO) {
 
           Environment environment = environmentService.save(environmentDTO);
           
@@ -126,7 +126,7 @@ public class EnvironmentResource {
      @ApiOperation(value = "Update Environment")
      @PutMapping(value = "/{environmentId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_ENVIRONMENT)
-     public ResponseEntity<?> update(@PathVariable("environmentId") Long id, @RequestBody EnvironmentDTO environmentDTO) {
+     public ResponseEntity<Environment> update(@PathVariable("environmentId") Long id, @RequestBody EnvironmentDTO environmentDTO) {
 
           Environment environment = environmentService.update(id, environmentDTO);
           amqpCacheService.dispatchClean();
@@ -144,7 +144,7 @@ public class EnvironmentResource {
      @ApiOperation(value = "Delete Environment")
      @DeleteMapping(value = "/{environmentId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_ENVIRONMENT)
-     public ResponseEntity<?> delete(@PathVariable("environmentId") Long id) {
+     public ResponseEntity<Void> delete(@PathVariable("environmentId") Long id) {
 
           environmentService.delete(id);
           amqpCacheService.dispatchClean();

@@ -94,6 +94,8 @@ public class OAuthInterceptorService {
 
     private static final String ACESS_TOKEN = "access_token";
 
+    private static final String BEARER = "bearer";
+
     @Autowired
     private OAuthService oAuthService;
 
@@ -391,7 +393,7 @@ public class OAuthInterceptorService {
 
         TokenOAuth tokenOAuth = oAuthService.generateTokenOAuth(oAuthRequest, oAuthRequest.getClientId(), privateKey, timeAccessToken, timeRefreshToken, body);
         if (Objects.nonNull(tokenOAuth)) {
-            tokenOAuth.setToken_type("bearer");
+            tokenOAuth.setToken_type(BEARER);
             try {
                 generateResponseWithSuccess(mapper().writeValueAsString(tokenOAuth));
             } catch (JsonProcessingException e) {
@@ -410,7 +412,7 @@ public class OAuthInterceptorService {
 
         TokenImplicit tokenImplicit = oAuthService.generateTokenImplicit(oAuthRequest, privateKey, timeAccessToken, body);
         if (Objects.nonNull(tokenImplicit)) {
-            tokenImplicit.setToken_type("bearer");
+            tokenImplicit.setToken_type(BEARER);
             try {
                 generateResponseWithSuccess(mapper().writeValueAsString(tokenImplicit));
             } catch (JsonProcessingException e) {
@@ -426,7 +428,7 @@ public class OAuthInterceptorService {
         String claimsJson = getBodyRequest(request);
         TokenOAuth tokenOAuth = oAuthService.generateTokenOAuth(oAuthRequest, oAuthRequest.getClientId(), privateKey, timeAccessToken, timeRefreshToken, claimsJson);
         if (Objects.nonNull(tokenOAuth)) {
-            tokenOAuth.setToken_type("bearer");
+            tokenOAuth.setToken_type(BEARER);
             try {
                 generateResponseWithSuccess(mapper().writeValueAsString(tokenOAuth));
             } catch (JsonProcessingException e) {
