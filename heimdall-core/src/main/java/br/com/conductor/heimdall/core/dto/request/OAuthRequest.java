@@ -22,7 +22,6 @@ package br.com.conductor.heimdall.core.dto.request;
 
 import java.io.Serializable;
 import java.util.Set;
-import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

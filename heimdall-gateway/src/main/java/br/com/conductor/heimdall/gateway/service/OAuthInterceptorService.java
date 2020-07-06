@@ -218,6 +218,7 @@ public class OAuthInterceptorService {
      * @param timeRefreshToken time to expire refreshToken
      * @throws HeimdallException Code not found, code already used, grant_type not found
      */
+
     private void runGenerate(OAuthRequest oAuthRequest, HttpServletRequest request, String privateKey, int timeAccessToken, int timeRefreshToken) throws HeimdallException {
         String claimsJson = getBodyRequest(request);
         TokenOAuth tokenOAuth = oAuthService.generateTokenOAuth(oAuthRequest, oAuthRequest.getClientId(), privateKey, timeAccessToken, timeRefreshToken, claimsJson);
@@ -237,7 +238,7 @@ public class OAuthInterceptorService {
      * @param privateKey privateKey used in Token
      * @throws HeimdallException Token invalid, Authorization not found, Token expired
      */
-    private void runValidate(String privateKey) throws HeimdallException {
+    private void runValidate(String privateKey) {
 
         String authorization = context.getRequest().getHeader("Authorization");
 
@@ -266,7 +267,7 @@ public class OAuthInterceptorService {
      * @param oAuthAuthorizeFromToken {@link OAuthAuthorize} recover from database
      * @throws HeimdallException Token expired
      */
-    private void generateTokenImplicit(String privateKey, String token, OAuthAuthorize oAuthAuthorizeFromToken) throws HeimdallException {
+    private void generateTokenImplicit(String privateKey, String token, OAuthAuthorize oAuthAuthorizeFromToken) {
         TokenImplicit tokenImplicit = oAuthService.generateTokenImplicitFromOtherToken(token, privateKey, oAuthAuthorizeFromToken.getExpirationTime());
         if (Objects.nonNull(tokenImplicit)) {
             oAuthService.saveToken(
@@ -462,7 +463,7 @@ public class OAuthInterceptorService {
                 ResponseEntity<String> entityResponse = template
                     .exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.POST, createHttpEntity(uriComponentsBuilder, provider.getProviderParams()), String.class);
 
-                HeimdallException.checkThrow(!(Series.valueOf(entityResponse.getStatusCodeValue()) == Series.SUCCESSFUL), ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);
+                HeimdallException.checkThrow(Series.valueOf(entityResponse.getStatusCodeValue()) != Series.SUCCESSFUL, ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);
             } catch (Exception ex) {
                 log.error(ex.getMessage(), ex);
                 throw new UnauthorizedException(ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);

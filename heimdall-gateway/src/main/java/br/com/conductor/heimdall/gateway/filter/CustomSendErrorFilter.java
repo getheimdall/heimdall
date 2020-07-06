@@ -66,7 +66,7 @@ public class CustomSendErrorFilter extends SendErrorFilter {
 				message = exception.getCause().getMessage();
 			}
 
-			Map<String, Object> errorAttributes = new LinkedHashMap<String, Object>();
+			Map<String, Object> errorAttributes = new LinkedHashMap<>();
 			errorAttributes.put("timestamp", LocalDateTime.now());
 			final int status = exception.nStatusCode;
 			errorAttributes.put("status", status);

@@ -35,7 +35,7 @@ public class HeimdallException extends RuntimeException {
      private static final long serialVersionUID = 4942916592031161727L;
      
      @Getter
-     private ExceptionMessage msgEnum;
+     private final ExceptionMessage msgEnum;
 
      /**
       * Creates a new Heimdall Exception.
@@ -56,7 +56,7 @@ public class HeimdallException extends RuntimeException {
       * @param exceptionMessage	{@link ExceptionMessage}
       * @throws HeimdallException {@link HeimdallException}
       */
-     public static void checkThrow(boolean expression, ExceptionMessage exceptionMessage) throws HeimdallException {
+     public static void checkThrow(boolean expression, ExceptionMessage exceptionMessage){
 
           if (expression) {
                exceptionMessage.raise();
@@ -71,7 +71,7 @@ public class HeimdallException extends RuntimeException {
       * @param dynamicText	text to be injected to the message
       * @throws HeimdallException {@link HeimdallException}
       */
-     public static void checkThrow(boolean expression, ExceptionMessage exceptionMessage, String... dynamicText) throws HeimdallException {
+     public static void checkThrow(boolean expression, ExceptionMessage exceptionMessage, String... dynamicText){
 
           if (expression) {
                exceptionMessage.raise(dynamicText);

@@ -32,9 +32,10 @@ import org.springframework.util.StreamUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -63,7 +64,7 @@ public class RequestHelper {
           
           try {
                reqDTO.setHeaders(getRequestHeadersInfo(request));
-               reqDTO.setBody(StreamUtils.copyToString(request.getInputStream(), Charset.forName("UTF-8")));
+               reqDTO.setBody(StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8));
                reqDTO.setUri(UrlUtil.getCurrentUrl(request));
 		} catch (IOException e) {
 		     log.error(e.getMessage(), e);
@@ -79,9 +80,9 @@ public class RequestHelper {
       * @param request {@link HttpServletRequest}
       * @return			A HashMap with the information of the headers
       */
-     public HashMap<String, String> getRequestHeadersInfo(HttpServletRequest request) {
+     public Map<String, String> getRequestHeadersInfo(HttpServletRequest request) {
           
-          HashMap<String, String> map = new HashMap<>();
+          Map<String, String> map = new HashMap<>();
           Enumeration<String> headerNames = request.getHeaderNames();
           while (headerNames.hasMoreElements()) {
                String key = headerNames.nextElement();

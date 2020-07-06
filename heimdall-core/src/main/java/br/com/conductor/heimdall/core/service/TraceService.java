@@ -100,7 +100,7 @@ public class TraceService {
         p.setNumberOfElements(page.getNumberOfElements());
         p.setPreviousPage(page.getPreviousPage());
         p.setTotalElements(page.getTotalElements());
-        p.setTotalPages(page.getTotalPages());;
+        p.setTotalPages(page.getTotalPages());
 
         List<LogTraceDTO> logTraces = new ArrayList<>();
 
