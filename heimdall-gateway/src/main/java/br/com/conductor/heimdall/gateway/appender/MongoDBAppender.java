@@ -114,7 +114,7 @@ public class MongoDBAppender extends UnsynchronizedAppenderBase<ILoggingEvent> {
         ZoneId zoneId = ZoneId.of(this.zoneId);
 
         // Offset in milliseconds based on the informed Zone
-        long offset = (long) zoneId.getRules().getOffset(Instant.now()).getTotalSeconds() * 1000;
+        int offset =  zoneId.getRules().getOffset(Instant.now()).getTotalSeconds() * 1000;
 
 		Map<String, Object> objLog = new HashMap<>();
 		objLog.put("ts", new BsonDateTime(e.getTimeStamp() + offset));
