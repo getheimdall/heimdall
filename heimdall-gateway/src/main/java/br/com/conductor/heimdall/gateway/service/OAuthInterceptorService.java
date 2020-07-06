@@ -160,14 +160,13 @@ public class OAuthInterceptorService {
             .checkThrow(Objects.isNull(oAuthRequest.getGrantType()) || oAuthRequest.getGrantType().isEmpty(), ExceptionMessage.GRANT_TYPE_NOT_FOUND);
 
         HttpServletRequest request = context.getRequest();
-        String body = getBodyRequest(request);
 
         timeAccessToken = (timeAccessToken <= 0) ? TIME_ACCESS_TOKEN : timeAccessToken;
         timeRefreshToken = (timeRefreshToken <= 0) ? TIME_REFRESH_TOKEN : timeRefreshToken;
 
         switch (typeOAuth) {
             case GENERATE:
-                runGenerate(oAuthRequest, privateKey, timeAccessToken, timeRefreshToken, body);
+                runGenerate(oAuthRequest, request, privateKey, timeAccessToken, timeRefreshToken);
                 return;
             case AUTHORIZE:
                 runAuthorize(oAuthRequest, request, providerId, privateKey, timeAccessToken, timeRefreshToken);
@@ -182,7 +181,11 @@ public class OAuthInterceptorService {
      * Method to run OAuth of the type Authorize.
      *
      * @param oAuthRequest {@link OAuthRequest}
+     * @param request       request in context
      * @param providerId   {@link Provider} id
+     * @param privateKey    privateKey used in Token
+     * @param timeAccessToken  time to expire accessToken
+     * @param timeRefreshToken time to expire refreshToken
      */
 
     private void runAuthorize(OAuthRequest oAuthRequest, HttpServletRequest request, Long providerId, String privateKey, int timeAccessToken, int timeRefreshToken) {
@@ -210,13 +213,14 @@ public class OAuthInterceptorService {
      * Method to run OAuth of the type Generate.
      *
      * @param oAuthRequest     {@link OAuthRequest}
+     * @param request          request in context
      * @param privateKey       privateKey used in Token
      * @param timeAccessToken  time to expire accessToken
      * @param timeRefreshToken time to expire refreshToken
-     * @param claimsJson       Claims to payload in JSON
      * @throws HeimdallException Code not found, code already used, grant_type not found
      */
-    private void runGenerate(OAuthRequest oAuthRequest, String privateKey, int timeAccessToken, int timeRefreshToken, String claimsJson) throws HeimdallException {
+    private void runGenerate(OAuthRequest oAuthRequest, HttpServletRequest request, String privateKey, int timeAccessToken, int timeRefreshToken) throws HeimdallException {
+        String claimsJson = getBodyRequest(request);
         TokenOAuth tokenOAuth = oAuthService.generateTokenOAuth(oAuthRequest, oAuthRequest.getClientId(), privateKey, timeAccessToken, timeRefreshToken, claimsJson);
         String tokenOAuthJson;
         try {
