@@ -51,7 +51,9 @@ public class HeimdallErrorController implements ErrorController {
      
      @Value("${error.path:/error}")
      private String errorPath;
-      
+
+     private static final String MESSAGE = "message";
+
      @Override
      public String getErrorPath() {
          return errorPath;
@@ -83,12 +85,12 @@ public class HeimdallErrorController implements ErrorController {
                HeimdallException exception = new HeimdallException(ExceptionMessage.GLOBAL_ERROR_ZUUL);
                
                errorAttributes.put("exception", exception.getClass().getSimpleName());
-               errorAttributes.put("message", exception.getMessage());
+               errorAttributes.put(MESSAGE, exception.getMessage());
           }
           
           Object message = request.getAttribute("javax.servlet.error.message");
-          if ((!StringUtils.isEmpty(message) || errorAttributes.get("message") == null) && !(error instanceof BindingResult)) {
-               errorAttributes.put("message", StringUtils.isEmpty(message) ? "No message available" : message);
+          if ((!StringUtils.isEmpty(message) || errorAttributes.get(MESSAGE) == null) && !(error instanceof BindingResult)) {
+               errorAttributes.put(MESSAGE, StringUtils.isEmpty(message) ? "No message available" : message);
           }
           
           String path = (String) request.getAttribute("javax.servlet.error.request_uri");

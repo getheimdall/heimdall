@@ -61,7 +61,7 @@ public class ProviderResource {
     @ApiOperation(value = "Save a new provider")
     @PostMapping
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_PROVIDER)
-    public ResponseEntity<?> save(@RequestBody ProviderDTO providerPersist) {
+    public ResponseEntity<Provider> save(@RequestBody ProviderDTO providerPersist) {
         Provider saved = this.providerService.save(providerPersist);
         return new ResponseEntity<>(saved, HttpStatus.CREATED);
     }
@@ -98,7 +98,7 @@ public class ProviderResource {
     @ResponseBody
     @ApiOperation(value = "Find Provider by ID", response = Provider.class)
     @GetMapping("/{id}")
-    public ResponseEntity<?> findById(@PathVariable Long id) {
+    public ResponseEntity<Provider> findById(@PathVariable Long id) {
 
         Provider provider = providerService.findOne(id);
 
@@ -115,7 +115,7 @@ public class ProviderResource {
     @ResponseBody
     @ApiOperation(value = "Update provider")
     @PutMapping(value = "/{idProvider}")
-    public ResponseEntity<?> update(@PathVariable Long idProvider, @RequestBody ProviderDTO providerDTO) {
+    public ResponseEntity<Provider> update(@PathVariable Long idProvider, @RequestBody ProviderDTO providerDTO) {
         Provider providerEdit = this.providerService.edit(idProvider, providerDTO);
 
         return ResponseEntity.ok(providerEdit);
@@ -131,7 +131,7 @@ public class ProviderResource {
     @ApiOperation(value = "Delete Provider")
     @DeleteMapping(value = "/{providerId}")
     @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_OPERATION)
-    public ResponseEntity<?> delete(@PathVariable Long providerId) {
+    public ResponseEntity<Void> delete(@PathVariable Long providerId) {
 
         this.providerService.delete(providerId);
 

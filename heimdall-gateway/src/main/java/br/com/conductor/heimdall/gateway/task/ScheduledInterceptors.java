@@ -63,16 +63,16 @@ public class ScheduledInterceptors {
     private boolean checkInterceptorInDisk(Interceptor interceptor) {
 
         String filename = StringUtils.concatCamelCase(interceptor.getLifeCycle().name(), interceptor.getType().name(), interceptor.getExecutionPoint().getFilterType(), interceptor.getId().toString()) + ".groovy";
-        String path = this.path;
+        String pathName = this.path;
 
         if (interceptor.getType() == TypeInterceptor.MIDDLEWARE) {
-            path = path.concat(File.separator + "api" + File.separator + interceptor.getApi().getId());
+            pathName = pathName.concat(File.separator + "api" + File.separator + interceptor.getApi().getId());
         } else {
-            path = path.concat(File.separator + interceptor.getExecutionPoint().getFilterType());
+            pathName = pathName.concat(File.separator + interceptor.getExecutionPoint().getFilterType());
         }
 
-        path = path.concat(File.separator + filename);
-        File file = new File(path);
+        pathName = pathName.concat(File.separator + filename);
+        File file = new File(pathName);
         
         return file.exists();
     }

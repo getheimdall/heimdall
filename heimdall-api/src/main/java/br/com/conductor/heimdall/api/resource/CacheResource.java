@@ -38,6 +38,8 @@ import br.com.conductor.heimdall.core.service.amqp.AMQPCacheService;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
 import io.swagger.annotations.ApiOperation;
 
+import java.util.List;
+
 /**
  * Uses a {@link CacheService} to provide methods to read and remove the cache.
  *
@@ -64,7 +66,7 @@ public class CacheResource {
      @ApiOperation(value = "Find all Caches")
      @GetMapping
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_CACHES)
-     public ResponseEntity<?> findAll() {
+     public ResponseEntity<List<String>> findAll() {
 
           return ResponseEntity.ok(cacheService.list());
      }
@@ -79,7 +81,7 @@ public class CacheResource {
      @ApiOperation(value = "Delete Cache")
      @DeleteMapping(value = "/{cacheKey}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_CACHES)
-     public ResponseEntity<?> delete(@PathVariable("cacheKey") String cacheKey) {
+     public ResponseEntity<Void> delete(@PathVariable("cacheKey") String cacheKey) {
           
           amqpCacheService.dispatchClean(cacheKey);
 
@@ -97,7 +99,7 @@ public class CacheResource {
      @ApiOperation(value = "Delete Cache")
      @DeleteMapping(value = "/{cacheKey}/{cacheId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_CACHES)
-     public ResponseEntity<?> delete(@PathVariable("cacheKey") String cacheKey, @PathVariable("cacheId") String cacheId) {
+     public ResponseEntity<Void> delete(@PathVariable("cacheKey") String cacheKey, @PathVariable("cacheId") String cacheId) {
           
           amqpCacheService.dispatchClean(cacheKey, cacheId);
           
@@ -113,7 +115,7 @@ public class CacheResource {
      @ApiOperation(value = "Delete All Caches")
      @DeleteMapping
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_CACHES)
-     public ResponseEntity<?> delete() {
+     public ResponseEntity<Void> delete() {
           
           amqpCacheService.dispatchClean();
           
@@ -129,7 +131,7 @@ public class CacheResource {
      @ApiOperation(value = "Delete all caches created by Cache interceptors")
      @DeleteMapping("/interceptors")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_CACHES)
-     public ResponseEntity<?> deleteInterceptors() {
+     public ResponseEntity<Void> deleteInterceptors() {
 
           amqpCacheService.dispatchCleanInterceptorsCache();
 

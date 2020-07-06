@@ -32,6 +32,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -89,12 +90,15 @@ public class ScopesFilter extends ZuulFilter {
     private void process() {
         final RequestContext context = RequestContext.getCurrentContext();
 
+        final Long operation = (Long) context.get(OPERATION_ID);
+
+        if (operation == null) return;
+
         final String client_id = context.getRequest().getHeader(CLIENT_ID);
 
-        if (client_id != null) {
-
+        if (Objects.nonNull(client_id)) {
             App app = appRepository.findByClientId(client_id);
-            if (app == null || app.getPlans() == null) return;
+            if (Objects.isNull(app) || Objects.isNull(app.getPlans())) return;
 
             Set<Long> apis = app.getPlans().stream().map(plan -> plan.getApi().getId()).collect(Collectors.toSet());
             Long apiId = (Long) context.get(API_ID);
@@ -112,14 +116,10 @@ public class ScopesFilter extends ZuulFilter {
                                     });
                     });
 
-            final Long operation = (Long) context.get(OPERATION_ID);
-
-            if (operation == null) return;
-
             // If the allowedOperations is empty it means that Scopes are not set
-            if (allowedOperations.isEmpty()) return;
-
-            if (!allowedOperations.contains(operation)) {
+            if (allowedOperations.isEmpty()){
+                return;
+            }else if (!allowedOperations.contains(operation)) {
                 context.setSendZuulResponse(false);
                 context.setResponseStatusCode(HttpStatus.FORBIDDEN.value());
                 context.setResponseBody(HttpStatus.FORBIDDEN.getReasonPhrase());

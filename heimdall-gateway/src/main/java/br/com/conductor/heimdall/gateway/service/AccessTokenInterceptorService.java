@@ -32,6 +32,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -87,16 +88,15 @@ public class AccessTokenInterceptorService {
 
         TraceContextHolder.getInstance().getActualTrace().setAccessToken(DigestUtils.digestMD5(accessToken));
 
-        if (clientId == null || clientId.isEmpty()) {
+        if (Objects.isNull(clientId) || clientId.isEmpty()) {
             buildResponse(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, "Client Id"));
             return;
         }
 
-        if (accessToken != null && !accessToken.isEmpty()) {
-
+        if (Objects.nonNull(accessToken) && !accessToken.isEmpty()){
             AccessToken token = accessTokenRepository.findAccessTokenActive(accessToken);
 
-            if (token != null && token.getApp() != null) {
+            if(Objects.nonNull(token) && Objects.nonNull(token.getApp())){
 
                 List<Plan> plans = token.getApp().getPlans();
                 Set<Long> collect = plans.parallelStream().map(plan -> plan.getApi().getId()).collect(Collectors.toSet());
@@ -104,9 +104,7 @@ public class AccessTokenInterceptorService {
 
                     String cId = token.getApp().getClientId();
                     if (clientId.equals(cId)) {
-
                         TraceContextHolder.getInstance().getActualTrace().setApp(token.getApp().getName());
-
                     } else {
                         buildResponse(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, ACCESS_TOKEN));
                     }
@@ -116,9 +114,10 @@ public class AccessTokenInterceptorService {
             } else {
                 buildResponse(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, ACCESS_TOKEN));
             }
-        } else {
+        }else {
             buildResponse(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, ACCESS_TOKEN));
         }
+
     }
 
     private void buildResponse(String message) {

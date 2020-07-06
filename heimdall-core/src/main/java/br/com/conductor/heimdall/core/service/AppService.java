@@ -117,9 +117,7 @@ public class AppService {
           Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
           Page<App> page = appRepository.findAll(example, pageable);
 
-          AppPage appPage = new AppPage(PageDTO.build(page));
-
-          return appPage;
+          return new AppPage(PageDTO.build(page));
      }
 
      /**
@@ -135,9 +133,7 @@ public class AppService {
 
           Example<App> example = Example.of(app, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 
-          List<App> apps = appRepository.findAll(example);
-
-          return apps;
+          return appRepository.findAll(example);
      }
 
      /**

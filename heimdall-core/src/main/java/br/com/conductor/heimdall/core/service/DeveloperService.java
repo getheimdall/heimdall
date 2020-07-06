@@ -98,9 +98,7 @@ public class DeveloperService {
           Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
           Page<Developer> page = developerRepository.findAll(example, pageable);
           
-          DeveloperPage developerPage = new DeveloperPage(PageDTO.build(page));
-          
-          return developerPage;
+          return new DeveloperPage(PageDTO.build(page));
      }
 
      /**
@@ -115,9 +113,7 @@ public class DeveloperService {
           
           Example<Developer> example = Example.of(developer, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
           
-          List<Developer> developers = developerRepository.findAll(example);
-          
-          return developers;
+          return developerRepository.findAll(example);
      }
      
      /**
