@@ -145,6 +145,35 @@ public class CallImpl implements Call {
                     return context.getRequest().getMethod();
                }
 
+               private HttpServletRequestWrapper removeRequestHeaderWrapper(HttpServletRequest request, String name) {
+
+                    return new HttpServletRequestWrapper(request) {
+
+                         public String getHeader(String nameHeader) {
+
+                              String valueHeader = null;
+                              if (name != null && !name.equalsIgnoreCase(nameHeader)) {
+
+                                   valueHeader = super.getHeader(nameHeader);
+                              }
+
+                              return valueHeader;
+                         }
+
+                         public Enumeration<String> getHeaderNames() {
+
+                              List<String> names = Collections.list(super.getHeaderNames());
+
+                              if (name != null && names.stream().anyMatch(s -> s.equalsIgnoreCase(name))) {
+
+                                   names.remove(name);
+                              }
+
+                              return Collections.enumeration(names);
+                         }
+                    };
+               }
+
           }
 
           @Override
@@ -408,7 +437,22 @@ public class CallImpl implements Call {
 
                     return null;
                }
-               
+
+               private HttpServletResponseWrapper removeResponseHeaderWrapper(HttpServletResponse response, String name) {
+
+                    return new HttpServletResponseWrapper(response) {
+
+                         public void addHeader(String headerName, String headerValue) {
+
+                              if (!name.equalsIgnoreCase(headerName)) {
+
+                                   super.addHeader(headerName, headerValue);
+                              }
+
+                         }
+                    };
+               }
+
           }
           
           @Override
@@ -644,56 +688,5 @@ public class CallImpl implements Call {
           }
           
      }
-     
-     //
-     // Private helper methods
-     //
-     
-     private HttpServletRequestWrapper removeRequestHeaderWrapper(HttpServletRequest request, String name) {
 
-          return new HttpServletRequestWrapper(request) {
-
-               @Override
-               public String getHeader(String nameHeader) {
-
-                    String valueHeader = null;
-                    if (name != null && !name.equalsIgnoreCase(nameHeader)) {
-
-                         valueHeader = super.getHeader(nameHeader);
-                    }
-
-                    return valueHeader;
-               }
-
-               @Override
-               public Enumeration<String> getHeaderNames() {
-
-                    List<String> names = Collections.list(super.getHeaderNames());
-                    
-                    if (name != null && names.stream().anyMatch(s -> s.equalsIgnoreCase(name))) {
-                         
-                         names.remove(name);
-                    }
-
-                    return Collections.enumeration(names);
-               }
-          };
-     }
-     
-     private HttpServletResponseWrapper removeResponseHeaderWrapper(HttpServletResponse response, String name) {
-
-          return new HttpServletResponseWrapper(response) {
-
-               @Override
-               public void addHeader(String headerName, String headerValue) {
-
-                    if (!name.equalsIgnoreCase(headerName)) {
-
-                         super.addHeader(headerName, headerValue);
-                    }
-
-               }
-          };
-     }
-     
 }
