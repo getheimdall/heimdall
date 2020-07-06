@@ -51,8 +51,8 @@ public class IpsInterceptorService {
      *
      * @param whitelist Set of allowed ids
      * @throws Throwable
-     */
-    public void executeWhiteList(Set<String> whitelist) throws Throwable {
+	 */
+    public void executeWhiteList(Set<String> whitelist) throws Throwable{
     	isAuthorized = false;
 
         RequestContext ctx = RequestContext.getCurrentContext();
@@ -131,7 +131,7 @@ public class IpsInterceptorService {
      * @param blacklist Set of blocked ids
      * @throws Throwable
      */
-	public void executeBlackList(Set<String> blacklist) throws Throwable {
+	public void executeBlackList(Set<String> blacklist) throws Throwable{
 		isAuthorized = true;
 
 		RequestContext ctx = RequestContext.getCurrentContext();

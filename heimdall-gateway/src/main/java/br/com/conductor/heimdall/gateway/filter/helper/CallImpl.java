@@ -36,7 +36,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 import java.io.*;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -63,9 +62,8 @@ public class CallImpl implements Call {
      
      @Override
      public Request request() {
-          
-          Request request = new RequestImpl();
-          return request;
+
+          return new RequestImpl();
      }
      
      public class RequestImpl implements Request {
@@ -73,8 +71,7 @@ public class CallImpl implements Call {
           @Override
           public Header header() {
                
-               Header header = new HeaderImpl();
-               return header;
+               return new HeaderImpl();
           }
                     
           public class HeaderImpl implements Header {
@@ -182,8 +179,7 @@ public class CallImpl implements Call {
           @Override
           public Query query() {
                
-               Query query = new QueryImpl();
-               return query;
+               return new QueryImpl();
           }
 
           public class QueryImpl implements Query {
@@ -223,32 +219,32 @@ public class CallImpl implements Call {
 
                     if (value != null) {
 
-                         RequestContext context = RequestContext.getCurrentContext();
+                         RequestContext requestContext = RequestContext.getCurrentContext();
 
-                         Map<String, List<String>> params = context.getRequestQueryParams();
+                         Map<String, List<String>> params = requestContext.getRequestQueryParams();
 
                          if (params == null) {
 
                               params = new ConcurrentHashMap<>();
                          }
                          params.put(name, Arrays.asList(value));
-                         context.setRequestQueryParams(params);
+                         requestContext.setRequestQueryParams(params);
                     }
                }
 
                @Override
                public void remove(String name) {
 
-                    RequestContext context = RequestContext.getCurrentContext();
+                    RequestContext requestContext = RequestContext.getCurrentContext();
 
-                    Map<String, List<String>> params = context.getRequestQueryParams();
+                    Map<String, List<String>> params = requestContext.getRequestQueryParams();
 
                     if (params != null) {
 
                          params.remove(name);
                     }
 
-                    context.setRequestQueryParams(params);
+                    requestContext.setRequestQueryParams(params);
                }
 
           }
@@ -259,9 +255,9 @@ public class CallImpl implements Call {
                try (InputStream in = (InputStream) context.get("requestEntity")) {
                     String bodyText;
             	    if (in == null) {
-                         bodyText = StreamUtils.copyToString(context.getRequest().getInputStream(), Charset.forName("UTF-8"));
+                         bodyText = StreamUtils.copyToString(context.getRequest().getInputStream(), StandardCharsets.UTF_8);
                     } else {
-                         bodyText = StreamUtils.copyToString(in, Charset.forName("UTF-8"));
+                         bodyText = StreamUtils.copyToString(in, StandardCharsets.UTF_8);
                     }
 
                     return bodyText;
@@ -278,7 +274,7 @@ public class CallImpl implements Call {
                
                try {
                     
-                    context.set("requestEntity", new ByteArrayInputStream(body.getBytes("UTF-8")));
+                    context.set("requestEntity", new ByteArrayInputStream(body.getBytes(StandardCharsets.UTF_8.name())));
                } catch (Exception e) {
                     
                     log.error(e.getMessage(), e);
@@ -361,9 +357,8 @@ public class CallImpl implements Call {
 
      @Override
      public Response response() {
-          
-          Response response = new ResponseImpl();
-          return response;
+
+          return new ResponseImpl();
      }
      
      public class ResponseImpl implements Response {
@@ -371,8 +366,7 @@ public class CallImpl implements Call {
           @Override
           public Header header() {
                
-               Header header = new HeaderImpl();
-               return header;
+               return new HeaderImpl();
           }
           
           public class HeaderImpl implements Header {
@@ -458,7 +452,7 @@ public class CallImpl implements Call {
                          }
                     };
                }
-               
+
           }
           
           @Override
@@ -492,29 +486,28 @@ public class CallImpl implements Call {
               setBody(body, false);
           }
 
-         @Override
-         public void setBody(byte[] body, boolean gzip) {
+          @Override
+          public void setBody(byte[] body, boolean gzip) {
 
-             InputStream stream;
-             try {
-                 if (body != null) {
-                     stream = new ByteArrayInputStream(body);
-                     if (gzip) {
-                         stream = new GZIPInputStream(stream);
-                     }
-                 } else {
-                     stream = new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8));
-                 }
-                 context.setSendZuulResponse(false);
-                 context.setResponseDataStream(stream);
-                 writeResponse(stream, context.getResponse().getOutputStream());
+               InputStream stream;
+               try {
+                    if (body != null) {
+                         stream = new ByteArrayInputStream(body);
+                         if (gzip) {
+                              stream = new GZIPInputStream(stream);
+                         }
+                    } else {
+                         stream = new ByteArrayInputStream("".getBytes(StandardCharsets.UTF_8));
+                    }
+                    context.setSendZuulResponse(false);
+                    context.setResponseDataStream(stream);
+                    writeResponse(stream, context.getResponse().getOutputStream());
 
-             } catch (UnsupportedEncodingException e) {
-                 log.error(e.getMessage(), e);
-             } catch (IOException e) {
-                 log.error(e.getMessage(), e);
-             }
-
+               } catch (UnsupportedEncodingException e) {
+                    log.error(e.getMessage(), e);
+               } catch (IOException e) {
+                    log.error(e.getMessage(), e);
+               }
          }
 
          private void writeResponse(InputStream zin, OutputStream out) throws IOException {
@@ -529,8 +522,7 @@ public class CallImpl implements Call {
      @Override
      public Trace trace() {
           
-          Trace trace = new TraceImpl();
-          return trace;
+          return new TraceImpl();
      }
      
      public class TraceImpl implements Trace {
@@ -585,9 +577,8 @@ public class CallImpl implements Call {
      
      @Override
      public Environment environment() {
-          
-          Environment environment = new EnvironmentImpl();
-          return environment;
+
+          return new EnvironmentImpl();
      }
      
      public class EnvironmentImpl implements Environment {
@@ -625,9 +616,8 @@ public class CallImpl implements Call {
      
      @Override
      public Info info() {
-          
-          Info info = new InfoImpl();
-          return info;
+
+          return new InfoImpl();
      }
      
      public class InfoImpl implements Info {
