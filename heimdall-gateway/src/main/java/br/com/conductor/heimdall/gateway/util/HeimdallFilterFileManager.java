@@ -93,6 +93,7 @@ public class HeimdallFilterFileManager {
 
     void startPoller() {
         poller = new Thread("HeimdallGroovyFilterFileManagerPoller") {
+            @Override
             public void run() {
                 while (bRunning) {
                     try {

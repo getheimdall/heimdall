@@ -65,10 +65,10 @@ public class ZuulConfiguration extends ZuulProxyAutoConfiguration {
 	private DiscoveryClient discovery;
 
 	@Autowired
-	private ZuulProperties zuulProperties;
+	private ZuulProperties zuulConfigurationProperties;
 
 	@Autowired
-	private ServerProperties server;
+	private ServerProperties serverProperties;
 
 	@Autowired
 	private EnvironmentInfoRepository environmentInfoRepository;
@@ -89,14 +89,14 @@ public class ZuulConfiguration extends ZuulProxyAutoConfiguration {
 	@Bean
 	public ProxyRouteLocator proxyRouteLocator() {
 
-		return new ProxyRouteLocator(server.getServletPath(), discovery, zuulProperties, zuulRouteStore);
+		return new ProxyRouteLocator(serverProperties.getServletPath(), discovery, zuulConfigurationProperties, zuulRouteStore);
 
 	}
 
 	@Override
 	public PreDecorationFilter preDecorationFilter(RouteLocator routeLocator, ProxyRequestHelper proxyRequestHelper) {
 
-		return new HeimdallDecorationFilter(proxyRouteLocator(), this.server.getServletPrefix(), zuulProperties,
+		return new HeimdallDecorationFilter(proxyRouteLocator(), this.serverProperties.getServletPrefix(), zuulConfigurationProperties,
 				proxyRequestHelper, requestHelper, credentialRepository, environmentInfoRepository);
 	}
 

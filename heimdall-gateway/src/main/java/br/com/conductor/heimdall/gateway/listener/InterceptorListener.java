@@ -49,10 +49,7 @@ public class InterceptorListener {
      
      @Autowired
      private InterceptorFileService interceptorFileService;
-//
-//     @Autowired
-//     private InterceptorRepository interceptorRepository;
-     
+
      @Autowired
      private InterceptorJDBCRepository interceptorJdbcRepository;
 
