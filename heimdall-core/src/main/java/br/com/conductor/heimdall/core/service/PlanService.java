@@ -91,9 +91,7 @@ public class PlanService {
           Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
           Page<Plan> page = planRepository.findAll(example, pageable);
           
-          PlanPage planPage = new PlanPage(PageDTO.build(page));
-          
-          return planPage;
+          return new PlanPage(PageDTO.build(page));
      }
 
      /**
@@ -109,9 +107,7 @@ public class PlanService {
           
           Example<Plan> example = Example.of(plan, ExampleMatcher.matching().withIgnorePaths("defaultPlan", "api.cors").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
           
-          List<Plan> plans = planRepository.findAll(example);
-          
-          return plans;
+          return planRepository.findAll(example);
      }
      
      /**

@@ -111,9 +111,7 @@ public class ResourceService {
           Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
           Page<Resource> page = resourceRepository.findAll(example, pageable);
           
-          ResourcePage resourcePage = new ResourcePage(PageDTO.build(page));
-          
-          return resourcePage;
+          return new ResourcePage(PageDTO.build(page));
      }
 
      /**
@@ -133,9 +131,7 @@ public class ResourceService {
           
           Example<Resource> example = Example.of(resource, ExampleMatcher.matching().withIgnorePaths("api.creationDate").withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
           
-          List<Resource> resources = resourceRepository.findAll(example);
-          
-          return resources;
+          return resourceRepository.findAll(example);
      }
      
      /**

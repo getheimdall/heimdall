@@ -95,8 +95,7 @@ public class GlobalExceptionHandler {
      @ExceptionHandler(NotFoundException.class)
      public @ResponseBody ErroInfo handleExceptionNotFound(HttpServletResponse response, HttpServletRequest request, Exception exception) {
 
-          ErroInfo erroInfo = buildErrorInfo(request, exception);
-          return erroInfo;
+          return buildErrorInfo(request, exception);
 
      }
 
@@ -115,8 +114,7 @@ public class GlobalExceptionHandler {
      @ExceptionHandler(ServerErrorException.class)
      public @ResponseBody ErroInfo handleExceptionServerError(HttpServletResponse response, HttpServletRequest request, Exception exception) {
 
-          ErroInfo erroInfo = buildErrorInfo(request, exception);
-          return erroInfo;
+          return buildErrorInfo(request, exception);
 
      }
 
@@ -135,7 +133,7 @@ public class GlobalExceptionHandler {
      @ExceptionHandler(Exception.class)
      public @ResponseBody ErroInfo handleException(HttpServletResponse response, HttpServletRequest request, Exception exception) {
           
-          ErroInfo erroInfo = buildErrorInfoException(request, exception);
+          ErroInfo erroInfo = buildErrorInfoException(request);
           log.error(exception.getMessage(), exception);
           return erroInfo;
           
@@ -156,7 +154,7 @@ public class GlobalExceptionHandler {
      @ExceptionHandler(ZuulException.class)
      public @ResponseBody ErroInfo zuulExceptionServerError(HttpServletResponse response, HttpServletRequest request, ZuulException exception) {
           
-          ErroInfo erroInfo = buildErrorInfoException(request, exception);
+          ErroInfo erroInfo = buildErrorInfoException(request);
           log.error(exception.getMessage(), exception);
           return erroInfo;
           
@@ -177,7 +175,7 @@ public class GlobalExceptionHandler {
      @ExceptionHandler(NoHttpResponseException.class)
      public @ResponseBody ErroInfo noHttpResponseExceptionServerError(HttpServletResponse response, HttpServletRequest request, NoHttpResponseException exception) {
           
-          ErroInfo erroInfo = buildErrorInfoException(request, exception);
+          ErroInfo erroInfo = buildErrorInfoException(request);
           log.error(exception.getMessage(), exception);
           return erroInfo;
           
@@ -198,8 +196,7 @@ public class GlobalExceptionHandler {
      @ExceptionHandler(BadRequestException.class)
      public @ResponseBody ErroInfo handleExceptionBadRequest(HttpServletResponse response, HttpServletRequest request, Exception exception) {
 
-          ErroInfo erroInfo = buildErrorInfo(request, exception);
-          return erroInfo;
+          return buildErrorInfo(request, exception);
 
      }
      
@@ -218,9 +215,7 @@ public class GlobalExceptionHandler {
      @ExceptionHandler(UnauthorizedException.class)
      public @ResponseBody ErroInfo handleExceptionUnauthorized(HttpServletResponse response, HttpServletRequest request, Exception exception) {
 
-          ErroInfo erroInfo = buildErrorInfo(request, exception);
-          return erroInfo;
-
+          return buildErrorInfo(request, exception);
      }
      
      /**
@@ -238,9 +233,7 @@ public class GlobalExceptionHandler {
      @ExceptionHandler(ForbiddenException.class)
      public @ResponseBody ErroInfo handleExceptionForbidden(HttpServletResponse response, HttpServletRequest request, Exception exception) {
           
-          ErroInfo erroInfo = buildErrorInfo(request, exception);
-          return erroInfo;
-          
+          return buildErrorInfo(request, exception);
      }
      
      /**
@@ -259,8 +252,7 @@ public class GlobalExceptionHandler {
      public @ResponseBody ErroInfo handleExceptionTimeout(HttpServletResponse response, HttpServletRequest request, Exception exception) {
 
           TimeoutException exceptionPIER = new TimeoutException(ExceptionMessage.GLOBAL_TIMEOUT);
-          ErroInfo erroInfo = new ErroInfo(LocalDateTime.now(), exceptionPIER.getMsgEnum().getHttpCode(), exceptionPIER.getClass().getSimpleName(), exceptionPIER.getMessage(), UrlUtil.getCurrentUrl(request));
-          return erroInfo;
+          return new ErroInfo(LocalDateTime.now(), exceptionPIER.getMsgEnum().getHttpCode(), exceptionPIER.getClass().getSimpleName(), exceptionPIER.getMessage(), UrlUtil.getCurrentUrl(request));
 
      }
      
@@ -370,8 +362,7 @@ public class GlobalExceptionHandler {
      private ErroInfo buildErrorInfo(HttpServletRequest request, Exception exception) {
 
           HeimdallException exceptionPIER = (HeimdallException) exception;
-          ErroInfo erroInfo = new ErroInfo(LocalDateTime.now(), exceptionPIER.getMsgEnum().getHttpCode(), exceptionPIER.getClass().getSimpleName(), exceptionPIER.getMessage(), UrlUtil.getCurrentUrl(request));
-          return erroInfo;
+          return new ErroInfo(LocalDateTime.now(), exceptionPIER.getMsgEnum().getHttpCode(), exceptionPIER.getClass().getSimpleName(), exceptionPIER.getMessage(), UrlUtil.getCurrentUrl(request));
      }
 
      /**
@@ -383,11 +374,10 @@ public class GlobalExceptionHandler {
       * {@link Exception}
       * @return {@link ErroInfo}
       */
-     private ErroInfo buildErrorInfoException(HttpServletRequest request, Exception exception) {
+     private ErroInfo buildErrorInfoException(HttpServletRequest request) {
           
           HeimdallException exceptionPIER = new HeimdallException(ExceptionMessage.GLOBAL_ERROR_ZUUL);
-          ErroInfo erroInfo = new ErroInfo(LocalDateTime.now(), exceptionPIER.getMsgEnum().getHttpCode(), exceptionPIER.getClass().getSimpleName(), exceptionPIER.getMessage(), UrlUtil.getCurrentUrl(request));
-          return erroInfo;
+          return new ErroInfo(LocalDateTime.now(), exceptionPIER.getMsgEnum().getHttpCode(), exceptionPIER.getClass().getSimpleName(), exceptionPIER.getMessage(), UrlUtil.getCurrentUrl(request));
      }
 
      /**
