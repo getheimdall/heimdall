@@ -45,6 +45,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -191,41 +192,17 @@ public class DBMockImpl implements DBMongo {
         limit = limit == null || limit > LIMIT ? LIMIT : limit;
         FindIterable<Document> documents;
 
-        if (page > 0 && limit > 0) {
-
-            if (Objeto.notBlank(filters)) {
-
+        if (Objects.nonNull(filters)){
+            if(page == 0){
+                documents = collection.find(Filters.and(filters)).limit(limit).skip(limit);
+            }else {
                 documents = collection.find(Filters.and(filters)).limit(limit).skip(page * limit);
-            } else {
-
+            }
+        }else{
+            if(page == 0){
+                documents = collection.find().limit(limit).skip(limit);
+            }else {
                 documents = collection.find().limit(limit).skip(page * limit);
-            }
-        } else if (page == 0 && limit > 0) {
-
-            if (Objeto.notBlank(filters)) {
-
-                documents = collection.find().limit(limit);
-            } else {
-
-                documents = collection.find(Filters.and(filters)).limit(limit);
-            }
-        } else if (limit > 0) {
-
-            if (Objeto.notBlank(filters)) {
-
-                documents = collection.find().limit(limit);
-            } else {
-
-                documents = collection.find(Filters.and(filters)).limit(limit);
-            }
-        } else {
-
-            if (Objeto.notBlank(filters)) {
-
-                documents = collection.find(Filters.and(filters)).limit(LIMIT);
-            } else {
-
-                documents = collection.find().limit(LIMIT);
             }
         }
 
