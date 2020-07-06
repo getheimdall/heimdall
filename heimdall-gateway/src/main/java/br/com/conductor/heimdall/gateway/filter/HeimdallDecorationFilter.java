@@ -267,7 +267,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                 String pattern = entry.getKey();
                 if (this.pathMatcher.match(pattern, requestURI)) {
                     auxMatch = true;
-                    List<Credential> credentials = credentialRepository.findByPattern(entry.getKey());
+                    List<Credential> credentials = credentialRepository.findByPattern(pattern);
                     Credential credential = null;
                     if (Objects.nonNull(credentials) && !credentials.isEmpty()) {
 
@@ -288,7 +288,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                         String basePath = credential.getApiBasePath();
                         requestURI = org.apache.commons.lang.StringUtils.removeStart(requestURI, basePath);
 
-                        ctx.put(PATTERN, org.apache.commons.lang.StringUtils.removeStart(entry.getKey(), basePath));
+                        ctx.put(PATTERN, org.apache.commons.lang.StringUtils.removeStart(pattern, basePath));
                         ctx.put(API_NAME, credential.getApiName());
                         ctx.put(API_ID, credential.getApiId());
                         ctx.put(RESOURCE_ID, credential.getResourceId());
@@ -324,7 +324,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                         traceContextHolder.getActualTrace().setResourceId(credential.getResourceId());
                         traceContextHolder.getActualTrace().setOperationId(credential.getOperationId());
 
-                        return new HeimdallRoute(entry.getKey(), route, false);
+                        return new HeimdallRoute(pattern, route, false);
                     } else {
                         ctx.put(INTERRUPT, true);
                     }
