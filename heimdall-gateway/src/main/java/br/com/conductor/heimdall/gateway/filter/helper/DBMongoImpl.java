@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Objects;
 
 /**
  * Implements the {@link DB} interface.
@@ -197,46 +198,21 @@ public class DBMongoImpl implements DBMongo {
 
      @Override
      public <T> Page<T> find(MongoCollection<Document> collection, Class<T> classType, Bson filters, Integer page, Integer limit) {
-
           page = page == null ? PAGE : page;
           limit = limit == null || limit > LIMIT ? LIMIT : limit;
           FindIterable<Document> documents;
 
-          if (page > 0 && limit > 0) {
-
-               if (filters != null) {
-
+          if (Objects.nonNull(filters)){
+               if(page == 0){
+                    documents = collection.find(Filters.and(filters)).limit(limit).skip(limit);
+               }else {
                     documents = collection.find(Filters.and(filters)).limit(limit).skip(page * limit);
-               } else {
-
+               }
+          }else{
+               if(page == 0){
+                    documents = collection.find().limit(limit).skip(limit);
+               }else {
                     documents = collection.find().limit(limit).skip(page * limit);
-               }
-          } else if (page == 0 && limit > 0) {
-
-               if (filters == null) {
-
-                    documents = collection.find().limit(limit);
-               } else {
-
-                    documents = collection.find(Filters.and(filters)).limit(limit);
-               }
-          } else if (limit > 0) {
-
-               if (filters == null) {
-
-                    documents = collection.find().limit(limit);
-               } else {
-
-                    documents = collection.find(Filters.and(filters)).limit(limit);
-               }
-          } else {
-
-               if (filters != null) {
-
-                    documents = collection.find(Filters.and(filters)).limit(LIMIT);
-               } else {
-
-                    documents = collection.find().limit(LIMIT);
                }
           }
 

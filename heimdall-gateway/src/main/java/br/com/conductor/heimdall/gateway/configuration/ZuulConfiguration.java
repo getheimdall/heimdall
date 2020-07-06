@@ -110,7 +110,8 @@ public class ZuulConfiguration extends ZuulProxyAutoConfiguration {
 	public SendErrorFilter sendErrorFilter() {
 		return new CustomSendErrorFilter();
 	}
-	
+
+	@Override
 	@Bean
 	@ConditionalOnMissingBean({ SimpleHostRoutingFilter.class, CloseableHttpClient.class })
 	public SimpleHostRoutingFilter simpleHostRoutingFilter(ProxyRequestHelper helper, ZuulProperties zuulProperties,
@@ -119,6 +120,7 @@ public class ZuulConfiguration extends ZuulProxyAutoConfiguration {
 		return new CustomHostRoutingFilter(helper, zuulProperties, connectionManagerFactory, httpClientFactory, circuitBreakerManager);
 	}
 
+	@Override
 	@Bean
 	@ConditionalOnMissingBean({ SimpleHostRoutingFilter.class })
 	public SimpleHostRoutingFilter simpleHostRoutingFilter2(ProxyRequestHelper helper, ZuulProperties zuulProperties,

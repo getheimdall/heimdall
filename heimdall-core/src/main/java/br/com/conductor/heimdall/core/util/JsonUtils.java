@@ -46,9 +46,7 @@ public final class JsonUtils {
      public static <T> String convertObjectToJson(T object) throws JsonProcessingException {
           
           ObjectMapper mapper = new ObjectMapper();
-          String jsonInString = mapper.writeValueAsString(object);
-          
-          return jsonInString;
+          return mapper.writeValueAsString(object);
      }
 
      /**
@@ -62,9 +60,7 @@ public final class JsonUtils {
      public static <T> T convertJsonToObject(String json, Class<T> clazz) throws IOException {
           
           ObjectMapper mapper = new ObjectMapper();
-          T value = mapper.readValue(json, clazz);
-          
-          return value;
+          return mapper.readValue(json, clazz);
      }
 
 }

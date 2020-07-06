@@ -27,6 +27,7 @@ import java.io.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+
 /**
  * Provides a method to zip a Middleware file
  *
@@ -64,7 +65,9 @@ public final class ZipUtils {
             zipOutputStream.flush();
             return byteArrayOutputStream.toByteArray();
 
-        } catch (IOException ignored) { }
+        } catch (IOException ignored) {
+            // This exception should be ignored.
+        }
 
         return new byte[0];
     }
