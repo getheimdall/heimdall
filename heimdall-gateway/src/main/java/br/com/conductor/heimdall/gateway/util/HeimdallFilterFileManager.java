@@ -47,6 +47,7 @@ public class HeimdallFilterFileManager {
     private static final Logger LOG = LoggerFactory.getLogger(HeimdallFilterFileManager.class);
     private Set<String> aDirectories;
     private int pollingIntervalSeconds;
+    private Thread poller;
     private boolean bRunning = true;
     private static FilenameFilter filenameFilter;
     private static HeimdallFilterFileManager instance;
@@ -91,11 +92,11 @@ public class HeimdallFilterFileManager {
     }
 
     void startPoller() {
-       Thread poller = new Thread("HeimdallGroovyFilterFileManagerPoller") {
+        poller = new Thread("HeimdallGroovyFilterFileManagerPoller") {
             public void run() {
                 while (bRunning) {
                     try {
-                        sleep((long) pollingIntervalSeconds * 1000);
+                        sleep(pollingIntervalSeconds * 1000);
                         manageFiles();
                     } catch (Exception e) {
                     	log.error(e.getMessage(), e);

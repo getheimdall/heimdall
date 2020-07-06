@@ -86,6 +86,6 @@ public final class StringUtils {
      public static String removeMultipleSlashes(String path) {
          final String SLASH = "/";
          path = SLASH + path;
-         return path.replaceAll("//+", "/");
+         return path.replaceAll("//+", SLASH);
      }
 }
