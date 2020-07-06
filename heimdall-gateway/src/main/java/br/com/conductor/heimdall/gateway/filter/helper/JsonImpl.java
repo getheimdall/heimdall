@@ -55,6 +55,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class JsonImpl implements Json {
 
+	private static final String BEAN_VALIDATION_ERROR = "Bean validation error.";
+
 	public String parse(Map<String, Object> body) {
 
 		try {
@@ -115,7 +117,7 @@ public class JsonImpl implements Json {
 
 				String jsonViolations = parse(errors);
 
-				throw new BeanValidationException("Bean validation error.", jsonViolations);
+				throw new BeanValidationException(BEAN_VALIDATION_ERROR, jsonViolations);
 			}
 
 			return obj;
@@ -142,7 +144,7 @@ public class JsonImpl implements Json {
 
 				String jsonViolations = parse(errors);
 
-				throw new BeanValidationException("Bean validation error.", jsonViolations);
+				throw new BeanValidationException(BEAN_VALIDATION_ERROR, jsonViolations);
 			}
 
 			return obj;
@@ -168,7 +170,7 @@ public class JsonImpl implements Json {
 
 				String jsonViolations = parse(errors);
 
-				throw new BeanValidationException("Bean validation error.", jsonViolations);
+				throw new BeanValidationException(BEAN_VALIDATION_ERROR, jsonViolations);
 			}
 
 			return obj;

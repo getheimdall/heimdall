@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Mock class created to help unit test the root request class of a middleware.
@@ -264,11 +265,16 @@ public class DBMockImpl implements DBMongo {
 
     private <T> Object getValueId(T object) {
 
-        Field id = Arrays.stream(object.getClass().getDeclaredFields()).filter(field -> field.getAnnotation(Id.class) != null).findFirst().get();
-        id.setAccessible(true);
-        try {
-            return id.get(object);
-        } catch (IllegalArgumentException | IllegalAccessException ignored) { }
+        Optional<Field> idOptional = Arrays.stream(object.getClass().getDeclaredFields())
+                .filter(field -> field.getAnnotation(Id.class) != null).findFirst();
+        Field id;
+        if(idOptional.isPresent()){
+            id = idOptional.get();
+            id.setAccessible(true);
+            try {
+                return id.get(object);
+            } catch (IllegalArgumentException | IllegalAccessException ignored) { }
+        }
         return null;
     }
 

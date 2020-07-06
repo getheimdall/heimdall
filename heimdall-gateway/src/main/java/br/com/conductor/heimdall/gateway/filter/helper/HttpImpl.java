@@ -275,6 +275,7 @@ public class HttpImpl implements Http {
     }
 
     /**
+     * @deprecated
      * This provider will affect only the next request inside middleware
      */
     @Override

@@ -130,6 +130,15 @@ public class Trace {
 
     private String version;
 
+    @JsonIgnore
+    private static final String HEIMDALL_TRACE = " [HEIMDALL-TRACE] - {} ";
+
+    @JsonIgnore
+    private static final String TRACE = "trace";
+
+    @JsonIgnore
+    private static final String HEIMDALL_TRACE_PREFIX = " [HEIMDALL-TRACE] - ";
+
     public Trace() {
 
     }
@@ -268,26 +277,26 @@ public class Trace {
 
             if (isInfo(this.resultStatus)) {
 
-                log.info(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
+                log.info(HEIMDALL_TRACE, mapper.writeValueAsString(this));
             } else if (isWarn(this.resultStatus)) {
 
-                log.warn(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
+                log.warn(HEIMDALL_TRACE, mapper.writeValueAsString(this));
             } else {
 
-                log.error(" [HEIMDALL-TRACE] - {} ", mapper.writeValueAsString(this));
+                log.error(HEIMDALL_TRACE, mapper.writeValueAsString(this));
             }
         } else {
-            String url = Objects.nonNull(this.url) ? this.url : "";
+            String currentUrl = Objects.nonNull(this.url) ? this.url : "";
 
             if (isInfo(this.resultStatus)) {
 
-                log.info(append("call", this), " [HEIMDALL-TRACE] - " + url);
+                log.info(append("call", this), HEIMDALL_TRACE_PREFIX + currentUrl);
             } else if (isWarn(this.resultStatus)) {
 
-                log.warn(append("call", this), " [HEIMDALL-TRACE] - " + url);
+                log.warn(append("call", this), HEIMDALL_TRACE_PREFIX + currentUrl);
             } else {
 
-                log.error(append("call", this), " [HEIMDALL-TRACE] - " + url);
+                log.error(append("call", this), HEIMDALL_TRACE_PREFIX + currentUrl);
             }
         }
 
@@ -308,19 +317,19 @@ public class Trace {
 			if (isMongo(logger))
 				logger.info(mapper.writeValueAsString(this));
 			else
-				logger.info(append("trace", mapper.convertValue(this, Map.class)), null);
+				logger.info(append(TRACE, mapper.convertValue(this, Map.class)), null);
 		} else if (isWarn(this.resultStatus)) {
 
 			if (isMongo(logger))
 				logger.warn(mapper.writeValueAsString(this));
 			else
-				logger.warn(append("trace", mapper.convertValue(this, Map.class)), null);
+				logger.warn(append(TRACE, mapper.convertValue(this, Map.class)), null);
 		} else {
 
 			if (isMongo(logger))
 				logger.error(mapper.writeValueAsString(this));
 			else
-				logger.error(append("trace", mapper.convertValue(this, Map.class)), null);
+				logger.error(append(TRACE, mapper.convertValue(this, Map.class)), null);
 		}
 	}
 
@@ -353,9 +362,9 @@ public class Trace {
             customFilter = SimpleBeanPropertyFilter.serializeAll();
         }
 
-        FilterProvider filters = new SimpleFilterProvider().addFilter("customFilter", customFilter);
+        FilterProvider filterProvider = new SimpleFilterProvider().addFilter("customFilter", customFilter);
 
-        return new ObjectMapper().setFilterProvider(filters);
+        return new ObjectMapper().setFilterProvider(filterProvider);
 
     }
 }

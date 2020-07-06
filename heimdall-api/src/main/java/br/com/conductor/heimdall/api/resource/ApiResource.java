@@ -67,7 +67,7 @@ public class ApiResource {
      @ApiOperation(value = "Find API by id", response = Api.class)
      @GetMapping(value = "/{apiId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_API)
-     public ResponseEntity<?> findById(@PathVariable("apiId") Long id) {
+     public ResponseEntity<Api> findById(@PathVariable("apiId") Long id) {
 
           Api api = apiService.find(id);
           return ResponseEntity.ok(api);
@@ -83,7 +83,7 @@ public class ApiResource {
      @ApiOperation(value = "Get SwaggerJson by Api Id", response = Api.class)
      @GetMapping(value = "/{apiId}/swagger")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_API)
-     public ResponseEntity<?> getSwaggerByApiId(@PathVariable("apiId") Long id) {
+     public ResponseEntity<Swagger> getSwaggerByApiId(@PathVariable("apiId") Long id) {
 
           Swagger swagger = apiService.findSwaggerByApi(id);
 
@@ -125,7 +125,7 @@ public class ApiResource {
      @ApiOperation(value = "Save a new API")
      @PostMapping
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_API)
-     public ResponseEntity<?> save(@RequestBody @Valid ApiDTO apiDTO) {
+     public ResponseEntity<String> save(@RequestBody @Valid ApiDTO apiDTO) {
 
           Api api = apiService.save(apiDTO);
 
@@ -143,7 +143,7 @@ public class ApiResource {
      @ApiOperation(value = "Update API")
      @PutMapping(value = "/{apiId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_API)
-     public ResponseEntity<?> update(@PathVariable("apiId") Long id, @RequestBody ApiDTO apiDTO) {
+     public ResponseEntity<Api> update(@PathVariable("apiId") Long id, @RequestBody ApiDTO apiDTO) {
 
           Api api = apiService.update(id, apiDTO);
           
@@ -160,7 +160,7 @@ public class ApiResource {
      @ApiOperation(value = "Delete API")
      @DeleteMapping(value = "/{apiId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_API)
-     public ResponseEntity<?> delete(@PathVariable("apiId") Long id) {
+     public ResponseEntity<Void> delete(@PathVariable("apiId") Long id) {
 
           apiService.delete(id);
           
@@ -178,10 +178,8 @@ public class ApiResource {
      @ApiOperation(value = "Delete API")
      @PostMapping(value = "/{apiId}/file-middlewares")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_API)
-     public ResponseEntity<?> fileUpload(@PathVariable("apiId") Long id, 
+     public ResponseEntity<Void> fileUpload(@PathVariable("apiId") Long id,
                @RequestParam("file") MultipartFile file) {
-          
-          
           
           return ResponseEntity.noContent().build();
      }
@@ -189,7 +187,7 @@ public class ApiResource {
      @ApiOperation(value = "Update API by Swagger JSON")
      @PutMapping("/{apiId}/swagger")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_API)
-     public ResponseEntity<?> updateApiBySwaggerJSON(@PathVariable("apiId") Long id, @RequestBody String swagger, boolean override) {
+     public ResponseEntity<Api> updateApiBySwaggerJSON(@PathVariable("apiId") Long id, @RequestBody String swagger, boolean override) {
           Api api = apiService.updateBySwagger(id, swagger, override);
           return ResponseEntity.ok(api);
      }

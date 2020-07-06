@@ -99,7 +99,7 @@ public class JsonMockImpl implements Json {
     	   
     	try {
                @SuppressWarnings("unchecked")
-               T obj = (T) mapper().readValue(json, type);
+               T obj = mapper().readValue(json, type);
                return obj;
            } catch (Exception e) {
                return null;
@@ -110,7 +110,7 @@ public class JsonMockImpl implements Json {
 
         try {
             @SuppressWarnings("unchecked")
-            T obj = (T) mapper().readValue(json,
+            T obj = mapper().readValue(json,
                     TypeFactory.defaultInstance().constructParametricType(parametrized, parameterClasses));
             return obj;
         } catch (Exception e) {
@@ -137,7 +137,7 @@ public class JsonMockImpl implements Json {
 
         boolean valid = false;
         try {
-            JSONObject jsonObject = new JSONObject(string);
+            new JSONObject(string);
 
             valid = true;
         } catch (JSONException e) {
