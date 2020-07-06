@@ -64,8 +64,7 @@ public class HelperImpl implements Helper {
 	@Override
 	public ApiResponse apiResponse() {
 
-		ApiResponse apiResponse = new ApiResponseImpl();
-		return apiResponse;
+		return new ApiResponseImpl();
 	}
 
 	@Override
@@ -81,9 +80,8 @@ public class HelperImpl implements Helper {
 	}
 
 	private DB db(String databaseName, DBType type) {
-
 		switch (type) {
-		default:
+			default:
 			return new DBMongoImpl(databaseName, mongoClient);
 		}
 	}
@@ -119,9 +117,7 @@ public class HelperImpl implements Helper {
 
 	@Override
 	public Json json() {
-
-		Json json = new JsonImpl();
-		return json;
+		return new JsonImpl();
 	}
 
 	@Override

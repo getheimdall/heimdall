@@ -27,8 +27,6 @@ import br.com.conductor.heimdall.core.util.LocalDateTimeSerializer;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 
-import java.time.LocalDateTime;
-
 /**
  * Data class that represents a General Trace
  *

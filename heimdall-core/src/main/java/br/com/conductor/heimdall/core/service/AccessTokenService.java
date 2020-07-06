@@ -116,9 +116,7 @@ public class AccessTokenService {
           Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
           Page<AccessToken> page = accessTokenRepository.findAll(example, pageable);
 
-          AccessTokenPage accessTokenPage = new AccessTokenPage(PageDTO.build(page));
-
-          return accessTokenPage;
+          return new AccessTokenPage(PageDTO.build(page));
      }
 
      /**
@@ -134,9 +132,8 @@ public class AccessTokenService {
 
           Example<AccessToken> example = Example.of(accessToken, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 
-          List<AccessToken> accessTokens = accessTokenRepository.findAll(example);
+          return accessTokenRepository.findAll(example);
 
-          return accessTokens;
      }
 
      /**
