@@ -72,7 +72,7 @@ public class InterceptorResource {
      @ApiOperation(value = "Find API by id", response = Interceptor.class)
      @GetMapping(value = "/{interceptorId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_INTERCEPTOR)
-     public ResponseEntity<?> findById(@PathVariable("interceptorId") Long id) {
+     public ResponseEntity<Interceptor> findById(@PathVariable("interceptorId") Long id) {
 
           Interceptor interceptor = interceptorService.find(id);
 
@@ -112,7 +112,7 @@ public class InterceptorResource {
      @ApiOperation(value = "List all types of Interceptors", responseContainer = "List", response = Option.class)
      @GetMapping(value = "/types")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_INTERCEPTOR)
-     public ResponseEntity<?> types() {
+     public ResponseEntity<List<Option>> types() {
 
           List<Option> types = new ArrayList<>();
 
@@ -133,7 +133,7 @@ public class InterceptorResource {
      @ApiOperation(value = "Save a new Interceptor")
      @PostMapping
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_INTERCEPTOR)
-     public ResponseEntity<?> save(@RequestBody @Valid InterceptorDTO interceptorDTO) {
+     public ResponseEntity<String> save(@RequestBody @Valid InterceptorDTO interceptorDTO) {
 
           Interceptor interceptor = interceptorService.save(interceptorDTO); 
 
@@ -151,7 +151,7 @@ public class InterceptorResource {
      @ApiOperation(value = "Update Interceptor")
      @PutMapping(value = "/{interceptorId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_INTERCEPTOR)
-     public ResponseEntity<?> update(@PathVariable("interceptorId") Long id, @RequestBody InterceptorDTO interceptorDTO) {
+     public ResponseEntity<Interceptor> update(@PathVariable("interceptorId") Long id, @RequestBody InterceptorDTO interceptorDTO) {
 
           Interceptor interceptor = interceptorService.update(id, interceptorDTO);
           
@@ -168,7 +168,7 @@ public class InterceptorResource {
      @ApiOperation(value = "Delete Interceptor")
      @DeleteMapping(value = "/{interceptorId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_INTERCEPTOR)
-     public ResponseEntity<?> delete(@PathVariable("interceptorId") Long id) {
+     public ResponseEntity<Void> delete(@PathVariable("interceptorId") Long id) {
 
           interceptorService.delete(id);
           
@@ -184,7 +184,7 @@ public class InterceptorResource {
      @ApiOperation(value = "Refresh Interceptor")
      @PostMapping(value = "/refresh")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_REFRESH_INTERCEPTOR)
-     public ResponseEntity<?> refresh() {
+     public ResponseEntity<Void> refresh() {
           
           amqpInterceptorService.dispatchRefreshAllInterceptors();
           

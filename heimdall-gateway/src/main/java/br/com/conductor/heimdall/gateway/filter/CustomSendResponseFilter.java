@@ -45,7 +45,6 @@ public class CustomSendResponseFilter extends SendResponseFilter {
 
 		RequestContext context = RequestContext.getCurrentContext();
 		boolean should = (!context.getZuulResponseHeaders().isEmpty() || context.getResponseDataStream() != null || context.getResponseBody() != null);
-		// boolean should = super.shouldFilter();
 
 		long endTime = System.currentTimeMillis();
 		long duration = (endTime - startTime);

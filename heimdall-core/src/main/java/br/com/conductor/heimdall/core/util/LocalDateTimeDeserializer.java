@@ -62,7 +62,7 @@ public class LocalDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
 
                     parser.nextToken();
                     int day = parser.getIntValue();
-                    
+
                     parser.nextToken();
                     int hour = parser.getIntValue();
 
@@ -71,10 +71,10 @@ public class LocalDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
 
                     parser.nextToken();
                     int second = parser.getIntValue();
-                    
+
                     parser.nextToken();
                     int nanosecond = parser.getIntValue();
-                    
+
                     if (parser.nextToken() != JsonToken.END_ARRAY) {
                          context.reportWrongTokenException(JsonToken.class, JsonToken.END_ARRAY, "Expected array to end.");
                     }
@@ -86,9 +86,10 @@ public class LocalDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
                          return null;
                     }
                     return LocalDateTime.parse(string, ISO_DATE_TIME);
+               default:
+                    break;
           }
           context.reportWrongTokenException(JsonToken.class, JsonToken.START_ARRAY, "Expected array or string.");
           return null;
      }
-
 }
