@@ -271,12 +271,10 @@ public class StartServer implements ServletContextListener {
 
 		try {
 
-			if (Objects.nonNull(middleware)) {
+			if (Objects.nonNull(middleware) && Status.ACTIVE.equals(middleware.getStatus())) {
+				fileService.save(middleware.getFile(), middleware.getPath() + "/" + middleware.getName() + "."
+						+ middleware.getVersion() + "." + middleware.getType());
 
-				if (Status.ACTIVE.equals(middleware.getStatus())) {
-					fileService.save(middleware.getFile(), middleware.getPath() + "/" + middleware.getName() + "."
-							+ middleware.getVersion() + "." + middleware.getType());
-				}
 			}
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);

@@ -286,17 +286,17 @@ public class Trace {
                 log.error(HEIMDALL_TRACE, mapper.writeValueAsString(this));
             }
         } else {
-            String url = Objects.nonNull(this.url) ? this.url : "";
+            String currentUrl = Objects.nonNull(this.url) ? this.url : "";
 
             if (isInfo(this.resultStatus)) {
 
-                log.info(append("call", this), HEIMDALL_TRACE_PREFIX + url);
+                log.info(append("call", this), HEIMDALL_TRACE_PREFIX + currentUrl);
             } else if (isWarn(this.resultStatus)) {
 
-                log.warn(append("call", this), HEIMDALL_TRACE_PREFIX + url);
+                log.warn(append("call", this), HEIMDALL_TRACE_PREFIX + currentUrl);
             } else {
 
-                log.error(append("call", this), HEIMDALL_TRACE_PREFIX + url);
+                log.error(append("call", this), HEIMDALL_TRACE_PREFIX + currentUrl);
             }
         }
 
@@ -362,9 +362,9 @@ public class Trace {
             customFilter = SimpleBeanPropertyFilter.serializeAll();
         }
 
-        FilterProvider filters = new SimpleFilterProvider().addFilter("customFilter", customFilter);
+        FilterProvider filterProvider = new SimpleFilterProvider().addFilter("customFilter", customFilter);
 
-        return new ObjectMapper().setFilterProvider(filters);
+        return new ObjectMapper().setFilterProvider(filterProvider);
 
     }
 }

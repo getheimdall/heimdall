@@ -206,7 +206,6 @@ public class OAuthInterceptorService {
                 ExceptionMessage.WRONG_GRANT_TYPE_INFORMED.raise();
         }
 
-
     }
 
     /**
