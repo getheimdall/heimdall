@@ -470,7 +470,7 @@ public class OAuthInterceptorService {
                 ResponseEntity<String> entityResponse = template
                     .exchange(uriComponentsBuilder.build().encode().toUri(), HttpMethod.POST, createHttpEntity(uriComponentsBuilder, provider.getProviderParams()), String.class);
 
-                HeimdallException.checkThrow((Series.valueOf(entityResponse.getStatusCodeValue()) != Series.SUCCESSFUL), ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);
+                HeimdallException.checkThrow(Series.valueOf(entityResponse.getStatusCodeValue()) != Series.SUCCESSFUL, ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);
             } catch (Exception ex) {
                 log.error(ex.getMessage(), ex);
                 throw new UnauthorizedException(ExceptionMessage.PROVIDER_USER_UNAUTHORIZED);
