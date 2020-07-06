@@ -315,19 +315,19 @@ public class Trace {
 
 		if (isInfo(this.resultStatus)) {
 			if (isMongo(logger))
-				logger.info(mapper().writeValueAsString(this));
+				logger.info(mapper.writeValueAsString(this));
 			else
 				logger.info(append(TRACE, mapper.convertValue(this, Map.class)), null);
 		} else if (isWarn(this.resultStatus)) {
 
 			if (isMongo(logger))
-				logger.warn(mapper().writeValueAsString(this));
+				logger.warn(mapper.writeValueAsString(this));
 			else
 				logger.warn(append(TRACE, mapper.convertValue(this, Map.class)), null);
 		} else {
 
 			if (isMongo(logger))
-				logger.error(mapper().writeValueAsString(this));
+				logger.error(mapper.writeValueAsString(this));
 			else
 				logger.error(append(TRACE, mapper.convertValue(this, Map.class)), null);
 		}
