@@ -44,6 +44,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Implements the {@link DB} interface.
@@ -61,9 +62,9 @@ public class DBMongoImpl implements DBMongo {
 
      private String databaseName;
 
-     private final static Integer PAGE = 0;
+     private static final Integer PAGE = 0;
 
-     private final static Integer LIMIT = 100;
+     private static final Integer LIMIT = 100;
 
 	 private MongoClient mongoClient;
 
@@ -148,7 +149,7 @@ public class DBMongoImpl implements DBMongo {
           pageResponse.totalElements = totalElements;
           pageResponse.hasPreviousPage = page > 0;
           pageResponse.hasNextPage = page < (pageResponse.totalPages - 1);
-          pageResponse.hasContent = list != null && list.size() > 0;
+          pageResponse.hasContent = list != null && !list.isEmpty();
           pageResponse.first = page == 0;
           pageResponse.last = page == (pageResponse.totalPages - 1);
           pageResponse.nextPage = page == (pageResponse.totalPages - 1) ? page : page + 1;
@@ -294,12 +295,16 @@ public class DBMongoImpl implements DBMongo {
 
      private <T> Object getValueId(T object) {
 
-          Field id = Arrays.stream(object.getClass().getDeclaredFields()).filter(field -> field.getAnnotation(Id.class) != null).findFirst().get();
-          id.setAccessible(true);
-          try {
-               return id.get(object);
-          } catch (IllegalArgumentException | IllegalAccessException e) {
-               log.error(e.getMessage(), e);
+          Optional<Field> idOptional = Arrays.stream(object.getClass().getDeclaredFields()).filter(field -> field.getAnnotation(Id.class) != null).findFirst();
+          Field id;
+          if(idOptional.isPresent()){
+               id = idOptional.get();
+               id.setAccessible(true);
+               try {
+                    return id.get(object);
+               } catch (IllegalArgumentException | IllegalAccessException e) {
+                    log.error(e.getMessage(), e);
+               }
           }
           return null;
      }

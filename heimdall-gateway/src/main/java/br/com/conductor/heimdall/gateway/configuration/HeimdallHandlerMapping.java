@@ -58,6 +58,7 @@ public class HeimdallHandlerMapping extends ZuulHandlerMapping {
           return super.lookupHandler(urlPath, request);
      }
 
+     @Override
      public void setDirty(boolean dirty) {
 
           this.dirty = dirty;

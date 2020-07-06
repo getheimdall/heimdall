@@ -212,13 +212,13 @@ public class InterceptorFileService {
             String fileName = parameters.get("name") + ".groovy";
 
             String pathName;
-            final TypeInterceptor interceptorType = (TypeInterceptor) parameters.get("interceptorType");
+            final TypeInterceptor interceptorType = (TypeInterceptor) parameters.get(INTERCEPTOR_TYPE);
             if (TypeInterceptor.MIDDLEWARE.equals(interceptorType)) {
 
-                pathName = String.join(File.separator, zuulFilterRoot, MIDDLEWARE_API_ROOT, parameters.get("apiId").toString(), fileName);
+                pathName = String.join(File.separator, zuulFilterRoot, MIDDLEWARE_API_ROOT, parameters.get(API_ID).toString(), fileName);
             } else {
 
-                pathName = String.join(File.separator, zuulFilterRoot, parameters.get("executionPoint").toString(), fileName);
+                pathName = String.join(File.separator, zuulFilterRoot, parameters.get(EXECUTION_POINT).toString(), fileName);
             }
             File file = new File(pathName);
 

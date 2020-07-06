@@ -75,7 +75,7 @@ public class AccessTokenResource {
      @ApiOperation(value = "Find AccessToken by id", response = AccessToken.class)
      @GetMapping(value = "/{accessTokenId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_READ_ACCESSTOKEN)
-     public ResponseEntity<?> findById(@PathVariable("accessTokenId") Long id) {
+     public ResponseEntity<AccessToken> findById(@PathVariable("accessTokenId") Long id) {
 
           AccessToken accessToken = accessTokenService.find(id);
 
@@ -116,7 +116,7 @@ public class AccessTokenResource {
      @ApiOperation(value = "Save a new AccessToken")
      @PostMapping
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_CREATE_ACCESSTOKEN)
-     public ResponseEntity<?> save(@RequestBody @Valid AccessTokenPersist accessTokenPersist) {
+     public ResponseEntity<String> save(@RequestBody @Valid AccessTokenPersist accessTokenPersist) {
 
           AccessToken accessToken = accessTokenService.save(accessTokenPersist);
 
@@ -134,7 +134,7 @@ public class AccessTokenResource {
      @ApiOperation(value = "Update AccessToken")
      @PutMapping(value = "/{accessTokenId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_UPDATE_ACCESSTOKEN)
-     public ResponseEntity<?> update(@PathVariable("accessTokenId") Long id, @RequestBody AccessTokenPersist accessTokenPersist) {
+     public ResponseEntity<AccessToken> update(@PathVariable("accessTokenId") Long id, @RequestBody AccessTokenPersist accessTokenPersist) {
 
           AccessToken accessToken = accessTokenService.update(id, accessTokenPersist);
           
@@ -151,7 +151,7 @@ public class AccessTokenResource {
      @ApiOperation(value = "Delete AccessToken")
      @DeleteMapping(value = "/{accessTokenId}")
      @PreAuthorize(ConstantsPrivilege.PRIVILEGE_DELETE_ACCESSTOKEN)
-     public ResponseEntity<?> delete(@PathVariable("accessTokenId") Long id) {
+     public ResponseEntity<Void> delete(@PathVariable("accessTokenId") Long id) {
 
           accessTokenService.delete(id);
           
