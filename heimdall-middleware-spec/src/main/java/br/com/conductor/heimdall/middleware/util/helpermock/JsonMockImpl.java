@@ -147,8 +147,8 @@ public class JsonMockImpl implements Json {
             try {
                 new JSONArray(string);
                 valid = true;
-            } catch (JSONException exception) {
-                log.error(exception.getMessage(), exception);
+            } catch (JSONException ignored) {
+                // This exception should be ignored
             }
         }
 
