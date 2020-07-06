@@ -169,12 +169,10 @@ public class TokenAuthenticationService {
                         .getBody();
                 String user = claims.getSubject();
 
-                if (user != null) {
-                    if (credentialStateService.isLogged(claims.getId())) {
-                        User userFound = userService.findByUsername(user);
-                        addAuthentication(response, user, claims.getId());
-                        return new UsernamePasswordAuthenticationToken(userFound.getUserName(), userFound.getPassword(), getAuthoritiesByRoles(userFound.getRoles()));
-                    }
+                if (user != null && credentialStateService.isLogged(claims.getId())) {
+                    User userFound = userService.findByUsername(user);
+                    addAuthentication(response, user, claims.getId());
+                    return new UsernamePasswordAuthenticationToken(userFound.getUserName(), userFound.getPassword(), getAuthoritiesByRoles(userFound.getRoles()));
                 }
             } catch (ExpiredJwtException ex) {
                 credentialStateService.logout(token);

@@ -59,9 +59,9 @@ public class DBMockImpl implements DBMongo {
 
     private String databaseName;
 
-    private final static Integer PAGE = 0;
+    private static final Integer PAGE = 0;
 
-    private final static Integer LIMIT = 100;
+    private static final Integer LIMIT = 100;
 
     private Helper helper = new HelperMock();
 
@@ -159,6 +159,7 @@ public class DBMockImpl implements DBMongo {
             }
             collection.insertMany(ts);
         } catch (Exception ignored) {
+            // This exception should be ignored
         } finally {
 
             createMongoClient().close();
@@ -173,6 +174,7 @@ public class DBMockImpl implements DBMongo {
             Document document = Document.parse(json.parse(object));
             collection.insertOne(document);
         } catch (Exception ignored) {
+            // This exception should be ignored
         } finally {
 
             createMongoClient().close();
@@ -273,7 +275,9 @@ public class DBMockImpl implements DBMongo {
             id.setAccessible(true);
             try {
                 return id.get(object);
-            } catch (IllegalArgumentException | IllegalAccessException ignored) { }
+            } catch (IllegalArgumentException | IllegalAccessException ignored) {
+                // This exception should be ignored
+            }
         }
         return null;
     }
@@ -288,7 +292,9 @@ public class DBMockImpl implements DBMongo {
             Object value = null;
             try {
                 value = field.get(criteria);
-            } catch (IllegalArgumentException | IllegalAccessException ignored) {}
+            } catch (IllegalArgumentException | IllegalAccessException ignored){
+                // This exception should be ignored
+            }
 
             if (value != null) {
                 query.criteria(field.getName()).equal(value);

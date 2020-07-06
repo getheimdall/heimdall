@@ -22,7 +22,6 @@ package br.com.conductor.heimdall.core.service;
  */
 
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.GLOBAL_RESOURCE_NOT_FOUND;
-import static br.com.conductor.heimdall.core.exception.ExceptionMessage.MIDDLEWARE_INVALID_FILE;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.MIDDLEWARE_UNSUPPORTED_TYPE;
 import static br.com.conductor.heimdall.core.exception.ExceptionMessage.ONLY_ONE_MIDDLEWARE_PER_VERSION_AND_API;
 
@@ -122,9 +121,8 @@ public class MiddlewareService {
           Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit(), sort);
           Page<Middleware> page = middlewareRepository.findAll(example, pageable);
 
-          MiddlewarePage middlewarePage = new MiddlewarePage(PageDTO.build(page));
 
-          return middlewarePage;
+          return new MiddlewarePage(PageDTO.build(page));
      }
 
      /**
@@ -139,9 +137,7 @@ public class MiddlewareService {
 
           Example<Middleware> example = this.createExample(apiId, middlewareDTO);
 
-          List<Middleware> middlewares = middlewareRepository.findAll(example);
-
-          return middlewares;
+          return middlewareRepository.findAll(example);
      }
 
      private Example<Middleware> createExample(Long apiId, MiddlewareDTO middlewareDTO) {
@@ -226,9 +222,10 @@ public class MiddlewareService {
 
           Boolean deleteDeprecated = property.getMiddlewares().getDeleteDeprecated();
 
-          if (middleware.getStatus().equals(Status.DEPRECATED))
-        	  if (deleteDeprecated != null && deleteDeprecated)
-        		  middleware.setFile(null);
+          if (middleware.getStatus().equals(Status.DEPRECATED) && deleteDeprecated != null && deleteDeprecated){
+               middleware.setFile(null);
+          }
+
 
           middleware = middlewareRepository.save(middleware);
 
@@ -249,7 +246,7 @@ public class MiddlewareService {
           Middleware middleware = middlewareRepository.findByApiIdAndId(apiId, middlewareId);
           HeimdallException.checkThrow(middleware == null, GLOBAL_RESOURCE_NOT_FOUND);
           HeimdallException.checkThrow(middleware.getInterceptors() != null &&
-                  middleware.getInterceptors().size() > 0, ExceptionMessage.MIDDLEWARE_CONTAINS_INTERCEPTORS);
+                  !middleware.getInterceptors().isEmpty(), ExceptionMessage.MIDDLEWARE_CONTAINS_INTERCEPTORS);
 
           amqpMiddlewareService.dispatchRemoveMiddlewares(middleware.getPath());
           middlewareRepository.delete(middleware.getId());
