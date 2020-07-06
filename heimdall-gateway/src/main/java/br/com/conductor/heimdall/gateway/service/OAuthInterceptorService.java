@@ -199,21 +199,6 @@ public class OAuthInterceptorService {
                 ExceptionMessage.WRONG_GRANT_TYPE_INFORMED.raise();
         }
 
-        // Not in use yet
-//        switch (oAuthRequest.getResponseType().toLowerCase()) {
-//            case CODE:
-//                String codeAuthorize = oAuthService.generateAuthorize(oAuthRequest.getClientId());
-//                generateResponseWithSuccess("{\""+CODE+"\": \"" + codeAuthorize + "\"}");
-//                break;
-//            case TOKEN:
-//                TokenImplicit tokenImplicit = oAuthService.generateTokenImplicit(oAuthRequest, privateKey, timeAccessToken, claimsJson);
-//                if (Objects.nonNull(tokenImplicit)) {
-//                    generateResponseWithSuccess(helper.json().parse(tokenImplicit));
-//                }
-//                break;
-//            default:
-//                HeimdallException.checkThrow(true, ExceptionMessage.RESPONSE_TYPE_NOT_FOUND);
-//        }
     }
 
     /**
