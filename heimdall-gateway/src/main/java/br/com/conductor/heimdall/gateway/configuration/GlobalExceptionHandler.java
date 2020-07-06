@@ -135,7 +135,7 @@ public class GlobalExceptionHandler {
      @ExceptionHandler(Exception.class)
      public @ResponseBody ErroInfo handleException(HttpServletResponse response, HttpServletRequest request, Exception exception) {
           
-          ErroInfo erroInfo = buildErrorInfoException(request, exception);
+          ErroInfo erroInfo = buildErrorInfoException(request);
           log.error(exception.getMessage(), exception);
           return erroInfo;
           
@@ -156,7 +156,7 @@ public class GlobalExceptionHandler {
      @ExceptionHandler(ZuulException.class)
      public @ResponseBody ErroInfo zuulExceptionServerError(HttpServletResponse response, HttpServletRequest request, ZuulException exception) {
           
-          ErroInfo erroInfo = buildErrorInfoException(request, exception);
+          ErroInfo erroInfo = buildErrorInfoException(request);
           log.error(exception.getMessage(), exception);
           return erroInfo;
           
@@ -177,7 +177,7 @@ public class GlobalExceptionHandler {
      @ExceptionHandler(NoHttpResponseException.class)
      public @ResponseBody ErroInfo noHttpResponseExceptionServerError(HttpServletResponse response, HttpServletRequest request, NoHttpResponseException exception) {
           
-          ErroInfo erroInfo = buildErrorInfoException(request, exception);
+          ErroInfo erroInfo = buildErrorInfoException(request);
           log.error(exception.getMessage(), exception);
           return erroInfo;
           
@@ -383,7 +383,7 @@ public class GlobalExceptionHandler {
       * {@link Exception}
       * @return {@link ErroInfo}
       */
-     private ErroInfo buildErrorInfoException(HttpServletRequest request, Exception exception) {
+     private ErroInfo buildErrorInfoException(HttpServletRequest request) {
           
           HeimdallException exceptionPIER = new HeimdallException(ExceptionMessage.GLOBAL_ERROR_ZUUL);
           ErroInfo erroInfo = new ErroInfo(LocalDateTime.now(), exceptionPIER.getMsgEnum().getHttpCode(), exceptionPIER.getClass().getSimpleName(), exceptionPIER.getMessage(), UrlUtil.getCurrentUrl(request));
