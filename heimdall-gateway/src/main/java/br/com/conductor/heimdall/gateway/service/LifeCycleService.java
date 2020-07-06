@@ -81,11 +81,11 @@ public class LifeCycleService {
 
     private boolean validatePlan(RequestContext context, Long referenceId) {
 
-        String clientId = context.getRequest().getHeader(CLIENT_ID);
+        String client_id = context.getRequest().getHeader(CLIENT_ID);
 
-        if (clientId == null) return false;
+        if (client_id == null) return false;
 
-        App app = appRepository.findByClientId(clientId);
+        App app = appRepository.findByClientId(client_id);
 
         if (app == null) return false;
         if (app.getPlans() == null || app.getPlans().isEmpty()) return false;

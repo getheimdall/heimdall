@@ -34,7 +34,7 @@ public class MiddlewareException extends RuntimeException {
      private static final long serialVersionUID = -3474588879728085772L;
 
      @Getter
-     private final ExceptionMessage msgEnum;
+     private ExceptionMessage msgEnum;
 
      /**
       * Constructor of a MiddlewareException.
@@ -55,7 +55,7 @@ public class MiddlewareException extends RuntimeException {
       * @param exceptionMessage			The {@link ExceptionMessage} that should be thrown
       * @throws MiddlewareException		If the expression is true, throw a MiddlewareExcpetion
       */
-     public static void checkThrow(boolean expression, ExceptionMessage exceptionMessage) {
+     public static void checkThrow(boolean expression, ExceptionMessage exceptionMessage) throws MiddlewareException {
 
           if (expression) {
                exceptionMessage.raise();
@@ -70,7 +70,7 @@ public class MiddlewareException extends RuntimeException {
       * @param dynamicText				The custom text that will be placed in the exception message
       * @throws MiddlewareException		If the expression is true, throw a MiddlewareExcpetion
       */
-     public static void checkThrow(boolean expression, ExceptionMessage exceptionMessage, String... dynamicText) {
+     public static void checkThrow(boolean expression, ExceptionMessage exceptionMessage, String... dynamicText) throws MiddlewareException {
 
           if (expression) {
                exceptionMessage.raise(dynamicText);

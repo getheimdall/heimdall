@@ -277,8 +277,8 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                         }
 
                         if (Objects.isNull(credential)) {
-                        	credential = credentials.stream()
-                                    .filter(o -> o.getMethod().equals(HttpMethod.ALL.name()) || method.equalsIgnoreCase(o.getMethod()))
+                            credential = credentials.stream()
+                                    .filter(o -> o.getMethod().equals(HttpMethod.ALL.name()) || method.equals(o.getMethod().toUpperCase()))
                                     .findFirst().orElse(null);
                         }
                     }
@@ -315,7 +315,7 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
                                 requestURI,
                                 location,
                                 "",
-                                zuulRoute.getRetryable() != null ? zuulRoute.getRetryable() : Boolean.FALSE,
+                                zuulRoute.getRetryable() != null ? zuulRoute.getRetryable() : false,
                                 zuulRoute.isCustomSensitiveHeaders() ? zuulRoute.getSensitiveHeaders() : null);
 
                         TraceContextHolder traceContextHolder = TraceContextHolder.getInstance();
@@ -342,15 +342,15 @@ public class HeimdallDecorationFilter extends PreDecorationFilter {
 
     protected String getPathWithoutStripSuffix(HttpServletRequest request) {
 
-        String uri = this.urlPathHelper.getPathWithinApplication(request);
+        String URI = this.urlPathHelper.getPathWithinApplication(request);
 
-        if (uri.endsWith(ConstantsPath.PATH_ROOT)) {
-            uri = org.apache.commons.lang.StringUtils.removeEnd(uri, ConstantsPath.PATH_ROOT);
+        if (URI.endsWith(ConstantsPath.PATH_ROOT)) {
+            URI = org.apache.commons.lang.StringUtils.removeEnd(URI, ConstantsPath.PATH_ROOT);
         }
 
-        uri = adjustPath(uri);
+        URI = adjustPath(URI);
 
-        return uri;
+        return URI;
     }
 
     protected void addProxyHeaders(RequestContext ctx) {

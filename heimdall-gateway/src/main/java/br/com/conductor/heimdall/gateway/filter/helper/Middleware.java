@@ -37,7 +37,7 @@ public class Middleware {
 
      private GroovyClassLoader classLoader;
 
-     private static final String JAR = ".jar";
+     private final String JAR = ".jar";
      
      private final String pathReferences;
 

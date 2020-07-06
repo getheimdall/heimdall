@@ -23,6 +23,8 @@ package br.com.conductor.heimdall.middleware.spec;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
+import br.com.conductor.heimdall.middleware.exception.BeanValidationException;
+
 import java.util.Map;
 
 /**
@@ -64,7 +66,7 @@ public interface Json {
       * @param classType
       * @return
       */
-     public <T> T parse(String json, Class<?> classType);
+     public <T> T parse(String json, Class<?> classType) throws BeanValidationException;
 
      /**
       * Parses a json string to a parametrized class through a list of parameters classes.
@@ -75,7 +77,7 @@ public interface Json {
       * @param <T>
       * @return
       */
-     public <T> T parse(String json, Class<?> parametrized, Class<?>... parameterClasses);
+     public <T> T parse(String json, Class<?> parametrized, Class<?>... parameterClasses) throws BeanValidationException;
 
      /**
       * Parses a json string to a generic type through TypeReference object.
@@ -84,7 +86,7 @@ public interface Json {
       * @param type
       * @return
       */
-     public <T> T parse(String json, TypeReference<T> type);
+     public <T> T parse(String json, TypeReference<T> type) throws BeanValidationException;
      
      /**
       * Parses a object to a Map<String, Object>.

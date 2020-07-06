@@ -67,15 +67,13 @@ public class ProxyRouteLocator extends DiscoveryClientRouteLocator {
      @Override
      protected LinkedHashMap<String, ZuulRoute> locateRoutes() {
 
-          final String SLASH = "/";
-
           log.info("Updating locate Routes");
-          LinkedHashMap<String, ZuulRoute> routesMap = new LinkedHashMap<>();
+          LinkedHashMap<String, ZuulRoute> routesMap = new LinkedHashMap<String, ZuulRoute>();
           routesMap.putAll(init());
 
           if (this.discovery != null) {
 
-               Map<String, ZuulRoute> staticServices = new LinkedHashMap<>();
+               Map<String, ZuulRoute> staticServices = new LinkedHashMap<String, ZuulRoute>();
                for (ZuulRoute route : routesMap.values()) {
 
                     String serviceId = route.getServiceId();
@@ -130,12 +128,12 @@ public class ProxyRouteLocator extends DiscoveryClientRouteLocator {
                String path = entry.getKey();
                // Prepend with slash if not already present.
                if (!path.startsWith("/")) {
-                    path = SLASH + path;
+                    path = "/" + path;
                }
                if (StringUtils.hasText(this.properties.getPrefix())) {
                     path = this.properties.getPrefix() + path;
                     if (!path.startsWith("/")) {
-                         path = SLASH + path;
+                         path = "/" + path;
                     }
                }
                values.put(path, entry.getValue());
@@ -150,7 +148,7 @@ public class ProxyRouteLocator extends DiscoveryClientRouteLocator {
      private LinkedHashMap<String, ZuulRoute> init() {
 
           log.info("Calling Storage.findAll()");
-          LinkedHashMap<String, ZuulRoute> routesMap = new LinkedHashMap<>();
+          LinkedHashMap<String, ZuulRoute> routesMap = new LinkedHashMap<String, ZuulRoute>();
           for (ZuulRoute route : storage.findAll()) {
                routesMap.put(route.getPath(), route);
           }

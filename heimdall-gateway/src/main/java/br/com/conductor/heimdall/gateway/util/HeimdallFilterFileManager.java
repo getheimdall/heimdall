@@ -49,14 +49,14 @@ public class HeimdallFilterFileManager {
     private int pollingIntervalSeconds;
     private Thread poller;
     private boolean bRunning = true;
-    private static FilenameFilter filenameFilter;
-    private static HeimdallFilterFileManager instance;
+    private static FilenameFilter FILENAME_FILTER;
+    private static HeimdallFilterFileManager INSTANCE;
 
     private HeimdallFilterFileManager() {
     }
 
     public static void setFilenameFilter(FilenameFilter filter) {
-        filenameFilter = filter;
+        FILENAME_FILTER = filter;
     }
 
     /**
@@ -68,23 +68,23 @@ public class HeimdallFilterFileManager {
      * @throws IllegalAccessException
      * @throws InstantiationException
      */
-    public static void init(int pollingIntervalSeconds, Set<String> directories) throws Exception {
-        if (instance == null) instance = new HeimdallFilterFileManager();
-        instance.aDirectories = directories;
-        instance.pollingIntervalSeconds = pollingIntervalSeconds;
-        instance.manageFiles();
-        instance.startPoller();
+    public static void init(int pollingIntervalSeconds, Set<String> directories) throws Exception, IllegalAccessException, InstantiationException {
+        if (INSTANCE == null) INSTANCE = new HeimdallFilterFileManager();
+        INSTANCE.aDirectories = directories;
+        INSTANCE.pollingIntervalSeconds = pollingIntervalSeconds;
+        INSTANCE.manageFiles();
+        INSTANCE.startPoller();
     }
 
     public static HeimdallFilterFileManager getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
     /**
      * Shuts down the poller
      */
     public static void shutdown() {
-        instance.stopPoller();
+        INSTANCE.stopPoller();
     }
 
     void stopPoller() {
@@ -141,7 +141,7 @@ public class HeimdallFilterFileManager {
         for (String sDirectory : aDirectories) {
             if (sDirectory != null) {
                 File directory = getDirectory(sDirectory);
-                File[] aFiles = directory.listFiles(filenameFilter);
+                File[] aFiles = directory.listFiles(FILENAME_FILTER);
                 if (aFiles != null) {
                     list.addAll(Arrays.asList(aFiles));
                 }
@@ -158,13 +158,13 @@ public class HeimdallFilterFileManager {
      * @throws InstantiationException
      * @throws IllegalAccessException
      */
-    void processGroovyFiles(List<File> aFiles) throws Exception {
+    void processGroovyFiles(List<File> aFiles) throws Exception, InstantiationException, IllegalAccessException {
         for (File file : aFiles) {
             FilterLoader.getInstance().putFilter(file);
         }
     }
 
-    void manageFiles() throws Exception {
+    void manageFiles() throws Exception, IllegalAccessException, InstantiationException {
         List<File> aFiles = getFiles();
         processGroovyFiles(aFiles);
     }
