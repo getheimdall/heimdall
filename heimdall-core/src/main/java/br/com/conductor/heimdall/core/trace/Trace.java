@@ -160,14 +160,14 @@ public class Trace {
         this.printLogstash = printLogstash;
         this.printFilters = printFilters;
 
-        HttpServletRequest request = (HttpServletRequest) servletRequest;
-        HeimdallException.checkThrow(request == null, ExceptionMessage.GLOBAL_REQUEST_NOT_FOUND);
+        HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequest;
+        HeimdallException.checkThrow(httpServletRequest == null, ExceptionMessage.GLOBAL_REQUEST_NOT_FOUND);
 
         this.initialTime = System.currentTimeMillis();
-        this.method = request.getMethod();
-        this.url = UrlUtil.getCurrentUrl(request);
+        this.method = httpServletRequest.getMethod();
+        this.url = UrlUtil.getCurrentUrl(httpServletRequest);
 
-        Enumeration<String> headers = request.getHeaders("x-forwarded-for");
+        Enumeration<String> headers = httpServletRequest.getHeaders("x-forwarded-for");
 
         if (headers != null) {
             List<String> listIps = Collections.list(headers);
