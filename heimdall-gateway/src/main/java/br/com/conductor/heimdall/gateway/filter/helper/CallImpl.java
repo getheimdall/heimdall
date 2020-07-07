@@ -159,7 +159,8 @@ public class CallImpl implements Call {
                private HttpServletRequestWrapper removeRequestHeaderWrapper(HttpServletRequest request, String name) {
 
                     return new HttpServletRequestWrapper(request) {
-
+                         
+                         @Override
                          public String getHeader(String nameHeader) {
 
                               String valueHeader = null;
@@ -170,7 +171,8 @@ public class CallImpl implements Call {
 
                               return valueHeader;
                          }
-
+                         
+                         @Override
                          public Enumeration<String> getHeaderNames() {
 
                               List<String> names = Collections.list(super.getHeaderNames());
@@ -452,7 +454,8 @@ public class CallImpl implements Call {
                private HttpServletResponseWrapper removeResponseHeaderWrapper(HttpServletResponse response, String name) {
 
                     return new HttpServletResponseWrapper(response) {
-
+                        
+                         @Override
                          public void addHeader(String headerName, String headerValue) {
 
                               if (!name.equalsIgnoreCase(headerName)) {
@@ -699,5 +702,4 @@ public class CallImpl implements Call {
           }
           
      }
-
 }
