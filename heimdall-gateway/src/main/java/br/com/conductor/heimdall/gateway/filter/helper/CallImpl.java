@@ -663,6 +663,7 @@ public class CallImpl implements Call {
 
           return new HttpServletRequestWrapper(request) {
 
+               @Override
                public String getHeader(String nameHeader) {
 
                     String valueHeader = null;
@@ -674,6 +675,7 @@ public class CallImpl implements Call {
                     return valueHeader;
                }
 
+               @Override
                public Enumeration<String> getHeaderNames() {
 
                     List<String> names = Collections.list(super.getHeaderNames());
@@ -692,6 +694,7 @@ public class CallImpl implements Call {
 
           return new HttpServletResponseWrapper(response) {
 
+               @Override
                public void addHeader(String headerName, String headerValue) {
 
                     if (!name.equalsIgnoreCase(headerName)) {

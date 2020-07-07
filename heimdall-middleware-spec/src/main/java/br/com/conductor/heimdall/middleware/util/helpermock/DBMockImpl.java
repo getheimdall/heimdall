@@ -180,7 +180,7 @@ public class DBMockImpl implements DBMongo {
     @Override
     public <T> Query<T> getQueryProvider(Object criteria) {
 
-        return (Query<T>) this.prepareQuery(criteria, this.datastore());
+        return this.prepareQuery(criteria, this.datastore());
     }
 
     @Override
