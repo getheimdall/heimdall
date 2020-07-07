@@ -52,7 +52,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Optional;
 
 import static br.com.conductor.heimdall.core.util.Constants.INTERRUPT;
 import static br.com.conductor.heimdall.gateway.util.ConstantsContext.API_ID;
