@@ -204,35 +204,35 @@ public class MongoLogConnector implements Serializable {
 	private Query<LogTrace> prepareRange(Query<LogTrace> query, Periods date) {
 		String insertedOnDate = "ts";
 		switch (date) {
-		case TODAY: {
+		case TODAY:
 			query.field(insertedOnDate).containsIgnoreCase(LocalDate.now().format(DateTimeFormatter.ISO_DATE));
 			break;
-		}
-		case YESTERDAY: {
+
+		case YESTERDAY:
 			query.field(insertedOnDate)
 					.containsIgnoreCase(LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_DATE));
 			break;
-		}
-		case THIS_WEEK: {
+
+		case THIS_WEEK:
 			Map<String, LocalDate> week = CalendarUtils.firstAndLastDaysOfWeek(LocalDate.now());
 			query.field(insertedOnDate).greaterThanOrEq(week.get(FIRST).format(DateTimeFormatter.ISO_DATE));
 			query.field(insertedOnDate).lessThanOrEq(week.get(LAST).format(DateTimeFormatter.ISO_DATE));
 			break;
-		}
-		case LAST_WEEK: {
-			Map<String, LocalDate> week = CalendarUtils.firstAndLastDaysOfWeek(LocalDate.now().minusWeeks(1));
-			query.field(insertedOnDate).greaterThanOrEq(week.get(FIRST).format(DateTimeFormatter.ISO_DATE));
-			query.field(insertedOnDate).lessThanOrEq(week.get(LAST).format(DateTimeFormatter.ISO_DATE));
+
+		case LAST_WEEK:
+			Map<String, LocalDate> lastWeek = CalendarUtils.firstAndLastDaysOfWeek(LocalDate.now().minusWeeks(1));
+			query.field(insertedOnDate).greaterThanOrEq(lastWeek.get(FIRST).format(DateTimeFormatter.ISO_DATE));
+			query.field(insertedOnDate).lessThanOrEq(lastWeek.get(LAST).format(DateTimeFormatter.ISO_DATE));
 			break;
-		}
-		case THIS_MONTH: {
+
+		case THIS_MONTH:
 			query.field(insertedOnDate).containsIgnoreCase(CalendarUtils.yearAndMonth(LocalDate.now()));
 			break;
-		}
-		case LAST_MONTH: {
+
+		case LAST_MONTH:
 			query.field(insertedOnDate).containsIgnoreCase(CalendarUtils.yearAndMonth(LocalDate.now().minusMonths(1)));
 			break;
-		}
+
 		}
 		return query;
 	}
@@ -242,7 +242,8 @@ public class MongoLogConnector implements Serializable {
 
 		filtersDTOs.forEach(filtersDTO -> {
 
-			Object value1, value2;
+			Object value1;
+			Object value2;
 
 			try {
 				value1 = Integer.parseInt(filtersDTO.getFirstValue());
@@ -257,82 +258,82 @@ public class MongoLogConnector implements Serializable {
 			}
 
 			switch (filtersDTO.getOperationSelected()) {
-			case EQUALS: {
+			case EQUALS:
 				query.field(filtersDTO.getName()).equal(value1);
 				break;
-			}
-			case NOT_EQUALS: {
+
+			case NOT_EQUALS:
 				query.field(filtersDTO.getName()).notEqual(value1);
 				break;
-			}
-			case CONTAINS: {
+
+			case CONTAINS:
 				query.field(filtersDTO.getName()).containsIgnoreCase(value1.toString());
 				break;
-			}
-			case BETWEEN: {
+
+			case BETWEEN:
 				query.field(filtersDTO.getName()).greaterThanOrEq(value1);
 				query.field(filtersDTO.getName()).lessThanOrEq(value2);
 				break;
-			}
-			case LESS_THAN: {
+
+			case LESS_THAN:
 				query.field(filtersDTO.getName()).lessThan(value1);
 				break;
-			}
-			case LESS_THAN_EQUALS: {
+
+			case LESS_THAN_EQUALS:
 				query.field(filtersDTO.getName()).lessThanOrEq(value1);
 				break;
-			}
-			case GREATER_THAN: {
+
+			case GREATER_THAN:
 				query.field(filtersDTO.getName()).greaterThan(value1);
 				break;
-			}
-			case GREATER_THAN_EQUALS: {
+
+			case GREATER_THAN_EQUALS:
 				query.field(filtersDTO.getName()).greaterThanOrEq(value1);
 				break;
-			}
-			case ALL: {
+
+			case ALL:
 				query.field(filtersDTO.getName()).exists();
 				break;
-			}
-			case NONE: {
+
+			case NONE:
 				query.field(filtersDTO.getName()).doesNotExist();
 				break;
-			}
-			case TODAY: {
+
+			case TODAY:
 				query.field(filtersDTO.getName())
 						.containsIgnoreCase(LocalDate.now().format(DateTimeFormatter.ISO_DATE));
 				break;
-			}
-			case YESTERDAY: {
+
+			case YESTERDAY:
 				query.field(filtersDTO.getName())
 						.containsIgnoreCase(LocalDate.now().minusDays(1).format(DateTimeFormatter.ISO_DATE));
 				break;
-			}
-			case THIS_WEEK: {
+
+			case THIS_WEEK:
 				Map<String, LocalDate> week = CalendarUtils.firstAndLastDaysOfWeek(LocalDate.now());
 				query.field(filtersDTO.getName()).greaterThanOrEq(week.get(FIRST).format(DateTimeFormatter.ISO_DATE));
 				query.field(filtersDTO.getName()).lessThanOrEq(week.get(LAST).format(DateTimeFormatter.ISO_DATE));
 				break;
-			}
-			case LAST_WEEK: {
-				Map<String, LocalDate> week = CalendarUtils.firstAndLastDaysOfWeek(LocalDate.now().minusWeeks(1));
-				query.field(filtersDTO.getName()).greaterThanOrEq(week.get(FIRST).format(DateTimeFormatter.ISO_DATE));
-				query.field(filtersDTO.getName()).lessThanOrEq(week.get(LAST).format(DateTimeFormatter.ISO_DATE));
+
+			case LAST_WEEK:
+				Map<String, LocalDate> lastWeek = CalendarUtils.firstAndLastDaysOfWeek(LocalDate.now().minusWeeks(1));
+				query.field(filtersDTO.getName()).greaterThanOrEq(lastWeek.get(FIRST).format(DateTimeFormatter.ISO_DATE));
+				query.field(filtersDTO.getName()).lessThanOrEq(lastWeek.get(LAST).format(DateTimeFormatter.ISO_DATE));
 				break;
-			}
-			case THIS_MONTH: {
+
+			case THIS_MONTH:
 				query.field(filtersDTO.getName()).containsIgnoreCase(CalendarUtils.yearAndMonth(LocalDate.now()));
 				break;
-			}
-			case LAST_MONTH: {
+
+			case LAST_MONTH:
 				query.field(filtersDTO.getName())
 						.containsIgnoreCase(CalendarUtils.yearAndMonth(LocalDate.now().minusMonths(1)));
 				break;
-			}
-			case THIS_YEAR: {
+
+			case THIS_YEAR:
 				query.field(filtersDTO.getName()).containsIgnoreCase(CalendarUtils.year(LocalDate.now()));
 				break;
-			}
+
 			}
 		});
 

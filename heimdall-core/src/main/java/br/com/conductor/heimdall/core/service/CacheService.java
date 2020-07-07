@@ -26,7 +26,6 @@ import java.util.List;
 
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
@@ -52,9 +51,7 @@ public class CacheService {
       */
      public List<String> list() {
           
-          List<String> cacheNames = new ArrayList<>(cacheManager.getCacheNames());
-          
-          return cacheNames;
+          return new ArrayList<>(cacheManager.getCacheNames());
      }
 
      /**

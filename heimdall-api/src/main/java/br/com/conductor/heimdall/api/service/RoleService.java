@@ -74,7 +74,7 @@ public class RoleService {
 
           Set<Role> nameRole = roleRepository.findByName(roleDTO.getName());
 
-          HeimdallException.checkThrow(nameRole.size() > 0, ExceptionMessage.ROLE_ALREADY_EXIST);
+          HeimdallException.checkThrow(!nameRole.isEmpty(), ExceptionMessage.ROLE_ALREADY_EXIST);
 
           List<Long> invalidPrivileges = new ArrayList<>();
           role.getPrivileges().forEach(p -> {
@@ -122,9 +122,7 @@ public class RoleService {
           Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
           Page<Role> page = roleRepository.findAll(example, pageable);
 
-          RolePage rolePage = new RolePage(PageDTO.build(page));
-
-          return rolePage;
+          return new RolePage(PageDTO.build(page));
      }
 
      /**
@@ -140,9 +138,7 @@ public class RoleService {
 
           Example<Role> example = Example.of(role, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 
-          List<Role> roles = roleRepository.findAll(example);
-
-          return roles;
+          return roleRepository.findAll(example);
      }
 
      /**
@@ -173,7 +169,7 @@ public class RoleService {
           HeimdallException.checkThrow(role == null, GLOBAL_RESOURCE_NOT_FOUND);
           Set<Role> roleByName = roleRepository.findByName(roleDTO.getName());
 
-          if (roleByName.size() > 0){
+          if (!roleByName.isEmpty()){
                HeimdallException.checkThrow(roleByName.stream().anyMatch(r -> !r.getId().equals(roleId) && r.getName().equals(roleDTO.getName())), ExceptionMessage.ROLE_ALREADY_EXIST);
           }
 

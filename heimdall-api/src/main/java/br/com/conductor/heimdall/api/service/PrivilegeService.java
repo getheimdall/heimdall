@@ -82,9 +82,7 @@ public class PrivilegeService {
           Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
           Page<Privilege> page = repository.findAll(example, pageable);
 
-          PrivilegePage privilegePage = new PrivilegePage(PageDTO.build(page));
-
-          return privilegePage;
+          return new PrivilegePage(PageDTO.build(page));
      }
 
      /**
@@ -99,9 +97,7 @@ public class PrivilegeService {
 
           Example<Privilege> example = Example.of(privilege, ExampleMatcher.matching().withIgnoreCase().withStringMatcher(StringMatcher.CONTAINING));
 
-          List<Privilege> privileges = repository.findAll(example);
-
-          return privileges;
+          return repository.findAll(example);
      }
 
      public Set<Privilege> list(String username) {

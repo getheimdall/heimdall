@@ -124,9 +124,7 @@ public class ApiService {
         Pageable pageable = Pageable.setPageable(pageableDTO.getOffset(), pageableDTO.getLimit());
         Page<Api> page = apiRepository.findAll(example, pageable);
 
-        ApiPage apiPage = new ApiPage(PageDTO.build(page));
-
-        return apiPage;
+        return new ApiPage(PageDTO.build(page));
     }
 
     /**

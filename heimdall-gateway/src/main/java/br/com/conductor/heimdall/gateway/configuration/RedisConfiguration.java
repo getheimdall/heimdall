@@ -97,7 +97,7 @@ public class RedisConfiguration {
      @Bean
      public RedisTemplate<Object, Object> redisTemplateObject() {
 
-          RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<Object, Object>();
+          RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<>();
           redisTemplate.setConnectionFactory(jedisConnectionFactory());
           redisTemplate.setKeySerializer(new StringRedisSerializer());
           redisTemplate.setValueSerializer(new JdkSerializationRedisSerializer());

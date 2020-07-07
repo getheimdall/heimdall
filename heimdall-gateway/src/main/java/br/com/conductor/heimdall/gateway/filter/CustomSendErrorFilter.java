@@ -44,6 +44,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CustomSendErrorFilter extends SendErrorFilter {
 
+	private static final String MESSAGE = "message";
+	private static final String ERROR = "error";
+
 	@Override
 	public Object run() {
 		try {
@@ -63,24 +66,24 @@ public class CustomSendErrorFilter extends SendErrorFilter {
 				message = exception.getCause().getMessage();
 			}
 
-			Map<String, Object> errorAttributes = new LinkedHashMap<String, Object>();
+			Map<String, Object> errorAttributes = new LinkedHashMap<>();
 			errorAttributes.put("timestamp", LocalDateTime.now());
 			final int status = exception.nStatusCode;
 			errorAttributes.put("status", status);
 
 			try {
-				errorAttributes.put("error", HttpStatus.valueOf(status).getReasonPhrase());
+				errorAttributes.put(ERROR, HttpStatus.valueOf(status).getReasonPhrase());
 			} catch (Exception ex) {
-				errorAttributes.put("error", "Http Status " + status);
+				errorAttributes.put(ERROR, "Http Status " + status);
 			}
 
 			HeimdallException exceptionHeimdall = new HeimdallException(ExceptionMessage.GLOBAL_ERROR_ZUUL);
 
 			errorAttributes.put("exception", exceptionHeimdall.getClass().getSimpleName());
-			errorAttributes.put("message", exception.getMessage());
+			errorAttributes.put(MESSAGE, exception.getMessage());
 
-			if ((!StringUtils.isEmpty(message) || errorAttributes.get("message") == null)) {
-				errorAttributes.put("message", StringUtils.isEmpty(message) ? "No message available" : message);
+			if ((!StringUtils.isEmpty(message) || errorAttributes.get(MESSAGE) == null)) {
+				errorAttributes.put(MESSAGE, StringUtils.isEmpty(message) ? "No message available" : message);
 			}
 
 			String path = (String) request.getAttribute("javax.servlet.error.request_uri");

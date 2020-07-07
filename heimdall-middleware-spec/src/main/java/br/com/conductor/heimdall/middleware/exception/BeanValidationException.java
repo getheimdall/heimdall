@@ -37,7 +37,7 @@ public class BeanValidationException extends RuntimeException {
 
      private static final long serialVersionUID = -3415601794675335171L;
      
-     private String violations;
+     private final String violations;
      
      public BeanValidationException(String message, String violations) {
           super(message);

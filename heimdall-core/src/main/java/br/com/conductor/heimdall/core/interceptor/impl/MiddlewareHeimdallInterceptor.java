@@ -27,9 +27,6 @@ import br.com.conductor.heimdall.core.interceptor.HeimdallInterceptor;
 import java.util.HashMap;
 import java.util.Map;
 
-import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_API_ROOT;
-import static br.com.conductor.heimdall.core.util.Constants.MIDDLEWARE_ROOT;
-
 /**
  * Implementation of the HeimdallInterceptor to type Middleware.
  *

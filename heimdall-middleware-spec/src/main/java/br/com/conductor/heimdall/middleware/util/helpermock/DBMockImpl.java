@@ -45,6 +45,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Mock class created to help unit test the root request class of a middleware.
@@ -57,9 +59,9 @@ public class DBMockImpl implements DBMongo {
 
     private String databaseName;
 
-    private final static Integer PAGE = 0;
+    private static final Integer PAGE = 0;
 
-    private final static Integer LIMIT = 100;
+    private static final Integer LIMIT = 100;
 
     private Helper helper = new HelperMock();
 
@@ -157,6 +159,7 @@ public class DBMockImpl implements DBMongo {
             }
             collection.insertMany(ts);
         } catch (Exception ignored) {
+            // This exception should be ignored
         } finally {
 
             createMongoClient().close();
@@ -171,6 +174,7 @@ public class DBMockImpl implements DBMongo {
             Document document = Document.parse(json.parse(object));
             collection.insertOne(document);
         } catch (Exception ignored) {
+            // This exception should be ignored
         } finally {
 
             createMongoClient().close();
@@ -190,41 +194,17 @@ public class DBMockImpl implements DBMongo {
         limit = limit == null || limit > LIMIT ? LIMIT : limit;
         FindIterable<Document> documents;
 
-        if (page > 0 && limit > 0) {
-
-            if (Objeto.notBlank(filters)) {
-
+        if (Objects.nonNull(filters)){
+            if(page == 0){
+                documents = collection.find(Filters.and(filters)).limit(limit).skip(limit);
+            }else {
                 documents = collection.find(Filters.and(filters)).limit(limit).skip(page * limit);
-            } else {
-
+            }
+        }else{
+            if(page == 0){
+                documents = collection.find().limit(limit).skip(limit);
+            }else {
                 documents = collection.find().limit(limit).skip(page * limit);
-            }
-        } else if (page == 0 && limit > 0) {
-
-            if (Objeto.notBlank(filters)) {
-
-                documents = collection.find().limit(limit);
-            } else {
-
-                documents = collection.find(Filters.and(filters)).limit(limit);
-            }
-        } else if (limit > 0) {
-
-            if (Objeto.notBlank(filters)) {
-
-                documents = collection.find().limit(limit);
-            } else {
-
-                documents = collection.find(Filters.and(filters)).limit(limit);
-            }
-        } else {
-
-            if (Objeto.notBlank(filters)) {
-
-                documents = collection.find(Filters.and(filters)).limit(LIMIT);
-            } else {
-
-                documents = collection.find().limit(LIMIT);
             }
         }
 
@@ -287,11 +267,18 @@ public class DBMockImpl implements DBMongo {
 
     private <T> Object getValueId(T object) {
 
-        Field id = Arrays.stream(object.getClass().getDeclaredFields()).filter(field -> field.getAnnotation(Id.class) != null).findFirst().get();
-        id.setAccessible(true);
-        try {
-            return id.get(object);
-        } catch (IllegalArgumentException | IllegalAccessException ignored) { }
+        Optional<Field> idOptional = Arrays.stream(object.getClass().getDeclaredFields())
+                .filter(field -> field.getAnnotation(Id.class) != null).findFirst();
+        Field id;
+        if(idOptional.isPresent()){
+            id = idOptional.get();
+            id.setAccessible(true);
+            try {
+                return id.get(object);
+            } catch (IllegalArgumentException | IllegalAccessException ignored) {
+                // This exception should be ignored
+            }
+        }
         return null;
     }
 
@@ -305,7 +292,9 @@ public class DBMockImpl implements DBMongo {
             Object value = null;
             try {
                 value = field.get(criteria);
-            } catch (IllegalArgumentException | IllegalAccessException ignored) {}
+            } catch (IllegalArgumentException | IllegalAccessException ignored){
+                // This exception should be ignored
+            }
 
             if (value != null) {
                 query.criteria(field.getName()).equal(value);

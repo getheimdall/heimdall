@@ -100,8 +100,8 @@ public class HeimdallLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
       */
      private final List<String> getPrivileges(final Collection<Role> roles) {
 
-          final List<String> privileges = new ArrayList<String>();
-          final Set<Privilege> collection = new HashSet<Privilege>();
+          final List<String> privileges = new ArrayList<>();
+          final Set<Privilege> collection = new HashSet<>();
           for (final Role role : roles) {
                collection.addAll(role.getPrivileges());
           }
@@ -117,7 +117,7 @@ public class HeimdallLdapAuthoritiesPopulator implements LdapAuthoritiesPopulato
       */
      private final List<GrantedAuthority> getGrantedAuthorities(final List<String> privileges) {
 
-          final List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
+          final List<GrantedAuthority> authorities = new ArrayList<>();
           for (final String privilege : privileges) {
                authorities.add(new SimpleGrantedAuthority(privilege));
           }
