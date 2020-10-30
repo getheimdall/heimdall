@@ -89,7 +89,7 @@ public class UserResource {
      public ResponseEntity<?> findById(@PathVariable("userId") Long userId) {
 
           User user = userService.find(userId);
-
+          user.setPassword("hidden");
           return ResponseEntity.ok(user);
      }
 
@@ -111,15 +111,15 @@ public class UserResource {
                UserPage userPage = userService.list(userDTO, pageableDTO);
                if (!userPage.getContent().isEmpty()) {
                     List<User> users = userPage.getContent();
-                    users = users.stream().map(user -> new User(user.getId(), user.getFirstName(), user.getLastName(), user.getUserName(), user.getEmail(), user.getPassword(), user.getStatus(), user.getCreationDate(), user.getType(), null)).collect(Collectors.toList());
+                    users = users.stream().map(user -> new User(user.getId(), user.getFirstName(), user.getLastName(), user.getUserName(), user.getEmail(), "hidden", user.getStatus(), user.getCreationDate(), user.getType(), null)).collect(Collectors.toList());
                     userPage.setContent(users);
                }
                return ResponseEntity.ok(userPage);
           } else {
-               
+
                List<User> users = userService.list(userDTO);
                if (!users.isEmpty()) {
-                    users = users.stream().map(user -> new User(user.getId(), user.getFirstName(), user.getLastName(), user.getUserName(), user.getEmail(), user.getPassword(), user.getStatus(), user.getCreationDate(), user.getType(), null)).collect(Collectors.toList());
+                    users = users.stream().map(user -> new User(user.getId(), user.getFirstName(), user.getLastName(), user.getUserName(), user.getEmail(), "hidden", user.getStatus(), user.getCreationDate(), user.getType(), null)).collect(Collectors.toList());
                }
                return ResponseEntity.ok(users);
           }
@@ -139,7 +139,7 @@ public class UserResource {
      public ResponseEntity<?> update(@PathVariable("userId") Long userId, @RequestBody UserEditDTO userDTO) {
 
           User user = userService.update(userId, userDTO);
-
+          user.setPassword("hidden");
           return ResponseEntity.ok(user);
      }
 
