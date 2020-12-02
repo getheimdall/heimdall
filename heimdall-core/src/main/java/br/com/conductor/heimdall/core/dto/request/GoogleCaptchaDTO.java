@@ -1,6 +1,8 @@
+package br.com.conductor.heimdall.core.dto.request;
+
 /*-
  * =========================LICENSE_START==================================
- * heimdall-api
+ * heimdall-core
  * ========================================================================
  * Copyright (C) 2018 Conductor Tecnologia SA
  * ========================================================================
@@ -17,18 +19,27 @@
  * limitations under the License.
  * ==========================LICENSE_END===================================
  */
-package br.com.conductor.heimdall.api.security;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.Collection;
+
 /**
- * @author <a href="https://dijalmasilva.github.io" target="_blank">Dijalma Silva</a>
+ * Class is a Data Response Object for the Captcha validation.
+ *
+ * @author Leticia Campelo
  */
 @Data
-public class AccountCredentials {
+public class GoogleCaptchaDTO implements Serializable {
 
-    private String username;
-    private String password;
-    private String captchaResponse;
+    @NotNull
+    private boolean success;
+
+    private Timestamp challenge_ts;
+
+    private String hostname;
 
 }

@@ -29,9 +29,9 @@ export const finishLoading = () => dispatch => {
     dispatch({ type: AuthConstants.AUTH_LOADING_FINISH })
 }
 
-export const login = (login, password, renderToHomePage) => dispatch => {
+export const login = (login, password, renderToHomePage, captchaResponse) => dispatch => {
     dispatch(initLoading())
-    userService.login(login, password)
+    userService.login(login, password, captchaResponse)
     .then(data => {
         dispatch(loginSuccessful(data))
         if (renderToHomePage) {
@@ -42,8 +42,13 @@ export const login = (login, password, renderToHomePage) => dispatch => {
         }
         dispatch(finishLoading())
     }).catch(error => {
-        notification['error']({ message: i18n.t('username_password_incorrect') })
-        dispatch(loginFailed(i18n.t('username_password_incorrect')))
+        if(error.response.data.message.includes('captcha')){
+            notification['error']({ message: i18n.t('invalid_captcha') })
+            dispatch(loginFailed(i18n.t('invalid_captcha')))
+        }else{
+            notification['error']({ message: i18n.t('username_password_incorrect') })
+            dispatch(loginFailed(i18n.t('username_password_incorrect')))
+        }
         dispatch(closeModalSession())
         dispatch(push('/login'))
         dispatch(finishLoading())

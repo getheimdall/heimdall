@@ -9,16 +9,19 @@ import formLogo from '../logo-form.png'
 
 import LoginForm from '../components/login/LoginForm'
 import Session from "../services/SessionService"
+import { loadReCaptcha } from 'react-recaptcha-google'
 
 
 class Login extends Component {
 
     componentDidMount() {
+        loadReCaptcha();
         if (Session){
             Session.cancelTimeouts()
         }
         if (!userService.isUserLogged()) {
             this.props.logout()
+
         }
     }
 
