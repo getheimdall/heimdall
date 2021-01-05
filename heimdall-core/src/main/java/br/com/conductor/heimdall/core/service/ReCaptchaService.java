@@ -38,22 +38,18 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.UNAVAILA
 
 @Service
 public class ReCaptchaService {
-     private RestTemplate restTemplate;
-
 
      public GoogleCaptchaDTO validateCaptcha(String response, String secret){
-          initRestTemplate();
+
+          RestTemplate restTemplate = new RestTemplate();
+
           String url =  "https://www.google.com/recaptcha/api/siteverify?response=" + response + "&secret=" + secret;
           GoogleCaptchaDTO googleCaptchaValidation =  restTemplate.getForObject(url, GoogleCaptchaDTO.class);
+
           HeimdallException.checkThrow(googleCaptchaValidation == null, UNAVAILABLE_CAPTCHA_VALIDATION);
           HeimdallException.checkThrow(!googleCaptchaValidation.isSuccess(), INVALID_CAPTCHA_VALIDATION);
-         return googleCaptchaValidation;
-     }
 
-     private void initRestTemplate(){
-          if (this.restTemplate == null){
-               restTemplate = new RestTemplate();
-          }
+         return googleCaptchaValidation;
      }
 
 }
