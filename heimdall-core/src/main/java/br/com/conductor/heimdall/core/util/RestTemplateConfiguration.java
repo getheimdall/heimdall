@@ -1,4 +1,4 @@
-package br.com.conductor.heimdall.api.configuration;
+package br.com.conductor.heimdall.core.util;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -23,6 +23,7 @@ package br.com.conductor.heimdall.core.service;
 import br.com.conductor.heimdall.core.dto.request.GoogleCaptchaDTO;
 import br.com.conductor.heimdall.core.entity.Developer;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -39,12 +40,11 @@ import static br.com.conductor.heimdall.core.exception.ExceptionMessage.UNAVAILA
 @Service
 public class ReCaptchaService {
 
+     @Autowired
      private RestTemplate restTemplate;
 
 
      public GoogleCaptchaDTO validateCaptcha(String response, String secret){
-
-          initRestTemplate();
 
           String url =  "https://www.google.com/recaptcha/api/siteverify?response=" + response + "&secret=" + secret;
           GoogleCaptchaDTO googleCaptchaValidation =  restTemplate.getForObject(url, GoogleCaptchaDTO.class);
@@ -53,12 +53,6 @@ public class ReCaptchaService {
           HeimdallException.checkThrow(!googleCaptchaValidation.isSuccess(), INVALID_CAPTCHA_VALIDATION);
 
          return googleCaptchaValidation;
-     }
-
-     private void initRestTemplate(){
-          if (this.restTemplate == null){
-               restTemplate = new RestTemplate();
-          }
      }
 
 }
