@@ -5,6 +5,7 @@ info:
         description: "@description@"
         version: "@project.version@"
         captchaKey: 6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe
+        captchaEnabled: true
 
 server:
     context-path: /

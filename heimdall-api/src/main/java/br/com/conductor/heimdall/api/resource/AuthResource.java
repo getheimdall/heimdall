@@ -61,11 +61,14 @@ public class AuthResource {
     @Value(value = "${info.app.captchaKey}")
     private String secret;
 
+    @Value(value = "${info.app.captchaEnabled}")
+    private String captchaEnabled;
+
     @ResponseBody
     @ApiOperation(value = "Login Authentication")
     @PostMapping(ConstantsPath.PATH_LOGIN)
     public ResponseEntity<?> login(@RequestBody AccountCredentials accountCredentials, HttpServletResponse response) {
-        if(!accountCredentials.getCaptchaResponse().equals("false")){
+        if(Boolean.TRUE.toString().equals(captchaEnabled)){
             reCaptchaService.validateCaptcha(accountCredentials.getCaptchaResponse(), secret);
         }
         UserAuthenticateResponse userLogged = tokenAuthenticationService.login(accountCredentials, response);

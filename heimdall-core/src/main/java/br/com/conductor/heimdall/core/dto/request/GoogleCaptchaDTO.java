@@ -20,6 +20,7 @@ package br.com.conductor.heimdall.core.dto.request;
  * ==========================LICENSE_END===================================
  */
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -38,7 +39,8 @@ public class GoogleCaptchaDTO implements Serializable {
     @NotNull
     private boolean success;
 
-    private Timestamp challenge_ts;
+    @JsonProperty("challenge_ts")
+    private Timestamp challengeTs;
 
     private String hostname;
 
