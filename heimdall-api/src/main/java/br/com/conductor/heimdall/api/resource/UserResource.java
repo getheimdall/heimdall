@@ -139,7 +139,7 @@ public class UserResource {
      public ResponseEntity<?> update(@PathVariable("userId") Long userId, @RequestBody UserEditDTO userDTO) {
 
           User user = userService.update(userId, userDTO);
-          user.setPassword("hidden");
+          user.setPassword(null);
           return ResponseEntity.ok(user);
      }
 
