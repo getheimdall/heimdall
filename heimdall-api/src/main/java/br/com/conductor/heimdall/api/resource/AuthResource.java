@@ -24,10 +24,12 @@ import br.com.conductor.heimdall.api.entity.CredentialState;
 import br.com.conductor.heimdall.api.security.AccountCredentials;
 import br.com.conductor.heimdall.api.service.CredentialStateService;
 import br.com.conductor.heimdall.api.service.TokenAuthenticationService;
+import br.com.conductor.heimdall.core.service.ReCaptchaService;
 import br.com.conductor.heimdall.core.util.ConstantsPath;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -53,9 +55,22 @@ public class AuthResource {
     @Autowired
     private TokenAuthenticationService tokenAuthenticationService;
 
+    @Autowired
+    private ReCaptchaService reCaptchaService;
+
+    @Value(value = "${info.app.captchaKey}")
+    private String secret;
+
+    @Value(value = "${info.app.captchaEnabled}")
+    private String captchaEnabled;
+
+    @ResponseBody
     @ApiOperation(value = "Login Authentication")
     @PostMapping(ConstantsPath.PATH_LOGIN)
     public ResponseEntity<?> login(@RequestBody AccountCredentials accountCredentials, HttpServletResponse response) {
+        if(Boolean.TRUE.toString().equals(captchaEnabled)){
+            reCaptchaService.validateCaptcha(accountCredentials.getCaptchaResponse(), secret);
+        }
         UserAuthenticateResponse userLogged = tokenAuthenticationService.login(accountCredentials, response);
 
         return ResponseEntity.ok(userLogged);
