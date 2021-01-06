@@ -1,10 +1,11 @@
 import i18n from "../i18n/i18n"
 import {HTTP, HTTPv1} from '../utils/Http'
 
-const login = (login, password) => {
+const login = (login, password, captchaResponse) => {
     let accountCredentials = {
         username: login,
-        password: password
+        password: password,
+        captchaResponse: captchaResponse
     }
 
     return HTTP.post('/v1/api/login', accountCredentials)

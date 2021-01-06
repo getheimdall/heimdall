@@ -2,6 +2,7 @@ export default {
     translations: {
         'insert_username': 'Por favor, insira o nome de usuário!',
         'insert_password': 'Por favor, insira a senha!',
+        'invalid_captcha': 'Erro na validação do ReCaptcha',
         'username': 'Nome de usuário',
         'password': 'Senha',
         'sign_in': 'Entrar',

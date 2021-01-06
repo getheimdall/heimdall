@@ -196,7 +196,11 @@ public enum ExceptionMessage {
 
     USER_LDAP_UNAUTHORIZED_TO_CHANGE_PASSWORD(UNAUTHORIZED.value(), "User from LDAP can't change the password!", UnauthorizedException.class),
 
-    DEFAULT_PLAN_ALREADY_EXIST_TO_THIS_API(BAD_REQUEST.value(), "Default plan already exist to this Api", BadRequestException.class);
+    DEFAULT_PLAN_ALREADY_EXIST_TO_THIS_API(BAD_REQUEST.value(), "Default plan already exist to this Api", BadRequestException.class),
+
+    INVALID_CAPTCHA_VALIDATION (UNAUTHORIZED.value(), "Invalid user captcha", UnauthorizedException.class),
+
+    UNAVAILABLE_CAPTCHA_VALIDATION(INTERNAL_SERVER_ERROR.value(), "Google recaptcha service unavailable", ServerErrorException.class);
 
     @Getter
     private final Integer httpCode;

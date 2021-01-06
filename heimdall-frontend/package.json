@@ -27,9 +27,12 @@
     "react-dnd": "2.6.0",
     "react-dnd-html5-backend": "2.6.0",
     "react-dom": "16.3.2",
+    "react-google-recaptcha": "^2.1.0",
+    "react-i18next": "8.3.8",
     "react-joyride": "1.11.4",
     "react-json-view": "^1.17.1",
     "react-particles-js": "2.1.2",
+    "react-recaptcha-google": "^1.1.1",
     "react-redux": "5.0.6",
     "react-router": "4.2.0",
     "react-router-dom": "4.2.2",
@@ -38,9 +41,8 @@
     "recharts": "1.0.0-beta.10",
     "redux": "3.7.2",
     "redux-logger": "3.0.6",
-    "swagger-ui": "3.23.11",
     "redux-thunk": "2.3.0",
-    "react-i18next": "8.3.8"
+    "swagger-ui": "3.23.11"
   },
   "scripts": {
     "start": "node env.js && mv env-config.js ./public/ && react-app-rewired start",
