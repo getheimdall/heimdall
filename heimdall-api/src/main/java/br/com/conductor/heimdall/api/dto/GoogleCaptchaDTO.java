@@ -1,4 +1,4 @@
-package br.com.conductor.heimdall.core.dto.request;
+package br.com.conductor.heimdall.api.dto;
 
 /*-
  * =========================LICENSE_START==================================

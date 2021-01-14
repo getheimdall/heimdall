@@ -24,7 +24,7 @@ import br.com.conductor.heimdall.api.entity.CredentialState;
 import br.com.conductor.heimdall.api.security.AccountCredentials;
 import br.com.conductor.heimdall.api.service.CredentialStateService;
 import br.com.conductor.heimdall.api.service.TokenAuthenticationService;
-import br.com.conductor.heimdall.core.service.ReCaptchaService;
+import br.com.conductor.heimdall.api.service.ReCaptchaService;
 import br.com.conductor.heimdall.core.util.ConstantsPath;
 import br.com.conductor.heimdall.core.util.ConstantsTag;
 import io.swagger.annotations.ApiOperation;
