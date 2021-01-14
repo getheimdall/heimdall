@@ -1,4 +1,4 @@
-package br.com.conductor.heimdall.core.service;
+package br.com.conductor.heimdall.api.service;
 
 /*-
  * =========================LICENSE_START==================================
@@ -20,7 +20,7 @@ package br.com.conductor.heimdall.core.service;
  * ==========================LICENSE_END===================================
  */
 
-import br.com.conductor.heimdall.core.dto.request.GoogleCaptchaDTO;
+import br.com.conductor.heimdall.api.dto.GoogleCaptchaDTO;
 import br.com.conductor.heimdall.core.entity.Developer;
 import br.com.conductor.heimdall.core.exception.HeimdallException;
 import org.springframework.beans.factory.annotation.Autowired;
