@@ -4,7 +4,7 @@ info:
         name: "@name@"
         description: "@description@"
         version: "@project.version@"
-        captchaKey: 6LffNiIaAAAAAOdIH3kcHrEFVs88xnQY3kVBkU28
+        captchaKey: 6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe
         captchaEnabled: true
 
 server:
