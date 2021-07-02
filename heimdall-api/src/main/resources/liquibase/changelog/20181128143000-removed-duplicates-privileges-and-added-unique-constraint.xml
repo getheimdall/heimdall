@@ -3,7 +3,7 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-    <changeSet author="conductor\ewerton.araujo" id="1">
+    <changeSet author="ewerton.araujo" id="1">
         <preConditions>
             <tableExists tableName="PRIVILEGES"/>
             <tableExists tableName="ROLES_PRIVILEGES"/>
@@ -25,7 +25,7 @@
         </sql>
     </changeSet>
 
-    <changeSet author="conductor\marcelo.rodrigues" id="2">
+    <changeSet author="marcelo.rodrigues" id="2">
         <preConditions>
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE constraint_name='uq_privileges_name'

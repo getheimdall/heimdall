@@ -11,7 +11,7 @@
 
 ## What is Heimdall
 
-Heimdall is a open source project developed by [Conductor Tecnologia SA](http://www.conductor.com.br) with the objective to provide an API Orchestrator solution. Feel free to manage your apis in a easy way. The plataform allows to manage your apis in real time, making possible the centralization of all api requests. Providing control, traceability, security and customization of your requests and responses. The Heimdall toolkit was developed with objective to provide the most flexible structure possible to give you the power to manage your Api.
+Heimdall is a open source project with the objective to provide an API Orchestrator solution. Feel free to manage your apis in a easy way. The plataform allows to manage your apis in real time, making possible the centralization of all api requests. Providing control, traceability, security and customization of your requests and responses. The Heimdall toolkit was developed with objective to provide the most flexible structure possible to give you the power to manage your Api.
 
 ### Features
 * Gateway

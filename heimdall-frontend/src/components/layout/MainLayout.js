@@ -66,8 +66,6 @@ class MainLayout extends Component {
 						</Row>
 					</Content>
 					<Footer>
-						<a href="http://www.conductor.com.br">Conductor Tecnologia</a>
-						<br/>
 						<span>Version: {version}</span>
 					</Footer>
 				</Layout>

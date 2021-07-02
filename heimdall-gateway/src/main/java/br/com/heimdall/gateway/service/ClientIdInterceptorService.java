@@ -1,0 +1,108 @@
+/*-
+ * =========================LICENSE_START==================================
+ * heimdall-gateway
+ * ========================================================================
+ * 
+ * ========================================================================
+ * Licensed under the Apache License, Version 2.0 (the "License")
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ==========================LICENSE_END===================================
+ */
+package br.com.heimdall.gateway.service;
+
+import br.com.heimdall.core.entity.App;
+import br.com.heimdall.core.entity.Plan;
+import br.com.heimdall.core.enums.Location;
+import br.com.heimdall.core.repository.AppRepository;
+import br.com.heimdall.core.util.ConstantsInterceptors;
+import br.com.heimdall.core.util.DigestUtils;
+import br.com.heimdall.core.trace.TraceContextHolder;
+import br.com.heimdall.gateway.util.ConstantsContext;
+import com.netflix.zuul.context.RequestContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+
+import static br.com.heimdall.core.util.Constants.INTERRUPT;
+
+/**
+ * @author Marcelo Aguiar Rodrigues
+ */
+@Service
+public class ClientIdInterceptorService {
+
+    @Autowired
+    private AppRepository appRepository;
+
+    /**
+     * Validates if a client id originated from {@link Location} is valid
+     *
+     * @param apiId    Api id
+     * @param location {@link Location}
+     */
+    public void validate(Long apiId, Location location) {
+
+        RequestContext context = RequestContext.getCurrentContext();
+
+        String clientId;
+        if (Location.HEADER.equals(location)) {
+            clientId = context.getZuulRequestHeaders().get(ConstantsContext.CLIENT_ID);
+
+            if (clientId == null) clientId = context.getRequest().getHeader(ConstantsContext.CLIENT_ID);
+        }
+        else
+            clientId = context.getRequest().getParameter(ConstantsContext.CLIENT_ID);
+
+        this.validateClientId(apiId, clientId);
+    }
+
+    /**
+     * Method responsible for validating client_id in interceptor
+     *
+     * @param apiId    The apiId
+     * @param clientId ClientId to be validated
+     */
+    private void validateClientId(Long apiId, String clientId) {
+
+        final String CLIENT_ID = "Client Id";
+
+        if (clientId != null) {
+
+            TraceContextHolder.getInstance().getActualTrace().setClientId(DigestUtils.digestMD5(clientId));
+            App app = appRepository.findByClientId(clientId);
+            if (app != null) {
+
+                Plan plan = app.getPlans().stream().filter(p -> apiId.equals(p.getApi().getId())).findFirst().orElse(null);
+                if (plan != null) {
+                    TraceContextHolder.getInstance().getActualTrace().setApp(app.getName());
+                    TraceContextHolder.getInstance().getActualTrace().setAppDeveloper(app.getDeveloper().getEmail());
+
+                } else {
+                    buildResponse(ConstantsInterceptors.GLOBAL_ACCESS_NOT_ALLOWED_API);
+                }
+            } else {
+                buildResponse(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, CLIENT_ID));
+            }
+        } else {
+            buildResponse(String.format(ConstantsInterceptors.GLOBAL_CLIENT_ID_OR_ACESS_TOKEN_NOT_FOUND, CLIENT_ID));
+        }
+    }
+
+    private void buildResponse(String message) {
+        RequestContext ctx = RequestContext.getCurrentContext();
+        ctx.setSendZuulResponse(false);
+        ctx.put(INTERRUPT, true);
+        ctx.setResponseStatusCode(HttpStatus.UNAUTHORIZED.value());
+        ctx.setResponseBody(message);
+    }
+
+}

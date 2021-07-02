@@ -1,0 +1,77 @@
+/*-
+ * =========================LICENSE_START==================================
+ * heimdall-core
+ * ========================================================================
+ *
+ * ========================================================================
+ * Licensed under the Apache License, Version 2.0 (the "License")
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * ==========================LICENSE_END===================================
+ */
+package br.com.heimdall.core.entity;
+
+import br.com.heimdall.core.enums.Interval;
+import br.com.heimdall.core.util.LocalDateTimeDeserializer;
+import br.com.heimdall.core.util.LocalDateTimeSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
+/**
+ * Represents a view of rate limit that client will define how many requests can be executed by the user. 
+ * 
+ * @author Marcos Filho
+ *
+ */
+@Data
+@AllArgsConstructor
+public class RateLimit implements Serializable {
+
+     public static final int MIN_REMAINING = 0;
+
+     private static final long serialVersionUID = 7194905692521670392L;
+     
+     public static final String KEY = "Rate";
+     private String path;
+     private Long calls;
+     private Interval interval;
+     private Long remaining;
+     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+     @JsonSerialize(using = LocalDateTimeSerializer.class)
+     private LocalDateTime lastRequest;
+     
+     public RateLimit(String path, Long calls, Interval interval) {
+          this.path = path;
+          this.calls = calls;
+          this.interval = interval;
+          reset();
+     }
+     
+     public void decreaseRemaining() {
+          if (this.remaining > MIN_REMAINING) {
+               this.remaining--;
+          }
+     }
+
+     public void reset() {
+          this.remaining = this.calls;
+          this.lastRequest = LocalDateTime.now();
+     }
+     
+     public boolean hasRemaining() {
+          return this.remaining != null && this.remaining > MIN_REMAINING;
+     }
+}

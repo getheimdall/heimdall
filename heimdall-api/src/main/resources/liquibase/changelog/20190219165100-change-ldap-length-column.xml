@@ -5,13 +5,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet id="1" author="conductor\marcos.filho">
+	<changeSet id="1" author="marcos.filho">
 
 		<modifyDataType columnName="PASSWORD" newDataType="VARCHAR(100)" tableName="LDAP" />
 		<rollback/>
 	</changeSet>
 	
-	<changeSet id="2" author="conductor\marcos.filho">
+	<changeSet id="2" author="marcos.filho">
 
 		<modifyDataType columnName="SEARCH_BASE" newDataType="VARCHAR(200)" tableName="LDAP" />
 		<rollback/>

@@ -5,7 +5,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
 
-	<changeSet id="01" author="conductor\marcos.filho">
+	<changeSet id="01" author="marcos.filho">
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="PLANS" />
             <columnExists tableName="PLANS" columnName="DEFAULT_PLAN"/>
@@ -15,7 +15,7 @@
         <dropUniqueConstraint tableName="PLANS" constraintName="DF_PLANS_DEFAULT_PLAN" />
     </changeSet>
 	
-    <changeSet id="02" author="conductor\marcelo.rodrigues">
+    <changeSet id="02" author="marcelo.rodrigues">
         <preConditions>
             <tableExists tableName="PLANS" />
             <columnExists tableName="PLANS" columnName="DEFAULT_PLAN"/>
@@ -32,7 +32,7 @@
         </rollback>
     </changeSet>
 
-    <changeSet id="03" author="conductor\marcelo.rodrigues">
+    <changeSet id="03" author="marcelo.rodrigues">
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="PLANS" />
             <not>

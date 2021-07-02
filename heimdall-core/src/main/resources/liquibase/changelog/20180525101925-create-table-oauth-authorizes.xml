@@ -5,7 +5,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
 
-	<changeSet id="01" author="conductor\dijalma.silva">
+	<changeSet id="01" author="dijalma.silva">
 		
 		<createTable tableName="OAUTH_AUTHORIZES">
 		
@@ -24,7 +24,7 @@
 		</rollback>
 	</changeSet>
 
-	<changeSet id="02" author="conductor\dijalma.silav">
+	<changeSet id="02" author="dijalma.silav">
 		
 		<preConditions>
 			<tableExists tableName="OAUTH_AUTHORIZES" />

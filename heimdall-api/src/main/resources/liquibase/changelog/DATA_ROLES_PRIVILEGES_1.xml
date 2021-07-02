@@ -3,7 +3,7 @@
 	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="conductor\marcos.filho" id="1">
+	<changeSet author="marcos.filho" id="1">
 		<preConditions>
 			<tableExists tableName="ROLES_PRIVILEGES" />
 			<sqlCheck expectedResult="0">
@@ -16,7 +16,7 @@
 	</changeSet>
 	
 	
-	<changeSet author="conductor\marcos.filho" id="2">
+	<changeSet author="marcos.filho" id="2">
 		<preConditions>
 			<tableExists tableName="ROLES_PRIVILEGES" />
 			<sqlCheck expectedResult="50">
