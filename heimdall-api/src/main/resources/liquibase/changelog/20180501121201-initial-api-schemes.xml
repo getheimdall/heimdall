@@ -1,7 +1,7 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
     
-    <changeSet author="conductor\filipe.germano" id="1">
+    <changeSet author="filipe.germano" id="1">
         <createTable tableName="PRIVILEGES">
             <column autoIncrement="true" name="ID" type="bigint">
                 <constraints primaryKey="true" primaryKeyName="PK_PRIVILEGES"/>
@@ -12,7 +12,7 @@
         </createTable>
     </changeSet>
     
-    <changeSet author="conductor\filipe.germano" id="2">
+    <changeSet author="filipe.germano" id="2">
         <createTable tableName="ROLES">
             <column autoIncrement="true" name="ID" type="bigint">
                 <constraints primaryKey="true" primaryKeyName="PK_ROLES"/>
@@ -23,7 +23,7 @@
         </createTable>
     </changeSet>
     
-    <changeSet author="conductor\filipe.germano" id="3">
+    <changeSet author="filipe.germano" id="3">
         <createTable tableName="USERS_ROLES">
             <column name="USER_ID" type="bigint">
                 <constraints primaryKey="true" primaryKeyName="PK_USERS_ROLES"/>
@@ -34,7 +34,7 @@
         </createTable>
     </changeSet>
     
-    <changeSet author="conductor\filipe.germano" id="4">
+    <changeSet author="filipe.germano" id="4">
         <createTable tableName="ROLES_PRIVILEGES">
             <column name="ROLE_ID" type="bigint">
                 <constraints primaryKey="true" primaryKeyName="PK_ROLES_PRIVILEGES"/>
@@ -45,7 +45,7 @@
         </createTable>
     </changeSet>
     
-    <changeSet author="conductor\filipe.germano" id="5">
+    <changeSet author="filipe.germano" id="5">
         <createTable tableName="USERS">
             <column autoIncrement="true" name="ID" type="bigint">
                 <constraints primaryKey="true" primaryKeyName="PK_USERS"/>
@@ -77,25 +77,25 @@
         </createTable>
     </changeSet>
     
-    <changeSet author="conductor\filipe.germano" id="6">
+    <changeSet author="filipe.germano" id="6">
         <addForeignKeyConstraint baseColumnNames="ROLE_ID" baseTableName="USERS_ROLES" constraintName="FK_USERS_ROLES_ROLE_ID" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="ROLES" validate="true"/>
     </changeSet>
     
-    <changeSet author="conductor\filipe.germano" id="7">
+    <changeSet author="filipe.germano" id="7">
         <addForeignKeyConstraint baseColumnNames="PRIVILEGE_ID" baseTableName="ROLES_PRIVILEGES" constraintName="FK_ROLES_PRIVILEGES_PRIVILEGE_ID" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="PRIVILEGES" validate="true"/>
     </changeSet>
-    <changeSet author="conductor\filipe.germano" id="8">
+    <changeSet author="filipe.germano" id="8">
         <addForeignKeyConstraint baseColumnNames="ROLE_ID" baseTableName="ROLES_PRIVILEGES" constraintName="FK_ROLES_PRIVILEGES_ROLE_ID" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="ROLES" validate="true"/>
     </changeSet>
     
-    <changeSet author="conductor\filipe.germano" id="9">
+    <changeSet author="filipe.germano" id="9">
         <addUniqueConstraint columnNames="EMAIL" constraintName="UQ_USERS_EMAIL" tableName="USERS"/>
     </changeSet>
-    <changeSet author="conductor\filipe.germano" id="51">
+    <changeSet author="filipe.germano" id="51">
         <addUniqueConstraint columnNames="USERNAME" constraintName="UQ_USERS_USERNAME" tableName="USERS"/>
     </changeSet>
     
-    <changeSet author="conductor\filipe.germano" id="10">
+    <changeSet author="filipe.germano" id="10">
         <addForeignKeyConstraint baseColumnNames="USER_ID" baseTableName="USERS_ROLES" constraintName="FK_USERS_ROLES_USER_ID" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="USERS" validate="true"/>
     </changeSet>
     

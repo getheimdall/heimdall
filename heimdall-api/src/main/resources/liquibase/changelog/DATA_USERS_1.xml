@@ -3,7 +3,7 @@
 	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="conductor\marcos.filho" id="1">
+	<changeSet author=" marcos.filho" id="1">
 		<preConditions>
 			<tableExists tableName="USERS" />
 			<sqlCheck expectedResult="0">
@@ -11,7 +11,7 @@
 			</sqlCheck>
 		</preConditions>
 		<sql>
-			INSERT INTO USERS (FIRST_NAME, LAST_NAME, EMAIL, STATUS, PASSWORD, CREATION_DATE, USERNAME, TYPE_USER) VALUES ('ADMIN', 'ADMIN', 'heimdall@conductor.com.br', 'ACTIVE', '$2a$11$ns7AI2vTPnyxLMDUtFKjIecbCkAa6EPDcWNarw.AEzjmA8OV/Nfqe', CURRENT_TIMESTAMP, 'admin', 'DATABASE')
+			INSERT INTO USERS (FIRST_NAME, LAST_NAME, EMAIL, STATUS, PASSWORD, CREATION_DATE, USERNAME, TYPE_USER) VALUES ('ADMIN', 'ADMIN', 'heimdall@portal.com.br', 'ACTIVE', '$2a$11$ns7AI2vTPnyxLMDUtFKjIecbCkAa6EPDcWNarw.AEzjmA8OV/Nfqe', CURRENT_TIMESTAMP, 'admin', 'DATABASE')
 		</sql>
 	</changeSet>
 

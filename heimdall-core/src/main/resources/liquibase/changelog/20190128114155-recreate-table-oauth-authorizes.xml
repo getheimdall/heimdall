@@ -6,11 +6,11 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd
         http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
 
-    <changeSet id="01" author="conductor\dijalma.silva">
+    <changeSet id="01" author=" dijalma.silva">
         <dropTable tableName="OAUTH_AUTHORIZES"/>
     </changeSet>
 
-    <changeSet id="02" author="conductor\dijalma.silva">
+    <changeSet id="02" author=" dijalma.silva">
         <createTable tableName="OAUTH_AUTHORIZES">
             <column name="ID" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" primaryKeyName="PK_OAUTH_AUTHORIZES" nullable="false"/>
@@ -33,7 +33,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="03" author="conductor\dijalma.silva">
+    <changeSet id="03" author=" dijalma.silva">
         <addUniqueConstraint tableName="OAUTH_AUTHORIZES" columnNames="ID" constraintName="UQ_OAUTH_AUTHORIZES"/>
         <addForeignKeyConstraint
                 baseTableName="OAUTH_AUTHORIZES" baseColumnNames="CLIENT_ID"

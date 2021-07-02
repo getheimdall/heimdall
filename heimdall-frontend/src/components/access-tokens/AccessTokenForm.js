@@ -147,7 +147,7 @@ class AccessTokenForm extends Component {
                                         rules: [
                                             {required: true, message: i18n.t('please_pick_plan')}
                                         ]
-                                    })(<Checkbox.Group className='checkbox-conductor'>
+                                    })(<Checkbox.Group className='checkbox-name'>
                                         {plans && plans.map((plan, index) => {
                                             return <Checkbox key={index} value={plan.id}
                                                              disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_CREATE_ACCESSTOKEN, privileges.PRIVILEGE_UPDATE_ACCESSTOKEN])}>{plan.name}</Checkbox>

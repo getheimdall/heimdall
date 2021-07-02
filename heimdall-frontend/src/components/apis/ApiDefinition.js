@@ -144,7 +144,7 @@ class ApiDefinition extends Component {
                                             getFieldDecorator('environments', {
                                                 initialValue: api.environments ? api.environments.map(env => env.id) : [],
                                                 rules: [{required: true, message: i18n.t('please_select_an_environment') }]
-                                            })(<Checkbox.Group className='checkbox-conductor' options={options} disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_API])}/>)
+                                            })(<Checkbox.Group className='checkbox-name' options={options} disabled={!PrivilegeUtils.verifyPrivileges([privileges.PRIVILEGE_UPDATE_API])}/>)
                                         }
                                     </FormItem>
                                 </Col>
