@@ -9,7 +9,7 @@
     "brace": "0.11.1",
     "classnames": "2.2.5",
     "connected-react-router": "4.3.0",
-    "cross-fetch": "1.1.1",
+    "cross-fetch": "3.1.5",
     "css-animation": "1.4.1",
     "dotenv": "5.0.1",
     "i18next": "11.9.0",
