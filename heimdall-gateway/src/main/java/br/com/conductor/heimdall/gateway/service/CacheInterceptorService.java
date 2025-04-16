@@ -111,7 +111,7 @@ public class CacheInterceptorService {
         cacheKey.append(":");
         cacheKey.append(cacheName);
         cacheKey.append(":");
-        cacheKey.append(context.getRequest().getRequestURL().toString());
+        cacheKey.append(context.getRequest().getRequestURI());
 
         if (headers != null && !headers.isEmpty()) {
             cacheKey.append(":headers=");
